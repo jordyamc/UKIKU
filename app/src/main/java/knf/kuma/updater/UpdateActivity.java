@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.crashlytics.android.answers.Answers;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -43,10 +41,6 @@ import xdroid.toaster.Toaster;
 
 public class UpdateActivity extends AppCompatActivity {
 
-    public static void start(Context context){
-        context.startActivity(new Intent(context,UpdateActivity.class));
-    }
-
     @BindView(R.id.rel_back)
     RelativeLayout back;
     @BindView(R.id.card)
@@ -57,6 +51,10 @@ public class UpdateActivity extends AppCompatActivity {
     TextView progress_indicator;
     @BindView(R.id.download)
     Button download;
+
+    public static void start(Context context) {
+        context.startActivity(new Intent(context, UpdateActivity.class));
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -143,11 +141,18 @@ public class UpdateActivity extends AppCompatActivity {
 
     @OnClick(R.id.download)
     void install(Button button) {
-        Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "knf.kuma.fileprovider", new File(getFilesDir(), "update.apk")))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
-                .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, getPackageName());
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "knf.kuma.fileprovider", new File(getFilesDir(), "update.apk")))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
+                    .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, getPackageName());
+            startActivity(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(FileProvider.getUriForFile(this, "knf.kuma.fileprovider", new File(getFilesDir(), "update.apk")), "application/vnd.android.package-archive")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            startActivity(intent);
+        }
         finish();
     }
 
