@@ -44,8 +44,11 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         if (!chapters.isAdded())
             transaction.add(R.id.root, chapters, FragmentChapters.TAG);
         transaction.commit();
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             setFragment(true, null);
+        }else {
+            files.setListener(this);
+        }
         super.onViewCreated(view, savedInstanceState);
     }
 

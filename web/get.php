@@ -8,9 +8,7 @@
 if (is_old_android()) {
     echo "<h1>Lo sentimos, esta app solo esta disponible para Android 5 o superior :(</h1>";
 } else {
-    header("Content-disposition: attachment; filename=app-release.apk");
-    header("Content-Type", "application/vnd.android.package-archive");
-    readfile("updater/app-release.apk");
+    header("Location: https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk");
 }
 
 function is_old_android($version = '5.0')

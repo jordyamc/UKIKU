@@ -23,6 +23,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import org.cryse.widget.persistentsearch.PersistentSearchView;
 
 import butterknife.BindView;
@@ -44,12 +47,14 @@ import knf.kuma.search.FiltersSuggestion;
 import knf.kuma.search.SearchFragment;
 import knf.kuma.seeing.SeeingActivity;
 import knf.kuma.updater.UpdateActivity;
+import knf.kuma.updater.Updatechecker;
 import xdroid.toaster.Toaster;
 
 public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
-        BottomNavigationView.OnNavigationItemReselectedListener {
+        BottomNavigationView.OnNavigationItemReselectedListener,
+        Updatechecker.CheckListener{
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -96,6 +101,7 @@ public class Main extends AppCompatActivity
         RecentsJob.schedule(this);
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);
+        Updatechecker.check(this,this);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -103,6 +109,27 @@ public class Main extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 55498);
+    }
+
+
+    @Override
+    public void onNeedUpdate(String o_code, final String n_code) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new MaterialDialog.Builder(Main.this)
+                        .title("Actualización")
+                        .content("Parece que la versión "+n_code+" está disponible, ¿Quieres actualizar?")
+                        .positiveText("si")
+                        .negativeText("despues")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                UpdateActivity.start(Main.this);
+                            }
+                        }).build().show();
+            }
+        });
     }
 
     private void setSearch() {
@@ -246,8 +273,7 @@ public class Main extends AppCompatActivity
                 setFragment(BottomPreferencesFragment.get());
                 break;
             case R.id.drawer_explorer:
-                //ExplorerActivity.start(this);
-                startActivity(new Intent(this, UpdateActivity.class));
+                ExplorerActivity.start(this);
                 break;
             case R.id.drawer_emision:
                 EmisionActivity.open(this);

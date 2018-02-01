@@ -80,7 +80,7 @@ public class FragmentFiles extends Fragment {
         }
     }
 
-    private void setListener(SelectedListener listener){
+    public void setListener(SelectedListener listener){
         this.listener=listener;
     }
 

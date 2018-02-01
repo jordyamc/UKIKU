@@ -22,8 +22,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 2
-        versionName "0.2 pre-pre-alpha"
+        versionCode 3
+        versionName "0.3 beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

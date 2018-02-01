@@ -2,11 +2,11 @@ package knf.kuma.updater;
 
 import android.animation.Animator;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -24,22 +24,17 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.answers.Answers;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knf.kuma.R;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import xdroid.toaster.Toaster;
 
 /**
@@ -47,6 +42,11 @@ import xdroid.toaster.Toaster;
  */
 
 public class UpdateActivity extends AppCompatActivity {
+
+    public static void start(Context context){
+        context.startActivity(new Intent(context,UpdateActivity.class));
+    }
+
     @BindView(R.id.rel_back)
     RelativeLayout back;
     @BindView(R.id.card)
@@ -115,11 +115,12 @@ public class UpdateActivity extends AppCompatActivity {
     }
 
     private void start() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new ThinDownloadManager().add(new DownloadRequest(Uri.parse("http://ukiku.ga/updater/app-release.apk"))
-                .setDestinationURI(Uri.fromFile(new File(getFilesDir(), "update.apk")))
+        File file = new File(getFilesDir(), "update.apk");
+        if (file.exists())
+            file.delete();
+        new ThinDownloadManager().add(new DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk"))
+                .setDestinationURI(Uri.fromFile(file))
+                .setDownloadResumable(false)
                 .setStatusListener(new DownloadStatusListenerV1() {
                     @Override
                     public void onDownloadComplete(DownloadRequest downloadRequest) {
@@ -128,7 +129,9 @@ public class UpdateActivity extends AppCompatActivity {
 
                     @Override
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
-                        Log.e("Update Error","Code: "+errorCode+" Message: "+errorMessage);
+                        Log.e("Update Error", "Code: " + errorCode + " Message: " + errorMessage);
+                        Toaster.toast("Error al actualizar: "+errorMessage);
+                        finish();
                     }
 
                     @Override
@@ -136,8 +139,6 @@ public class UpdateActivity extends AppCompatActivity {
                         setDownProgress(progress);
                     }
                 }));
-            }
-        }, 1000);
     }
 
     @OnClick(R.id.download)
