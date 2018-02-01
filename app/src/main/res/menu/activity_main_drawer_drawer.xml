@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:showIn="navigation_view">
+    <item
+        android:id="@+id/drawer_explorer"
+        android:icon="@drawable/ic_files"
+        android:title="Explorador"/>
+    <item
+        android:id="@+id/drawer_emision"
+        android:icon="@drawable/ic_emision"
+        android:title="Emisión"/>
+    <item
+        android:id="@+id/drawer_seeing"
+        android:icon="@drawable/ic_seeing_drawer"
+        android:title="Siguiendo"/>
+    <item
+        android:id="@+id/drawer_records"
+        android:icon="@drawable/ic_record"
+        android:title="Historial"/>
+</menu>

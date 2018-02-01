@@ -1,0 +1,11 @@
+order allow,deny
+deny from all
+
+#### PERSISTENT CONTENT ####
+
+
+
+#### PERSISTENT CONTENT END ####
+
+#### PERSISTENT CONTENT ####
+

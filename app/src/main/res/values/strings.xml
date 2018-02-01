@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">UKIKU</string>
+    <string name="title_activity_main">UKIKU</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="directory_channel_title">Actualizacion de directorio</string>
+    <string name="directory_channel_desc">Servicio en segundo plano para actualizar el directorio</string>
+
+    <string-array name="theme_options">
+        <item>Automático</item>
+        <item>Dia</item>
+        <item>Noche</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="storage_type">
+        <item>Memoria interna</item>
+        <item>Tarjeta SD</item>
+    </string-array>
+    <string-array name="storage_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="recents_options">
+        <item>Nunca</item>
+        <item>15 minutos</item>
+        <item>30 minutos</item>
+        <item>45 minutos</item>
+        <item>60 minutos</item>
+    </string-array>
+    <string-array name="recents_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="dir_options">
+        <item>Nunca</item>
+        <item>Diario</item>
+        <item>2 dias</item>
+        <item>3 dias</item>
+        <item>4 dias</item>
+        <item>5 dias</item>
+        <item>6 dias</item>
+        <item>Semanalmente</item>
+    </string-array>
+    <string-array name="dir_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
+    <string-array name="player_options">
+        <item>Interno</item>
+        <item>Externo</item>
+    </string-array>
+    <string-array name="player_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="layType_options">
+        <item>Lista</item>
+        <item>Cuadrícula</item>
+    </string-array>
+    <string-array name="layType_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+</resources>

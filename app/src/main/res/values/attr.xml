@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ExpandableTextView">
+        <attr name="tvea_expandLines" format="integer"/>
+        <attr name="tvea_shrinkBitmap" format="reference"/>
+        <attr name="tvea_expandBitmap" format="reference"/>
+        <attr name="tvea_textStateColor" format="color"/>
+        <attr name="tvea_textContentColor" format="color"/>
+        <attr name="tvea_textContentSize" format="dimension"/>
+        <attr name="tvea_textShrink" format="string"/>
+        <attr name="tvea_textExpand" format="string"/>
+    </declare-styleable>
+    <declare-styleable name="CustomSeekBarPreference">
+        <attr name="cs_max" format="integer"/>
+        <attr name="cs_min" format="integer"/>
+        <attr name="cs_step" format="integer"/>
+        <attr name="cs_mask" format="string"/>
+        <attr name="cs_zero_value" format="string"/>
+    </declare-styleable>
+</resources>

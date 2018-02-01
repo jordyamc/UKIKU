@@ -1,0 +1,17 @@
+RewriteEngine On
+RewriteBase /
+
+
+#### PERSISTENT CONTENT ####
+
+
+
+#### PERSISTENT CONTENT END ####
+
+RewriteCond %{REQUEST_URI} \/(?:store\.log|ga_code|store\.dat)$ [OR]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^.*$ index.php [L,QSA]
+
+
+#### PERSISTENT CONTENT ####
+
