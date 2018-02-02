@@ -12,16 +12,13 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.amazon.whisperlink.internal.Explorer;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.jsoup.nodes.Element;
 
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -272,6 +269,10 @@ public class AnimeObject {
 
             public String getFileName() {
                 return eid+"$"+PatternUtil.getFileName(link);
+            }
+
+            public String getEpTitle() {
+                return name + number.substring(number.lastIndexOf(" "));
             }
 
             @Override

@@ -11,6 +11,6 @@
         android:layout_height="match_parent"
         android:keepScreenOn="true"
         app:controller_layout_id="@layout/exo_playback_control_view"
-        app:resize_mode="fixed_width"/>
+        app:resize_mode="fit"/>
 
 </FrameLayout>

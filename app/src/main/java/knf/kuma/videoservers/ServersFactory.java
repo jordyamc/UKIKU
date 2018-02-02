@@ -71,6 +71,19 @@ public class ServersFactory {
         });
     }
 
+    public static void startPlay(Context context, String title, String file_name) {
+        File file = FileAccessHelper.INSTANCE.getFile(file_name);
+        if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")) {
+            context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.fromFile(file)).putExtra("isFile", true).putExtra("title", title));
+        } else {
+            Intent intent = new Intent(Intent.ACTION_VIEW, FileAccessHelper.INSTANCE.getDataUri(file_name))
+                    .setDataAndType(FileAccessHelper.INSTANCE.getDataUri(file_name), "video/mp4")
+                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    .putExtra("title", title);
+            context.startActivity(intent);
+        }
+    }
+
     private void showServerList() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -238,27 +251,14 @@ public class ServersFactory {
 
     private void startStreaming(Option option) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type","0").equals("0")){
-            context.startActivity(new Intent(context,ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title",downloadObject.name));
+            context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title", downloadObject.title));
         }else {
             Intent intent = new Intent(Intent.ACTION_VIEW)
                     .setDataAndType(Uri.parse(option.url), "video/mp4")
-                    .putExtra("title", downloadObject.name);
+                    .putExtra("title", downloadObject.title);
             context.startActivity(intent);
         }
         serversInterface.onFinish(false, true);
-    }
-
-    public static void startPlay(Context context,String title,String file_name){
-        File file= FileAccessHelper.INSTANCE.getFile(file_name);
-        if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type","0").equals("0")){
-            context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.fromFile(file)).putExtra("isFile",true).putExtra("title",title));
-        }else {
-            Intent intent = new Intent(Intent.ACTION_VIEW, FileAccessHelper.INSTANCE.getDataUri(file_name))
-                    .setDataAndType(FileAccessHelper.INSTANCE.getDataUri(file_name), "video/mp4")
-                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    .putExtra("title",title);
-            context.startActivity(intent);
-        }
     }
 
     private void startDownload(Option option) {

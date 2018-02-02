@@ -13,7 +13,6 @@ import java.util.List;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
-import knf.kuma.database.dao.RecentsDAO;
 import knf.kuma.downloadservice.FileAccessHelper;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
@@ -73,6 +72,10 @@ public class RecentObject {
 
     public String getFileName() {
         return eid+"$"+PatternUtil.getFileName(url);
+    }
+
+    public String getEpTitle() {
+        return name + chapter.substring(chapter.lastIndexOf(" "));
     }
 
     @Override

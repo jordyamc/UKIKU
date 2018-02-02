@@ -8,7 +8,6 @@ import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -212,7 +211,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                     chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(object));
                     recordsDAO.add(RecordObject.fromRecent(object));
                     holder.setSeen(true);
-                    ServersFactory.startPlay(context, object.name, object.getFileName());
+                    ServersFactory.startPlay(context, object.getEpTitle(), object.getFileName());
                 } else {
                     Toaster.toast("Aun no se está descargando");
                 }

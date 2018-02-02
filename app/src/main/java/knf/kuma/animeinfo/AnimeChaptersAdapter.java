@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -142,7 +141,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                     updateSeeing(chapter.number);
                                     holder.setSeen(context, true);
                                     holder.setSeen(context, true);
-                                    ServersFactory.startPlay(context, chapter.name, chapter.getFileName());
+                                    ServersFactory.startPlay(context, chapter.getEpTitle(), chapter.getFileName());
                                 } else {
                                     Toaster.toast("Aun no se está descargando");
                                 }

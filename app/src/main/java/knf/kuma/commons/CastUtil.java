@@ -118,7 +118,7 @@ public class CastUtil implements CastListener, PlayStatusListener {
     }
 
     public void openControls(){
-        context.startActivity(new Intent(context, CastControlsActivity.class));
+        context.startActivity(new Intent(context, CastControlsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     @Override

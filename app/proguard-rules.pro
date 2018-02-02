@@ -20,6 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**
+
 -keep public enum knf.kuma.**{*;}
 -keep class es.munix.multidisplaycast.**{*;}
 -keep class com.connectsdk.**{* ;}

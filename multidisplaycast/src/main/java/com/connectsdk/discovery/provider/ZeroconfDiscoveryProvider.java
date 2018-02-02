@@ -30,7 +30,6 @@ import com.connectsdk.discovery.DiscoveryProvider;
 import com.connectsdk.discovery.DiscoveryProviderListener;
 import com.connectsdk.service.config.ServiceDescription;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -154,7 +153,7 @@ public class ZeroconfDiscoveryProvider implements DiscoveryProvider {
         scanTimer.schedule( new MDNSSearchTask(), 100, RESCAN_INTERVAL );
     }
 
-    protected JmDNS createJmDNS() throws IOException {
+    private JmDNS createJmDNS() throws Exception {
         if ( srcAddress != null )
             return JmDNS.create( srcAddress, HOSTNAME );
         else
@@ -209,7 +208,7 @@ public class ZeroconfDiscoveryProvider implements DiscoveryProvider {
                     }
                 }
             }
-        } catch ( IOException e ) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -128,8 +128,8 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_marginStart="5dp"
-                        app:srcCompat="@drawable/ic_pip"
-                        android:visibility="gone"/>
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_pip"/>
                 </LinearLayout>
 
                 <TextView
@@ -156,6 +156,14 @@
 
             </RelativeLayout>
         </LinearLayout>
+
     </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 
 </FrameLayout>

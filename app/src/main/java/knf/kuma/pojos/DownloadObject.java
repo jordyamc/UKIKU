@@ -32,6 +32,8 @@ public class DownloadObject {
     public String link;
     public String name;
     public String chapter;
+    @Ignore
+    public String title;
     public int progress;
     public long d_bytes;
     public long t_bytes;
@@ -45,6 +47,7 @@ public class DownloadObject {
         this.link = link;
         this.name = name;
         this.chapter = chapter;
+        this.title = name + chapter.substring(chapter.lastIndexOf(" "));
         this.progress = progress;
         this.d_bytes = d_bytes;
         this.t_bytes = t_bytes;
@@ -58,6 +61,7 @@ public class DownloadObject {
         this.file = file;
         this.name = name;
         this.chapter = chapter;
+        this.title = name + chapter.substring(chapter.lastIndexOf(" "));
         this.progress = 0;
         this.d_bytes = 0;
         this.t_bytes = -1;

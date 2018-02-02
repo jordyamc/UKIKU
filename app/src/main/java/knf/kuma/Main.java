@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -68,6 +69,8 @@ public class Main extends AppCompatActivity
     BottomNavigationView bottomNavigationView;
     BottomFragment selectedFragment;
     BottomFragment tmpfragment;
+
+    private boolean readyToFinish = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +185,18 @@ public class Main extends AppCompatActivity
         } else if (searchView.isSearching()) {
             closeSearch();
         } else {
-            super.onBackPressed();
+            if (readyToFinish) {
+                super.onBackPressed();
+            } else {
+                readyToFinish = true;
+                Toaster.toast("Presione de nuevo para salir");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        readyToFinish = false;
+                    }
+                }, 2000);
+            }
         }
     }
 
