@@ -78,4 +78,16 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+    <string-array name="player_resize_options">
+        <item>Ajustar video</item>
+        <item>Llenar pantalla</item>
+        <item>Llenar ancho</item>
+        <item>Llenar largo</item>
+    </string-array>
+    <string-array name="player_resize_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 </resources>

@@ -29,6 +29,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 03/01/2018.
@@ -46,49 +47,82 @@ public class Repository {
         getFactoryBack("https://animeflv.net/").getRecents("device=computer").enqueue(new Callback<Recents>() {
             @Override
             public void onResponse(Call<Recents> call, final Response<Recents> response) {
-                final List<RecentObject> objects = RecentObject.create(response.body().list);
-                RecentsDAO dao = CacheDB.INSTANCE.recentsDAO();
-                dao.clear();
-                dao.setCache(objects);
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        data.setValue(objects);
+                try {
+                    if (response.isSuccessful() && response.code() == 200) {
+                        final List<RecentObject> objects = RecentObject.create(response.body().list);
+                        RecentsDAO dao = CacheDB.INSTANCE.recentsDAO();
+                        dao.clear();
+                        dao.setCache(objects);
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                data.setValue(objects);
+                            }
+                        });
+                    } else {
+                        onFailure(call, new Exception("HTTP " + String.valueOf(response.code())));
                     }
-                });
+                } catch (Exception e) {
+                    onFailure(call, e);
+                }
             }
 
             @Override
             public void onFailure(Call<Recents> call, Throwable t) {
+                Toaster.toast("Error al obtener - " + t.getMessage());
                 t.printStackTrace();
                 final List<RecentObject> objects = CacheDB.INSTANCE.recentsDAO().getObjects().getValue();
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        data.setValue(objects);
-                    }
-                });
+                if (objects != null)
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            data.setValue(objects);
+                        }
+                    });
             }
         });
         return data;
     }
 
     public void reloadRecents() {
-        if (Network.isConnected())
+        if (Network.isConnected()) {
             getFactoryBack("https://animeflv.net/").getRecents("device=computer").enqueue(new Callback<Recents>() {
                 @Override
-                public void onResponse(Call<Recents> call, Response<Recents> response) {
-                    final List<RecentObject> objects = RecentObject.create(response.body().list);
-                    RecentsDAO dao = CacheDB.INSTANCE.recentsDAO();
-                    dao.clear();
-                    dao.setCache(objects);
+                public void onResponse(@NonNull Call<Recents> call, @NonNull Response<Recents> response) {
+                    try {
+                        if (response.isSuccessful() && response.code() == 200) {
+                            final List<RecentObject> objects = RecentObject.create(response.body().list);
+                            RecentsDAO dao = CacheDB.INSTANCE.recentsDAO();
+                            dao.clear();
+                            dao.setCache(objects);
+                        } else {
+                            onFailure(call, new Exception("HTTP " + String.valueOf(response.code())));
+                        }
+                    } catch (Exception e) {
+                        onFailure(call, e);
+                    }
                 }
 
                 @Override
-                public void onFailure(Call<Recents> call, Throwable t) {
+                public void onFailure(@NonNull Call<Recents> call, @NonNull Throwable t) {
+                    Toaster.toast("Error al obtener - " + t.getMessage());
                     t.printStackTrace();
+                    RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
+                    final List<RecentObject> objects = recentsDAO.getObjects().getValue();
+                    if (objects != null) {
+                        recentsDAO.clear();
+                        recentsDAO.setCache(objects);
+                    }
                 }
             });
+        } else {
+            RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
+            final List<RecentObject> objects = recentsDAO.getObjects().getValue();
+            if (objects != null) {
+                recentsDAO.clear();
+                recentsDAO.setCache(objects);
+            }
+        }
     }
 
     public LiveData<AnimeObject> getAnime(final String link, final boolean persist) {

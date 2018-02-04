@@ -51,6 +51,14 @@
             android:key="player_type"
             android:summary="%s"
             android:title="Tipo de reproductor"/>
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/player_resize_options"
+            android:entryValues="@array/player_resize_values"
+            android:icon="@drawable/ic_resize"
+            android:key="player_resize"
+            android:summary="%s"
+            android:title="Redimensión de video"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Diseño">

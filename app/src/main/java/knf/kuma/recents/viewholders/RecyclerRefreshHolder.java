@@ -19,6 +19,8 @@ public class RecyclerRefreshHolder {
     public RecyclerView recyclerView;
     @BindView(R.id.refresh)
     public SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.error)
+    public View error;
     private LinearLayoutManager layoutManager;
     public RecyclerRefreshHolder(View view) {
         ButterKnife.bind(this,view);
@@ -45,6 +47,15 @@ public class RecyclerRefreshHolder {
             @Override
             public void run() {
                 refreshLayout.setRefreshing(refreshing);
+            }
+        });
+    }
+
+    public void setError(final boolean visible) {
+        error.post(new Runnable() {
+            @Override
+            public void run() {
+                error.setVisibility(visible ? View.VISIBLE : View.GONE);
             }
         });
     }

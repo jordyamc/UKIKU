@@ -13,10 +13,9 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import knf.kuma.BottomFragment;
-import knf.kuma.commons.Network;
-import knf.kuma.database.CacheDB;
-import knf.kuma.pojos.RecentObject;
 import knf.kuma.R;
+import knf.kuma.commons.Network;
+import knf.kuma.pojos.RecentObject;
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder;
 
 /**
@@ -43,6 +42,7 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
             @Override
             public void onChanged(@Nullable List<RecentObject> objects) {
                 if (objects!=null && !isFisrt){
+                    holder.setError(objects.size() == 0);
                     holder.setRefreshing(false);
                     adapter.updateList(objects);
                 }else if (isFisrt){

@@ -19,24 +19,26 @@ import knf.kuma.pojos.ExplorerObject;
  */
 
 public class ExplorerCreator {
-    public static void start(final Context context){
-        final ExplorerDAO explorerDAO=CacheDB.INSTANCE.explorerDAO();
+    public static void start(final Context context) {
+        final ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();
         explorerDAO.deleteAll();
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                AnimeDAO animeDAO= CacheDB.INSTANCE.animeDAO();
-                File root= FileAccessHelper.INSTANCE.getDownloadsDirectory();
-                if (root.exists()){
-                    List<ExplorerObject> list=new ArrayList<>();
-                    for (File file:root.listFiles()){
-                        try {
-                            Log.e("Explorer","Search "+file.getName());
-                            list.add(new ExplorerObject(context,animeDAO.getByFile(file.getName())));
-                        }catch (IllegalStateException e){
-                            e.printStackTrace();
+                AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
+                File root = FileAccessHelper.INSTANCE.getDownloadsDirectory();
+                if (root.exists()) {
+                    List<ExplorerObject> list = new ArrayList<>();
+                    File[] files = root.listFiles();
+                    if (files != null)
+                        for (File file : files) {
+                            try {
+                                Log.e("Explorer", "Search " + file.getName());
+                                list.add(new ExplorerObject(context, animeDAO.getByFile(file.getName())));
+                            } catch (IllegalStateException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
                     explorerDAO.insert(list);
                 }
             }

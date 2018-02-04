@@ -47,6 +47,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -247,20 +248,27 @@ public class SSDPDiscoveryProvider implements DiscoveryProvider {
                     }
                 }
 
-                for ( int i = 0; i < 3; i++ ) {
-                    if ( !executorService.isTerminated() && !executorService.isShutdown() ) {
-                        executorService.schedule( new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    if ( ssdpClient != null ) {
-                                        ssdpClient.send( message );
+                try {
+                    for (int i = 0; i < 3; i++) {
+                        if (!executorService.isTerminated() && !executorService.isShutdown()) {
+                            executorService.schedule(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        if (ssdpClient != null) {
+                                            ssdpClient.send(message);
+                                        }
+                                    } catch (IOException ex) {
+                                        Log.e(Util.T, ex.getMessage());
                                     }
-                                } catch ( IOException ex ) {
-                                    Log.e( Util.T, ex.getMessage() );
                                 }
-                            }
-                        }, i, TimeUnit.SECONDS );
+                            }, i, TimeUnit.SECONDS);
+                        }
+                    }
+                } catch (RejectedExecutionException e) {
+                    if (serviceFilters != null && !serviceFilters.isEmpty()) {
+                        int poolSize = serviceFilters.size() * 3;
+                        executorService = Executors.newScheduledThreadPool(poolSize);
                     }
                 }
             }

@@ -52,7 +52,7 @@ public class ExplorerObject {
     }
 
     @Ignore
-    public ExplorerObject(Context context,@Nullable AnimeObject object) throws IllegalStateException {
+    public ExplorerObject(Context context, @Nullable AnimeObject object) throws IllegalStateException {
         if (object == null)
             throw new IllegalStateException("Anime not found!!!");
         this.key = object.key;
@@ -65,8 +65,8 @@ public class ExplorerObject {
         chapters = new ArrayList<>();
         for (File chap : file.listFiles()) {
             try {
-                chapters.add(new FileDownObj(context,object.name,object.aid,PatternUtil.getNumFromfile(chap.getName()), chap));
-            }catch (Exception e){
+                chapters.add(new FileDownObj(context, object.name, object.aid, PatternUtil.getNumFromfile(chap.getName()), chap));
+            } catch (Exception e) {
                 //e.printStackTrace();
             }
         }
@@ -76,7 +76,7 @@ public class ExplorerObject {
         Collections.sort(chapters);
     }
 
-    public static class FileDownObj implements Comparable<FileDownObj>{
+    public static class FileDownObj implements Comparable<FileDownObj> {
         public String title;
         public String chapter;
         public String aid;
@@ -86,49 +86,47 @@ public class ExplorerObject {
         public String fileName;
         public String link;
 
-        public FileDownObj(Context context, String title,String aid,String chapter, File file) {
-            this.title=title;
+        public FileDownObj(Context context, String title, String aid, String chapter, File file) {
+            this.title = title;
             this.chapter = chapter;
-            this.aid=aid;
-            this.eid=PatternUtil.getEidFromfile(file.getName());
-            this.fileName=file.getName();
+            this.aid = aid;
+            this.eid = PatternUtil.getEidFromfile(file.getName());
+            this.fileName = file.getName();
             this.path = file.getAbsolutePath();
-            this.time =getTime(context, file);
+            this.time = getTime(context, file);
             if (time.equals(""))
                 throw new IllegalStateException("No duration");
-            this.link="https://animeflv.net/ver/"+fileName.replace("$","/").replace(".mp4","");
+            this.link = "https://animeflv.net/ver/" + fileName.replace("$", "/").replace(".mp4", "");
         }
 
-        public String getChapTitle(){
-            return title+" "+chapter;
+        public String getChapTitle() {
+            return title + " " + chapter;
         }
 
-        private String getTime(Context context,File file){
+        private String getTime(Context context, File file) {
             try {
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                 retriever.setDataSource(context, Uri.fromFile(file));
-                long duration=Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-                long hours= TimeUnit.MILLISECONDS.toHours(duration);
-                long minutes=TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
-                long seconds=TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
-                StringBuilder builder=new StringBuilder();
-                if (hours>0){
+                long duration = Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+                long hours = TimeUnit.MILLISECONDS.toHours(duration);
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
+                StringBuilder builder = new StringBuilder();
+                if (hours > 0) {
                     builder.append(hours);
                     builder.append(":");
                 }
-                if (minutes>0){
-                    if (minutes<=9)
-                        builder.append("0");
-                    builder.append(minutes);
-                    builder.append(":");
+                if (minutes <= 9) {
+                    builder.append("0");
                 }
-                if (seconds>0){
-                    if (seconds<=9)
-                        builder.append("0");
-                    builder.append(seconds);
+                builder.append(minutes);
+                builder.append(":");
+                if (seconds <= 9) {
+                    builder.append("0");
                 }
+                builder.append(seconds);
                 return builder.toString();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return "??:??";
             }

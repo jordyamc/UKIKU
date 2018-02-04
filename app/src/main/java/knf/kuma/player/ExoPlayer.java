@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
@@ -93,7 +95,22 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
             pip.setVisibility(View.VISIBLE);
         addVisibilityListener(exoPlayerView, this);
+        exoPlayerView.setResizeMode(getResizeMode());
         exoPlayerView.requestFocus();
+    }
+
+    private int getResizeMode() {
+        switch (PreferenceManager.getDefaultSharedPreferences(this).getString("player_resize", "0")) {
+            default:
+            case "0":
+                return AspectRatioFrameLayout.RESIZE_MODE_FIT;
+            case "1":
+                return AspectRatioFrameLayout.RESIZE_MODE_FILL;
+            case "2":
+                return AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH;
+            case "3":
+                return AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT;
+        }
     }
 
     private void initPlayer() {

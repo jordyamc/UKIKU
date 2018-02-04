@@ -3,25 +3,16 @@ package knf.kuma.downloadservice;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.Intent;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-import knf.kuma.R;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.pojos.DownloadObject;
-import knf.kuma.pojos.NotificationObj;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -102,7 +93,7 @@ public class DownloadService extends IntentService {
             completedNotification();
         }catch (Exception e){
             e.printStackTrace();
-            FileAccessHelper.INSTANCE.getFile(file).delete();
+            FileAccessHelper.INSTANCE.delete(file);
             downloadsDAO.delete(current);
             errorNotification();
         }
