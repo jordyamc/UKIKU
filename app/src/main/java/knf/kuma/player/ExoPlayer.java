@@ -259,7 +259,7 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
                 exception = error.getUnexpectedException();
                 break;
             case ExoPlaybackException.TYPE_SOURCE:
-                exception = error.getRendererException();
+                exception = error.getSourceException();
                 break;
         }
         if (exception != null) {
@@ -268,6 +268,7 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
         } else {
             Toaster.toast("Error desconocido al reproducir");
         }
+        finish();
     }
 
     @Override

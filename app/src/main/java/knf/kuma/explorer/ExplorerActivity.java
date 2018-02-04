@@ -13,6 +13,7 @@ import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.database.CacheDB;
 
 /**
  * Created by Jordy on 29/01/2018.
@@ -20,18 +21,17 @@ import knf.kuma.R;
 
 public class ExplorerActivity extends AppCompatActivity {
 
-    public static void start(Context context){
-        context.startActivity(new Intent(context,ExplorerActivity.class));
-    }
-
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.tabs)
     TabLayout tabLayout;
     @BindView(R.id.pager)
     ViewPager pager;
-
     private ExplorerPagerAdapter adapter;
+
+    public static void start(Context context) {
+        context.startActivity(new Intent(context, ExplorerActivity.class));
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,5 +58,11 @@ public class ExplorerActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (!((FragmentBase) adapter.getItem(pager.getCurrentItem())).onBackPressed())
             super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        CacheDB.INSTANCE.explorerDAO().getAll();
+        super.onDestroy();
     }
 }

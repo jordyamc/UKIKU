@@ -21,7 +21,6 @@ import knf.kuma.pojos.ExplorerObject;
 public class ExplorerCreator {
     public static void start(final Context context) {
         final ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();
-        explorerDAO.deleteAll();
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -40,6 +39,8 @@ public class ExplorerCreator {
                             }
                         }
                     explorerDAO.insert(list);
+                } else {
+                    explorerDAO.deleteAll();
                 }
             }
         });

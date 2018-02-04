@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
@@ -141,15 +142,15 @@ public class UpdateActivity extends AppCompatActivity {
 
     @OnClick(R.id.download)
     void install(Button button) {
-        try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "knf.kuma.fileprovider", new File(getFilesDir(), "update.apk")))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
                     .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, getPackageName());
             startActivity(intent);
-        } catch (Exception e) {
+        } else {
             Intent intent = new Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(FileProvider.getUriForFile(this, "knf.kuma.fileprovider", new File(getFilesDir(), "update.apk")), "application/vnd.android.package-archive")
+                    .setDataAndType(Uri.fromFile(new File(getFilesDir(), "update.apk")), "application/vnd.android.package-archive")
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivity(intent);
         }
