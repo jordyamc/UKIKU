@@ -135,6 +135,8 @@ public class Repository {
         getFactory(base).getAnime("device=computer", rest).enqueue(new Callback<AnimeObject.WebInfo>() {
             @Override
             public void onResponse(Call<AnimeObject.WebInfo> call, Response<AnimeObject.WebInfo> response) {
+                if (response.body() == null)
+                    data.setValue(CacheDB.INSTANCE.animeDAO().getAnime(link).getValue());
                 AnimeObject animeObject = new AnimeObject(link, response.body());
                 if (persist)
                     dao.insert(animeObject);
@@ -247,6 +249,7 @@ public class Repository {
     private Factory getFactory(String link) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(link)
+                //.client(NoSSLOkHttpClient.get())
                 .addConverterFactory(JspoonConverterFactory.create())
                 .build();
         return retrofit.create(Factory.class);
@@ -255,6 +258,7 @@ public class Repository {
     private Factory getFactoryBack(String link) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(link)
+                //.client(NoSSLOkHttpClient.get())
                 .addConverterFactory(JspoonConverterFactory.create())
                 .callbackExecutor(Executors.newSingleThreadExecutor())
                 .build();

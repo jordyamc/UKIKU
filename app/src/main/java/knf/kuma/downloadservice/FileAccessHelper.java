@@ -21,6 +21,7 @@ import java.io.OutputStream;
 
 import knf.kuma.commons.FileUtil;
 import knf.kuma.commons.PatternUtil;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 10/01/2018.
@@ -31,12 +32,48 @@ public class FileAccessHelper {
     public static FileAccessHelper INSTANCE;
     private Context context;
 
-    public static void init(Context context){
-        FileAccessHelper.INSTANCE=new FileAccessHelper(context);
-    }
-
     private FileAccessHelper(Context context) {
         this.context = context;
+    }
+
+    public static void init(Context context) {
+        FileAccessHelper.INSTANCE = new FileAccessHelper(context);
+    }
+
+    public static void openTreeChooser(Fragment fragment) {
+        try {
+            fragment.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST);
+        } catch (Exception e) {
+            Toaster.toast("Error al buscar SD");
+        }
+    }
+
+    public static void openTreeChooser(android.app.Fragment fragment) {
+        try {
+            fragment.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST);
+        } catch (Exception e) {
+            Toaster.toast("Error al buscar SD");
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static boolean isSDCardRoot(Uri uri) {
+        return isExternalStorageDocument(uri) && isRootUri(uri) && !isInternalStorage(uri);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static boolean isRootUri(Uri uri) {
+        String docId = DocumentsContract.getTreeDocumentId(uri);
+        return docId.endsWith(":");
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static boolean isInternalStorage(Uri uri) {
+        return isExternalStorageDocument(uri) && DocumentsContract.getTreeDocumentId(uri).contains("primary");
+    }
+
+    private static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
     public File getFile(String file_name){
@@ -243,14 +280,6 @@ public class FileAccessHelper {
         return root;
     }
 
-    public static void openTreeChooser(Fragment fragment) {
-        fragment.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST);
-    }
-
-    public static void openTreeChooser(android.app.Fragment fragment) {
-        fragment.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST);
-    }
-
     public boolean isUriValid(Uri uri) {
         if (isSDCardRoot(uri)) {
             context.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -268,25 +297,5 @@ public class FileAccessHelper {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private static boolean isSDCardRoot(Uri uri) {
-        return isExternalStorageDocument(uri) && isRootUri(uri) && !isInternalStorage(uri);
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private static boolean isRootUri(Uri uri) {
-        String docId = DocumentsContract.getTreeDocumentId(uri);
-        return docId.endsWith(":");
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private static boolean isInternalStorage(Uri uri) {
-        return isExternalStorageDocument(uri) && DocumentsContract.getTreeDocumentId(uri).contains("primary");
-    }
-
-    private static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 }

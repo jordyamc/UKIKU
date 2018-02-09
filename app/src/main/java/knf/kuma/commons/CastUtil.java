@@ -45,7 +45,8 @@ public class CastUtil implements CastListener, PlayStatusListener {
     }
 
     public boolean connected() {
-        return isConnected;
+        return CastManager.getInstance().isConnected();
+        //return isConnected;
     }
 
     public MutableLiveData<String> getCasting(){
@@ -53,14 +54,19 @@ public class CastUtil implements CastListener, PlayStatusListener {
     }
 
     public void play(Activity activity,String eid, String url, String title, String chapter, String preview, boolean isAid){
-        if (connected()){
-            startLoading(activity);
-            setEid(eid);
-            if (isAid)
-                preview="https://animeflv.net/uploads/animes/thumbs/"+preview+".jpg";
-            CastManager.getInstance().playMedia(url,"video/mp4",title,chapter,preview);
-        }else {
-            Toaster.toast("No hay dispositivo seleccionado");
+        try {
+            if (connected()) {
+                startLoading(activity);
+                setEid(eid);
+                if (isAid)
+                    preview = "https://animeflv.net/uploads/animes/thumbs/" + preview + ".jpg";
+                CastManager.getInstance().playMedia(url, "video/mp4", title, chapter, preview);
+            } else {
+                Toaster.toast("No hay dispositivo seleccionado");
+            }
+        } catch (Exception e) {
+            stopLoading();
+            Toaster.toast("Error al reproducir");
         }
     }
 
@@ -93,7 +99,11 @@ public class CastUtil implements CastListener, PlayStatusListener {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                getLoading(activity).show();
+                try {
+                    getLoading(activity).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -102,8 +112,12 @@ public class CastUtil implements CastListener, PlayStatusListener {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                if (loading!=null)
-                    loading.dismiss();
+                try {
+                    if (loading != null)
+                        loading.dismiss();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

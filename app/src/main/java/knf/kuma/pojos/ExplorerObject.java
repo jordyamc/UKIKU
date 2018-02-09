@@ -61,6 +61,8 @@ public class ExplorerObject {
         this.fileName = object.fileName;
         this.name = object.name;
         File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.fileName);
+        if (file.listFiles() == null)
+            throw new IllegalStateException("Directory empty: " + object.fileName);
         this.path = file.getAbsolutePath();
         chapters = new ArrayList<>();
         for (File chap : file.listFiles()) {

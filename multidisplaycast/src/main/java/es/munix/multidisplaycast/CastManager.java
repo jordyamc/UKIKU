@@ -364,36 +364,6 @@ public class CastManager implements DiscoveryManagerListener, MenuItem.OnMenuIte
                             mMediaControl = object.mediaControl;
                             mMediaControl.subscribePlayState(CastManager.this);
 
-
-                            /*try {
-                                final LaunchSession session = LaunchSession.launchSessionFromJSONObject( object.launchSession
-                                        .toJSONObject() );
-
-                                new Handler().postDelayed( new Runnable() {
-                                    @Override
-                                    public void run() {
-
-                                        Toast.makeText( activity, "desconectar desde sesión", Toast.LENGTH_LONG )
-                                                .show();
-
-                                        connectableDevice.getCapability( MediaPlayer.class )
-                                                .closeMedia( session, new ResponseListener<Object>() {
-                                                    @Override
-                                                    public void onError( ServiceCommandError error ) {
-
-                                                    }
-
-                                                    @Override
-                                                    public void onSuccess( Object object ) {
-
-                                                    }
-                                                } );
-                                    }
-                                }, 2000 );
-                            } catch ( JSONException e ) {
-                                e.printStackTrace();
-                            }*/
-
                             for (Map.Entry<String, PlayStatusListener> playStatusListener : playStatusListeners
                                     .entrySet()) {
                                 playStatusListener.getValue()

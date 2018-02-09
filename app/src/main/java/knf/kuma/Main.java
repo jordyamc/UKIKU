@@ -22,7 +22,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -32,6 +34,7 @@ import org.cryse.widget.persistentsearch.PersistentSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.munix.multidisplaycast.CastManager;
+import knf.kuma.changelog.ChangelogActivity;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.directory.DirectoryFragment;
 import knf.kuma.directory.DirectoryService;
@@ -41,6 +44,7 @@ import knf.kuma.favorite.FavoriteFragment;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
 import knf.kuma.preferences.BottomPreferencesFragment;
+import knf.kuma.random.RandomActivity;
 import knf.kuma.recents.RecentFragment;
 import knf.kuma.recents.RecentsNotReceiver;
 import knf.kuma.record.RecordActivity;
@@ -70,6 +74,9 @@ public class Main extends AppCompatActivity
     BottomFragment selectedFragment;
     BottomFragment tmpfragment;
 
+    ImageButton info;
+    ImageButton login;
+
     private boolean readyToFinish = false;
 
     @Override
@@ -86,6 +93,7 @@ public class Main extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        setNavigationButtons();
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setOnNavigationItemReselectedListener(this);
@@ -105,6 +113,18 @@ public class Main extends AppCompatActivity
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);
         Updatechecker.check(this,this);
+        ChangelogActivity.check(this);
+    }
+
+    private void setNavigationButtons() {
+        info = navigationView.getHeaderView(0).findViewById(R.id.action_info);
+        login = navigationView.getHeaderView(0).findViewById(R.id.action_login);
+        info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ChangelogActivity.open(Main.this);
+            }
+        });
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -297,6 +317,9 @@ public class Main extends AppCompatActivity
                 break;
             case R.id.drawer_seeing:
                 SeeingActivity.open(this);
+                break;
+            case R.id.drawer_random:
+                RandomActivity.open(this);
                 break;
         }
         closeSearchBar();

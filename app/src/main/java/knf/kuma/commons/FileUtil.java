@@ -4,19 +4,16 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Locale;
 
 /**
  * Created by Jordy on 11/01/2018.
@@ -24,16 +21,15 @@ import java.util.ArrayList;
 
 public final class FileUtil {
 
-    static String TAG="TAG";
     private static final String PRIMARY_VOLUME_NAME = "primary";
-
+    static String TAG = "TAG";
 
     @Nullable
     public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
         if (treeUri == null) {
             return null;
         }
-        String volumePath = FileUtil.getVolumePath(FileUtil.getVolumeIdFromTreeUri(treeUri),con);
+        String volumePath = FileUtil.getVolumePath(FileUtil.getVolumeIdFromTreeUri(treeUri), con);
         if (volumePath == null) {
             return File.separator;
         }
@@ -49,12 +45,10 @@ public final class FileUtil {
         if (documentPath.length() > 0) {
             if (documentPath.startsWith(File.separator)) {
                 return volumePath + documentPath;
-            }
-            else {
+            } else {
                 return volumePath + File.separator + documentPath;
             }
-        }
-        else {
+        } else {
             return volumePath;
         }
     }
@@ -94,8 +88,7 @@ public final class FileUtil {
 
             // not found.
             return null;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -107,8 +100,7 @@ public final class FileUtil {
 
         if (split.length > 0) {
             return split[0];
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -120,10 +112,44 @@ public final class FileUtil {
         final String[] split = docId.split(":");
         if ((split.length >= 2) && (split[1] != null)) {
             return split[1];
-        }
-        else {
+        } else {
             return File.separator;
         }
+    }
+
+    public static HashSet<String> getExternalMounts() {
+
+        final HashSet<String> out = new HashSet<>();
+        String reg = "(?i).*vold.*(vfat|ntfs|exfat|fat32|ext3|ext4).*rw.*";
+        String s = "";
+        try {
+            final Process process = new ProcessBuilder().command("mount").redirectErrorStream(true).start();
+            process.waitFor();
+            final InputStream is = process.getInputStream();
+            final byte[] buffer = new byte[1024];
+            while (is.read(buffer) != -1) {
+                s = s + new String(buffer);
+            }
+            is.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        final String[] lines = s.split("\n");
+        for (String line : lines) {
+            if (!line.toLowerCase(Locale.US).contains("asec")) {
+                if (line.matches(reg)) {
+                    String[] parts = line.split(" ");
+                    for (String part : parts) {
+                        if (part.startsWith("/")) {
+                            if (!part.toLowerCase(Locale.US).contains("vold")) {
+                                out.add(part);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return out;
     }
 
 

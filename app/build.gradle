@@ -22,8 +22,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 6
-        versionName "0.3.3 beta"
+        versionCode 7
+        versionName "0.3.4 beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -62,7 +62,7 @@ dependencies {
     implementation "android.arch.paging:runtime:1.0.0-alpha5"
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    implementation 'pl.droidsonroids:jspoon:1.2.0'
+    implementation 'pl.droidsonroids:jspoon:1.2.1'
     implementation 'pl.droidsonroids.retrofit2:converter-jspoon:1.0.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
@@ -79,6 +79,7 @@ dependencies {
     implementation 'com.shamanland:xdroid-toaster:0.3.0'
     implementation 'com.github.MFlisar:DragSelectRecyclerView:0.3'
     implementation 'com.mani:ThinDownloadManager:1.4.0'
+    implementation 'com.github.StephenVinouze:MaterialNumberPicker:1.0.5'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

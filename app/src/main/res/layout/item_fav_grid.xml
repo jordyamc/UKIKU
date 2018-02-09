@@ -24,8 +24,7 @@
             android:layout_width="105dp"
             android:layout_height="149dp"
             android:scaleType="centerCrop"
-            android:transitionName="img"
-            />
+            android:transitionName="img"/>
 
         <TextView
             android:id="@+id/title"

@@ -110,43 +110,50 @@ public class ServersFactory {
                                         AsyncTask.execute(new Runnable() {
                                             @Override
                                             public void run() {
-                                                final VideoServer server = servers.get(selected).getVideoServer();
-                                                dialog.dismiss();
-                                                if (server == null && servers.size() == 1) {
-                                                    Toaster.toast("Error en servidor, intente mas tarde");
-                                                    serversInterface.onFinish(false, false);
-                                                } else if (server == null) {
-                                                    Toaster.toast("Error en servidor");
-                                                    showServerList();
-                                                } else if (server.haveOptions()) {
-                                                    showOptions(server, false);
-                                                } else {
-                                                    switch (text.toString().toLowerCase()) {
-                                                        case "zippyshare":
-                                                            ZippyHelper.calculate(context, server.getOption().url, new ZippyHelper.OnZippyResult() {
-                                                                @Override
-                                                                public void onSuccess(ZippyHelper.ZippyObject object) {
-                                                                    startDownload(server.getOption(), object);
-                                                                }
+                                                try {
+                                                    final VideoServer server = servers.get(selected).getVideoServer();
+                                                    dialog.dismiss();
+                                                    if (server == null && servers.size() == 1) {
+                                                        Toaster.toast("Error en servidor, intente mas tarde");
+                                                        serversInterface.onFinish(false, false);
+                                                    } else if (server == null) {
+                                                        Toaster.toast("Error en servidor");
+                                                        showServerList();
+                                                    } else if (server.options.size() == 0) {
+                                                        Toaster.toast("Error en servidor");
+                                                        showServerList();
+                                                    } else if (server.haveOptions()) {
+                                                        showOptions(server, false);
+                                                    } else {
+                                                        switch (text.toString().toLowerCase()) {
+                                                            case "zippyshare":
+                                                                ZippyHelper.calculate(context, server.getOption().url, new ZippyHelper.OnZippyResult() {
+                                                                    @Override
+                                                                    public void onSuccess(ZippyHelper.ZippyObject object) {
+                                                                        startDownload(server.getOption(), object);
+                                                                    }
 
-                                                                @Override
-                                                                public void onError() {
-                                                                    Toaster.toast("Error en servidor");
-                                                                    showServerList();
+                                                                    @Override
+                                                                    public void onError() {
+                                                                        Toaster.toast("Error en servidor");
+                                                                        showServerList();
+                                                                    }
+                                                                });
+                                                                break;
+                                                            case "mega":
+                                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
+                                                                break;
+                                                            default:
+                                                                if (isStream) {
+                                                                    startStreaming(server.getOption());
+                                                                } else {
+                                                                    startDownload(server.getOption());
                                                                 }
-                                                            });
-                                                            break;
-                                                        case "mega":
-                                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
-                                                            break;
-                                                        default:
-                                                            if (isStream) {
-                                                                startStreaming(server.getOption());
-                                                            } else {
-                                                                startDownload(server.getOption());
-                                                            }
-                                                            break;
+                                                                break;
+                                                        }
                                                     }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
                                                 }
                                             }
                                         });
@@ -180,29 +187,33 @@ public class ServersFactory {
                                             AsyncTask.execute(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    final VideoServer server = servers.get(selected).getVideoServer();
-                                                    dialog.dismiss();
-                                                    if (server == null && servers.size() == 1) {
-                                                        Toaster.toast("Error en servidor, intente mas tarde");
-                                                        serversInterface.onFinish(false, false);
-                                                    } else if (server == null) {
-                                                        Toaster.toast("Error en servidor");
-                                                        showServerList();
-                                                    } else if (server.haveOptions()) {
-                                                        showOptions(server, true);
-                                                    } else {
-                                                        switch (Server.getNames(servers).get(d.getSelectedIndex()).toLowerCase()) {
-                                                            case "zippyshare":
-                                                                Toaster.toast("No soportado en CAST");
-                                                                showServerList();
-                                                                break;
-                                                            case "mega":
-                                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
-                                                                break;
-                                                            default:
-                                                                serversInterface.onCast(server.getOption().url);
-                                                                break;
+                                                    try {
+                                                        final VideoServer server = servers.get(selected).getVideoServer();
+                                                        dialog.dismiss();
+                                                        if (server == null && servers.size() == 1) {
+                                                            Toaster.toast("Error en servidor, intente mas tarde");
+                                                            serversInterface.onFinish(false, false);
+                                                        } else if (server == null) {
+                                                            Toaster.toast("Error en servidor");
+                                                            showServerList();
+                                                        } else if (server.haveOptions()) {
+                                                            showOptions(server, true);
+                                                        } else {
+                                                            switch (Server.getNames(servers).get(d.getSelectedIndex()).toLowerCase()) {
+                                                                case "zippyshare":
+                                                                    Toaster.toast("No soportado en CAST");
+                                                                    showServerList();
+                                                                    break;
+                                                                case "mega":
+                                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
+                                                                    break;
+                                                                default:
+                                                                    serversInterface.onCast(server.getOption().url);
+                                                                    break;
+                                                            }
                                                         }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
                                                     }
                                                 }
                                             });

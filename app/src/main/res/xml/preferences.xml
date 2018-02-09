@@ -98,5 +98,12 @@
             android:icon="@drawable/ic_setting_gps"
             android:key="daynigth_permission"
             android:title="Tema dia/noche preciso"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_changelog_get"
+            android:key="changelog_load"
+            android:summaryOff="Web"
+            android:summaryOn="Archivo local"
+            android:title="Obtencion de changelog"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -18,4 +18,8 @@
         android:id="@+id/drawer_records"
         android:icon="@drawable/ic_record"
         android:title="Historial"/>
+    <item
+        android:id="@+id/drawer_random"
+        android:icon="@drawable/ic_random"
+        android:title="Random"/>
 </menu>

@@ -75,6 +75,17 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(fragment.getActivity(), view, "img").toBundle());
     }
 
+    public static void open(Activity activity, AnimeObject object, View view, boolean persist, boolean animate) {
+        Intent intent = new Intent(activity, ActivityAnime.class);
+        intent.setData(Uri.parse(object.link));
+        intent.putExtra("title", object.name);
+        intent.putExtra("aid", object.aid);
+        intent.putExtra("img", object.img);
+        intent.putExtra("persist", persist);
+        intent.putExtra("noTransition", !animate);
+        activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "img").toBundle());
+    }
+
     public static void open(Fragment fragment, ExplorerObject object, View view) {
         Intent intent = new Intent(fragment.getContext(), ActivityAnime.class);
         intent.setData(Uri.parse(object.link));

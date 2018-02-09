@@ -2,4 +2,5 @@
 <resources>
     <integer name="span_count">5</integer>
     <integer name="span_count_large">3</integer>
+    <dimen name="num_picker">22sp</dimen>
 </resources>

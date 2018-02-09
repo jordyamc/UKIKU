@@ -25,6 +25,17 @@
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
 
+-keep class com.tickaroo.tikxml.** { *; }
+-keep class **$$TypeAdapter { *; }
+
+-keepclasseswithmembernames class * {
+    @com.tickaroo.tikxml.* <fields>;
+}
+
+-keepclasseswithmembernames class * {
+    @com.tickaroo.tikxml.* <methods>;
+}
+
 -keep public enum knf.kuma.**{*;}
 -keep class es.munix.multidisplaycast.**{*;}
 -keep class com.connectsdk.**{* ;}

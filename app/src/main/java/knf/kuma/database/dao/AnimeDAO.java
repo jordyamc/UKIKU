@@ -26,6 +26,9 @@ public interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE link LIKE :link")
     LiveData<AnimeObject> getAnime(String link);
 
+    @Query("SELECT * FROM AnimeObject ORDER BY RANDOM() LIMIT :limit")
+    LiveData<List<AnimeObject>> getRandom(int limit);
+
     @Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day ORDER BY name")
     LiveData<List<AnimeObject>> getByDay(int day);
 

@@ -75,6 +75,8 @@
         <activity
             android:name=".updater.UpdateActivity"
             android:excludeFromRecents="true"/>
+        <activity android:name=".random.RandomActivity"/>
+        <activity android:name=".changelog.ChangelogActivity"/>
 
         <service android:name=".directory.DirectoryService"/>
         <service android:name=".directory.DirectoryUpdateService"/>
