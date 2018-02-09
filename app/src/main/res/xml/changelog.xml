@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--<change type="new"/>
-<change type="imp"/>
-<change type="bug"/>-->
-<changelog>
-    <release version="0.2 pre-pre-alpha" code="2">
-        <change type="new">Changelog</change>
-    </release>
-</changelog>

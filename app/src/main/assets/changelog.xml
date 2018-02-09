@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<changelog>
+    <release code="7" version="0.3.4 beta">
+        <change type="new">Changelog</change>
+        <change type="new">Sección de animes random</change>
+        <change type="fix">Errores generales</change>
+    </release>
+</changelog>
