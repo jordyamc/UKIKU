@@ -3,6 +3,10 @@ package knf.kuma.commons;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
+
+import static android.content.Context.WIFI_SERVICE;
 
 /**
  * Created by Jordy on 03/01/2018.
@@ -26,5 +30,10 @@ public class Network {
         }catch (NullPointerException e){
             return false;
         }
+    }
+
+    public static String getIPAddress() {
+        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+        return Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
     }
 }

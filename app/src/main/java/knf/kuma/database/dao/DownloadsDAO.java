@@ -29,6 +29,9 @@ public interface DownloadsDAO {
     @Query("SELECT * FROM downloadobject WHERE eid LIKE :eid")
     LiveData<DownloadObject> getLiveByEid(String eid);
 
+    @Query("SELECT count(*) FROM downloadobject WHERE state=-1")
+    int countPending();
+
     @Query("DELETE FROM downloadobject WHERE eid LIKE :eid")
     void deleteByEid(String eid);
 

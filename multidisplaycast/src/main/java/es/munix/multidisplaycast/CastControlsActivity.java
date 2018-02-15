@@ -211,9 +211,13 @@ public class CastControlsActivity extends AppCompatActivity implements CastListe
 
     @Override
     public void onTotalDurationObtained( long totalDuration ) {
-        streamSeekBar.setMax( (int) totalDuration );
-        if ( !isSeeking ) {
-            streamDurationTextView.setText( Format.time( totalDuration ) );
+        try {
+            streamSeekBar.setMax((int) totalDuration);
+            if (!isSeeking) {
+                streamDurationTextView.setText(Format.time(totalDuration));
+            }
+        } catch (Exception e) {
+            //
         }
     }
 

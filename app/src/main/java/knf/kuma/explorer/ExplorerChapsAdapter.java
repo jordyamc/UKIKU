@@ -31,7 +31,9 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.PicassoSingle;
+import knf.kuma.commons.SelfServer;
 import knf.kuma.custom.SeenAnimeOverlay;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.ChaptersDAO;
@@ -101,7 +103,11 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject));
                 recordsDAO.add(RecordObject.fromDownloaded(chapObject));
                 holder.seenOverlay.setSeen(true,true);
-                ServersFactory.startPlay(context, chapObject.getChapTitle(), chapObject.fileName);
+                if (CastUtil.get().connected()) {
+                    CastUtil.get().play(fragment.getActivity(), chapObject.eid, SelfServer.start(chapObject.fileName), chapObject.title, "Episodio " + chapObject.chapter, chapObject.aid, true);
+                } else {
+                    ServersFactory.startPlay(context, chapObject.getChapTitle(), chapObject.fileName);
+                }
             }
         });
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {

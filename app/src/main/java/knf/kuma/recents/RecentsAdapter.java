@@ -29,6 +29,7 @@ import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.PicassoSingle;
+import knf.kuma.commons.SelfServer;
 import knf.kuma.custom.SeenAnimeOverlay;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
@@ -107,8 +108,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                 } else {
                     object.isDownloading = (downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING);
                     object.downloadState = downloadObject.state;
-                    File file=FileAccessHelper.INSTANCE.getFile(object.getFileName());
-                    object.isChapterDownloaded=file.exists();
+                    File file = FileAccessHelper.INSTANCE.getFile(object.getFileName());
+                    object.isChapterDownloaded = file.exists();
                 }
                 holder.setState(isNetworkAvailable, object.isChapterDownloaded || object.isDownloading);
             }
@@ -157,6 +158,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                                     public void onCast(String url) {
                                         CastUtil.get().play(fragment.getActivity(), object.eid, url, object.name, object.chapter, object.aid, true);
                                         chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(object));
+                                        recordsDAO.add(RecordObject.fromRecent(object));
+                                        holder.setSeen(true);
                                     }
                                 });
                             }
@@ -215,6 +218,18 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                 } else {
                     Toaster.toast("Aun no se está descargando");
                 }
+            }
+        });
+        holder.download.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                DownloadObject obj = downloadsDAO.getByEid(object.eid);
+                if (CastUtil.get().connected() &&
+                        object.isChapterDownloaded && (obj == null || obj.state == DownloadObject.COMPLETED)) {
+                    chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(object));
+                    CastUtil.get().play(fragment.getActivity(), object.eid, SelfServer.start(object.getFileName()), object.name, object.chapter, object.aid, true);
+                }
+                return true;
             }
         });
     }
@@ -293,7 +308,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
         }
 
         void setSeen(boolean seen) {
-            animeOverlay.setSeen(seen,false);
+            animeOverlay.setSeen(seen, false);
         }
 
         void setLocked(final boolean locked) {

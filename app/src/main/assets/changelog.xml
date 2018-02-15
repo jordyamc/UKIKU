@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="8" version="0.3.5 beta">
+        <change type="new">Cast de episodios descargados</change>
+        <change type="new">Comentarios de capítulos</change>
+        <change type="change">Mejoras en explorador</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="7" version="0.3.4 beta">
         <change type="new">Changelog</change>
         <change type="new">Sección de animes random</change>

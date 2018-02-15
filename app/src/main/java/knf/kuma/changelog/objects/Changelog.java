@@ -4,7 +4,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,7 +17,6 @@ public class Changelog {
         for (Element element : document.select("release")) {
             list.add(new Release(element));
         }
-        Collections.reverse(list);
         this.releases = list;
     }
 }

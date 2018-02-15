@@ -28,11 +28,11 @@ import knf.kuma.pojos.RecordObject;
  * Created by Jordy on 19/01/2018.
  */
 
-public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordItem>{
+public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordItem> {
     private Activity activity;
-    private List<RecordObject> items=new ArrayList<>();
+    private List<RecordObject> items = new ArrayList<>();
 
-    private RecordsDAO dao= CacheDB.INSTANCE.recordsDAO();
+    private RecordsDAO dao = CacheDB.INSTANCE.recordsDAO();
 
     public RecordsAdapter(Activity activity) {
         this.activity = activity;
@@ -40,29 +40,30 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordIt
 
     @Override
     public RecordItem onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new RecordItem(LayoutInflater.from(parent.getContext()).inflate(getLayout(),parent,false));
+        return new RecordItem(LayoutInflater.from(parent.getContext()).inflate(getLayout(), parent, false));
     }
 
     @LayoutRes
-    private int getLayout(){
-        if (PreferenceManager.getDefaultSharedPreferences(activity).getString("lay_type","0").equals("0")){
+    private int getLayout() {
+        if (PreferenceManager.getDefaultSharedPreferences(activity).getString("lay_type", "0").equals("0")) {
             return R.layout.item_record;
-        }else {
+        } else {
             return R.layout.item_record_grid;
         }
     }
 
     @Override
     public void onBindViewHolder(final RecordItem holder, int position) {
-        final RecordObject item=items.get(position);
-        AnimeObject animeObject=item.animeObject;
-        PicassoSingle.get(activity).load(animeObject.img).into(holder.imageView);
-        holder.title.setText(animeObject.name);
+        final RecordObject item = items.get(position);
+        AnimeObject animeObject = item.animeObject;
+        if (animeObject != null)
+            PicassoSingle.get(activity).load(animeObject.img).into(holder.imageView);
+        holder.title.setText(item.name);
         holder.chapter.setText(item.chapter);
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActivityAnime.open(activity,item,holder.imageView);
+                ActivityAnime.open(activity, item, holder.imageView);
             }
         });
     }
@@ -78,12 +79,12 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordIt
         notifyItemRemoved(position);
     }
 
-    public void update(List<RecordObject> items){
-        this.items=items;
+    public void update(List<RecordObject> items) {
+        this.items = items;
         notifyDataSetChanged();
     }
 
-    class RecordItem extends RecyclerView.ViewHolder{
+    class RecordItem extends RecyclerView.ViewHolder {
         @BindView(R.id.card)
         CardView cardView;
         @BindView(R.id.img)
@@ -92,9 +93,10 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordIt
         TextView title;
         @BindView(R.id.chapter)
         TextView chapter;
+
         RecordItem(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

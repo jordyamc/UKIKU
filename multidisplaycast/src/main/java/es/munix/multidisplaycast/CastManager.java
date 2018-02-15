@@ -457,7 +457,7 @@ public class CastManager implements DiscoveryManagerListener, MenuItem.OnMenuIte
     }
 
     public void togglePause() {
-        if (isConnected() && mMediaControl != null) {
+        if (isConnected() && mMediaControl != null && mediaObject != null) {
             if (!isPaused) {
                 mMediaControl.pause(null);
                 isPaused = true;

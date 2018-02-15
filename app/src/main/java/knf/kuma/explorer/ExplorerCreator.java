@@ -19,7 +19,7 @@ import knf.kuma.pojos.ExplorerObject;
  */
 
 public class ExplorerCreator {
-    public static void start(final Context context) {
+    public static void start(final Context context, final EmptyListener listener) {
         final ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();
         AsyncTask.execute(new Runnable() {
             @Override
@@ -39,10 +39,17 @@ public class ExplorerCreator {
                             }
                         }
                     explorerDAO.insert(list);
+                    if (list.size() == 0)
+                        listener.onEmpty();
                 } else {
                     explorerDAO.deleteAll();
+                    listener.onEmpty();
                 }
             }
         });
+    }
+
+    public interface EmptyListener {
+        void onEmpty();
     }
 }

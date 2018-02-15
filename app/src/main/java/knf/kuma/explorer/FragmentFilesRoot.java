@@ -14,16 +14,16 @@ import knf.kuma.R;
  * Created by Jordy on 30/01/2018.
  */
 
-public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.SelectedListener,FragmentChapters.ClearInterface {
+public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.SelectedListener, FragmentChapters.ClearInterface, ExplorerCreator.EmptyListener {
 
     private FragmentFiles files;
     private FragmentChapters chapters;
     private boolean isFiles = true;
 
     public FragmentFilesRoot() {
-        ExplorerCreator.start(getContext());
         files = FragmentFiles.get(this);
         chapters=FragmentChapters.get(this);
+        ExplorerCreator.start(getContext(), this);
     }
 
     public static FragmentFilesRoot get() {
@@ -75,6 +75,12 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     @Override
     public void onClear() {
         setFragment(true,null);
+    }
+
+    @Override
+    public void onEmpty() {
+        if (files != null)
+            files.onEmpty();
     }
 
     @Override

@@ -32,6 +32,7 @@ import knf.kuma.R;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.PicassoSingle;
+import knf.kuma.commons.SelfServer;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.ChaptersDAO;
 import knf.kuma.database.dao.DownloadsDAO;
@@ -125,8 +126,12 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 PopupMenu menu = new PopupMenu(context, view);
                 if (CastUtil.get().getCasting().getValue().equals(chapter.eid)) {
                     menu.inflate(R.menu.chapter_casting_menu);
+                    if (canPlay(d_file))
+                        menu.getMenu().findItem(R.id.download).setVisible(false);
                 } else if (isPlayAvailable(chapter.eid, d_file)) {
                     menu.inflate(R.menu.chapter_downloaded_menu);
+                    if (!CastUtil.get().connected())
+                        menu.getMenu().findItem(R.id.cast).setVisible(false);
                 } else {
                     menu.inflate(R.menu.chapter_menu);
                 }
@@ -140,11 +145,22 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                     recordsDAO.add(RecordObject.fromChapter(chapter));
                                     updateSeeing(chapter.number);
                                     holder.setSeen(context, true);
-                                    holder.setSeen(context, true);
                                     ServersFactory.startPlay(context, chapter.getEpTitle(), chapter.getFileName());
                                 } else {
                                     Toaster.toast("Aun no se está descargando");
                                 }
+                                break;
+                            case R.id.cast:
+                                if (canPlay(d_file)) {
+                                    CastUtil.get().play(fragment.getActivity(), chapter.eid, SelfServer.start(chapter.getFileName()), chapter.name, chapter.number, chapter.img == null ? chapter.aid : chapter.img, chapter.img == null);
+                                    chaptersDAO.addChapter(chapter);
+                                    recordsDAO.add(RecordObject.fromChapter(chapter));
+                                    updateSeeing(chapter.number);
+                                    holder.setSeen(context, true);
+                                }
+                                break;
+                            case R.id.casting:
+                                CastUtil.get().openControls();
                                 break;
                             case R.id.delete:
                                 new MaterialDialog.Builder(context)

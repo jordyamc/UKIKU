@@ -329,11 +329,15 @@ public class Main extends AppCompatActivity
     }
 
     private void setFragment(BottomFragment fragment) {
-        selectedFragment = fragment;
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout);
-        transaction.replace(R.id.root, selectedFragment);
-        transaction.commit();
+        try {
+            selectedFragment = fragment;
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout);
+            transaction.replace(R.id.root, selectedFragment);
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void closeDrawer() {

@@ -100,16 +100,18 @@ public class DownloadService extends IntentService {
     }
 
     private void updateNotification(){
-        Notification notification=new NotificationCompat.Builder(this,CHANNEL_ONGOING)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, CHANNEL_ONGOING)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(current.name)
                 .setContentText(current.chapter)
                 .setProgress(100,current.progress,false)
                 .setOngoing(true)
                 .setSound(null)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build();
-        manager.notify(DOWNLOADING_ID,notification);
+                .setPriority(NotificationCompat.PRIORITY_LOW);
+        int pending = downloadsDAO.countPending();
+        if (pending > 0)
+            notification.setSubText(pending + " " + (pending == 1 ? "pendiente" : "pendientes"));
+        manager.notify(DOWNLOADING_ID, notification.build());
     }
 
     private void completedNotification(){

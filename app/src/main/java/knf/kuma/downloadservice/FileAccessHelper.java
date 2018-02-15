@@ -16,7 +16,9 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.provider.DocumentFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import knf.kuma.commons.FileUtil;
@@ -159,6 +161,25 @@ public class FileAccessHelper {
                 return new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
             } else {
                 return context.getContentResolver().openOutputStream(find(DocumentFile.fromTreeUri(context, getTreeUri()), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).getUri(),"rw");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public InputStream getInputStream(String file_name) {
+        try {
+            if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
+                File file = new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name));
+                if (!file.exists())
+                    file.mkdirs();
+                file = new File(file, file_name);
+                if (!file.exists())
+                    file.createNewFile();
+                return new FileInputStream(new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
+            } else {
+                return context.getContentResolver().openInputStream(find(DocumentFile.fromTreeUri(context, getTreeUri()), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).getUri());
             }
         } catch (Exception e) {
             e.printStackTrace();

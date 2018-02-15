@@ -9,6 +9,8 @@ import android.os.Looper;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.jetbrains.annotations.Contract;
+
 import es.munix.multidisplaycast.CastControlsActivity;
 import es.munix.multidisplaycast.CastManager;
 import es.munix.multidisplaycast.interfaces.CastListener;
@@ -40,6 +42,7 @@ public class CastUtil implements CastListener, PlayStatusListener {
         ourInstance = new CastUtil(context);
     }
 
+    @Contract(pure = true)
     public static CastUtil get() {
         return ourInstance;
     }
@@ -56,6 +59,8 @@ public class CastUtil implements CastListener, PlayStatusListener {
     public void play(Activity activity,String eid, String url, String title, String chapter, String preview, boolean isAid){
         try {
             if (connected()) {
+                if (!url.contains(":8080"))
+                    SelfServer.stop();
                 startLoading(activity);
                 setEid(eid);
                 if (isAid)
@@ -90,7 +95,7 @@ public class CastUtil implements CastListener, PlayStatusListener {
         loading = new MaterialDialog.Builder(activity)
                 .content("Cargando...")
                 .progress(true, 0)
-                .cancelable(false)
+                .cancelable(true)
                 .build();
         return loading;
     }

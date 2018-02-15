@@ -2,6 +2,8 @@ package knf.kuma.explorer;
 
 import android.arch.lifecycle.Observer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -38,6 +40,8 @@ public class FragmentFiles extends Fragment {
     private ExplorerFilesAdapter adapter;
     private boolean isFist=true;
 
+    private int count = 0;
+
     public FragmentFiles() {
     }
 
@@ -53,12 +57,16 @@ public class FragmentFiles extends Fragment {
         CacheDB.INSTANCE.explorerDAO().getAll().observe(this, new Observer<List<ExplorerObject>>() {
             @Override
             public void onChanged(List<ExplorerObject> explorerObjects) {
-                progressBar.setVisibility(View.GONE);
-                error.setVisibility(explorerObjects.size()==0?View.VISIBLE:View.GONE);
-                adapter.update(explorerObjects);
-                if (isFist&&explorerObjects.size()!=0){
-                    isFist=false;
-                    recyclerView.scheduleLayoutAnimation();
+                if (count >= 1) {
+                    progressBar.setVisibility(View.GONE);
+                    error.setVisibility(explorerObjects.size() == 0 ? View.VISIBLE : View.GONE);
+                    adapter.update(explorerObjects);
+                    if (isFist && explorerObjects.size() != 0) {
+                        isFist = false;
+                        recyclerView.scheduleLayoutAnimation();
+                    }
+                } else {
+                    count++;
                 }
             }
         });
@@ -81,6 +89,16 @@ public class FragmentFiles extends Fragment {
         }else {
             return R.layout.recycler_explorer_grid;
         }
+    }
+
+    public void onEmpty() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.GONE);
+                error.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     public void setListener(SelectedListener listener){

@@ -8,11 +8,13 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.CastUtil;
 import knf.kuma.database.CacheDB;
 
 /**
@@ -55,6 +57,13 @@ public class ExplorerActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (CastUtil.get().connected())
+            getMenuInflater().inflate(R.menu.menu_explorer_connected, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public void onBackPressed() {
         if (!((FragmentBase) adapter.getItem(pager.getCurrentItem())).onBackPressed())
             super.onBackPressed();
@@ -62,7 +71,7 @@ public class ExplorerActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        CacheDB.INSTANCE.explorerDAO().getAll();
+        CacheDB.INSTANCE.explorerDAO().deleteAll();
         super.onDestroy();
     }
 }

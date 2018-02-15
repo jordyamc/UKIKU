@@ -24,6 +24,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ShareEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import knf.kuma.R;
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder;
 import knf.kuma.database.CacheDB;
@@ -49,6 +52,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
     private FavoriteObject favoriteObject;
     private FavsDAO dao = CacheDB.INSTANCE.favsDAO();
     private SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
+    private List<AnimeObject.WebInfo.AnimeChapter> chapters = new ArrayList<>();
 
     public static void open(Fragment fragment, RecentObject object, View view, int position) {
         Intent intent = new Intent(fragment.getContext(), ActivityAnime.class);
@@ -167,6 +171,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
             @Override
             public void onChanged(@Nullable final AnimeObject object) {
                 if (object != null) {
+                    chapters = object.chapters;
                     favoriteObject = new FavoriteObject(object);
                     holder.setTitle(object.name);
                     holder.loadImg(object.img, new View.OnClickListener() {
@@ -262,6 +267,9 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         switch (item.getItemId()) {
             case R.id.action_share:
                 share();
+                break;
+            case R.id.action_comments:
+                new CommentsDialog(chapters).show(this);
                 break;
         }
         return true;

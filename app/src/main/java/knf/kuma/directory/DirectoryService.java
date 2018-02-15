@@ -19,13 +19,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import knf.kuma.R;
 import knf.kuma.commons.Network;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DirectoryPage;
-import knf.kuma.R;
 import pl.droidsonroids.jspoon.Jspoon;
 
 /**
@@ -33,11 +33,10 @@ import pl.droidsonroids.jspoon.Jspoon;
  */
 
 public class DirectoryService extends IntentService {
-    private NotificationManager manager;
-    private int count=0;
     public static int NOT_CODE=5598;
     public static String CHANNEL="directory_update";
-
+    private NotificationManager manager;
+    private int count = 0;
     private int page=0;
 
     public DirectoryService() {
@@ -152,7 +151,7 @@ public class DirectoryService extends IntentService {
 
     private void cancelForeground(){
         stopForeground(true);
-        manager.cancel(NOT_CODE);
+        notCancel(NOT_CODE);
     }
 
     private void updateNotification(){
@@ -165,7 +164,7 @@ public class DirectoryService extends IntentService {
                 .setColor(Color.parseColor("#e53935"))
                 .setSound(null)
                 .build();
-        manager.notify(NOT_CODE,notification);
+        notShow(NOT_CODE, notification);
     }
 
     private Notification getStartNotification(){
@@ -179,10 +178,20 @@ public class DirectoryService extends IntentService {
                 .build();
     }
 
+    private void notShow(int code, Notification notification) {
+        if (manager != null)
+            manager.notify(code, notification);
+    }
+
+    private void notCancel(int code) {
+        if (manager != null)
+            manager.cancel(code);
+    }
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         stopForeground(true);
-        manager.cancel(NOT_CODE);
+        notCancel(NOT_CODE);
         super.onTaskRemoved(rootIntent);
     }
 }

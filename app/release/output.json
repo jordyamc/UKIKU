@@ -6,7 +6,7 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 7
+      "versionCode": 8
     },
     "path": "app-release.apk",
     "properties": {

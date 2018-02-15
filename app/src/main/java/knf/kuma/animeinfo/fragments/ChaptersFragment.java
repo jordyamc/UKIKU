@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import java.util.List;
 
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
-import knf.kuma.animeinfo.AnimeChaptersAdapter;
 import knf.kuma.animeinfo.AnimeViewModel;
 import knf.kuma.animeinfo.viewholders.AnimeChaptersHolder;
 import knf.kuma.pojos.AnimeObject;
@@ -41,11 +39,13 @@ public class ChaptersFragment extends BottomFragment {
         ViewModelProviders.of(getActivity()).get(AnimeViewModel.class).getLiveData().observe(this, new Observer<AnimeObject>() {
             @Override
             public void onChanged(@Nullable AnimeObject object) {
-                List<AnimeObject.WebInfo.AnimeChapter> chapters=object.chapters;
-                if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("asc_chapters",false))
-                    Collections.reverse(chapters);
-                holder.setAdapter(ChaptersFragment.this,chapters);
-                holder.goToChapter();
+                if (object != null) {
+                    List<AnimeObject.WebInfo.AnimeChapter> chapters = object.chapters;
+                    if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("asc_chapters", false))
+                        Collections.reverse(chapters);
+                    holder.setAdapter(ChaptersFragment.this, chapters);
+                    holder.goToChapter();
+                }
             }
         });
     }

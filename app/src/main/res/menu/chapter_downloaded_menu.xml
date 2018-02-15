@@ -4,6 +4,9 @@
         android:id="@+id/play"
         android:title="REPRODUCIR"/>
     <item
+        android:id="@+id/cast"
+        android:title="CAST"/>
+    <item
         android:id="@+id/delete"
         android:title="ELIMINAR"/>
 
