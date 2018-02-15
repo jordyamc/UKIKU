@@ -19,6 +19,8 @@ public class JobsCreator implements JobCreator {
                 return new RecentsJob();
             case DirUpdateJob.TAG:
                 return new DirUpdateJob();
+            case UpdateJob.TAG:
+                return new UpdateJob();
             default:
                 return null;
         }

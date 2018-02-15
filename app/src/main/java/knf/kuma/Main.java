@@ -43,6 +43,7 @@ import knf.kuma.explorer.ExplorerActivity;
 import knf.kuma.favorite.FavoriteFragment;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
+import knf.kuma.jobscheduler.UpdateJob;
 import knf.kuma.preferences.BottomPreferencesFragment;
 import knf.kuma.random.RandomActivity;
 import knf.kuma.recents.RecentFragment;
@@ -109,6 +110,7 @@ public class Main extends AppCompatActivity
     private void checkServices() {
         checkPermissions();
         ContextCompat.startForegroundService(this, new Intent(this, DirectoryService.class));
+        UpdateJob.schedule();
         RecentsJob.schedule(this);
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);

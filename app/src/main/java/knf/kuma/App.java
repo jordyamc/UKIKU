@@ -23,6 +23,7 @@ import knf.kuma.downloadservice.DownloadService;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.jobscheduler.JobsCreator;
 import knf.kuma.jobscheduler.RecentsJob;
+import knf.kuma.jobscheduler.UpdateJob;
 
 /**
  * Created by Jordy on 03/01/2018.
@@ -72,6 +73,7 @@ public class App extends Application {
             manager.createNotificationChannel(new NotificationChannel(RecentsJob.CHANNEL_RECENTS,"Capitulos recientes",NotificationManager.IMPORTANCE_HIGH));
             manager.createNotificationChannel(new NotificationChannel(DownloadService.CHANNEL,"Descargas",NotificationManager.IMPORTANCE_HIGH));
             manager.createNotificationChannel(new NotificationChannel(DownloadService.CHANNEL_ONGOING,"Descargas en progreso",NotificationManager.IMPORTANCE_LOW));
+            manager.createNotificationChannel(new NotificationChannel(UpdateJob.CHANNEL, "Actualización de la app", NotificationManager.IMPORTANCE_DEFAULT));
         }
     }
 }
