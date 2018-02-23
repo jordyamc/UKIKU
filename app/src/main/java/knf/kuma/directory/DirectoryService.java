@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioAttributes;
@@ -43,11 +44,18 @@ public class DirectoryService extends IntentService {
         super("Directory update");
     }
 
+    public static boolean isDirectoryFinished(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false);
+    }
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        if (!Network.isConnected())
-            stopSelf();
         startForeground(NOT_CODE,getStartNotification());
+        if (!Network.isConnected()) {
+            stopSelf();
+            stopForeground(true);
+            notCancel(NOT_CODE);
+        }
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
         Jspoon jspoon=Jspoon.create();

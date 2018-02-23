@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="9" version="0.3.6 beta">
+        <change type="new">Sincronizacion en la nube (Dropbox y Google Drive)</change>
+        <change type="new">Migración de favoritos desde AnimeflvApp</change>
+        <change type="fix">Errores en explorador al girar la pantalla</change>
+    </release>
     <release code="8" version="0.3.5 beta">
         <change type="new">Cast de episodios descargados</change>
-        <change type="new">Comentarios de capítulos</change>
-        <change type="change">Mejoras en explorador</change>
+        <change type="fix">Error al abrir la app sin conexión</change>
         <change type="fix">Errores generales</change>
     </release>
     <release code="7" version="0.3.4 beta">

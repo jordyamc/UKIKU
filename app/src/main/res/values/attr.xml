@@ -17,4 +17,9 @@
         <attr name="cs_mask" format="string"/>
         <attr name="cs_zero_value" format="string"/>
     </declare-styleable>
+    <declare-styleable name="SyncItemView">
+        <attr name="si_title" format="string"/>
+        <attr name="si_showDivider" format="boolean"/>
+        <attr name="si_actionId" format="string"/>
+    </declare-styleable>
 </resources>

@@ -34,7 +34,7 @@ public class FragmentChapters extends Fragment {
 
     public static FragmentChapters get(ClearInterface clearInterface) {
         FragmentChapters fragmentChapters = new FragmentChapters();
-        fragmentChapters.setClearInterface(clearInterface);
+        fragmentChapters.setInterface(clearInterface);
         return fragmentChapters;
     }
 
@@ -62,7 +62,8 @@ public class FragmentChapters extends Fragment {
             public void onChanged(@Nullable ExplorerObject object) {
                 if (isFirst) {
                     isFirst = false;
-                    recyclerView.setAdapter(new ExplorerChapsAdapter(FragmentChapters.this,object,clearInterface));
+                    adapter = new ExplorerChapsAdapter(FragmentChapters.this, object, clearInterface);
+                    recyclerView.setAdapter(adapter);
                     recyclerView.scheduleLayoutAnimation();
                 }
             }
@@ -80,8 +81,10 @@ public class FragmentChapters extends Fragment {
             });
     }
 
-    public void setClearInterface(ClearInterface clearInterface) {
+    public void setInterface(ClearInterface clearInterface) {
         this.clearInterface = clearInterface;
+        if (adapter != null)
+            adapter.setInterface(clearInterface);
     }
 
     public interface ClearInterface {

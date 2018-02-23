@@ -140,6 +140,10 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
         });
     }
 
+    public void setInterface(FragmentChapters.ClearInterface clearInterface) {
+        this.clearInterface = clearInterface;
+    }
+
     private void delete(ExplorerObject.FileDownObj obj, final int position) {
         FileAccessHelper.INSTANCE.delete(obj.fileName);
         downloadsDAO.deleteByEid(obj.eid);

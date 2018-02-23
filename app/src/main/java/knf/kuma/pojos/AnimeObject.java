@@ -162,7 +162,7 @@ public class AnimeObject {
     public static class WebInfo {
         @Selector(value = "div.Image img[src]", attr = "src", format = "/(\\d+)[/.]")
         public String aid;
-        @Selector(value = "meta[property='og:title']", attr = "content", format = "^ ?Ver (.+) Capítulos Online$", defValue = "Error")
+        @Selector(value = "meta[property='og:title']", attr = "content", format = "^ ?(.+) Online$", defValue = "Error")
         @ColumnInfo(name = "web_name")
         public String name;
         @Selector(value = "div.Image img[src]", attr = "src")

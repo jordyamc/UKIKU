@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/lay_buttons"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <knf.kuma.custom.SyncItemView
+        android:id="@+id/sync_favs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:si_actionId="favs"
+        app:si_showDivider="true"
+        app:si_title="Favoritos">
+
+    </knf.kuma.custom.SyncItemView>
+
+    <knf.kuma.custom.SyncItemView
+        android:id="@+id/sync_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:si_actionId="history"
+        app:si_showDivider="true"
+        app:si_title="Historial"/>
+
+    <knf.kuma.custom.SyncItemView
+        android:id="@+id/sync_following"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:si_actionId="following"
+        app:si_showDivider="true"
+        app:si_title="Seguidos"/>
+
+    <knf.kuma.custom.SyncItemView
+        android:id="@+id/sync_seen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:si_actionId="seen"
+        app:si_showDivider="true"
+        app:si_title="Vistos"/>
+
+    <Button
+        android:id="@+id/logOut"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:padding="20dp"
+        android:text="Cerrar sesion"
+        android:textColor="@android:color/white"/>
+</LinearLayout>

@@ -27,6 +27,23 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="AppTheme.Translucent" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="AppTheme.Button.Dropbox" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:colorButtonNormal">@color/dropbox</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.Button.Drive" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:colorButtonNormal">@color/drive</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
     <style name="AppTheme.Updater" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/ic_launcher_background</item>
         <item name="android:colorPrimaryDark">@color/ic_launcher_background</item>

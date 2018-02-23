@@ -19,4 +19,8 @@
     <color name="active_icon_color">#8A000000</color>
     <color name="cards_and_dialogs_color">@android:color/white</color>
     <color name="quantum_grey_600">#757575</color>
+
+    <color name="dropbox">#007EE5</color>
+    <color name="drive">#ffbb00</color>
+    <color name="text_disable">#42000000</color>
 </resources>

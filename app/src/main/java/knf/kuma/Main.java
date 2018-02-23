@@ -34,6 +34,9 @@ import org.cryse.widget.persistentsearch.PersistentSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.munix.multidisplaycast.CastManager;
+import knf.kuma.backup.BUUtils;
+import knf.kuma.backup.BackUpActivity;
+import knf.kuma.backup.MigrationActivity;
 import knf.kuma.changelog.ChangelogActivity;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.directory.DirectoryFragment;
@@ -60,7 +63,7 @@ public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemReselectedListener,
-        Updatechecker.CheckListener{
+        Updatechecker.CheckListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -75,6 +78,7 @@ public class Main extends AppCompatActivity
     BottomFragment selectedFragment;
     BottomFragment tmpfragment;
 
+    ImageButton migrate;
     ImageButton info;
     ImageButton login;
 
@@ -114,19 +118,35 @@ public class Main extends AppCompatActivity
         RecentsJob.schedule(this);
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);
-        Updatechecker.check(this,this);
+        Updatechecker.check(this, this);
         ChangelogActivity.check(this);
     }
 
     private void setNavigationButtons() {
         info = navigationView.getHeaderView(0).findViewById(R.id.action_info);
         login = navigationView.getHeaderView(0).findViewById(R.id.action_login);
+        migrate = navigationView.getHeaderView(0).findViewById(R.id.action_migrate);
         info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ChangelogActivity.open(Main.this);
             }
         });
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BackUpActivity.start(Main.this);
+            }
+        });
+        migrate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MigrationActivity.start(Main.this);
+            }
+        });
+        if (BUUtils.isAnimeflvInstalled(this) &&
+                DirectoryService.isDirectoryFinished(this))
+            migrate.setVisibility(View.VISIBLE);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -144,7 +164,7 @@ public class Main extends AppCompatActivity
             public void run() {
                 new MaterialDialog.Builder(Main.this)
                         .title("Actualización")
-                        .content("Parece que la versión "+n_code+" está disponible, ¿Quieres actualizar?")
+                        .content("Parece que la versión " + n_code + " está disponible, ¿Quieres actualizar?")
                         .positiveText("si")
                         .negativeText("despues")
                         .onPositive(new MaterialDialog.SingleButtonCallback() {

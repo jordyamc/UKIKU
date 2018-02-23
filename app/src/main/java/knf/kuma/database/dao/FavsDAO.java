@@ -22,6 +22,9 @@ import knf.kuma.pojos.FavoriteObject;
 public interface FavsDAO {
     @Query("SELECT * FROM favoriteobject ORDER BY name")
     LiveData<List<FavoriteObject>> getAll();
+
+    @Query("SELECT * FROM favoriteobject ORDER BY name")
+    List<FavoriteObject> getAllRaw();
     @Query("SELECT * FROM favoriteobject ORDER BY aid ASC")
     LiveData<List<FavoriteObject>> getAllID();
 
@@ -37,6 +40,12 @@ public interface FavsDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addFav(FavoriteObject object);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void addAll(List<FavoriteObject> list);
+
     @Delete
     void deleteFav(FavoriteObject object);
+
+    @Query("DELETE FROM favoriteobject")
+    void clear();
 }

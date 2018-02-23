@@ -20,8 +20,14 @@ public interface RecordsDAO {
     @Query("SELECT * FROM recordobject ORDER BY date DESC")
     LiveData<List<RecordObject>> getAll();
 
+    @Query("SELECT * FROM recordobject ORDER BY date DESC")
+    List<RecordObject> getAllRaw();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void add(RecordObject object);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void addAll(List<RecordObject> list);
 
     @Delete
     void delete(RecordObject object);

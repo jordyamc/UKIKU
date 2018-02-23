@@ -53,3 +53,4 @@
 -dontwarn okhttp3.internal.**
 -dontwarn okio.**
 -dontwarn retrofit2.**
+-dontwarn com.dropbox.core.**

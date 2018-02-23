@@ -22,15 +22,24 @@ public interface SeeingDAO {
     @Query("SELECT * FROM seeingobject ORDER BY title")
     LiveData<List<SeeingObject>> getAll();
 
+    @Query("SELECT * FROM seeingobject ORDER BY title")
+    List<SeeingObject> getAllRaw();
+
     @Query("SELECT * FROM seeingobject WHERE aid LIKE :aid")
     SeeingObject getByAid(String aid);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void add(SeeingObject object);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void addAll(List<SeeingObject> object);
+
     @Update
     void update(SeeingObject object);
 
     @Delete
     void remove(SeeingObject object);
+
+    @Query("DELETE FROM seeingobject")
+    void clear();
 }

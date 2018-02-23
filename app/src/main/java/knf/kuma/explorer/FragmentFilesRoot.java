@@ -48,6 +48,7 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
             setFragment(true, null);
         }else {
             files.setListener(this);
+            chapters.setInterface(this);
         }
         super.onViewCreated(view, savedInstanceState);
     }

@@ -103,6 +103,8 @@ public class FragmentFiles extends Fragment {
 
     public void setListener(SelectedListener listener){
         this.listener=listener;
+        if (adapter != null)
+            adapter.setListener(listener);
     }
 
     public interface SelectedListener{

@@ -1,6 +1,5 @@
 package knf.kuma.explorer;
 
-import android.app.Activity;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
@@ -50,6 +49,10 @@ public class ExplorerFilesAdapter extends RecyclerView.Adapter<ExplorerFilesAdap
         } else {
             return R.layout.item_explorer_grid;
         }
+    }
+
+    public void setListener(FragmentFiles.SelectedListener listener) {
+        this.listener = listener;
     }
 
     @Override

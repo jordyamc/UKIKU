@@ -65,7 +65,7 @@ public class ExplorerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!((FragmentBase) adapter.getItem(pager.getCurrentItem())).onBackPressed())
+        if (adapter == null || !((FragmentBase) adapter.getItem(pager.getCurrentItem())).onBackPressed())
             super.onBackPressed();
     }
 

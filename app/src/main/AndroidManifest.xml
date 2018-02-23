@@ -77,6 +77,27 @@
             android:excludeFromRecents="true"/>
         <activity android:name=".random.RandomActivity"/>
         <activity android:name=".changelog.ChangelogActivity"/>
+        <activity
+            android:name=".backup.BackUpActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Translucent"/>
+
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <data android:scheme="db-qtjow4hsk06vt19"/>
+
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".backup.MigrationActivity"
+            android:theme="@style/AppTheme.Translucent"/>
 
         <service android:name=".directory.DirectoryService"/>
         <service android:name=".directory.DirectoryUpdateService"/>

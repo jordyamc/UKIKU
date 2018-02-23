@@ -12,7 +12,6 @@ import java.util.List;
 
 import knf.kuma.database.BaseConverter;
 import knf.kuma.pojos.AnimeObject;
-import knf.kuma.seeing.SeeingActivity;
 
 /**
  * Created by Jordy on 08/01/2018.
@@ -24,6 +23,9 @@ public interface ChaptersDAO {
 
     @Query("SELECT count(*) FROM animechapter")
     int init();
+
+    @Query("SELECT * FROM animechapter")
+    List<AnimeObject.WebInfo.AnimeChapter> getAll();
 
     @Query("SELECT * FROM animechapter WHERE eid LIKE :eid LIMIT 1")
     LiveData<AnimeObject.WebInfo.AnimeChapter> chapterSeen(String eid);
@@ -40,6 +42,12 @@ public interface ChaptersDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addChapter(AnimeObject.WebInfo.AnimeChapter chapter);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void addAll(List<AnimeObject.WebInfo.AnimeChapter> list);
+
     @Delete
     void deleteChapter(AnimeObject.WebInfo.AnimeChapter chapter);
+
+    @Query("DELETE FROM animechapter")
+    void clear();
 }
