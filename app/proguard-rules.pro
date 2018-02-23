@@ -36,6 +36,7 @@
     @com.tickaroo.tikxml.* <methods>;
 }
 
+-dontwarn knf.kuma.**
 -keep public enum knf.kuma.**{*;}
 -keep class es.munix.multidisplaycast.**{*;}
 -keep class com.connectsdk.**{* ;}

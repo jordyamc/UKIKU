@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="10" version="0.3.7 beta">
+        <change type="fix">Error al migrar datos</change>
+    </release>
     <release code="9" version="0.3.6 beta">
         <change type="new">Sincronizacion en la nube (Dropbox y Google Drive)</change>
         <change type="new">Migración de favoritos desde AnimeflvApp</change>

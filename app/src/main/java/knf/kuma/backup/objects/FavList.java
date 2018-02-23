@@ -1,6 +1,7 @@
 package knf.kuma.backup.objects;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.InputStream;
@@ -19,7 +20,9 @@ import xdroid.toaster.Toaster;
  */
 
 public class FavList {
+    @SerializedName("response")
     String response;
+    @SerializedName("favs")
     List<FavSection> favs;
 
     public static List<FavoriteObject> decode(InputStream inputStream) {
@@ -43,14 +46,20 @@ public class FavList {
     }
 
     static class FavSection {
+        @SerializedName("name")
         String name;
+        @SerializedName("list")
         List<FavEntry> list;
     }
 
     static class FavEntry {
+        @SerializedName("title")
         String title;
+        @SerializedName("aid")
         String aid;
+        @SerializedName("section")
         String section;
+        @SerializedName("order")
         int order;
     }
 }
