@@ -76,18 +76,18 @@ ext {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile files('libs/java-websocket-1.3.1.jar')
-    compile files('libs/javax.jmdns_3.4.1-patch2.jar')
-    compile files('libs/AmazonFling.jar')
-    compile files('libs/WhisperPlay.jar')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation files('libs/java-websocket-1.3.1.jar')
+    implementation files('libs/javax.jmdns_3.4.1-patch2.jar')
+    implementation files('libs/AmazonFling.jar')
+    implementation files('libs/WhisperPlay.jar')
 
-    compile supportV4
-    compile appCompat
-    compile mediaRouter
-    compile supportDesign
-    compile playServicesCast
+    implementation supportV4
+    implementation appCompat
+    implementation mediaRouter
+    implementation supportDesign
+    implementation playServicesCast
 
-    compile glide
-    compile gson
+    implementation glide
+    implementation gson
 }

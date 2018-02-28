@@ -6,13 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 
 import org.jsoup.Jsoup;
@@ -34,27 +30,26 @@ import pl.droidsonroids.jspoon.Jspoon;
  */
 
 public class EmisionFragment extends Fragment {
-    public static EmisionFragment get(AnimeObject.Day day){
-        Bundle bundle=new Bundle();
-        bundle.putInt("day",day.value);
-        EmisionFragment fragment=new EmisionFragment();
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-    public EmisionFragment() {
-    }
-
     @BindView(R.id.recycler)
     GridRecyclerView recyclerView;
     @BindView(R.id.error)
     View error;
     @BindView(R.id.progress)
     ProgressBar progressBar;
-
     private AnimeDAO dao=CacheDB.INSTANCE.animeDAO();
     private EmisionAdapter adapter;
     private boolean isFirst=true;
+
+    public EmisionFragment() {
+    }
+
+    public static EmisionFragment get(AnimeObject.Day day) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("day", day.value);
+        EmisionFragment fragment = new EmisionFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -90,17 +85,21 @@ public class EmisionFragment extends Fragment {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                for (AnimeObject animeObject:animeObjects){
-                    try {
-                        Document document= Jsoup.connect(animeObject.link).cookie("device","computer").get();
-                        AnimeObject object= new AnimeObject(animeObject.link,Jspoon.create().adapter(AnimeObject.WebInfo.class).fromHtml(document.outerHtml()));
-                        if (!object.state.equals("En emisión")){
-                            dao.updateAnime(object);
-                            adapter.remove(adapter.list.indexOf(animeObject));
+                try {
+                    for (AnimeObject animeObject : animeObjects) {
+                        try {
+                            Document document = Jsoup.connect(animeObject.link).cookie("device", "computer").get();
+                            AnimeObject object = new AnimeObject(animeObject.link, Jspoon.create().adapter(AnimeObject.WebInfo.class).fromHtml(document.outerHtml()));
+                            if (!object.state.equals("En emisión")) {
+                                dao.updateAnime(object);
+                                adapter.remove(adapter.list.indexOf(animeObject));
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    }catch (Exception e){
-                        e.printStackTrace();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -90,6 +92,7 @@ public class Main extends AppCompatActivity
         if (!getString(R.string.app_name).equals("UKIKU")) {
             Toaster.toast("Te dije que no lo cambiaras");
             finish();
+            return;
         }
         setContentView(R.layout.activity_main_drawer);
         ButterKnife.bind(this);
@@ -107,7 +110,7 @@ public class Main extends AppCompatActivity
             checkServices();
             setFragment(RecentFragment.get());
         } else {
-            returnFragment();
+            returnSelectFragment();
         }
     }
 
@@ -147,6 +150,18 @@ public class Main extends AppCompatActivity
         if (BUUtils.isAnimeflvInstalled(this) &&
                 DirectoryService.isDirectoryFinished(this))
             migrate.setVisibility(View.VISIBLE);
+        TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
+        switch (BUUtils.getType(this)) {
+            case LOCAL:
+                backupLocation.setText("Almacenamiento local");
+                break;
+            case DROPBOX:
+                backupLocation.setText("Dropbox");
+                break;
+            case DRIVE:
+                backupLocation.setText("Google Drive");
+                break;
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -383,6 +398,22 @@ public class Main extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
+    private void returnSelectFragment() {
+        if (tmpfragment != null) {
+            if (tmpfragment instanceof FavoriteFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_recents);
+            } else if (tmpfragment instanceof DirectoryFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_directory);
+            } else if (tmpfragment instanceof BottomPreferencesFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_settings);
+            } else {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_recents);
+            }
+        }
+        tmpfragment = null;
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
     @Override
     public void onNavigationItemReselected(@NonNull MenuItem item) {
         if (tmpfragment != null) {
@@ -397,6 +428,29 @@ public class Main extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
             checkPermissions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (navigationView != null)
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
+                    switch (BUUtils.getType(Main.this)) {
+                        case LOCAL:
+                            backupLocation.setText("Almacenamiento local");
+                            break;
+                        case DROPBOX:
+                            backupLocation.setText("Dropbox");
+                            break;
+                        case DRIVE:
+                            backupLocation.setText("Google Drive");
+                            break;
+                    }
+                }
+            });
     }
 
     @Override

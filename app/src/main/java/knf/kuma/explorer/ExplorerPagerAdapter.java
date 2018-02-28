@@ -15,12 +15,12 @@ import android.view.ViewGroup;
 
 public class ExplorerPagerAdapter extends PagerAdapter {
 
-    FragmentManager fragmentManager;
-    Fragment[] fragments;
+    private FragmentManager fragmentManager;
+    private Fragment[] fragments;
 
     public ExplorerPagerAdapter(FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
-        fragments = new Fragment[1];
+        fragments = new Fragment[2];
     }
 
     @NonNull
@@ -75,6 +75,8 @@ public class ExplorerPagerAdapter extends PagerAdapter {
             default:
             case 0:
                 return FragmentFilesRoot.get();
+            case 1:
+                return FragmentDownloads.get();
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -85,7 +86,7 @@ public class DownloadService extends IntentService {
                 if (prog > current.progress) {
                     current.progress = prog;
                     updateNotification();
-                    downloadsDAO.update(current);
+                    downloadsDAO.insert(current);
                 }
             }
             outputStream.flush();
@@ -134,6 +135,7 @@ public class DownloadService extends IntentService {
     private void updateMedia() {
         try {
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(FileAccessHelper.INSTANCE.getFile(file))));
+            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{FileAccessHelper.INSTANCE.getFile(file).getAbsolutePath()}, new String[]{"video/mp4"}, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

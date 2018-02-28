@@ -36,6 +36,23 @@
     @com.tickaroo.tikxml.* <methods>;
 }
 
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+
 -dontwarn knf.kuma.**
 -keep public enum knf.kuma.**{*;}
 -keep class es.munix.multidisplaycast.**{*;}

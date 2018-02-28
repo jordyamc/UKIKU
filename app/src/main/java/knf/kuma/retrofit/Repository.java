@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -29,6 +31,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import xdroid.toaster.Toaster;
 
 /**
@@ -71,6 +74,7 @@ public class Repository {
             public void onFailure(Call<Recents> call, Throwable t) {
                 Toaster.toast("Error al obtener - " + t.getMessage());
                 t.printStackTrace();
+                Crashlytics.logException(t);
                 final List<RecentObject> objects = CacheDB.INSTANCE.recentsDAO().getObjects().getValue();
                 if (objects != null)
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -107,6 +111,7 @@ public class Repository {
                 public void onFailure(@NonNull Call<Recents> call, @NonNull Throwable t) {
                     Toaster.toast("Error al obtener - " + t.getMessage());
                     t.printStackTrace();
+                    Crashlytics.logException(t);
                     RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
                     final List<RecentObject> objects = recentsDAO.getObjects().getValue();
                     if (objects != null) {
@@ -251,6 +256,7 @@ public class Repository {
                 .baseUrl(link)
                 //.client(NoSSLOkHttpClient.get())
                 .addConverterFactory(JspoonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
         return retrofit.create(Factory.class);
     }
@@ -260,6 +266,7 @@ public class Repository {
                 .baseUrl(link)
                 //.client(NoSSLOkHttpClient.get())
                 .addConverterFactory(JspoonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .callbackExecutor(Executors.newSingleThreadExecutor())
                 .build();
         return retrofit.create(Factory.class);

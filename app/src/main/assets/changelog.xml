@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="11" version="0.3.8 beta">
+        <change type="new">Pantalla para descargas activas (Explorador>Descargas)</change>
+    </release>
     <release code="10" version="0.3.7 beta">
         <change type="fix">Error al migrar datos</change>
     </release>

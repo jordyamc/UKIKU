@@ -102,8 +102,7 @@
         <service android:name=".directory.DirectoryService"/>
         <service android:name=".directory.DirectoryUpdateService"/>
         <service
-            android:name=".downloadservice.DownloadService"
-            android:process=":UKIKU.downloads"/>
+            android:name=".downloadservice.DownloadService"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

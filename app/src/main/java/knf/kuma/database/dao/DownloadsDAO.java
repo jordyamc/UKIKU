@@ -9,6 +9,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import java.util.List;
+
 import knf.kuma.pojos.DownloadObject;
 
 /**
@@ -28,6 +30,12 @@ public interface DownloadsDAO {
 
     @Query("SELECT * FROM downloadobject WHERE eid LIKE :eid")
     LiveData<DownloadObject> getLiveByEid(String eid);
+
+    @Query("SELECT * FROM downloadobject WHERE `key` LIKE :key")
+    LiveData<DownloadObject> getLiveByKey(int key);
+
+    @Query("SELECT * FROM downloadobject WHERE state<=0")
+    LiveData<List<DownloadObject>> getActive();
 
     @Query("SELECT count(*) FROM downloadobject WHERE state=-1")
     int countPending();

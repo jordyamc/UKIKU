@@ -5,8 +5,6 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-import com.amazon.whisperlink.internal.Explorer;
-
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.database.dao.ChaptersDAO;
 import knf.kuma.database.dao.DownloadsDAO;
@@ -48,12 +46,20 @@ public abstract class CacheDB extends RoomDatabase {
     }
 
     public abstract RecentsDAO recentsDAO();
+
     public abstract AnimeDAO animeDAO();
+
     public abstract FavsDAO favsDAO();
+
     public abstract ChaptersDAO chaptersDAO();
+
     public abstract NotificationDAO notificationDAO();
+
     public abstract DownloadsDAO downloadsDAO();
+
     public abstract RecordsDAO recordsDAO();
+
     public abstract SeeingDAO seeingDAO();
+
     public abstract ExplorerDAO explorerDAO();
 }
