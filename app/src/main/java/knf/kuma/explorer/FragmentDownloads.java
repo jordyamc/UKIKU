@@ -20,10 +20,6 @@ import knf.kuma.R;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.DownloadObject;
 
-/**
- * Created by jordy on 27/02/2018.
- */
-
 public class FragmentDownloads extends FragmentBase {
     @BindView(R.id.recycler)
     RecyclerView recyclerView;

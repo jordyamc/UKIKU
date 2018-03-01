@@ -13,10 +13,6 @@ import java.util.List;
 import knf.kuma.database.BaseConverter;
 import knf.kuma.pojos.FavoriteObject;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 @Dao
 @TypeConverters(BaseConverter.class)
 public interface FavsDAO {
@@ -25,6 +21,7 @@ public interface FavsDAO {
 
     @Query("SELECT * FROM favoriteobject ORDER BY name")
     List<FavoriteObject> getAllRaw();
+
     @Query("SELECT * FROM favoriteobject ORDER BY aid ASC")
     LiveData<List<FavoriteObject>> getAllID();
 

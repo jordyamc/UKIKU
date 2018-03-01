@@ -5,10 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-/**
- * Created by Jordy on 06/01/2018.
- */
-
 public class DirPagerAdapter extends FragmentPagerAdapter {
 
     private DirectoryPageFragment animes=DirectoryPageFragment.get(DirectoryPageFragment.DirType.ANIMES);

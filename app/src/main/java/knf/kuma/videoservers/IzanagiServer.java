@@ -8,10 +8,6 @@ import org.jsoup.Jsoup;
 
 import static knf.kuma.videoservers.VideoServer.Names.IZANAGI;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class IzanagiServer extends Server {
     public IzanagiServer(Context context, String baseLink) {
         super(context, baseLink);

@@ -10,24 +10,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import knf.kuma.R;
 import knf.kuma.animeinfo.AnimeViewModel;
 import knf.kuma.animeinfo.viewholders.AnimeDetailsHolder;
 import knf.kuma.pojos.AnimeObject;
-import knf.kuma.R;
-
-/**
- * Created by Jordy on 05/01/2018.
- */
 
 public class DetailsFragment extends Fragment {
+    private AnimeDetailsHolder holder;
+
+    public DetailsFragment() {
+    }
+
     @NonNull
     public static DetailsFragment get(){
         return new DetailsFragment();
     }
-    public DetailsFragment() {
-    }
-
-    private AnimeDetailsHolder holder;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

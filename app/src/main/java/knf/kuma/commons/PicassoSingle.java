@@ -5,10 +5,6 @@ import android.content.Context;
 
 import com.squareup.picasso.Picasso;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public class PicassoSingle {
     @SuppressLint("StaticFieldLeak")
     private static Picasso picasso;

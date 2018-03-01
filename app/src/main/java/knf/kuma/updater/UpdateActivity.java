@@ -9,6 +9,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -35,10 +36,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knf.kuma.R;
 import xdroid.toaster.Toaster;
-
-/**
- * Created by Jordy on 31/01/2018.
- */
 
 public class UpdateActivity extends AppCompatActivity {
 
@@ -114,7 +111,7 @@ public class UpdateActivity extends AppCompatActivity {
     }
 
     private void start() {
-        File file = new File(getFilesDir(), "update.apk");
+        File file = getUpdate();
         if (file.exists())
             file.delete();
         new ThinDownloadManager().add(new DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk"))
@@ -143,18 +140,29 @@ public class UpdateActivity extends AppCompatActivity {
     @OnClick(R.id.download)
     void install(Button button) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "knf.kuma.fileprovider", new File(getFilesDir(), "update.apk")))
+            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "knf.kuma.fileprovider", getUpdate()))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
                     .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, getPackageName());
             startActivity(intent);
         } else {
             Intent intent = new Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(Uri.fromFile(new File(getFilesDir(), "update.apk")), "application/vnd.android.package-archive")
+                    .setDataAndType(Uri.fromFile(getUpdate()), "application/vnd.android.package-archive")
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivity(intent);
         }
         finish();
+    }
+
+    private File getUpdate() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            return new File(getFilesDir(), "update.apk");
+        else
+            return new File(getDownloadsDir(), "update.apk");
+    }
+
+    private File getDownloadsDir() {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     }
 
     private void setDownProgress(final int progress) {

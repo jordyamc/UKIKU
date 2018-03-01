@@ -8,10 +8,6 @@ import org.jsoup.Jsoup;
 
 import static knf.kuma.videoservers.VideoServer.Names.YOURUPLOAD;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class YUServer extends Server {
     public YUServer(Context context, String baseLink) {
         super(context, baseLink);

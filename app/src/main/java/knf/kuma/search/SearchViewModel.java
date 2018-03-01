@@ -7,10 +7,6 @@ import android.arch.paging.PagedList;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.retrofit.Repository;
 
-/**
- * Created by Jordy on 09/01/2018.
- */
-
 public class SearchViewModel extends ViewModel {
     private Repository repository=new Repository();
 

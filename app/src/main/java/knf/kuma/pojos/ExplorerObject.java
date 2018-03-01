@@ -23,10 +23,6 @@ import java.util.concurrent.TimeUnit;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.downloadservice.FileAccessHelper;
 
-/**
- * Created by Jordy on 29/01/2018.
- */
-
 @Entity
 @TypeConverters(ExplorerObject.Converter.class)
 public class ExplorerObject {

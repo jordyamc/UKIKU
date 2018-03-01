@@ -46,10 +46,6 @@ import knf.kuma.pojos.RecordObject;
 import knf.kuma.videoservers.ServersFactory;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHolder> {
 
     private Context context;

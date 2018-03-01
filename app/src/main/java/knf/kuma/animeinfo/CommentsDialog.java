@@ -20,10 +20,6 @@ import java.util.List;
 import knf.kuma.R;
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 13/02/2018.
- */
-
 public class CommentsDialog {
     Spinner spinner;
     ProgressBar progressBar;

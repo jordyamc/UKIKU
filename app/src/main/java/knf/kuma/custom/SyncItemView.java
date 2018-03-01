@@ -17,10 +17,6 @@ import knf.kuma.backup.BUUtils;
 import knf.kuma.backup.objects.BackupObject;
 import knf.kuma.commons.Network;
 
-/**
- * Created by Jordy on 19/02/2018.
- */
-
 public class SyncItemView extends RelativeLayout {
 
     @BindView(R.id.title)

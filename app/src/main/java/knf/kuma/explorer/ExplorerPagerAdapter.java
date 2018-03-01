@@ -9,10 +9,6 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * Created by Jordy on 19/02/2018.
- */
-
 public class ExplorerPagerAdapter extends PagerAdapter {
 
     private FragmentManager fragmentManager;

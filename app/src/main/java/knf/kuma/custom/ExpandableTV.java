@@ -7,11 +7,10 @@ import android.widget.ImageButton;
 
 import at.blogc.android.views.ExpandableTextView;
 
-/**
- * Created by Jordy on 06/01/2018.
- */
-
 public class ExpandableTV extends ExpandableTextView {
+
+    private ImageButton indicator;
+    private String textSetted;
 
     public ExpandableTV(Context context) {
         super(context);
@@ -20,13 +19,9 @@ public class ExpandableTV extends ExpandableTextView {
     public ExpandableTV(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
-
     public ExpandableTV(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-
-    private ImageButton indicator;
-    private String textSetted;
 
     public void setIndicator(ImageButton indicator) {
         this.indicator = indicator;

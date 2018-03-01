@@ -18,10 +18,6 @@ import knf.kuma.R;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.ExplorerObject;
 
-/**
- * Created by Jordy on 30/01/2018.
- */
-
 public class FragmentChapters extends Fragment {
     public static final String TAG = "Chapters";
     @BindView(R.id.recycler)
@@ -29,6 +25,7 @@ public class FragmentChapters extends Fragment {
     ExplorerChapsAdapter adapter;
     private ClearInterface clearInterface;
     private boolean isFirst = true;
+
     public FragmentChapters() {
     }
 

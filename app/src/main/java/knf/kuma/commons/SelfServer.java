@@ -9,10 +9,6 @@ import fi.iki.elonen.NanoHTTPD;
 import knf.kuma.downloadservice.FileAccessHelper;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 12/02/2018.
- */
-
 public class SelfServer {
     private static Server INSTANCE;
 

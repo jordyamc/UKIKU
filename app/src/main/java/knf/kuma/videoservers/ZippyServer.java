@@ -7,10 +7,6 @@ import org.jsoup.nodes.Document;
 
 import java.net.URLDecoder;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class ZippyServer extends Server {
 
     public ZippyServer(Context context, String baseLink) {

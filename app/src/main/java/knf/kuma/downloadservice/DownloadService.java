@@ -19,10 +19,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * Created by Jordy on 10/01/2018.
- */
-
 public class DownloadService extends IntentService {
     public static final String CHANNEL="service.Downloads";
     public static final String CHANNEL_ONGOING="service.Downloads.Ongoing";

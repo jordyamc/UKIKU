@@ -46,10 +46,6 @@ import knf.kuma.pojos.SeeingObject;
 import knf.kuma.videoservers.ServersFactory;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdapter.ChapterImgHolder> {
 
     private Context context;

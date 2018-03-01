@@ -15,10 +15,6 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Locale;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public final class FileUtil {
 
     private static final String PRIMARY_VOLUME_NAME = "primary";

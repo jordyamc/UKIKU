@@ -14,10 +14,6 @@ import knf.kuma.database.dao.ExplorerDAO;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.pojos.ExplorerObject;
 
-/**
- * Created by Jordy on 29/01/2018.
- */
-
 public class ExplorerCreator {
     public static void start(final Context context, final EmptyListener listener) {
         final ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();

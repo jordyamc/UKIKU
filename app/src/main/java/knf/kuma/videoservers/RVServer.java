@@ -7,10 +7,6 @@ import org.jsoup.Jsoup;
 
 import static knf.kuma.videoservers.VideoServer.Names.RV;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class RVServer extends Server {
     public RVServer(Context context, String baseLink) {
         super(context, baseLink);

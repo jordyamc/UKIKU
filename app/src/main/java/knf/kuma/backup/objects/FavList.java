@@ -15,10 +15,6 @@ import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.FavoriteObject;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 22/02/2018.
- */
-
 public class FavList {
     @SerializedName("response")
     String response;

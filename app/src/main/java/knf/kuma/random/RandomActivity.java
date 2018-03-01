@@ -30,10 +30,6 @@ import knf.kuma.R;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 07/02/2018.
- */
-
 public class RandomActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;

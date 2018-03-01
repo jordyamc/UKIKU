@@ -41,10 +41,6 @@ import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 04/01/2018.
- */
-
 public class ActivityAnime extends AppCompatActivity implements AnimeActivityHolder.Interface {
     public static int REQUEST_CODE = 558;
     private boolean isEdited = false;

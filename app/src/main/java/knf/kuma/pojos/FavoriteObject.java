@@ -4,10 +4,6 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 @Entity
 public class FavoriteObject {
     @PrimaryKey

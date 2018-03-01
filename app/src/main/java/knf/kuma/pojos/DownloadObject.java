@@ -12,10 +12,6 @@ import com.google.gson.Gson;
 
 import knf.kuma.database.BaseConverter;
 
-/**
- * Created by Jordy on 10/01/2018.
- */
-
 @Entity
 @TypeConverters({DownloadObject.Converter.class, BaseConverter.class})
 public class DownloadObject {

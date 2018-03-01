@@ -21,10 +21,6 @@ import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 07/02/2018.
- */
-
 public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.RandomItem> {
 
     private Activity activity;

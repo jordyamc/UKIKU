@@ -28,10 +28,6 @@ import knf.kuma.custom.ExpandableTV;
 import knf.kuma.pojos.AnimeObject;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 public class AnimeDetailsHolder {
     @BindViews({R.id.card_title, R.id.card_desc, R.id.card_details, R.id.card_genres, R.id.card_related})
     List<CardView> cardViews;

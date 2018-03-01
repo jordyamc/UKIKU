@@ -9,10 +9,6 @@ import org.jsoup.nodes.Document;
 
 import knf.kuma.commons.Network;
 
-/**
- * Created by Jordy on 31/01/2018.
- */
-
 public class Updatechecker {
     public static void check(final Context context, final CheckListener listener) {
         if (Network.isConnected())

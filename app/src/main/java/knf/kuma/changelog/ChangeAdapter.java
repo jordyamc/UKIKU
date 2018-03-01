@@ -15,10 +15,6 @@ import knf.kuma.R;
 import knf.kuma.changelog.objects.Change;
 import knf.kuma.changelog.objects.Release;
 
-/**
- * Created by Jordy on 08/02/2018.
- */
-
 public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeItem> {
 
     private List<Change> changes = new ArrayList<>();

@@ -16,10 +16,6 @@ import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.downloadservice.FileAccessHelper;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 @Entity
 public class RecentObject {
     @PrimaryKey(autoGenerate = true)

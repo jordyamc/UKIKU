@@ -11,10 +11,6 @@ import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
 
-/**
- * Created by Jordy on 07/02/2018.
- */
-
 public class NoSSLOkHttpClient {
     public static OkHttpClient get() {
         try {

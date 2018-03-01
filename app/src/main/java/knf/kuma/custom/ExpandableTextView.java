@@ -20,104 +20,29 @@ import android.widget.TextView;
 
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 02/10/2017.
- */
-
 @SuppressWarnings("unused")
 public class ExpandableTextView extends LinearLayout
         implements
         View.OnClickListener {
 
-    /**
-     * handler信号
-     * <br>handler signal
-     */
     private final int WHAT = 2;
-    /**
-     * 动画结束信号
-     * <br>animation end signal of handler
-     */
     private final int WHAT_ANIMATION_END = 3;
-    /**
-     * 动画结束，只是改变图标，并不隐藏
-     * <br>animation end and expand only,but not disappear
-     */
     private final int WHAT_EXPAND_ONLY = 4;
-    /**
-     * TextView
-     */
     private TextView textView;
-    /**
-     * 点击进行折叠/展开的图片
-     * <br>shrink/expand icon
-     */
     @Nullable
     private ImageButton ivExpandOrShrink;
-    /**
-     * 提示折叠的图片资源
-     * <br>shrink drawable
-     */
     private Drawable drawableShrink;
-    /**
-     * 提示显示全部的图片资源
-     * <br>expand drawable
-     */
     private Drawable drawableExpand;
-    /**
-     * 全部/收起文本的字体颜色
-     * <br>color of shrink/expand text
-     */
     private int textViewStateColor;
-    /**
-     * 是否折叠显示的标示
-     * <br>flag of shrink/expand
-     */
     private boolean isShrink = false;
-    /**
-     * 是否需要折叠的标示
-     * <br>flag of expand needed
-     */
     private boolean isExpandNeeded = false;
-    /**
-     * 是否初始化TextView
-     * <br>flag of TextView Initialization
-     */
     private boolean isInitTextView = true;
-    /**
-     * 折叠显示的行数
-     * <br>number of lines to expand
-     */
     private int expandLines;
-    /**
-     * 文本的行数
-     * <br>Original number of lines
-     */
     private int textLines;
-    /**
-     * 显示的文本
-     * <br>content text
-     */
     private CharSequence textContent;
-    /**
-     * 显示的文本颜色
-     * <br>content color
-     */
     private int textContentColor;
-    /**
-     * 显示的文本字体大小
-     * <br>content text size
-     */
     private float textContentSize;
-    /**
-     * 动画线程
-     * <br>thread
-     */
     private Thread thread;
-    /**
-     * 动画过度间隔
-     * <br>animation interval
-     */
     private int sleepTime = 22;
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -221,11 +146,6 @@ public class ExpandableTextView extends LinearLayout
         });
     }
 
-    /**
-     * @param startIndex 开始动画的起点行数 <br> start index of animation
-     * @param endIndex   结束动画的终点行数 <br> end index of animation
-     * @param what       动画结束后的handler信号标示 <br> signal of animation end
-     */
     private void doAnimation(final int startIndex, final int endIndex,
                              final int what) {
 
@@ -278,12 +198,6 @@ public class ExpandableTextView extends LinearLayout
 
     }
 
-    /**
-     * 改变折叠状态（仅仅改变折叠与展开状态，不会隐藏折叠/展开图片布局）
-     * change shrink/expand state(only change state,but not hide shrink/expand icon)
-     *
-     * @param endIndex end
-     */
     @SuppressWarnings("deprecation")
     private void changeExpandState(int endIndex) {
         if (endIndex < textLines) {
@@ -296,12 +210,6 @@ public class ExpandableTextView extends LinearLayout
 
     }
 
-    /**
-     * 设置折叠状态（如果折叠行数设定大于文本行数，那么折叠/展开图片布局将会隐藏,文本将一直处于展开状态）
-     * change shrink/expand state(if number of expand lines bigger than original text lines,hide shrink/expand icon,and TextView will always be at expand state)
-     *
-     * @param endIndex end
-     */
     @SuppressWarnings("deprecation")
     private void setExpandState(int endIndex) {
 
@@ -319,10 +227,6 @@ public class ExpandableTextView extends LinearLayout
 
     }
 
-    /**
-     * 无需折叠
-     * do not expand
-     */
     private void doNotExpand() {
         textView.setMaxLines(expandLines);
         textView.setOnClickListener(null);
@@ -380,12 +284,6 @@ public class ExpandableTextView extends LinearLayout
         this.expandLines = newExpandLines;
     }
 
-    /**
-     * 取得显示的文本内容
-     * get content text
-     *
-     * @return content text
-     */
     public CharSequence getTextContent() {
         return textContent;
     }

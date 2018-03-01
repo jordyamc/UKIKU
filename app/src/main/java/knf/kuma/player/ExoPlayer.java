@@ -45,10 +45,6 @@ import butterknife.OnClick;
 import knf.kuma.R;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 10/01/2018.
- */
-
 public class ExoPlayer extends AppCompatActivity implements Player.EventListener, PlaybackControlView.VisibilityListener {
     @BindView(R.id.player)
     SimpleExoPlayerView exoPlayerView;

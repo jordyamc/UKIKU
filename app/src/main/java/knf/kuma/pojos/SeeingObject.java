@@ -6,9 +6,6 @@ import android.arch.persistence.room.PrimaryKey;
 
 import knf.kuma.database.CacheDB;
 
-/**
- * Created by Jordy on 23/01/2018.
- */
 @Entity
 public class SeeingObject {
     @PrimaryKey

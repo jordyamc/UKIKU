@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import knf.kuma.Main;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
-import knf.kuma.animeinfo.AnimeBroadcast;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.database.dao.FavsDAO;
@@ -35,10 +34,6 @@ import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.Recents;
 import knf.kuma.recents.RecentsNotReceiver;
 import pl.droidsonroids.jspoon.Jspoon;
-
-/**
- * Created by Jordy on 09/01/2018.
- */
 
 public class RecentsJob extends Job {
     public static final String CHANNEL_RECENTS = "channel.RECENTS";

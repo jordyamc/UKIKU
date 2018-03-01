@@ -5,9 +5,6 @@ import org.jsoup.nodes.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jordy on 07/02/2018.
- */
 public class Release {
     public String version;
     public String code;

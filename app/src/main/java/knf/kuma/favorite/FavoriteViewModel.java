@@ -9,12 +9,6 @@ import java.util.List;
 
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.FavoriteObject;
-import knf.kuma.retrofit.Factory;
-import knf.kuma.retrofit.Repository;
-
-/**
- * Created by Jordy on 08/01/2018.
- */
 
 public class FavoriteViewModel extends ViewModel {
 

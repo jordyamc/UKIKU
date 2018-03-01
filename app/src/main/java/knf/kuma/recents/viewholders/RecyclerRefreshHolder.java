@@ -10,10 +10,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public class RecyclerRefreshHolder {
     @BindView(R.id.recycler)
     public RecyclerView recyclerView;
@@ -22,6 +18,7 @@ public class RecyclerRefreshHolder {
     @BindView(R.id.error)
     public View error;
     private LinearLayoutManager layoutManager;
+
     public RecyclerRefreshHolder(View view) {
         ButterKnife.bind(this,view);
         layoutManager=new LinearLayoutManager(view.getContext());

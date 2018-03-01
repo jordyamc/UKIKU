@@ -28,10 +28,6 @@ import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.pojos.DownloadObject;
 
-/**
- * Created by jordy on 27/02/2018.
- */
-
 public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.DownloadingItem> {
 
     private Fragment fragment;

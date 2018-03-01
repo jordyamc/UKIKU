@@ -19,14 +19,10 @@ import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 24/01/2018.
- */
-
 public class EmisionAdapter extends RecyclerView.Adapter<EmisionAdapter.EmisionItem>{
 
-    private Fragment fragment;
     public List<AnimeObject> list=new ArrayList<>();
+    private Fragment fragment;
 
     public EmisionAdapter(Fragment fragment) {
         this.fragment = fragment;
@@ -74,6 +70,7 @@ public class EmisionAdapter extends RecyclerView.Adapter<EmisionAdapter.EmisionI
         ImageView imageView;
         @BindView(R.id.title)
         TextView title;
+
         EmisionItem(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);

@@ -12,10 +12,6 @@ import java.util.List;
 
 import knf.kuma.pojos.SeeingObject;
 
-/**
- * Created by Jordy on 23/01/2018.
- */
-
 @Dao
 public interface SeeingDAO {
 

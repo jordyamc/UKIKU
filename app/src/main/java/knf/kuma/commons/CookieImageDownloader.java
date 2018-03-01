@@ -8,10 +8,6 @@ import com.squareup.picasso.UrlConnectionDownloader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public  class CookieImageDownloader extends UrlConnectionDownloader {
 
     public CookieImageDownloader(Context context) {

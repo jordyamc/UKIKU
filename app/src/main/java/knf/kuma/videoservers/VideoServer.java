@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class VideoServer {
     public String name;
     public List<Option> options = new ArrayList<>();

@@ -12,9 +12,6 @@ import knf.kuma.database.dao.AnimeDAO;
 import pl.droidsonroids.jspoon.Jspoon;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
-/**
- * Created by Jordy on 06/01/2018.
- */
 public class DirectoryPage {
     @Selector(value = "article.Anime.alt.B > a", attr = "href")
     public List<String> links = new ArrayList<>();
@@ -64,6 +61,7 @@ public class DirectoryPage {
 
     public interface UpdateInterface {
         void onAdd();
+
         void onError();
     }
 }

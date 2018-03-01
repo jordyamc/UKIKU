@@ -3,7 +3,6 @@ package knf.kuma.preferences;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,24 +14,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import com.evernote.android.job.JobManager;
-import com.pavelsikun.seekbarpreference.SeekBarPreference;
-import com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat;
 
 import knf.kuma.R;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
 import xdroid.toaster.Toaster;
-
-/**
- * Created by Jordy on 08/01/2018.
- */
 
 public class ConfigurationFragment extends PreferenceFragment {
     public ConfigurationFragment() {

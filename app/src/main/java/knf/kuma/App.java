@@ -25,10 +25,6 @@ import knf.kuma.jobscheduler.JobsCreator;
 import knf.kuma.jobscheduler.RecentsJob;
 import knf.kuma.jobscheduler.UpdateJob;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public class App extends Application {
     @Override
     public void onCreate() {

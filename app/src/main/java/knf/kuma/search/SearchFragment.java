@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +25,6 @@ import butterknife.ButterKnife;
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
 import knf.kuma.pojos.AnimeObject;
-
-/**
- * Created by Jordy on 09/01/2018.
- */
 
 public class SearchFragment extends BottomFragment {
     @BindView(R.id.recycler)

@@ -29,10 +29,6 @@ import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DirectoryPage;
 import pl.droidsonroids.jspoon.Jspoon;
 
-/**
- * Created by Jordy on 06/01/2018.
- */
-
 public class DirectoryService extends IntentService {
     public static int NOT_CODE=5598;
     public static String CHANNEL="directory_update";

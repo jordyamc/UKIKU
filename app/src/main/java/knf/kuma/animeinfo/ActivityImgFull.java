@@ -11,7 +11,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,10 +25,6 @@ import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.commons.PicassoSingle;
 import xdroid.toaster.Toaster;
-
-/**
- * Created by Jordy on 15/01/2018.
- */
 
 public class ActivityImgFull extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 

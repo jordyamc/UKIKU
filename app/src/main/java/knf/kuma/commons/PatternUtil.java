@@ -2,17 +2,12 @@ package knf.kuma.commons;
 
 import android.util.Log;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import knf.kuma.pojos.AnimeObject;
-
-/**
- * Created by Jordy on 04/01/2018.
- */
 
 public class PatternUtil {
     public static String getLinkNumber(String link){
@@ -93,6 +88,7 @@ public class PatternUtil {
         matcher.find();
         return matcher.group(1);
     }
+
     public static String getCustomAttr(String s){
         Matcher matcher=Pattern.compile("^:([a-z]+):.*$").matcher(s);
         matcher.find();

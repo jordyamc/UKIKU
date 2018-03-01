@@ -13,10 +13,6 @@ import java.util.List;
 import knf.kuma.database.BaseConverter;
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 08/01/2018.
- */
-
 @Dao
 @TypeConverters({BaseConverter.class})
 public interface ChaptersDAO {

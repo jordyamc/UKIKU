@@ -13,10 +13,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 public class AnimeTagsAdapter extends RecyclerView.Adapter<AnimeTagsAdapter.TagHolder>{
 
     private List<String> list=new ArrayList<>();
@@ -43,6 +39,7 @@ public class AnimeTagsAdapter extends RecyclerView.Adapter<AnimeTagsAdapter.TagH
     class TagHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.chip)
         TextView chip;
+
         public TagHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);

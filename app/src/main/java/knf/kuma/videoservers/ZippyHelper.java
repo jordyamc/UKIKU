@@ -14,13 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.net.URLDecoder;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-/**
- * Created by Jordy on 11/01/2018.
- */
 
 public class ZippyHelper {
     public static void calculate(final Context context, final String u, final OnZippyResult callback) {

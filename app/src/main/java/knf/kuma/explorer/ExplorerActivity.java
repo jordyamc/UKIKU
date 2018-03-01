@@ -17,10 +17,6 @@ import knf.kuma.R;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.database.CacheDB;
 
-/**
- * Created by Jordy on 29/01/2018.
- */
-
 public class ExplorerActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)

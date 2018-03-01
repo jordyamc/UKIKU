@@ -9,10 +9,6 @@ import android.support.annotation.NonNull;
 
 import knf.kuma.recents.RecentsNotReceiver;
 
-/**
- * Created by Jordy on 09/01/2018.
- */
-
 @Entity
 public class NotificationObj {
     @Ignore
@@ -26,13 +22,13 @@ public class NotificationObj {
         this.type = type;
     }
 
-    public Intent getBroadcast(Context context){
-        return new Intent(context, RecentsNotReceiver.class).putExtra("key",key).putExtra("type",type);
-    }
-
     @NonNull
     public static NotificationObj fromIntent(Intent intent){
         return new NotificationObj(intent.getIntExtra("key",-1),intent.getIntExtra("type",-1));
+    }
+
+    public Intent getBroadcast(Context context) {
+        return new Intent(context, RecentsNotReceiver.class).putExtra("key", key).putExtra("type", type);
     }
 
     @Override

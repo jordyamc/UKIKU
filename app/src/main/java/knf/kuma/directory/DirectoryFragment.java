@@ -9,22 +9,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import knf.kuma.BottomFragment;
-import knf.kuma.directory.viewholders.DirMainFragmentHolder;
 import knf.kuma.R;
-
-/**
- * Created by Jordy on 06/01/2018.
- */
+import knf.kuma.directory.viewholders.DirMainFragmentHolder;
 
 public class DirectoryFragment extends BottomFragment {
-    public static DirectoryFragment get(){
-        return new DirectoryFragment();
-    }
+    private DirMainFragmentHolder fragmentHolder;
 
     public DirectoryFragment() {
     }
 
-    private DirMainFragmentHolder fragmentHolder;
+    public static DirectoryFragment get(){
+        return new DirectoryFragment();
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

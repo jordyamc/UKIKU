@@ -16,17 +16,24 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.AnimeObject;
-import knf.kuma.R;
-
-/**
- * Created by Jordy on 06/01/2018.
- */
 
 public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,DirectorypageAdapter.ItemHolder> {
 
+    public static final DiffCallback<AnimeObject> DIFF_CALLBACK = new DiffCallback<AnimeObject>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
+            return oldItem.key == newItem.key;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
+            return oldItem.name.equals(newItem.name);
+        }
+    };
     private Fragment fragment;
 
     public DirectorypageAdapter(Fragment fragment) {
@@ -62,19 +69,6 @@ public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,Directory
             });
         }
     }
-
-
-    public static final DiffCallback<AnimeObject> DIFF_CALLBACK = new DiffCallback<AnimeObject>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
-            return oldItem.key==newItem.key;
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
-            return oldItem.name.equals(newItem.name);
-        }
-    };
 
     class ItemHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.card)

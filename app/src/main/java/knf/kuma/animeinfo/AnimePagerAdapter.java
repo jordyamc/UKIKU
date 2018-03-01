@@ -8,10 +8,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import knf.kuma.animeinfo.fragments.ChaptersFragment;
 import knf.kuma.animeinfo.fragments.DetailsFragment;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 public class AnimePagerAdapter extends FragmentPagerAdapter {
 
     private DetailsFragment detailsFragment=DetailsFragment.get();

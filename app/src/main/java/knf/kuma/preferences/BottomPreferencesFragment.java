@@ -10,15 +10,12 @@ import android.view.ViewGroup;
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 08/01/2018.
- */
-
 public class BottomPreferencesFragment extends BottomFragment {
+    public BottomPreferencesFragment() {
+    }
+
     public static BottomPreferencesFragment get(){
         return new BottomPreferencesFragment();
-    }
-    public BottomPreferencesFragment() {
     }
 
     @Nullable

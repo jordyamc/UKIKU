@@ -29,10 +29,6 @@ import knf.kuma.database.dao.SeeingDAO;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.SeeingObject;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 public class AnimeChaptersHolder {
     @BindView(R.id.recycler)
     public RecyclerView recyclerView;

@@ -23,10 +23,6 @@ import knf.kuma.R;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.ExplorerObject;
 
-/**
- * Created by Jordy on 30/01/2018.
- */
-
 public class FragmentFiles extends Fragment {
 
     public static final String TAG = "Files";

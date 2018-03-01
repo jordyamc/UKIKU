@@ -7,10 +7,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public interface Factory {
     @GET(".")
     Call<Recents> getRecents(@Header("Cookie") String cookies);

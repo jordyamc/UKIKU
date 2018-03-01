@@ -23,10 +23,6 @@ import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 @Database(entities = {
         RecentObject.class,
         AnimeObject.class,

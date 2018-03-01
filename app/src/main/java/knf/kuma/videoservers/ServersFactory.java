@@ -34,10 +34,6 @@ import knf.kuma.player.ExoPlayer;
 import knf.kuma.pojos.DownloadObject;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class ServersFactory {
     private Context context;
     private String url;
@@ -346,6 +342,7 @@ public class ServersFactory {
 
     public interface ServersInterface {
         void onFinish(boolean started, boolean success);
+
         void onCast(String url);
     }
 }

@@ -8,12 +8,8 @@ import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.BottomFragment;
-import knf.kuma.directory.DirPagerAdapter;
 import knf.kuma.R;
-
-/**
- * Created by Jordy on 06/01/2018.
- */
+import knf.kuma.directory.DirPagerAdapter;
 
 public class DirMainFragmentHolder {
     @BindView(R.id.tabs)

@@ -8,10 +8,6 @@ import android.content.Context;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.retrofit.Repository;
 
-/**
- * Created by Jordy on 06/01/2018.
- */
-
 public class DirectoryViewModel extends ViewModel {
     private Repository repository=new Repository();
 

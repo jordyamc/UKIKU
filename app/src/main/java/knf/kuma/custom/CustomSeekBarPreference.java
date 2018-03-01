@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatSeekBar;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +15,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
-
-/**
- * Created by Jordy on 12/01/2018.
- */
 
 public class CustomSeekBarPreference extends Preference implements SeekBar.OnSeekBarChangeListener{
 

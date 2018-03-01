@@ -5,10 +5,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by Jordy on 20/02/2018.
- */
-
 public class BackupObject<T> {
     public String date;
     public List<T> data;

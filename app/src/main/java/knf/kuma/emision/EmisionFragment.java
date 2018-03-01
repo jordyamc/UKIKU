@@ -25,10 +25,6 @@ import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.pojos.AnimeObject;
 import pl.droidsonroids.jspoon.Jspoon;
 
-/**
- * Created by Jordy on 24/01/2018.
- */
-
 public class EmisionFragment extends Fragment {
     @BindView(R.id.recycler)
     GridRecyclerView recyclerView;

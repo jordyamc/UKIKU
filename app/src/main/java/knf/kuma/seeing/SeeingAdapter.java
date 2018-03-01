@@ -5,7 +5,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,15 +24,11 @@ import knf.kuma.database.dao.SeeingDAO;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.SeeingObject;
 
-/**
- * Created by Jordy on 23/01/2018.
- */
-
 public class SeeingAdapter extends RecyclerView.Adapter<SeeingAdapter.SeeingItem>{
 
+    public List<SeeingObject> list = new ArrayList<>();
     private Activity activity;
     private SeeingDAO seeingDAO= CacheDB.INSTANCE.seeingDAO();
-    public List<SeeingObject> list=new ArrayList<>();
 
     public SeeingAdapter(Activity activity) {
         this.activity = activity;
@@ -89,6 +84,7 @@ public class SeeingAdapter extends RecyclerView.Adapter<SeeingAdapter.SeeingItem
         list.remove(position);
         notifyItemRemoved(position);
     }
+
     class SeeingItem extends RecyclerView.ViewHolder{
         @BindView(R.id.card)
         CardView cardView;
@@ -98,6 +94,7 @@ public class SeeingAdapter extends RecyclerView.Adapter<SeeingAdapter.SeeingItem
         TextView title;
         @BindView(R.id.chapter)
         TextView chapter;
+
         SeeingItem(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);

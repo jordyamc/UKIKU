@@ -16,21 +16,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 24/01/2018.
- */
-
 public class EmisionActivity extends AppCompatActivity {
-    public static void open(Context context){
-        context.startActivity(new Intent(context,EmisionActivity.class));
-    }
-
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.tabs)
     TabLayout tabLayout;
     @BindView(R.id.pager)
     ViewPager pager;
+
+    public static void open(Context context) {
+        context.startActivity(new Intent(context, EmisionActivity.class));
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

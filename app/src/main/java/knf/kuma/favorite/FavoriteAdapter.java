@@ -22,10 +22,6 @@ import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.FavoriteObject;
 
-/**
- * Created by Jordy on 08/01/2018.
- */
-
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ItemHolder> {
 
     private Context context;

@@ -19,10 +19,6 @@ import knf.kuma.animeinfo.AnimeViewModel;
 import knf.kuma.animeinfo.viewholders.AnimeChaptersHolder;
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 05/01/2018.
- */
-
 public class ChaptersFragment extends BottomFragment {
     private AnimeChaptersHolder holder;
 

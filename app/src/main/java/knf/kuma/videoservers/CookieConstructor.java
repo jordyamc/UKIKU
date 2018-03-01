@@ -1,9 +1,5 @@
 package knf.kuma.videoservers;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class CookieConstructor {
     private String cookie;
     private String useAgent;

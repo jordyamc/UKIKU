@@ -9,10 +9,6 @@ import org.jsoup.Jsoup;
 
 import static knf.kuma.videoservers.VideoServer.Names.HYPERION;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class HyperionServer extends Server {
     public HyperionServer(Context context, String baseLink) {
         super(context, baseLink);

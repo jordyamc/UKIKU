@@ -7,10 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 24/01/2018.
- */
-
 public class EmisionPagerAdapter extends FragmentPagerAdapter {
 
     private EmisionFragment monday=EmisionFragment.get(AnimeObject.Day.MONDAY);

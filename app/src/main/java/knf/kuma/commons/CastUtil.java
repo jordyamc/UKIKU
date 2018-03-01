@@ -17,10 +17,6 @@ import es.munix.multidisplaycast.interfaces.CastListener;
 import es.munix.multidisplaycast.interfaces.PlayStatusListener;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 25/01/2018.
- */
-
 public class CastUtil implements CastListener, PlayStatusListener {
     public static String NO_PLAYING = "no_play";
     private static CastUtil ourInstance;

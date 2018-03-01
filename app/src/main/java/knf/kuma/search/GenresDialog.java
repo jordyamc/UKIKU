@@ -11,10 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by Jordy on 09/01/2018.
- */
-
 public class GenresDialog extends DialogFragment {
 
     private List<String> genres=new ArrayList<>();
@@ -56,10 +52,6 @@ public class GenresDialog extends DialogFragment {
                 }).create();
     }
 
-    public interface MultichoiseListener{
-        void onOkay(List<String> selected);
-    }
-
     private boolean[] getStates(){
         boolean[] states=new boolean[genres.size()];
         int index=0;
@@ -67,5 +59,9 @@ public class GenresDialog extends DialogFragment {
             states[index++]=selected.contains(genre);
         }
         return states;
+    }
+
+    public interface MultichoiseListener {
+        void onOkay(List<String> selected);
     }
 }

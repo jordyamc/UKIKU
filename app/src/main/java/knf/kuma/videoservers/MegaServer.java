@@ -7,10 +7,6 @@ import java.net.URLDecoder;
 
 import static knf.kuma.videoservers.VideoServer.Names.MEGA;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class MegaServer extends Server {
     public MegaServer(Context context, String baseLink) {
         super(context, baseLink);

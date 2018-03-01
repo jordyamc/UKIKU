@@ -8,19 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.GridLayoutAnimationController;
 
-/**
- * Created by Jordy on 24/01/2018.
- */
-
 public class GridRecyclerView extends RecyclerView {
 
-    /** @see View#View(Context) */
     public GridRecyclerView(Context context) { super(context); }
 
-    /** @see View#View(Context, AttributeSet) */
     public GridRecyclerView(Context context, AttributeSet attrs) { super(context, attrs); }
 
-    /** @see View#View(Context, AttributeSet, int) */
     public GridRecyclerView(Context context, AttributeSet attrs, int defStyle) { super(context, attrs, defStyle); }
 
     @Override

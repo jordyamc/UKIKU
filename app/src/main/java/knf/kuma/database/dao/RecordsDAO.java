@@ -11,10 +11,6 @@ import java.util.List;
 
 import knf.kuma.pojos.RecordObject;
 
-/**
- * Created by Jordy on 19/01/2018.
- */
-
 @Dao
 public interface RecordsDAO {
     @Query("SELECT * FROM recordobject ORDER BY date DESC")

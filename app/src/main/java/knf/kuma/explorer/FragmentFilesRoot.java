@@ -10,10 +10,6 @@ import android.view.ViewGroup;
 
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 30/01/2018.
- */
-
 public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.SelectedListener, FragmentChapters.ClearInterface, ExplorerCreator.EmptyListener {
 
     private FragmentFiles files;

@@ -8,10 +8,6 @@ import android.text.format.Formatter;
 
 import static android.content.Context.WIFI_SERVICE;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public class Network {
     private static Context context;
 

@@ -48,10 +48,6 @@ import knf.kuma.videoservers.ServersFactory;
 
 import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
 
-/**
- * Created by Jordy on 30/01/2018.
- */
-
 public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem> {
 
     private Fragment fragment;

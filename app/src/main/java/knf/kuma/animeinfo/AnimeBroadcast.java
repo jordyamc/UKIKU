@@ -7,10 +7,6 @@ import android.content.Intent;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.AnimeObject;
 
-/**
- * Created by Jordy on 09/01/2018.
- */
-
 public class AnimeBroadcast extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {

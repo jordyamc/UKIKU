@@ -23,10 +23,6 @@ import knf.kuma.animeinfo.ActivityImgFull;
 import knf.kuma.animeinfo.AnimePagerAdapter;
 import knf.kuma.commons.PicassoSingle;
 
-/**
- * Created by Jordy on 04/01/2018.
- */
-
 public class AnimeActivityHolder {
     @BindView(R.id.appBar)
     public AppBarLayout appBarLayout;

@@ -33,10 +33,6 @@ import knf.kuma.R;
 import knf.kuma.changelog.objects.Changelog;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 07/02/2018.
- */
-
 public class ChangelogActivity extends AppCompatActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;

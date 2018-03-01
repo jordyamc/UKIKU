@@ -34,10 +34,6 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 @Singleton
 public class Repository {
     public Repository() {

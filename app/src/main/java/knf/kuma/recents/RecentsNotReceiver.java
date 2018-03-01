@@ -9,14 +9,20 @@ import java.util.List;
 
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.NotificationDAO;
-import knf.kuma.pojos.NotificationObj;
 import knf.kuma.jobscheduler.RecentsJob;
-
-/**
- * Created by Jordy on 09/01/2018.
- */
+import knf.kuma.pojos.NotificationObj;
 
 public class RecentsNotReceiver extends BroadcastReceiver {
+    public static void removeAll(Context context) {
+        NotificationManager manager = ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
+        NotificationDAO notificationDAO = CacheDB.INSTANCE.notificationDAO();
+        for (NotificationObj obj : notificationDAO.getAll()) {
+            manager.cancel(obj.key);
+        }
+        notificationDAO.clear();
+        manager.cancel(RecentsJob.KEY_SUMMARY);
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationDAO notificationDAO= CacheDB.INSTANCE.notificationDAO();
@@ -28,15 +34,5 @@ public class RecentsNotReceiver extends BroadcastReceiver {
             if (objs.size()<=1)
                 ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(RecentsJob.KEY_SUMMARY);
         }
-    }
-
-    public static void removeAll(Context context){
-        NotificationManager manager=((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE));
-        NotificationDAO notificationDAO= CacheDB.INSTANCE.notificationDAO();
-        for (NotificationObj obj:notificationDAO.getAll()){
-            manager.cancel(obj.key);
-        }
-        notificationDAO.clear();
-        manager.cancel(RecentsJob.KEY_SUMMARY);
     }
 }

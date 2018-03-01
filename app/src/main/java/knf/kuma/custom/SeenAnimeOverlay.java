@@ -11,10 +11,6 @@ import android.widget.LinearLayout;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 04/01/2018.
- */
-
 public class SeenAnimeOverlay extends LinearLayout {
     public SeenAnimeOverlay(Context context) {
         super(context);

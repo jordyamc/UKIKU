@@ -15,16 +15,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import knf.kuma.R;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.pojos.AnimeObject;
-import knf.kuma.R;
-
-/**
- * Created by Jordy on 05/01/2018.
- */
 
 public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Context context;
@@ -96,6 +92,7 @@ public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView textView;
         @BindView(R.id.relation)
         TextView relation;
+
         public RelatedHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
@@ -109,6 +106,7 @@ public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView textView;
         @BindView(R.id.relation)
         TextView relation;
+
         public RelatedNoImgHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);

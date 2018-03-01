@@ -9,13 +9,9 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import java.util.List;
-import java.util.Locale;
 
 import knf.kuma.pojos.ExplorerObject;
 
-/**
- * Created by Jordy on 29/01/2018.
- */
 @Dao
 public interface ExplorerDAO {
     @Query("SELECT * FROM explorerobject ORDER BY name")

@@ -12,10 +12,6 @@ import java.util.List;
 
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 16/01/2018.
- */
-
 public class FiltersSuggestion implements SearchSuggestionsBuilder {
 
     private Context context;

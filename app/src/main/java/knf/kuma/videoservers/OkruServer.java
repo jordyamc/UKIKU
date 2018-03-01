@@ -9,10 +9,6 @@ import org.jsoup.Jsoup;
 
 import static knf.kuma.videoservers.VideoServer.Names.OKRU;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class OkruServer extends Server {
     public OkruServer(Context context, String baseLink) {
         super(context, baseLink);

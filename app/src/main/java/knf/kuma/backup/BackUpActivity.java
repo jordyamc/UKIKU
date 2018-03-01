@@ -31,10 +31,6 @@ import knf.kuma.backup.objects.BackupObject;
 import knf.kuma.custom.SyncItemView;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 15/02/2018.
- */
-
 public class BackUpActivity extends AppCompatActivity implements BUUtils.LoginInterface, SyncItemView.OnClick {
 
     @BindView(R.id.colorChanger)

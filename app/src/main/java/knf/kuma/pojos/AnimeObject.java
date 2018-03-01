@@ -142,7 +142,14 @@ public class AnimeObject {
     }
 
     public enum Day {
-        MONDAY(2), TUESDAY(3), WEDNESDAY(4), THURSDAY(5), FRIDAY(6), SATURDAY(7), SUNDAY(1), NONE(0);
+        MONDAY(2),
+        TUESDAY(3),
+        WEDNESDAY(4),
+        THURSDAY(5),
+        FRIDAY(6),
+        SATURDAY(7),
+        SUNDAY(1),
+        NONE(0);
         public int value;
 
         Day(int value) {
@@ -297,7 +304,8 @@ public class AnimeObject {
             }
 
             public enum ChapterType {
-                NEW(0), OLD(1);
+                NEW(0),
+                OLD(1);
                 public int value;
 
                 ChapterType(int value) {

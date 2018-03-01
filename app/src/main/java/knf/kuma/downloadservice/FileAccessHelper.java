@@ -25,10 +25,6 @@ import knf.kuma.commons.FileUtil;
 import knf.kuma.commons.PatternUtil;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 10/01/2018.
- */
-
 public class FileAccessHelper {
     public static final int SD_REQUEST = 51247;
     public static FileAccessHelper INSTANCE;

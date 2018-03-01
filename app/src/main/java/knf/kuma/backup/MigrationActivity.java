@@ -21,10 +21,6 @@ import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.FavoriteObject;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 22/02/2018.
- */
-
 public class MigrationActivity extends AppCompatActivity {
 
     private final int REQUEST_FAVS = 5628;

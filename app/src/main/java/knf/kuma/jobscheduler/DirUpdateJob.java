@@ -15,10 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import knf.kuma.directory.DirectoryUpdateService;
 
-/**
- * Created by Jordy on 09/01/2018.
- */
-
 public class DirUpdateJob extends Job {
     public static final String TAG = "dir-update-job";
 

@@ -3,10 +3,6 @@ package knf.kuma.videoservers;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jordy on 11/01/2018.
- */
-
 public class Option {
     public String name;
     public String url;

@@ -18,10 +18,6 @@ import knf.kuma.commons.Network;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder;
 
-/**
- * Created by Jordy on 03/01/2018.
- */
-
 public class RecentFragment extends BottomFragment implements SwipeRefreshLayout.OnRefreshListener {
     private RecentsViewModel viewModel;
     private RecyclerRefreshHolder holder;

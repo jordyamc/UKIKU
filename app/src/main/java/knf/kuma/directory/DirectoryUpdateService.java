@@ -1,12 +1,10 @@
 package knf.kuma.directory;
 
-import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -14,9 +12,7 @@ import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import knf.kuma.R;
 import knf.kuma.commons.Network;
@@ -26,16 +22,11 @@ import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DirectoryPage;
 import pl.droidsonroids.jspoon.Jspoon;
 
-/**
- * Created by Jordy on 06/01/2018.
- */
-
 public class DirectoryUpdateService extends IntentService {
-    private NotificationManager manager;
-    private int count=0;
     public static int NOT_CODE=5599;
     public static String CHANNEL="directory_update";
-
+    private NotificationManager manager;
+    private int count = 0;
     private int page=0;
 
     public DirectoryUpdateService() {

@@ -13,10 +13,6 @@ import java.util.List;
 
 import knf.kuma.pojos.DownloadObject;
 
-/**
- * Created by Jordy on 10/01/2018.
- */
-
 @Dao
 public interface DownloadsDAO {
     @Query("SELECT * FROM downloadobject")

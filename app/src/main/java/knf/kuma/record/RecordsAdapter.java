@@ -24,10 +24,6 @@ import knf.kuma.database.dao.RecordsDAO;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.RecordObject;
 
-/**
- * Created by Jordy on 19/01/2018.
- */
-
 public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordItem> {
     private Activity activity;
     private List<RecordObject> items = new ArrayList<>();

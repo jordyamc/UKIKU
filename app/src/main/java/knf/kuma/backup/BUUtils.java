@@ -58,10 +58,6 @@ import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 15/02/2018.
- */
-
 public class BUUtils {
     public static final int LOGIN_CODE = 56478;
     private static Activity activity;
@@ -458,7 +454,9 @@ public class BUUtils {
     }
 
     public enum BUType {
-        LOCAL(-1), DRIVE(0), DROPBOX(1);
+        LOCAL(-1),
+        DRIVE(0),
+        DROPBOX(1);
         public int value;
 
         BUType(int value) {

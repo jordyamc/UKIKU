@@ -9,12 +9,10 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 
 import java.util.List;
 
@@ -24,25 +22,20 @@ import knf.kuma.R;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.SeeingObject;
 
-/**
- * Created by Jordy on 23/01/2018.
- */
-
 public class SeeingActivity extends AppCompatActivity {
-    public static void open(Context context){
-        context.startActivity(new Intent(context,SeeingActivity.class));
-    }
-
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.recycler)
     RecyclerView recyclerView;
     @BindView(R.id.error)
     View error;
-
     private SeeingAdapter adapter;
     private boolean internalMove = false;
     private boolean isFisrt = true;
+
+    public static void open(Context context) {
+        context.startActivity(new Intent(context, SeeingActivity.class));
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

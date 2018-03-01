@@ -21,10 +21,6 @@ import java.util.concurrent.TimeUnit;
 import knf.kuma.Main;
 import knf.kuma.R;
 
-/**
- * Created by Jordy on 14/02/2018.
- */
-
 public class UpdateJob extends Job {
     public static final String TAG = "update-job";
     public static final String CHANNEL = "app-updater";

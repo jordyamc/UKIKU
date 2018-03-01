@@ -22,10 +22,6 @@ import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.ExplorerObject;
 
-/**
- * Created by Jordy on 30/01/2018.
- */
-
 public class ExplorerFilesAdapter extends RecyclerView.Adapter<ExplorerFilesAdapter.FileItem> {
 
     private List<ExplorerObject> list = new ArrayList<>();
