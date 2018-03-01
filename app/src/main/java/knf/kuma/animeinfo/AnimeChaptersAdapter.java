@@ -70,13 +70,14 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
             seeingObject = seeingDAO.getByAid(chapters.get(0).aid);
     }
 
+    @NonNull
     @Override
-    public ChapterImgHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ChapterImgHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ChapterImgHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chapter_preview, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final ChapterImgHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ChapterImgHolder holder, int position) {
         final AnimeObject.WebInfo.AnimeChapter chapter = chapters.get(position);
         final DownloadObject downloadObject = downloadsDAO.getByEid(chapter.eid);
         final File d_file = FileAccessHelper.INSTANCE.getFile(chapter.getFileName());

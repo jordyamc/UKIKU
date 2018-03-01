@@ -17,7 +17,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knf.kuma.R;
 import knf.kuma.backup.objects.FavList;
+import knf.kuma.backup.objects.SeenList;
 import knf.kuma.database.CacheDB;
+import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.FavoriteObject;
 import xdroid.toaster.Toaster;
 
@@ -64,6 +66,10 @@ public class MigrationActivity extends AppCompatActivity {
                         case REQUEST_FAVS:
                             List<FavoriteObject> list = FavList.decode(getContentResolver().openInputStream(data.getData()));
                             CacheDB.INSTANCE.favsDAO().addAll(list);
+                            break;
+                        case REQUEST_SEEN:
+                            List<AnimeObject.WebInfo.AnimeChapter> chapters = SeenList.decode(getContentResolver().openInputStream(data.getData()));
+                            CacheDB.INSTANCE.chaptersDAO().addAll(chapters);
                             break;
                     }
                 } catch (Exception e) {
