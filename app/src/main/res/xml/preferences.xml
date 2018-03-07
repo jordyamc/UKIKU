@@ -105,5 +105,9 @@
             android:summaryOff="Web"
             android:summaryOn="Archivo local"
             android:title="Obtencion de changelog"/>
+        <Preference
+            android:icon="@drawable/ic_danger"
+            android:key="dir_destroy"
+            android:title="Actualizar directorio"/>
     </PreferenceCategory>
 </PreferenceScreen>

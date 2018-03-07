@@ -82,7 +82,7 @@ public class DownloadService extends IntentService {
                 if (prog > current.progress) {
                     current.progress = prog;
                     updateNotification();
-                    downloadsDAO.insert(current);
+                    downloadsDAO.update(current);
                 }
             }
             outputStream.flush();

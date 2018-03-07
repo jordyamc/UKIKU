@@ -196,7 +196,11 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
 
     @Override
     public int getItemCount() {
-        return explorerObject.chapters.size();
+        try {
+            return explorerObject.chapters.size();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     class ChapItem extends RecyclerView.ViewHolder {

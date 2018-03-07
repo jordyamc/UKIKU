@@ -51,7 +51,7 @@ public class DirectoryPageFragment extends BottomFragment {
                     @Override
                     public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                         hideProgress();
-                        adapter.setList(animeObjects);
+                        adapter.submitList(animeObjects);
                         makeAnimation();
                     }
                 });
@@ -61,7 +61,7 @@ public class DirectoryPageFragment extends BottomFragment {
                     @Override
                     public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                         hideProgress();
-                        adapter.setList(animeObjects);
+                        adapter.submitList(animeObjects);
                         makeAnimation();
                     }
                 });
@@ -71,7 +71,7 @@ public class DirectoryPageFragment extends BottomFragment {
                     @Override
                     public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                         hideProgress();
-                        adapter.setList(animeObjects);
+                        adapter.submitList(animeObjects);
                         makeAnimation();
                     }
                 });
@@ -90,7 +90,7 @@ public class DirectoryPageFragment extends BottomFragment {
                         @Override
                         public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                             hideProgress();
-                            adapter.setList(animeObjects);
+                            adapter.submitList(animeObjects);
                             makeAnimation();
                         }
                     });
@@ -100,7 +100,7 @@ public class DirectoryPageFragment extends BottomFragment {
                         @Override
                         public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                             hideProgress();
-                            adapter.setList(animeObjects);
+                            adapter.submitList(animeObjects);
                             makeAnimation();
                         }
                     });
@@ -110,7 +110,7 @@ public class DirectoryPageFragment extends BottomFragment {
                         @Override
                         public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                             hideProgress();
-                            adapter.setList(animeObjects);
+                            adapter.submitList(animeObjects);
                             makeAnimation();
                         }
                     });

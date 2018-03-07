@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="13" version="0.3.10 beta">
+        <change type="new">Pantalla de informacion</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="12" version="0.3.9 beta">
         <change type="fix">Error al actualizar app en Android 5 y 6</change>
     </release>

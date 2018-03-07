@@ -52,6 +52,12 @@
         <item name="android:fitsSystemWindows">true</item>
     </style>
 
+    <style name="AppTheme.AppInfo" parent="Theme.Mal.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
     <style name="AppTheme.Button">
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:colorButtonNormal">#000</item>

@@ -19,7 +19,6 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     public FragmentFilesRoot() {
         files = FragmentFiles.get(this);
         chapters=FragmentChapters.get(this);
-        ExplorerCreator.start(getContext(), this);
     }
 
     public static FragmentFilesRoot get() {
@@ -42,6 +41,7 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         transaction.commit();
         if (savedInstanceState == null) {
             setFragment(true, null);
+            ExplorerCreator.start(getContext(), this);
         }else {
             files.setListener(this);
             chapters.setInterface(this);

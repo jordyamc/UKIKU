@@ -25,6 +25,7 @@ import pl.droidsonroids.jspoon.Jspoon;
 public class DirectoryUpdateService extends IntentService {
     public static int NOT_CODE=5599;
     public static String CHANNEL="directory_update";
+    private static boolean running = false;
     private NotificationManager manager;
     private int count = 0;
     private int page=0;
@@ -33,10 +34,15 @@ public class DirectoryUpdateService extends IntentService {
         super("Directory re-update");
     }
 
+    public static boolean isRunning() {
+        return running;
+    }
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (!Network.isConnected())
             stopSelf();
+        running = true;
         startForeground(NOT_CODE,getStartNotification());
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
@@ -84,6 +90,7 @@ public class DirectoryUpdateService extends IntentService {
     }
 
     private void cancelForeground(){
+        running = false;
         stopForeground(true);
         manager.cancel(NOT_CODE);
     }
@@ -112,8 +119,7 @@ public class DirectoryUpdateService extends IntentService {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        stopForeground(true);
-        manager.cancel(NOT_CODE);
+        cancelForeground();
         super.onTaskRemoved(rootIntent);
     }
 }

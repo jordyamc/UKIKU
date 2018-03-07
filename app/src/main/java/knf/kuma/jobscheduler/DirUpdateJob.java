@@ -13,7 +13,9 @@ import com.evernote.android.job.JobRequest;
 
 import java.util.concurrent.TimeUnit;
 
+import knf.kuma.commons.Network;
 import knf.kuma.directory.DirectoryUpdateService;
+import xdroid.toaster.Toaster;
 
 public class DirUpdateJob extends Job {
     public static final String TAG = "dir-update-job";
@@ -41,10 +43,23 @@ public class DirUpdateJob extends Job {
                     .build().schedule();
     }
 
+    public static void runNow() {
+        if (Network.isConnected()) {
+            JobManager.instance().cancelAllForTag(TAG);
+            new JobRequest.Builder(TAG)
+                    .startNow()
+                    .build().schedule();
+        } else {
+            Toaster.toast("Se necesita internet");
+        }
+    }
+
     @NonNull
     @Override
     protected Result onRunJob(@NonNull Params params) {
-        ContextCompat.startForegroundService(getContext(), new Intent(getContext(), DirectoryUpdateService.class));
+        if (!DirectoryUpdateService.isRunning())
+            ContextCompat.startForegroundService(getContext(), new Intent(getContext(), DirectoryUpdateService.class));
+        else Toaster.toast("El directorio ya se está actualizando");
         reSchedule(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("dir_update_time", "7")));
         return Result.SUCCESS;
     }

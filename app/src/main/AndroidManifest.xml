@@ -98,6 +98,9 @@
         <activity
             android:name=".backup.MigrationActivity"
             android:theme="@style/AppTheme.Translucent"/>
+        <activity
+            android:name=".AppInfo"
+            android:theme="@style/AppTheme.AppInfo"/>
 
         <service android:name=".directory.DirectoryService"/>
         <service android:name=".directory.DirectoryUpdateService"/>

@@ -5,7 +5,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.recyclerview.extensions.DiffCallback;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,7 +23,7 @@ import knf.kuma.pojos.AnimeObject;
 
 public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,DirectorypageAdapter.ItemHolder> {
 
-    public static final DiffCallback<AnimeObject> DIFF_CALLBACK = new DiffCallback<AnimeObject>() {
+    private static final DiffUtil.ItemCallback<AnimeObject> DIFF_CALLBACK = new DiffUtil.ItemCallback<AnimeObject>() {
         @Override
         public boolean areItemsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
             return oldItem.key == newItem.key;
@@ -36,11 +36,12 @@ public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,Directory
     };
     private Fragment fragment;
 
-    public DirectorypageAdapter(Fragment fragment) {
+    DirectorypageAdapter(Fragment fragment) {
         super(DIFF_CALLBACK);
         this.fragment = fragment;
     }
 
+    @NonNull
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(getLayType(), parent, false));
@@ -56,7 +57,7 @@ public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,Directory
     }
 
     @Override
-    public void onBindViewHolder(final ItemHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ItemHolder holder, int position) {
         final AnimeObject object=getItem(position);
         if (object!=null){
             PicassoSingle.get(fragment.getContext()).load(object.img).into(holder.imageView);

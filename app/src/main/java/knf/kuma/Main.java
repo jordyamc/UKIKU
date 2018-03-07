@@ -132,7 +132,7 @@ public class Main extends AppCompatActivity
         info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChangelogActivity.open(Main.this);
+                AppInfo.open(Main.this);
             }
         });
         login.setOnClickListener(new View.OnClickListener() {
@@ -177,17 +177,21 @@ public class Main extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                new MaterialDialog.Builder(Main.this)
-                        .title("Actualización")
-                        .content("Parece que la versión " + n_code + " está disponible, ¿Quieres actualizar?")
-                        .positiveText("si")
-                        .negativeText("despues")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                UpdateActivity.start(Main.this);
-                            }
-                        }).build().show();
+                try {
+                    new MaterialDialog.Builder(Main.this)
+                            .title("Actualización")
+                            .content("Parece que la versión " + n_code + " está disponible, ¿Quieres actualizar?")
+                            .positiveText("si")
+                            .negativeText("despues")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    UpdateActivity.start(Main.this);
+                                }
+                            }).build().show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

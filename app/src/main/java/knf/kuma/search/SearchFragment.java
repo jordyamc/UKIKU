@@ -60,7 +60,7 @@ public class SearchFragment extends BottomFragment {
         model.getSearch("", "").observe(this, new Observer<PagedList<AnimeObject>>() {
             @Override
             public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                adapter.setList(animeObjects);
+                adapter.submitList(animeObjects);
                 errorView.setVisibility(animeObjects.size()==0?View.VISIBLE:View.GONE);
                 if (isFirst) {
                     progressBar.setVisibility(View.GONE);
@@ -105,7 +105,7 @@ public class SearchFragment extends BottomFragment {
             @Override
             public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                 if (animeObjects!=null) {
-                    adapter.setList(animeObjects);
+                    adapter.submitList(animeObjects);
                     errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
                 }
                 if (isFirst) {

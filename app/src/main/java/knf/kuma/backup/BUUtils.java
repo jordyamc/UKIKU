@@ -372,30 +372,36 @@ public class BUUtils {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                switch (id) {
-                    case "favs":
-                        if (replace)
-                            CacheDB.INSTANCE.favsDAO().clear();
-                        CacheDB.INSTANCE.favsDAO().addAll(backupObject.data);
-                        break;
-                    case "history":
-                        if (replace)
-                            CacheDB.INSTANCE.recordsDAO().clear();
-                        CacheDB.INSTANCE.recordsDAO().addAll(backupObject.data);
-                        break;
-                    case "following":
-                        if (replace)
-                            CacheDB.INSTANCE.seeingDAO().clear();
-                        CacheDB.INSTANCE.seeingDAO().addAll(backupObject.data);
-                        break;
-                    case "seen":
-                        if (replace)
-                            CacheDB.INSTANCE.chaptersDAO().clear();
-                        CacheDB.INSTANCE.chaptersDAO().addAll(backupObject.data);
-                        break;
+                try {
+                    switch (id) {
+                        case "favs":
+                            if (replace)
+                                CacheDB.INSTANCE.favsDAO().clear();
+                            CacheDB.INSTANCE.favsDAO().addAll(backupObject.data);
+                            break;
+                        case "history":
+                            if (replace)
+                                CacheDB.INSTANCE.recordsDAO().clear();
+                            CacheDB.INSTANCE.recordsDAO().addAll(backupObject.data);
+                            break;
+                        case "following":
+                            if (replace)
+                                CacheDB.INSTANCE.seeingDAO().clear();
+                            CacheDB.INSTANCE.seeingDAO().addAll(backupObject.data);
+                            break;
+                        case "seen":
+                            if (replace)
+                                CacheDB.INSTANCE.chaptersDAO().clear();
+                            CacheDB.INSTANCE.chaptersDAO().addAll(backupObject.data);
+                            break;
+                    }
+                    Toaster.toast("Restauración completada");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toaster.toast("Error al restaurar");
+                } finally {
+                    closeDialog(dialog);
                 }
-                closeDialog(dialog);
-                Toaster.toast("Restauración completada");
             }
         });
     }

@@ -17,6 +17,9 @@ import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.widget.ListView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import knf.kuma.R;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.jobscheduler.DirUpdateJob;
@@ -77,6 +80,26 @@ public class ConfigurationFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object o) {
                 DirUpdateJob.reSchedule(Integer.valueOf((String)o)*15);
                 return true;
+            }
+        });
+        getPreferenceScreen().findPreference("dir_destroy").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                try {
+                    new MaterialDialog.Builder(getActivity())
+                            .content("¿Desea recrear el directorio?")
+                            .positiveText("continuar")
+                            .negativeText("cancelar")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    DirUpdateJob.runNow();
+                                }
+                            }).build().show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return false;
             }
         });
     }
