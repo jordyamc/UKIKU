@@ -16,14 +16,13 @@ repositories {
 
 
 android {
-    buildToolsVersion '27.0.3'
     compileSdkVersion 27
     defaultConfig {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 14
-        versionName "0.3.10 beta"
+        versionCode 15
+        versionName "0.3.11 beta"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -98,7 +97,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
+    compile 'com.google.firebase:firebase-core:11.8.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
         transitive = true
     }
 }
+apply plugin: 'com.google.gms.google-services'

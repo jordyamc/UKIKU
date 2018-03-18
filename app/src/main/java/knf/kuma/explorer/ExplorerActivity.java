@@ -1,5 +1,6 @@
 package knf.kuma.explorer;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import butterknife.BindView;
@@ -53,11 +55,34 @@ public class ExplorerActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (CastUtil.get().connected())
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        if (CastUtil.get().connected()) {
             getMenuInflater().inflate(R.menu.menu_explorer_connected, menu);
+            CastUtil.get().getCasting().observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String s) {
+                    try {
+                        if (s.equals(CastUtil.NO_PLAYING)) {
+                            menu.findItem(R.id.casting).setEnabled(false);
+                        } else {
+                            menu.findItem(R.id.casting).setEnabled(true);
+                            menu.findItem(R.id.casting).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    CastUtil.get().openControls();
+                                    return true;
+                                }
+                            });
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
         return super.onCreateOptionsMenu(menu);
     }
+
 
     @Override
     public void onBackPressed() {

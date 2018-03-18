@@ -162,7 +162,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
             }
         });
         AnimeViewModel viewModel = ViewModelProviders.of(this).get(AnimeViewModel.class);
-        viewModel.init(getIntent().getDataString(), getIntent().getBooleanExtra("persist", true));
+        viewModel.init(this, getIntent().getDataString(), getIntent().getBooleanExtra("persist", true));
         viewModel.getLiveData().observe(this, new Observer<AnimeObject>() {
             @Override
             public void onChanged(@Nullable final AnimeObject object) {

@@ -23,11 +23,13 @@ import java.util.concurrent.TimeUnit;
 import knf.kuma.Main;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.BypassUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.database.dao.FavsDAO;
 import knf.kuma.database.dao.NotificationDAO;
 import knf.kuma.database.dao.RecentsDAO;
+import knf.kuma.database.dao.SeeingDAO;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.NotificationObj;
 import knf.kuma.pojos.RecentObject;
@@ -42,6 +44,7 @@ public class RecentsJob extends Job {
     public final String RECENTS_GROUP = "recents-group";
     private RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
     private FavsDAO favsDAO=CacheDB.INSTANCE.favsDAO();
+    private SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
     private AnimeDAO animeDAO=CacheDB.INSTANCE.animeDAO();
     private NotificationDAO notificationDAO = CacheDB.INSTANCE.notificationDAO();
     private NotificationManager manager;
@@ -67,14 +70,12 @@ public class RecentsJob extends Job {
                     .build().schedule();
     }
 
-    //TODO: Bypass
-
     @NonNull
     @Override
     protected Result onRunJob(@NonNull Params params) {
         try {
             manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            Recents recents = Jspoon.create().adapter(Recents.class).fromHtml(Jsoup.connect("https://animeflv.net/").cookie("device", "computer").get().outerHtml());
+            Recents recents = Jspoon.create().adapter(Recents.class).fromHtml(Jsoup.connect("https://animeflv.net/").cookies(BypassUtil.getMapCookie(getContext())).userAgent(BypassUtil.userAgent).get().outerHtml());
             List<RecentObject> objects = RecentObject.create(recents.list);
             List<RecentObject> local = recentsDAO.getAll();
             if (local.size()==0)
@@ -102,7 +103,7 @@ public class RecentsJob extends Job {
 
     private void notifyFavChaps(List<RecentObject> local,List<RecentObject> objects){
         for (RecentObject object : objects) {
-            if (!local.contains(object)&&favsDAO.isFav(Integer.parseInt(object.aid)))
+            if (!local.contains(object) && favsDAO.isFav(Integer.parseInt(object.aid)) && seeingDAO.isSeeing(object.aid))
                 notifyRecent(object);
         }
     }

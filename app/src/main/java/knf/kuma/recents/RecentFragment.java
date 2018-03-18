@@ -70,7 +70,7 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
         if (!Network.isConnected()) {
             holder.setRefreshing(false);
         }else {
-            viewModel.reload();
+            viewModel.reload(getContext());
         }
     }
 

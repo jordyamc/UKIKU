@@ -3,7 +3,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:enabled="false"
+        android:id="@+id/casting"
         android:icon="@drawable/ic_casting_menu"
         android:title="Casting"
         app:showAsAction="always"/>

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.downloadservice.DownloadService;
@@ -298,12 +299,10 @@ public class ServersFactory {
         serversInterface.onFinish(true, true);
     }
 
-    //TODO: Bypass
-
     public void get(MaterialDialog dialog) {
         try {
             Log.e("Url", url);
-            Document main = Jsoup.connect(url).timeout(5000).get();
+            Document main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get();
             Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
             List<Server> servers = new ArrayList<>();
             for (Element e : descargas) {

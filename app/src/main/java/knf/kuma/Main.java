@@ -40,6 +40,7 @@ import knf.kuma.backup.BUUtils;
 import knf.kuma.backup.BackUpActivity;
 import knf.kuma.backup.MigrationActivity;
 import knf.kuma.changelog.ChangelogActivity;
+import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.directory.DirectoryFragment;
 import knf.kuma.directory.DirectoryService;
@@ -65,7 +66,8 @@ public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemReselectedListener,
-        Updatechecker.CheckListener {
+        Updatechecker.CheckListener,
+        BypassUtil.BypassListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -418,6 +420,21 @@ public class Main extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
+    private void reselectFragment() {
+        if (selectedFragment != null) {
+            if (selectedFragment instanceof FavoriteFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_recents);
+            } else if (selectedFragment instanceof DirectoryFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_directory);
+            } else if (selectedFragment instanceof BottomPreferencesFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_settings);
+            } else {
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_recents);
+            }
+        }
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
     @Override
     public void onNavigationItemReselected(@NonNull MenuItem item) {
         if (tmpfragment != null) {
@@ -437,6 +454,7 @@ public class Main extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        BypassUtil.check(this);
         if (navigationView != null)
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -455,6 +473,11 @@ public class Main extends AppCompatActivity
                     }
                 }
             });
+    }
+
+    @Override
+    public void onNeedRecreate() {
+        reselectFragment();
     }
 
     @Override

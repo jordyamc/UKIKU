@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import knf.kuma.R;
+import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
@@ -75,7 +76,7 @@ public class DirectoryService extends IntentService {
                 return;
             }
             try {
-                Document document = Jsoup.connect("https://animeflv.net/browse?order=added&page=" + s).cookie("device", "computer").get();
+                Document document = Jsoup.connect("https://animeflv.net/browse?order=added&page=" + s).cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get();
                 if (document.select("div.alert.alert-info").size()==0) {
                     List<AnimeObject> animeObjects = jspoon.adapter(DirectoryPage.class).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, new DirectoryPage.UpdateInterface() {
                         @Override
@@ -114,7 +115,7 @@ public class DirectoryService extends IntentService {
                 return;
             }
             try {
-                Document document = Jsoup.connect("https://animeflv.net/browse?order=added&page=" + page).cookie("device", "computer").get();
+                Document document = Jsoup.connect("https://animeflv.net/browse?order=added&page=" + page).cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get();
                 if (document.select("div.alert.alert-info").size()==0) {
                     page++;
                     List<AnimeObject> animeObjects = jspoon.adapter(DirectoryPage.class).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, new DirectoryPage.UpdateInterface() {

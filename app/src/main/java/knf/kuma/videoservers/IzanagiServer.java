@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import knf.kuma.commons.BypassUtil;
+
 import static knf.kuma.videoservers.VideoServer.Names.IZANAGI;
 
 public class IzanagiServer extends Server {
@@ -23,15 +25,13 @@ public class IzanagiServer extends Server {
         return IZANAGI;
     }
 
-    //TODO: Bypass
-
     @Nullable
     @Override
     VideoServer getVideoServer() {
         String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
         String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
         try {
-            return new VideoServer(IZANAGI, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).get().body().text()).getString("file")));
+            return new VideoServer(IZANAGI, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text()).getString("file")));
         } catch (Exception e) {
             return null;
         }

@@ -5,8 +5,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +16,7 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 
+import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
@@ -39,54 +38,9 @@ public class Repository {
     public Repository() {
     }
 
-    public LiveData<List<RecentObject>> getRecents() {
-        final MutableLiveData<List<RecentObject>> data = new MutableLiveData<>();
-        if (!Network.isConnected())
-            return CacheDB.INSTANCE.recentsDAO().getObjects();
-        getFactoryBack("https://animeflv.net/").getRecents("device=computer").enqueue(new Callback<Recents>() {
-            @Override
-            public void onResponse(Call<Recents> call, final Response<Recents> response) {
-                try {
-                    if (response.isSuccessful() && response.code() == 200) {
-                        final List<RecentObject> objects = RecentObject.create(response.body().list);
-                        RecentsDAO dao = CacheDB.INSTANCE.recentsDAO();
-                        dao.clear();
-                        dao.setCache(objects);
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                data.setValue(objects);
-                            }
-                        });
-                    } else {
-                        onFailure(call, new Exception("HTTP " + String.valueOf(response.code())));
-                    }
-                } catch (Exception e) {
-                    onFailure(call, e);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Recents> call, Throwable t) {
-                Toaster.toast("Error al obtener - " + t.getMessage());
-                t.printStackTrace();
-                Crashlytics.logException(t);
-                final List<RecentObject> objects = CacheDB.INSTANCE.recentsDAO().getObjects().getValue();
-                if (objects != null)
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            data.setValue(objects);
-                        }
-                    });
-            }
-        });
-        return data;
-    }
-
-    public void reloadRecents() {
+    public void reloadRecents(Context context) {
         if (Network.isConnected()) {
-            getFactoryBack("https://animeflv.net/").getRecents("device=computer").enqueue(new Callback<Recents>() {
+            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(context), BypassUtil.userAgent).enqueue(new Callback<Recents>() {
                 @Override
                 public void onResponse(@NonNull Call<Recents> call, @NonNull Response<Recents> response) {
                     try {
@@ -126,14 +80,14 @@ public class Repository {
         }
     }
 
-    public LiveData<AnimeObject> getAnime(final String link, final boolean persist) {
+    public LiveData<AnimeObject> getAnime(Context context, final String link, final boolean persist) {
         String base = link.substring(0, link.lastIndexOf("/") + 1);
         String rest = link.substring(link.lastIndexOf("/") + 1);
         final MutableLiveData<AnimeObject> data = new MutableLiveData<>();
         final AnimeDAO dao = CacheDB.INSTANCE.animeDAO();
         if (!Network.isConnected() && dao.existLink(link))
             return CacheDB.INSTANCE.animeDAO().getAnime(link);
-        getFactory(base).getAnime("device=computer", rest).enqueue(new Callback<AnimeObject.WebInfo>() {
+        getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, rest).enqueue(new Callback<AnimeObject.WebInfo>() {
             @Override
             public void onResponse(Call<AnimeObject.WebInfo> call, Response<AnimeObject.WebInfo> response) {
                 if (response.body() == null)

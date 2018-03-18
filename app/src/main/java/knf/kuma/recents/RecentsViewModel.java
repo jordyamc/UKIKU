@@ -2,6 +2,7 @@ package knf.kuma.recents;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 
 import java.util.List;
 
@@ -15,11 +16,9 @@ public class RecentsViewModel extends ViewModel {
     public RecentsViewModel() {
     }
 
-    public LiveData<List<RecentObject>> getLiveData(){
-        return repository.getRecents();
+    public void reload(Context context) {
+        repository.reloadRecents(context);
     }
-
-    public void reload(){repository.reloadRecents();}
 
     public LiveData<List<RecentObject>> getDBLiveData(){return CacheDB.INSTANCE.recentsDAO().getObjects();}
 }

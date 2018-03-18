@@ -9,9 +9,13 @@ public class PicassoSingle {
     @SuppressLint("StaticFieldLeak")
     private static Picasso picasso;
 
-    public static Picasso get(Context context){
+    public static Picasso get(final Context context) {
         if (picasso==null)
             PicassoSingle.picasso = new Picasso.Builder(context).downloader(new CookieImageDownloader(context)).build();
         return picasso;
+    }
+
+    public static void clear() {
+        picasso = null;
     }
 }

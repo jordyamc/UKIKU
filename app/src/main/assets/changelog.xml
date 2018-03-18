@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="15" version="0.3.11 beta">
+        <change type="fix">Bypass de cloudflare agregado</change>
+        <change type="change">Boton cast en explorador ahora abre controles</change>
+    </release>
     <release code="14" version="0.3.10 beta">
         <change type="new">Pantalla de informacion</change>
         <change type="fix">Errores generales</change>
