@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.Crashlytics;
 
 import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
@@ -125,6 +126,7 @@ public class ChangelogActivity extends AppCompatActivity {
                         }
                     });
                 } catch (Exception e) {
+                    Crashlytics.logException(e);
                     Toaster.toast("Error al cargar changelog");
                     finish();
                 }

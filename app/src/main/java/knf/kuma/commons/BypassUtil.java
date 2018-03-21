@@ -26,17 +26,18 @@ import xdroid.toaster.Toaster;
 
 public class BypassUtil {
     public static final String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0";
+    private static boolean isLoading = false;
 
     public static void check(final Activity activity) {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                if (isNeeded(activity))
+                if (isNeeded(activity) && !isLoading) {
+                    isLoading = true;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Log.e("CloudflareBypass", "is needed");
-                            Toaster.toast("Actualizando bypass");
                             clearCookies();
                             final WebView webView = new WebView(activity);
                             webView.getSettings().setJavaScriptEnabled(true);
@@ -51,6 +52,7 @@ public class BypassUtil {
                                         PicassoSingle.clear();
                                         ((BypassListener) activity).onNeedRecreate();
                                     }
+                                    isLoading = false;
                                     return false;
                                 }
                             });
@@ -58,7 +60,7 @@ public class BypassUtil {
                             webView.loadUrl("https://animeflv.net/");
                         }
                     });
-                else Log.e("CloudflareBypass", "Not needed");
+                } else Log.e("CloudflareBypass", "Not needed");
             }
         });
     }

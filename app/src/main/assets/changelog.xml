@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="16" version="0.3.12 beta">
+        <change type="fix">Icono arreglado para algunos telefonos</change>
+    </release>
     <release code="15" version="0.3.11 beta">
         <change type="fix">Bypass de cloudflare agregado</change>
         <change type="change">Boton cast en explorador ahora abre controles</change>
