@@ -156,7 +156,7 @@ public class ExpandableTextView extends LinearLayout
 
                 if (startIndex < endIndex) {
                     // 如果起止行数小于结束行数，那么往下展开至结束行数
-                    // if start index smaller than end index ,do expand action
+                    // if open index smaller than end index ,do expand action
                     int count = startIndex;
                     while (count++ < endIndex) {
                         Message msg = handler.obtainMessage(WHAT, count, 0);
@@ -171,7 +171,7 @@ public class ExpandableTextView extends LinearLayout
                     }
                 } else if (startIndex > endIndex) {
                     // 如果起止行数大于结束行数，那么往上折叠至结束行数
-                    // if start index bigger than end index ,do shrink action
+                    // if open index bigger than end index ,do shrink action
                     int count = startIndex;
                     while (count-- > endIndex) {
                         Message msg = handler.obtainMessage(WHAT, count, 0);

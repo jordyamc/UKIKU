@@ -101,6 +101,8 @@
         <activity
             android:name=".AppInfo"
             android:theme="@style/AppTheme.AppInfo"/>
+        <activity android:name=".recommended.RecommendActivity"/>
+        <activity android:name=".recommended.RankingActivity"/>
 
         <service android:name=".directory.DirectoryService"/>
         <service android:name=".directory.DirectoryUpdateService"/>

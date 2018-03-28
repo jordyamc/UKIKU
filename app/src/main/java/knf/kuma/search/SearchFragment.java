@@ -25,6 +25,8 @@ import butterknife.ButterKnife;
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
 import knf.kuma.pojos.AnimeObject;
+import knf.kuma.recommended.RankType;
+import knf.kuma.recommended.RecommendHelper;
 
 public class SearchFragment extends BottomFragment {
     @BindView(R.id.recycler)
@@ -133,6 +135,7 @@ public class SearchFragment extends BottomFragment {
         if (selected.size()==0){
             return "";
         }else {
+            RecommendHelper.registerAll(selected, RankType.SEARCH);
             StringBuilder builder=new StringBuilder("%");
             for (String genre:selected){
                 builder.append(genre)

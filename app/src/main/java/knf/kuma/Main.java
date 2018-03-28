@@ -54,6 +54,7 @@ import knf.kuma.preferences.BottomPreferencesFragment;
 import knf.kuma.random.RandomActivity;
 import knf.kuma.recents.RecentFragment;
 import knf.kuma.recents.RecentsNotReceiver;
+import knf.kuma.recommended.RecommendActivity;
 import knf.kuma.record.RecordActivity;
 import knf.kuma.search.FiltersSuggestion;
 import knf.kuma.search.SearchFragment;
@@ -350,10 +351,13 @@ public class Main extends AppCompatActivity
                 setFragment(BottomPreferencesFragment.get());
                 break;
             case R.id.drawer_explorer:
-                ExplorerActivity.start(this);
+                ExplorerActivity.open(this);
                 break;
             case R.id.drawer_emision:
                 EmisionActivity.open(this);
+                break;
+            case R.id.drawer_suggestions:
+                RecommendActivity.open(this);
                 break;
             case R.id.drawer_records:
                 RecordActivity.open(this);

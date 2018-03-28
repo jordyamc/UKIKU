@@ -29,7 +29,7 @@ public class ExplorerActivity extends AppCompatActivity {
     ViewPager pager;
     private ExplorerPagerAdapter adapter;
 
-    public static void start(Context context) {
+    public static void open(Context context) {
         context.startActivity(new Intent(context, ExplorerActivity.class));
     }
 

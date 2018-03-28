@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="17" version="0.4 beta">
+        <change type="new">Seccion de sugerencias</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="16" version="0.3.12 beta">
         <change type="fix">Icono arreglado para algunos telefonos</change>
     </release>

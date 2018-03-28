@@ -15,6 +15,10 @@
         android:icon="@drawable/ic_seeing_drawer"
         android:title="Siguiendo"/>
     <item
+        android:id="@+id/drawer_suggestions"
+        android:icon="@drawable/ic_suggestions"
+        android:title="Sugerencias"/>
+    <item
         android:id="@+id/drawer_records"
         android:icon="@drawable/ic_record"
         android:title="Historial"/>

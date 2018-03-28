@@ -39,6 +39,8 @@ import knf.kuma.pojos.NotificationObj;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
+import knf.kuma.recommended.RankType;
+import knf.kuma.recommended.RecommendHelper;
 import xdroid.toaster.Toaster;
 
 public class ActivityAnime extends AppCompatActivity implements AnimeActivityHolder.Interface {
@@ -49,6 +51,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
     private FavsDAO dao = CacheDB.INSTANCE.favsDAO();
     private SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
     private List<AnimeObject.WebInfo.AnimeChapter> chapters = new ArrayList<>();
+    private List<String> genres = new ArrayList<>();
 
     public static void open(Fragment fragment, RecentObject object, View view, int position) {
         Intent intent = new Intent(fragment.getContext(), ActivityAnime.class);
@@ -168,6 +171,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
             public void onChanged(@Nullable final AnimeObject object) {
                 if (object != null) {
                     chapters = object.chapters;
+                    genres = object.genres;
                     favoriteObject = new FavoriteObject(object);
                     holder.setTitle(object.name);
                     holder.loadImg(object.img, new View.OnClickListener() {
@@ -185,6 +189,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                     }
                     holder.showFAB();
                     supportInvalidateOptionsMenu();
+                    RecommendHelper.registerAll(genres, RankType.CHECK);
                 }
             }
         });
@@ -202,11 +207,13 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         if (isfav) {
             holder.setFABState(false);
             dao.deleteFav(favoriteObject);
+            RecommendHelper.registerAll(genres, RankType.UNFAV);
         } else if (isSeeing) {
             onFabLongClicked(actionButton);
         } else {
             holder.setFABState(true);
             dao.addFav(favoriteObject);
+            RecommendHelper.registerAll(genres, RankType.FAV);
         }
     }
 
@@ -228,6 +235,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                                 seeingDAO.remove(seeingObject);
                                 dao.addFav(favoriteObject);
                                 holder.setFABState(true);
+                                RecommendHelper.registerAll(genres, RankType.FAV);
                             }
                         })
                         .onNeutral(new MaterialDialog.SingleButtonCallback() {
@@ -235,11 +243,13 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 seeingDAO.remove(seeingObject);
                                 holder.setFABState(false);
+                                RecommendHelper.registerAll(genres, RankType.UNFOLLOW);
                             }
                         }).build().show();
             } else {
                 holder.setFABSeeing();
                 seeingDAO.add(SeeingObject.fromAnime(favoriteObject));
+                RecommendHelper.registerAll(genres, RankType.FOLLOW);
                 Toaster.toast("Agregado a animes seguidos");
             }
         }

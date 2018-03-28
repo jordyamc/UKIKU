@@ -8,6 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,6 +60,51 @@ public class GenresDialog extends DialogFragment {
             states[index++]=selected.contains(genre);
         }
         return states;
+    }
+
+    public static List<String> getGenres() {
+        return Arrays.asList(
+                "Acción",
+                "Artes Marciales",
+                "Aventuras",
+                "Carreras",
+                "Comedia",
+                "Demencia",
+                "Demonios",
+                "Deportes",
+                "Drama",
+                "Ecchi",
+                "Escolares",
+                "Espacial",
+                "Fantasía",
+                "Ciencia Ficción",
+                "Harem",
+                "Historico",
+                "Infantil",
+                "Josei",
+                "Juegos",
+                "Magia",
+                "Mecha",
+                "Militar",
+                "Misterio",
+                "Musica",
+                "Parodia",
+                "Policía",
+                "Psicológico",
+                "Recuentos de la vida",
+                "Romance",
+                "Samurai",
+                "Seinen",
+                "Shoujo",
+                "Shounen",
+                "Sin Generos",
+                "Sobrenatural",
+                "Superpoderes",
+                "Suspenso",
+                "Terror",
+                "Vampiros",
+                "Yaoi",
+                "Yuri");
     }
 
     public interface MultichoiseListener {

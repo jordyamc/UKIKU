@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
+import com.crashlytics.android.Crashlytics;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
@@ -90,6 +91,7 @@ public class RecentsJob extends Job {
             return Result.SUCCESS;
         } catch (Exception e) {
             e.printStackTrace();
+            Crashlytics.logException(e);
             return Result.FAILURE;
         }
     }
@@ -106,14 +108,6 @@ public class RecentsJob extends Job {
             if (!local.contains(object) && favsDAO.isFav(Integer.parseInt(object.aid)) && seeingDAO.isSeeing(object.aid))
                 notifyRecent(object);
         }
-    }
-
-    private boolean listContains(List<RecentObject> list,RecentObject object){
-        for (RecentObject o:list){
-            if (o.eid.equals(object.eid))
-                return true;
-        }
-        return false;
     }
 
     private void notifyRecent(RecentObject recentObject) {

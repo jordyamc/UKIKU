@@ -41,6 +41,9 @@ public interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genres ORDER BY name")
     DataSource.Factory<Integer,AnimeObject> getSearchG(String genres);
 
+    @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genres ORDER BY name")
+    List<AnimeObject> getByGenres(String genres);
+
     @Query("SELECT * FROM AnimeObject WHERE name LIKE :query AND genres LIKE :genres ORDER BY name")
     DataSource.Factory<Integer,AnimeObject> getSearchTG(String query,String genres);
 

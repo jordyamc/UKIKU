@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/blacklist"
+        android:icon="@drawable/ic_blacklist"
+        android:title="Lista negra"
+        app:showAsAction="always|always"/>
+    <item
+        android:id="@+id/rating"
+        android:icon="@drawable/ic_rating"
+        android:title="Rating"
+        app:showAsAction="always|always"/>
+</menu>

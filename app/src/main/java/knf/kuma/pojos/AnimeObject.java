@@ -34,7 +34,7 @@ import pl.droidsonroids.jspoon.annotation.Selector;
 
 @Entity(indices = @Index(value = {"name", "link", "aid", "type", "state","fileName"}, unique = true))
 @TypeConverters(AnimeObject.Converter.class)
-public class AnimeObject {
+public class AnimeObject implements Comparable<AnimeObject> {
     @PrimaryKey
     public int key;
     public String link;
@@ -139,6 +139,11 @@ public class AnimeObject {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof AnimeObject && aid.equals(((AnimeObject)obj).aid);
+    }
+
+    @Override
+    public int compareTo(@NonNull AnimeObject o) {
+        return name.compareTo(o.name);
     }
 
     public enum Day {
