@@ -44,16 +44,16 @@ public class RecentsJob extends Job {
     static final String TAG = "recents-job";
     public final String RECENTS_GROUP = "recents-group";
     private RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
-    private FavsDAO favsDAO=CacheDB.INSTANCE.favsDAO();
+    private FavsDAO favsDAO = CacheDB.INSTANCE.favsDAO();
     private SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
-    private AnimeDAO animeDAO=CacheDB.INSTANCE.animeDAO();
+    private AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
     private NotificationDAO notificationDAO = CacheDB.INSTANCE.notificationDAO();
     private NotificationManager manager;
 
     public static void schedule(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int time=Integer.valueOf(preferences.getString("recents_time","1"))*15;
-        if (time>0 && JobManager.instance().getAllJobRequestsForTag(TAG).size() == 0)
+        int time = Integer.valueOf(preferences.getString("recents_time", "1")) * 15;
+        if (time > 0 && JobManager.instance().getAllJobRequestsForTag(TAG).size() == 0)
             new JobRequest.Builder(TAG)
                     .setPeriodic(TimeUnit.MINUTES.toMillis(time))
                     .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
@@ -63,7 +63,7 @@ public class RecentsJob extends Job {
 
     public static void reSchedule(int time) {
         JobManager.instance().cancelAllForTag(TAG);
-        if (time>0)
+        if (time > 0)
             new JobRequest.Builder(TAG)
                     .setPeriodic(TimeUnit.MINUTES.toMillis(time))
                     .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
@@ -79,12 +79,12 @@ public class RecentsJob extends Job {
             Recents recents = Jspoon.create().adapter(Recents.class).fromHtml(Jsoup.connect("https://animeflv.net/").cookies(BypassUtil.getMapCookie(getContext())).userAgent(BypassUtil.userAgent).get().outerHtml());
             List<RecentObject> objects = RecentObject.create(recents.list);
             List<RecentObject> local = recentsDAO.getAll();
-            if (local.size()==0)
+            if (local.size() == 0)
                 return Result.SUCCESS;
-            if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("notify_favs",false)){
-                notifyFavChaps(local,objects);
-            }else {
-                notifyAllChaps(local,objects);
+            if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("notify_favs", false)) {
+                notifyFavChaps(local, objects);
+            } else {
+                notifyAllChaps(local, objects);
             }
             recentsDAO.clear();
             recentsDAO.setCache(objects);
@@ -96,22 +96,22 @@ public class RecentsJob extends Job {
         }
     }
 
-    private void notifyAllChaps(List<RecentObject> local,List<RecentObject> objects){
+    private void notifyAllChaps(List<RecentObject> local, List<RecentObject> objects) throws Exception {
         for (RecentObject object : objects) {
             if (!local.contains(object))
                 notifyRecent(object);
         }
     }
 
-    private void notifyFavChaps(List<RecentObject> local,List<RecentObject> objects){
+    private void notifyFavChaps(List<RecentObject> local, List<RecentObject> objects) throws Exception {
         for (RecentObject object : objects) {
             if (!local.contains(object) && favsDAO.isFav(Integer.parseInt(object.aid)) && seeingDAO.isSeeing(object.aid))
                 notifyRecent(object);
         }
     }
 
-    private void notifyRecent(RecentObject recentObject) {
-        AnimeObject animeObject=animeDAO.getByAid(recentObject.aid);
+    private void notifyRecent(RecentObject recentObject) throws Exception {
+        AnimeObject animeObject = getAnime(recentObject);
         NotificationObj obj = new NotificationObj(Integer.parseInt(recentObject.eid), NotificationObj.RECENT);
         Notification notification = new NotificationCompat.Builder(getContext(), CHANNEL_RECENTS)
                 .setSmallIcon(R.drawable.ic_new_recent)
@@ -121,7 +121,7 @@ public class RecentsJob extends Job {
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
-                .setContentIntent(PendingIntent.getActivity(getContext(),(int)System.currentTimeMillis(),getAnimeIntent(animeObject,obj),PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(PendingIntent.getActivity(getContext(), (int) System.currentTimeMillis(), getAnimeIntent(animeObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setDeleteIntent(PendingIntent.getBroadcast(getContext(), (int) System.currentTimeMillis(), obj.getBroadcast(getContext()), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setGroup(RECENTS_GROUP)
                 .build();
@@ -130,15 +130,24 @@ public class RecentsJob extends Job {
         notifySummary();
     }
 
+    private AnimeObject getAnime(RecentObject recentObject) throws Exception {
+        AnimeObject animeObject = animeDAO.getByAid(recentObject.aid);
+        if (animeObject == null) {
+            animeObject = new AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect(recentObject.anime).get().outerHtml()));
+            animeDAO.insert(animeObject);
+        }
+        return animeObject;
+    }
+
     @NonNull
-    private Intent getAnimeIntent(AnimeObject object, NotificationObj notificationObj){
+    private Intent getAnimeIntent(AnimeObject object, NotificationObj notificationObj) {
         return new Intent(getContext(), ActivityAnime.class)
                 .setData(Uri.parse(object.link))
                 .putExtras(notificationObj.getBroadcast(getContext()))
                 .putExtra("title", object.name)
                 .putExtra("aid", object.aid)
                 .putExtra("img", object.img)
-                .putExtra("notification",true);
+                .putExtra("notification", true);
     }
 
     private void notifySummary() {
@@ -156,7 +165,7 @@ public class RecentsJob extends Job {
         manager.notify(KEY_SUMMARY, notification);
     }
 
-    private Intent getSummaryBroadcast(){
-        return new Intent(getContext(), RecentsNotReceiver.class).putExtra("mode",1);
+    private Intent getSummaryBroadcast() {
+        return new Intent(getContext(), RecentsNotReceiver.class).putExtra("mode", 1);
     }
 }

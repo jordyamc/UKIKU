@@ -6,13 +6,14 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 17
+      "versionCode": 18,
+      "versionName": "0.4.1 beta",
+      "enabled": true,
+      "outputFile": "app-release.apk",
+      "fullName": "release",
+      "baseName": "release"
     },
     "path": "app-release.apk",
-    "properties": {
-      "packageId": "knf.kuma",
-      "split": "",
-      "minSdkVersion": "21"
-    }
+    "properties": {}
   }
 ]

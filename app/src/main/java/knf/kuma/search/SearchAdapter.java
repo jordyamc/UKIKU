@@ -3,7 +3,7 @@ package knf.kuma.search;
 import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.recyclerview.extensions.DiffCallback;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,7 +21,7 @@ import knf.kuma.pojos.AnimeObject;
 
 public class SearchAdapter extends PagedListAdapter<AnimeObject,SearchAdapter.ItemHolder> {
 
-    public static final DiffCallback<AnimeObject> DIFF_CALLBACK = new DiffCallback<AnimeObject>() {
+    public static final DiffUtil.ItemCallback<AnimeObject> DIFF_CALLBACK = new DiffUtil.ItemCallback<AnimeObject>() {
         @Override
         public boolean areItemsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
             return oldItem.key == newItem.key;
