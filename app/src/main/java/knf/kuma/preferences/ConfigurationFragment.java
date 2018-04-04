@@ -125,7 +125,6 @@ public class ConfigurationFragment extends PreferenceFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
             if (!FileAccessHelper.INSTANCE.isUriValid(data.getData())) {
                 Toaster.toast("Directorio invalido");

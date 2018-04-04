@@ -277,11 +277,13 @@ public class RecommendActivity extends AppCompatActivity {
             @Override
             public void run() {
                 SectionedRecyclerViewAdapter adapter = ((SectionedRecyclerViewAdapter) recyclerView.getAdapter());
-                adapter.removeAllSections();
-                recyclerView.setAdapter(adapter);
-                loading.setVisibility(View.VISIBLE);
-                error.setVisibility(View.GONE);
-                setAdapter();
+                if (adapter != null) {
+                    adapter.removeAllSections();
+                    recyclerView.setAdapter(adapter);
+                    loading.setVisibility(View.VISIBLE);
+                    error.setVisibility(View.GONE);
+                    setAdapter();
+                }
             }
         });
     }

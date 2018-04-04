@@ -18,6 +18,7 @@ import javax.inject.Singleton;
 
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
+import knf.kuma.commons.NoSSLOkHttpClient;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
@@ -89,9 +90,11 @@ public class Repository {
             return CacheDB.INSTANCE.animeDAO().getAnime(link);
         getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, rest).enqueue(new Callback<AnimeObject.WebInfo>() {
             @Override
-            public void onResponse(Call<AnimeObject.WebInfo> call, Response<AnimeObject.WebInfo> response) {
-                if (response.body() == null)
+            public void onResponse(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Response<AnimeObject.WebInfo> response) {
+                if (response.body() == null) {
                     data.setValue(CacheDB.INSTANCE.animeDAO().getAnime(link).getValue());
+                    return;
+                }
                 AnimeObject animeObject = new AnimeObject(link, response.body());
                 if (persist)
                     dao.insert(animeObject);
@@ -99,7 +102,7 @@ public class Repository {
             }
 
             @Override
-            public void onFailure(Call<AnimeObject.WebInfo> call, Throwable t) {
+            public void onFailure(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Throwable t) {
                 t.printStackTrace();
             }
         });
@@ -204,7 +207,7 @@ public class Repository {
     private Factory getFactory(String link) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(link)
-                //.client(NoSSLOkHttpClient.get())
+                .client(NoSSLOkHttpClient.get())
                 .addConverterFactory(JspoonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
@@ -214,7 +217,7 @@ public class Repository {
     private Factory getFactoryBack(String link) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(link)
-                //.client(NoSSLOkHttpClient.get())
+                .client(NoSSLOkHttpClient.get())
                 .addConverterFactory(JspoonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .callbackExecutor(Executors.newSingleThreadExecutor())

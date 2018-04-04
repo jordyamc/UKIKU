@@ -23,9 +23,13 @@ public class ExplorerPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         Fragment fragment = getItem(position);
-        FragmentTransaction trans = fragmentManager.beginTransaction();
-        trans.add(container.getId(), fragment, "fragment:" + position);
-        trans.commit();
+        try {
+            FragmentTransaction trans = fragmentManager.beginTransaction();
+            trans.add(container.getId(), fragment, "fragment:" + position);
+            trans.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return fragment;
     }
 

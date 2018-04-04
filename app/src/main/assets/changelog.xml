@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="19" version="0.4.2 beta">
+        <change type="change">Agregada mas informacion en acerca de</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="18" version="0.4.1 beta">
         <change type="fix">Error al notificar animes nuevos</change>
     </release>

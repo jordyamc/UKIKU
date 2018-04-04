@@ -6,8 +6,8 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 18,
-      "versionName": "0.4.1 beta",
+      "versionCode": 19,
+      "versionName": "0.4.2 beta",
       "enabled": true,
       "outputFile": "app-release.apk",
       "fullName": "release",
