@@ -60,15 +60,16 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
     private RecordsDAO recordsDAO = CacheDB.INSTANCE.recordsDAO();
     private ExplorerDAO explorerDAO=CacheDB.INSTANCE.explorerDAO();
 
-    public ExplorerChapsAdapter(Fragment fragment, ExplorerObject explorerObject, FragmentChapters.ClearInterface clearInterface) {
+    ExplorerChapsAdapter(Fragment fragment, ExplorerObject explorerObject, FragmentChapters.ClearInterface clearInterface) {
         this.fragment = fragment;
         this.context = fragment.getContext();
         this.explorerObject = explorerObject;
         this.clearInterface = clearInterface;
     }
 
+    @NonNull
     @Override
-    public ChapItem onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ChapItem onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ChapItem(LayoutInflater.from(parent.getContext()).inflate(getLayout(), parent, false));
     }
 
@@ -82,7 +83,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
     }
 
     @Override
-    public void onBindViewHolder(final ChapItem holder, int position) {
+    public void onBindViewHolder(@NonNull final ChapItem holder, int position) {
         final ExplorerObject.FileDownObj chapObject = explorerObject.chapters.get(position);
         loadThumb(chapObject, holder.imageView);
         chaptersDAO.chapterSeen(chapObject.eid).observe(fragment, new Observer<AnimeObject.WebInfo.AnimeChapter>() {

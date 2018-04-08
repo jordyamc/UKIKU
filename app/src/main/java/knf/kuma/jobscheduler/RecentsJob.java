@@ -105,7 +105,7 @@ public class RecentsJob extends Job {
 
     private void notifyFavChaps(List<RecentObject> local, List<RecentObject> objects) throws Exception {
         for (RecentObject object : objects) {
-            if (!local.contains(object) && favsDAO.isFav(Integer.parseInt(object.aid)) && seeingDAO.isSeeing(object.aid))
+            if (!local.contains(object) && (favsDAO.isFav(Integer.parseInt(object.aid)) || seeingDAO.isSeeing(object.aid)))
                 notifyRecent(object);
         }
     }

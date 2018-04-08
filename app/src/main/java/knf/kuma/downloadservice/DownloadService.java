@@ -15,15 +15,16 @@ import java.io.BufferedOutputStream;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.pojos.DownloadObject;
+import knf.kuma.videoservers.ServersFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class DownloadService extends IntentService {
-    public static final String CHANNEL="service.Downloads";
-    public static final String CHANNEL_ONGOING="service.Downloads.Ongoing";
-    private static final int DOWNLOADING_ID=8879;
-    private DownloadsDAO downloadsDAO= CacheDB.INSTANCE.downloadsDAO();
+    public static final String CHANNEL = "service.Downloads";
+    public static final String CHANNEL_ONGOING = "service.Downloads.Ongoing";
+    private static final int DOWNLOADING_ID = 8879;
+    private DownloadsDAO downloadsDAO = CacheDB.INSTANCE.downloadsDAO();
 
     private NotificationManager manager;
 
@@ -39,20 +40,20 @@ public class DownloadService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        eid=intent.getStringExtra("eid");
-        current=downloadsDAO.getByEid(eid);
-        if (current==null)
+        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        eid = intent.getStringExtra("eid");
+        current = downloadsDAO.getByEid(eid);
+        if (current == null)
             return;
-        file=current.file;
-        startForeground(DOWNLOADING_ID,getStartNotification());
+        file = current.file;
+        startForeground(DOWNLOADING_ID, getStartNotification());
         try {
             Request.Builder request = new Request.Builder()
                     .url(intent.getDataString());
-            if (intent.getBooleanExtra("constructor",false)){
-                request.addHeader("Cookie",intent.getStringExtra("cookie"));
-                request.addHeader("Referer",intent.getStringExtra("referer"));
-                request.addHeader("User-Agent",intent.getStringExtra("ua"));
+            if (intent.getBooleanExtra("constructor", false)) {
+                request.addHeader("Cookie", intent.getStringExtra("cookie"));
+                request.addHeader("Referer", intent.getStringExtra("referer"));
+                request.addHeader("User-Agent", intent.getStringExtra("ua"));
             }
             Response response = new OkHttpClient().newCall(request.build()).execute();
             current.t_bytes = response.body().contentLength();
@@ -89,7 +90,7 @@ public class DownloadService extends IntentService {
             outputStream.close();
             inputStream.close();
             completedNotification();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             FileAccessHelper.INSTANCE.delete(file);
             downloadsDAO.delete(current);
@@ -97,12 +98,12 @@ public class DownloadService extends IntentService {
         }
     }
 
-    private void updateNotification(){
+    private void updateNotification() {
         NotificationCompat.Builder notification = new NotificationCompat.Builder(this, CHANNEL_ONGOING)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(current.name)
                 .setContentText(current.chapter)
-                .setProgress(100,current.progress,false)
+                .setProgress(100, current.progress, false)
                 .setOngoing(true)
                 .setSound(null)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
@@ -112,18 +113,20 @@ public class DownloadService extends IntentService {
         manager.notify(DOWNLOADING_ID, notification.build());
     }
 
-    private void completedNotification(){
-        current.state= DownloadObject.COMPLETED;
+    private void completedNotification() {
+        current.state = DownloadObject.COMPLETED;
         downloadsDAO.update(current);
-        Notification notification=new NotificationCompat.Builder(this,CHANNEL)
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL)
                 .setColor(getResources().getColor(android.R.color.holo_green_dark))
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setContentTitle(current.name)
                 .setContentText(current.chapter)
+                .setContentIntent(ServersFactory.getPlayIntent(this, current.name, file))
                 .setOngoing(false)
+                .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
-        manager.notify(Integer.parseInt(current.eid),notification);
+        manager.notify(Integer.parseInt(current.eid), notification);
         updateMedia();
         cancelForeground();
     }
@@ -137,32 +140,32 @@ public class DownloadService extends IntentService {
         }
     }
 
-    private void errorNotification(){
-        Notification notification=new NotificationCompat.Builder(this,CHANNEL)
+    private void errorNotification() {
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL)
                 .setColor(getResources().getColor(android.R.color.holo_red_dark))
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(current.name)
-                .setContentText("Error al descargar "+current.chapter.toLowerCase())
+                .setContentText("Error al descargar " + current.chapter.toLowerCase())
                 .setOngoing(false)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
-        manager.notify(Integer.parseInt(current.eid),notification);
+        manager.notify(Integer.parseInt(current.eid), notification);
         cancelForeground();
     }
 
-    private Notification getStartNotification(){
-        return new NotificationCompat.Builder(this,CHANNEL_ONGOING)
+    private Notification getStartNotification() {
+        return new NotificationCompat.Builder(this, CHANNEL_ONGOING)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(current.name)
                 .setContentText(current.chapter)
-                .setProgress(100,current.progress,true)
+                .setProgress(100, current.progress, true)
                 .setOngoing(true)
                 .setSound(null)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build();
     }
 
-    private void cancelForeground(){
+    private void cancelForeground() {
         stopForeground(true);
         manager.cancel(DOWNLOADING_ID);
     }

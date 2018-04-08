@@ -1,5 +1,6 @@
 package knf.kuma.videoservers;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -78,6 +79,23 @@ public class ServersFactory {
                     .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     .putExtra("title", title);
             context.startActivity(intent);
+        }
+    }
+
+    private static String getEpTitle(String title, String file) {
+        return title + " " + file.substring(file.lastIndexOf("-") + 1, file.lastIndexOf("."));
+    }
+
+    public static PendingIntent getPlayIntent(Context context, String title, String file_name) {
+        File file = FileAccessHelper.INSTANCE.getFile(file_name);
+        if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")) {
+            return PendingIntent.getActivity(context, Math.abs(file_name.hashCode()), new Intent(context, ExoPlayer.class).setData(Uri.fromFile(file)).putExtra("isFile", true).putExtra("title", getEpTitle(title, file_name)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_UPDATE_CURRENT);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_VIEW, FileAccessHelper.INSTANCE.getDataUri(file_name))
+                    .setDataAndType(FileAccessHelper.INSTANCE.getDataUri(file_name), "video/mp4")
+                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .putExtra("title", getEpTitle(title, file_name));
+            return PendingIntent.getActivity(context, Math.abs(file_name.hashCode()), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
     }
 

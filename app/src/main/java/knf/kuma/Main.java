@@ -2,7 +2,6 @@ package knf.kuma;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -111,7 +110,8 @@ public class Main extends AppCompatActivity
         setSearch();
         if (savedInstanceState == null) {
             checkServices();
-            setFragment(RecentFragment.get());
+            startChange();
+
         } else {
             returnSelectFragment();
         }
@@ -119,7 +119,7 @@ public class Main extends AppCompatActivity
 
     private void checkServices() {
         checkPermissions();
-        ContextCompat.startForegroundService(this, new Intent(this, DirectoryService.class));
+        DirectoryService.run(this);
         UpdateJob.schedule();
         RecentsJob.schedule(this);
         DirUpdateJob.schedule(this);
@@ -411,7 +411,7 @@ public class Main extends AppCompatActivity
     private void returnSelectFragment() {
         if (tmpfragment != null) {
             if (tmpfragment instanceof FavoriteFragment) {
-                bottomNavigationView.setSelectedItemId(R.id.action_bottom_recents);
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_favorites);
             } else if (tmpfragment instanceof DirectoryFragment) {
                 bottomNavigationView.setSelectedItemId(R.id.action_bottom_directory);
             } else if (tmpfragment instanceof BottomPreferencesFragment) {
@@ -422,6 +422,21 @@ public class Main extends AppCompatActivity
         }
         tmpfragment = null;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    private void startChange() {
+        switch (getIntent().getIntExtra("start_position", -1)) {
+            default:
+            case 0:
+                setFragment(RecentFragment.get());
+                break;
+            case 1:
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_favorites);
+                break;
+            case 2:
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_directory);
+                break;
+        }
     }
 
     private void reselectFragment() {

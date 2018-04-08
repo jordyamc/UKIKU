@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="20" version="1.0">
+        <change type="change">Version final</change>
+        <change type="new">Accesos directos en launcher</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="19" version="0.4.2 beta">
         <change type="change">Agregada mas informacion en acerca de</change>
         <change type="fix">Errores generales</change>

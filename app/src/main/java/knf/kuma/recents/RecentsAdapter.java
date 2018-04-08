@@ -37,6 +37,7 @@ import knf.kuma.database.dao.ChaptersDAO;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.database.dao.FavsDAO;
 import knf.kuma.database.dao.RecordsDAO;
+import knf.kuma.directory.DirectoryService;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
@@ -59,24 +60,21 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
     private DownloadsDAO downloadsDAO = CacheDB.INSTANCE.downloadsDAO();
     private boolean isNetworkAvailable;
 
-    public RecentsAdapter(Fragment fragment, RecyclerView recyclerView) {
+    RecentsAdapter(Fragment fragment, RecyclerView recyclerView) {
         this.context = fragment.getContext();
         this.fragment = fragment;
         this.recyclerView = recyclerView;
         this.isNetworkAvailable = Network.isConnected();
     }
 
+    @NonNull
     @Override
-    public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recents, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final ItemHolder holder, int position) {
-        holder.setNew(false);
-        holder.setFav(false);
-        holder.setSeen(false);
-        holder.setDownloaded(false);
+    public void onBindViewHolder(@NonNull final ItemHolder holder, int position) {
         final RecentObject object = list.get(position);
         holder.setState(isNetworkAvailable, object.isChapterDownloaded || object.isDownloading);
         PicassoSingle.get(context).load(object.img).into(holder.imageView);
@@ -177,8 +175,22 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                         ActivityAnime.open(fragment, animeObject, holder.imageView);
                     } else {
                         Toaster.toast("Aún no esta en directorio!");
+                        DirectoryService.run(context);
                     }
                 }
+            }
+        });
+        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (!chaptersDAO.chapterIsSeen(object.eid)) {
+                    chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(object));
+                    holder.animeOverlay.setSeen(true, true);
+                } else {
+                    chaptersDAO.deleteChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(object));
+                    holder.animeOverlay.setSeen(false, true);
+                }
+                return true;
             }
         });
         holder.download.setOnClickListener(new View.OnClickListener() {
