@@ -150,7 +150,7 @@ public class CastUtil implements CastListener, PlayStatusListener {
             case STATUS_NOT_SUPPORT_LISTENER:
                 stopLoading();
                 setEid(NO_PLAYING);
-                Toaster.toast("Video no soportado por diapositivo");
+                Toaster.toast("Video no soportado por dispositivo");
                 break;
         }
     }

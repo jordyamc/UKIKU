@@ -1,6 +1,7 @@
 package knf.kuma.player;
 
 import android.annotation.TargetApi;
+import android.app.PictureInPictureParams;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Rational;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -43,6 +45,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 import xdroid.toaster.Toaster;
 
 public class ExoPlayer extends AppCompatActivity implements Player.EventListener, PlaybackControlView.VisibilityListener {
@@ -54,6 +57,13 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
     ImageButton pip;
     @BindView(R.id.progress)
     ProgressBar progressBar;
+
+    @BindView(R.id.lay_top)
+    View top;
+    @BindView(R.id.lay_bottom)
+    View bottom;
+    @BindView(R.id.pip_exit)
+    ImageButton pip_exit;
 
     SimpleExoPlayer player;
     private long currentPosition = 0;
@@ -84,15 +94,16 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(EAHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.exo_player);
         ButterKnife.bind(this);
-        title.setText(getIntent().getStringExtra("title"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
             pip.setVisibility(View.VISIBLE);
         addVisibilityListener(exoPlayerView, this);
         exoPlayerView.setResizeMode(getResizeMode());
         exoPlayerView.requestFocus();
+        initPlayer(getIntent());
     }
 
     private int getResizeMode() {
@@ -109,18 +120,19 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
         }
     }
 
-    private void initPlayer() {
+    private void initPlayer(Intent intent) {
         if (player == null) {
+            title.setText(intent.getStringExtra("title"));
             BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
             TrackSelection.Factory videoTrackSelectionFactory =
                     new AdaptiveTrackSelection.Factory(bandwidthMeter);
             TrackSelector trackSelector =
                     new DefaultTrackSelector(videoTrackSelectionFactory);
             MediaSource source;
-            if (!getIntent().getBooleanExtra("isFile", false)) {
-                source = new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(getIntent().getData());
+            if (!intent.getBooleanExtra("isFile", false)) {
+                source = new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(intent.getData());
             } else {
-                source = new ExtractorMediaSource.Factory(new FileDataSourceFactory()).createMediaSource(getIntent().getData());
+                source = new ExtractorMediaSource.Factory(new FileDataSourceFactory()).createMediaSource(intent.getData());
             }
             player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
             exoPlayerView.setPlayer(player);
@@ -145,38 +157,73 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
     @OnClick(R.id.pip)
     @TargetApi(Build.VERSION_CODES.N)
     void onPip(View view) {
-        view.setOnClickListener(new View.OnClickListener() {
+        /*view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isInPictureInPictureMode())
                     enterPictureInPictureMode();
             }
-        });
+        });*/
+        if (!isInPictureInPictureMode()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                PictureInPictureParams params = new PictureInPictureParams.Builder()
+                        .setAspectRatio(new Rational(exoPlayerView.getWidth(), exoPlayerView.getHeight()))
+                        .build();
+                enterPictureInPictureMode(params);
+            } else {
+                enterPictureInPictureMode();
+            }
+        }
+    }
+
+    @OnClick(R.id.pip_exit)
+    void onExitPip(View view) {
+        getApplication().startActivity(new Intent(this, getClass())
+                .putExtra("isReorder", true)
+                .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
 
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
-        if (!isInPictureInPictureMode)
-            getApplication().startActivity(new Intent(this, getClass())
+        if (!isInPictureInPictureMode) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    top.setVisibility(View.VISIBLE);
+                    bottom.setVisibility(View.VISIBLE);
+                    //pip_exit.setVisibility(View.GONE);
+                }
+            });
+            /*getApplication().startActivity(new Intent(this, getClass())
                     .putExtra("isReorder", true)
-                    .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));*/
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    top.setVisibility(View.GONE);
+                    bottom.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    //pip_exit.setVisibility(View.VISIBLE);
+                }
+            });
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        if (exoPlayerView != null && !intent.getBooleanExtra("isReorder", false)) {
-            exoPlayerView.getPlayer().stop();
-            currentPosition = 0;
-            resumeWindow = C.INDEX_UNSET;
-            initPlayer();
-        }
+        setIntent(intent);
+        releasePlayer();
+        currentPosition = 0;
+        resumeWindow = C.INDEX_UNSET;
+        initPlayer(intent);
         super.onNewIntent(intent);
     }
 
     @Override
     protected void onStart() {
-        initPlayer();
+        initPlayer(getIntent());
         super.onStart();
     }
 
@@ -189,18 +236,21 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        initPlayer();
+        initPlayer(getIntent());
         super.onResume();
     }
 
     @Override
     protected void onPause() {
+        super.onPause();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+                isInPictureInPictureMode())
+            return;
         if (player != null) {
             resumeWindow = player.getCurrentWindowIndex();
             currentPosition = Math.max(0, player.getContentPosition());
             releasePlayer();
         }
-        super.onPause();
     }
 
     @Override
@@ -231,7 +281,9 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
+        if (playbackState == Player.STATE_ENDED) {
+            finish();
+        }
     }
 
     @Override

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Option {
+    public String server;
     public String name;
     public String url;
 
-    public Option(String name, String url) {
+    public Option(String server, String name, String url) {
+        this.server = server;
         this.name = name;
         this.url = url;
     }

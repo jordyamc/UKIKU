@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.SearchEvent;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -101,14 +104,17 @@ public class SearchFragment extends BottomFragment {
         return view;
     }
 
-    public void setSearch(String query){
-        this.query = query.trim();
-        model.getSearch(query.trim(), getGenresString()).observe(this, new Observer<PagedList<AnimeObject>>() {
+    public void setSearch(String q) {
+        this.query = q.trim();
+        model.getSearch(q.trim(), getGenresString()).observe(this, new Observer<PagedList<AnimeObject>>() {
             @Override
             public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
                 if (animeObjects!=null) {
                     adapter.submitList(animeObjects);
                     errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
+                    Answers.getInstance().logSearch(new SearchEvent().putQuery(query));
+                    if (!getGenresString().equals(""))
+                        Answers.getInstance().logSearch(new SearchEvent().putQuery(getGenresString()));
                 }
                 if (isFirst) {
                     progressBar.setVisibility(View.GONE);

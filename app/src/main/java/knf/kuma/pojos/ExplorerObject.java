@@ -35,6 +35,8 @@ public class ExplorerObject {
     public int count;
     public String path;
     public List<FileDownObj> chapters;
+    @Ignore
+    public boolean isProcessed = false;
 
     public ExplorerObject(int key, String img, String link, String fileName, String name, int count, String path, List<FileDownObj> chapters) {
         this.key = key;
@@ -57,13 +59,15 @@ public class ExplorerObject {
         this.fileName = object.fileName;
         this.name = object.name;
         File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.fileName);
-        if (file.listFiles() == null)
+        File[] list = file.listFiles();
+        if (list == null)
             throw new IllegalStateException("Directory empty: " + object.fileName);
         this.path = file.getAbsolutePath();
         chapters = new ArrayList<>();
-        for (File chap : file.listFiles()) {
+        for (File chap : list) {
             try {
-                chapters.add(new FileDownObj(context, object.name, object.aid, PatternUtil.getNumFromfile(chap.getName()), chap));
+                String name = chap.getName();
+                chapters.add(new FileDownObj(context, object.name, object.aid, PatternUtil.getNumFromfile(name), name, chap));
             } catch (Exception e) {
                 //e.printStackTrace();
             }
@@ -84,12 +88,12 @@ public class ExplorerObject {
         public String fileName;
         public String link;
 
-        public FileDownObj(Context context, String title, String aid, String chapter, File file) {
+        public FileDownObj(Context context, String title, String aid, String chapter, String name, File file) {
             this.title = title;
             this.chapter = chapter;
             this.aid = aid;
-            this.eid = PatternUtil.getEidFromfile(file.getName());
-            this.fileName = file.getName();
+            this.eid = PatternUtil.getEidFromfile(name);
+            this.fileName = name;
             this.path = file.getAbsolutePath();
             this.time = getTime(context, file);
             if (time.equals(""))

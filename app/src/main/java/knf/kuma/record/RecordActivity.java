@@ -25,6 +25,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.RecordObject;
 
@@ -46,6 +47,7 @@ public class RecordActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(EAHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(getLayout());
         ButterKnife.bind(this);

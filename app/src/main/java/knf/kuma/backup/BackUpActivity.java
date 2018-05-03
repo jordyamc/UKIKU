@@ -17,6 +17,8 @@ import android.widget.Button;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.LoginEvent;
 import com.dropbox.core.android.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
@@ -125,6 +127,7 @@ public class BackUpActivity extends AppCompatActivity implements BUUtils.LoginIn
             setState(true);
             showColor(true);
             initSyncButtons();
+            Answers.getInstance().logLogin(new LoginEvent().putMethod((BUUtils.getType() == BUUtils.BUType.DRIVE) ? "Drive" : "Dropbox"));
         } else if (waitingLogin) {
             Toaster.toast("Error al iniciar sesión");
         }

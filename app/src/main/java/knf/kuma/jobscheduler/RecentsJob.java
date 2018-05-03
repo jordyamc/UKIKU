@@ -162,7 +162,8 @@ public class RecentsJob extends Job {
                 .setContentIntent(PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), Main.class), PendingIntent.FLAG_CANCEL_CURRENT))
                 .setDeleteIntent(PendingIntent.getBroadcast(getContext(), (int) System.currentTimeMillis(), getSummaryBroadcast(), PendingIntent.FLAG_UPDATE_CURRENT))
                 .build();
-        manager.notify(KEY_SUMMARY, notification);
+        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("group_notifications", true))
+            manager.notify(KEY_SUMMARY, notification);
     }
 
     private Intent getSummaryBroadcast() {

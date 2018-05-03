@@ -10,6 +10,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
 
 import java.util.List;
+import java.util.Set;
 
 import knf.kuma.database.BaseConverter;
 import knf.kuma.pojos.AnimeObject;
@@ -26,8 +27,11 @@ public interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject ORDER BY RANDOM() LIMIT :limit")
     LiveData<List<AnimeObject>> getRandom(int limit);
 
-    @Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day ORDER BY name")
-    LiveData<List<AnimeObject>> getByDay(int day);
+    @Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day AND aid NOT IN (:list) ORDER BY name")
+    LiveData<List<AnimeObject>> getByDay(int day, Set<String> list);
+
+    @Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day AND aid NOT IN (:list) ORDER BY name")
+    List<AnimeObject> getByDayDirect(int day, Set<String> list);
 
     @Query("SELECT * FROM AnimeObject ORDER BY name")
     DataSource.Factory<Integer,AnimeObject> getAll();
@@ -40,6 +44,9 @@ public interface AnimeDAO {
 
     @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genres ORDER BY name")
     DataSource.Factory<Integer,AnimeObject> getSearchG(String genres);
+
+    @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genre ORDER BY name")
+    DataSource.Factory<Integer, AnimeObject> getAllGenre(String genre);
 
     @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genres ORDER BY name")
     List<AnimeObject> getByGenres(String genres);
@@ -79,6 +86,9 @@ public interface AnimeDAO {
 
     @Query("SELECT * FROM AnimeObject WHERE fileName LIKE :file")
     AnimeObject getByFile(String file);
+
+    @Query("SELECT * FROM AnimeObject WHERE fileName IN (:names)")
+    List<AnimeObject> getAllByFile(List<String> names);
 
     @Query("SELECT count(*) FROM AnimeObject WHERE sid LIKE :sid")
     Boolean existSid(String sid);

@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.commons.CastUtil;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 
 public class ExplorerActivity extends AppCompatActivity {
@@ -35,6 +36,7 @@ public class ExplorerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(EAHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explorer);
         ButterKnife.bind(this);

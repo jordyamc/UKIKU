@@ -10,6 +10,8 @@
     <string name="directory_channel_title">Actualizacion de directorio</string>
     <string name="directory_channel_desc">Servicio en segundo plano para actualizar el directorio</string>
 
+    <string name="io.branch.apiKey" translatable="false">key_live_gos8mZF3SuGUJ45nY7BKnddawsklPytr</string>
+
     <string-array name="theme_options">
         <item>Automático</item>
         <item>Dia</item>
@@ -99,4 +101,49 @@
     <string name="shortcut_explorer_long">Explorador</string>
     <string name="shortcut_emision_short">Emision</string>
     <string name="shortcut_emision_long">Animes en emision</string>
+
+    <string-array name="theme_colors">
+        <item>Rojo</item>
+        <item>Rosa</item>
+        <item>Morado</item>
+        <item>Morado obscuro</item>
+        <item>Indigo</item>
+        <item>Azul</item>
+        <item>Azul claro</item>
+        <item>Cyan</item>
+        <item>Verde azulado</item>
+        <item>Verde</item>
+        <item>Verde claro</item>
+        <item>Lima</item>
+        <item>Amarillo</item>
+        <item>Ambar</item>
+        <item>Naranja</item>
+        <item>Naranja obscuro</item>
+        <item>Café</item>
+        <item>Gris</item>
+        <item>Gris azulado</item>
+    </string-array>
+
+    <string-array name="theme_colors_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+    </string-array>
+    <string name="title_activity_eam">Mapa</string>
 </resources>

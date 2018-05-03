@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/img"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
@@ -45,6 +46,16 @@
             android:layout_height="32dp"
             android:padding="5dp"
             app:srcCompat="@drawable/ic_sync"/>
+
+        <ImageButton
+            android:id="@+id/action_map"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="5dp"
+            android:padding="5dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_map"/>
     </LinearLayout>
 
     <ImageView

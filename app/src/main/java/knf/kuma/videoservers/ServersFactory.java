@@ -16,6 +16,8 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -284,6 +286,7 @@ public class ServersFactory {
     }
 
     private void startStreaming(Option option) {
+        Answers.getInstance().logCustom(new CustomEvent("Streaming").putCustomAttribute("Server", option.server));
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type","0").equals("0")){
             context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title", downloadObject.title));
         }else {
@@ -296,6 +299,7 @@ public class ServersFactory {
     }
 
     private void startDownload(Option option) {
+        Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
         downloadObject.link = option.url;
         CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
         ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));

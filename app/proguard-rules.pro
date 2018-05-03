@@ -72,3 +72,4 @@
 -dontwarn okio.**
 -dontwarn retrofit2.**
 -dontwarn com.dropbox.core.**
+-dontwarn io.branch.**

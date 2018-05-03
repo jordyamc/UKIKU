@@ -14,6 +14,8 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 
 import knf.kuma.changelog.ChangelogActivity;
+import knf.kuma.commons.EAHelper;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by jordy on 05/03/2018.
@@ -50,6 +52,14 @@ public class AppInfo extends MaterialAboutActivity {
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_facebook), "Facebook", true, Uri.parse("https://www.facebook.com/ukikuapp")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_discord), "Discord", false, Uri.parse("https://discord.gg/6hzpua6")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_beta), "Grupo Beta", false, Uri.parse("https://t.me/joinchat/A3tvqEKOzGVyaZhQPc14_Q")));
+        final String ea = EAHelper.getEAMessage(this);
+        if (ea != null)
+            extraCard.addItem(new MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction(new MaterialAboutItemOnClickAction() {
+                @Override
+                public void onClick() {
+                    Toaster.toastLong(ea);
+                }
+            }).build());
         return new MaterialAboutList.Builder()
                 .addCard(infoCard.build())
                 .addCard(authorCard.build())

@@ -3,6 +3,7 @@ package knf.kuma.record;
 import android.app.Activity;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.RecordsDAO;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.RecordObject;
+import xdroid.toaster.Toaster;
 
 public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordItem> {
     private Activity activity;
@@ -49,7 +51,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordIt
     }
 
     @Override
-    public void onBindViewHolder(final RecordItem holder, int position) {
+    public void onBindViewHolder(@NonNull final RecordItem holder, int position) {
         final RecordObject item = items.get(position);
         AnimeObject animeObject = item.animeObject;
         if (animeObject != null)
@@ -59,7 +61,9 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordIt
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActivityAnime.open(activity, item, holder.imageView);
+                if (item.animeObject != null)
+                    ActivityAnime.open(activity, item, holder.imageView);
+                else Toaster.toast("Error al abrir");
             }
         });
     }

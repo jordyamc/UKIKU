@@ -14,6 +14,11 @@
             android:summary="%s"
             android:title="Revisar recientes"/>
         <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_group"
+            android:key="group_notifications"
+            android:title="Agrupar notificaciones"/>
+        <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_heart"
             android:key="notify_favs"
@@ -89,6 +94,14 @@
             android:key="theme_option"
             android:summary="%s"
             android:title="Estilo de tema"/>
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/theme_colors"
+            android:entryValues="@array/theme_colors_values"
+            android:icon="@drawable/ic_palette"
+            android:key="theme_color"
+            android:summary="%s"
+            android:title="Color de tema"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Extras">

@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,10 +21,13 @@ import android.widget.ListView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import knf.kuma.Main;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
+import knf.kuma.widgets.emision.WEmisionProvider;
 import xdroid.toaster.Toaster;
 
 public class ConfigurationFragment extends PreferenceFragment {
@@ -63,6 +67,8 @@ public class ConfigurationFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
                 AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) o));
+                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("theme_value", (String) o).apply();
+                WEmisionProvider.update(getActivity());
                 getActivity().recreate();
                 return true;
             }
@@ -102,6 +108,19 @@ public class ConfigurationFragment extends PreferenceFragment {
                 return false;
             }
         });
+        if (EAHelper.getPhase(getActivity()) == 4)
+            getPreferenceScreen().findPreference("theme_color").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    startActivity(new Intent(getActivity(), Main.class).putExtra("start_position", 3));
+                    getActivity().finish();
+                    return true;
+                }
+            });
+        else {
+            getPreferenceScreen().findPreference("theme_color").setSummary("Resuleve el secreto para desbloquear");
+            getPreferenceScreen().findPreference("theme_color").setEnabled(false);
+        }
     }
 
     @Override

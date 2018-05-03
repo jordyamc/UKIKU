@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.directory.viewholders.DirMainFragmentHolder;
 
 public class DirectoryFragment extends BottomFragment {
@@ -33,6 +34,7 @@ public class DirectoryFragment extends BottomFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_directory,container,false);
         fragmentHolder=new DirMainFragmentHolder(view,getChildFragmentManager());
+        EAHelper.enter1(getContext(), "D");
         return view;
     }
 
@@ -42,6 +44,7 @@ public class DirectoryFragment extends BottomFragment {
 
     @Override
     public void onReselect() {
+        EAHelper.enter1(getContext(), "D");
         fragmentHolder.onReselect();
     }
 }

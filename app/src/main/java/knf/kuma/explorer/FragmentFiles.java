@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class FragmentFiles extends Fragment {
     View error;
     @BindView(R.id.progress)
     ProgressBar progressBar;
+    @BindView(R.id.state)
+    TextView state;
     private SelectedListener listener;
     private ExplorerFilesAdapter adapter;
     private boolean isFist=true;
@@ -55,6 +58,7 @@ public class FragmentFiles extends Fragment {
             public void onChanged(List<ExplorerObject> explorerObjects) {
                 if (count >= 1) {
                     progressBar.setVisibility(View.GONE);
+                    state.setVisibility(View.GONE);
                     error.setVisibility(explorerObjects.size() == 0 ? View.VISIBLE : View.GONE);
                     adapter.update(explorerObjects);
                     if (isFist && explorerObjects.size() != 0) {
@@ -64,6 +68,12 @@ public class FragmentFiles extends Fragment {
                 } else {
                     count++;
                 }
+            }
+        });
+        ExplorerCreator.getStateListener().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                state.setText(s);
             }
         });
     }

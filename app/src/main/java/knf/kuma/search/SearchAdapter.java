@@ -21,7 +21,7 @@ import knf.kuma.pojos.AnimeObject;
 
 public class SearchAdapter extends PagedListAdapter<AnimeObject,SearchAdapter.ItemHolder> {
 
-    public static final DiffUtil.ItemCallback<AnimeObject> DIFF_CALLBACK = new DiffUtil.ItemCallback<AnimeObject>() {
+    private static final DiffUtil.ItemCallback<AnimeObject> DIFF_CALLBACK = new DiffUtil.ItemCallback<AnimeObject>() {
         @Override
         public boolean areItemsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
             return oldItem.key == newItem.key;
@@ -34,18 +34,19 @@ public class SearchAdapter extends PagedListAdapter<AnimeObject,SearchAdapter.It
     };
     private Fragment fragment;
 
-    public SearchAdapter(Fragment fragment) {
+    SearchAdapter(Fragment fragment) {
         super(DIFF_CALLBACK);
         this.fragment = fragment;
     }
 
+    @NonNull
     @Override
-    public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ItemHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dir, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final ItemHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ItemHolder holder, int position) {
         final AnimeObject object=getItem(position);
         if (object!=null){
             PicassoSingle.get(fragment.getContext()).load(object.img).into(holder.imageView);

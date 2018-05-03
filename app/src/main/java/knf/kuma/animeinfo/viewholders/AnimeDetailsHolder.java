@@ -92,7 +92,7 @@ public class AnimeDetailsHolder {
                 ratingBar.setRating(Float.parseFloat(object.rate_stars));
                 showCard(cardViews.get(2));
                 if (object.genres.size() != 0) {
-                    recyclerView_genres.setAdapter(new AnimeTagsAdapter(object.genres));
+                    recyclerView_genres.setAdapter(new AnimeTagsAdapter(fragment.getContext(), object.genres));
                     showCard(cardViews.get(3));
                 }
                 if (object.related.size() != 0) {

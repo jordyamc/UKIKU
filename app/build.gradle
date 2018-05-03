@@ -21,8 +21,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 20
-        versionName "1.0"
+        versionCode 21
+        versionName "1.1"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -35,7 +35,7 @@ android {
     }
 }
 
-configurations.all{
+configurations.all {
     resolutionStrategy {
         force 'org.jsoup:jsoup:1.10.3'
     }
@@ -52,25 +52,26 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:preference-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:animated-vector-drawable:27.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.android.support:mediarouter-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.google.android.gms:play-services-cast:12.0.1'
-    implementation 'com.google.android.gms:play-services-drive:12.0.1'
-    implementation 'com.google.android.gms:play-services-auth:12.0.1'
-    implementation 'com.google.firebase:firebase-core:12.0.1'
+    implementation 'com.google.android.gms:play-services-cast:15.0.0'
+    implementation 'com.google.android.gms:play-services-drive:15.0.0'
+    implementation 'com.google.android.gms:play-services-auth:15.0.0'
+    implementation 'com.google.firebase:firebase-core:15.0.0'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     implementation 'android.arch.lifecycle:runtime:1.1.1'
+    implementation 'com.google.android.gms:play-services-maps:15.0.0'
     annotationProcessor 'android.arch.lifecycle:compiler:1.1.1'
-    implementation 'android.arch.persistence.room:runtime:1.1.0-beta2'
-    annotationProcessor 'android.arch.persistence.room:compiler:1.1.0-beta2'
+    implementation 'android.arch.persistence.room:runtime:1.1.0-beta3'
+    annotationProcessor 'android.arch.persistence.room:compiler:1.1.0-beta3'
     implementation 'com.google.dagger:dagger-android-support:2.14.1'
     annotationProcessor 'com.google.dagger:dagger-android-processor:2.14.1'
-    implementation "android.arch.paging:runtime:1.0.0-beta1"
+    implementation 'android.arch.paging:runtime:1.0.0-rc1'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'pl.droidsonroids:jspoon:1.2.2'
@@ -98,9 +99,15 @@ dependencies {
     implementation 'com.github.daniel-stoneuk:material-about-library:2.2.5'
     implementation 'io.github.luizgrp.sectionedrecyclerviewadapter:sectionedrecyclerviewadapter:1.2.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
+        transitive = true
+    }
+    implementation('com.crashlytics.sdk.android:answers:1.4.1@aar') {
+        transitive = true
+    }
+    implementation('io.branch.sdk.android:library:2.17.1@aar') {
         transitive = true
     }
 }

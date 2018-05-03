@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="21" version="1.1">
+        <change type="new">Click largo en emisión para ocultar</change>
+        <change type="new">Widget de emisión agregado</change>
+        <change type="new">Abrir pantalla de genero desde informacion de anime</change>
+        <change type="new">Easter egg agregado, pista: "easteregg"</change>
+        <change type="change">Modo PIP en reproductor mejorado</change>
+        <change type="change">Explorador optimizado</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="20" version="1.0">
         <change type="change">Version final</change>
         <change type="new">Accesos directos en launcher</change>

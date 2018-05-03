@@ -37,9 +37,9 @@ public class OkruServer extends Server {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("name").equals("sd")) {
-                    videoServer.addOption(new Option("SD", object.getString("url")));
+                    videoServer.addOption(new Option(getName(), "SD", object.getString("url")));
                 } else if (object.getString("name").equals("hd")) {
-                    videoServer.addOption(new Option("HD", object.getString("url")));
+                    videoServer.addOption(new Option(getName(), "HD", object.getString("url")));
                 }
             }
             return videoServer;

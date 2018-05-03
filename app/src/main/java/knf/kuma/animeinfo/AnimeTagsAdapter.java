@@ -1,34 +1,46 @@
 package knf.kuma.animeinfo;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.search.GenreActivity;
 
 public class AnimeTagsAdapter extends RecyclerView.Adapter<AnimeTagsAdapter.TagHolder>{
 
-    private List<String> list=new ArrayList<>();
+    private Context context;
+    private List<String> list;
 
-    public AnimeTagsAdapter(List<String> list) {
+    public AnimeTagsAdapter(Context context, List<String> list) {
+        this.context = context;
         this.list = list;
     }
 
+    @NonNull
     @Override
-    public TagHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TagHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new TagHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip,parent,false));
     }
 
     @Override
-    public void onBindViewHolder(TagHolder holder, int position) {
-        holder.chip.setText(list.get(holder.getAdapterPosition()));
+    public void onBindViewHolder(@NonNull final TagHolder holder, int position) {
+        holder.chip.setText(list.get(position));
+        holder.chip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GenreActivity.open(context, list.get(holder.getAdapterPosition()));
+            }
+        });
+
     }
 
     @Override
@@ -40,7 +52,7 @@ public class AnimeTagsAdapter extends RecyclerView.Adapter<AnimeTagsAdapter.TagH
         @BindView(R.id.chip)
         TextView chip;
 
-        public TagHolder(View itemView) {
+        TagHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
         }

@@ -68,4 +68,14 @@ public class EmisionPagerAdapter extends FragmentPagerAdapter {
                 return sunday;
         }
     }
+
+    public void reloadPages() {
+        monday.reloadList();
+        tuesday.reloadList();
+        wednesday.reloadList();
+        thursday.reloadList();
+        friday.reloadList();
+        saturday.reloadList();
+        sunday.reloadList();
+    }
 }

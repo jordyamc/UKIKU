@@ -14,6 +14,7 @@ import knf.kuma.R;
 import knf.kuma.animeinfo.AnimeViewModel;
 import knf.kuma.animeinfo.viewholders.AnimeDetailsHolder;
 import knf.kuma.pojos.AnimeObject;
+import xdroid.toaster.Toaster;
 
 public class DetailsFragment extends Fragment {
     private AnimeDetailsHolder holder;
@@ -22,7 +23,7 @@ public class DetailsFragment extends Fragment {
     }
 
     @NonNull
-    public static DetailsFragment get(){
+    public static DetailsFragment get() {
         return new DetailsFragment();
     }
 
@@ -32,7 +33,12 @@ public class DetailsFragment extends Fragment {
         ViewModelProviders.of(getActivity()).get(AnimeViewModel.class).getLiveData().observe(this, new Observer<AnimeObject>() {
             @Override
             public void onChanged(@Nullable AnimeObject object) {
-                holder.populate(DetailsFragment.this,object);
+                if (object != null)
+                    holder.populate(DetailsFragment.this, object);
+                else {
+                    Toaster.toast("No se pudo obtener la informacion");
+                    getActivity().finish();
+                }
             }
         });
     }
@@ -40,8 +46,8 @@ public class DetailsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_anime_details,container,false);
-        holder=new AnimeDetailsHolder(view);
+        View view = inflater.inflate(R.layout.fragment_anime_details, container, false);
+        holder = new AnimeDetailsHolder(view);
         return view;
     }
 }

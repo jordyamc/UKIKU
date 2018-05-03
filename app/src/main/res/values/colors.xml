@@ -4,12 +4,32 @@
     <color name="colorPrimaryDark">#1b1b1b</color>
     <color name="colorAccent">#d32f2f</color>
 
+    <color name="colorAccentPink">#C2185B</color>
+    <color name="colorAccentPurple">#7B1FA2</color>
+    <color name="colorAccentDeepPurple">#512DA8</color>
+    <color name="colorAccentIndigo">#303F9F</color>
+    <color name="colorAccentBlue">#1976D2</color>
+    <color name="colorAccentLightBlue">#0288D1</color>
+    <color name="colorAccentCyan">#0097A7</color>
+    <color name="colorAccentTeal">#00796B</color>
+    <color name="colorAccentGreen">#388E3C</color>
+    <color name="colorAccentLightGreen">#689F38</color>
+    <color name="colorAccentLime">#AFB42B</color>
+    <color name="colorAccentYellow">#FBC02D</color>
+    <color name="colorAccentAmber">#FFA000</color>
+    <color name="colorAccentOrange">#F57C00</color>
+    <color name="colorAccentDeepOrange">#E64A19</color>
+    <color name="colorAccentBrown">#5D4037</color>
+    <color name="colorAccentGray">#616161</color>
+    <color name="colorAccentBlueGrey">#455A64</color>
+
     <color name="colorAccentLight">#ff6f60</color>
 
     <color name="cardview_background">#FFFFFFFF</color>
 
     <color name="divider">#000</color>
     <color name="textPrimary">#000</color>
+    <color name="textSecondary">#323232</color>
 
     <color name="material_light_primary_text">#DE000000</color>
     <color name="material_light_hint_text">#61000000</color>

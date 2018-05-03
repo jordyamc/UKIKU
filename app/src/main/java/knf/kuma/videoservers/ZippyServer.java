@@ -30,7 +30,7 @@ public class ZippyServer extends Server {
             Document zi = Jsoup.connect(decoded).timeout(TIMEOUT).get();
             String t = zi.select("meta[property='og:title']").attr("content");
             if (!t.trim().equals(""))
-                return new VideoServer(getName(), new Option(null, decoded));
+                return new VideoServer(getName(), new Option(getName(), null, decoded));
             return null;
         } catch (Exception e) {
             e.printStackTrace();

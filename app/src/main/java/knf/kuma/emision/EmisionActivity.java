@@ -1,13 +1,16 @@
 package knf.kuma.emision;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.util.Calendar;
@@ -15,21 +18,24 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 
-public class EmisionActivity extends AppCompatActivity {
+public class EmisionActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.tabs)
     TabLayout tabLayout;
     @BindView(R.id.pager)
     ViewPager pager;
+    private EmisionPagerAdapter pagerAdapter;
 
-    public static void open(Context context) {
-        context.startActivity(new Intent(context, EmisionActivity.class));
+    public static void open(Activity context) {
+        context.startActivityForResult(new Intent(context, EmisionActivity.class), 4987);
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(EAHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emision);
         ButterKnife.bind(this);
@@ -44,9 +50,12 @@ public class EmisionActivity extends AppCompatActivity {
             }
         });
         pager.setOffscreenPageLimit(7);
-        pager.setAdapter(new EmisionPagerAdapter(getSupportFragmentManager()));
+        pagerAdapter = new EmisionPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(pager);
+        tabLayout.addOnTabSelectedListener(this);
         pager.setCurrentItem(getCurrentDay()-1,true);
+        EAHelper.clear2();
     }
 
     private int getCurrentDay(){
@@ -55,5 +64,45 @@ public class EmisionActivity extends AppCompatActivity {
         if (day==0)
             return 7;
         else return day;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_emision, menu);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_hidden", false))
+            menu.findItem(R.id.action_hideshow).setIcon(R.drawable.ic_hide);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean show = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_hidden", false);
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("show_hidden", !show).apply();
+        supportInvalidateOptionsMenu();
+        if (pagerAdapter != null)
+            pagerAdapter.reloadPages();
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        EAHelper.enter2(this, String.valueOf(getDayByPos(tab.getPosition())));
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+        EAHelper.enter2(this, String.valueOf(getDayByPos(tab.getPosition())));
+    }
+
+    private int getDayByPos(int pos) {
+        pos += 2;
+        if (pos == 8)
+            pos = 1;
+        return pos;
     }
 }

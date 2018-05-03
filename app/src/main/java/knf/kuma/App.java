@@ -14,6 +14,7 @@ import com.crashlytics.android.answers.Answers;
 import com.evernote.android.job.JobManager;
 
 import es.munix.multidisplaycast.CastManager;
+import io.branch.referral.Branch;
 import io.fabric.sdk.android.Fabric;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.Network;
@@ -49,6 +50,7 @@ public class App extends Application {
             }
         });*/
         Fabric.with(this, new Crashlytics(),new Answers());
+        Branch.getAutoInstance(this);
         AppCompatDelegate.setDefaultNightMode(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("theme_option","0")));
         CastManager.register(this);
         Network.init(this);

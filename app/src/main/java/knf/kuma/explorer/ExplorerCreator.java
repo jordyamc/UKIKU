@@ -1,46 +1,74 @@
 package knf.kuma.explorer;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.database.dao.ExplorerDAO;
 import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.ExplorerObject;
 
 public class ExplorerCreator {
+    private static MutableLiveData<String> STATE_LISTENER = new MutableLiveData<>();
     public static void start(final Context context, final EmptyListener listener) {
         final ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();
+        postState("Iniciando busqueda");
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
                 File root = FileAccessHelper.INSTANCE.getDownloadsDirectory();
                 if (root.exists()) {
+                    postState("Buscando animes");
                     List<ExplorerObject> list = new ArrayList<>();
                     File[] files = root.listFiles();
-                    if (files != null)
+                    if (files != null) {
+                        List<String> names = new ArrayList<>();
+                        int progress = 0;
                         for (File file : files) {
+                            names.add(file.getName());
+                        }
+                        for (AnimeObject object : animeDAO.getAllByFile(names))
                             try {
-                                Log.e("Explorer", "Search " + file.getName());
-                                list.add(new ExplorerObject(context, animeDAO.getByFile(file.getName())));
+                                progress++;
+                                postState(String.format(Locale.getDefault(), "Procesando animes %d/%d", progress, files.length));
+                                list.add(new ExplorerObject(context, object));
                             } catch (IllegalStateException e) {
                                 e.printStackTrace();
                             }
-                        }
-                    explorerDAO.insert(list);
+                        postState("Creando lista");
+                        explorerDAO.insert(list);
+                    }
                     if (list.size() == 0)
                         listener.onEmpty();
                 } else {
                     explorerDAO.deleteAll();
                     listener.onEmpty();
                 }
+            }
+        });
+    }
+
+    static LiveData<String> getStateListener() {
+        return STATE_LISTENER;
+    }
+
+    private static void postState(final String state) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                STATE_LISTENER.setValue(state);
             }
         });
     }

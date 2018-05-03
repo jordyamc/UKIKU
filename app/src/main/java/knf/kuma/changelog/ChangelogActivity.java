@@ -32,6 +32,7 @@ import butterknife.ButterKnife;
 import io.fabric.sdk.android.services.concurrency.AsyncTask;
 import knf.kuma.R;
 import knf.kuma.changelog.objects.Changelog;
+import knf.kuma.commons.EAHelper;
 import xdroid.toaster.Toaster;
 
 public class ChangelogActivity extends AppCompatActivity {
@@ -53,7 +54,7 @@ public class ChangelogActivity extends AppCompatActivity {
                 try {
                     int c_code = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0);
                     final int p_code = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionCode;
-                    if (p_code > c_code)
+                    if (p_code > c_code && c_code != 0)
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
@@ -86,6 +87,8 @@ public class ChangelogActivity extends AppCompatActivity {
                                 }
                             }
                         });
+                    else
+                        PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -95,6 +98,7 @@ public class ChangelogActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(EAHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recycler_changelog);
         ButterKnife.bind(this);

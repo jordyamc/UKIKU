@@ -14,6 +14,7 @@ import java.util.List;
 
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder;
@@ -23,7 +24,7 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
     private RecyclerRefreshHolder holder;
     private RecentsAdapter adapter;
 
-    private boolean isFisrt=Network.isConnected();
+    private boolean isFisrt = Network.isConnected();
 
     @NonNull
     public static RecentFragment get() {
@@ -37,12 +38,12 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
         viewModel.getDBLiveData().observe(this, new Observer<List<RecentObject>>() {
             @Override
             public void onChanged(@Nullable List<RecentObject> objects) {
-                if (objects!=null && !isFisrt){
+                if (objects != null && !isFisrt) {
                     holder.setError(objects.size() == 0);
                     holder.setRefreshing(false);
                     adapter.updateList(objects);
-                }else if (isFisrt){
-                    isFisrt=false;
+                } else if (isFisrt) {
+                    isFisrt = false;
                 }
             }
         });
@@ -58,6 +59,7 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
         adapter = new RecentsAdapter(this, holder.recyclerView);
         holder.recyclerView.setAdapter(adapter);
         holder.setRefreshing(true);
+        EAHelper.enter1(getContext(), "R");
         return view;
     }
 
@@ -69,13 +71,14 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
     private void updateList() {
         if (!Network.isConnected()) {
             holder.setRefreshing(false);
-        }else {
+        } else {
             viewModel.reload(getContext());
         }
     }
 
     @Override
     public void onReselect() {
-        holder.scrollToTop();
+        EAHelper.enter1(getContext(), "R");
+        if (holder != null) holder.scrollToTop();
     }
 }

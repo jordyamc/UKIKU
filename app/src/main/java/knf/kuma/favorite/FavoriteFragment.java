@@ -20,7 +20,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.pojos.FavoriteObject;
+import xdroid.toaster.Toaster;
 
 public class FavoriteFragment extends BottomFragment {
 
@@ -31,6 +33,8 @@ public class FavoriteFragment extends BottomFragment {
     private RecyclerView.LayoutManager manager;
     private FavoriteAdapter adapter;
     private boolean isFirst=true;
+
+    private int count = 0;
 
     public FavoriteFragment() {
     }
@@ -72,6 +76,7 @@ public class FavoriteFragment extends BottomFragment {
         manager=recyclerView.getLayoutManager();
         adapter=new FavoriteAdapter(this,recyclerView);
         recyclerView.setAdapter(adapter);
+        EAHelper.enter1(getContext(), "F");
         return view;
     }
 
@@ -110,7 +115,16 @@ public class FavoriteFragment extends BottomFragment {
 
     @Override
     public void onReselect() {
-        if (manager!=null)
-            manager.smoothScrollToPosition(recyclerView,null,0);
+        EAHelper.enter1(getContext(), "F");
+        if (manager != null) {
+            manager.smoothScrollToPosition(recyclerView, null, 0);
+            count++;
+            if (count == 3) {
+                if (adapter != null)
+                    Toaster.toast("Tienes " + adapter.getItemCount() + " animes en favoritos");
+                count = 0;
+            }
+
+        }
     }
 }

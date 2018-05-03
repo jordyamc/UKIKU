@@ -2,6 +2,7 @@ package knf.kuma;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -35,12 +36,15 @@ import org.cryse.widget.persistentsearch.PersistentSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.munix.multidisplaycast.CastManager;
+import io.fabric.sdk.android.Fabric;
 import knf.kuma.backup.BUUtils;
 import knf.kuma.backup.BackUpActivity;
 import knf.kuma.backup.MigrationActivity;
 import knf.kuma.changelog.ChangelogActivity;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
+import knf.kuma.commons.EAHelper;
+import knf.kuma.commons.EAMActivity;
 import knf.kuma.directory.DirectoryFragment;
 import knf.kuma.directory.DirectoryService;
 import knf.kuma.emision.EmisionActivity;
@@ -82,6 +86,7 @@ public class Main extends AppCompatActivity
     BottomFragment selectedFragment;
     BottomFragment tmpfragment;
 
+    ImageButton map;
     ImageButton migrate;
     ImageButton info;
     ImageButton login;
@@ -90,12 +95,14 @@ public class Main extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(EAHelper.getThemeNA(this));
         super.onCreate(savedInstanceState);
         if (!getString(R.string.app_name).equals("UKIKU")) {
             Toaster.toast("Te dije que no lo cambiaras");
             finish();
             return;
         }
+        Fabric.with(this);
         setContentView(R.layout.activity_main_drawer);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -111,7 +118,6 @@ public class Main extends AppCompatActivity
         if (savedInstanceState == null) {
             checkServices();
             startChange();
-
         } else {
             returnSelectFragment();
         }
@@ -126,12 +132,15 @@ public class Main extends AppCompatActivity
         RecentsNotReceiver.removeAll(this);
         Updatechecker.check(this, this);
         ChangelogActivity.check(this);
+        EAHelper.clear1();
     }
 
     private void setNavigationButtons() {
         info = navigationView.getHeaderView(0).findViewById(R.id.action_info);
         login = navigationView.getHeaderView(0).findViewById(R.id.action_login);
         migrate = navigationView.getHeaderView(0).findViewById(R.id.action_migrate);
+        map = navigationView.getHeaderView(0).findViewById(R.id.action_map);
+        navigationView.getHeaderView(0).findViewById(R.id.img).setBackgroundResource(EAHelper.getThemeImg(this));
         info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,9 +159,14 @@ public class Main extends AppCompatActivity
                 MigrationActivity.start(Main.this);
             }
         });
-        if (BUUtils.isAnimeflvInstalled(this) &&
-                DirectoryService.isDirectoryFinished(this))
-            migrate.setVisibility(View.VISIBLE);
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EAMActivity.start(Main.this);
+            }
+        });
+        migrate.setVisibility((BUUtils.isAnimeflvInstalled(this) && DirectoryService.isDirectoryFinished(this)) ? View.VISIBLE : View.GONE);
+        map.setVisibility(EAHelper.getPhase(this) == 3 ? View.VISIBLE : View.GONE);
         TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
         switch (BUUtils.getType(this)) {
             case LOCAL:
@@ -211,6 +225,7 @@ public class Main extends AppCompatActivity
 
             @Override
             public void onSearchTermChanged(String term) {
+                EAHelper.checkStart(Main.this, term);
                 if (selectedFragment instanceof SearchFragment)
                     ((SearchFragment) selectedFragment).setSearch(term);
             }
@@ -436,6 +451,9 @@ public class Main extends AppCompatActivity
             case 2:
                 bottomNavigationView.setSelectedItemId(R.id.action_bottom_directory);
                 break;
+            case 3:
+                bottomNavigationView.setSelectedItemId(R.id.action_bottom_settings);
+                break;
         }
     }
 
@@ -503,5 +521,11 @@ public class Main extends AppCompatActivity
     protected void onDestroy() {
         CastUtil.get().onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        setNavigationButtons();
     }
 }

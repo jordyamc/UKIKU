@@ -2,6 +2,7 @@ package knf.kuma.explorer;
 
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -28,13 +29,14 @@ public class ExplorerFilesAdapter extends RecyclerView.Adapter<ExplorerFilesAdap
     private Fragment fragment;
     private FragmentFiles.SelectedListener listener;
 
-    public ExplorerFilesAdapter(Fragment fragment, FragmentFiles.SelectedListener listener) {
+    ExplorerFilesAdapter(Fragment fragment, FragmentFiles.SelectedListener listener) {
         this.fragment=fragment;
         this.listener = listener;
     }
 
+    @NonNull
     @Override
-    public FileItem onCreateViewHolder(ViewGroup parent, int viewType) {
+    public FileItem onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new FileItem(LayoutInflater.from(parent.getContext()).inflate(getLayout(), parent, false));
     }
 
@@ -52,7 +54,7 @@ public class ExplorerFilesAdapter extends RecyclerView.Adapter<ExplorerFilesAdap
     }
 
     @Override
-    public void onBindViewHolder(final FileItem holder, int position) {
+    public void onBindViewHolder(@NonNull final FileItem holder, int position) {
         final ExplorerObject object=list.get(position);
         PicassoSingle.get(fragment.getContext()).load(object.img).into(holder.imageView);
         holder.title.setText(object.name);

@@ -19,6 +19,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 
 public class RankingActivity extends AppCompatActivity {
@@ -33,6 +34,7 @@ public class RankingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(EAHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recycler_ranking);
         ButterKnife.bind(this);

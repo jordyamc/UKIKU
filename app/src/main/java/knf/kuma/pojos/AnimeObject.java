@@ -32,7 +32,7 @@ import knf.kuma.commons.PatternUtil;
 import pl.droidsonroids.jspoon.ElementConverter;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
-@Entity(indices = @Index(value = {"name", "link", "aid", "type", "state","fileName"}, unique = true))
+@Entity(indices = @Index(value = {"name", "link", "aid", "type", "state", "fileName"}, unique = true))
 @TypeConverters(AnimeObject.Converter.class)
 public class AnimeObject implements Comparable<AnimeObject> {
     @PrimaryKey
@@ -63,12 +63,12 @@ public class AnimeObject implements Comparable<AnimeObject> {
     public List<WebInfo.AnimeRelated> related;
     public List<WebInfo.AnimeChapter> chapters;
 
-    public AnimeObject(int key, String link, String sid, String name,String fileName, WebInfo webInfo, String type, String state, Day day) {
+    public AnimeObject(int key, String link, String sid, String name, String fileName, WebInfo webInfo, String type, String state, Day day) {
         this.key = key;
         this.link = link;
         this.sid = sid;
         this.name = name;
-        this.fileName=fileName;
+        this.fileName = fileName;
         this.webInfo = webInfo;
         this.type = type;
         this.state = state;
@@ -79,7 +79,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
     @Ignore
     public AnimeObject(String link, WebInfo webInfo) {
         this.link = link;
-        this.fileName=PatternUtil.getRootFileName(link);
+        this.fileName = PatternUtil.getRootFileName(link);
         this.sid = extract(link);
         this.webInfo = webInfo;
         populate(webInfo);
@@ -138,7 +138,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof AnimeObject && aid.equals(((AnimeObject)obj).aid);
+        return obj instanceof AnimeObject && aid.equals(((AnimeObject) obj).aid);
     }
 
     @Override
@@ -280,7 +280,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
             }
 
             public String getFileName() {
-                return eid+"$"+PatternUtil.getFileName(link);
+                return eid + "$" + PatternUtil.getFileName(link);
             }
 
             public String getEpTitle() {
@@ -383,7 +383,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
         @Override
         public Day convert(Element node, Selector selector) {
             try {
-                Element element=node.select(selector.value()).first();
+                Element element = node.select(selector.value()).first();
                 if (element == null)
                     return Day.NONE;
                 String date = element.ownText().trim();

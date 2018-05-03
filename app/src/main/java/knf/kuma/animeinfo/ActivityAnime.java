@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.crashlytics.android.answers.ShareEvent;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import knf.kuma.R;
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.FavsDAO;
 import knf.kuma.database.dao.SeeingDAO;
@@ -41,6 +43,7 @@ import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
 import knf.kuma.recommended.RankType;
 import knf.kuma.recommended.RecommendHelper;
+import knf.kuma.widgets.emision.WEListItem;
 import xdroid.toaster.Toaster;
 
 public class ActivityAnime extends AppCompatActivity implements AnimeActivityHolder.Interface {
@@ -148,8 +151,18 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         fragment.startActivityForResult(intent, REQUEST_CODE);
     }
 
+    public static Intent getSimpleIntent(Context context, WEListItem item) {
+        Intent intent = new Intent(context, ActivityAnime.class);
+        intent.setData(Uri.parse(item.link));
+        intent.putExtra("title", item.title);
+        intent.putExtra("aid", item.aid);
+        intent.putExtra("img", item.img);
+        return intent;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(EAHelper.getThemeNA(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_anime_info);
         if (getIntent().getBooleanExtra("notification", false))
@@ -170,6 +183,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
             @Override
             public void onChanged(@Nullable final AnimeObject object) {
                 if (object != null) {
+                    Answers.getInstance().logContentView(new ContentViewEvent().putContentName(object.name).putContentType(object.type).putContentId(object.aid));
                     chapters = object.chapters;
                     genres = object.genres;
                     favoriteObject = new FavoriteObject(object);

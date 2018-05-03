@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="knf.kuma">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="knf.kuma">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -9,11 +8,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
     <application
         android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -23,6 +24,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter android:label="@string/app_name">
@@ -39,6 +41,16 @@
                     android:host="ukiku.ga"
                     android:pathPrefix="/get.php"
                     android:scheme="http"/>
+            </intent-filter>
+
+            <intent-filter>
+                <data
+                    android:host="open"
+                    android:scheme="ukiku"/>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
 
             <meta-data
@@ -85,7 +97,6 @@
             android:name=".backup.BackUpActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Translucent"/>
-
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
@@ -107,11 +118,26 @@
             android:theme="@style/AppTheme.AppInfo"/>
         <activity android:name=".recommended.RecommendActivity"/>
         <activity android:name=".recommended.RankingActivity"/>
+        <activity android:name=".search.GenreActivity"/>
 
         <service android:name=".directory.DirectoryService"/>
         <service android:name=".directory.DirectoryUpdateService"/>
+        <service android:name=".downloadservice.DownloadService"/>
         <service
-            android:name=".downloadservice.DownloadService"/>
+            android:name=".widgets.emision.WEmisionService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
+        <receiver
+            android:name=".widgets.emision.WEmisionProvider"
+            android:label="Emisión">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_emision"/>
+        </receiver>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -126,6 +152,22 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
+
+        <activity
+            android:name=".commons.EAMActivity"
+            android:label="@string/title_activity_eam">
+        </activity>
     </application>
 
 </manifest>

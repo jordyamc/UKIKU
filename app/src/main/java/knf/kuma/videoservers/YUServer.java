@@ -31,7 +31,7 @@ public class YUServer extends Server {
         String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
         String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
         try {
-            return new VideoServer(YOURUPLOAD, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text()).getString("file")));
+            return new VideoServer(YOURUPLOAD, new Option(getName(), null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text()).getString("file")));
         } catch (Exception e) {
             return null;
         }

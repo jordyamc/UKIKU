@@ -39,13 +39,13 @@ public class HyperionServer extends Server {
                 try {
                     switch (array.getJSONObject(i).getInt("label")) {
                         case 360:
-                            videoServer.addOption(new Option("360p", array.getJSONObject(i).getString("file")));
+                            videoServer.addOption(new Option(getName(), "360p", array.getJSONObject(i).getString("file")));
                             break;
                         case 480:
-                            videoServer.addOption(new Option("480p", array.getJSONObject(i).getString("file")));
+                            videoServer.addOption(new Option(getName(), "480p", array.getJSONObject(i).getString("file")));
                             break;
                         case 720:
-                            videoServer.addOption(new Option("720p", array.getJSONObject(i).getString("file")));
+                            videoServer.addOption(new Option(getName(), "720p", array.getJSONObject(i).getString("file")));
                             break;
                     }
                 } catch (Exception e) {
@@ -53,7 +53,7 @@ public class HyperionServer extends Server {
                 }
             }
             try {
-                videoServer.addOption(new Option("Direct", options.getString("direct")));
+                videoServer.addOption(new Option(getName(), "Direct", options.getString("direct")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
