@@ -14,6 +14,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -153,6 +154,8 @@ public class DirectoryService extends IntentService {
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet("failed_pages", strings).apply();
                     DirUpdateJob.schedule(this);
                 }
+            } catch (HttpStatusException e) {
+                finished = true;
             } catch (Exception e) {
                 Log.e("Directory Getter", "Page error: " + page);
                 if (!strings.contains(String.valueOf(page)))

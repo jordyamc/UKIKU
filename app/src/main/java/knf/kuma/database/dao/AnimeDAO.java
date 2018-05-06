@@ -21,8 +21,11 @@ public interface AnimeDAO {
     @Query("SELECT count(*) FROM AnimeObject")
     int init();
 
-    @Query("SELECT * FROM AnimeObject WHERE link LIKE :link")
+    @Query("SELECT * FROM AnimeObject WHERE link = :link")
     LiveData<AnimeObject> getAnime(String link);
+
+    @Query("SELECT * FROM AnimeObject WHERE link = :link")
+    AnimeObject getAnimeRaw(String link);
 
     @Query("SELECT * FROM AnimeObject ORDER BY RANDOM() LIMIT :limit")
     LiveData<List<AnimeObject>> getRandom(int limit);

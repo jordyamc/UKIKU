@@ -25,6 +25,25 @@
 
     <color name="colorAccentLight">#ff6f60</color>
 
+    <color name="colorAccentPinkLight">#fa5788</color>
+    <color name="colorAccentPurpleLight">#ae52d4</color>
+    <color name="colorAccentDeepPurpleLight">#8559da</color>
+    <color name="colorAccentIndigoLight">#666ad1</color>
+    <color name="colorAccentBlueLight">#63a4ff</color>
+    <color name="colorAccentLightBlueLight">#5eb8ff</color>
+    <color name="colorAccentCyanLight">#56c8d8</color>
+    <color name="colorAccentTealLight">#48a999</color>
+    <color name="colorAccentGreenLight">#6abf69</color>
+    <color name="colorAccentLightGreenLight">#99d066</color>
+    <color name="colorAccentLimeLight">#e4e65e</color>
+    <color name="colorAccentYellowLight">#fff263</color>
+    <color name="colorAccentAmberLight">#ffd149</color>
+    <color name="colorAccentOrangeLight">#ffad42</color>
+    <color name="colorAccentDeepOrangeLight">#ff7d47</color>
+    <color name="colorAccentBrownLight">#8b6b61</color>
+    <color name="colorAccentGrayLight">#8e8e8e</color>
+    <color name="colorAccentBlueGreyLight">#718792</color>
+
     <color name="cardview_background">#FFFFFFFF</color>
 
     <color name="divider">#000</color>

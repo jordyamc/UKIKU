@@ -24,8 +24,8 @@ import com.crashlytics.android.Crashlytics;
 import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -150,13 +150,22 @@ public class ChangelogActivity extends AppCompatActivity {
         String xmlString = null;
         AssetManager am = getAssets();
         try {
-            InputStream is = am.open("changelog.xml");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(am.open("changelog.xml")));
+            StringBuilder sb = new StringBuilder();
+            String mLine = reader.readLine();
+            while (mLine != null) {
+                sb.append(mLine); // process line
+                mLine = reader.readLine();
+            }
+            reader.close();
+            xmlString = sb.toString();
+            /*InputStream is = am.open("changelog.xml");
             int length = is.available();
             byte[] data = new byte[length];
             is.read(data);
             is.close();
-            xmlString = new String(data);
-        } catch (IOException e1) {
+            xmlString = new String(data);*/
+        } catch (Exception e1) {
             e1.printStackTrace();
         }
         return xmlString;

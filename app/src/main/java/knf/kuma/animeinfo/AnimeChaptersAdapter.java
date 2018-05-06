@@ -30,6 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.commons.CastUtil;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.commons.SelfServer;
@@ -82,7 +83,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
         final DownloadObject downloadObject = downloadsDAO.getByEid(chapter.eid);
         final File d_file = FileAccessHelper.INSTANCE.getFile(chapter.getFileName());
         if (selected.contains(position)) {
-            holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorAccentLight));
+            holder.cardView.setCardBackgroundColor(context.getResources().getColor(EAHelper.getThemeColorLight(context)));
         } else {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardview_background));
         }
@@ -114,7 +115,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 holder.setDownloaded(isPlayAvailable(chapter.eid, d_file),chapter.eid.equals(s));
             }
         });
-        holder.chapter.setTextColor(context.getResources().getColor(chaptersDAO.chapterIsSeen(chapter.eid) ? R.color.colorAccent : R.color.textPrimary));
+        holder.chapter.setTextColor(context.getResources().getColor(chaptersDAO.chapterIsSeen(chapter.eid) ? EAHelper.getThemeColor(context) : R.color.textPrimary));
         holder.separator.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
         holder.chapter.setText(chapter.number);
         holder.actions.setOnClickListener(new View.OnClickListener() {

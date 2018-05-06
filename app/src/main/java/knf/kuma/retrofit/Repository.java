@@ -54,6 +54,7 @@ public class Repository {
                             onFailure(call, new Exception("HTTP " + String.valueOf(response.code())));
                         }
                     } catch (Exception e) {
+                        e.printStackTrace();
                         onFailure(call, e);
                     }
                 }
@@ -63,21 +64,8 @@ public class Repository {
                     Toaster.toast("Error al obtener - " + t.getMessage());
                     t.printStackTrace();
                     Crashlytics.logException(t);
-                    RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
-                    final List<RecentObject> objects = recentsDAO.getObjects().getValue();
-                    if (objects != null) {
-                        recentsDAO.clear();
-                        recentsDAO.setCache(objects);
-                    }
                 }
             });
-        } else {
-            RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
-            final List<RecentObject> objects = recentsDAO.getObjects().getValue();
-            if (objects != null) {
-                recentsDAO.clear();
-                recentsDAO.setCache(objects);
-            }
         }
     }
 
@@ -91,8 +79,8 @@ public class Repository {
         getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, rest).enqueue(new Callback<AnimeObject.WebInfo>() {
             @Override
             public void onResponse(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Response<AnimeObject.WebInfo> response) {
-                if (response.body() == null || response.code() == 503) {
-                    data.setValue(CacheDB.INSTANCE.animeDAO().getAnime(link).getValue());
+                if (response.body() == null || response.code() != 200) {
+                    data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
                     return;
                 }
                 AnimeObject animeObject = new AnimeObject(link, response.body());
@@ -104,7 +92,7 @@ public class Repository {
             @Override
             public void onFailure(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Throwable t) {
                 t.printStackTrace();
-                data.setValue(CacheDB.INSTANCE.animeDAO().getAnime(link).getValue());
+                data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
             }
         });
         return data;

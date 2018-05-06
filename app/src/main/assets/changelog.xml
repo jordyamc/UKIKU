@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="22" version="1.1.1">
+        <change type="fix">Error de colores</change>
+        <change type="fix">Error al abrir informacion de animes sin conexion</change>
+    </release>
     <release code="21" version="1.1">
         <change type="new">Click largo en emisión para ocultar</change>
         <change type="new">Widget de emisión agregado</change>

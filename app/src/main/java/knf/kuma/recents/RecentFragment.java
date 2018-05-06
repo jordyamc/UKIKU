@@ -24,8 +24,6 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
     private RecyclerRefreshHolder holder;
     private RecentsAdapter adapter;
 
-    private boolean isFisrt = Network.isConnected();
-
     @NonNull
     public static RecentFragment get() {
         return new RecentFragment();
@@ -38,12 +36,10 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
         viewModel.getDBLiveData().observe(this, new Observer<List<RecentObject>>() {
             @Override
             public void onChanged(@Nullable List<RecentObject> objects) {
-                if (objects != null && !isFisrt) {
+                if (objects != null) {
                     holder.setError(objects.size() == 0);
                     holder.setRefreshing(false);
                     adapter.updateList(objects);
-                } else if (isFisrt) {
-                    isFisrt = false;
                 }
             }
         });

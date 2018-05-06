@@ -65,20 +65,21 @@ public class EmisionFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, new Observer<List<AnimeObject>>() {
-            @Override
-            public void onChanged(@Nullable List<AnimeObject> animeObjects) {
-                progressBar.setVisibility(View.GONE);
-                if (isFirst && animeObjects != null && animeObjects.size() != 0) {
-                    isFirst = false;
-                    adapter.update(animeObjects);
-                    recyclerView.scheduleLayoutAnimation();
-                    checkStates(animeObjects);
+        if (getContext() != null)
+            CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, new Observer<List<AnimeObject>>() {
+                @Override
+                public void onChanged(@Nullable List<AnimeObject> animeObjects) {
+                    progressBar.setVisibility(View.GONE);
+                    if (isFirst && animeObjects != null && animeObjects.size() != 0) {
+                        isFirst = false;
+                        adapter.update(animeObjects);
+                        recyclerView.scheduleLayoutAnimation();
+                        checkStates(animeObjects);
+                    }
+                    if (animeObjects == null || animeObjects.size() == 0)
+                        error.setVisibility(View.VISIBLE);
                 }
-                if (animeObjects == null || animeObjects.size() == 0)
-                    error.setVisibility(View.VISIBLE);
-            }
-        });
+            });
     }
 
     private void checkStates(final List<AnimeObject> animeObjects) {
@@ -107,17 +108,18 @@ public class EmisionFragment extends Fragment {
     }
 
     public void reloadList() {
-        CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, new Observer<List<AnimeObject>>() {
-            @Override
-            public void onChanged(@Nullable List<AnimeObject> animeObjects) {
-                error.setVisibility(View.GONE);
-                if (animeObjects != null && animeObjects.size() != 0)
-                    adapter.update(animeObjects);
-                else adapter.update(new ArrayList<AnimeObject>());
-                if (animeObjects == null || animeObjects.size() == 0)
-                    error.setVisibility(View.VISIBLE);
-            }
-        });
+        if (getContext() != null)
+            CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, new Observer<List<AnimeObject>>() {
+                @Override
+                public void onChanged(@Nullable List<AnimeObject> animeObjects) {
+                    error.setVisibility(View.GONE);
+                    if (animeObjects != null && animeObjects.size() != 0)
+                        adapter.update(animeObjects);
+                    else adapter.update(new ArrayList<AnimeObject>());
+                    if (animeObjects == null || animeObjects.size() == 0)
+                        error.setVisibility(View.VISIBLE);
+                }
+            });
     }
 
     private Set<String> getBlacklist() {
