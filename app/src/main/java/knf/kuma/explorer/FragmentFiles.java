@@ -37,7 +37,7 @@ public class FragmentFiles extends Fragment {
     TextView state;
     private SelectedListener listener;
     private ExplorerFilesAdapter adapter;
-    private boolean isFist=true;
+    private boolean isFist = true;
 
     private int count = 0;
 
@@ -74,6 +74,7 @@ public class FragmentFiles extends Fragment {
             @Override
             public void onChanged(@Nullable String s) {
                 state.setText(s);
+                state.setVisibility(s == null ? View.GONE : View.VISIBLE);
             }
         });
     }
@@ -81,18 +82,18 @@ public class FragmentFiles extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(getLayout(),container,false);
-        ButterKnife.bind(this,view);
-        adapter=new ExplorerFilesAdapter(this,listener);
+        View view = inflater.inflate(getLayout(), container, false);
+        ButterKnife.bind(this, view);
+        adapter = new ExplorerFilesAdapter(this, listener);
         recyclerView.setAdapter(adapter);
         return view;
     }
 
     @LayoutRes
-    private int getLayout(){
-        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString("lay_type","0").equals("0")){
+    private int getLayout() {
+        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString("lay_type", "0").equals("0")) {
             return R.layout.recycler_explorer;
-        }else {
+        } else {
             return R.layout.recycler_explorer_grid;
         }
     }
@@ -107,13 +108,13 @@ public class FragmentFiles extends Fragment {
         });
     }
 
-    public void setListener(SelectedListener listener){
-        this.listener=listener;
+    public void setListener(SelectedListener listener) {
+        this.listener = listener;
         if (adapter != null)
             adapter.setListener(listener);
     }
 
-    public interface SelectedListener{
+    public interface SelectedListener {
         void onSelected(String name);
     }
 }

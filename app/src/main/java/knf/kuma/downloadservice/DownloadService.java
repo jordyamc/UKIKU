@@ -15,6 +15,7 @@ import java.io.BufferedOutputStream;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.pojos.DownloadObject;
+import knf.kuma.queue.QueueManager;
 import knf.kuma.videoservers.ServersFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -63,6 +64,7 @@ public class DownloadService extends IntentService {
                 outputStream = new BufferedOutputStream(FileAccessHelper.INSTANCE.getOutputStream(current.file), 1024);
             } else {
                 downloadsDAO.delete(current);
+                QueueManager.remove(current.eid);
                 return;
             }
             current.state = DownloadObject.DOWNLOADING;
@@ -74,6 +76,7 @@ public class DownloadService extends IntentService {
                 if (revised == null) {
                     FileAccessHelper.INSTANCE.delete(file);
                     downloadsDAO.delete(current);
+                    QueueManager.remove(current.eid);
                     cancelForeground();
                     return;
                 }
@@ -94,6 +97,7 @@ public class DownloadService extends IntentService {
             e.printStackTrace();
             FileAccessHelper.INSTANCE.delete(file);
             downloadsDAO.delete(current);
+            QueueManager.remove(current.eid);
             errorNotification();
         }
     }
@@ -176,6 +180,7 @@ public class DownloadService extends IntentService {
         errorNotification();
         FileAccessHelper.INSTANCE.delete(file);
         downloadsDAO.delete(current);
+        QueueManager.remove(current.eid);
         super.onTaskRemoved(rootIntent);
     }
 }

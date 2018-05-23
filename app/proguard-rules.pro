@@ -73,3 +73,4 @@
 -dontwarn retrofit2.**
 -dontwarn com.dropbox.core.**
 -dontwarn io.branch.**
+-dontwarn com.bumptech.glide.**

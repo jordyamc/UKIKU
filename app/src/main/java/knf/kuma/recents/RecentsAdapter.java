@@ -44,6 +44,7 @@ import knf.kuma.pojos.DownloadObject;
 import knf.kuma.pojos.FavoriteObject;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.RecordObject;
+import knf.kuma.queue.QueueManager;
 import knf.kuma.videoservers.ServersFactory;
 import xdroid.toaster.Toaster;
 
@@ -134,6 +135,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 FileAccessHelper.INSTANCE.delete(object.getFileName());
                                                 downloadsDAO.deleteByEid(object.eid);
+                                                QueueManager.remove(object.eid);
                                                 object.isChapterDownloaded = false;
                                                 holder.setState(isNetworkAvailable, false);
                                             }
@@ -202,7 +204,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                         !object.isDownloading &&
                         object.downloadState != DownloadObject.PENDING) {
                     holder.setLocked(true);
-                    ServersFactory.start(context, object.url, DownloadObject.fromRecent(object), false, new ServersFactory.ServersInterface() {
+                    ServersFactory.start(context, object.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(object), false, new ServersFactory.ServersInterface() {
                         @Override
                         public void onFinish(boolean started, boolean success) {
                             if (started) {

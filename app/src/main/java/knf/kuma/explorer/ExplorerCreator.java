@@ -50,11 +50,14 @@ public class ExplorerCreator {
                         postState("Creando lista");
                         explorerDAO.insert(list);
                     }
-                    if (list.size() == 0)
+                    if (list.size() == 0) {
                         listener.onEmpty();
+                        postState(null);
+                    }
                 } else {
                     explorerDAO.deleteAll();
                     listener.onEmpty();
+                    postState(null);
                 }
             }
         });

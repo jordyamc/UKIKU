@@ -24,6 +24,7 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -41,11 +42,16 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.FileDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
+import knf.kuma.database.CacheDB;
+import knf.kuma.pojos.QueueObject;
 import xdroid.toaster.Toaster;
 
 public class ExoPlayer extends AppCompatActivity implements Player.EventListener, PlaybackControlView.VisibilityListener {
@@ -68,6 +74,9 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
     SimpleExoPlayer player;
     private long currentPosition = 0;
     private int resumeWindow = C.INDEX_UNSET;
+
+    private int listPosition = 0;
+    private List<QueueObject> playList = new ArrayList<>();
 
     private static void addVisibilityListener(SimpleExoPlayerView playerView, PlaybackControlView.VisibilityListener listener) {
         PlaybackControlView playbackControlView = findPlaybackControlView(playerView);
@@ -129,7 +138,18 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
             TrackSelector trackSelector =
                     new DefaultTrackSelector(videoTrackSelectionFactory);
             MediaSource source;
-            if (!intent.getBooleanExtra("isFile", false)) {
+            if (intent.getBooleanExtra("isPlayList", false)) {
+                List<MediaSource> sourceList = new ArrayList<>();
+                playList = CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist"));
+                title.setText(playList.get(0).getTitle());
+                for (QueueObject object : playList) {
+                    if (object.isFile)
+                        sourceList.add(new ExtractorMediaSource.Factory(new FileDataSourceFactory()).createMediaSource(object.uri));
+                    else
+                        sourceList.add(new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(object.uri));
+                }
+                source = new ConcatenatingMediaSource(sourceList.toArray(new MediaSource[]{}));
+            } else if (!intent.getBooleanExtra("isFile", false)) {
                 source = new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(intent.getData());
             } else {
                 source = new ExtractorMediaSource.Factory(new FileDataSourceFactory()).createMediaSource(intent.getData());
@@ -143,6 +163,7 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
                 player.seekTo(resumeWindow, currentPosition);
             player.prepare(source, !canResume, false);
             player.setPlayWhenReady(true);
+
         }
     }
 
@@ -321,7 +342,11 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
 
     @Override
     public void onPositionDiscontinuity(int reason) {
-
+        int latestPosition = player.getCurrentWindowIndex();
+        if (latestPosition != listPosition) {
+            listPosition = latestPosition;
+            title.setText(playList.get(listPosition).getTitle());
+        }
     }
 
     @Override

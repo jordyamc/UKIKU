@@ -9,5 +9,8 @@
     <item
         android:id="@+id/delete"
         android:title="ELIMINAR"/>
+    <item
+        android:id="@+id/queue"
+        android:title="AÑADIR A COLA"/>
 
 </menu>

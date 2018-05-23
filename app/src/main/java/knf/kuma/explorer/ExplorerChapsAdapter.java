@@ -44,6 +44,7 @@ import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.ExplorerObject;
 import knf.kuma.pojos.RecordObject;
+import knf.kuma.queue.QueueManager;
 import knf.kuma.videoservers.ServersFactory;
 
 import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
@@ -144,6 +145,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
     private void delete(ExplorerObject.FileDownObj obj, final int position) {
         FileAccessHelper.INSTANCE.delete(obj.fileName);
         downloadsDAO.deleteByEid(obj.eid);
+        QueueManager.remove(obj.eid);
         explorerObject.chapters.remove(position);
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override

@@ -54,6 +54,7 @@ import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
 import knf.kuma.jobscheduler.UpdateJob;
 import knf.kuma.preferences.BottomPreferencesFragment;
+import knf.kuma.queue.QueueActivity;
 import knf.kuma.random.RandomActivity;
 import knf.kuma.recents.RecentFragment;
 import knf.kuma.recents.RecentsNotReceiver;
@@ -370,6 +371,9 @@ public class Main extends AppCompatActivity
                 break;
             case R.id.drawer_emision:
                 EmisionActivity.open(this);
+                break;
+            case R.id.drawer_queue:
+                QueueActivity.open(this);
                 break;
             case R.id.drawer_suggestions:
                 RecommendActivity.open(this);

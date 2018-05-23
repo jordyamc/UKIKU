@@ -3,17 +3,13 @@ package knf.kuma.pojos;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
-import android.net.Uri;
 import android.support.annotation.NonNull;
-
-import com.google.gson.Gson;
 
 import knf.kuma.database.BaseConverter;
 
 @Entity
-@TypeConverters({DownloadObject.Converter.class, BaseConverter.class})
+@TypeConverters({BaseConverter.class})
 public class DownloadObject {
     @Ignore
     public static final int PENDING = -1;
@@ -30,6 +26,8 @@ public class DownloadObject {
     public String chapter;
     @Ignore
     public String title;
+    @Ignore
+    public boolean addQueue = false;
     public int progress;
     public long d_bytes;
     public long t_bytes;
@@ -52,10 +50,11 @@ public class DownloadObject {
     }
 
     @Ignore
-    public DownloadObject(String eid, String file, String name, String chapter) {
+    public DownloadObject(String eid, String file, String name, String chapter, boolean addQueue) {
         this.eid = eid;
         this.file = file;
         this.name = name;
+        this.addQueue = addQueue;
         this.chapter = chapter;
         this.title = name + chapter.substring(chapter.lastIndexOf(" "));
         this.progress = 0;
@@ -67,12 +66,17 @@ public class DownloadObject {
 
     @NonNull
     public static DownloadObject fromRecent(RecentObject object) {
-        return new DownloadObject(object.eid, object.getFileName(), object.name, object.chapter);
+        return new DownloadObject(object.eid, object.getFileName(), object.name, object.chapter, false);
     }
 
     @NonNull
     public static DownloadObject fromChapter(AnimeObject.WebInfo.AnimeChapter chapter) {
-        return new DownloadObject(chapter.eid, chapter.getFileName(), chapter.name, chapter.number);
+        return fromChapter(chapter, false);
+    }
+
+    @NonNull
+    public static DownloadObject fromChapter(AnimeObject.WebInfo.AnimeChapter chapter, boolean addQueue) {
+        return new DownloadObject(chapter.eid, chapter.getFileName(), chapter.name, chapter.number, addQueue);
     }
 
     public boolean isDownloading() {
@@ -84,18 +88,6 @@ public class DownloadObject {
         d_bytes = 0;
         t_bytes = -1;
         canResume = false;
-    }
-
-    public static class Converter {
-        @TypeConverter
-        public String uriToString(Uri uri) {
-            return new Gson().toJson(uri);
-        }
-
-        @TypeConverter
-        public Uri stringToUri(String s) {
-            return Uri.parse(s);
-        }
     }
 
 }

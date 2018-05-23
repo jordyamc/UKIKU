@@ -79,6 +79,10 @@ public class PatternUtil {
         return "https://animeflv.net/anime/"+aid+chapter.substring(chapter.lastIndexOf("/"),chapter.lastIndexOf("-"));
     }
 
+    public static String getCover(String aid) {
+        return "https://animeflv.net/uploads/animes/covers/" + aid + ".jpg";
+    }
+
     public static boolean isCustomSearch(String s){
         return s.matches("^:[a-z]+:.*$");
     }

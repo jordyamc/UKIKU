@@ -35,12 +35,16 @@ import knf.kuma.database.CacheDB;
 import knf.kuma.downloadservice.DownloadService;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.player.ExoPlayer;
+import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
+import knf.kuma.pojos.QueueObject;
+import knf.kuma.queue.QueueManager;
 import xdroid.toaster.Toaster;
 
 public class ServersFactory {
     private Context context;
     private String url;
+    private AnimeObject.WebInfo.AnimeChapter chapter;
     private DownloadObject downloadObject;
     private boolean isStream;
     private ServersInterface serversInterface;
@@ -48,12 +52,40 @@ public class ServersFactory {
     private List<Server> servers = new ArrayList<>();
     private int selected = 0;
 
-    public ServersFactory(Context context, String url, DownloadObject downloadObject, boolean isStream, ServersInterface serversInterface) {
+    private ServersFactory(Context context, String url, AnimeObject.WebInfo.AnimeChapter chapter, boolean isStream, boolean addQueue, ServersInterface serversInterface) {
+        this.context = context;
+        this.url = url;
+        this.chapter = chapter;
+        this.downloadObject = DownloadObject.fromChapter(chapter, addQueue);
+        this.isStream = isStream;
+        this.serversInterface = serversInterface;
+    }
+
+    private ServersFactory(Context context, String url, DownloadObject downloadObject, boolean isStream, ServersInterface serversInterface) {
         this.context = context;
         this.url = url;
         this.downloadObject = downloadObject;
         this.isStream = isStream;
         this.serversInterface = serversInterface;
+    }
+
+    public static void start(final Context context, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final boolean addQueue, final ServersInterface serversInterface) {
+        final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                .content("Obteniendo servidores")
+                .progress(true, 0)
+                .build();
+        dialog.show();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                ServersFactory factory = new ServersFactory(context, url, chapter, isStream, addQueue, serversInterface);
+                factory.get(dialog);
+            }
+        });
+    }
+
+    public static void start(final Context context, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final ServersInterface serversInterface) {
+        start(context, url, chapter, isStream, false, serversInterface);
     }
 
     public static void start(final Context context, final String url, final DownloadObject downloadObject, final boolean isStream, final ServersInterface serversInterface) {
@@ -176,7 +208,7 @@ public class ServersFactory {
                                         });
                                         return true;
                                     }
-                                }).positiveText("INICIAR")
+                                }).positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
                                 .negativeText("CANCELAR")
                                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                                     @Override
@@ -269,7 +301,7 @@ public class ServersFactory {
                                     return true;
                                 }
                             })
-                            .positiveText("INICIAR")
+                            .positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
                             .negativeText("ATRAS")
                             .cancelListener(new DialogInterface.OnCancelListener() {
                                 @Override
@@ -286,19 +318,27 @@ public class ServersFactory {
     }
 
     private void startStreaming(Option option) {
-        Answers.getInstance().logCustom(new CustomEvent("Streaming").putCustomAttribute("Server", option.server));
-        if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type","0").equals("0")){
-            context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title", downloadObject.title));
-        }else {
-            Intent intent = new Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(Uri.parse(option.url), "video/mp4")
-                    .putExtra("title", downloadObject.title);
-            context.startActivity(intent);
+        if (chapter != null && downloadObject.addQueue) {
+            QueueManager.add(Uri.parse(option.url), false, chapter);
+        } else {
+            Answers.getInstance().logCustom(new CustomEvent("Streaming").putCustomAttribute("Server", option.server));
+            if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")) {
+                context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title", downloadObject.title));
+            } else {
+                Intent intent = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(Uri.parse(option.url), "video/mp4")
+                        .putExtra("title", downloadObject.title);
+                context.startActivity(intent);
+            }
         }
         serversInterface.onFinish(false, true);
     }
 
     private void startDownload(Option option) {
+        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid)) {
+            final File d_file = FileAccessHelper.INSTANCE.getFile(chapter.getFileName());
+            CacheDB.INSTANCE.queueDAO().add(new QueueObject(Uri.fromFile(d_file), true, chapter));
+        }
         Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
         downloadObject.link = option.url;
         CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);

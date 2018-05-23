@@ -6,5 +6,8 @@
     <item
         android:id="@+id/streaming"
         android:title="STREAMING"/>
+    <item
+        android:id="@+id/queue"
+        android:title="AÑADIR A COLA"/>
 
 </menu>

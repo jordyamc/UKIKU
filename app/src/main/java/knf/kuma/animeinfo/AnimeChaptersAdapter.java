@@ -2,6 +2,7 @@ package knf.kuma.animeinfo;
 
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -44,6 +45,7 @@ import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
 import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
+import knf.kuma.queue.QueueManager;
 import knf.kuma.videoservers.ServersFactory;
 import xdroid.toaster.Toaster;
 
@@ -112,7 +114,9 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
         CastUtil.get().getCasting().observe(fragment, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                holder.setDownloaded(isPlayAvailable(chapter.eid, d_file),chapter.eid.equals(s));
+                holder.setDownloaded(isPlayAvailable(chapter.eid, d_file), chapter.eid.equals(s));
+                if (!chapter.eid.equals(s))
+                    holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.eid, d_file));
             }
         });
         holder.chapter.setTextColor(context.getResources().getColor(chaptersDAO.chapterIsSeen(chapter.eid) ? EAHelper.getThemeColor(context) : R.color.textPrimary));
@@ -133,6 +137,8 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 } else {
                     menu.inflate(R.menu.chapter_menu);
                 }
+                if (QueueManager.isInQueue(chapter.eid))
+                    menu.getMenu().findItem(R.id.queue).setVisible(false);
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -171,18 +177,19 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                                 if (downloadObject != null)
                                                     downloadObject.state = -8;
                                                 chapter.isDownloaded = false;
-                                                holder.setDownloaded(false,false);
+                                                holder.setDownloaded(false, false);
                                                 FileAccessHelper.INSTANCE.delete(chapter.getFileName());
                                                 CacheDB.INSTANCE.downloadsDAO().deleteByEid(chapter.eid);
+                                                QueueManager.remove(chapter.eid);
                                             }
                                         }).build().show();
                                 break;
                             case R.id.download:
-                                ServersFactory.start(context, chapter.link, DownloadObject.fromChapter(chapter), false, new ServersFactory.ServersInterface() {
+                                ServersFactory.start(context, chapter.link, chapter, false, new ServersFactory.ServersInterface() {
                                     @Override
                                     public void onFinish(boolean started, boolean success) {
                                         if (started) {
-                                            holder.setDownloaded(true,false);
+                                            holder.setQueue(CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid), true);
                                             chapter.isDownloaded = true;
                                         }
                                     }
@@ -194,7 +201,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                 });
                                 break;
                             case R.id.streaming:
-                                ServersFactory.start(context, chapter.link, DownloadObject.fromChapter(chapter), true, new ServersFactory.ServersInterface() {
+                                ServersFactory.start(context, chapter.link, chapter, true, new ServersFactory.ServersInterface() {
                                     @Override
                                     public void onFinish(boolean started, boolean success) {
                                         if (!started && success) {
@@ -215,6 +222,23 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                     }
                                 });
                                 break;
+                            case R.id.queue:
+                                if (isPlayAvailable(chapter.eid, d_file)) {
+                                    QueueManager.add(Uri.fromFile(d_file), true, chapter);
+                                    holder.setQueue(true, true);
+                                } else
+                                    ServersFactory.start(context, chapter.link, chapter, true, true, new ServersFactory.ServersInterface() {
+                                        @Override
+                                        public void onFinish(boolean started, boolean success) {
+                                            if (success) {
+                                                holder.setQueue(true, false);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCast(String url) {
+                                        }
+                                    });
                         }
                         return true;
                     }
@@ -339,11 +363,25 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
             });
         }
 
+        void setQueue(final boolean isInQueue, final boolean isDownloaded) {
+            in_down.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (!isInQueue)
+                        setDownloaded(isDownloaded, false);
+                    else {
+                        in_down.setImageResource(isDownloaded ? R.drawable.ic_queue_file : R.drawable.ic_queue_normal);
+                        in_down.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        }
+
         void setSeen(final Context context, final boolean seen) {
             chapter.post(new Runnable() {
                 @Override
                 public void run() {
-                    chapter.setTextColor(context.getResources().getColor(seen ? R.color.colorAccent : R.color.textPrimary));
+                    chapter.setTextColor(context.getResources().getColor(seen ? EAHelper.getThemeColor(context) : R.color.textPrimary));
                 }
             });
         }

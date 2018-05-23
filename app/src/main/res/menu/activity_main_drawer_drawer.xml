@@ -15,6 +15,10 @@
         android:icon="@drawable/ic_seeing_drawer"
         android:title="Siguiendo"/>
     <item
+        android:id="@+id/drawer_queue"
+        android:icon="@drawable/ic_clock"
+        android:title="Pendientes"/>
+    <item
         android:id="@+id/drawer_suggestions"
         android:icon="@drawable/ic_suggestions"
         android:title="Sugerencias"/>
