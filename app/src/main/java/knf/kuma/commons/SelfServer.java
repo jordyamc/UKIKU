@@ -33,7 +33,7 @@ public class SelfServer {
         private String file_name;
 
         public Server(String file_name) throws Exception {
-            super(8080);
+            super(6991);
             this.file_name = file_name;
             start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         }

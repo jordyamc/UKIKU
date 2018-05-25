@@ -36,10 +36,22 @@ public class OkruServer extends Server {
             VideoServer videoServer = new VideoServer(OKRU);
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                if (object.getString("name").equals("sd")) {
-                    videoServer.addOption(new Option(getName(), "SD", object.getString("url")));
-                } else if (object.getString("name").equals("hd")) {
-                    videoServer.addOption(new Option(getName(), "HD", object.getString("url")));
+                switch (object.getString("name")) {
+                    case "hd":
+                        videoServer.addOption(new Option(getName(), "HD", object.getString("url")));
+                        break;
+                    case "sd":
+                        videoServer.addOption(new Option(getName(), "SD", object.getString("url")));
+                        break;
+                    case "low":
+                        videoServer.addOption(new Option(getName(), "LOW", object.getString("url")));
+                        break;
+                    case "lowest":
+                        videoServer.addOption(new Option(getName(), "LOWEST", object.getString("url")));
+                        break;
+                    case "mobile":
+                        videoServer.addOption(new Option(getName(), "MOBILE", object.getString("url")));
+                        break;
                 }
             }
             return videoServer;

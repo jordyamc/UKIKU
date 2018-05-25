@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="24" version="1.2.1">
+        <change type="fix">Servidor Mega duplicado</change>
+        <change type="fix">Servidor Fire corregido</change>
+        <change type="change">Marcar episodios pendientes como vistos y el ultimo es añadido a
+            historial
+        </change>
+    </release>
     <release code="23" version="1.2">
         <change type="fix">Errores generales</change>
         <change type="new">Cola de reproducción</change>

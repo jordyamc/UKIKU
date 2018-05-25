@@ -13,6 +13,7 @@ import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.player.ExoPlayer;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.QueueObject;
+import knf.kuma.pojos.RecordObject;
 import xdroid.toaster.Toaster;
 
 public class QueueManager {
@@ -42,6 +43,7 @@ public class QueueManager {
     }
 
     static void startQueue(Context context, List<QueueObject> list) {
+        markAllSeen(list);
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")
                 || isMxInstalled(context) == null)
             startQueueInternal(context, list);
@@ -88,5 +90,12 @@ public class QueueManager {
         } catch (PackageManager.NameNotFoundException e) {
         }
         return null;
+    }
+
+    private static void markAllSeen(List<QueueObject> list) {
+        for (QueueObject object : list) {
+            CacheDB.INSTANCE.chaptersDAO().addChapter(object.chapter);
+        }
+        CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(list.get(list.size() - 1).chapter));
     }
 }

@@ -30,7 +30,7 @@ public class FireServer extends Server {
         try {
             String frame = PatternUtil.extractLink(baseLink);
             String media_func = Jsoup.connect(frame).get().select("script").last().outerHtml();
-            String download = Jsoup.connect(PatternUtil.extractLink(media_func)).get().select("a[href~=http://download.*]").first().attr("href");
+            String download = Jsoup.connect(PatternUtil.extractMediaLink(media_func)).get().select("a[href~=http://download.*]").first().attr("href");
             return new VideoServer(FIRE, new Option(getName(), null, download));
         } catch (Exception e) {
             e.printStackTrace();

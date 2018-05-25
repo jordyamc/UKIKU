@@ -75,6 +75,12 @@ public class PatternUtil {
         return matcher.group(0);
     }
 
+    public static String extractMediaLink(String html) {
+        Matcher matcher = Pattern.compile("https?://www\\.mediafire[a-zA-Z0-a.=?/&]+").matcher(html);
+        matcher.find();
+        return matcher.group(0);
+    }
+
     public static String getAnimeUrl(String chapter,String aid){
         return "https://animeflv.net/anime/"+aid+chapter.substring(chapter.lastIndexOf("/"),chapter.lastIndexOf("-"));
     }
