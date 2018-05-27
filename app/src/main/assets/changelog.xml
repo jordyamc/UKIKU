@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="25" version="1.2.2">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Error al hacer cast de archivos locales</change>
+    </release>
     <release code="24" version="1.2.1">
         <change type="fix">Servidor Mega duplicado</change>
         <change type="fix">Servidor Fire corregido</change>

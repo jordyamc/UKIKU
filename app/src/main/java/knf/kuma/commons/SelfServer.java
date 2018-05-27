@@ -12,11 +12,13 @@ import xdroid.toaster.Toaster;
 public class SelfServer {
     private static Server INSTANCE;
 
+    public static int HTTP_PORT = 6991;
+
     public static String start(String file_name) {
         try {
             stop();
             INSTANCE = new Server(file_name);
-            return "http://" + Network.getIPAddress() + ":8080";
+            return "http://" + Network.getIPAddress() + ":" + HTTP_PORT;
         } catch (Exception e) {
             e.printStackTrace();
             Toaster.toast("Error al iniciar server");
@@ -33,7 +35,7 @@ public class SelfServer {
         private String file_name;
 
         public Server(String file_name) throws Exception {
-            super(6991);
+            super(HTTP_PORT);
             this.file_name = file_name;
             start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         }

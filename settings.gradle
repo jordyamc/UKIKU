@@ -1,1 +1,1 @@
-include ':app', ':multidisplaycast'
+include ':app'

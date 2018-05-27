@@ -55,7 +55,7 @@ public class CastUtil implements CastListener, PlayStatusListener {
     public void play(Activity activity,String eid, String url, String title, String chapter, String preview, boolean isAid){
         try {
             if (connected()) {
-                if (!url.contains(":8080"))
+                if (!url.contains(":" + SelfServer.HTTP_PORT))
                     SelfServer.stop();
                 startLoading(activity);
                 setEid(eid);
