@@ -56,17 +56,11 @@ public class FragmentFiles extends Fragment {
         CacheDB.INSTANCE.explorerDAO().getAll().observe(this, new Observer<List<ExplorerObject>>() {
             @Override
             public void onChanged(List<ExplorerObject> explorerObjects) {
-                if (count >= 1) {
+                adapter.update(explorerObjects);
+                if (explorerObjects.size() != 0) {
                     progressBar.setVisibility(View.GONE);
                     state.setVisibility(View.GONE);
-                    error.setVisibility(explorerObjects.size() == 0 ? View.VISIBLE : View.GONE);
-                    adapter.update(explorerObjects);
-                    if (isFist && explorerObjects.size() != 0) {
-                        isFist = false;
-                        recyclerView.scheduleLayoutAnimation();
-                    }
-                } else {
-                    count++;
+                    recyclerView.scheduleLayoutAnimation();
                 }
             }
         });
@@ -104,6 +98,7 @@ public class FragmentFiles extends Fragment {
             public void run() {
                 progressBar.setVisibility(View.GONE);
                 error.setVisibility(View.VISIBLE);
+                state.setVisibility(View.GONE);
             }
         });
     }

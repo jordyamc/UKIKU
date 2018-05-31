@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -55,8 +57,12 @@ public class CastUtil implements CastListener, PlayStatusListener {
     public void play(Activity activity,String eid, String url, String title, String chapter, String preview, boolean isAid){
         try {
             if (connected()) {
-                if (!url.contains(":" + SelfServer.HTTP_PORT))
+                if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("samsung_mode", false)
+                        && !url.endsWith(":" + SelfServer.HTTP_PORT))
+                    url = SelfServer.start(url, false);
+                if (!url.endsWith(":" + SelfServer.HTTP_PORT))
                     SelfServer.stop();
+                Log.e("Cast", url);
                 startLoading(activity);
                 setEid(eid);
                 if (isAid)

@@ -24,6 +24,9 @@ public interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE link = :link")
     LiveData<AnimeObject> getAnime(String link);
 
+    @Query("SELECT * FROM AnimeObject WHERE aid = :aid")
+    LiveData<AnimeObject> getAnimeByAid(String aid);
+
     @Query("SELECT * FROM AnimeObject WHERE link = :link")
     AnimeObject getAnimeRaw(String link);
 
@@ -116,4 +119,8 @@ public interface AnimeDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<AnimeObject> objects);
+
+    @Query("DELETE FROM animeobject")
+    void nuke();
+
 }

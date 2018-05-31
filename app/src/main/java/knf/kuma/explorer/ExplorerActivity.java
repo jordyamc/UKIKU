@@ -18,7 +18,6 @@ import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.EAHelper;
-import knf.kuma.database.CacheDB;
 
 public class ExplorerActivity extends AppCompatActivity {
 
@@ -50,6 +49,8 @@ public class ExplorerActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        if (savedInstanceState == null)
+            ExplorerCreator.onDestroy();
         pager.setOffscreenPageLimit(2);
         adapter = new ExplorerPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
@@ -90,11 +91,5 @@ public class ExplorerActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (adapter == null || !((FragmentBase) adapter.getItem(pager.getCurrentItem())).onBackPressed())
             super.onBackPressed();
-    }
-
-    @Override
-    protected void onDestroy() {
-        CacheDB.INSTANCE.explorerDAO().deleteAll();
-        super.onDestroy();
     }
 }

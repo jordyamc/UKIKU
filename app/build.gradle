@@ -22,8 +22,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 26
-        versionName "1.2.3"
+        versionCode 27
+        versionName "1.2.4"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -93,7 +93,7 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
     implementation 'com.beloo.widget:ChipsLayoutManager:0.3.7@aar'
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'me.zhanghai.android.materialratingbar:library:1.1.1'
     implementation 'at.blogc:expandabletextview:1.0.5'
     implementation 'com.evernote:android-job:1.2.1'

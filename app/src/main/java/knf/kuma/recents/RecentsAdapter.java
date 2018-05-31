@@ -237,7 +237,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                 if (CastUtil.get().connected() &&
                         object.isChapterDownloaded && (obj == null || obj.state == DownloadObject.COMPLETED)) {
                     chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(object));
-                    CastUtil.get().play(fragment.getActivity(), object.eid, SelfServer.start(object.getFileName()), object.name, object.chapter, object.aid, true);
+                    CastUtil.get().play(fragment.getActivity(), object.eid, SelfServer.start(object.getFileName(), true), object.name, object.chapter, object.aid, true);
                 }
                 return true;
             }

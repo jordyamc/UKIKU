@@ -24,7 +24,7 @@
             android:layout_width="60dp"
             android:layout_height="85dp"
             android:scaleType="centerCrop"
-            android:transitionName="imgRel"/>
+            android:transitionName="img"/>
 
         <RelativeLayout
             android:layout_width="0dp"

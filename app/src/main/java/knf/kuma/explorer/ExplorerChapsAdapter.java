@@ -102,7 +102,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
                 recordsDAO.add(RecordObject.fromDownloaded(chapObject));
                 holder.seenOverlay.setSeen(true,true);
                 if (CastUtil.get().connected()) {
-                    CastUtil.get().play(fragment.getActivity(), chapObject.eid, SelfServer.start(chapObject.fileName), chapObject.title, "Episodio " + chapObject.chapter, chapObject.aid, true);
+                    CastUtil.get().play(fragment.getActivity(), chapObject.eid, SelfServer.start(chapObject.fileName, true), chapObject.title, "Episodio " + chapObject.chapter, chapObject.aid, true);
                 } else {
                     ServersFactory.startPlay(context, chapObject.getChapTitle(), chapObject.fileName);
                 }

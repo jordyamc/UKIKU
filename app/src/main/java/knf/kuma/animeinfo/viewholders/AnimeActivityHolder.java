@@ -71,7 +71,7 @@ public class AnimeActivityHolder {
         });
         if (activity.getIntent().getBooleanExtra("isRecord", false))
             pager.setCurrentItem(1, true);
-        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(pager) {
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(pager) {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 1 && animePagerAdapter != null)

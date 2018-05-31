@@ -15,14 +15,22 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     private FragmentFiles files;
     private FragmentChapters chapters;
     private boolean isFiles = true;
+    private String name;
+    private Boolean isRestored = false;
 
     public FragmentFilesRoot() {
         files = FragmentFiles.get(this);
-        chapters=FragmentChapters.get(this);
+        chapters = FragmentChapters.get(this);
     }
 
     public static FragmentFilesRoot get() {
         return new FragmentFilesRoot();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Nullable
@@ -39,18 +47,14 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         if (!chapters.isAdded())
             transaction.add(R.id.root, chapters, FragmentChapters.TAG);
         transaction.commit();
-        if (savedInstanceState == null) {
-            setFragment(true, null);
-            ExplorerCreator.start(getContext(), this);
-        }else {
-            files.setListener(this);
-            chapters.setInterface(this);
-        }
         super.onViewCreated(view, savedInstanceState);
     }
 
     private void setFragment(boolean isFiles, @Nullable String name) {
         this.isFiles = isFiles;
+        this.name = name;
+        ExplorerCreator.IS_FILES = isFiles;
+        ExplorerCreator.FILES_NAME = name;
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         if (isFiles) {
             transaction.hide(chapters);
@@ -65,13 +69,34 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            this.isFiles = savedInstanceState.getBoolean("isFiles", true);
+            this.name = savedInstanceState.getString("name");
+            this.isRestored = savedInstanceState.getBoolean("isRestored", false);
+        }
+        setFragment(ExplorerCreator.IS_FILES, ExplorerCreator.FILES_NAME);
+        if (!ExplorerCreator.IS_CREATED)
+            ExplorerCreator.start(getContext(), this);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isFiles", isFiles);
+        outState.putString("name", name);
+        outState.putBoolean("isRestored", true);
+    }
+
+    @Override
     public void onSelected(String name) {
         setFragment(false, name);
     }
 
     @Override
     public void onClear() {
-        setFragment(true,null);
+        setFragment(true, null);
     }
 
     @Override

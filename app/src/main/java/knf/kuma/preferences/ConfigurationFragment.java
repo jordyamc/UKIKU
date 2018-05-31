@@ -24,6 +24,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import knf.kuma.Main;
 import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
+import knf.kuma.database.CacheDB;
+import knf.kuma.directory.DirectoryService;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
@@ -99,7 +101,10 @@ public class ConfigurationFragment extends PreferenceFragment {
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    DirUpdateJob.runNow();
+                                    CacheDB.INSTANCE.animeDAO().nuke();
+                                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("directory_finished", false).apply();
+                                    DirectoryService.run(getActivity().getApplicationContext());
+                                    //DirUpdateJob.runNow();
                                 }
                             }).build().show();
                 } catch (Exception e) {

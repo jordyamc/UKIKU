@@ -156,7 +156,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                 break;
                             case R.id.cast:
                                 if (canPlay(d_file)) {
-                                    CastUtil.get().play(fragment.getActivity(), chapter.eid, SelfServer.start(chapter.getFileName()), chapter.name, chapter.number, chapter.img == null ? chapter.aid : chapter.img, chapter.img == null);
+                                    CastUtil.get().play(fragment.getActivity(), chapter.eid, SelfServer.start(chapter.getFileName(), true), chapter.name, chapter.number, chapter.img == null ? chapter.aid : chapter.img, chapter.img == null);
                                     chaptersDAO.addChapter(chapter);
                                     recordsDAO.add(RecordObject.fromChapter(chapter));
                                     updateSeeing(chapter.number);

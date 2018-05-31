@@ -64,6 +64,12 @@
             android:key="player_resize"
             android:summary="%s"
             android:title="Redimensión de video"/>
+        <!--<SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_cast_conf"
+            android:key="samsung_mode"
+            android:summary="Usar cast local para animes descargados y streaming"
+            android:title="Cast local"/>-->
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Diseño">

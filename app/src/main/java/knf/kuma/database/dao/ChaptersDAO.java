@@ -32,7 +32,7 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM animechapter WHERE eid IN (:eids) ORDER BY eid DESC LIMIT 1")
     AnimeObject.WebInfo.AnimeChapter getLast(List<String> eids);
 
-    @Query("SELECT * FROM animechapter WHERE aid LIKE :aid ORDER BY eid DESC LIMIT 1")
+    @Query("SELECT * FROM animechapter WHERE aid LIKE :aid ORDER BY `key` DESC LIMIT 1")
     AnimeObject.WebInfo.AnimeChapter getLastByAid(String aid);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

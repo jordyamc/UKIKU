@@ -38,6 +38,7 @@ import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.ExplorerObject;
 import knf.kuma.pojos.FavoriteObject;
 import knf.kuma.pojos.NotificationObj;
+import knf.kuma.pojos.QueueObject;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
@@ -67,10 +68,10 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
     }
 
     public static void open(Fragment fragment, AnimeObject object, View view) {
-        open(fragment, object, view, true,true);
+        open(fragment, object, view, true, true);
     }
 
-    public static void open(Fragment fragment, AnimeObject object, View view, boolean persist,boolean animate) {
+    public static void open(Fragment fragment, AnimeObject object, View view, boolean persist, boolean animate) {
         Intent intent = new Intent(fragment.getContext(), ActivityAnime.class);
         intent.setData(Uri.parse(object.link));
         intent.putExtra("title", object.name);
@@ -143,6 +144,15 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(fragment.getActivity(), view, "img").toBundle());
     }
 
+    public static void open(Activity activity, QueueObject object, String img, View view) {
+        Intent intent = new Intent(activity, ActivityAnime.class);
+        intent.putExtra("title", object.chapter.name);
+        intent.putExtra("aid", object.chapter.aid);
+        intent.putExtra("img", img);
+        intent.putExtra("aid_only", true);
+        activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "img").toBundle());
+    }
+
     public static void open(Fragment fragment, AnimeObject.WebInfo.AnimeRelated object) {
         Intent intent = new Intent(fragment.getContext(), ActivityAnime.class);
         intent.setData(Uri.parse("https://animeflv.net/" + object.link));
@@ -178,7 +188,10 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
             }
         });
         AnimeViewModel viewModel = ViewModelProviders.of(this).get(AnimeViewModel.class);
-        viewModel.init(this, getIntent().getDataString(), getIntent().getBooleanExtra("persist", true));
+        if (getIntent().getBooleanExtra("aid_only", false))
+            viewModel.init(getIntent().getStringExtra("aid"));
+        else
+            viewModel.init(this, getIntent().getDataString(), getIntent().getBooleanExtra("persist", true));
         viewModel.getLiveData().observe(this, new Observer<AnimeObject>() {
             @Override
             public void onChanged(@Nullable final AnimeObject object) {

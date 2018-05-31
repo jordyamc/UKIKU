@@ -1,6 +1,6 @@
 package knf.kuma.queue;
 
-import android.content.Context;
+import android.app.Activity;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -19,6 +19,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.database.CacheDB;
@@ -26,13 +27,13 @@ import knf.kuma.pojos.QueueObject;
 
 public class QueueAnimesAdapter extends RecyclerView.Adapter<QueueAnimesAdapter.AnimeHolder> {
 
-    private Context context;
+    private Activity activity;
     private OnAnimeSelectedListener listener;
     private List<QueueObject> list = new ArrayList<>();
 
-    QueueAnimesAdapter(Context context) {
-        this.context = context;
-        this.listener = (OnAnimeSelectedListener) context;
+    QueueAnimesAdapter(Activity activity) {
+        this.activity = activity;
+        this.listener = (OnAnimeSelectedListener) activity;
     }
 
     @NonNull
@@ -42,9 +43,10 @@ public class QueueAnimesAdapter extends RecyclerView.Adapter<QueueAnimesAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AnimeHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final AnimeHolder holder, int position) {
         final QueueObject object = list.get(position);
-        PicassoSingle.get(context).load(PatternUtil.getCover(object.chapter.aid)).into(holder.imageView);
+        final String img = PatternUtil.getCover(object.chapter.aid);
+        PicassoSingle.get(activity).load(img).into(holder.imageView);
         holder.title.setText(object.chapter.name);
         int count = CacheDB.INSTANCE.queueDAO().countAlone(object.chapter.aid);
         holder.type.setText(String.format(Locale.getDefault(), count == 1 ? "%d episodio" : "%d episodios", count));
@@ -52,6 +54,13 @@ public class QueueAnimesAdapter extends RecyclerView.Adapter<QueueAnimesAdapter.
             @Override
             public void onClick(View v) {
                 listener.onSelect(object);
+            }
+        });
+        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ActivityAnime.open(activity, object, img, holder.imageView);
+                return true;
             }
         });
     }
@@ -68,10 +77,10 @@ public class QueueAnimesAdapter extends RecyclerView.Adapter<QueueAnimesAdapter.
 
     @LayoutRes
     private int getLayout() {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0").equals("0")) {
-            return R.layout.item_fav;
+        if (PreferenceManager.getDefaultSharedPreferences(activity).getString("lay_type", "0").equals("0")) {
+            return R.layout.item_anim_queue;
         } else {
-            return R.layout.item_fav_grid;
+            return R.layout.item_anim_queue_grid;
         }
     }
 

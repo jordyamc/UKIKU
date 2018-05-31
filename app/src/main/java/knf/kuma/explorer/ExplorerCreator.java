@@ -20,8 +20,12 @@ import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.ExplorerObject;
 
 public class ExplorerCreator {
+    static boolean IS_CREATED = false;
+    static boolean IS_FILES = true;
+    static String FILES_NAME;
     private static MutableLiveData<String> STATE_LISTENER = new MutableLiveData<>();
     public static void start(final Context context, final EmptyListener listener) {
+        IS_CREATED = true;
         final ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();
         postState("Iniciando busqueda");
         AsyncTask.execute(new Runnable() {
@@ -61,6 +65,13 @@ public class ExplorerCreator {
                 }
             }
         });
+    }
+
+    public static void onDestroy() {
+        IS_CREATED = false;
+        IS_FILES = true;
+        FILES_NAME = null;
+        CacheDB.INSTANCE.explorerDAO().deleteAll();
     }
 
     static LiveData<String> getStateListener() {
