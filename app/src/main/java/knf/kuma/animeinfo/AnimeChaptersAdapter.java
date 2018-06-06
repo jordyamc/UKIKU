@@ -254,7 +254,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                     holder.chapter.setTextColor(context.getResources().getColor(R.color.textPrimary));
                 } else {
                     chaptersDAO.addChapter(chapter);
-                    holder.chapter.setTextColor(context.getResources().getColor(R.color.colorAccent));
+                    holder.chapter.setTextColor(context.getResources().getColor(EAHelper.getThemeColor(context)));
                 }
                 updateSeeing(chapter.number);
             }

@@ -1,5 +1,7 @@
 package knf.kuma.queue;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
@@ -13,11 +15,15 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -31,8 +37,9 @@ import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.QueueObject;
+import xdroid.toaster.Toaster;
 
-public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapter.OnAnimeSelectedListener {
+public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapter.OnAnimeSelectedListener, QueueAllAdapter.OnStartDragListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.recycler)
@@ -46,10 +53,13 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
     @BindView(R.id.error)
     View error_view;
     BottomSheetBehavior<CardView> bottomSheetBehavior;
-    private QueueAnimesAdapter animesAdapter;
     private QueueListAdapter listAdapter;
 
+    private ItemTouchHelper mItemTouchHelper;
+
     private QueueObject current;
+
+    private LiveData<List<QueueObject>> currentData = new MutableLiveData<>();
 
     public static void open(Context context) {
         context.startActivity(new Intent(context, QueueActivity.class));
@@ -111,22 +121,46 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
 
             }
         });
+        setLayoutManager(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true));
         list_recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
-        animesAdapter = new QueueAnimesAdapter(this);
         listAdapter = new QueueListAdapter();
-        recyclerView.setAdapter(animesAdapter);
         list_recyclerView.setAdapter(listAdapter);
         reload();
     }
 
     private void reload() {
-        CacheDB.INSTANCE.queueDAO().getAll().observe(this, new Observer<List<QueueObject>>() {
-            @Override
-            public void onChanged(@Nullable List<QueueObject> list) {
-                error_view.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
-                animesAdapter.update(QueueObject.getOne(list));
-            }
-        });
+        currentData.removeObservers(this);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true)) {
+            currentData = CacheDB.INSTANCE.queueDAO().getAll();
+            currentData.observe(this, new Observer<List<QueueObject>>() {
+                @Override
+                public void onChanged(@Nullable List<QueueObject> list) {
+                    error_view.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
+                    QueueAnimesAdapter animesAdapter = new QueueAnimesAdapter(QueueActivity.this);
+                    recyclerView.setAdapter(animesAdapter);
+                    dettachHelper();
+                    mItemTouchHelper = new ItemTouchHelper(new NoTouchHelperCallback());
+                    mItemTouchHelper.attachToRecyclerView(recyclerView);
+                    animesAdapter.update(QueueObject.getOne(list));
+                }
+            });
+        } else {
+            currentData = CacheDB.INSTANCE.queueDAO().getAllAsort();
+            currentData.observe(this, new Observer<List<QueueObject>>() {
+                @Override
+                public void onChanged(@Nullable List<QueueObject> list) {
+                    clearInterfaces();
+                    error_view.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
+                    QueueAllAdapter allAdapter = new QueueAllAdapter(QueueActivity.this);
+                    recyclerView.setAdapter(allAdapter);
+                    dettachHelper();
+                    mItemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(allAdapter));
+                    mItemTouchHelper.attachToRecyclerView(recyclerView);
+                    allAdapter.update(list);
+                    currentData.removeObserver(this);
+                }
+            });
+        }
     }
 
     @LayoutRes
@@ -138,17 +172,35 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
         }
     }
 
+    private void dettachHelper() {
+        if (mItemTouchHelper != null)
+            mItemTouchHelper.attachToRecyclerView(null);
+    }
+
+    private void clearInterfaces() {
+        if (recyclerView.getAdapter() instanceof QueueAnimesAdapter)
+            ((QueueAnimesAdapter) recyclerView.getAdapter()).clear();
+    }
+
+    private void setLayoutManager(boolean isFull) {
+        if (isFull || PreferenceManager.getDefaultSharedPreferences(this).getString("lay_type", "0").equals("0")) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(this, getResources().getInteger(R.integer.span_count)));
+            recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(this, R.anim.grid_fall_down));
+        }
+    }
+
     @Override
     public void onSelect(final QueueObject object) {
-        if (object.equals(current)) {
+        if (object.equalsAnime(current)) {
             current = null;
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else {
-            current = object;
-            if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             list_toolbar.setTitle(object.chapter.name);
-            CacheDB.INSTANCE.queueDAO().getByAid(object.chapter.aid).observe(this, new Observer<List<QueueObject>>() {
+            final LiveData<List<QueueObject>> liveData = CacheDB.INSTANCE.queueDAO().getByAid(object.chapter.aid);
+            liveData.observe(this, new Observer<List<QueueObject>>() {
                 @Override
                 public void onChanged(@Nullable List<QueueObject> list) {
                     if (list.size() == 0)
@@ -157,14 +209,34 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
                         listAdapter.update(object.chapter.aid, list);
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                     }
+                    current = object;
+                    liveData.removeObserver(this);
                 }
             });
         }
     }
 
     @Override
+    public void onStartDrag(RecyclerView.ViewHolder holder) {
+        mItemTouchHelper.startDrag(holder);
+    }
+
+    @Override
+    public void onListCleared() {
+        error_view.post(new Runnable() {
+            @Override
+            public void run() {
+                error_view.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_info_queue, menu);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true))
+            getMenuInflater().inflate(R.menu.menu_queue_group, menu);
+        else
+            getMenuInflater().inflate(R.menu.menu_queue_list, menu);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (!preferences.getBoolean("is_queue_info_shown", false)) {
             preferences.edit().putBoolean("is_queue_info_shown", true).apply();
@@ -175,12 +247,33 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         switch (item.getItemId()) {
             case R.id.info:
                 new MaterialDialog.Builder(this)
                         .content("Los episodios añadidos desde servidor podrían dejar de funcionar después de días sin reproducir")
                         .positiveText("OK")
                         .build().show();
+                break;
+            case R.id.queue_group:
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("queue_is_grouped", true).apply();
+                setLayoutManager(false);
+                reload();
+                supportInvalidateOptionsMenu();
+                break;
+            case R.id.queue_list:
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("queue_is_grouped", false).apply();
+                setLayoutManager(true);
+                reload();
+                supportInvalidateOptionsMenu();
+                break;
+            case R.id.play:
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                List<QueueObject> list = ((QueueAllAdapter) recyclerView.getAdapter()).getList();
+                if (list.size() > 0)
+                    QueueManager.startQueue(getApplicationContext(), list);
+                else
+                    Toaster.toast("La lista esta vacia");
                 break;
         }
         return super.onOptionsItemSelected(item);

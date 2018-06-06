@@ -17,6 +17,13 @@ public class PatternUtil {
         return matcher.group(1);
     }
 
+    public static String getRapidLink(String link) {
+        Pattern pattern = Pattern.compile("\"(.*rapidvideo.*)\"");
+        Matcher matcher = pattern.matcher(link);
+        matcher.find();
+        return matcher.group(1);
+    }
+
     public static String getLinkId(String link){
         Matcher matcher=Pattern.compile("^.*/(.*)-\\d+$").matcher(link);
         matcher.find();

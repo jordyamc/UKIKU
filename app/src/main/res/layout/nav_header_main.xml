@@ -70,7 +70,10 @@
         android:id="@+id/backupLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="4dp"
         android:text="Almacenamiento local"
-        android:textColor="@android:color/white"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"/>
 
 </LinearLayout>

@@ -159,12 +159,6 @@ public class ChangelogActivity extends AppCompatActivity {
             }
             reader.close();
             xmlString = sb.toString();
-            /*InputStream is = am.open("changelog.xml");
-            int length = is.available();
-            byte[] data = new byte[length];
-            is.read(data);
-            is.close();
-            xmlString = new String(data);*/
         } catch (Exception e1) {
             e1.printStackTrace();
         }

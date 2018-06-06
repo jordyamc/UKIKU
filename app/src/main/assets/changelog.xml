@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="28" version="1.2.5">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Servidor RV</change>
+        <change type="change">Mejora en pendientes</change>
+    </release>
     <release code="27" version="1.2.4">
         <change type="change">Mejora en explorador</change>
     </release>

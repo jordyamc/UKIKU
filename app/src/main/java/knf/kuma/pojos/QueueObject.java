@@ -79,6 +79,10 @@ public class QueueObject {
     public boolean equals(Object obj) {
         return obj instanceof QueueObject && chapter.eid.equals(((QueueObject) obj).chapter.eid);
     }
+
+    public boolean equalsAnime(Object obj) {
+        return obj instanceof QueueObject && chapter.aid.equals(((QueueObject) obj).chapter.aid);
+    }
 }
 
 

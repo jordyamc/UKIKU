@@ -53,7 +53,7 @@ public class QueueAnimesAdapter extends RecyclerView.Adapter<QueueAnimesAdapter.
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onSelect(object);
+                if (listener != null) listener.onSelect(object);
             }
         });
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -73,6 +73,10 @@ public class QueueAnimesAdapter extends RecyclerView.Adapter<QueueAnimesAdapter.
     public void update(List<QueueObject> list) {
         this.list = list;
         notifyDataSetChanged();
+    }
+
+    public void clear() {
+        listener = null;
     }
 
     @LayoutRes

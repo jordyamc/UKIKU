@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/queue_list"
+        android:icon="@drawable/ic_queue_list"
+        android:title="Lista"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/info"
+        android:icon="@drawable/ic_info"
+        android:title="Info"
+        app:showAsAction="always"/>
+</menu>

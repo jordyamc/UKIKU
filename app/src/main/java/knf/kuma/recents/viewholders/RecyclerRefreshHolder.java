@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.EAHelper;
 
 public class RecyclerRefreshHolder {
     @BindView(R.id.recycler)
@@ -24,6 +25,7 @@ public class RecyclerRefreshHolder {
         layoutManager=new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(view.getContext(),R.anim.layout_fall_down));
+        refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(view.getContext()), EAHelper.getThemeColorLight(view.getContext()), R.color.colorPrimary);
     }
 
     public void setRecyclerAdapter(final RecyclerView.Adapter adapter){

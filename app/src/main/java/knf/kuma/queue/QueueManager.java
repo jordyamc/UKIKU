@@ -30,6 +30,10 @@ public class QueueManager {
         CacheDB.INSTANCE.queueDAO().remove(queueObject);
     }
 
+    public static void update(QueueObject... objects) {
+        CacheDB.INSTANCE.queueDAO().update(objects);
+    }
+
     public static void remove(List<QueueObject> list) {
         CacheDB.INSTANCE.queueDAO().remove(list);
     }

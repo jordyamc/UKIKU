@@ -1,5 +1,6 @@
 package knf.kuma.backup;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -58,8 +59,9 @@ import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
 import xdroid.toaster.Toaster;
 
+@SuppressLint("StaticFieldLeak")
 public class BUUtils {
-    public static final int LOGIN_CODE = 56478;
+    static final int LOGIN_CODE = 56478;
     private static Activity activity;
     private static LoginInterface loginInterface;
     private static DriveResourceClient DRC;
@@ -72,18 +74,18 @@ public class BUUtils {
             startClient(getType(), true);
     }
 
-    public static boolean isLogedIn() {
+    static boolean isLogedIn() {
         return DRC != null || DBC != null;
     }
 
-    public static void setDriveClient() {
+    static void setDriveClient() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
         if (account != null)
             DRC = Drive.getDriveResourceClient(activity, account);
         loginInterface.onLogin();
     }
 
-    public static void setDropBoxClient(String token) {
+    static void setDropBoxClient(String token) {
         if (token != null) {
             PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("db_token", token).apply();
             DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("dropbox_app")
@@ -111,7 +113,7 @@ public class BUUtils {
         client.signOut();
     }
 
-    public static void startClient(BUType type, boolean fromInit) {
+    static void startClient(BUType type, boolean fromInit) {
         switch (type) {
             case DRIVE:
                 if (!fromInit) {
@@ -222,7 +224,7 @@ public class BUUtils {
                 final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
                 appFolderTask.continueWithTask(new Continuation<DriveFolder, Task<MetadataBuffer>>() {
                     @Override
-                    public Task<MetadataBuffer> then(@NonNull Task<DriveFolder> task) throws Exception {
+                    public Task<MetadataBuffer> then(@NonNull Task<DriveFolder> task) {
                         DriveFolder appfolder = appFolderTask.getResult();
                         Query query = new Query.Builder()
                                 .addFilter(Filters.contains(SearchableField.TITLE, id))
@@ -231,7 +233,7 @@ public class BUUtils {
                     }
                 }).continueWithTask(new Continuation<MetadataBuffer, Task<DriveContents>>() {
                     @Override
-                    public Task<DriveContents> then(@NonNull Task<MetadataBuffer> task) throws Exception {
+                    public Task<DriveContents> then(@NonNull Task<MetadataBuffer> task) {
                         MetadataBuffer metadata = task.getResult();
                         if (metadata.getCount() > 0) {
                             DriveFile driveFile = metadata.get(0).getDriveId().asDriveFile();

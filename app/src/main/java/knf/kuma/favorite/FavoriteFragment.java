@@ -50,14 +50,10 @@ public class FavoriteFragment extends BottomFragment {
             @Override
             public void onChanged(@Nullable List<FavoriteObject> favoriteObjects) {
                 if (favoriteObjects==null || favoriteObjects.size()==0){
+                    error_layout.setVisibility(View.VISIBLE);
                     adapter.updateList(new ArrayList<FavoriteObject>());
-                    error_layout.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            error_layout.setVisibility(View.VISIBLE);
-                        }
-                    });
                 }else {
+                    error_layout.setVisibility(View.GONE);
                     adapter.updateList(favoriteObjects);
                     if (isFirst) {
                         isFirst = false;
