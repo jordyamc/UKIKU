@@ -28,7 +28,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.cryse.widget.persistentsearch.PersistentSearchView;
@@ -142,30 +141,10 @@ public class Main extends AppCompatActivity
         migrate = navigationView.getHeaderView(0).findViewById(R.id.action_migrate);
         map = navigationView.getHeaderView(0).findViewById(R.id.action_map);
         navigationView.getHeaderView(0).findViewById(R.id.img).setBackgroundResource(EAHelper.getThemeImg(this));
-        info.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppInfo.open(Main.this);
-            }
-        });
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BackUpActivity.start(Main.this);
-            }
-        });
-        migrate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MigrationActivity.start(Main.this);
-            }
-        });
-        map.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EAMActivity.start(Main.this);
-            }
-        });
+        info.setOnClickListener(v -> AppInfo.open(Main.this));
+        login.setOnClickListener(v -> BackUpActivity.start(Main.this));
+        migrate.setOnClickListener(v -> MigrationActivity.start(Main.this));
+        map.setOnClickListener(v -> EAMActivity.start(Main.this));
         migrate.setVisibility((BUUtils.isAnimeflvInstalled(this) && DirectoryService.isDirectoryFinished(this)) ? View.VISIBLE : View.GONE);
         map.setVisibility(EAHelper.getPhase(this) == 3 ? View.VISIBLE : View.GONE);
         TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
@@ -192,24 +171,16 @@ public class Main extends AppCompatActivity
 
     @Override
     public void onNeedUpdate(String o_code, final String n_code) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    new MaterialDialog.Builder(Main.this)
-                            .title("Actualización")
-                            .content("Parece que la versión " + n_code + " está disponible, ¿Quieres actualizar?")
-                            .positiveText("si")
-                            .negativeText("despues")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    UpdateActivity.start(Main.this);
-                                }
-                            }).build().show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        runOnUiThread(() -> {
+            try {
+                new MaterialDialog.Builder(Main.this)
+                        .title("Actualización")
+                        .content("Parece que la versión " + n_code + " está disponible, ¿Quieres actualizar?")
+                        .positiveText("si")
+                        .negativeText("despues")
+                        .onPositive((dialog, which) -> UpdateActivity.start(Main.this)).build().show();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -497,21 +468,18 @@ public class Main extends AppCompatActivity
         super.onResume();
         BypassUtil.check(this);
         if (navigationView != null)
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
-                    switch (BUUtils.getType(Main.this)) {
-                        case LOCAL:
-                            backupLocation.setText("Almacenamiento local");
-                            break;
-                        case DROPBOX:
-                            backupLocation.setText("Dropbox");
-                            break;
-                        case DRIVE:
-                            backupLocation.setText("Google Drive");
-                            break;
-                    }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
+                switch (BUUtils.getType(Main.this)) {
+                    case LOCAL:
+                        backupLocation.setText("Almacenamiento local");
+                        break;
+                    case DROPBOX:
+                        backupLocation.setText("Dropbox");
+                        break;
+                    case DRIVE:
+                        backupLocation.setText("Google Drive");
+                        break;
                 }
             });
     }

@@ -25,6 +25,7 @@ import java.util.Set;
 import knf.kuma.R;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
+import knf.kuma.commons.SSLSkipper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.jobscheduler.DirUpdateJob;
@@ -63,6 +64,7 @@ public class DirectoryService extends IntentService {
         }
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
+        SSLSkipper.skip();
         Jspoon jspoon = Jspoon.create();
         doPartialSearch(jspoon, animeDAO);
         doFullSearch(jspoon, animeDAO);

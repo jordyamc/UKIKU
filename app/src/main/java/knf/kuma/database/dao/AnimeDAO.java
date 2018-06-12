@@ -45,6 +45,9 @@ public interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE name LIKE :query ORDER BY name")
     DataSource.Factory<Integer,AnimeObject> getSearch(String query);
 
+    @Query("SELECT * FROM AnimeObject WHERE name LIKE :query ORDER BY name")
+    LiveData<List<AnimeObject>> getSearchList(String query);
+
     @Query("SELECT * FROM AnimeObject WHERE aid LIKE :query ORDER BY name")
     DataSource.Factory<Integer,AnimeObject> getSearchID(String query);
 

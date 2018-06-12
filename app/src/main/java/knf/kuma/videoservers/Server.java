@@ -19,6 +19,7 @@ public abstract class Server implements Comparable<Server> {
         this.baseLink = baseLink;
     }
 
+
     private static List<Server> getServers(Context context, String base) {
         return Arrays.asList(
                 new FireServer(context, base),
@@ -40,7 +41,7 @@ public abstract class Server implements Comparable<Server> {
         return null;
     }
 
-    public static int findPosition(List<Server> servers, String name) {
+    private static int findPosition(List<Server> servers, String name) {
         int i = 0;
         for (Server server : servers) {
             if (server.getName().equals(name))
@@ -77,7 +78,7 @@ public abstract class Server implements Comparable<Server> {
     public abstract String getName();
 
     @Nullable
-    abstract VideoServer getVideoServer();
+    public abstract VideoServer getVideoServer();
 
     @Nullable
     public VideoServer getLink() {

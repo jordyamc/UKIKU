@@ -1,10 +1,13 @@
 package knf.kuma.videoservers;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class VideoServer {
+public class VideoServer implements Parcelable {
     public String name;
     public List<Option> options = new ArrayList<>();
 
@@ -16,6 +19,18 @@ public class VideoServer {
         this.name = name;
         addOption(option);
     }
+
+    public static final Creator<VideoServer> CREATOR = new Creator<VideoServer>() {
+        @Override
+        public VideoServer createFromParcel(Parcel in) {
+            return new VideoServer(in);
+        }
+
+        @Override
+        public VideoServer[] newArray(int size) {
+            return new VideoServer[size];
+        }
+    };
 
     public static List<VideoServer> filter(List<VideoServer> videoServers) {
         List<String> names = new ArrayList<>();
@@ -78,6 +93,22 @@ public class VideoServer {
         public int compare(VideoServer videoServer, VideoServer t1) {
             return videoServer.name.compareToIgnoreCase(t1.name);
         }
+    }
+
+    protected VideoServer(Parcel in) {
+        name = in.readString();
+        options = in.createTypedArrayList(Option.CREATOR);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeTypedList(options);
     }
 
     public static class Names {

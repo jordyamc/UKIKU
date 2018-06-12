@@ -154,7 +154,7 @@ public class ChangelogActivity extends AppCompatActivity {
             StringBuilder sb = new StringBuilder();
             String mLine = reader.readLine();
             while (mLine != null) {
-                sb.append(mLine); // process line
+                sb.append(mLine);
                 mLine = reader.readLine();
             }
             reader.close();

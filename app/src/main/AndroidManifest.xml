@@ -8,6 +8,9 @@
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -15,17 +18,18 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
         android:name=".App"
         android:allowBackup="true"
+        android:banner="@drawable/tv_banner"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:banner="@drawable/tv_banner"
-        android:fullBackupContent="@xml/backup_descriptor"
         android:theme="@style/AppTheme">
         <activity
             android:name=".Main"
@@ -34,10 +38,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW"/>
+
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
 
@@ -64,6 +68,16 @@
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts"/>
+        </activity>
+        <activity
+            android:name=".tv.ui.TVMain"
+            android:banner="@drawable/tv_banner"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.TV.Browser">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".animeinfo.ActivityAnime"
@@ -160,14 +174,7 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/.
-        -->
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
@@ -177,6 +184,18 @@
             android:label="@string/title_activity_eam">
         </activity>
         <activity android:name=".queue.QueueActivity"/>
+        <activity
+            android:name=".tv.streaming.TVServerSelection"
+            android:theme="@style/AppTheme.TV.Guided"/>
+        <activity
+            android:name=".tv.exoplayer.TVPlayer"
+            android:theme="@style/AppTheme.TV.Base"/>
+        <activity
+            android:name=".tv.details.TVAnimesDetails"
+            android:theme="@style/AppTheme.TV.Details"/>
+        <activity
+            android:name=".tv.search.TVSearch"
+            android:theme="@style/AppTheme.TV.Base"/>
     </application>
 
 </manifest>

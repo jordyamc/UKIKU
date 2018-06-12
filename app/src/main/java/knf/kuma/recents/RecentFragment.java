@@ -1,6 +1,5 @@
 package knf.kuma.recents;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,13 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
-import knf.kuma.pojos.RecentObject;
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder;
 
 public class RecentFragment extends BottomFragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -33,14 +29,11 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(RecentsViewModel.class);
-        viewModel.getDBLiveData().observe(this, new Observer<List<RecentObject>>() {
-            @Override
-            public void onChanged(@Nullable List<RecentObject> objects) {
-                if (objects != null) {
-                    holder.setError(objects.size() == 0);
-                    holder.setRefreshing(false);
-                    adapter.updateList(objects);
-                }
+        viewModel.getDBLiveData().observe(this, objects -> {
+            if (objects != null) {
+                holder.setError(objects.size() == 0);
+                holder.setRefreshing(false);
+                adapter.updateList(objects);
             }
         });
         updateList();

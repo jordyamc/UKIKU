@@ -13,16 +13,16 @@
         android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:orientation="vertical"
-        android:paddingBottom="10dp"
-        android:paddingTop="25dp">
+        android:paddingTop="25dp"
+        android:paddingBottom="10dp">
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
             android:visibility="gone"
             app:cardCornerRadius="2dp"
@@ -56,9 +56,9 @@
             android:id="@+id/card_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
             android:visibility="gone"
             app:cardCornerRadius="2dp"
@@ -97,10 +97,10 @@
                     android:id="@+id/expandable_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TEST"
                     android:clickable="true"
-                    android:maxLines="4"
                     android:ellipsize="end"
+                    android:maxLines="4"
+                    android:text="TEST"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textSize="16sp"/>
 
@@ -119,9 +119,9 @@
             android:id="@+id/card_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
             android:visibility="gone"
             app:cardCornerRadius="2dp"
@@ -149,9 +149,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="8dp"
                     android:paddingStart="8dp"
                     android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
                     android:text="Tipo"
                     android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
 
@@ -171,9 +171,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="8dp"
                     android:paddingStart="8dp"
                     android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
                     android:text="Estado"
                     android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
 
@@ -193,9 +193,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="8dp"
                     android:paddingStart="8dp"
                     android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
                     android:text="ID"
                     android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
 
@@ -215,9 +215,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="8dp"
                     android:paddingStart="8dp"
                     android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
                     android:text="Votos"
                     android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
 
@@ -236,9 +236,9 @@
             android:id="@+id/card_genres"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
             android:visibility="gone"
             app:cardCornerRadius="2dp"
@@ -271,9 +271,9 @@
             android:id="@+id/card_related"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
             android:visibility="gone"
             app:cardCornerRadius="2dp"

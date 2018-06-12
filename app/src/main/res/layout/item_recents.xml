@@ -5,16 +5,16 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="10dp"
     android:layout_marginStart="10dp"
     android:layout_marginTop="10dp"
+    android:layout_marginEnd="10dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
     android:orientation="vertical"
     android:theme="@style/AppTheme.Cardview"
     app:cardCornerRadius="2dp"
-    app:cardElevation="2dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackgroundBorderless">
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,12 +24,14 @@
         <RelativeLayout
             android:layout_width="100dp"
             android:layout_height="142dp">
+
             <ImageView
                 android:id="@+id/img"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:transitionName="img"/>
+
             <knf.kuma.custom.SeenAnimeOverlay
                 android:id="@+id/seenOverlay"
                 android:layout_width="match_parent"
@@ -45,14 +47,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="horizontal"
-                android:baselineAligned="false">
+                android:baselineAligned="false"
+                android:orientation="horizontal">
 
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="2dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginEnd="2dp"
                     android:layout_weight="1">
 
                     <TextView
@@ -85,9 +87,9 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginEnd="5dp"
                     android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 

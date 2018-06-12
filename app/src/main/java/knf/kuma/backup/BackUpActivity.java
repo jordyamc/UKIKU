@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,7 +14,6 @@ import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.LoginEvent;
@@ -29,7 +27,6 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import knf.kuma.R;
-import knf.kuma.backup.objects.BackupObject;
 import knf.kuma.custom.SyncItemView;
 import xdroid.toaster.Toaster;
 
@@ -91,13 +88,10 @@ public class BackUpActivity extends AppCompatActivity implements BUUtils.LoginIn
     @Override
     public void onAction(final SyncItemView syncItemView, String id, boolean isBackup) {
         if (isBackup) {
-            BUUtils.backup(id, new BUUtils.BackupInterface() {
-                @Override
-                public void onResponse(@Nullable BackupObject backupObject) {
-                    if (backupObject == null)
-                        Toaster.toast("Error al respaldar");
-                    syncItemView.enableBackup(backupObject, BackUpActivity.this);
-                }
+            BUUtils.backup(id, backupObject -> {
+                if (backupObject == null)
+                    Toaster.toast("Error al respaldar");
+                syncItemView.enableBackup(backupObject, BackUpActivity.this);
             });
         } else {
             BUUtils.restoreDialog(id, syncItemView.getBakup());
@@ -110,14 +104,11 @@ public class BackUpActivity extends AppCompatActivity implements BUUtils.LoginIn
                 .content("Los datos se quedaran en el dispositivo, ¿desea continuar?")
                 .positiveText("continuar")
                 .negativeText("cancelar")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        BUUtils.logOut();
-                        revertColor();
-                        setState(false);
-                        clearSyncButtons();
-                    }
+                .onPositive((dialog, which) -> {
+                    BUUtils.logOut();
+                    revertColor();
+                    setState(false);
+                    clearSyncButtons();
                 }).build().show();
     }
 
@@ -148,73 +139,64 @@ public class BackUpActivity extends AppCompatActivity implements BUUtils.LoginIn
     }
 
     private void showColor(final boolean animate) {
-        colorChanger.post(new Runnable() {
-            @Override
-            public void run() {
-                colorChanger.setBackgroundColor(getBackColor());
-                if (animate) {
-                    Rect bounds = new Rect();
-                    colorChanger.getDrawingRect(bounds);
-                    int centerX = bounds.centerX();
-                    int centerY = bounds.centerY();
-                    int finalRadius = Math.max(bounds.width(), bounds.height());
-                    Animator animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, 0f, finalRadius);
-                    animator.setDuration(1000);
-                    animator.setInterpolator(new AccelerateDecelerateInterpolator());
-                    colorChanger.setVisibility(View.VISIBLE);
-                    animator.start();
-                } else {
-                    colorChanger.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-    }
-
-    private void revertColor() {
-        colorChanger.post(new Runnable() {
-            @Override
-            public void run() {
+        colorChanger.post(() -> {
+            colorChanger.setBackgroundColor(getBackColor());
+            if (animate) {
                 Rect bounds = new Rect();
                 colorChanger.getDrawingRect(bounds);
                 int centerX = bounds.centerX();
                 int centerY = bounds.centerY();
                 int finalRadius = Math.max(bounds.width(), bounds.height());
-                Animator animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, finalRadius, 0f);
+                Animator animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, 0f, finalRadius);
                 animator.setDuration(1000);
                 animator.setInterpolator(new AccelerateDecelerateInterpolator());
-                animator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        colorChanger.setVisibility(View.INVISIBLE);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                });
+                colorChanger.setVisibility(View.VISIBLE);
                 animator.start();
+            } else {
+                colorChanger.setVisibility(View.VISIBLE);
             }
         });
     }
 
+    private void revertColor() {
+        colorChanger.post(() -> {
+            Rect bounds = new Rect();
+            colorChanger.getDrawingRect(bounds);
+            int centerX = bounds.centerX();
+            int centerY = bounds.centerY();
+            int finalRadius = Math.max(bounds.width(), bounds.height());
+            Animator animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, finalRadius, 0f);
+            animator.setDuration(1000);
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    colorChanger.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+            animator.start();
+        });
+    }
+
     private void setState(final boolean isLogedIn) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                lay_main.setVisibility(isLogedIn ? View.GONE : View.VISIBLE);
-                lay_buttons.setVisibility(isLogedIn ? View.VISIBLE : View.GONE);
-            }
+        runOnUiThread(() -> {
+            lay_main.setVisibility(isLogedIn ? View.GONE : View.VISIBLE);
+            lay_buttons.setVisibility(isLogedIn ? View.VISIBLE : View.GONE);
         });
     }
 

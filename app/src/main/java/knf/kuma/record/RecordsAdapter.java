@@ -58,13 +58,10 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordIt
             PicassoSingle.get(activity).load(animeObject.img).into(holder.imageView);
         holder.title.setText(item.name);
         holder.chapter.setText(item.chapter);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (item.animeObject != null)
-                    ActivityAnime.open(activity, item, holder.imageView);
-                else Toaster.toast("Error al abrir");
-            }
+        holder.cardView.setOnClickListener(v -> {
+            if (item.animeObject != null)
+                ActivityAnime.open(activity, item, holder.imageView);
+            else Toaster.toast("Error al abrir");
         });
     }
 

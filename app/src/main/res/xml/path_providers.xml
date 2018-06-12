@@ -3,5 +3,7 @@
     <external-path
         name="downloads"
         path="UKIKU/downloads/"/>
-    <files-path name="files" path="." />
+    <files-path
+        name="files"
+        path="."/>
 </paths>

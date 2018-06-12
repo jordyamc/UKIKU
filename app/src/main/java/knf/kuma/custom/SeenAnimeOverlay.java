@@ -40,42 +40,33 @@ public class SeenAnimeOverlay extends LinearLayout {
     }
 
     public void setSeen(final boolean seen,boolean animate){
-        if (!animate){
-            setState(seen);
-        }else {
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    Animation animation = AnimationUtils.loadAnimation(getContext(), seen ? R.anim.fadein : R.anim.fadeout);
-                    animation.setDuration(200);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
+        setState(seen);
+        if (animate) {
+            post(() -> {
+                Animation animation = AnimationUtils.loadAnimation(getContext(), seen ? R.anim.fadein : R.anim.fadeout);
+                animation.setDuration(200);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                        }
+                    }
 
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
 
-                        }
+                    }
 
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-                        }
-                    });
-                    startAnimation(animation);
-                }
+                    }
+                });
+                startAnimation(animation);
             });
         }
     }
 
     private void setState(final boolean seen){
-        post(new Runnable() {
-            @Override
-            public void run() {
-                setVisibility(seen?VISIBLE:GONE);
-            }
-        });
+        post(() -> setVisibility(seen ? VISIBLE : GONE));
     }
 }

@@ -8,6 +8,38 @@
         <item name="android:windowContentTransitions">true</item>
     </style>
 
+    <style name="AppTheme.TV.Browser" parent="Theme.Leanback.Browse">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="defaultBrandColor">@color/colorPrimary</item>
+        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppTheme.TV.Guided" parent="Theme.Leanback.GuidedStep">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="defaultBrandColor">@color/colorPrimary</item>
+        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppTheme.TV.Base" parent="Theme.Leanback">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="defaultBrandColor">@color/colorPrimary</item>
+        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppTheme.TV.Details" parent="Theme.Leanback.Details">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="defaultBrandColor">@color/colorPrimary</item>
+        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+    </style>
+
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -15,7 +47,7 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
-    
+
     <style name="AppTheme.FullScreen" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>

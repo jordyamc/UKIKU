@@ -24,7 +24,7 @@ public class ZippyServer extends Server {
     }
 
     @Override
-    VideoServer getVideoServer() {
+    public VideoServer getVideoServer() {
         try {
             String decoded=URLDecoder.decode(baseLink, "utf-8");
             Document zi = Jsoup.connect(decoded).timeout(TIMEOUT).get();

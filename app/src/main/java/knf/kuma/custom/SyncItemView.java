@@ -109,13 +109,10 @@ public class SyncItemView extends RelativeLayout {
 
     public void clear() {
         backupObject = null;
-        post(new Runnable() {
-            @Override
-            public void run() {
-                backup.setEnabled(false);
-                restore.setEnabled(false);
-                tv_date.setText("Cargando...");
-            }
+        post(() -> {
+            backup.setEnabled(false);
+            restore.setEnabled(false);
+            tv_date.setText("Cargando...");
         });
     }
 
@@ -125,12 +122,9 @@ public class SyncItemView extends RelativeLayout {
     }
 
     public void init(final OnClick onClick) {
-        BUUtils.search(actionId, new BUUtils.SearchInterface() {
-            @Override
-            public void onResponse(@Nullable BackupObject object) {
-                backupObject = object;
-                enableBackup(backupObject, onClick);
-            }
+        BUUtils.search(actionId, object -> {
+            backupObject = object;
+            enableBackup(backupObject, onClick);
         });
     }
 

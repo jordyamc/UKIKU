@@ -6,8 +6,8 @@
           android:layout_height="wrap_content"
           android:gravity="center_vertical"
           android:minHeight="?android:attr/listPreferredItemHeightSmall"
-          android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
           android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+          android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
           android:textAppearance="@style/TextAppearance.AppCompat.Widget.DropDownItem"
           android:textColor="@color/textPrimary"
           tools:text="jajdna"/>

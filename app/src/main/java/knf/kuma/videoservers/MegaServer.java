@@ -24,7 +24,7 @@ public class MegaServer extends Server {
 
     @Nullable
     @Override
-    VideoServer getVideoServer() {
+    public VideoServer getVideoServer() {
         try {
             return new VideoServer(MEGA, new Option(getName(), null, URLDecoder.decode(baseLink, "utf-8")));
         } catch (Exception e) {

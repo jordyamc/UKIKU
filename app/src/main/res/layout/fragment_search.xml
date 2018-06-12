@@ -12,10 +12,10 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:nestedScrollingEnabled="false"
-        android:paddingBottom="140dp"
-        android:paddingEnd="10dp"
         android:paddingStart="10dp"
         android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="140dp"
         tools:listitem="@layout/item_dir"/>
 
     <ProgressBar
@@ -57,12 +57,12 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="72dp"
-        android:layout_marginEnd="16dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="72dp"
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_genres_0"/>
 

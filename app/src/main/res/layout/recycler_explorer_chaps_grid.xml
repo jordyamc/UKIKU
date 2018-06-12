@@ -15,11 +15,11 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:layoutAnimation="@anim/grid_fall_down"
-        android:paddingEnd="10dp"
         android:paddingStart="10dp"
         android:paddingTop="10dp"
-        app:spanCount="@integer/span_count_large"
+        android:paddingEnd="10dp"
         app:layoutManager="GridLayoutManager"
+        app:spanCount="@integer/span_count_large"
         tools:listitem="@layout/item_chap_grid"/>
 
 </RelativeLayout>

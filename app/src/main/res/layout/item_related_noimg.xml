@@ -28,9 +28,9 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:lines="2"
-            android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:paddingTop="8dp"
+            android:paddingEnd="8dp"
             android:text="Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textSize="18sp"/>
@@ -41,8 +41,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:lines="1"
-            android:paddingEnd="8dp"
             android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:text="Relation"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textSize="16sp"/>

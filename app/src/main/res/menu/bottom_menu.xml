@@ -5,25 +5,25 @@
     <item
         android:id="@+id/action_bottom_recents"
         android:enabled="true"
-        android:title="Recientes"
         android:icon="@drawable/bottom_recents"
+        android:title="Recientes"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_bottom_favorites"
         android:enabled="true"
-        android:title="Favoritos"
         android:icon="@drawable/heart_full"
+        android:title="Favoritos"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_bottom_directory"
         android:enabled="true"
-        android:title="Directorio"
         android:icon="@drawable/bottom_directory"
+        android:title="Directorio"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_bottom_settings"
         android:enabled="true"
-        android:title="Configuración"
         android:icon="@drawable/bottom_settings"
+        android:title="Configuración"
         app:showAsAction="ifRoom"/>
 </menu>

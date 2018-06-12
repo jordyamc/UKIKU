@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -33,9 +33,6 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.gson.Gson;
@@ -61,31 +58,35 @@ import xdroid.toaster.Toaster;
 
 @SuppressLint("StaticFieldLeak")
 public class BUUtils {
-    static final int LOGIN_CODE = 56478;
+    public static final int LOGIN_CODE = 56478;
     private static Activity activity;
     private static LoginInterface loginInterface;
     private static DriveResourceClient DRC;
     private static DbxClientV2 DBC;
 
     public static void init(Activity activity, boolean startclient) {
+        init(activity, (LoginInterface) activity, startclient);
+    }
+
+    public static void init(Activity activity, LoginInterface lInterface, boolean startclient) {
         BUUtils.activity = activity;
-        loginInterface = (LoginInterface) activity;
+        loginInterface = lInterface;
         if (startclient)
             startClient(getType(), true);
     }
 
-    static boolean isLogedIn() {
+    public static boolean isLogedIn() {
         return DRC != null || DBC != null;
     }
 
-    static void setDriveClient() {
+    public static void setDriveClient() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
         if (account != null)
             DRC = Drive.getDriveResourceClient(activity, account);
         loginInterface.onLogin();
     }
 
-    static void setDropBoxClient(String token) {
+    public static void setDropBoxClient(String token) {
         if (token != null) {
             PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("db_token", token).apply();
             DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("dropbox_app")
@@ -113,7 +114,7 @@ public class BUUtils {
         client.signOut();
     }
 
-    static void startClient(BUType type, boolean fromInit) {
+    public static void startClient(BUType type, boolean fromInit) {
         switch (type) {
             case DRIVE:
                 if (!fromInit) {
@@ -197,71 +198,53 @@ public class BUUtils {
     }
 
     private static void searchDropbox(final String id, final SearchInterface searchInterface) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    List<SearchMatch> list = DBC.files().search("", id).getMatches();
-                    if (list.size() > 0) {
-                        DbxDownloader<FileMetadata> downloader = DBC.files().download("/" + id);
-                        searchInterface.onResponse((BackupObject) new Gson().fromJson(new InputStreamReader(downloader.getInputStream()), getType(id)));
-                        downloader.close();
-                    } else {
-                        searchInterface.onResponse(null);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+        AsyncTask.execute(() -> {
+            try {
+                List<SearchMatch> list = DBC.files().search("", id).getMatches();
+                if (list.size() > 0) {
+                    DbxDownloader<FileMetadata> downloader = DBC.files().download("/" + id);
+                    searchInterface.onResponse((BackupObject) new Gson().fromJson(new InputStreamReader(downloader.getInputStream()), getType(id)));
+                    downloader.close();
+                } else {
                     searchInterface.onResponse(null);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                searchInterface.onResponse(null);
             }
         });
     }
 
     private static void searchDrive(final String id, final SearchInterface searchInterface) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
-                appFolderTask.continueWithTask(new Continuation<DriveFolder, Task<MetadataBuffer>>() {
-                    @Override
-                    public Task<MetadataBuffer> then(@NonNull Task<DriveFolder> task) {
-                        DriveFolder appfolder = appFolderTask.getResult();
-                        Query query = new Query.Builder()
-                                .addFilter(Filters.contains(SearchableField.TITLE, id))
-                                .build();
-                        return DRC.queryChildren(appfolder, query);
-                    }
-                }).continueWithTask(new Continuation<MetadataBuffer, Task<DriveContents>>() {
-                    @Override
-                    public Task<DriveContents> then(@NonNull Task<MetadataBuffer> task) {
-                        MetadataBuffer metadata = task.getResult();
-                        if (metadata.getCount() > 0) {
-                            DriveFile driveFile = metadata.get(0).getDriveId().asDriveFile();
-                            metadata.release();
-                            return DRC.openFile(driveFile, DriveFile.MODE_READ_ONLY);
-                        } else {
-                            metadata.release();
-                            return null;
-                        }
-                    }
-                }).addOnSuccessListener(activity, new OnSuccessListener<DriveContents>() {
-                    @Override
-                    public void onSuccess(DriveContents driveContents) {
-                        try {
-                            searchInterface.onResponse((BackupObject) new Gson().fromJson(new InputStreamReader(driveContents.getInputStream()), getType(id)));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            searchInterface.onResponse(null);
-                        }
-                    }
-                }).addOnFailureListener(activity, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                        searchInterface.onResponse(null);
-                    }
-                });
-            }
+        AsyncTask.execute(() -> {
+            final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
+            appFolderTask.continueWithTask(task -> {
+                DriveFolder appfolder = appFolderTask.getResult();
+                Query query = new Query.Builder()
+                        .addFilter(Filters.contains(SearchableField.TITLE, id))
+                        .build();
+                return DRC.queryChildren(appfolder, query);
+            }).continueWithTask(task -> {
+                MetadataBuffer metadata = task.getResult();
+                if (metadata.getCount() > 0) {
+                    DriveFile driveFile = metadata.get(0).getDriveId().asDriveFile();
+                    metadata.release();
+                    return DRC.openFile(driveFile, DriveFile.MODE_READ_ONLY);
+                } else {
+                    metadata.release();
+                    return null;
+                }
+            }).addOnSuccessListener(activity, driveContents -> {
+                try {
+                    searchInterface.onResponse((BackupObject) new Gson().fromJson(new InputStreamReader(driveContents.getInputStream()), getType(id)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    searchInterface.onResponse(null);
+                }
+            }).addOnFailureListener(activity, e -> {
+                e.printStackTrace();
+                searchInterface.onResponse(null);
+            });
         });
     }
 
@@ -272,22 +255,19 @@ public class BUUtils {
                 .cancelable(false)
                 .build();
         dialog.show();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BackupObject backupObject = new BackupObject(getList(id));
-                    DBC.files().uploadBuilder("/" + id)
-                            .withMute(true)
-                            .withMode(WriteMode.OVERWRITE)
-                            .uploadAndFinish(new ByteArrayInputStream(new Gson().toJson(backupObject, getType(id)).getBytes(StandardCharsets.UTF_8)));
-                    backupInterface.onResponse(backupObject);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    backupInterface.onResponse(null);
-                }
-                closeDialog(dialog);
+        AsyncTask.execute(() -> {
+            try {
+                BackupObject backupObject = new BackupObject(getList(id));
+                DBC.files().uploadBuilder("/" + id)
+                        .withMute(true)
+                        .withMode(WriteMode.OVERWRITE)
+                        .uploadAndFinish(new ByteArrayInputStream(new Gson().toJson(backupObject, getType(id)).getBytes(StandardCharsets.UTF_8)));
+                backupInterface.onResponse(backupObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+                backupInterface.onResponse(null);
             }
+            closeDialog(dialog);
         });
     }
 
@@ -298,24 +278,17 @@ public class BUUtils {
                 .cancelable(false)
                 .build();
         dialog.show();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
-                final Task<DriveContents> driveContents = DRC.createContents();
-                final BackupObject backupObject = new BackupObject(getList(id));
-                Tasks.whenAll(appFolderTask, driveContents)
-                        .continueWithTask(new Continuation<Void, Task<MetadataBuffer>>() {
-                            @Override
-                            public Task<MetadataBuffer> then(@NonNull Task<Void> task) throws Exception {
-                                Query query = new Query.Builder()
-                                        .addFilter(Filters.contains(SearchableField.TITLE, id))
-                                        .build();
-                                return DRC.queryChildren(appFolderTask.getResult(), query);
-                            }
-                        }).continueWithTask(new Continuation<MetadataBuffer, Task<DriveFile>>() {
-                    @Override
-                    public Task<DriveFile> then(@NonNull Task<MetadataBuffer> task) throws Exception {
+        AsyncTask.execute(() -> {
+            final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
+            final Task<DriveContents> driveContents = DRC.createContents();
+            final BackupObject backupObject = new BackupObject(getList(id));
+            Tasks.whenAll(appFolderTask, driveContents)
+                    .continueWithTask(task -> {
+                        Query query = new Query.Builder()
+                                .addFilter(Filters.contains(SearchableField.TITLE, id))
+                                .build();
+                        return DRC.queryChildren(appFolderTask.getResult(), query);
+                    }).continueWithTask(task -> {
                         MetadataBuffer metadata = task.getResult();
                         if (metadata.getCount() > 0)
                             DRC.delete(metadata.get(0).getDriveId().asDriveResource());
@@ -333,21 +306,13 @@ public class BUUtils {
                                 .build();
 
                         return DRC.createFile(appFolderTask.getResult(), changeSet, contents);
-                    }
-                }).addOnSuccessListener(activity, new OnSuccessListener<DriveFile>() {
-                    @Override
-                    public void onSuccess(DriveFile driveFile) {
+            }).addOnSuccessListener(activity, driveFile -> {
                         closeDialog(dialog);
                         backupInterface.onResponse(backupObject);
-                    }
-                }).addOnFailureListener(activity, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+            }).addOnFailureListener(activity, e -> {
                         closeDialog(dialog);
                         backupInterface.onResponse(null);
-                    }
-                });
-            }
+            });
         });
     }
 
@@ -356,12 +321,7 @@ public class BUUtils {
                 .content("¿Como desea restaurar?")
                 .positiveText("mezclar")
                 .negativeText("reemplazar")
-                .onAny(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        restore(which == DialogAction.NEGATIVE, id, backupObject);
-                    }
-                }).build().show();
+                .onAny((dialog, which) -> restore(which == DialogAction.NEGATIVE, id, backupObject)).build().show();
     }
 
     private static void restore(final boolean replace, final String id, final BackupObject backupObject) {
@@ -371,41 +331,67 @@ public class BUUtils {
                 .cancelable(false)
                 .build();
         dialog.show();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    switch (id) {
-                        case "favs":
-                            if (replace)
-                                CacheDB.INSTANCE.favsDAO().clear();
-                            CacheDB.INSTANCE.favsDAO().addAll(backupObject.data);
-                            break;
-                        case "history":
-                            if (replace)
-                                CacheDB.INSTANCE.recordsDAO().clear();
-                            CacheDB.INSTANCE.recordsDAO().addAll(backupObject.data);
-                            break;
-                        case "following":
-                            if (replace)
-                                CacheDB.INSTANCE.seeingDAO().clear();
-                            CacheDB.INSTANCE.seeingDAO().addAll(backupObject.data);
-                            break;
-                        case "seen":
-                            if (replace)
-                                CacheDB.INSTANCE.chaptersDAO().clear();
-                            CacheDB.INSTANCE.chaptersDAO().addAll(backupObject.data);
-                            break;
-                    }
-                    Toaster.toast("Restauración completada");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toaster.toast("Error al restaurar");
-                } finally {
-                    closeDialog(dialog);
+        AsyncTask.execute(() -> {
+            try {
+                switch (id) {
+                    case "favs":
+                        if (replace)
+                            CacheDB.INSTANCE.favsDAO().clear();
+                        CacheDB.INSTANCE.favsDAO().addAll(backupObject.data);
+                        break;
+                    case "history":
+                        if (replace)
+                            CacheDB.INSTANCE.recordsDAO().clear();
+                        CacheDB.INSTANCE.recordsDAO().addAll(backupObject.data);
+                        break;
+                    case "following":
+                        if (replace)
+                            CacheDB.INSTANCE.seeingDAO().clear();
+                        CacheDB.INSTANCE.seeingDAO().addAll(backupObject.data);
+                        break;
+                    case "seen":
+                        if (replace)
+                            CacheDB.INSTANCE.chaptersDAO().clear();
+                        CacheDB.INSTANCE.chaptersDAO().addAll(backupObject.data);
+                        break;
                 }
+                Toaster.toast("Restauración completada");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toaster.toast("Error al restaurar");
+            } finally {
+                closeDialog(dialog);
             }
         });
+    }
+
+    public static void silentRestoreAll() {
+        if (isLogedIn()) {
+            search("favs", backupObject -> {
+                if (backupObject != null)
+                    AsyncTask.execute(() -> {
+                        CacheDB.INSTANCE.favsDAO().addAll(backupObject.data);
+                        Log.e("Sync", "Favs sync");
+                        //Toaster.toast("Favoritos sincronizados");
+                    });
+            });
+            search("seen", backupObject -> {
+                if (backupObject != null)
+                    AsyncTask.execute(() -> {
+                        CacheDB.INSTANCE.chaptersDAO().addAll(backupObject.data);
+                        Log.e("Sync", "Seen sync");
+                        //Toaster.toast("Capitulos vistos sincronizados");
+                    });
+            });
+            search("history", backupObject -> {
+                if (backupObject != null)
+                    AsyncTask.execute(() -> {
+                        CacheDB.INSTANCE.recordsDAO().addAll(backupObject.data);
+                        Log.e("Sync", "History sync");
+                        //Toaster.toast("Ultimos vistos sincronizados");
+                    });
+            });
+        }
     }
 
     private static void closeDialog(MaterialDialog dialog) {

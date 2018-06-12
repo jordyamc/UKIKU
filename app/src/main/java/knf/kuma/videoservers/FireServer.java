@@ -26,7 +26,7 @@ public class FireServer extends Server {
 
     @Nullable
     @Override
-    VideoServer getVideoServer() {
+    public VideoServer getVideoServer() {
         try {
             String frame = PatternUtil.extractLink(baseLink);
             String media_func = Jsoup.connect(frame).get().select("script").last().outerHtml();

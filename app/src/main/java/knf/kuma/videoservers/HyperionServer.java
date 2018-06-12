@@ -28,7 +28,7 @@ public class HyperionServer extends Server {
 
     @Nullable
     @Override
-    VideoServer getVideoServer() {
+    public VideoServer getVideoServer() {
         String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
         String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
         try {

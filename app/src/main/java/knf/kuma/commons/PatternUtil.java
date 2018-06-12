@@ -96,6 +96,10 @@ public class PatternUtil {
         return "https://animeflv.net/uploads/animes/covers/" + aid + ".jpg";
     }
 
+    public static String getBanner(String aid) {
+        return "https://animeflv.net/uploads/animes/banners/" + aid + ".jpg";
+    }
+
     public static boolean isCustomSearch(String s){
         return s.matches("^:[a-z]+:.*$");
     }

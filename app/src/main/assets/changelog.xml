@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="29" version="1.3">
+        <change type="fix">Errores generales</change>
+        <change type="new">Diseño especial para Android TV</change>
+    </release>
     <release code="28" version="1.2.5">
         <change type="fix">Errores generales</change>
         <change type="fix">Servidor RV</change>

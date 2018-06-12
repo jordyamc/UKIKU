@@ -131,6 +131,18 @@ public class AnimeObject implements Comparable<AnimeObject> {
         }
     }
 
+    public String getGenresString() {
+        if (genres.size() == 0)
+            return "Sin generos";
+        StringBuilder builder = new StringBuilder();
+        for (String genre : genres) {
+            builder.append(genre)
+                    .append(", ");
+        }
+        String g = builder.toString();
+        return g.substring(0, g.lastIndexOf(","));
+    }
+
     @Override
     public int hashCode() {
         return aid.hashCode();

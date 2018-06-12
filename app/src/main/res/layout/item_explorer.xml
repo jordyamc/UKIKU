@@ -29,8 +29,8 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="2dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="2dp"
             android:layout_weight="1">
 
             <TextView
@@ -53,10 +53,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="12dp"
-                android:textColor="?colorAccent"
                 android:lines="1"
                 android:text="Chapter #"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="?colorAccent"
                 android:textSize="16sp"/>
 
         </RelativeLayout>

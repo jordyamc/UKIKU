@@ -24,7 +24,7 @@ public class DirectoryPage {
             if (Network.isConnected()) {
                 if (!animeDAO.existLink("https://animeflv.net" + link))
                     try {
-                        AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).get().outerHtml());
+                        AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).validateTLSCertificates(true).get().outerHtml());
                         animeObjects.add(new AnimeObject("https://animeflv.net" + link, webInfo));
                         Log.e("Directory Getter", "Added: https://animeflv.net" + link);
                         updateInterface.onAdd();

@@ -22,6 +22,7 @@
         <RelativeLayout
             android:layout_width="145dp"
             android:layout_height="85dp">
+
             <ImageView
                 android:id="@+id/img"
                 android:layout_width="match_parent"
@@ -38,8 +39,8 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="2dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="2dp"
             android:layout_weight="1">
 
             <TextView
