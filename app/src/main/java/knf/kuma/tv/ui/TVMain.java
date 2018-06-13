@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
 import knf.kuma.backup.BUUtils;
@@ -15,8 +16,10 @@ import knf.kuma.jobscheduler.RecentsJob;
 import knf.kuma.recents.RecentsNotReceiver;
 import knf.kuma.tv.TVBaseActivity;
 import knf.kuma.tv.TVServersFactory;
+import knf.kuma.updater.UpdateActivity;
+import knf.kuma.updater.Updatechecker;
 
-public class TVMain extends TVBaseActivity implements TVServersFactory.ServersInterface {
+public class TVMain extends TVBaseActivity implements TVServersFactory.ServersInterface, Updatechecker.CheckListener {
 
     private TVMainFragment fragment;
     private TVServersFactory serversFactory;
@@ -30,6 +33,23 @@ public class TVMain extends TVBaseActivity implements TVServersFactory.ServersIn
         RecentsJob.schedule(this);
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);
+        Updatechecker.check(this, this);
+    }
+
+    @Override
+    public void onNeedUpdate(String o_code, String n_code) {
+        runOnUiThread(() -> {
+            try {
+                new MaterialDialog.Builder(TVMain.this)
+                        .title("Actualización")
+                        .content("Parece que la versión " + n_code + " está disponible, ¿Quieres actualizar?")
+                        .positiveText("si")
+                        .negativeText("despues")
+                        .onPositive((dialog, which) -> UpdateActivity.start(TVMain.this)).build().show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
