@@ -46,7 +46,8 @@ public class GlideBackgroundManager {
     public GlideBackgroundManager(Activity activity) {
         mActivityWeakReference = new WeakReference<>(activity);
         mBackgroundManager = BackgroundManager.getInstance(activity);
-        mBackgroundManager.attach(activity.getWindow());
+        if (!mBackgroundManager.isAttached())
+            mBackgroundManager.attach(activity.getWindow());
     }
 
     public void loadImage(String imageUrl) {

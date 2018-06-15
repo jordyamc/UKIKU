@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
 import knf.kuma.backup.BUUtils;
@@ -34,6 +35,7 @@ public class TVMain extends TVBaseActivity implements TVServersFactory.ServersIn
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);
         Updatechecker.check(this, this);
+        Answers.getInstance().logCustom(new CustomEvent("TV UI"));
     }
 
     @Override
@@ -66,7 +68,6 @@ public class TVMain extends TVBaseActivity implements TVServersFactory.ServersIn
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == BUUtils.LOGIN_CODE) {
-            Log.e("Result", "Code: " + resultCode);
             if (resultCode == RESULT_OK) {
                 GoogleSignIn.getSignedInAccountFromIntent(data);
                 BUUtils.setType(BUUtils.BUType.DRIVE);
