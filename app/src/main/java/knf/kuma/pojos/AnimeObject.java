@@ -254,7 +254,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
                 this.name = name;
                 if (element.select("img").first() == null) {
                     this.chapterType = ChapterType.OLD;
-                    String full = element.select("a").first().ownText();
+                    String full = element.select("a").first().text();
                     this.number = "Episodio " + extract(full, "^.* (\\d+\\.?\\d*):?.*$");
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
                     this.eid = extract(link, "^.*/(\\d+)/.*$");
@@ -285,7 +285,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
                     try {
                         chapters.add(new AnimeChapter(name, aid, element));
                     } catch (Exception e) {
-                        //e.printStackTrace();
+                        e.printStackTrace();
                     }
                 }
                 return chapters;

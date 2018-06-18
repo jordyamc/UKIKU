@@ -57,6 +57,7 @@ public class UpdateJob extends Job {
     private void showNotification() {
         try {
             Notification notification = new NotificationCompat.Builder(getContext(), CHANNEL)
+                    .setSmallIcon(R.drawable.ic_not_update)
                     .setContentText("Nueva versión disponible")
                     .setContentIntent(PendingIntent.getActivity(getContext(), 5598, new Intent(getContext(), Main.class), PendingIntent.FLAG_UPDATE_CURRENT))
                     .setColor(getContext().getResources().getColor(R.color.colorAccent))
