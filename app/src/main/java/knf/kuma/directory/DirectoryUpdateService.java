@@ -63,7 +63,7 @@ public class DirectoryUpdateService extends IntentService {
             }
             try {
                 Document document = Jsoup.connect("https://animeflv.net/browse?order=added&page=" + page).cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get();
-                if (document.select("div.alert.alert-info").size()==0) {
+                if (document.select("article").size() != 0) {
                     page++;
                     List<AnimeObject> animeObjects = jspoon.adapter(DirectoryPage.class).fromHtml(document.outerHtml()).getAnimesRecreate(this, jspoon, new DirectoryPage.UpdateInterface() {
                         @Override
@@ -79,7 +79,6 @@ public class DirectoryUpdateService extends IntentService {
                     });
                     if (animeObjects.size()>0)
                         animeDAO.insertAll(animeObjects);
-
                 }else {
                     finished=true;
                     Log.e("Directory Getter","Processed "+page+" pages");
@@ -88,6 +87,7 @@ public class DirectoryUpdateService extends IntentService {
                 Log.e("Directory Getter", "Page error: "+page);
             }
         }
+        cancelForeground();
     }
 
     private void cancelForeground(){

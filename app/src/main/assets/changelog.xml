@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="33" version="1.3.4">
+        <change type="fix">Notificacion persistente al crear/recrear directorio</change>
+    </release>
     <release code="32" version="1.3.3">
         <change type="fix">Error en listar episodios de animes largos</change>
     </release>
