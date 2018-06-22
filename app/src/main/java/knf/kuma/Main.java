@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -44,6 +43,7 @@ import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.EAMActivity;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.directory.DirectoryFragment;
 import knf.kuma.directory.DirectoryService;
 import knf.kuma.emision.EmisionActivity;
@@ -257,7 +257,7 @@ public class Main extends AppCompatActivity
             getMenuInflater().inflate(R.menu.main, menu);
         } else if (selectedFragment instanceof FavoriteFragment) {
             getMenuInflater().inflate(R.menu.fav_menu, menu);
-            switch (PreferenceManager.getDefaultSharedPreferences(this).getInt("favs_order", 0)) {
+            switch (PrefsUtil.getFavsOrder()) {
                 case 0:
                     menu.findItem(R.id.by_name).setChecked(true);
                     break;
@@ -267,7 +267,7 @@ public class Main extends AppCompatActivity
             }
         } else if (selectedFragment instanceof DirectoryFragment) {
             getMenuInflater().inflate(R.menu.dir_menu, menu);
-            switch (PreferenceManager.getDefaultSharedPreferences(this).getInt("dir_order", 0)) {
+            switch (PrefsUtil.getDirOrder()) {
                 case 0:
                     menu.findItem(R.id.by_name_dir).setChecked(true);
                     break;
@@ -292,19 +292,19 @@ public class Main extends AppCompatActivity
                 setFragment(SearchFragment.get());
                 break;
             case R.id.by_name:
-                PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("favs_order", 0).apply();
+                PrefsUtil.setFavsOrder(0);
                 changeOrder();
                 break;
             case R.id.by_name_dir:
-                PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("dir_order", 0).apply();
+                PrefsUtil.setDirOrder(0);
                 changeOrder();
                 break;
             case R.id.by_votes:
-                PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("dir_order", 1).apply();
+                PrefsUtil.setDirOrder(1);
                 changeOrder();
                 break;
             case R.id.by_id:
-                PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("favs_order", 1).apply();
+                PrefsUtil.setFavsOrder(1);
                 changeOrder();
                 break;
         }

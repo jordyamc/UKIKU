@@ -13,11 +13,23 @@ public class AnimeInfo {
     public HashMap<String, String> epMap;
 
     public AnimeInfo(String code) {
-        Matcher matcher = Pattern.compile("\"(.*)\",\"(.*),\"(.*)\"").matcher(code);
-        matcher.find();
-        this.aid = matcher.group(1);
-        this.title = matcher.group(2);
-        this.sid = matcher.group(3);
+        //Matcher matcher = Pattern.compile("\"(.*)\",\"(.*)\",\"(.*)\",\"(.*)\"").matcher(code);
+        Matcher matcher = Pattern.compile("\"([^\",/<>]*)\"").matcher(code);
+        int i = 0;
+        while (matcher.find()) {
+            switch (i) {
+                case 0:
+                    this.aid = matcher.group(1);
+                    break;
+                case 1:
+                    this.title = matcher.group(1);
+                    break;
+                case 2:
+                    this.sid = matcher.group(1);
+                    break;
+            }
+            i++;
+        }
         this.epMap = PatternUtil.getEpListMap(code);
     }
 }

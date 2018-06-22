@@ -61,6 +61,7 @@
    public <init>(...);
 }
 -keep public class * extends java.lang.Exception
+-keep class org.jsoup.**{*;}
 -keeppackagenames org.jsoup.nodes
 -dontwarn com.amazon.client.metrics.**
 -dontwarn com.beloo.widget.chipslayoutmanager.**

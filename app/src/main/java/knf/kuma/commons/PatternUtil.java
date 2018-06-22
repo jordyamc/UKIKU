@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,7 +103,7 @@ public class PatternUtil {
     }
 
     public static HashMap<String, String> getEpListMap(String code) {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, String> map = new LinkedHashMap<>();
         Matcher matcher = Pattern.compile("\\[(\\d+),(\\d+)\\]").matcher(code);
         while (matcher.find()) {
             map.put(matcher.group(1), matcher.group(2));

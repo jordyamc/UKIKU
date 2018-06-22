@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="35" version="1.3.6">
+        <change type="fix">Obtencion de imagenes de episodios</change>
+        <change type="change">Opción para deshabilitar progreso en pantalla</change>
+    </release>
     <release code="34" version="1.3.5">
         <change type="fix">Obtencion de lista de episodios</change>
         <change type="new">Progreso de descarga en recientes y lista de episodios</change>

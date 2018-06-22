@@ -1,7 +1,6 @@
 package knf.kuma.animeinfo;
 
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -181,43 +180,30 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         setSupportActionBar(holder.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
-        holder.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                closeActivity();
-            }
-        });
+        holder.toolbar.setNavigationOnClickListener(view -> closeActivity());
         AnimeViewModel viewModel = ViewModelProviders.of(this).get(AnimeViewModel.class);
         if (getIntent().getBooleanExtra("aid_only", false))
             viewModel.init(getIntent().getStringExtra("aid"));
         else
             viewModel.init(this, getIntent().getDataString(), getIntent().getBooleanExtra("persist", true));
-        viewModel.getLiveData().observe(this, new Observer<AnimeObject>() {
-            @Override
-            public void onChanged(@Nullable final AnimeObject object) {
-                if (object != null) {
-                    Answers.getInstance().logContentView(new ContentViewEvent().putContentName(object.name).putContentType(object.type).putContentId(object.aid));
-                    chapters = object.chapters;
-                    genres = object.genres;
-                    favoriteObject = new FavoriteObject(object);
-                    holder.setTitle(object.name);
-                    holder.loadImg(object.img, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            startActivity(new Intent(ActivityAnime.this, ActivityImgFull.class).setData(Uri.parse(object.img)).putExtra("title", object.name), ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityAnime.this, holder.imageView, "img").toBundle());
-                        }
-                    });
-                    if (dao.isFav(favoriteObject.key)) {
-                        holder.setFABState(true);
-                    } else if (seeingDAO.getByAid(favoriteObject.aid) != null) {
-                        holder.setFABSeeing();
-                    } else {
-                        holder.setFABState(false);
-                    }
-                    holder.showFAB();
-                    supportInvalidateOptionsMenu();
-                    RecommendHelper.registerAll(genres, RankType.CHECK);
+        viewModel.getLiveData().observe(this, object -> {
+            if (object != null) {
+                Answers.getInstance().logContentView(new ContentViewEvent().putContentName(object.name).putContentType(object.type).putContentId(object.aid));
+                chapters = object.chapters;
+                genres = object.genres;
+                favoriteObject = new FavoriteObject(object);
+                holder.setTitle(object.name);
+                holder.loadImg(object.img, v -> startActivity(new Intent(ActivityAnime.this, ActivityImgFull.class).setData(Uri.parse(object.img)).putExtra("title", object.name), ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityAnime.this, holder.imageView, "img").toBundle()));
+                if (dao.isFav(favoriteObject.key)) {
+                    holder.setFABState(true);
+                } else if (seeingDAO.getByAid(favoriteObject.aid) != null) {
+                    holder.setFABSeeing();
+                } else {
+                    holder.setFABState(false);
                 }
+                holder.showFAB();
+                supportInvalidateOptionsMenu();
+                RecommendHelper.registerAll(genres, RankType.CHECK);
             }
         });
     }

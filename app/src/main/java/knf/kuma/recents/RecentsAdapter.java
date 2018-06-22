@@ -31,6 +31,7 @@ import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.PicassoSingle;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.commons.SelfServer;
 import knf.kuma.custom.SeenAnimeOverlay;
 import knf.kuma.database.CacheDB;
@@ -350,7 +351,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
 
         void setDownloadState(DownloadObject object) {
             progressBar.post(() -> {
-                if (object != null)
+                if (object != null && PrefsUtil.showProgress())
                     switch (object.state) {
                         case DownloadObject.PENDING:
                             progressBar.setVisibility(View.VISIBLE);

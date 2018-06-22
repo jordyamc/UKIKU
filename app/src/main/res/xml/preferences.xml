@@ -89,6 +89,11 @@
             android:key="lay_type"
             android:summary="%s"
             android:title="Diseño de listas"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_download_progress"
+            android:key="show_progress"
+            android:title="Progreso de descarga"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Personalización">

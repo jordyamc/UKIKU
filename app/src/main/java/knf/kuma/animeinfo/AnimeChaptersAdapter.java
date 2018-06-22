@@ -34,6 +34,7 @@ import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.PicassoSingle;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.commons.SelfServer;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.ChaptersDAO;
@@ -401,7 +402,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
 
         void setDownloadState(DownloadObject object) {
             progressBar.post(() -> {
-                if (object != null)
+                if (object != null && PrefsUtil.showProgress())
                     switch (object.state) {
                         case DownloadObject.PENDING:
                             progressBar.setVisibility(View.VISIBLE);
