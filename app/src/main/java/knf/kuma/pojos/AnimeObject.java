@@ -23,11 +23,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import knf.kuma.animeinfo.AnimeInfo;
 import knf.kuma.commons.PatternUtil;
 import pl.droidsonroids.jspoon.ElementConverter;
 import pl.droidsonroids.jspoon.annotation.Selector;
@@ -99,7 +102,18 @@ public class AnimeObject implements Comparable<AnimeObject> {
         this.rate_count = webInfo.rate_count;
         this.genres = webInfo.genres;
         this.related = webInfo.related;
-        this.chapters = WebInfo.AnimeChapter.create(name, aid, webInfo.chapters);
+        this.chapters = WebInfo.AnimeChapter.create(name, aid, findDataScript(webInfo.scripts));
+    }
+
+    private Element findDataScript(List<Element> scripts) {
+        try {
+            for (Element element : scripts)
+                if (element.html().contains("var anime_info"))
+                    return element;
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private String extract(String link) {
@@ -210,8 +224,10 @@ public class AnimeObject implements Comparable<AnimeObject> {
         @Selector("ul.ListAnmRel li:has(a[href~=^\\/[a-z]+\\/\\d+\\/.+$])")
         public List<AnimeRelated> related = new ArrayList<>();
         @Ignore
-        @Selector("ul.ListCaps li,ul.ListEpisodes li")
-        public List<Element> chapters = new ArrayList<>();
+        @Selector("script[type=text/javascript]:not([src])")
+        public List<Element> scripts;
+        /*@Selector("ul.ListCaps li,ul.ListEpisodes li,ul#episodeList li")
+        public List<Element> chapters = new ArrayList<>();*/
 
         public static class AnimeRelated {
             @Selector(value = "a", attr = "href")
@@ -263,10 +279,22 @@ public class AnimeObject implements Comparable<AnimeObject> {
                     this.number = element.select("p").first().ownText();
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
                     this.eid = extract(link, "^.*/(\\d+)/.*$");
-                    this.img = element.select("img.lazy").first().attr("data-original");
+                    this.img = element.select("img.lazy").first().attr("src");
                 }
                 this.key = Integer.parseInt(eid);
                 this.aid = aid;
+            }
+
+            @Ignore
+            public AnimeChapter(AnimeInfo info, String num, String sid) {
+                this.name = info.title;
+                this.chapterType = ChapterType.NEW;
+                this.number = "Episodio " + num;
+                this.link = "https://animeflv.net/ver/" + sid + "/" + info.sid + "-" + num;
+                this.eid = sid;
+                this.img = "https://animeflv.net/uploads/animes/screenshots/" + info.aid + "/" + num + "/th_3.jpg";
+                this.key = Integer.parseInt(eid);
+                this.aid = info.aid;
             }
 
             @Ignore
@@ -291,6 +319,24 @@ public class AnimeObject implements Comparable<AnimeObject> {
                 return chapters;
             }
 
+            public static List<AnimeChapter> create(String name, String aid, Element chaps) {
+                List<AnimeChapter> chapters = new ArrayList<>();
+                try {
+                    AnimeInfo info = new AnimeInfo(chaps.html());
+                    for (Map.Entry<String, String> entry : info.epMap.entrySet()) {
+                        try {
+                            chapters.add(new AnimeChapter(info, entry.getKey(), entry.getValue()));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Collections.sort(chapters);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return chapters;
+            }
+
             public String getFileName() {
                 return eid + "$" + PatternUtil.getFileName(link);
             }
@@ -301,7 +347,9 @@ public class AnimeObject implements Comparable<AnimeObject> {
 
             @Override
             public int compareTo(@NonNull AnimeChapter animeChapter) {
-                return number.compareTo(animeChapter.number);
+                int num1 = Integer.parseInt(number.substring(number.lastIndexOf(" ") + 1));
+                int num2 = Integer.parseInt(animeChapter.number.substring(animeChapter.number.lastIndexOf(" ") + 1));
+                return num2 - num1;
             }
 
             @Override

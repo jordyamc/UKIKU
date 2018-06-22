@@ -11,58 +11,75 @@
     app:cardCornerRadius="0dp"
     app:cardElevation="2dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <View
-            android:id="@+id/separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:alpha="0.12"
-            android:background="@color/divider"/>
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical">
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/img"
-                android:layout_width="100dp"
-                android:layout_height="60dp"
-                android:scaleType="centerCrop"
-                android:visibility="visible"/>
+            <View
+                android:id="@+id/separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:alpha="0.12"
+                android:background="@color/divider"/>
 
-            <TextView
-                android:id="@+id/chapter"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:paddingStart="8dp"
-                android:text="Episodio #"
-                android:textAppearance="@android:style/TextAppearance.Material.Title"
-                android:textSize="18sp"/>
+                android:gravity="center_vertical">
 
-            <ImageView
-                android:id="@+id/in_down"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_chap_down"/>
+                <ImageView
+                    android:id="@+id/img"
+                    android:layout_width="100dp"
+                    android:layout_height="60dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="visible"/>
 
-            <ImageButton
-                android:id="@+id/actions"
-                style="@style/Base.Widget.AppCompat.Button.Borderless"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="10dp"
-                app:srcCompat="@drawable/action_chapter"/>
+                <TextView
+                    android:id="@+id/chapter"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:paddingStart="8dp"
+                    android:text="Episodio #"
+                    android:textAppearance="@android:style/TextAppearance.Material.Title"
+                    android:textSize="18sp"/>
+
+                <ImageView
+                    android:id="@+id/in_down"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_chap_down"/>
+
+                <ImageButton
+                    android:id="@+id/actions"
+                    style="@style/Base.Widget.AppCompat.Button.Borderless"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="10dp"
+                    app:srcCompat="@drawable/action_chapter"/>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+
+        <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+            android:id="@+id/progress"
+            style="@style/Widget.MaterialProgressBar.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_alignParentBottom="true"
+            android:progress="50"
+            android:visibility="gone"
+            app:mpb_progressStyle="horizontal"
+            app:mpb_setBothDrawables="true"
+            app:mpb_useIntrinsicPadding="false"/>
+    </RelativeLayout>
 
 </android.support.v7.widget.CardView>

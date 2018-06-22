@@ -2,66 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90684a6d-0c49-4c34-9f86-a427c19eef30" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/assetWizardSettings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/EAHelper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/HiddenOverlay.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/GenreActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/GenreAdapter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEListItem.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEListProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEmisionProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEmisionService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/test.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/drawable/chip_ripple.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/drawable/ic_egg.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/drawable/ic_hide.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/drawable/ic_show.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/drawable/widget_emision_preview.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/layout/item_widget_list.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_genre.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/layout/view_hidden_overlay.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/layout/widget_emision.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/menu/menu_emision.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/res/xml/widget_emision.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/app-release.apk" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/app-release.apk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/output.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/assets/changelog.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/assets/changelog.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/AppInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/AppInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/ActivityAnime.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/ActivityAnime.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeTagsAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeTagsAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/fragments/DetailsFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/fragments/DetailsFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/viewholders/AnimeDetailsHolder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/viewholders/AnimeDetailsHolder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/database/dao/AnimeDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/database/dao/AnimeDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionPagerAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionPagerAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/ExplorerCreator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/ExplorerCreator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/FragmentFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/FragmentFiles.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/favorite/FavoriteFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/favorite/FavoriteFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/ExoPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/ExoPlayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PatternUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PatternUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/database/dao/DownloadsDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/database/dao/DownloadsDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/DownloadingAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/DownloadingAdapter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/ExplorerObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/ExplorerObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/BottomPreferencesFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/BottomPreferencesFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/ConfigurationFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/ConfigurationFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/record/RecordsAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/record/RecordsAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/SearchAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/SearchAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/drawable/ic_pip_exit.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/drawable/ic_pip_exit.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/exo_playback_control_view.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/exo_playback_control_view.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/item_chip.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/item_chip.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/item_emision.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/item_emision.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_explorer.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_explorer.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_explorer_grid.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_explorer_grid.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values-night/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values-night/colors.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values/colors.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../multidisplaycast/src/main/java/com/connectsdk/service/CastService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../multidisplaycast/src/main/java/com/connectsdk/service/CastService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../version.num" beforeDir="false" afterPath="$PROJECT_DIR$/../version.num" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/DownloadObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/DownloadObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentsAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentsAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/item_recents.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/item_recents.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -82,25 +33,32 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="eacounter.php" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/eacounter.php">
+      <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="16" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="eacount.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/eacount.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="1" selection-start-column="1" selection-end-column="1" />
+            <state relative-caret-position="476">
+              <caret line="392" column="181" selection-start-line="392" selection-start-column="172" selection-end-line="392" selection-end-column="181" />
+              <folding>
+                <element signature="n#style#0;n#input#0;n#li#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>anime_id</find>
+      <find>anime_info</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -115,6 +73,7 @@
         <option value="$PROJECT_DIR$/sitepro/eacount.txt" />
         <option value="$PROJECT_DIR$/sitepro/eacounter.php" />
         <option value="$PROJECT_DIR$/eacounter.php" />
+        <option value="$PROJECT_DIR$/test.js" />
       </list>
     </option>
   </component>
@@ -150,18 +109,7 @@
           <expand>
             <path>
               <item name="web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="web" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="web" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sitepro" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="web" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sitepro" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="css" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -171,7 +119,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../PHP/Unbot" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
@@ -205,34 +153,37 @@
       <workItem from="1517440958461" duration="5805000" />
       <workItem from="1523661286558" duration="1233000" />
       <workItem from="1524080472128" duration="35000" />
+      <workItem from="1529616054681" duration="29000" />
+      <workItem from="1529616162614" duration="618000" />
+      <workItem from="1529632941094" duration="3080000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10802000" />
+    <option name="totallyTimeSpent" value="14529000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22440477" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22677262" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.32995495" />
+      <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,6 +193,55 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/get.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/get.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eacount.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="1" selection-start-column="1" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eacounter.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="16" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/get.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eacount.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="1" selection-start-column="1" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/eacounter.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="16" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/get.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
@@ -300,13 +300,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/get.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/eacount.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -318,6 +311,23 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="11" column="16" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/get.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="392" column="181" selection-start-line="392" selection-start-column="172" selection-end-line="392" selection-end-column="181" />
+          <folding>
+            <element signature="n#style#0;n#input#0;n#li#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

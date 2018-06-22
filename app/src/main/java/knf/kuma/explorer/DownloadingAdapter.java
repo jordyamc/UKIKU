@@ -1,10 +1,7 @@
 package knf.kuma.explorer;
 
-import android.arch.lifecycle.Observer;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
@@ -66,47 +62,38 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
             holder.progress.setIndeterminate(false);
             holder.progress.setProgress(downloadObject.progress);
         }
-        holder.action.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    new MaterialDialog.Builder(fragment.getContext())
-                            .content("¿Cancelar descarga del " + downloadObject.chapter.toLowerCase() + " de " + downloadObject.name + "?")
-                            .positiveText("CONFIRMAR")
-                            .negativeText("CANCELAR")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    downloadObjects.remove(holder.getAdapterPosition());
-                                    notifyItemRemoved(holder.getAdapterPosition());
-                                    downloadsDAO.deleteByEid(downloadObject.eid);
-                                }
-                            }).build().show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        holder.action.setOnClickListener(v -> {
+            try {
+                new MaterialDialog.Builder(fragment.getContext())
+                        .content("¿Cancelar descarga del " + downloadObject.chapter.toLowerCase() + " de " + downloadObject.name + "?")
+                        .positiveText("CONFIRMAR")
+                        .negativeText("CANCELAR")
+                        .onPositive((dialog, which) -> {
+                            downloadObjects.remove(holder.getAdapterPosition());
+                            notifyItemRemoved(holder.getAdapterPosition());
+                            downloadsDAO.deleteByEid(downloadObject.eid);
+                        }).build().show();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
-        downloadsDAO.getLiveByKey(downloadObject.key).observe(fragment, new Observer<DownloadObject>() {
-            @Override
-            public void onChanged(@Nullable DownloadObject object) {
-                try {
-                    Log.e("Download Updated", object == null ? "Not exist" : "Progress: " + object.progress);
-                    if (object == null || object.state == DownloadObject.COMPLETED) {
-                        downloadObjects.remove(holder.getAdapterPosition());
-                        notifyItemRemoved(holder.getAdapterPosition());
+        downloadsDAO.getLiveByKey(downloadObject.key).observe(fragment, object -> {
+            try {
+                Log.e("Download Updated", object == null ? "Not exist" : "Progress: " + object.progress);
+                if (object == null || object.state == DownloadObject.COMPLETED) {
+                    downloadObjects.remove(holder.getAdapterPosition());
+                    notifyItemRemoved(holder.getAdapterPosition());
+                } else {
+                    if (object.state == DownloadObject.PENDING) {
+                        holder.progress.setIndeterminate(true);
+                        holder.progress.setProgress(0);
                     } else {
-                        if (object.state == DownloadObject.PENDING) {
-                            holder.progress.setIndeterminate(true);
-                            holder.progress.setProgress(0);
-                        } else {
-                            holder.progress.setIndeterminate(false);
-                            holder.progress.setProgress(object.progress);
-                        }
+                        holder.progress.setIndeterminate(false);
+                        holder.progress.setProgress(object.progress);
                     }
-                } catch (Exception e) {
-                    //
                 }
+            } catch (Exception e) {
+                //
             }
         });
     }

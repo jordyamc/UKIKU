@@ -1,6 +1,5 @@
 package knf.kuma.animeinfo.fragments;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -32,16 +31,13 @@ public class ChaptersFragment extends BottomFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ViewModelProviders.of(getActivity()).get(AnimeViewModel.class).getLiveData().observe(this, new Observer<AnimeObject>() {
-            @Override
-            public void onChanged(@Nullable AnimeObject object) {
-                if (object != null) {
-                    List<AnimeObject.WebInfo.AnimeChapter> chapters = object.chapters;
-                    if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("asc_chapters", false))
-                        Collections.reverse(chapters);
-                    holder.setAdapter(ChaptersFragment.this, chapters);
-                    holder.goToChapter();
-                }
+        ViewModelProviders.of(getActivity()).get(AnimeViewModel.class).getLiveData().observe(this, object -> {
+            if (object != null) {
+                List<AnimeObject.WebInfo.AnimeChapter> chapters = object.chapters;
+                if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("asc_chapters", false))
+                    Collections.reverse(chapters);
+                holder.setAdapter(ChaptersFragment.this, chapters);
+                holder.goToChapter();
             }
         });
     }

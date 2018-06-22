@@ -70,11 +70,6 @@ public class DownloadObject {
     }
 
     @NonNull
-    public static DownloadObject fromChapter(AnimeObject.WebInfo.AnimeChapter chapter) {
-        return fromChapter(chapter, false);
-    }
-
-    @NonNull
     public static DownloadObject fromChapter(AnimeObject.WebInfo.AnimeChapter chapter, boolean addQueue) {
         return new DownloadObject(chapter.eid, chapter.getFileName(), chapter.name, chapter.number, addQueue);
     }

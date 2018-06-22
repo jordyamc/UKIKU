@@ -24,7 +24,7 @@ public interface DownloadsDAO {
     @Query("SELECT * FROM downloadobject WHERE file LIKE :name")
     DownloadObject getByFile(String name);
 
-    @Query("SELECT * FROM downloadobject WHERE eid LIKE :eid")
+    @Query("SELECT * FROM downloadobject WHERE eid = :eid")
     LiveData<DownloadObject> getLiveByEid(String eid);
 
     @Query("SELECT * FROM downloadobject WHERE `key` LIKE :key")
