@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 
+import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.PatternUtil;
 
 import static knf.kuma.videoservers.VideoServer.Names.FIRE;
@@ -29,7 +30,7 @@ public class FireServer extends Server {
     public VideoServer getVideoServer() {
         try {
             String frame = PatternUtil.extractLink(baseLink);
-            String media_func = Jsoup.connect(frame).get().select("script").last().outerHtml();
+            String media_func = Jsoup.connect(frame).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("script").last().outerHtml();
             String download = Jsoup.connect(PatternUtil.extractMediaLink(media_func)).get().select("a[href~=http://download.*]").first().attr("href");
             return new VideoServer(FIRE, new Option(getName(), null, download));
         } catch (Exception e) {

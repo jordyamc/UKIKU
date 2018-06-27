@@ -18,7 +18,6 @@ import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.widget.ListView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import knf.kuma.Main;
@@ -57,70 +56,48 @@ public class ConfigurationFragment extends PreferenceFragment {
                 return true;
             }
         });
-        getPreferenceScreen().findPreference("download_type").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                if (o.equals("1") && !FileAccessHelper.INSTANCE.canDownload(ConfigurationFragment.this,(String)o))
-                    Toaster.toast("Por favor selecciona la raiz de tu SD");
-                return true;
-            }
+        getPreferenceScreen().findPreference("download_type").setOnPreferenceChangeListener((preference, o) -> {
+            if (o.equals("1") && !FileAccessHelper.INSTANCE.canDownload(ConfigurationFragment.this, (String) o))
+                Toaster.toast("Por favor selecciona la raiz de tu SD");
+            return true;
         });
-        getPreferenceScreen().findPreference("theme_option").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) o));
-                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("theme_value", (String) o).apply();
-                WEmisionProvider.update(getActivity());
-                getActivity().recreate();
-                return true;
-            }
+        getPreferenceScreen().findPreference("theme_option").setOnPreferenceChangeListener((preference, o) -> {
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) o));
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("theme_value", (String) o).apply();
+            WEmisionProvider.update(getActivity());
+            getActivity().recreate();
+            return true;
         });
-        getPreferenceScreen().findPreference("recents_time").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                getPreferenceScreen().findPreference("notify_favs").setEnabled(!"0".equals(o));
-                RecentsJob.reSchedule(Integer.valueOf((String)o)*15);
-                return true;
-            }
+        getPreferenceScreen().findPreference("recents_time").setOnPreferenceChangeListener((preference, o) -> {
+            getPreferenceScreen().findPreference("notify_favs").setEnabled(!"0".equals(o));
+            RecentsJob.reSchedule(Integer.valueOf((String) o) * 15);
+            return true;
         });
-        getPreferenceScreen().findPreference("dir_update_time").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                DirUpdateJob.reSchedule(Integer.valueOf((String)o)*15);
-                return true;
-            }
+        getPreferenceScreen().findPreference("dir_update_time").setOnPreferenceChangeListener((preference, o) -> {
+            DirUpdateJob.reSchedule(Integer.valueOf((String) o) * 15);
+            return true;
         });
-        getPreferenceScreen().findPreference("dir_destroy").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                try {
-                    new MaterialDialog.Builder(getActivity())
-                            .content("¿Desea recrear el directorio?")
-                            .positiveText("continuar")
-                            .negativeText("cancelar")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    CacheDB.INSTANCE.animeDAO().nuke();
-                                    PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("directory_finished", false).apply();
-                                    DirectoryService.run(getActivity().getApplicationContext());
-                                    //DirUpdateJob.runNow();
-                                }
-                            }).build().show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return false;
+        getPreferenceScreen().findPreference("dir_destroy").setOnPreferenceClickListener(preference -> {
+            try {
+                new MaterialDialog.Builder(getActivity())
+                        .content("¿Desea recrear el directorio?")
+                        .positiveText("continuar")
+                        .negativeText("cancelar")
+                        .onPositive((dialog, which) -> {
+                            CacheDB.INSTANCE.animeDAO().nuke();
+                            PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("directory_finished", false).apply();
+                            DirectoryService.run(getActivity().getApplicationContext());
+                        }).build().show();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            return false;
         });
         if (EAHelper.getPhase(getActivity()) == 4)
-            getPreferenceScreen().findPreference("theme_color").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    startActivity(new Intent(getActivity(), Main.class).putExtra("start_position", 3));
-                    getActivity().finish();
-                    return true;
-                }
+            getPreferenceScreen().findPreference("theme_color").setOnPreferenceChangeListener((preference, newValue) -> {
+                startActivity(new Intent(getActivity(), Main.class).putExtra("start_position", 3));
+                getActivity().finish();
+                return true;
             });
         else {
             getPreferenceScreen().findPreference("theme_color").setSummary("Resuleve el secreto para desbloquear");

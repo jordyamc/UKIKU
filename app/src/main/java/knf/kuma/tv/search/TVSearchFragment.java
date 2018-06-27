@@ -14,6 +14,7 @@ import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
+import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 import android.support.v4.content.ContextCompat;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import knf.kuma.pojos.AnimeObject;
 import knf.kuma.tv.anime.AnimePresenter;
 import knf.kuma.tv.details.TVAnimesDetails;
 
-public class TVSearchFragment extends SearchSupportFragment implements SearchSupportFragment.SearchResultProvider, OnItemViewClickedListener {
+public class TVSearchFragment extends SearchSupportFragment implements SearchSupportFragment.SearchResultProvider, SpeechRecognitionCallback, OnItemViewClickedListener {
     private ArrayObjectAdapter arrayObjectAdapter;
 
     @Override
@@ -33,6 +34,8 @@ public class TVSearchFragment extends SearchSupportFragment implements SearchSup
         arrayObjectAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setSearchResultProvider(this);
         setOnItemViewClickedListener(this);
+        if (getContext().getPackageManager().hasSystemFeature("amazon.hardware.fire_tv"))
+            setSpeechRecognitionCallback(this);
     }
 
     private void checkPermissions() {
@@ -49,6 +52,11 @@ public class TVSearchFragment extends SearchSupportFragment implements SearchSup
     public boolean onQueryTextChange(String newQuery) {
         setResult(newQuery);
         return true;
+    }
+
+    @Override
+    public void recognizeSpeech() {
+
     }
 
     @Override

@@ -342,10 +342,14 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
 
     @Override
     public void onPositionDiscontinuity(int reason) {
-        int latestPosition = player.getCurrentWindowIndex();
-        if (latestPosition != listPosition) {
-            listPosition = latestPosition;
-            title.setText(playList.get(listPosition).getTitle());
+        try {
+            int latestPosition = player.getCurrentWindowIndex();
+            if (latestPosition != listPosition) {
+                listPosition = latestPosition;
+                title.setText(playList.get(listPosition).getTitle());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

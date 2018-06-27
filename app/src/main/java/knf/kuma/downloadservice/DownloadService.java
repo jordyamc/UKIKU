@@ -31,8 +31,6 @@ public class DownloadService extends IntentService {
 
     private DownloadObject current;
 
-    private String eid;
-
     private String file;
 
     public DownloadService() {
@@ -42,8 +40,7 @@ public class DownloadService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        eid = intent.getStringExtra("eid");
-        current = downloadsDAO.getByEid(eid);
+        current = downloadsDAO.getByEid(intent.getStringExtra("eid"));
         if (current == null)
             return;
         file = current.file;
@@ -72,7 +69,7 @@ public class DownloadService extends IntentService {
             byte data[] = new byte[1024];
             int count;
             while ((count = inputStream.read(data, 0, 1024)) >= 0) {
-                DownloadObject revised = downloadsDAO.getByEid(eid);
+                DownloadObject revised = downloadsDAO.getByEid(intent.getStringExtra("eid"));
                 if (revised == null) {
                     FileAccessHelper.INSTANCE.delete(file);
                     downloadsDAO.delete(current);

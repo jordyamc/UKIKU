@@ -2,14 +2,12 @@ package knf.kuma.changelog;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 
@@ -33,6 +30,7 @@ import io.fabric.sdk.android.services.concurrency.AsyncTask;
 import knf.kuma.R;
 import knf.kuma.changelog.objects.Changelog;
 import knf.kuma.commons.EAHelper;
+import knf.kuma.jobscheduler.DirUpdateJob;
 import xdroid.toaster.Toaster;
 
 public class ChangelogActivity extends AppCompatActivity {
@@ -48,52 +46,39 @@ public class ChangelogActivity extends AppCompatActivity {
     }
 
     public static void check(final Activity activity) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    int c_code = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0);
-                    final int p_code = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionCode;
-                    if (p_code > c_code && c_code != 0)
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    new MaterialDialog.Builder(activity)
-                                            .content("Nueva versión, ¿Leer Changelog?")
-                                            .positiveText("Leer")
-                                            .negativeText("Omitir")
-                                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                    PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply();
-                                                    ChangelogActivity.open(activity);
-                                                }
-                                            })
-                                            .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                    PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply();
-                                                }
-                                            })
-                                            .cancelListener(new DialogInterface.OnCancelListener() {
-                                                @Override
-                                                public void onCancel(DialogInterface dialog) {
-                                                    PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply();
-                                                }
-                                            }).build().show();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    else
-                        PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        AsyncTask.execute(() -> {
+            try {
+                int c_code = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0);
+                final int p_code = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionCode;
+                if (p_code > c_code && c_code != 0) {
+                    runWVersion(p_code);
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        try {
+                            new MaterialDialog.Builder(activity)
+                                    .content("Nueva versión, ¿Leer Changelog?")
+                                    .positiveText("Leer")
+                                    .negativeText("Omitir")
+                                    .onPositive((dialog, which) -> ChangelogActivity.open(activity))
+                                    .onAny((dialog, which) -> PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply())
+                                    .cancelListener(dialog -> PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply()).build().show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } else
+                    PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
+    }
+
+    private static void runWVersion(int code) {
+        switch (code) {
+            case 36:
+                DirUpdateJob.runNow();
+                break;
+        }
     }
 
     @Override
@@ -106,34 +91,16 @@ public class ChangelogActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        toolbar.setNavigationOnClickListener(v -> finish());
+        AsyncTask.execute(() -> {
+            try {
+                final Changelog changelog = getChangelog();
+                progres.post(() -> progres.setVisibility(View.GONE));
+                recyclerView.post(() -> recyclerView.setAdapter(new ReleaseAdapter(changelog)));
+            } catch (Exception e) {
+                Crashlytics.logException(e);
+                Toaster.toast("Error al cargar changelog");
                 finish();
-            }
-        });
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final Changelog changelog = getChangelog();
-                    progres.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            progres.setVisibility(View.GONE);
-                        }
-                    });
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            recyclerView.setAdapter(new ReleaseAdapter(changelog));
-                        }
-                    });
-                } catch (Exception e) {
-                    Crashlytics.logException(e);
-                    Toaster.toast("Error al cargar changelog");
-                    finish();
-                }
             }
         });
     }

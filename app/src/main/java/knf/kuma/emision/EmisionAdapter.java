@@ -51,30 +51,22 @@ public class EmisionAdapter extends RecyclerView.Adapter<EmisionAdapter.EmisionI
         PicassoSingle.get(fragment.getContext()).load(animeObject.img).into(holder.imageView);
         holder.title.setText(animeObject.name);
         holder.hiddenOverlay.setHidden(blacklist.contains(animeObject.aid), false);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityAnime.open(fragment, animeObject, holder.imageView, true, true);
+        holder.cardView.setOnClickListener(v -> ActivityAnime.open(fragment, animeObject, holder.imageView, true, true));
+        holder.cardView.setOnLongClickListener(v -> {
+            boolean removed;
+            if (blacklist.contains(animeObject.aid)) {
+                updateList(true, animeObject.aid);
+                removed = true;
+            } else {
+                updateList(false, animeObject.aid);
+                removed = false;
             }
-        });
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                boolean removed;
-                if (blacklist.contains(animeObject.aid)) {
-                    updateList(true, animeObject.aid);
-                    removed = true;
-                } else {
-                    updateList(false, animeObject.aid);
-                    removed = false;
-                }
-                if (showHidden) {
-                    holder.hiddenOverlay.setHidden(!removed, true);
-                } else if (!removed) {
-                    remove(holder.getAdapterPosition());
-                }
-                return true;
+            if (showHidden) {
+                holder.hiddenOverlay.setHidden(!removed, true);
+            } else if (!removed) {
+                remove(holder.getAdapterPosition());
             }
+            return true;
         });
     }
 

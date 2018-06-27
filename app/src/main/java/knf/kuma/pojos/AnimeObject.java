@@ -102,7 +102,17 @@ public class AnimeObject implements Comparable<AnimeObject> {
         this.rate_count = webInfo.rate_count;
         this.genres = webInfo.genres;
         this.related = webInfo.related;
-        this.chapters = WebInfo.AnimeChapter.create(name, aid, findDataScript(webInfo.scripts));
+        completeInfo(webInfo.scripts);
+    }
+
+    private void completeInfo(List<Element> scripts) {
+        try {
+            AnimeInfo animeInfo = new AnimeInfo(findDataScript(scripts).html());
+            this.day = animeInfo.day;
+            this.chapters = WebInfo.AnimeChapter.create(name, aid, animeInfo);
+        } catch (Exception e) {
+            //
+        }
     }
 
     private Element findDataScript(List<Element> scripts) {
@@ -319,10 +329,9 @@ public class AnimeObject implements Comparable<AnimeObject> {
                 return chapters;
             }
 
-            public static List<AnimeChapter> create(String name, String aid, Element chaps) {
+            public static List<AnimeChapter> create(String name, String aid, AnimeInfo info) {
                 List<AnimeChapter> chapters = new ArrayList<>();
                 try {
-                    AnimeInfo info = new AnimeInfo(chaps.html());
                     for (Map.Entry<String, String> entry : info.epMap.entrySet()) {
                         try {
                             chapters.add(new AnimeChapter(info, entry.getKey(), entry.getValue()));

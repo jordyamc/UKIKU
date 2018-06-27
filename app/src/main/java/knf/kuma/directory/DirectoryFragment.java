@@ -19,7 +19,7 @@ public class DirectoryFragment extends BottomFragment {
     public DirectoryFragment() {
     }
 
-    public static DirectoryFragment get(){
+    public static DirectoryFragment get() {
         return new DirectoryFragment();
     }
 
@@ -32,19 +32,21 @@ public class DirectoryFragment extends BottomFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_directory,container,false);
-        fragmentHolder=new DirMainFragmentHolder(view,getChildFragmentManager());
+        View view = inflater.inflate(R.layout.fragment_directory, container, false);
+        fragmentHolder = new DirMainFragmentHolder(view, getChildFragmentManager());
         EAHelper.enter1(getContext(), "D");
         return view;
     }
 
-    public void onChangeOrder(){
-        fragmentHolder.onChangeOrder();
+    public void onChangeOrder() {
+        if (fragmentHolder != null)
+            fragmentHolder.onChangeOrder();
     }
 
     @Override
     public void onReselect() {
         EAHelper.enter1(getContext(), "D");
-        fragmentHolder.onReselect();
+        if (fragmentHolder != null)
+            fragmentHolder.onReselect();
     }
 }

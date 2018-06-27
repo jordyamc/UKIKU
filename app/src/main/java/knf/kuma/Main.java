@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,9 +21,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -43,6 +48,7 @@ import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.EAMActivity;
+import knf.kuma.commons.PicassoSingle;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.directory.DirectoryFragment;
 import knf.kuma.directory.DirectoryService;
@@ -66,6 +72,12 @@ import knf.kuma.updater.UpdateActivity;
 import knf.kuma.updater.Updatechecker;
 import xdroid.toaster.Toaster;
 
+import static knf.kuma.commons.BypassUtil.clearCookies;
+import static knf.kuma.commons.BypassUtil.isLoading;
+import static knf.kuma.commons.BypassUtil.isNeeded;
+import static knf.kuma.commons.BypassUtil.saveCookies;
+import static knf.kuma.commons.BypassUtil.userAgent;
+
 public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
@@ -83,6 +95,9 @@ public class Main extends AppCompatActivity
     NavigationView navigationView;
     @BindView(R.id.bottomNavigation)
     BottomNavigationView bottomNavigationView;
+    @BindView(R.id.webview)
+    WebView webView;
+
     BottomFragment selectedFragment;
     BottomFragment tmpfragment;
 
@@ -466,7 +481,8 @@ public class Main extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        BypassUtil.check(this);
+        //BypassUtil.check(this);
+        checkBypass();
         if (navigationView != null)
             new Handler(Looper.getMainLooper()).post(() -> {
                 TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
@@ -499,5 +515,39 @@ public class Main extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         setNavigationButtons();
+    }
+
+    private void checkBypass() {
+        AsyncTask.execute(() -> {
+            if (isNeeded(this) && !isLoading) {
+                Toaster.toast("Creando bypass");
+                isLoading = true;
+                Log.e("CloudflareBypass", "is needed");
+                clearCookies();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    webView.getSettings().setJavaScriptEnabled(true);
+                    webView.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+                            Log.e("CloudflareBypass", "Override " + url);
+                            if (url.equals("https://animeflv.net/")) {
+                                Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"));
+                                saveCookies(Main.this);
+                                Toaster.toast("Bypass actualizado");
+                                PicassoSingle.clear();
+                                onNeedRecreate();
+                            }
+                            isLoading = false;
+                            Toaster.toast("Bypass creado");
+                            return false;
+                        }
+                    });
+                    webView.getSettings().setUserAgentString(userAgent);
+                    webView.loadUrl("https://animeflv.net/");
+                });
+            } else {
+                Log.e("CloudflareBypass", "Not needed");
+            }
+        });
     }
 }

@@ -4,10 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioAttributes;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -37,9 +41,14 @@ public class DirectoryService extends IntentService {
     public static int NOT_CODE = 5598;
     public static String CHANNEL = "directory_update";
     private static boolean RUNNING = false;
+    public static final int STATE_PARTIAL = 0;
     private NotificationManager manager;
     private int count = 0;
     private int page = 0;
+    public static final int STATE_FULL = 1;
+    public static final int STATE_FINISHED = 2;
+    public static final int STATE_INTERRUPTED = 3;
+    private static MutableLiveData<Integer> liveStatus = new MutableLiveData<>();
 
     public DirectoryService() {
         super("Directory update");
@@ -54,6 +63,10 @@ public class DirectoryService extends IntentService {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false);
     }
 
+    public static LiveData<Integer> getLiveStatus() {
+        return liveStatus;
+    }
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         startForeground(NOT_CODE, getStartNotification());
@@ -66,14 +79,16 @@ public class DirectoryService extends IntentService {
         AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
         SSLSkipper.skip();
         Jspoon jspoon = Jspoon.create();
+        setStatus(STATE_PARTIAL);
         doPartialSearch(jspoon, animeDAO);
+        setStatus(STATE_FULL);
         doFullSearch(jspoon, animeDAO);
         cancelForeground();
     }
 
     @SuppressLint("ApplySharedPref")
     private void doPartialSearch(Jspoon jspoon, AnimeDAO animeDAO) {
-        final Set<String> strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet("failed_pages", new LinkedHashSet<String>());
+        final Set<String> strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet("failed_pages", new LinkedHashSet<>());
         final Set<String> newStrings = new LinkedHashSet<>();
         int partialCount = 0;
         if (strings.size() == 0)
@@ -155,9 +170,11 @@ public class DirectoryService extends IntentService {
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("directory_finished", true).apply();
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet("failed_pages", strings).apply();
                     DirUpdateJob.schedule(this);
+                    setStatus(STATE_FINISHED);
                 }
             } catch (HttpStatusException e) {
                 finished = true;
+                setStatus(STATE_INTERRUPTED);
             } catch (Exception e) {
                 Log.e("Directory Getter", "Page error: " + page);
                 if (!strings.contains(String.valueOf(page)))
@@ -197,6 +214,10 @@ public class DirectoryService extends IntentService {
                 .build();
     }
 
+    private void setStatus(int status) {
+        new Handler(Looper.getMainLooper()).post(() -> liveStatus.setValue(status));
+    }
+
     private void notShow(int code, Notification notification) {
         if (manager != null)
             manager.notify(code, notification);
@@ -213,5 +234,9 @@ public class DirectoryService extends IntentService {
         stopForeground(true);
         notCancel(NOT_CODE);
         super.onTaskRemoved(rootIntent);
+    }
+
+    public interface OnDirStatus {
+        void onFinished();
     }
 }

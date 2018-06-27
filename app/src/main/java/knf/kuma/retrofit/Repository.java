@@ -70,31 +70,36 @@ public class Repository {
     }
 
     public LiveData<AnimeObject> getAnime(Context context, final String link, final boolean persist) {
-        String base = link.substring(0, link.lastIndexOf("/") + 1);
-        String rest = link.substring(link.lastIndexOf("/") + 1);
         final MutableLiveData<AnimeObject> data = new MutableLiveData<>();
-        final AnimeDAO dao = CacheDB.INSTANCE.animeDAO();
-        if (!Network.isConnected() && dao.existLink(link))
-            return CacheDB.INSTANCE.animeDAO().getAnime(link);
-        getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, rest).enqueue(new Callback<AnimeObject.WebInfo>() {
-            @Override
-            public void onResponse(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Response<AnimeObject.WebInfo> response) {
-                if (response.body() == null || response.code() != 200) {
-                    data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
-                    return;
+        try {
+            String base = link.substring(0, link.lastIndexOf("/") + 1);
+            String rest = link.substring(link.lastIndexOf("/") + 1);
+            final AnimeDAO dao = CacheDB.INSTANCE.animeDAO();
+            if (!Network.isConnected() && dao.existLink(link))
+                return CacheDB.INSTANCE.animeDAO().getAnime(link);
+            getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, rest).enqueue(new Callback<AnimeObject.WebInfo>() {
+                @Override
+                public void onResponse(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Response<AnimeObject.WebInfo> response) {
+                    if (response.body() == null || response.code() != 200) {
+                        data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
+                        return;
+                    }
+                    AnimeObject animeObject = new AnimeObject(link, response.body());
+                    if (persist)
+                        dao.insert(animeObject);
+                    data.setValue(animeObject);
                 }
-                AnimeObject animeObject = new AnimeObject(link, response.body());
-                if (persist)
-                    dao.insert(animeObject);
-                data.setValue(animeObject);
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Throwable t) {
-                t.printStackTrace();
-                data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Throwable t) {
+                    t.printStackTrace();
+                    data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            data.setValue(null);
+        }
         return data;
     }
 

@@ -2,31 +2,20 @@ package knf.kuma.backup;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.crashlytics.android.Crashlytics;
-
-import java.util.List;
-
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import knf.kuma.R;
-import knf.kuma.backup.objects.FavList;
-import knf.kuma.backup.objects.SeenList;
-import knf.kuma.database.CacheDB;
-import knf.kuma.pojos.AnimeObject;
-import knf.kuma.pojos.FavoriteObject;
-import xdroid.toaster.Toaster;
+import knf.kuma.backup.screens.MigrateDirectoryFragment;
+import knf.kuma.backup.screens.MigrateSuccessFragment;
+import knf.kuma.backup.screens.MigrateVersionFragment;
+import knf.kuma.commons.PrefsUtil;
+import knf.kuma.directory.DirectoryService;
 
-public class MigrationActivity extends AppCompatActivity {
-
-    private final int REQUEST_FAVS = 5628;
-    private final int REQUEST_SEEN = 9986;
+public class MigrationActivity extends AppCompatActivity implements DirectoryService.OnDirStatus {
 
     public static void start(Context context) {
         context.startActivity(new Intent(context, MigrationActivity.class));
@@ -36,50 +25,28 @@ public class MigrationActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_migrate);
-        ButterKnife.bind(this);
-    }
-
-    @OnClick(R.id.migrate_favs)
-    void onMigrateFavs(View view) {
-        startActivityForResult(new Intent().setAction("knf.kuma.MIGRATE").putExtra("type", 0), REQUEST_FAVS);
-    }
-
-    @OnClick(R.id.migrate_seen)
-    void onMigrateSeen(View view) {
-        startActivityForResult(new Intent().setAction("knf.kuma.MIGRATE").putExtra("type", 1), REQUEST_SEEN);
     }
 
     @Override
-    protected void onActivityResult(final int requestCode, int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        final MaterialDialog dialog = new MaterialDialog.Builder(this)
-                .content("Migrando...")
-                .progress(true, 0)
-                .cancelable(false)
-                .build();
-        dialog.show();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    switch (requestCode) {
-                        case REQUEST_FAVS:
-                            List<FavoriteObject> list = FavList.decode(getContentResolver().openInputStream(data.getData()));
-                            CacheDB.INSTANCE.favsDAO().addAll(list);
-                            break;
-                        case REQUEST_SEEN:
-                            List<AnimeObject.WebInfo.AnimeChapter> chapters = SeenList.decode(getContentResolver().openInputStream(data.getData()));
-                            CacheDB.INSTANCE.chaptersDAO().addAll(chapters);
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Crashlytics.logException(e);
-                    Toaster.toast("Error al migrar datos");
-                }
-                if (dialog.isShowing())
-                    dialog.dismiss();
-            }
-        });
+    protected void onResume() {
+        super.onResume();
+        if (MigrateVersionFragment.getInstalledCode(this) < 252)
+            setFragment(new MigrateVersionFragment());
+        else if (!PrefsUtil.isDirectoryFinished()) {
+            DirectoryService.run(this);
+            setFragment(MigrateDirectoryFragment.get(this));
+        } else
+            setFragment(new MigrateSuccessFragment());
+    }
+
+    private void setFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.root, fragment);
+        transaction.commit();
+    }
+
+    @Override
+    public void onFinished() {
+        setFragment(new MigrateSuccessFragment());
     }
 }

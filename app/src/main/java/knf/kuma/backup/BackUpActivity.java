@@ -140,20 +140,24 @@ public class BackUpActivity extends AppCompatActivity implements BUUtils.LoginIn
 
     private void showColor(final boolean animate) {
         colorChanger.post(() -> {
-            colorChanger.setBackgroundColor(getBackColor());
-            if (animate) {
-                Rect bounds = new Rect();
-                colorChanger.getDrawingRect(bounds);
-                int centerX = bounds.centerX();
-                int centerY = bounds.centerY();
-                int finalRadius = Math.max(bounds.width(), bounds.height());
-                Animator animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, 0f, finalRadius);
-                animator.setDuration(1000);
-                animator.setInterpolator(new AccelerateDecelerateInterpolator());
-                colorChanger.setVisibility(View.VISIBLE);
-                animator.start();
-            } else {
-                colorChanger.setVisibility(View.VISIBLE);
+            try {
+                colorChanger.setBackgroundColor(getBackColor());
+                if (animate) {
+                    Rect bounds = new Rect();
+                    colorChanger.getDrawingRect(bounds);
+                    int centerX = bounds.centerX();
+                    int centerY = bounds.centerY();
+                    int finalRadius = Math.max(bounds.width(), bounds.height());
+                    Animator animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, 0f, finalRadius);
+                    animator.setDuration(1000);
+                    animator.setInterpolator(new AccelerateDecelerateInterpolator());
+                    colorChanger.setVisibility(View.VISIBLE);
+                    animator.start();
+                } else {
+                    colorChanger.setVisibility(View.VISIBLE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }

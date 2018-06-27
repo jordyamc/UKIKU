@@ -100,6 +100,7 @@ public class QueueManager {
         for (QueueObject object : list) {
             CacheDB.INSTANCE.chaptersDAO().addChapter(object.chapter);
         }
-        CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(list.get(list.size() - 1).chapter));
+        if (list.size() != 0)
+            CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(list.get(list.size() - 1).chapter));
     }
 }

@@ -204,6 +204,9 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                 holder.showFAB();
                 supportInvalidateOptionsMenu();
                 RecommendHelper.registerAll(genres, RankType.CHECK);
+            } else {
+                Toaster.toast("Error al cargar informacion del anime");
+                onBackPressed();
             }
         });
     }

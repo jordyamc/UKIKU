@@ -39,6 +39,9 @@ public interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day AND aid NOT IN (:list) ORDER BY name")
     List<AnimeObject> getByDayDirect(int day, Set<String> list);
 
+    @Query("SELECT * FROM AnimeObject")
+    LiveData<List<AnimeObject>> getAllList();
+
     @Query("SELECT * FROM AnimeObject ORDER BY name")
     DataSource.Factory<Integer,AnimeObject> getAll();
 

@@ -76,33 +76,29 @@ public class EmisionFragment extends Fragment {
                         recyclerView.scheduleLayoutAnimation();
                         checkStates(animeObjects);
                     }
-                    if (animeObjects == null || animeObjects.size() == 0)
-                        error.setVisibility(View.VISIBLE);
+                    error.setVisibility((animeObjects == null || animeObjects.size() == 0) ? View.VISIBLE : View.GONE);
                 }
             });
     }
 
     private void checkStates(final List<AnimeObject> animeObjects) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    for (AnimeObject animeObject : animeObjects) {
-                        try {
-                            Document document = Jsoup.connect(animeObject.link).cookie("device", "computer").get();
-                            AnimeObject object = new AnimeObject(animeObject.link, Jspoon.create().adapter(AnimeObject.WebInfo.class).fromHtml(document.outerHtml()));
-                            if (!object.state.equals("En emisión")) {
-                                dao.updateAnime(object);
-                                adapter.remove(adapter.list.indexOf(animeObject));
-                                WEmisionProvider.update(getContext());
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+        AsyncTask.execute(() -> {
+            try {
+                for (AnimeObject animeObject : animeObjects) {
+                    try {
+                        Document document = Jsoup.connect(animeObject.link).cookie("device", "computer").get();
+                        AnimeObject object = new AnimeObject(animeObject.link, Jspoon.create().adapter(AnimeObject.WebInfo.class).fromHtml(document.outerHtml()));
+                        if (!object.state.equals("En emisión")) {
+                            dao.updateAnime(object);
+                            adapter.remove(adapter.list.indexOf(animeObject));
+                            WEmisionProvider.update(getContext());
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }

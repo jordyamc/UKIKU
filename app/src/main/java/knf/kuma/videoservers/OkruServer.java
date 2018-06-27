@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import knf.kuma.commons.BypassUtil;
+
 import static knf.kuma.videoservers.VideoServer.Names.OKRU;
 
 public class OkruServer extends Server {
@@ -30,7 +32,7 @@ public class OkruServer extends Server {
         try {
             String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
             String down_link = "http:" + Jsoup.parse(frame).select("iframe").first().attr("src");
-            String e_json = Jsoup.connect(down_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
+            String e_json = Jsoup.connect(down_link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("div[data-module='OKVideo']").first().attr("data-options");
             String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "") + "}";
             JSONArray array = new JSONObject(cut_json).getJSONArray("videos");
             VideoServer videoServer = new VideoServer(OKRU);

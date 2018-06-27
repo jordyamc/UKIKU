@@ -196,6 +196,7 @@
         <activity
             android:name=".tv.search.TVSearch"
             android:theme="@style/AppTheme.TV.Base"/>
+        <activity android:name=".commons.BypassUtil"/>
     </application>
 
 </manifest>

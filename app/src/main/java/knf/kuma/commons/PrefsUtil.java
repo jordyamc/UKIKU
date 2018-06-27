@@ -37,4 +37,8 @@ public class PrefsUtil {
     public static boolean isChapsAsc() {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("asc_chapters", false);
     }
+
+    public static boolean isDirectoryFinished() {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false);
+    }
 }
