@@ -24,6 +24,10 @@ public class AnimeViewModel extends ViewModel {
         liveData = CacheDB.INSTANCE.animeDAO().getAnimeByAid(aid);
     }
 
+    public void reload(Context context, String link, boolean persist) {
+        liveData = repository.getAnime(context, link, persist);
+    }
+
     public LiveData<AnimeObject> getLiveData() {
         return liveData;
     }

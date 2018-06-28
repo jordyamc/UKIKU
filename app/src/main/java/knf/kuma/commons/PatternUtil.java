@@ -85,9 +85,9 @@ public class PatternUtil {
     }
 
     public static String extractMediaLink(String html) {
-        Matcher matcher = Pattern.compile("https?://www\\.mediafire[a-zA-Z0-a.=?/&]+").matcher(html);
+        Matcher matcher = Pattern.compile("www\\.mediafire[a-zA-Z0-a.=?/&%]+").matcher(html);
         matcher.find();
-        return matcher.group(0);
+        return "https://" + matcher.group().replace("%2F", "/");
     }
 
     public static String getAnimeUrl(String chapter,String aid){

@@ -520,7 +520,6 @@ public class Main extends AppCompatActivity
     private void checkBypass() {
         AsyncTask.execute(() -> {
             if (isNeeded(this) && !isLoading) {
-                Toaster.toast("Creando bypass");
                 isLoading = true;
                 Log.e("CloudflareBypass", "is needed");
                 clearCookies();
@@ -538,7 +537,6 @@ public class Main extends AppCompatActivity
                                 onNeedRecreate();
                             }
                             isLoading = false;
-                            Toaster.toast("Bypass creado");
                             return false;
                         }
                     });

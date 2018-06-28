@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
@@ -49,6 +47,7 @@ import xdroid.toaster.Toaster;
 public class ActivityAnime extends AppCompatActivity implements AnimeActivityHolder.Interface {
     public static int REQUEST_CODE = 558;
     private boolean isEdited = false;
+    private AnimeViewModel viewModel;
     private AnimeActivityHolder holder;
     private FavoriteObject favoriteObject;
     private FavsDAO dao = CacheDB.INSTANCE.favsDAO();
@@ -181,11 +180,15 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         holder.toolbar.setNavigationOnClickListener(view -> closeActivity());
-        AnimeViewModel viewModel = ViewModelProviders.of(this).get(AnimeViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(AnimeViewModel.class);
         if (getIntent().getBooleanExtra("aid_only", false))
             viewModel.init(getIntent().getStringExtra("aid"));
         else
             viewModel.init(this, getIntent().getDataString(), getIntent().getBooleanExtra("persist", true));
+        load();
+    }
+
+    private void load() {
         viewModel.getLiveData().observe(this, object -> {
             if (object != null) {
                 Answers.getInstance().logContentView(new ContentViewEvent().putContentName(object.name).putContentType(object.type).putContentId(object.aid));
@@ -245,22 +248,16 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                         .positiveText("si")
                         .negativeText("no")
                         .neutralText("dropear")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                seeingDAO.remove(seeingObject);
-                                dao.addFav(favoriteObject);
-                                holder.setFABState(true);
-                                RecommendHelper.registerAll(genres, RankType.FAV);
-                            }
+                        .onPositive((dialog, which) -> {
+                            seeingDAO.remove(seeingObject);
+                            dao.addFav(favoriteObject);
+                            holder.setFABState(true);
+                            RecommendHelper.registerAll(genres, RankType.FAV);
                         })
-                        .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                seeingDAO.remove(seeingObject);
-                                holder.setFABState(false);
-                                RecommendHelper.registerAll(genres, RankType.UNFOLLOW);
-                            }
+                        .onNeutral((dialog, which) -> {
+                            seeingDAO.remove(seeingObject);
+                            holder.setFABState(false);
+                            RecommendHelper.registerAll(genres, RankType.UNFOLLOW);
                         }).build().show();
             } else {
                 holder.setFABSeeing();
@@ -274,6 +271,18 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
     @Override
     public void onImgClicked(ImageView imageView) {
 
+    }
+
+    @Override
+    public void onNeedRecreate() {
+        try {
+            if (!getIntent().getBooleanExtra("aid_only", false)) {
+                viewModel.reload(this, getIntent().getDataString(), getIntent().getBooleanExtra("persist", true));
+                load();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

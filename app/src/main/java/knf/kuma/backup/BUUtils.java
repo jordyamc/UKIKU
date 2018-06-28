@@ -235,7 +235,7 @@ public class BUUtils {
                 }
             }).addOnSuccessListener(activity, driveContents -> {
                 try {
-                    searchInterface.onResponse((BackupObject) new Gson().fromJson(new InputStreamReader(driveContents.getInputStream()), getType(id)));
+                    searchInterface.onResponse(new Gson().fromJson(new InputStreamReader(driveContents.getInputStream()), getType(id)));
                 } catch (Exception e) {
                     e.printStackTrace();
                     searchInterface.onResponse(null);

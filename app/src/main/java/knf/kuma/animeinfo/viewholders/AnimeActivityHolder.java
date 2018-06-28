@@ -1,7 +1,11 @@
 package knf.kuma.animeinfo.viewholders;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -10,8 +14,12 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.webkit.CookieManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 import butterknife.BindView;
@@ -22,6 +30,13 @@ import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityImgFull;
 import knf.kuma.animeinfo.AnimePagerAdapter;
 import knf.kuma.commons.PicassoSingle;
+import xdroid.toaster.Toaster;
+
+import static knf.kuma.commons.BypassUtil.clearCookies;
+import static knf.kuma.commons.BypassUtil.isLoading;
+import static knf.kuma.commons.BypassUtil.isNeeded;
+import static knf.kuma.commons.BypassUtil.saveCookies;
+import static knf.kuma.commons.BypassUtil.userAgent;
 
 public class AnimeActivityHolder {
     @BindView(R.id.appBar)
@@ -38,6 +53,8 @@ public class AnimeActivityHolder {
     public ViewPager pager;
     @BindView(R.id.fab)
     public FloatingActionButton fab;
+    @BindView(R.id.webview)
+    WebView webView;
 
     private Intent intent;
     private AnimePagerAdapter animePagerAdapter;
@@ -81,21 +98,13 @@ public class AnimeActivityHolder {
     }
 
     public void setTitle(final String title) {
-        collapsingToolbarLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                collapsingToolbarLayout.setTitle(title);
-            }
-        });
+        collapsingToolbarLayout.post(() -> collapsingToolbarLayout.setTitle(title));
     }
 
     public void loadImg(final String link, final View.OnClickListener listener) {
-        imageView.post(new Runnable() {
-            @Override
-            public void run() {
-                PicassoSingle.get(imageView.getContext()).load(link).noPlaceholder().into(imageView);
-                imageView.setOnClickListener(listener);
-            }
+        imageView.post(() -> {
+            PicassoSingle.get(imageView.getContext()).load(link).noPlaceholder().into(imageView);
+            imageView.setOnClickListener(listener);
         });
     }
 
@@ -116,52 +125,33 @@ public class AnimeActivityHolder {
     }
 
     public void setFABState(final boolean isFav) {
-        fab.post(new Runnable() {
-            @Override
-            public void run() {
-                fab.setImageResource(isFav ? R.drawable.heart_full : R.drawable.heart_empty);
-            }
-        });
+        fab.post(() -> fab.setImageResource(isFav ? R.drawable.heart_full : R.drawable.heart_empty));
     }
 
     public void setFABSeeing() {
-        fab.post(new Runnable() {
-            @Override
-            public void run() {
-                fab.setImageResource(R.drawable.ic_seeing);
-            }
-        });
+        fab.post(() -> fab.setImageResource(R.drawable.ic_seeing));
     }
 
     public void showFAB() {
-        fab.post(new Runnable() {
-            @Override
-            public void run() {
-                fab.setEnabled(true);
-                fab.setVisibility(View.VISIBLE);
-                fab.startAnimation(AnimationUtils.loadAnimation(fab.getContext(), R.anim.scale_up));
-            }
+        fab.post(() -> {
+            fab.setEnabled(true);
+            fab.setVisibility(View.VISIBLE);
+            fab.startAnimation(AnimationUtils.loadAnimation(fab.getContext(), R.anim.scale_up));
         });
     }
 
     public void hideFAB() {
-        fab.post(new Runnable() {
-            @Override
-            public void run() {
-                fab.setEnabled(false);
-                fab.setVisibility(View.INVISIBLE);
-                fab.startAnimation(AnimationUtils.loadAnimation(fab.getContext(), R.anim.scale_down));
-            }
+        fab.post(() -> {
+            fab.setEnabled(false);
+            fab.setVisibility(View.INVISIBLE);
+            fab.startAnimation(AnimationUtils.loadAnimation(fab.getContext(), R.anim.scale_down));
         });
     }
 
     public void hideFABForce() {
-        fab.post(new Runnable() {
-            @Override
-            public void run() {
-                fab.setEnabled(false);
-                fab.setVisibility(View.INVISIBLE);
-            }
+        fab.post(() -> {
+            fab.setEnabled(false);
+            fab.setVisibility(View.INVISIBLE);
         });
     }
 
@@ -172,13 +162,40 @@ public class AnimeActivityHolder {
         final String img = intent.getStringExtra("img");
         if (img != null) {
             PicassoSingle.get(activity).load(img).into(imageView);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.startActivity(new Intent(activity, ActivityImgFull.class).setData(Uri.parse(img)).putExtra("title", title), ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imageView, "img").toBundle());
-                }
-            });
+            imageView.setOnClickListener(v -> activity.startActivity(new Intent(activity, ActivityImgFull.class).setData(Uri.parse(img)).putExtra("title", title), ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imageView, "img").toBundle()));
         }
+    }
+
+    public void checkBypass(Context context) {
+        AsyncTask.execute(() -> {
+            if (isNeeded(context) && !isLoading) {
+                isLoading = true;
+                Log.e("CloudflareBypass", "is needed");
+                clearCookies();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    webView.getSettings().setJavaScriptEnabled(true);
+                    webView.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+                            Log.e("CloudflareBypass", "Override " + url);
+                            if (url.equals("https://animeflv.net/")) {
+                                Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"));
+                                saveCookies(context);
+                                Toaster.toast("Bypass actualizado");
+                                PicassoSingle.clear();
+                                innerInterface.onNeedRecreate();
+                            }
+                            isLoading = false;
+                            return false;
+                        }
+                    });
+                    webView.getSettings().setUserAgentString(userAgent);
+                    webView.loadUrl("https://animeflv.net/");
+                });
+            } else {
+                Log.e("CloudflareBypass", "Not needed");
+            }
+        });
     }
 
     public interface Interface {
@@ -187,5 +204,7 @@ public class AnimeActivityHolder {
         void onFabLongClicked(FloatingActionButton actionButton);
 
         void onImgClicked(ImageView imageView);
+
+        void onNeedRecreate();
     }
 }
