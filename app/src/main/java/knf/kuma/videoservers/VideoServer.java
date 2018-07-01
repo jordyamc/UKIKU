@@ -138,6 +138,7 @@ public class VideoServer implements Parcelable {
                     YOURUPLOAD,
                     ZIPPYSHARE,
                     MEGA,
+                    MP4UPLOAD
             };
         }
     }
