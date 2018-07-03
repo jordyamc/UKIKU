@@ -35,7 +35,7 @@ public class OkruServer extends Server {
             String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
             String true_link = PatternUtil.extractOkruLink(Jsoup.connect(down_link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("script").last().html());
             String e_json = Jsoup.connect(true_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
-            String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "") + "}";
+            String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "").replace("%3B", ";") + "}";
             JSONArray array = new JSONObject(cut_json).getJSONArray("videos");
             VideoServer videoServer = new VideoServer(OKRU);
             for (int i = 0; i < array.length(); i++) {

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="39" version="1.4.1">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Errores en RV</change>
+        <change type="change">Servidor Izanagi restaurado</change>
+    </release>
     <release code="38" version="1.4">
         <change type="fix">Errores generales</change>
         <change type="fix">Errores en OKRU y RV</change>

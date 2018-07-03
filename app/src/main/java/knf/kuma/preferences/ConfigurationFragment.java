@@ -25,6 +25,7 @@ import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.directory.DirectoryService;
+import knf.kuma.directory.DirectoryUpdateService;
 import knf.kuma.downloadservice.FileAccessHelper;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
@@ -76,6 +77,16 @@ public class ConfigurationFragment extends PreferenceFragment {
         getPreferenceScreen().findPreference("dir_update_time").setOnPreferenceChangeListener((preference, o) -> {
             DirUpdateJob.reSchedule(Integer.valueOf((String) o) * 15);
             return true;
+        });
+        getPreferenceScreen().findPreference("dir_update").setOnPreferenceClickListener(preference -> {
+            try {
+                if (!DirectoryUpdateService.isRunning())
+                    ContextCompat.startForegroundService(getActivity().getApplicationContext(), new Intent(getActivity().getApplicationContext(), DirectoryUpdateService.class));
+                else Toaster.toast("Ya se esta actualizando");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
         });
         getPreferenceScreen().findPreference("dir_destroy").setOnPreferenceClickListener(preference -> {
             try {

@@ -27,7 +27,7 @@ public class PatternUtil {
     }
 
     public static String getRapidVideoLink(String link) {
-        Pattern pattern = Pattern.compile("\"(http.*mp4)\"");
+        Pattern pattern = Pattern.compile("\"(http.*\\.mp4)\"");
         Matcher matcher = pattern.matcher(link);
         matcher.find();
         return matcher.group(1);

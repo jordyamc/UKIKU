@@ -17,7 +17,7 @@ public class IzanagiServer extends Server {
 
     @Override
     public boolean isValid() {
-        return baseLink.contains("server=izanagi");
+        return baseLink.contains("s=izanagi");
     }
 
     @Override
@@ -31,7 +31,9 @@ public class IzanagiServer extends Server {
         String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
         String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
         try {
-            return new VideoServer(IZANAGI, new Option(getName(), null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text()).getString("file")));
+            String link = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text()).getString("file").replace("\\", "");
+            link = link.replaceAll("/", "//").replace(":////", "://");
+            return new VideoServer(IZANAGI, new Option(getName(), null, link));
         } catch (Exception e) {
             return null;
         }

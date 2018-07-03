@@ -63,12 +63,13 @@ public class FavSectionHelper {
             } else if (current_section.equals(object.category))
                 section.add(object);
         }
-        if (current_section != null && !current_section.equals(FavoriteObject.CATEGORY_NONE)) {
-            list.add(new FavSection(current_section));
-            Collections.sort(section, new FavSorter());
-            list.addAll(section);
-        } else if (current_section.equals(FavoriteObject.CATEGORY_NONE))
-            no_section = new ArrayList<>(section);
+        if (current_section != null)
+            if (!current_section.equals(FavoriteObject.CATEGORY_NONE)) {
+                list.add(new FavSection(current_section));
+                Collections.sort(section, new FavSorter());
+                list.addAll(section);
+            } else
+                no_section = new ArrayList<>(section);
         if (no_section.size() > 0) {
             list.add(new FavSection(FavoriteObject.CATEGORY_NONE));
             Collections.sort(no_section, new FavSorter());

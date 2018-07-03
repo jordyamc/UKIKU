@@ -8,6 +8,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -60,8 +61,10 @@ public class DownloadService extends IntentService {
             if (response.code() == 200) {
                 outputStream = new BufferedOutputStream(FileAccessHelper.INSTANCE.getOutputStream(current.file), 1024);
             } else {
+                Log.e("Download error", "Code: " + response.code());
                 downloadsDAO.delete(current);
                 QueueManager.remove(current.eid);
+                response.close();
                 return;
             }
             current.state = DownloadObject.DOWNLOADING;
@@ -89,6 +92,7 @@ public class DownloadService extends IntentService {
             outputStream.flush();
             outputStream.close();
             inputStream.close();
+            response.close();
             completedNotification();
         } catch (Exception e) {
             e.printStackTrace();

@@ -135,8 +135,12 @@
             android:summaryOn="Archivo local"
             android:title="Obtencion de changelog"/>
         <Preference
+            android:icon="@drawable/ic_settings_reload"
+            android:key="dir_update"
+            android:title="Actualizar directorio"/>
+        <Preference
             android:icon="@drawable/ic_danger"
             android:key="dir_destroy"
-            android:title="Actualizar directorio"/>
+            android:title="Recrear directorio"/>
     </PreferenceCategory>
 </PreferenceScreen>
