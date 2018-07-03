@@ -1,6 +1,5 @@
 package knf.kuma.record;
 
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,14 +19,11 @@ import android.view.View;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
-import knf.kuma.pojos.RecordObject;
 
 public class RecordActivity extends AppCompatActivity {
 
@@ -55,12 +51,7 @@ public class RecordActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         adapter = new RecordsAdapter(this);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
@@ -77,32 +68,29 @@ public class RecordActivity extends AppCompatActivity {
             }
         });
         touchHelper.attachToRecyclerView(recyclerView);
-        CacheDB.INSTANCE.recordsDAO().getAll().observe(this, new Observer<List<RecordObject>>() {
-            @Override
-            public void onChanged(@Nullable final List<RecordObject> recordObjects) {
-                if (recordObjects != null) {
-                    if (animate) {
-                        recyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.update(recordObjects);
-                                if (isFirst) {
-                                    isFirst = false;
-                                    recyclerView.scheduleLayoutAnimation();
-                                }
+        CacheDB.INSTANCE.recordsDAO().getAll().observe(this, recordObjects -> {
+            if (recordObjects != null) {
+                if (animate) {
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.update(recordObjects);
+                            if (isFirst) {
+                                isFirst = false;
+                                recyclerView.scheduleLayoutAnimation();
                             }
-                        });
-                    } else {
-                        animate = true;
-                    }
-                    if (recordObjects.size() == 0)
-                        error.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                error.setVisibility(View.VISIBLE);
-                            }
-                        });
+                        }
+                    });
+                } else {
+                    animate = true;
                 }
+                if (recordObjects.size() == 0)
+                    error.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            error.setVisibility(View.VISIBLE);
+                        }
+                    });
             }
         });
     }

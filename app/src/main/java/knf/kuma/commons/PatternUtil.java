@@ -26,6 +26,13 @@ public class PatternUtil {
         return matcher.group(1);
     }
 
+    public static String getRapidVideoLink(String link) {
+        Pattern pattern = Pattern.compile("\"(http.*mp4)\"");
+        Matcher matcher = pattern.matcher(link);
+        matcher.find();
+        return matcher.group(1);
+    }
+
     public static String getLinkId(String link){
         Matcher matcher=Pattern.compile("^.*/(.*)-\\d+$").matcher(link);
         matcher.find();
@@ -88,6 +95,12 @@ public class PatternUtil {
         Matcher matcher = Pattern.compile("www\\.mediafire[a-zA-Z0-a.=?/&%]+").matcher(html);
         matcher.find();
         return "https://" + matcher.group().replace("%2F", "/");
+    }
+
+    public static String extractOkruLink(String html) {
+        Matcher matcher = Pattern.compile("\"(https://ok\\.ru.*)\"").matcher(html);
+        matcher.find();
+        return matcher.group(1);
     }
 
     public static String getAnimeUrl(String chapter,String aid){

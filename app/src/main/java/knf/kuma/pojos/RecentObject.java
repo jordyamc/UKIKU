@@ -93,7 +93,7 @@ public class RecentObject {
         this.chapter = webInfo.chapter.trim();
         this.url = "https://animeflv.net" + webInfo.url;
         this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");
-        this.isNew = chapter.matches("^.* 1$| 0$| Preestreno$| [10] ?:.*$");
+        this.isNew = chapter.matches("^.* [10]$");
         this.anime = PatternUtil.getAnimeUrl(this.url, this.aid);
         File file = FileAccessHelper.INSTANCE.getFile(getFileName());
         DownloadObject downloadObject = CacheDB.INSTANCE.downloadsDAO().getByEid(eid);

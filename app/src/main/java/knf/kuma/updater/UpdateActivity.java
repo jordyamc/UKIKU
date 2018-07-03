@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -127,6 +128,7 @@ public class UpdateActivity extends AppCompatActivity {
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.e("Update Error", "Code: " + errorCode + " Message: " + errorMessage);
                         Toaster.toast("Error al actualizar: "+errorMessage);
+                        Crashlytics.logException(new IllegalStateException("Update failed\nCode: " + errorCode + " Message: " + errorMessage));
                         finish();
                     }
 

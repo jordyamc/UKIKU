@@ -9,7 +9,7 @@
         app:showAsAction="always"/>
     <item
         android:icon="@drawable/ic_filter"
-        android:orderInCategory="100"
+        android:orderInCategory="800"
         android:title="Item"
         app:showAsAction="always">
         <menu>
@@ -25,6 +25,12 @@
         </menu>
     </item>
 
+    <item
+        android:id="@+id/action_new_category"
+        android:icon="@drawable/ic_add_category"
+        android:orderInCategory="700"
+        android:title="Nueva categoria"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/castMenu"
         android:orderInCategory="2"

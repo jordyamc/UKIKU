@@ -256,12 +256,7 @@ public class Main extends AppCompatActivity
             } else {
                 readyToFinish = true;
                 Toaster.toast("Presione de nuevo para salir");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        readyToFinish = false;
-                    }
-                }, 2000);
+                new Handler().postDelayed(() -> readyToFinish = false, 2000);
             }
         }
     }
@@ -280,6 +275,8 @@ public class Main extends AppCompatActivity
                     menu.findItem(R.id.by_id).setChecked(true);
                     break;
             }
+            if (!PrefsUtil.showFavSections())
+                menu.findItem(R.id.action_new_category).setVisible(false);
         } else if (selectedFragment instanceof DirectoryFragment) {
             getMenuInflater().inflate(R.menu.dir_menu, menu);
             switch (PrefsUtil.getDirOrder()) {
@@ -305,6 +302,10 @@ public class Main extends AppCompatActivity
                 searchView.openSearch();
                 tmpfragment = selectedFragment;
                 setFragment(SearchFragment.get());
+                break;
+            case R.id.action_new_category:
+                if (selectedFragment instanceof FavoriteFragment)
+                    ((FavoriteFragment) selectedFragment).showNewCategoryDialog(null);
                 break;
             case R.id.by_name:
                 PrefsUtil.setFavsOrder(0);

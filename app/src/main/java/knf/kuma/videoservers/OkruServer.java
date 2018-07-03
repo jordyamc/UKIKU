@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
 import knf.kuma.commons.BypassUtil;
+import knf.kuma.commons.PatternUtil;
 
 import static knf.kuma.videoservers.VideoServer.Names.OKRU;
 
@@ -18,7 +19,7 @@ public class OkruServer extends Server {
 
     @Override
     public boolean isValid() {
-        return baseLink.contains("ok.ru");
+        return baseLink.contains("server=ok");
     }
 
     @Override
@@ -31,8 +32,9 @@ public class OkruServer extends Server {
     public VideoServer getVideoServer() {
         try {
             String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-            String down_link = "http:" + Jsoup.parse(frame).select("iframe").first().attr("src");
-            String e_json = Jsoup.connect(down_link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("div[data-module='OKVideo']").first().attr("data-options");
+            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+            String true_link = PatternUtil.extractOkruLink(Jsoup.connect(down_link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("script").last().html());
+            String e_json = Jsoup.connect(true_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
             String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "") + "}";
             JSONArray array = new JSONObject(cut_json).getJSONArray("videos");
             VideoServer videoServer = new VideoServer(OKRU);
@@ -58,6 +60,7 @@ public class OkruServer extends Server {
             }
             return videoServer;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

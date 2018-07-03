@@ -2,17 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90684a6d-0c49-4c34-9f86-a427c19eef30" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PatternUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PatternUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/database/dao/DownloadsDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/database/dao/DownloadsDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/DownloadingAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/DownloadingAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/DownloadObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/DownloadObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentsAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentsAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/item_recents.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/item_recents.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,7 +25,7 @@
       <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
+            <state relative-caret-position="503">
               <caret line="392" column="181" selection-start-line="392" selection-start-column="172" selection-end-line="392" selection-end-column="181" />
               <folding>
                 <element signature="n#style#0;n#input#0;n#li#0;n#!!top" expanded="true" />
@@ -103,7 +92,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -115,6 +103,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -156,27 +145,28 @@
       <workItem from="1529616054681" duration="29000" />
       <workItem from="1529616162614" duration="618000" />
       <workItem from="1529632941094" duration="3080000" />
+      <workItem from="1530280798549" duration="1199000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14529000" />
+    <option name="totallyTimeSpent" value="15728000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22677262" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22617611" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.32995495" />
-      <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -184,6 +174,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -193,6 +184,23 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/get.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6664">
+          <caret line="392" column="181" selection-start-line="392" selection-start-column="172" selection-end-line="392" selection-end-column="181" />
+          <folding>
+            <element signature="n#style#0;n#input#0;n#li#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/get.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
@@ -323,7 +331,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
+        <state relative-caret-position="503">
           <caret line="392" column="181" selection-start-line="392" selection-start-column="172" selection-end-line="392" selection-end-column="181" />
           <folding>
             <element signature="n#style#0;n#input#0;n#li#0;n#!!top" expanded="true" />

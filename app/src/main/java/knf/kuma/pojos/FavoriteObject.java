@@ -3,9 +3,13 @@ package knf.kuma.pojos;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-public class FavoriteObject {
+public class FavoriteObject implements Comparable<FavoriteObject> {
     @PrimaryKey
     public int key;
     public String aid;
@@ -14,6 +18,10 @@ public class FavoriteObject {
     public String type;
     public String link;
     public String category;
+    @Ignore
+    public static final String CATEGORY_NONE = "_NONE_";
+    @Ignore
+    public boolean isSection = false;
 
     public FavoriteObject(int key, String aid, String name, String img, String type, String link, String category) {
         this.key = key;
@@ -26,17 +34,67 @@ public class FavoriteObject {
     }
 
     @Ignore
-    public FavoriteObject(AnimeObject object){
-        this.key=object.key;
-        this.aid=object.aid;
-        this.name=object.name;
-        this.img=object.img;
-        this.type=object.type;
-        this.link=object.link;
-        this.category="_NONE_";
+    public FavoriteObject(AnimeObject object) {
+        if (object != null) {
+            this.key = object.key;
+            this.aid = object.aid;
+            this.name = object.name;
+            this.img = object.img;
+            this.type = object.type;
+            this.link = object.link;
+            this.category = CATEGORY_NONE;
+        }
     }
 
-    public void setCategory(String category){
-        this.category=category;
+    public static List<String> getNames(List<FavoriteObject> list) {
+        List<String> strings = new ArrayList<>();
+        for (FavoriteObject object : list) {
+            strings.add(object.name);
+        }
+        return strings;
+    }
+
+    public static List<String> getCategories(List<FavoriteObject> list) {
+        List<String> strings = new ArrayList<>();
+        for (FavoriteObject object : list) {
+            if (object.category.equals(CATEGORY_NONE))
+                strings.add("Sin categoría");
+            else
+                strings.add(object.category);
+        }
+        return strings;
+    }
+
+    public static Integer[] getIndex(List<FavoriteObject> list, String category) {
+        List<Integer> index = new ArrayList<>();
+        int i = 0;
+        for (FavoriteObject object : list) {
+            if (object.category.equals(category))
+                index.add(i);
+            i++;
+        }
+        return index.toArray(new Integer[0]);
+    }
+
+    public void setCategory(String category) {
+        if (category == null)
+            this.category = CATEGORY_NONE;
+        else
+            this.category = category;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode() + (isSection ? 1 : -1);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof FavSection || obj instanceof FavoriteObject) && name.equals(((FavoriteObject) obj).name);
+    }
+
+    @Override
+    public int compareTo(@NonNull FavoriteObject o) {
+        return name.compareTo(o.name);
     }
 }

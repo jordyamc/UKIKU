@@ -22,11 +22,20 @@ public interface FavsDAO {
     @Query("SELECT * FROM favoriteobject ORDER BY name")
     List<FavoriteObject> getAllRaw();
 
+    @Query("SELECT `key`,name,category FROM favoriteobject GROUP BY category ORDER BY category")
+    List<FavoriteObject> getCatagories();
+
     @Query("SELECT * FROM favoriteobject ORDER BY aid ASC")
     LiveData<List<FavoriteObject>> getAllID();
 
-    @Query("SELECT * FROM favoriteobject WHERE category LIKE :category")
-    List<FavoriteObject> getCategory(String category);
+    @Query("SELECT * FROM favoriteobject WHERE category NOT LIKE :category ORDER BY name")
+    List<FavoriteObject> getNotInCategory(String category);
+
+    @Query("SELECT * FROM favoriteobject WHERE category LIKE :category ORDER BY name")
+    List<FavoriteObject> getAllInCategory(String category);
+
+    @Query("SELECT * FROM favoriteobject ORDER BY category")
+    List<FavoriteObject> getByCategory();
 
     @Query("SELECT count(*) FROM favoriteobject WHERE `key` LIKE :key")
     Boolean isFav(int key);

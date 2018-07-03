@@ -32,9 +32,11 @@ public class FavList {
             totalCount += section.list.size();
             for (FavEntry favEntry : section.list) {
                 AnimeObject object = dao.getByAid(favEntry.aid);
-                if (object != null)
-                    favs.add(new FavoriteObject(object));
-                else errorCount++;
+                if (object != null) {
+                    FavoriteObject fav = new FavoriteObject(object);
+                    fav.setCategory(favEntry.section);
+                    favs.add(fav);
+                } else errorCount++;
             }
         }
         Toaster.toast("Migrados correctamente " + (totalCount - errorCount) + "/" + totalCount);

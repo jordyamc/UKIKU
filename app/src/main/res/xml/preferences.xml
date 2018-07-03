@@ -94,6 +94,11 @@
             android:icon="@drawable/ic_download_progress"
             android:key="show_progress"
             android:title="Progreso de descarga"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_sectioned_favs"
+            android:key="fav_sections"
+            android:title="Favoritos por categoria"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Personalización">

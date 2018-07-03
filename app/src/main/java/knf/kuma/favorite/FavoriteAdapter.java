@@ -55,22 +55,12 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ItemHo
         PicassoSingle.get(context).load(object.img).into(holder.imageView);
         holder.title.setText(object.name);
         holder.type.setText(object.type);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityAnime.open(fragment,object,holder.imageView);
-            }
-        });
+        holder.cardView.setOnClickListener(view -> ActivityAnime.open(fragment, object, holder.imageView));
     }
 
     public void updateList(List<FavoriteObject> list){
         this.list=list;
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
+        recyclerView.post(() -> notifyDataSetChanged());
     }
 
     @Override

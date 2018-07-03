@@ -10,6 +10,10 @@ public class PrefsUtil {
         PrefsUtil.context = context;
     }
 
+    public static String getLayType() {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0");
+    }
+
     public static boolean showProgress() {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true);
     }
@@ -32,6 +36,10 @@ public class PrefsUtil {
 
     public static void setDirOrder(int value) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("dir_order", value).apply();
+    }
+
+    public static boolean showFavSections() {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("fav_sections", true);
     }
 
     public static boolean isChapsAsc() {

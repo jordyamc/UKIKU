@@ -2,19 +2,15 @@ package knf.kuma.videoservers;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.View;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
@@ -75,12 +71,9 @@ public class ServersFactory {
                 .progress(true, 0)
                 .build();
         dialog.show();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ServersFactory factory = new ServersFactory(context, url, chapter, isStream, addQueue, serversInterface);
-                factory.get(dialog);
-            }
+        AsyncTask.execute(() -> {
+            ServersFactory factory = new ServersFactory(context, url, chapter, isStream, addQueue, serversInterface);
+            factory.get(dialog);
         });
     }
 
@@ -94,12 +87,9 @@ public class ServersFactory {
                 .progress(true, 0)
                 .build();
         dialog.show();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ServersFactory factory = new ServersFactory(context, url, downloadObject, isStream, serversInterface);
-                factory.get(dialog);
-            }
+        AsyncTask.execute(() -> {
+            ServersFactory factory = new ServersFactory(context, url, downloadObject, isStream, serversInterface);
+            factory.get(dialog);
         });
     }
 
@@ -134,185 +124,154 @@ public class ServersFactory {
     }
 
     private void showServerList() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (servers.size() == 0) {
-                        Toaster.toast("Sin servidores disponibles");
-                        serversInterface.onFinish(false, false);
-                    } else {
-                        MaterialDialog.Builder builder = new MaterialDialog.Builder(context)
-                                .title("Selecciona servidor")
-                                .items(Server.getNames(servers))
-                                .autoDismiss(true)
-                                .itemsCallbackSingleChoice(selected, new MaterialDialog.ListCallbackSingleChoice() {
-                                    @Override
-                                    public boolean onSelection(MaterialDialog d, View itemView, int which, final CharSequence text) {
-                                        selected = which;
-                                        d.dismiss();
-                                        final MaterialDialog dialog = new MaterialDialog.Builder(context)
-                                                .content("Obteniendo link")
-                                                .progress(true, 0)
-                                                .build();
-                                        dialog.show();
-                                        AsyncTask.execute(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    final VideoServer server = servers.get(selected).getVideoServer();
-                                                    dialog.dismiss();
-                                                    if (server == null && servers.size() == 1) {
-                                                        Toaster.toast("Error en servidor, intente mas tarde");
-                                                        serversInterface.onFinish(false, false);
-                                                    } else if (server == null) {
-                                                        Toaster.toast("Error en servidor");
-                                                        showServerList();
-                                                    } else if (server.options.size() == 0) {
-                                                        Toaster.toast("Error en servidor");
-                                                        showServerList();
-                                                    } else if (server.haveOptions()) {
-                                                        showOptions(server, false);
-                                                    } else {
-                                                        switch (text.toString().toLowerCase()) {
-                                                            case "zippyshare":
-                                                                ZippyHelper.calculate(context, server.getOption().url, new ZippyHelper.OnZippyResult() {
-                                                                    @Override
-                                                                    public void onSuccess(ZippyHelper.ZippyObject object) {
-                                                                        startDownload(server.getOption(), object);
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onError() {
-                                                                        Toaster.toast("Error en servidor");
-                                                                        showServerList();
-                                                                    }
-                                                                });
-                                                                break;
-                                                            case "mega":
-                                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
-                                                                break;
-                                                            default:
-                                                                if (isStream) {
-                                                                    startStreaming(server.getOption());
-                                                                } else {
-                                                                    startDownload(server.getOption());
-                                                                }
-                                                                break;
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                if (servers.size() == 0) {
+                    Toaster.toast("Sin servidores disponibles");
+                    serversInterface.onFinish(false, false);
+                } else {
+                    MaterialDialog.Builder builder = new MaterialDialog.Builder(context)
+                            .title("Selecciona servidor")
+                            .items(Server.getNames(servers))
+                            .autoDismiss(true)
+                            .itemsCallbackSingleChoice(selected, (d, itemView, which, text) -> {
+                                selected = which;
+                                d.dismiss();
+                                final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                        .content("Obteniendo link")
+                                        .progress(true, 0)
+                                        .build();
+                                dialog.show();
+                                AsyncTask.execute(() -> {
+                                    try {
+                                        final VideoServer server = servers.get(selected).getVideoServer();
+                                        dialog.dismiss();
+                                        if (server == null && servers.size() == 1) {
+                                            Toaster.toast("Error en servidor, intente mas tarde");
+                                            serversInterface.onFinish(false, false);
+                                        } else if (server == null) {
+                                            Toaster.toast("Error en servidor");
+                                            showServerList();
+                                        } else if (server.options.size() == 0) {
+                                            Toaster.toast("Error en servidor");
+                                            showServerList();
+                                        } else if (server.haveOptions()) {
+                                            showOptions(server, false);
+                                        } else {
+                                            switch (text.toString().toLowerCase()) {
+                                                case "zippyshare":
+                                                    ZippyHelper.calculate(context, server.getOption().url, new ZippyHelper.OnZippyResult() {
+                                                        @Override
+                                                        public void onSuccess(ZippyHelper.ZippyObject object) {
+                                                            startDownload(server.getOption(), object);
                                                         }
-                                                    }
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        });
-                                        return true;
-                                    }
-                                }).positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
-                                .negativeText("CANCELAR")
-                                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        serversInterface.onFinish(false, false);
-                                    }
-                                }).cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        serversInterface.onFinish(false, false);
-                                    }
-                                });
-                        if (isStream && CastUtil.get().connected())
-                            builder.neutralText("CAST")
-                                    .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull final MaterialDialog d, @NonNull DialogAction which) {
-                                            selected = d.getSelectedIndex();
-                                            d.dismiss();
-                                            final MaterialDialog dialog = new MaterialDialog.Builder(context)
-                                                    .content("Obteniendo link")
-                                                    .progress(true, 0)
-                                                    .build();
-                                            dialog.show();
-                                            AsyncTask.execute(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        final VideoServer server = servers.get(selected).getVideoServer();
-                                                        dialog.dismiss();
-                                                        if (server == null && servers.size() == 1) {
-                                                            Toaster.toast("Error en servidor, intente mas tarde");
-                                                            serversInterface.onFinish(false, false);
-                                                        } else if (server == null) {
+
+                                                        @Override
+                                                        public void onError() {
                                                             Toaster.toast("Error en servidor");
                                                             showServerList();
-                                                        } else if (server.haveOptions()) {
-                                                            showOptions(server, true);
-                                                        } else {
-                                                            switch (Server.getNames(servers).get(d.getSelectedIndex()).toLowerCase()) {
-                                                                case "zippyshare":
-                                                                    Toaster.toast("No soportado en CAST");
-                                                                    showServerList();
-                                                                    break;
-                                                                case "mega":
-                                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
-                                                                    break;
-                                                                default:
-                                                                    serversInterface.onCast(server.getOption().url);
-                                                                    break;
-                                                            }
                                                         }
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
+                                                    });
+                                                    break;
+                                                case "mega":
+                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
+                                                    break;
+                                                default:
+                                                    if (isStream) {
+                                                        startStreaming(server.getOption());
+                                                    } else {
+                                                        startDownload(server.getOption());
+                                                    }
+                                                    break;
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                });
+                                return true;
+                            }).positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
+                            .negativeText("CANCELAR")
+                            .onNegative((dialog, which) -> serversInterface.onFinish(false, false)).cancelListener(dialog -> serversInterface.onFinish(false, false));
+                    if (isStream && CastUtil.get().connected())
+                        builder.neutralText("CAST")
+                                .onNeutral((d, which) -> {
+                                    selected = d.getSelectedIndex();
+                                    d.dismiss();
+                                    final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                            .content("Obteniendo link")
+                                            .progress(true, 0)
+                                            .build();
+                                    dialog.show();
+                                    AsyncTask.execute(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                final VideoServer server = servers.get(selected).getVideoServer();
+                                                dialog.dismiss();
+                                                if (server == null && servers.size() == 1) {
+                                                    Toaster.toast("Error en servidor, intente mas tarde");
+                                                    serversInterface.onFinish(false, false);
+                                                } else if (server == null) {
+                                                    Toaster.toast("Error en servidor");
+                                                    showServerList();
+                                                } else if (server.haveOptions()) {
+                                                    showOptions(server, true);
+                                                } else {
+                                                    switch (Server.getNames(servers).get(d.getSelectedIndex()).toLowerCase()) {
+                                                        case "zippyshare":
+                                                            Toaster.toast("No soportado en CAST");
+                                                            showServerList();
+                                                            break;
+                                                        case "mega":
+                                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
+                                                            break;
+                                                        default:
+                                                            serversInterface.onCast(server.getOption().url);
+                                                            break;
                                                     }
                                                 }
-                                            });
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                     });
-                        builder.build().show();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                                });
+                    builder.build().show();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 
     }
 
     private void showOptions(final VideoServer server, final boolean isCast) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    new MaterialDialog.Builder(context)
-                            .title(server.name)
-                            .items(Option.getNames(server.options))
-                            .autoDismiss(true)
-                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
-                                @Override
-                                public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                                    dialog.dismiss();
-                                    if (isCast) {
-                                        serversInterface.onCast(server.options.get(which).url);
-                                    } else if (isStream) {
-                                        startStreaming(server.options.get(which));
-                                    } else {
-                                        startDownload(server.options.get(which));
-                                    }
-                                    return true;
-                                }
-                            })
-                            .positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
-                            .negativeText("ATRAS")
-                            .cancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    Log.e("Download", "ShowList from canceled");
-                                    showServerList();
-                                }
-                            }).build().show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                new MaterialDialog.Builder(context)
+                        .title(server.name)
+                        .items(Option.getNames(server.options))
+                        .autoDismiss(true)
+                        .itemsCallbackSingleChoice(0, (dialog, itemView, which, text) -> {
+                            dialog.dismiss();
+                            if (isCast) {
+                                serversInterface.onCast(server.options.get(which).url);
+                            } else if (isStream) {
+                                startStreaming(server.options.get(which));
+                            } else {
+                                startDownload(server.options.get(which));
+                            }
+                            return true;
+                        })
+                        .positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
+                        .negativeText("ATRAS")
+                        .cancelListener(dialog -> {
+                            Log.e("Download", "ShowList from canceled");
+                            showServerList();
+                        }).build().show();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
