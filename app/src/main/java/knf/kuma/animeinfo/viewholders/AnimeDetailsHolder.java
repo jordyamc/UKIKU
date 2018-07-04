@@ -43,6 +43,8 @@ public class AnimeDetailsHolder {
     TextView state;
     @BindView(R.id.aid)
     TextView id;
+    @BindView(R.id.rating_count)
+    TextView rating_count;
     @BindView(R.id.ratingBar)
     MaterialRatingBar ratingBar;
     @BindView(R.id.recycler_genres)
@@ -59,64 +61,51 @@ public class AnimeDetailsHolder {
     }
 
     public void populate(final Fragment fragment, final AnimeObject object) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                title.setText(object.name);
-                showCard(cardViews.get(0));
-                if (object.description != null && !object.description.trim().equals("")) {
-                    desc.setIndicator(expand_icon);
-                    desc.setText(object.description.trim());
-                    desc.setAnimationDuration(300);
-                    desc.setExpandInterpolator(new LinearInterpolator());
-                    desc.setCollapseInterpolator(new LinearInterpolator());
-                    View.OnClickListener onClickListener = new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            expand_icon.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    expand_icon.setImageResource(desc.isExpanded() ? R.drawable.action_expand : R.drawable.action_shrink);
-                                    desc.toggle();
-                                }
-                            });
-                        }
-                    };
-                    desc.setOnClickListener(onClickListener);
-                    expand_icon.setOnClickListener(onClickListener);
-                    showCard(cardViews.get(1));
-                }
-                type.setText(object.type);
-                state.setText(getStateString(object.state, object.day));
-                id.setText(object.aid);
-                ratingBar.setRating(Float.parseFloat(object.rate_stars));
-                showCard(cardViews.get(2));
-                if (object.genres.size() != 0) {
-                    recyclerView_genres.setAdapter(new AnimeTagsAdapter(fragment.getContext(), object.genres));
-                    showCard(cardViews.get(3));
-                }
-                if (object.related.size() != 0) {
-                    recyclerView_related.setAdapter(new AnimeRelatedAdapter(fragment, object.related));
-                    showCard(cardViews.get(4));
-                }
+        new Handler(Looper.getMainLooper()).post(() -> {
+            title.setText(object.name);
+            showCard(cardViews.get(0));
+            if (object.description != null && !object.description.trim().equals("")) {
+                desc.setIndicator(expand_icon);
+                desc.setText(object.description.trim());
+                desc.setAnimationDuration(300);
+                desc.setExpandInterpolator(new LinearInterpolator());
+                desc.setCollapseInterpolator(new LinearInterpolator());
+                View.OnClickListener onClickListener = view -> expand_icon.post(() -> {
+                    expand_icon.setImageResource(desc.isExpanded() ? R.drawable.action_expand : R.drawable.action_shrink);
+                    desc.toggle();
+                });
+                desc.setOnClickListener(onClickListener);
+                expand_icon.setOnClickListener(onClickListener);
+                showCard(cardViews.get(1));
+            }
+            type.setText(object.type);
+            state.setText(getStateString(object.state, object.day));
+            id.setText(object.aid);
+            rating_count.setText(object.rate_count);
+            ratingBar.setRating(Float.parseFloat(object.rate_stars));
+            showCard(cardViews.get(2));
+            if (object.genres.size() != 0) {
+                recyclerView_genres.setAdapter(new AnimeTagsAdapter(fragment.getContext(), object.genres));
+                showCard(cardViews.get(3));
+            }
+            if (object.related.size() != 0) {
+                recyclerView_related.setAdapter(new AnimeRelatedAdapter(fragment, object.related));
+                showCard(cardViews.get(4));
             }
         });
     }
 
     private void showCard(final View view) {
         RETARD += 125;
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                view.setVisibility(View.VISIBLE);
-                if (desc.getLayout() != null) {
-                    if (desc.getLineCount() <= 4)
-                        expand_icon.setVisibility(View.GONE);
-                }
-                Animation animation = AnimationUtils.makeInChildBottomAnimation(view.getContext());
-                animation.setDuration(250);
-                view.startAnimation(animation);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            view.setVisibility(View.VISIBLE);
+            if (desc.getLayout() != null) {
+                if (desc.getLineCount() <= 4)
+                    expand_icon.setVisibility(View.GONE);
             }
+            Animation animation = AnimationUtils.makeInChildBottomAnimation(view.getContext());
+            animation.setDuration(250);
+            view.startAnimation(animation);
         }, RETARD);
     }
 
