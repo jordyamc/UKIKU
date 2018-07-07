@@ -39,6 +39,7 @@ public class ExplorerObject {
     public String link;
     public String fileName;
     public String name;
+    public String aid;
     public int count;
     public String path;
     public List<FileDownObj> chapters = new ArrayList<>();
@@ -49,16 +50,15 @@ public class ExplorerObject {
     @Ignore
     private boolean isProcessing = false;
     @Ignore
-    private String aid;
-    @Ignore
     private File[] file_list;
 
-    public ExplorerObject(int key, String img, String link, String fileName, String name, int count, String path, List<FileDownObj> chapters) {
+    public ExplorerObject(int key, String img, String link, String fileName, String name, String aid, int count, String path, List<FileDownObj> chapters) {
         this.key = key;
         this.img = img;
         this.link = link;
         this.fileName = fileName;
         this.name = name;
+        this.aid = aid;
         this.count = count;
         this.path = path;
         File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
@@ -71,7 +71,7 @@ public class ExplorerObject {
         if (object == null)
             throw new IllegalStateException("Anime not found!!!");
         this.key = object.key;
-        this.img = object.img;
+        this.img = PatternUtil.getCover(object.aid);
         this.link = object.link;
         this.fileName = object.fileName;
         this.name = object.name;
@@ -92,8 +92,8 @@ public class ExplorerObject {
             this.file_list = file.listFiles();
             for (File chap : file_list) {
                 try {
-                    String name = chap.getName();
-                    chapters.add(new FileDownObj(context, name, aid, PatternUtil.getNumFromfile(name), name, chap));
+                    String file_name = chap.getName();
+                    chapters.add(new FileDownObj(context, name, aid, PatternUtil.getNumFromfile(file_name), file_name, chap));
                 } catch (Exception e) {
                     //e.printStackTrace();
                 }

@@ -28,6 +28,7 @@ import java.util.List;
 import knf.kuma.R;
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder;
 import knf.kuma.commons.EAHelper;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.FavsDAO;
 import knf.kuma.database.dao.SeeingDAO;
@@ -60,7 +61,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.anime));
         intent.putExtra("title", object.name);
         intent.putExtra("aid", object.aid);
-        intent.putExtra("img", object.img);
+        intent.putExtra("img", PatternUtil.getCover(object.aid));
         intent.putExtra("position", position);
         fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(fragment.getActivity(), view, "img").toBundle());
     }
@@ -74,7 +75,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.link));
         intent.putExtra("title", object.name);
         intent.putExtra("aid", object.aid);
-        intent.putExtra("img", object.img);
+        intent.putExtra("img", PatternUtil.getCover(object.aid));
         intent.putExtra("persist", persist);
         intent.putExtra("noTransition", !animate);
         fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(fragment.getActivity(), view, "img").toBundle());
@@ -85,7 +86,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.link));
         intent.putExtra("title", object.name);
         intent.putExtra("aid", object.aid);
-        intent.putExtra("img", object.img);
+        intent.putExtra("img", PatternUtil.getCover(object.aid));
         intent.putExtra("persist", persist);
         intent.putExtra("noTransition", !animate);
         activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "img").toBundle());
@@ -96,7 +97,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.link));
         intent.putExtra("title", object.name);
         intent.putExtra("aid", String.valueOf(object.key));
-        intent.putExtra("img", object.img);
+        intent.putExtra("img", PatternUtil.getCover(object.aid));
         fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(fragment.getActivity(), view, "img").toBundle());
     }
 
@@ -105,7 +106,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.animeObject.link));
         intent.putExtra("title", object.name);
         intent.putExtra("aid", object.aid);
-        intent.putExtra("img", object.animeObject.img);
+        intent.putExtra("img", PatternUtil.getCover(object.animeObject.aid));
         intent.putExtra("persist", true);
         intent.putExtra("isRecord", true);
         activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "img").toBundle());
@@ -116,7 +117,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.link));
         intent.putExtra("title", object.title);
         intent.putExtra("aid", object.aid);
-        intent.putExtra("img", object.img);
+        intent.putExtra("img", PatternUtil.getCover(object.aid));
         intent.putExtra("persist", true);
         intent.putExtra("noTransition", true);
         intent.putExtra("isRecord", true);
@@ -128,7 +129,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.link));
         intent.putExtra("title", object.name);
         intent.putExtra("aid", object.aid);
-        intent.putExtra("img", object.img);
+        intent.putExtra("img", PatternUtil.getCover(object.aid));
         context.startActivity(intent);
     }
 
@@ -137,7 +138,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(object.link));
         intent.putExtra("title", object.name);
         intent.putExtra("aid", object.aid);
-        intent.putExtra("img", object.img);
+        intent.putExtra("img", PatternUtil.getCover(object.aid));
         intent.putExtra("from_fav", true);
         fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(fragment.getActivity(), view, "img").toBundle());
     }
@@ -146,7 +147,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         Intent intent = new Intent(activity, ActivityAnime.class);
         intent.putExtra("title", object.chapter.name);
         intent.putExtra("aid", object.chapter.aid);
-        intent.putExtra("img", img);
+        intent.putExtra("img", PatternUtil.getCover(object.chapter.aid));
         intent.putExtra("aid_only", true);
         activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "img").toBundle());
     }
@@ -164,7 +165,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         intent.setData(Uri.parse(item.link));
         intent.putExtra("title", item.title);
         intent.putExtra("aid", item.aid);
-        intent.putExtra("img", item.img);
+        intent.putExtra("img", PatternUtil.getCover(item.aid));
         return intent;
     }
 
@@ -196,7 +197,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                 genres = object.genres;
                 favoriteObject = new FavoriteObject(object);
                 holder.setTitle(object.name);
-                holder.loadImg(object.img, v -> startActivity(new Intent(ActivityAnime.this, ActivityImgFull.class).setData(Uri.parse(object.img)).putExtra("title", object.name), ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityAnime.this, holder.imageView, "img").toBundle()));
+                holder.loadImg(PatternUtil.getCover(object.aid), v -> startActivity(new Intent(ActivityAnime.this, ActivityImgFull.class).setData(Uri.parse(PatternUtil.getCover(object.aid))).putExtra("title", object.name), ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityAnime.this, holder.imageView, "img").toBundle()));
                 if (dao.isFav(favoriteObject.key)) {
                     holder.setFABState(true);
                 } else if (seeingDAO.getByAid(favoriteObject.aid) != null) {

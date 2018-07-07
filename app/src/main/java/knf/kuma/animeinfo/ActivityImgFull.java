@@ -50,15 +50,12 @@ public class ActivityImgFull extends AppCompatActivity implements PopupMenu.OnMe
 
             }
         });
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(ActivityImgFull.this, anchor);
-                popupMenu.inflate(R.menu.menu_img);
-                popupMenu.setOnMenuItemClickListener(ActivityImgFull.this);
-                popupMenu.show();
-                return true;
-            }
+        imageView.setOnLongClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(ActivityImgFull.this, anchor);
+            popupMenu.inflate(R.menu.menu_img);
+            popupMenu.setOnMenuItemClickListener(ActivityImgFull.this);
+            popupMenu.show();
+            return true;
         });
     }
 
@@ -92,24 +89,21 @@ public class ActivityImgFull extends AppCompatActivity implements PopupMenu.OnMe
                 .cancelable(false)
                 .build();
         dialog.show();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ParcelFileDescriptor pfd = getContentResolver().
-                            openFileDescriptor(data.getData(), "w");
-                    FileOutputStream fileOutputStream =
-                            new FileOutputStream(pfd.getFileDescriptor());
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                    fileOutputStream.close();
-                    pfd.close();
-                    Toaster.toast("Image guardada!");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toaster.toast("Error al guardar imagen");
-                }
-                dialog.dismiss();
+        AsyncTask.execute(() -> {
+            try {
+                ParcelFileDescriptor pfd = getContentResolver().
+                        openFileDescriptor(data.getData(), "w");
+                FileOutputStream fileOutputStream =
+                        new FileOutputStream(pfd.getFileDescriptor());
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                fileOutputStream.close();
+                pfd.close();
+                Toaster.toast("Image guardada!");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toaster.toast("Error al guardar imagen");
             }
+            dialog.dismiss();
         });
     }
 

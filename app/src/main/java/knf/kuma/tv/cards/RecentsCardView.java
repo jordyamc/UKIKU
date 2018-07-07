@@ -7,6 +7,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.tv.BindableCardView;
@@ -27,7 +28,7 @@ public class RecentsCardView extends BindableCardView<RecentObject> {
 
     @Override
     public void bind(RecentObject data) {
-        PicassoSingle.get(context).load(data.img).into(imageView);
+        PicassoSingle.get(context).load(PatternUtil.getCover(data.aid)).into(imageView);
         title.setText(data.name);
         chapter.setText(data.chapter);
     }

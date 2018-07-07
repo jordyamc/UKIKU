@@ -11,6 +11,7 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.recommended.RHHolder;
@@ -49,15 +50,10 @@ public class MultipleSection extends StatelessSection {
     public void onBindItemViewHolder(RecyclerView.ViewHolder h, int position) {
         final RIHolder holder = (RIHolder) h;
         final AnimeObject object = animeObjects.get(position);
-        PicassoSingle.get(activity).load(object.img).into(holder.img);
+        PicassoSingle.get(activity).load(PatternUtil.getCover(object.aid)).into(holder.img);
         holder.title.setText(object.name);
         holder.type.setText(object.type);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityAnime.open(activity, object, holder.img, true, true);
-            }
-        });
+        holder.cardView.setOnClickListener(view -> ActivityAnime.open(activity, object, holder.img, true, true));
     }
 
     @Override

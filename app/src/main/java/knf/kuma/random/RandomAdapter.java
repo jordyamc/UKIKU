@@ -18,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.AnimeObject;
 
@@ -47,15 +48,10 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.RandomItem
     @Override
     public void onBindViewHolder(final RandomItem holder, int position) {
         final AnimeObject animeObject = list.get(position);
-        PicassoSingle.get(activity).load(animeObject.img).into(holder.imageView);
+        PicassoSingle.get(activity).load(PatternUtil.getCover(animeObject.aid)).into(holder.imageView);
         holder.title.setText(animeObject.name);
         holder.type.setText(animeObject.type);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityAnime.open(activity, animeObject, holder.imageView, false, true);
-            }
-        });
+        holder.cardView.setOnClickListener(v -> ActivityAnime.open(activity, animeObject, holder.imageView, false, true));
     }
 
     @Override

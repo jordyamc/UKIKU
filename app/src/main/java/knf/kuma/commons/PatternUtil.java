@@ -122,7 +122,8 @@ public class PatternUtil {
     }
 
     public static String getCover(String aid) {
-        return "https://animeflv.net/uploads/animes/covers/" + aid + ".jpg";
+        //TODO: Check img availability
+        return "https://m.animeflv.net/uploads/animes/covers/" + aid + ".jpg";
     }
 
     public static String getBanner(String aid) {

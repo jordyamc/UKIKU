@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.AnimeObject;
 
@@ -49,14 +50,9 @@ public class SearchAdapter extends PagedListAdapter<AnimeObject,SearchAdapter.It
     public void onBindViewHolder(@NonNull final ItemHolder holder, int position) {
         final AnimeObject object=getItem(position);
         if (object!=null){
-            PicassoSingle.get(fragment.getContext()).load(object.img).into(holder.imageView);
+            PicassoSingle.get(fragment.getContext()).load(PatternUtil.getCover(object.aid)).into(holder.imageView);
             holder.textView.setText(object.name);
-            holder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ActivityAnime.open(fragment,object,holder.imageView,false,true);
-                }
-            });
+            holder.cardView.setOnClickListener(view -> ActivityAnime.open(fragment, object, holder.imageView, false, true));
         }
     }
 

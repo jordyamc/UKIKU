@@ -8,6 +8,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.AnimeObject;
@@ -31,7 +32,7 @@ public class RelatedCardView extends BindableCardView<AnimeObject.WebInfo.AnimeR
     public void bind(AnimeObject.WebInfo.AnimeRelated data) {
         AnimeObject object = CacheDB.INSTANCE.animeDAO().getByLink("%" + data.link);
         if (object != null)
-            PicassoSingle.get(context).load(object.img).into(imageView);
+            PicassoSingle.get(context).load(PatternUtil.getCover(data.aid)).into(imageView);
         else
             PicassoSingle.get(context).load((Uri) null).into(imageView);
         title.setText(data.name);

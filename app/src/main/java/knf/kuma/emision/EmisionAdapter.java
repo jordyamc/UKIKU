@@ -20,6 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.custom.HiddenOverlay;
 import knf.kuma.pojos.AnimeObject;
@@ -48,7 +49,7 @@ public class EmisionAdapter extends RecyclerView.Adapter<EmisionAdapter.EmisionI
     @Override
     public void onBindViewHolder(@NonNull final EmisionItem holder, int position) {
         final AnimeObject animeObject = list.get(position);
-        PicassoSingle.get(fragment.getContext()).load(animeObject.img).into(holder.imageView);
+        PicassoSingle.get(fragment.getContext()).load(PatternUtil.getCover(animeObject.aid)).into(holder.imageView);
         holder.title.setText(animeObject.name);
         holder.hiddenOverlay.setHidden(blacklist.contains(animeObject.aid), false);
         holder.cardView.setOnClickListener(v -> ActivityAnime.open(fragment, animeObject, holder.imageView, true, true));

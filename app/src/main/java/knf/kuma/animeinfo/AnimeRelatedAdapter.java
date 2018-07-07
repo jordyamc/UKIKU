@@ -1,6 +1,7 @@
 package knf.kuma.animeinfo;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -46,30 +47,20 @@ public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int position) {
         final AnimeObject.WebInfo.AnimeRelated related=list.get(position);
         if (h.getItemViewType()==0){
             final RelatedHolder holder=(RelatedHolder)h;
             final AnimeObject object=dao.getByLink("%"+related.link);
-            PicassoSingle.get(context).load(object.img).into(holder.imageView);
+            PicassoSingle.get(context).load(PatternUtil.getCover(object.aid)).into(holder.imageView);
             holder.textView.setText(related.name);
             holder.relation.setText(related.relation);
-            holder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ActivityAnime.open(fragment,object,holder.imageView);
-                }
-            });
+            holder.cardView.setOnClickListener(view -> ActivityAnime.open(fragment, object, holder.imageView));
         }else {
             final RelatedNoImgHolder holder=(RelatedNoImgHolder) h;
             holder.textView.setText(related.name);
             holder.relation.setText(related.relation);
-            holder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ActivityAnime.open(fragment,related);
-                }
-            });
+            holder.cardView.setOnClickListener(view -> ActivityAnime.open(fragment, related));
         }
     }
 

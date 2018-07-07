@@ -19,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.RecordsDAO;
@@ -55,7 +56,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordIt
         final RecordObject item = items.get(position);
         AnimeObject animeObject = item.animeObject;
         if (animeObject != null)
-            PicassoSingle.get(activity).load(animeObject.img).into(holder.imageView);
+            PicassoSingle.get(activity).load(PatternUtil.getCover(animeObject.aid)).into(holder.imageView);
         holder.title.setText(item.name);
         holder.chapter.setText(item.chapter);
         holder.cardView.setOnClickListener(v -> {

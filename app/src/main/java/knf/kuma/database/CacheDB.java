@@ -42,10 +42,8 @@ import knf.kuma.pojos.SeeingObject;
         ExplorerObject.class,
         GenreStatusObject.class,
         QueueObject.class
-}, version = 4)
+}, version = 5)
 public abstract class CacheDB extends RoomDatabase {
-    public static CacheDB INSTANCE;
-
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -53,7 +51,6 @@ public abstract class CacheDB extends RoomDatabase {
                     + "`name` TEXT, `count` INTEGER NOT NULL, PRIMARY KEY(`key`))");
         }
     };
-
     public static final Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -61,13 +58,25 @@ public abstract class CacheDB extends RoomDatabase {
                     + "`number` TEXT, `eid` TEXT,`isFile` INTEGER NOT NULL,`link` TEXT,`name` TEXT,`aid` TEXT,`time` INTEGER NOT NULL, PRIMARY KEY (`id`))");
         }
     };
-
     public static final Migration MIGRATION_3_4 = new Migration(3, 4) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE `queueobject`  ADD COLUMN `uri` TEXT");
         }
     };
+    public static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE `explorerobject`  ADD COLUMN `aid` TEXT");
+        }
+    };
+    public static CacheDB INSTANCE;
+
+    public static void init(Context context) {
+        INSTANCE = Room.databaseBuilder(context, CacheDB.class, "cache-db")
+                .allowMainThreadQueries()
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build();
+    }
 
     public abstract RecentsDAO recentsDAO();
 
@@ -86,12 +95,6 @@ public abstract class CacheDB extends RoomDatabase {
     public abstract SeeingDAO seeingDAO();
 
     public abstract ExplorerDAO explorerDAO();
-
-    public static void init(Context context) {
-        INSTANCE = Room.databaseBuilder(context, CacheDB.class, "cache-db")
-                .allowMainThreadQueries()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build();
-    }
 
     public abstract QueueDAO queueDAO();
 

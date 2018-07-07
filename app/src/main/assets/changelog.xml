@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="41" version="1.4.3">
+        <change type="fix">Errores en explorador</change>
+        <change type="fix">Error al mostrar algunas imagenes</change>
+    </release>
     <release code="40" version="1.4.2">
         <change type="new">Servidor Mp4Upload (Gracias raulhaag)</change>
         <change type="change">Tiempo reducido al obtener lista de animes en explorador</change>

@@ -19,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.FavoriteObject;
 
@@ -52,7 +53,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ItemHo
     @Override
     public void onBindViewHolder(final ItemHolder holder, int position) {
         final FavoriteObject object=list.get(position);
-        PicassoSingle.get(context).load(object.img).into(holder.imageView);
+        PicassoSingle.get(context).load(PatternUtil.getCover(object.aid)).into(holder.imageView);
         holder.title.setText(object.name);
         holder.type.setText(object.type);
         holder.cardView.setOnClickListener(view -> ActivityAnime.open(fragment, object, holder.imageView));

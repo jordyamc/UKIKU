@@ -20,6 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.favorite.objects.InfoContainer;
@@ -72,7 +73,7 @@ public class FavsSectionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             holder.action.setOnClickListener(v -> listener.onEdit(object.name));
         } else if (h instanceof ItemHolder) {
             ItemHolder holder = (ItemHolder) h;
-            PicassoSingle.get(context).load(object.img).into(holder.imageView);
+            PicassoSingle.get(context).load(PatternUtil.getCover(object.aid)).into(holder.imageView);
             holder.title.setText(object.name);
             holder.type.setText(object.type);
             holder.cardView.setOnClickListener(view -> ActivityAnime.open(fragment, object, holder.imageView));

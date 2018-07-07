@@ -30,6 +30,7 @@ import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.Network;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.commons.SelfServer;
@@ -81,7 +82,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
     public void onBindViewHolder(@NonNull final ItemHolder holder, int position) {
         final RecentObject object = list.get(position);
         holder.setState(isNetworkAvailable, object.isChapterDownloaded || object.isDownloading);
-        PicassoSingle.get(context).load(object.img).into(holder.imageView);
+        PicassoSingle.get(context).load(PatternUtil.getCover(object.aid)).into(holder.imageView);
         holder.setNew(object.isNew);
         holder.setFav(dao.isFav(Integer.parseInt(object.aid)));
         holder.setSeen(chaptersDAO.chapterIsSeen(object.eid));

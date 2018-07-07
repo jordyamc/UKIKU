@@ -18,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.SeeingDAO;
@@ -52,15 +53,10 @@ public class SeeingAdapter extends RecyclerView.Adapter<SeeingAdapter.SeeingItem
     public void onBindViewHolder(final SeeingItem holder, int position) {
         final SeeingObject seeingObject=list.get(position);
         final AnimeObject.WebInfo.AnimeChapter lastChapter=seeingObject.lastChapter;
-        PicassoSingle.get(activity).load(seeingObject.img).into(holder.imageView);
+        PicassoSingle.get(activity).load(PatternUtil.getCover(seeingObject.aid)).into(holder.imageView);
         holder.title.setText(seeingObject.title);
         holder.chapter.setText(lastChapter==null?"No empezado":lastChapter.number);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityAnime.open(activity,seeingObject,holder.imageView);
-            }
-        });
+        holder.cardView.setOnClickListener(v -> ActivityAnime.open(activity, seeingObject, holder.imageView));
     }
 
     @Override
