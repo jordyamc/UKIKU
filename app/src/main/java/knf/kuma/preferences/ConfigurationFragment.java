@@ -80,9 +80,10 @@ public class ConfigurationFragment extends PreferenceFragment {
         });
         getPreferenceScreen().findPreference("dir_update").setOnPreferenceClickListener(preference -> {
             try {
-                if (!DirectoryUpdateService.isRunning())
+                if (!DirectoryUpdateService.isRunning() && !DirectoryService.isRunning())
                     ContextCompat.startForegroundService(getActivity().getApplicationContext(), new Intent(getActivity().getApplicationContext(), DirectoryUpdateService.class));
-                else Toaster.toast("Ya se esta actualizando");
+                else if (DirectoryUpdateService.isRunning())
+                    Toaster.toast("Ya se esta actualizando");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -90,15 +91,18 @@ public class ConfigurationFragment extends PreferenceFragment {
         });
         getPreferenceScreen().findPreference("dir_destroy").setOnPreferenceClickListener(preference -> {
             try {
-                new MaterialDialog.Builder(getActivity())
-                        .content("¿Desea recrear el directorio?")
-                        .positiveText("continuar")
-                        .negativeText("cancelar")
-                        .onPositive((dialog, which) -> {
-                            CacheDB.INSTANCE.animeDAO().nuke();
-                            PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("directory_finished", false).apply();
-                            DirectoryService.run(getActivity().getApplicationContext());
-                        }).build().show();
+                if (!DirectoryUpdateService.isRunning() && !DirectoryService.isRunning())
+                    new MaterialDialog.Builder(getActivity())
+                            .content("¿Desea recrear el directorio?")
+                            .positiveText("continuar")
+                            .negativeText("cancelar")
+                            .onPositive((dialog, which) -> {
+                                CacheDB.INSTANCE.animeDAO().nuke();
+                                PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit().putBoolean("directory_finished", false).apply();
+                                DirectoryService.run(getActivity().getApplicationContext());
+                            }).build().show();
+                else if (DirectoryService.isRunning())
+                    Toaster.toast("Ya se esta creando");
             } catch (Exception e) {
                 e.printStackTrace();
             }

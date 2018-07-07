@@ -38,20 +38,24 @@ import knf.kuma.pojos.DirectoryPage;
 import pl.droidsonroids.jspoon.Jspoon;
 
 public class DirectoryService extends IntentService {
-    public static int NOT_CODE = 5598;
-    public static String CHANNEL = "directory_update";
-    private static boolean RUNNING = false;
     public static final int STATE_PARTIAL = 0;
-    private NotificationManager manager;
-    private int count = 0;
-    private int page = 0;
     public static final int STATE_FULL = 1;
     public static final int STATE_FINISHED = 2;
     public static final int STATE_INTERRUPTED = 3;
+    public static int NOT_CODE = 5598;
+    public static String CHANNEL = "directory_update";
+    private static boolean RUNNING = false;
     private static MutableLiveData<Integer> liveStatus = new MutableLiveData<>();
+    private NotificationManager manager;
+    private int count = 0;
+    private int page = 0;
 
     public DirectoryService() {
         super("Directory update");
+    }
+
+    public static boolean isRunning() {
+        return RUNNING;
     }
 
     public static void run(Context context) {

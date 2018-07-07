@@ -57,7 +57,7 @@ public class DirUpdateJob extends Job {
     @NonNull
     @Override
     protected Result onRunJob(@NonNull Params params) {
-        if (!DirectoryUpdateService.isRunning())
+        if (DirectoryUpdateService.isRunning())
             ContextCompat.startForegroundService(getContext(), new Intent(getContext(), DirectoryUpdateService.class));
         else Toaster.toast("El directorio ya se está actualizando");
         reSchedule(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("dir_update_time", "7")));

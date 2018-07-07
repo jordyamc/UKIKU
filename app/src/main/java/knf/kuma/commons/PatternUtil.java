@@ -33,6 +33,20 @@ public class PatternUtil {
         return matcher.group(1);
     }
 
+    public static String getYULink(String link) {
+        Pattern pattern = Pattern.compile("\"(.*yourupload.*)\"");
+        Matcher matcher = pattern.matcher(link);
+        matcher.find();
+        return matcher.group(1);
+    }
+
+    public static String getYUvideoLink(String link) {
+        Pattern pattern = Pattern.compile("file: ?'(.*vidcache.*mp4)'");
+        Matcher matcher = pattern.matcher(link);
+        matcher.find();
+        return matcher.group(1);
+    }
+
     public static String getLinkId(String link){
         Matcher matcher=Pattern.compile("^.*/(.*)-\\d+$").matcher(link);
         matcher.find();

@@ -12,6 +12,7 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.util.concurrent.TimeUnit;
 
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
@@ -54,7 +55,9 @@ public class DownloadService extends IntentService {
                 request.addHeader("Referer", intent.getStringExtra("referer"));
                 request.addHeader("User-Agent", intent.getStringExtra("ua"));
             }
-            Response response = new OkHttpClient().newCall(request.build()).execute();
+            Response response = new OkHttpClient().newBuilder()
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS).build().newCall(request.build()).execute();
             current.t_bytes = response.body().contentLength();
             BufferedInputStream inputStream = new BufferedInputStream(response.body().byteStream());
             BufferedOutputStream outputStream;

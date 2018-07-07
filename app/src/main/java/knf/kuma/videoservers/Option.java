@@ -2,6 +2,7 @@ package knf.kuma.videoservers;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,17 @@ public class Option implements Parcelable {
     public String name;
     public String url;
 
-    public Option(String server, String name, String url) {
+
+    /**
+     * Crea una opcion de descarga
+     *
+     * @param server Nombre del servidor de donde viene la opcion {@link VideoServer.Names}
+     * @param name   Nombre de la opcion, null si es una opcion unica
+     * @param url    Url de la opcion
+     */
+    public Option(String server, @Nullable String name, String url) {
+        if (url == null || url.trim().isEmpty())
+            throw new IllegalStateException("Url is not valid!");
         this.server = server;
         this.name = name;
         this.url = url;

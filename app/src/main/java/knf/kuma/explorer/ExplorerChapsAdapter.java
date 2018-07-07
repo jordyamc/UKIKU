@@ -1,6 +1,5 @@
 package knf.kuma.explorer;
 
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
@@ -10,7 +9,6 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +19,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
@@ -87,55 +84,34 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
     public void onBindViewHolder(@NonNull final ChapItem holder, int position) {
         final ExplorerObject.FileDownObj chapObject = explorerObject.chapters.get(position);
         loadThumb(chapObject, holder.imageView);
-        chaptersDAO.chapterSeen(chapObject.eid).observe(fragment, new Observer<AnimeObject.WebInfo.AnimeChapter>() {
-            @Override
-            public void onChanged(@Nullable AnimeObject.WebInfo.AnimeChapter chapter) {
-                holder.seenOverlay.setSeen(chapter != null,false);
-            }
-        });
+        chaptersDAO.chapterSeen(chapObject.eid).observe(fragment, chapter -> holder.seenOverlay.setSeen(chapter != null, false));
         holder.chapter.setText(String.format(Locale.getDefault(), "Episodio %s", chapObject.chapter));
         holder.time.setText(chapObject.time);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.cardView.setOnClickListener(v -> {
+            chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject));
+            recordsDAO.add(RecordObject.fromDownloaded(chapObject));
+            holder.seenOverlay.setSeen(true, true);
+            if (CastUtil.get().connected()) {
+                CastUtil.get().play(fragment.getActivity(), chapObject.eid, SelfServer.start(chapObject.fileName, true), chapObject.title, "Episodio " + chapObject.chapter, chapObject.aid, true);
+            } else {
+                ServersFactory.startPlay(context, chapObject.getChapTitle(), chapObject.fileName);
+            }
+        });
+        holder.cardView.setOnLongClickListener(v -> {
+            if (!chaptersDAO.chapterIsSeen(chapObject.eid)) {
                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject));
-                recordsDAO.add(RecordObject.fromDownloaded(chapObject));
-                holder.seenOverlay.setSeen(true,true);
-                if (CastUtil.get().connected()) {
-                    CastUtil.get().play(fragment.getActivity(), chapObject.eid, SelfServer.start(chapObject.fileName, true), chapObject.title, "Episodio " + chapObject.chapter, chapObject.aid, true);
-                } else {
-                    ServersFactory.startPlay(context, chapObject.getChapTitle(), chapObject.fileName);
-                }
+                holder.seenOverlay.setSeen(true, true);
+            } else {
+                chaptersDAO.deleteChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject));
+                holder.seenOverlay.setSeen(false, true);
             }
+            return true;
         });
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (!chaptersDAO.chapterIsSeen(chapObject.eid)){
-                    chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject));
-                    holder.seenOverlay.setSeen(true,true);
-                }else {
-                    chaptersDAO.deleteChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject));
-                    holder.seenOverlay.setSeen(false,true);
-                }
-                return true;
-            }
-        });
-        holder.action.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new MaterialDialog.Builder(context)
-                        .content("¿Eliminar el episodio " + chapObject.chapter + " de " + chapObject.title + "?")
-                        .positiveText("CONFIRMAR")
-                        .negativeText("CANCELAR")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                delete(chapObject, holder.getAdapterPosition());
-                            }
-                        }).build().show();
-            }
-        });
+        holder.action.setOnClickListener(v -> new MaterialDialog.Builder(context)
+                .content("¿Eliminar el episodio " + chapObject.chapter + " de " + chapObject.title + "?")
+                .positiveText("CONFIRMAR")
+                .negativeText("CANCELAR")
+                .onPositive((dialog, which) -> delete(chapObject, holder.getAdapterPosition())).build().show());
     }
 
     public void setInterface(FragmentChapters.ClearInterface clearInterface) {
@@ -147,12 +123,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
         downloadsDAO.deleteByEid(obj.eid);
         QueueManager.remove(obj.eid);
         explorerObject.chapters.remove(position);
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                notifyItemRemoved(position);
-            }
-        });
+        new Handler(Looper.getMainLooper()).post(() -> notifyItemRemoved(position));
         if (explorerObject.chapters.size() == 0) {
             explorerDAO.delete(explorerObject);
             clearInterface.onClear();
@@ -167,31 +138,18 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
         if (file.exists()) {
             PicassoSingle.get(context).load(file).into(imageView);
         } else {
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        final Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(object.path, MINI_KIND);
-                        if (bitmap == null) {
-                            throw new IllegalStateException("Null bitmap");
-                        } else {
-                            file.createNewFile();
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    PicassoSingle.get(context).load(file).into(imageView);
-                                }
-                            });
-                        }
-                    } catch (Exception e) {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                PicassoSingle.get(context).load(R.drawable.ic_no_thumb).fit().into(imageView);
-                            }
-                        });
+            AsyncTask.execute(() -> {
+                try {
+                    final Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(object.path, MINI_KIND);
+                    if (bitmap == null) {
+                        throw new IllegalStateException("Null bitmap");
+                    } else {
+                        file.createNewFile();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
+                        new Handler(Looper.getMainLooper()).post(() -> PicassoSingle.get(context).load(file).into(imageView));
                     }
+                } catch (Exception e) {
+                    new Handler(Looper.getMainLooper()).post(() -> PicassoSingle.get(context).load(R.drawable.ic_no_thumb).fit().into(imageView));
                 }
             });
         }
@@ -220,7 +178,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
         @BindView(R.id.action)
         ImageButton action;
 
-        public ChapItem(View itemView) {
+        ChapItem(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

@@ -22,47 +22,44 @@ import knf.kuma.pojos.ExplorerObject;
 public class ExplorerCreator {
     static boolean IS_CREATED = false;
     static boolean IS_FILES = true;
-    static String FILES_NAME;
+    static ExplorerObject FILES_NAME;
     private static MutableLiveData<String> STATE_LISTENER = new MutableLiveData<>();
     public static void start(final Context context, final EmptyListener listener) {
         IS_CREATED = true;
         final ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();
         postState("Iniciando busqueda");
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
-                File root = FileAccessHelper.INSTANCE.getDownloadsDirectory();
-                if (root.exists()) {
-                    postState("Buscando animes");
-                    List<ExplorerObject> list = new ArrayList<>();
-                    File[] files = root.listFiles();
-                    if (files != null) {
-                        List<String> names = new ArrayList<>();
-                        int progress = 0;
-                        for (File file : files) {
-                            names.add(file.getName());
+        AsyncTask.execute(() -> {
+            AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
+            File root = FileAccessHelper.INSTANCE.getDownloadsDirectory();
+            if (root.exists()) {
+                postState("Buscando animes");
+                List<ExplorerObject> list = new ArrayList<>();
+                File[] files = root.listFiles();
+                if (files != null) {
+                    List<String> names = new ArrayList<>();
+                    int progress = 0;
+                    for (File file : files) {
+                        names.add(file.getName());
+                    }
+                    for (AnimeObject object : animeDAO.getAllByFile(names))
+                        try {
+                            progress++;
+                            postState(String.format(Locale.getDefault(), "Procesando animes %d/%d", progress, files.length));
+                            list.add(new ExplorerObject(object));
+                        } catch (IllegalStateException e) {
+                            e.printStackTrace();
                         }
-                        for (AnimeObject object : animeDAO.getAllByFile(names))
-                            try {
-                                progress++;
-                                postState(String.format(Locale.getDefault(), "Procesando animes %d/%d", progress, files.length));
-                                list.add(new ExplorerObject(context, object));
-                            } catch (IllegalStateException e) {
-                                e.printStackTrace();
-                            }
-                        postState("Creando lista");
-                        explorerDAO.insert(list);
-                    }
-                    if (list.size() == 0) {
-                        listener.onEmpty();
-                        postState(null);
-                    }
-                } else {
-                    explorerDAO.deleteAll();
+                    postState("Creando lista");
+                    explorerDAO.insert(list);
+                }
+                if (list.size() == 0) {
                     listener.onEmpty();
                     postState(null);
                 }
+            } else {
+                explorerDAO.deleteAll();
+                listener.onEmpty();
+                postState(null);
             }
         });
     }
@@ -79,12 +76,7 @@ public class ExplorerCreator {
     }
 
     private static void postState(final String state) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                STATE_LISTENER.setValue(state);
-            }
-        });
+        new Handler(Looper.getMainLooper()).post(() -> STATE_LISTENER.setValue(state));
     }
 
     public interface EmptyListener {

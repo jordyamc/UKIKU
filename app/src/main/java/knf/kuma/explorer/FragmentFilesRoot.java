@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import knf.kuma.R;
+import knf.kuma.pojos.ExplorerObject;
 
 public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.SelectedListener, FragmentChapters.ClearInterface, ExplorerCreator.EmptyListener {
 
@@ -50,17 +51,17 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         super.onViewCreated(view, savedInstanceState);
     }
 
-    private void setFragment(boolean isFiles, @Nullable String name) {
+    private void setFragment(boolean isFiles, @Nullable ExplorerObject object) {
         this.isFiles = isFiles;
-        this.name = name;
+        this.name = object != null ? object.name : null;
         ExplorerCreator.IS_FILES = isFiles;
-        ExplorerCreator.FILES_NAME = name;
+        ExplorerCreator.FILES_NAME = object;
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         if (isFiles) {
             transaction.hide(chapters);
             transaction.show(files);
         } else {
-            chapters.setName(name);
+            chapters.setObject(object);
             transaction.hide(files);
             transaction.show(chapters);
         }
@@ -90,8 +91,8 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     }
 
     @Override
-    public void onSelected(String name) {
-        setFragment(false, name);
+    public void onSelected(ExplorerObject object) {
+        setFragment(false, object);
     }
 
     @Override

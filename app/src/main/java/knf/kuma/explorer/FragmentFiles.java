@@ -1,6 +1,5 @@
 package knf.kuma.explorer;
 
-import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,8 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,23 +50,20 @@ public class FragmentFiles extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        CacheDB.INSTANCE.explorerDAO().getAll().observe(this, new Observer<List<ExplorerObject>>() {
-            @Override
-            public void onChanged(List<ExplorerObject> explorerObjects) {
-                adapter.update(explorerObjects);
-                if (explorerObjects.size() != 0) {
-                    progressBar.setVisibility(View.GONE);
-                    state.setVisibility(View.GONE);
+        CacheDB.INSTANCE.explorerDAO().getAll().observe(this, explorerObjects -> {
+            adapter.update(explorerObjects);
+            if (explorerObjects.size() != 0) {
+                progressBar.setVisibility(View.GONE);
+                state.setVisibility(View.GONE);
+                if (isFist) {
+                    isFist = false;
                     recyclerView.scheduleLayoutAnimation();
                 }
             }
         });
-        ExplorerCreator.getStateListener().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                state.setText(s);
-                state.setVisibility(s == null ? View.GONE : View.VISIBLE);
-            }
+        ExplorerCreator.getStateListener().observe(this, s -> {
+            state.setText(s);
+            state.setVisibility(s == null ? View.GONE : View.VISIBLE);
         });
     }
 
@@ -93,13 +87,10 @@ public class FragmentFiles extends Fragment {
     }
 
     public void onEmpty() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(View.GONE);
-                error.setVisibility(View.VISIBLE);
-                state.setVisibility(View.GONE);
-            }
+        new Handler(Looper.getMainLooper()).post(() -> {
+            progressBar.setVisibility(View.GONE);
+            error.setVisibility(View.VISIBLE);
+            state.setVisibility(View.GONE);
         });
     }
 
@@ -110,6 +101,6 @@ public class FragmentFiles extends Fragment {
     }
 
     public interface SelectedListener {
-        void onSelected(String name);
+        void onSelected(ExplorerObject object);
     }
 }

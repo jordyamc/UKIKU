@@ -59,18 +59,10 @@ public class ExplorerFilesAdapter extends RecyclerView.Adapter<ExplorerFilesAdap
         PicassoSingle.get(fragment.getContext()).load(object.img).into(holder.imageView);
         holder.title.setText(object.name);
         holder.chapter.setText(String.format(Locale.getDefault(),object.count==1?"%d archivo":"%d archivos",object.count));
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onSelected(object.fileName);
-            }
-        });
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                ActivityAnime.open(fragment,object,holder.imageView);
-                return true;
-            }
+        holder.cardView.setOnClickListener(v -> listener.onSelected(object));
+        holder.cardView.setOnLongClickListener(v -> {
+            ActivityAnime.open(fragment, object, holder.imageView);
+            return true;
         });
     }
 

@@ -1,5 +1,8 @@
 package knf.kuma.pojos;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -8,6 +11,9 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -21,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import knf.kuma.commons.PatternUtil;
+import knf.kuma.database.CacheDB;
 import knf.kuma.downloadservice.FileAccessHelper;
 
 @Entity
@@ -34,9 +41,17 @@ public class ExplorerObject {
     public String name;
     public int count;
     public String path;
-    public List<FileDownObj> chapters;
+    public List<FileDownObj> chapters = new ArrayList<>();
     @Ignore
-    public boolean isProcessed = false;
+    MutableLiveData<List<FileDownObj>> liveData = new MutableLiveData<>();
+    @Ignore
+    private boolean isProcessed = false;
+    @Ignore
+    private boolean isProcessing = false;
+    @Ignore
+    private String aid;
+    @Ignore
+    private File[] file_list;
 
     public ExplorerObject(int key, String img, String link, String fileName, String name, int count, String path, List<FileDownObj> chapters) {
         this.key = key;
@@ -46,11 +61,13 @@ public class ExplorerObject {
         this.name = name;
         this.count = count;
         this.path = path;
+        File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
+        this.file_list = file.listFiles();
         this.chapters = chapters;
     }
 
     @Ignore
-    public ExplorerObject(Context context, @Nullable AnimeObject object) throws IllegalStateException {
+    public ExplorerObject(@Nullable AnimeObject object) throws IllegalStateException {
         if (object == null)
             throw new IllegalStateException("Anime not found!!!");
         this.key = object.key;
@@ -58,24 +75,49 @@ public class ExplorerObject {
         this.link = object.link;
         this.fileName = object.fileName;
         this.name = object.name;
+        this.aid = object.aid;
         File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.fileName);
-        File[] list = file.listFiles();
-        if (list == null)
+        file_list = file.listFiles();
+        if (file_list == null)
             throw new IllegalStateException("Directory empty: " + object.fileName);
+        this.count = file_list.length;
         this.path = file.getAbsolutePath();
-        chapters = new ArrayList<>();
-        for (File chap : list) {
-            try {
-                String name = chap.getName();
-                chapters.add(new FileDownObj(context, object.name, object.aid, PatternUtil.getNumFromfile(name), name, chap));
-            } catch (Exception e) {
-                //e.printStackTrace();
+    }
+
+    private void process(Context context) {
+        isProcessing = true;
+        AsyncTask.execute(() -> {
+            chapters = new ArrayList<>();
+            File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
+            this.file_list = file.listFiles();
+            for (File chap : file_list) {
+                try {
+                    String name = chap.getName();
+                    chapters.add(new FileDownObj(context, name, aid, PatternUtil.getNumFromfile(name), name, chap));
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
             }
-        }
-        this.count = chapters.size();
-        if (count == 0)
-            throw new IllegalStateException("Directory empty: " + object.fileName);
-        Collections.sort(chapters);
+            this.count = chapters.size();
+            if (count == 0)
+                throw new IllegalStateException("Directory empty: " + fileName);
+            Collections.sort(chapters);
+            isProcessed = true;
+            isProcessing = false;
+            new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(chapters));
+            CacheDB.INSTANCE.explorerDAO().update(this);
+        });
+    }
+
+    public LiveData<List<FileDownObj>> getLiveData(Context context) {
+        if (!isProcessed && !isProcessing) process(context);
+        else if (isProcessed || chapters.size() > 0)
+            new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(chapters));
+        return liveData;
+    }
+
+    public void clearLiveData(LifecycleOwner owner) {
+        liveData.removeObservers(owner);
     }
 
     public static class FileDownObj implements Comparable<FileDownObj> {

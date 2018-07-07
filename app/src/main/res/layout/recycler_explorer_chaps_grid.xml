@@ -22,4 +22,11 @@
         app:spanCount="@integer/span_count_large"
         tools:listitem="@layout/item_chap_grid"/>
 
+    <ProgressBar
+        android:id="@+id/progress"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+
 </RelativeLayout>
