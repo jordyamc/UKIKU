@@ -33,7 +33,6 @@ import knf.kuma.R;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
-import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.commons.SelfServer;
@@ -105,7 +104,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
         if (!Network.isConnected() || chapter.img == null)
             holder.imageView.setVisibility(View.GONE);
         if (chapter.img != null)
-            PicassoSingle.get(context).load(PatternUtil.getCover(chapter.aid)).into(holder.imageView, new Callback() {
+            PicassoSingle.get(context).load(chapter.img).into(holder.imageView, new Callback() {
                 @Override
                 public void onSuccess() {
                     holder.imageView.setVisibility(View.VISIBLE);
