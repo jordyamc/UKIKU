@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder;
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity;
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem;
-import com.danielstone.materialaboutlibrary.items.MaterialAboutItemOnClickAction;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 
@@ -32,12 +31,7 @@ public class AppInfo extends MaterialAboutActivity {
         MaterialAboutCard.Builder infoCard = new MaterialAboutCard.Builder();
         infoCard.addItem(ConvenienceBuilder.createAppTitleItem(this));
         infoCard.addItem(ConvenienceBuilder.createVersionActionItem(this, getDrawable(R.drawable.ic_version), "Versión", true));
-        infoCard.addItem(new MaterialAboutActionItem.Builder().text("Changelog").icon(R.drawable.ic_changelog_get).setOnClickAction(new MaterialAboutItemOnClickAction() {
-            @Override
-            public void onClick() {
-                ChangelogActivity.open(AppInfo.this);
-            }
-        }).build());
+        infoCard.addItem(new MaterialAboutActionItem.Builder().text("Changelog").icon(R.drawable.ic_changelog_get).setOnClickAction(() -> ChangelogActivity.open(AppInfo.this)).build());
         MaterialAboutCard.Builder authorCard = new MaterialAboutCard.Builder();
         authorCard.title("Autor");
         authorCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_author), "Jordy Mendoza", true, Uri.parse("https://t.me/UnbarredStream")));
@@ -50,16 +44,12 @@ public class AppInfo extends MaterialAboutActivity {
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_web), "Página web", true, Uri.parse("http://ukiku.ga")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_github), "Proyecto en github", true, Uri.parse("https://github.com/jordyamc/UKIKU")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_facebook), "Facebook", true, Uri.parse("https://www.facebook.com/ukikuapp")));
+        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_facebook_group), "Grupo de Facebook", true, Uri.parse("https://www.facebook.com/groups/ukikugroup/")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_discord), "Discord", false, Uri.parse("https://discord.gg/6hzpua6")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_beta), "Grupo Beta", false, Uri.parse("https://t.me/joinchat/A3tvqEKOzGVyaZhQPc14_Q")));
         final String ea = EAHelper.getEAMessage(this);
         if (ea != null)
-            extraCard.addItem(new MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction(new MaterialAboutItemOnClickAction() {
-                @Override
-                public void onClick() {
-                    Toaster.toastLong(ea);
-                }
-            }).build());
+            extraCard.addItem(new MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction(() -> Toaster.toastLong(ea)).build());
         return new MaterialAboutList.Builder()
                 .addCard(infoCard.build())
                 .addCard(authorCard.build())

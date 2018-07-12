@@ -120,7 +120,7 @@ public class FileAccessHelper {
                     File file = new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
                     file.delete();
                     File dir = file.getParentFile();
-                    if (dir.listFiles().length == 0)
+                    if (dir.listFiles() == null || dir.listFiles().length == 0)
                         dir.delete();
                 } else {
                     try {
@@ -129,7 +129,7 @@ public class FileAccessHelper {
                             DocumentFile file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
                             file.delete();
                             DocumentFile dir = file.getParentFile();
-                            if (dir.listFiles().length == 0)
+                            if (dir != null && dir.listFiles().length == 0)
                                 dir.delete();
                         }
                     } catch (Exception e) {
