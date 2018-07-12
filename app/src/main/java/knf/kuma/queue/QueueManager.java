@@ -47,12 +47,15 @@ public class QueueManager {
     }
 
     static void startQueue(Context context, List<QueueObject> list) {
-        markAllSeen(list);
-        if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")
-                || isMxInstalled(context) == null)
-            startQueueInternal(context, list);
-        else
-            startQueueExternal(context, list);
+        if (list.size() > 0) {
+            markAllSeen(list);
+            if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")
+                    || isMxInstalled(context) == null)
+                startQueueInternal(context, list);
+            else
+                startQueueExternal(context, list);
+        } else
+            Toaster.toast("La lista esta vacía");
     }
 
     private static void startQueueInternal(Context context, List<QueueObject> list) {

@@ -79,7 +79,7 @@ public class TVAnimesDetailsFragment extends DetailsSupportFragment implements O
 
     private void buildDetails() {
         new Repository().getAnime(getContext(), getArguments().getString("url"), true).observe(getActivity(), animeObject ->
-                Glide.with(getActivity()).asBitmap().load(animeObject.img).into(new SimpleTarget<Bitmap>() {
+                Glide.with(getActivity()).asBitmap().load(PatternUtil.getCover(animeObject.aid)).into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         Palette.from(resource).generate(palette -> {

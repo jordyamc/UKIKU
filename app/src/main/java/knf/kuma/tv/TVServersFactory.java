@@ -136,7 +136,8 @@ public class TVServersFactory {
     }
 
     public void analizeOption(int position) {
-        startStreaming(current.options.get(position));
+        if (current != null)
+            startStreaming(current.options.get(position));
     }
 
     private void showOptions(final VideoServer server) {

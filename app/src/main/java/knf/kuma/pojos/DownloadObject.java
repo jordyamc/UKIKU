@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
 import knf.kuma.database.BaseConverter;
+import knf.kuma.videoservers.Headers;
 
 @Entity
 @TypeConverters({BaseConverter.class})
@@ -24,6 +25,7 @@ public class DownloadObject {
     public String link;
     public String name;
     public String chapter;
+    public Headers headers;
     @Ignore
     public String title;
     @Ignore
@@ -34,13 +36,14 @@ public class DownloadObject {
     public boolean canResume;
     public int state;
 
-    public DownloadObject(int key, String eid, String file, String link, String name, String chapter, int progress, long d_bytes, long t_bytes, boolean canResume, int state) {
+    public DownloadObject(int key, String eid, String file, String link, String name, String chapter, Headers headers, int progress, long d_bytes, long t_bytes, boolean canResume, int state) {
         this.key = key;
         this.eid = eid;
         this.file = file;
         this.link = link;
         this.name = name;
         this.chapter = chapter;
+        this.headers = headers;
         this.title = name + chapter.substring(chapter.lastIndexOf(" "));
         this.progress = progress;
         this.d_bytes = d_bytes;

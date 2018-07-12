@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import knf.kuma.R;
 import knf.kuma.pojos.ExplorerObject;
 
@@ -18,6 +20,7 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     private boolean isFiles = true;
     private String name;
     private Boolean isRestored = false;
+    private OnFileStateChange stateChange;
 
     public FragmentFilesRoot() {
         files = FragmentFiles.get(this);
@@ -52,6 +55,7 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     }
 
     private void setFragment(boolean isFiles, @Nullable ExplorerObject object) {
+        stateChange.onChange(isFiles);
         this.isFiles = isFiles;
         this.name = object != null ? object.name : null;
         ExplorerCreator.IS_FILES = isFiles;
@@ -88,6 +92,20 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         outState.putBoolean("isFiles", isFiles);
         outState.putString("name", name);
         outState.putBoolean("isRestored", true);
+    }
+
+    public void setStateChange(OnFileStateChange stateChange) {
+        this.stateChange = stateChange;
+    }
+
+    public void onRemoveAll() {
+        if (name != null && chapters != null)
+            new MaterialDialog.Builder(getActivity())
+                    .content("¿Eliminar todos los capitulos de " + name + "?")
+                    .positiveText("Eliminar")
+                    .negativeText("Cancelar")
+                    .onPositive((dialog, which) -> chapters.deleteAll())
+                    .build().show();
     }
 
     @Override

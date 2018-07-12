@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="43" version="1.4.5">
+        <change type="fix">Errores generales</change>
+        <change type="new">Servidor Mango</change>
+    </release>
     <release code="42" version="1.4.4">
         <change type="fix">Error en preview de episodio</change>
     </release>

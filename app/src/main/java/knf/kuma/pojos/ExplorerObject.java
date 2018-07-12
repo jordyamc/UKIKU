@@ -16,7 +16,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.downloadservice.FileAccessHelper;
+import xdroid.toaster.Toaster;
 
 @Entity
 @TypeConverters(ExplorerObject.Converter.class)
@@ -78,7 +81,7 @@ public class ExplorerObject {
         this.aid = object.aid;
         File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.fileName);
         file_list = file.listFiles();
-        if (file_list == null)
+        if (file_list == null || file_list.length == 0)
             throw new IllegalStateException("Directory empty: " + object.fileName);
         this.count = file_list.length;
         this.path = file.getAbsolutePath();
@@ -87,25 +90,32 @@ public class ExplorerObject {
     private void process(Context context) {
         isProcessing = true;
         AsyncTask.execute(() -> {
-            chapters = new ArrayList<>();
-            File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
-            this.file_list = file.listFiles();
-            for (File chap : file_list) {
-                try {
-                    String file_name = chap.getName();
-                    chapters.add(new FileDownObj(context, name, aid, PatternUtil.getNumFromfile(file_name), file_name, chap));
-                } catch (Exception e) {
-                    //e.printStackTrace();
+            try {
+                chapters = new ArrayList<>();
+                File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
+                this.file_list = file.listFiles();
+                for (File chap : file_list) {
+                    try {
+                        String file_name = chap.getName();
+                        chapters.add(new FileDownObj(context, name, aid, PatternUtil.getNumFromfile(file_name), file_name, chap));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                this.count = chapters.size();
+                if (count == 0)
+                    Log.e("Directory empty", fileName);
+                Collections.sort(chapters);
+                isProcessed = true;
+                isProcessing = false;
+                new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(chapters));
+                CacheDB.INSTANCE.explorerDAO().update(this);
+            } catch (Exception e) {
+                Crashlytics.logException(e);
+                Toaster.toast("Error al obtener lista de episodios");
+                isProcessed = true;
+                isProcessing = false;
             }
-            this.count = chapters.size();
-            if (count == 0)
-                throw new IllegalStateException("Directory empty: " + fileName);
-            Collections.sort(chapters);
-            isProcessed = true;
-            isProcessing = false;
-            new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(chapters));
-            CacheDB.INSTANCE.explorerDAO().update(this);
         });
     }
 

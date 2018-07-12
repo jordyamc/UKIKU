@@ -150,29 +150,19 @@ public class ServersFactory {
                                             Toaster.toast("Error en servidor, intente mas tarde");
                                             serversInterface.onFinish(false, false);
                                         } else if (server == null) {
+                                            servers.remove(selected);
+                                            selected = 0;
                                             Toaster.toast("Error en servidor");
                                             showServerList();
                                         } else if (server.options.size() == 0) {
+                                            servers.remove(selected);
+                                            selected = 0;
                                             Toaster.toast("Error en servidor");
                                             showServerList();
                                         } else if (server.haveOptions()) {
                                             showOptions(server, false);
                                         } else {
                                             switch (text.toString().toLowerCase()) {
-                                                case "zippyshare":
-                                                    ZippyHelper.calculate(context, server.getOption().url, new ZippyHelper.OnZippyResult() {
-                                                        @Override
-                                                        public void onSuccess(ZippyHelper.ZippyObject object) {
-                                                            startDownload(server.getOption(), object);
-                                                        }
-
-                                                        @Override
-                                                        public void onError() {
-                                                            Toaster.toast("Error en servidor");
-                                                            showServerList();
-                                                        }
-                                                    });
-                                                    break;
                                                 case "mega":
                                                     context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
                                                     break;
@@ -203,37 +193,34 @@ public class ServersFactory {
                                             .progress(true, 0)
                                             .build();
                                     dialog.show();
-                                    AsyncTask.execute(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                final VideoServer server = servers.get(selected).getVideoServer();
-                                                dialog.dismiss();
-                                                if (server == null && servers.size() == 1) {
-                                                    Toaster.toast("Error en servidor, intente mas tarde");
-                                                    serversInterface.onFinish(false, false);
-                                                } else if (server == null) {
-                                                    Toaster.toast("Error en servidor");
-                                                    showServerList();
-                                                } else if (server.haveOptions()) {
-                                                    showOptions(server, true);
-                                                } else {
-                                                    switch (Server.getNames(servers).get(d.getSelectedIndex()).toLowerCase()) {
-                                                        case "zippyshare":
-                                                            Toaster.toast("No soportado en CAST");
-                                                            showServerList();
-                                                            break;
-                                                        case "mega":
-                                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
-                                                            break;
-                                                        default:
-                                                            serversInterface.onCast(server.getOption().url);
-                                                            break;
-                                                    }
+                                    AsyncTask.execute(() -> {
+                                        try {
+                                            final VideoServer server = servers.get(selected).getVideoServer();
+                                            dialog.dismiss();
+                                            if (server == null && servers.size() == 1) {
+                                                Toaster.toast("Error en servidor, intente mas tarde");
+                                                serversInterface.onFinish(false, false);
+                                            } else if (server == null) {
+                                                Toaster.toast("Error en servidor");
+                                                showServerList();
+                                            } else if (server.haveOptions()) {
+                                                showOptions(server, true);
+                                            } else {
+                                                switch (Server.getNames(servers).get(d.getSelectedIndex()).toLowerCase()) {
+                                                    case "zippyshare":
+                                                        Toaster.toast("No soportado en CAST");
+                                                        showServerList();
+                                                        break;
+                                                    case "mega":
+                                                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
+                                                        break;
+                                                    default:
+                                                        serversInterface.onCast(server.getOption().url);
+                                                        break;
                                                 }
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
                                             }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
                                         }
                                     });
                                 });
@@ -300,23 +287,9 @@ public class ServersFactory {
         }
         Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
         downloadObject.link = option.url;
+        downloadObject.headers = option.headers;
         CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
         ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));
-        serversInterface.onFinish(true, true);
-    }
-
-    private void startDownload(Option option,ZippyHelper.ZippyObject object) {
-        downloadObject.link = object.download_url;
-        CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
-        CookieConstructor constructor=object.cookieConstructor;
-        Intent intent=new Intent(context,DownloadService.class)
-                .setData(Uri.parse(option.url))
-                .putExtra("eid", downloadObject.eid)
-                .putExtra("constructor",true)
-                .putExtra("cookie",constructor.getCookie())
-                .putExtra("referer",constructor.getReferer())
-                .putExtra("ua",constructor.getUseAgent());
-        ContextCompat.startForegroundService(context, intent);
         serversInterface.onFinish(true, true);
     }
 

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.Crashlytics;
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.android.Auth;
@@ -216,34 +217,39 @@ public class BUUtils {
 
     private static void searchDrive(final String id, final SearchInterface searchInterface) {
         AsyncTask.execute(() -> {
-            final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
-            appFolderTask.continueWithTask(task -> {
-                DriveFolder appfolder = appFolderTask.getResult();
-                Query query = new Query.Builder()
-                        .addFilter(Filters.contains(SearchableField.TITLE, id))
-                        .build();
-                return DRC.queryChildren(appfolder, query);
-            }).continueWithTask(task -> {
-                MetadataBuffer metadata = task.getResult();
-                if (metadata.getCount() > 0) {
-                    DriveFile driveFile = metadata.get(0).getDriveId().asDriveFile();
-                    metadata.release();
-                    return DRC.openFile(driveFile, DriveFile.MODE_READ_ONLY);
-                } else {
-                    metadata.release();
-                    return null;
-                }
-            }).addOnSuccessListener(activity, driveContents -> {
-                try {
-                    searchInterface.onResponse(new Gson().fromJson(new InputStreamReader(driveContents.getInputStream()), getType(id)));
-                } catch (Exception e) {
+            try {
+                final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
+                appFolderTask.continueWithTask(task -> {
+                    DriveFolder appfolder = appFolderTask.getResult();
+                    Query query = new Query.Builder()
+                            .addFilter(Filters.contains(SearchableField.TITLE, id))
+                            .build();
+                    return DRC.queryChildren(appfolder, query);
+                }).continueWithTask(task -> {
+                    MetadataBuffer metadata = task.getResult();
+                    if (metadata.getCount() > 0) {
+                        DriveFile driveFile = metadata.get(0).getDriveId().asDriveFile();
+                        metadata.release();
+                        return DRC.openFile(driveFile, DriveFile.MODE_READ_ONLY);
+                    } else {
+                        metadata.release();
+                        return null;
+                    }
+                }).addOnSuccessListener(activity, driveContents -> {
+                    try {
+                        searchInterface.onResponse(new Gson().fromJson(new InputStreamReader(driveContents.getInputStream()), getType(id)));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        searchInterface.onResponse(null);
+                    }
+                }).addOnFailureListener(activity, e -> {
                     e.printStackTrace();
                     searchInterface.onResponse(null);
-                }
-            }).addOnFailureListener(activity, e -> {
-                e.printStackTrace();
+                });
+            } catch (Exception e) {
+                Crashlytics.logException(e);
                 searchInterface.onResponse(null);
-            });
+            }
         });
     }
 

@@ -97,7 +97,11 @@ public class WEListProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public long getItemId(int position) {
-        return items.get(position).key;
+        try {
+            return items.get(position).key;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Override

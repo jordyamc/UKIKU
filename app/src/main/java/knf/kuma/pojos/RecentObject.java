@@ -52,22 +52,26 @@ public class RecentObject {
         populate(webInfo);
     }
 
-    private RecentObject(AnimeDAO dao,WebInfo webInfo) {
+    private RecentObject(AnimeDAO dao, WebInfo webInfo) {
         this.webInfo = webInfo;
-        populate(dao,webInfo);
+        populate(dao, webInfo);
     }
 
     public static List<RecentObject> create(List<WebInfo> infos) {
-        AnimeDAO dao=CacheDB.INSTANCE.animeDAO();
+        AnimeDAO dao = CacheDB.INSTANCE.animeDAO();
         List<RecentObject> objects = new ArrayList<>();
         for (WebInfo info : infos) {
-            objects.add(new RecentObject(dao,info));
+            try {
+                objects.add(new RecentObject(dao, info));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return objects;
     }
 
     public String getFileName() {
-        return eid+"$"+PatternUtil.getFileName(url);
+        return eid + "$" + PatternUtil.getFileName(url);
     }
 
     public String getEpTitle() {
@@ -87,6 +91,8 @@ public class RecentObject {
     }
 
     private void populate(WebInfo webInfo) {
+        if (!isNumeric(webInfo.aid) || !isNumeric(webInfo.eid))
+            throw new IllegalStateException("Aid and Eid must be numbers");
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
         this.name = Html.fromHtml(webInfo.name).toString();
@@ -107,7 +113,7 @@ public class RecentObject {
         this.animeObject = CacheDB.INSTANCE.animeDAO().getByAid(aid);
     }
 
-    private void populate(AnimeDAO dao,WebInfo webInfo) {
+    private void populate(AnimeDAO dao, WebInfo webInfo) {
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
         this.name = Html.fromHtml(webInfo.name).toString();
@@ -126,6 +132,16 @@ public class RecentObject {
             this.downloadState = -8;
         }
         this.animeObject = dao.getByAid(aid);
+    }
+
+    private boolean isNumeric(String number) {
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public static class WebInfo {

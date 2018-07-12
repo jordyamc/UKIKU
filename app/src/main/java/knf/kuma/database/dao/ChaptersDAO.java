@@ -23,10 +23,10 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM animechapter")
     List<AnimeObject.WebInfo.AnimeChapter> getAll();
 
-    @Query("SELECT * FROM animechapter WHERE eid LIKE :eid LIMIT 1")
+    @Query("SELECT * FROM animechapter WHERE eid = :eid LIMIT 1")
     LiveData<AnimeObject.WebInfo.AnimeChapter> chapterSeen(String eid);
 
-    @Query("SELECT count(*) FROM animechapter WHERE eid LIKE :eid")
+    @Query("SELECT count(*) FROM animechapter WHERE eid = :eid")
     Boolean chapterIsSeen(String eid);
 
     @Query("SELECT * FROM animechapter WHERE eid IN (:eids) ORDER BY eid DESC LIMIT 1")

@@ -1,5 +1,6 @@
 package knf.kuma.explorer;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,8 +14,10 @@ public class ExplorerPagerAdapter extends PagerAdapter {
 
     private FragmentManager fragmentManager;
     private Fragment[] fragments;
+    private OnFileStateChange stateChange;
 
-    public ExplorerPagerAdapter(FragmentManager fragmentManager) {
+    public ExplorerPagerAdapter(Context context, FragmentManager fragmentManager) {
+        this.stateChange = (OnFileStateChange) context;
         this.fragmentManager = fragmentManager;
         fragments = new Fragment[2];
     }
@@ -66,6 +69,8 @@ public class ExplorerPagerAdapter extends PagerAdapter {
     public Fragment getItem(int position) {
         if (fragments[position] == null) {
             fragments[position] = createFragment(position);
+            if (position == 0)
+                ((FragmentFilesRoot) fragments[position]).setStateChange(stateChange);
         }
         return fragments[position];
     }
@@ -77,6 +82,14 @@ public class ExplorerPagerAdapter extends PagerAdapter {
                 return FragmentFilesRoot.get();
             case 1:
                 return FragmentDownloads.get();
+        }
+    }
+
+    void onRemoveAllClicked() {
+        try {
+            ((FragmentFilesRoot) fragments[0]).onRemoveAll();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -223,11 +223,12 @@ public class FavoriteFragment extends BottomFragment implements FavsSectionAdapt
                         .title("Mover a...")
                         .items(categories)
                         .itemsCallbackSingleChoice(categories.indexOf(object.category), (dialog, itemView, which, text) -> {
-                            if (!text.equals(object.category)) {
+                            if (text != null && !text.equals(object.category)) {
                                 edited = object;
                                 edited.setCategory(text.toString().equals("Sin categoría") ? "_NONE_" : text.toString());
                                 CacheDB.INSTANCE.favsDAO().addFav(edited);
-                            }
+                            } else
+                                Toaster.toast("Error al mover");
                             return false;
                         })
                         .positiveText("mover")

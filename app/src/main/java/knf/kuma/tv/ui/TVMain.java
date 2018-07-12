@@ -67,23 +67,24 @@ public class TVMain extends TVBaseActivity implements TVServersFactory.ServersIn
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == BUUtils.LOGIN_CODE) {
-            if (resultCode == RESULT_OK) {
-                GoogleSignIn.getSignedInAccountFromIntent(data);
-                BUUtils.setType(BUUtils.BUType.DRIVE);
-                BUUtils.setDriveClient();
-            } else if (fragment != null) {
-                fragment.onLogin();
-            }
-        } else {
-            if (resultCode == Activity.RESULT_OK) {
+        if (data != null)
+            if (requestCode == BUUtils.LOGIN_CODE) {
+                if (resultCode == RESULT_OK) {
+                    GoogleSignIn.getSignedInAccountFromIntent(data);
+                    BUUtils.setType(BUUtils.BUType.DRIVE);
+                    BUUtils.setDriveClient();
+                } else if (fragment != null) {
+                    fragment.onLogin();
+                }
+            } else if (resultCode == Activity.RESULT_OK) {
                 Bundle bundle = data.getExtras();
-                if (bundle.getBoolean("is_video_server", false))
-                    serversFactory.analizeOption(bundle.getInt("position", 0));
-                else
-                    serversFactory.analizeServer(bundle.getInt("position", 0));
+                if (bundle != null)
+                    if (bundle.getBoolean("is_video_server", false))
+                        serversFactory.analizeOption(bundle.getInt("position", 0));
+                    else
+                        serversFactory.analizeServer(bundle.getInt("position", 0));
             } else if (resultCode == Activity.RESULT_CANCELED && data.getExtras().getBoolean("is_video_server", false))
                 serversFactory.showServerList();
-        }
     }
+
 }

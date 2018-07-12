@@ -84,7 +84,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
     public void onBindViewHolder(@NonNull final ChapItem holder, int position) {
         final ExplorerObject.FileDownObj chapObject = explorerObject.chapters.get(position);
         loadThumb(chapObject, holder.imageView);
-        chaptersDAO.chapterSeen(chapObject.eid).observe(fragment, chapter -> holder.seenOverlay.setSeen(chapter != null, false));
+        holder.seenOverlay.setSeen(chaptersDAO.chapterIsSeen(chapObject.eid), false);
         holder.chapter.setText(String.format(Locale.getDefault(), "Episodio %s", chapObject.chapter));
         holder.time.setText(chapObject.time);
         holder.cardView.setOnClickListener(v -> {
@@ -131,6 +131,22 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
             explorerObject.count=explorerObject.chapters.size();
             explorerDAO.update(explorerObject);
         }
+    }
+
+    void deleteAll() {
+        AsyncTask.execute(() -> {
+            int i = 0;
+            for (ExplorerObject.FileDownObj obj : explorerObject.chapters) {
+                FileAccessHelper.INSTANCE.delete(obj.fileName);
+                downloadsDAO.deleteByEid(obj.eid);
+                QueueManager.remove(obj.eid);
+                int finalI = i;
+                new Handler(Looper.getMainLooper()).post(() -> notifyItemRemoved(finalI));
+                i++;
+            }
+            explorerDAO.delete(explorerObject);
+            clearInterface.onClear();
+        });
     }
 
     private void loadThumb(final ExplorerObject.FileDownObj object, final ImageView imageView) {

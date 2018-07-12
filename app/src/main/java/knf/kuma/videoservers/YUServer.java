@@ -44,9 +44,11 @@ public class YUServer extends Server {
                     .build();
             Response response = client.newCall(request).execute();
             String ref_video_link = response.header("Location");
-            Log.e("YU", ref_video_link);
             response.close();
-            return new VideoServer(YOURUPLOAD, new Option(getName(), null, ref_video_link));
+            Headers headers = new Headers();
+            headers.addHeader("Range", "bytes=0-");
+            headers.addHeader("Referer", yu_link);
+            return new VideoServer(YOURUPLOAD, new Option(getName(), null, ref_video_link, headers));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

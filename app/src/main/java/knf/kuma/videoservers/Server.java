@@ -25,6 +25,7 @@ public abstract class Server implements Comparable<Server> {
                 new FireServer(context, base),
                 new HyperionServer(context, base),
                 new IzanagiServer(context, base),
+                new MangoServer(context, base),
                 new MegaServer(context, base),
                 new OkruServer(context, base),
                 new RVServer(context, base),

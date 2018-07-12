@@ -67,15 +67,17 @@ public class TVSearchFragment extends SearchSupportFragment implements SearchSup
 
     private void setResult(String query) {
         final LiveData<List<AnimeObject>> liveData = CacheDB.INSTANCE.animeDAO().getSearchList("%" + query + "%");
-        liveData.observe(getActivity(), animeObjects -> {
-            liveData.removeObservers(getActivity());
-            arrayObjectAdapter.clear();
-            ArrayObjectAdapter objectAdapter = new ArrayObjectAdapter(new AnimePresenter());
-            for (AnimeObject object : animeObjects)
-                objectAdapter.add(object);
-            HeaderItem headerItem = new HeaderItem(animeObjects.size() > 0 ? "Resultados para '" + query + "'" : "Sin resultados");
-            arrayObjectAdapter.add(new ListRow(headerItem, objectAdapter));
-        });
+        if (getActivity() != null) {
+            liveData.observe(getActivity(), animeObjects -> {
+                liveData.removeObservers(getActivity());
+                arrayObjectAdapter.clear();
+                ArrayObjectAdapter objectAdapter = new ArrayObjectAdapter(new AnimePresenter());
+                for (AnimeObject object : animeObjects)
+                    objectAdapter.add(object);
+                HeaderItem headerItem = new HeaderItem(animeObjects.size() > 0 ? "Resultados para '" + query + "'" : "Sin resultados");
+                arrayObjectAdapter.add(new ListRow(headerItem, objectAdapter));
+            });
+        }
     }
 
     @Override

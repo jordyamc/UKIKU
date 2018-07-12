@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.util.Pair;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -42,6 +43,8 @@ public class DownloadService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (intent == null)
+            return;
         current = downloadsDAO.getByEid(intent.getStringExtra("eid"));
         if (current == null)
             return;
@@ -50,18 +53,17 @@ public class DownloadService extends IntentService {
         try {
             Request.Builder request = new Request.Builder()
                     .url(intent.getDataString());
-            if (intent.getBooleanExtra("constructor", false)) {
-                request.addHeader("Cookie", intent.getStringExtra("cookie"));
-                request.addHeader("Referer", intent.getStringExtra("referer"));
-                request.addHeader("User-Agent", intent.getStringExtra("ua"));
-            }
+            if (current.headers != null)
+                for (Pair<String, String> pair : current.headers.getHeaders()) {
+                    request.addHeader(pair.first, pair.second);
+                }
             Response response = new OkHttpClient().newBuilder()
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(10, TimeUnit.SECONDS).build().newCall(request.build()).execute();
             current.t_bytes = response.body().contentLength();
             BufferedInputStream inputStream = new BufferedInputStream(response.body().byteStream());
             BufferedOutputStream outputStream;
-            if (response.code() == 200) {
+            if (response.code() == 200 || response.code() == 206) {
                 outputStream = new BufferedOutputStream(FileAccessHelper.INSTANCE.getOutputStream(current.file), 1024);
             } else {
                 Log.e("Download error", "Code: " + response.code());
@@ -175,7 +177,8 @@ public class DownloadService extends IntentService {
 
     private void cancelForeground() {
         stopForeground(true);
-        manager.cancel(DOWNLOADING_ID);
+        if (manager != null)
+            manager.cancel(DOWNLOADING_ID);
     }
 
     @Override

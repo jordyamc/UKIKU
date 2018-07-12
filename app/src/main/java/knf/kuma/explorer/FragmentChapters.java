@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,9 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.ExplorerObject;
+import xdroid.toaster.Toaster;
 
 public class FragmentChapters extends Fragment {
     public static final String TAG = "Chapters";
@@ -56,22 +59,35 @@ public class FragmentChapters extends Fragment {
     }
 
     public void setObject(ExplorerObject object) {
+        Log.e("Files", "on set");
         clear();
         object.getLiveData(getContext()).observe(this, fileDownObjs -> {
-            object.chapters = fileDownObjs;
-            if (isFirst) {
+            if (fileDownObjs.size() == 0) {
+                Toaster.toast("Directorio vacio");
+                CacheDB.INSTANCE.explorerDAO().delete(object);
+                clearInterface.onClear();
+            } else {
+                object.chapters = fileDownObjs;
                 progressBar.setVisibility(View.GONE);
-                isFirst = false;
                 adapter = new ExplorerChapsAdapter(FragmentChapters.this, object, clearInterface);
                 recyclerView.setAdapter(adapter);
-                recyclerView.scheduleLayoutAnimation();
+                if (isFirst) {
+                    isFirst = false;
+                    recyclerView.scheduleLayoutAnimation();
+                }
             }
-            object.clearLiveData(this);
+            //object.clearLiveData(this);
         });
+    }
+
+    void deleteAll() {
+        if (adapter != null)
+            adapter.deleteAll();
     }
 
     private void clear() {
         isFirst = true;
+        adapter = null;
         new Handler(Looper.getMainLooper()).post(() -> {
             if (progressBar != null)
                 progressBar.setVisibility(View.VISIBLE);

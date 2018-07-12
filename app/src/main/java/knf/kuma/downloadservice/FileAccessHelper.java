@@ -115,31 +115,28 @@ public class FileAccessHelper {
 
     public void delete(final String file_name){
         try {
-            if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
-                File file=new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
-                file.delete();
-                File dir=file.getParentFile();
-                if (dir.listFiles().length==0)
-                    dir.delete();
-            } else {
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            DocumentFile documentFile = DocumentFile.fromTreeUri(context, getTreeUri());
-                            if (documentFile != null && documentFile.exists()) {
-                                DocumentFile file=find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
-                                file.delete();
-                                DocumentFile dir=file.getParentFile();
-                                if (dir.listFiles().length==0)
-                                    dir.delete();
-                            }
-                        }catch (Exception e){
-                            //e.printStackTrace();
+            AsyncTask.execute(() -> {
+                if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
+                    File file = new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
+                    file.delete();
+                    File dir = file.getParentFile();
+                    if (dir.listFiles().length == 0)
+                        dir.delete();
+                } else {
+                    try {
+                        DocumentFile documentFile = DocumentFile.fromTreeUri(context, getTreeUri());
+                        if (documentFile != null && documentFile.exists()) {
+                            DocumentFile file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
+                            file.delete();
+                            DocumentFile dir = file.getParentFile();
+                            if (dir.listFiles().length == 0)
+                                dir.delete();
                         }
+                    } catch (Exception e) {
+                        //e.printStackTrace();
                     }
-                });
-            }
+                }
+            });
         } catch (Exception e) {
             //e.printStackTrace();
         }

@@ -149,7 +149,9 @@ public class TVMainFragment extends BrowseSupportFragment implements OnItemViewS
             TVServersFactory.start(getActivity(), object.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(object), ((TVMain) getActivity()));
         } else if (item instanceof RecordObject) {
             RecordObject object = (RecordObject) item;
-            TVAnimesDetails.start(getContext(), object.animeObject.link);
+            if (object.animeObject != null)
+                TVAnimesDetails.start(getContext(), object.animeObject.link);
+            else Toaster.toast("Anime no encontrado");
         } else if (item instanceof FavoriteObject) {
             FavoriteObject object = (FavoriteObject) item;
             TVAnimesDetails.start(getContext(), object.link);

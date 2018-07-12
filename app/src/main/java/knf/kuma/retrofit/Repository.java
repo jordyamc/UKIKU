@@ -80,14 +80,18 @@ public class Repository {
             getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, rest).enqueue(new Callback<AnimeObject.WebInfo>() {
                 @Override
                 public void onResponse(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Response<AnimeObject.WebInfo> response) {
-                    if (response.body() == null || response.code() != 200) {
-                        data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
-                        return;
+                    try {
+                        if (response.body() == null || response.code() != 200) {
+                            data.setValue(CacheDB.INSTANCE.animeDAO().getAnimeRaw(link));
+                            return;
+                        }
+                        AnimeObject animeObject = new AnimeObject(link, response.body());
+                        if (persist)
+                            dao.insert(animeObject);
+                        data.setValue(animeObject);
+                    } catch (Exception e) {
+                        data.setValue(null);
                     }
-                    AnimeObject animeObject = new AnimeObject(link, response.body());
-                    if (persist)
-                        dao.insert(animeObject);
-                    data.setValue(animeObject);
                 }
 
                 @Override

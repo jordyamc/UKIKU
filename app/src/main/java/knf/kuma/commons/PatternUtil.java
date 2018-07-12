@@ -105,6 +105,12 @@ public class PatternUtil {
         return matcher.group(0);
     }
 
+    public static String extractMangoLink(String html) {
+        Matcher matcher = Pattern.compile("\"(https.*streamango\\.com[/a-z]+)\"").matcher(html);
+        matcher.find();
+        return matcher.group(1);
+    }
+
     public static String extractMediaLink(String html) {
         Matcher matcher = Pattern.compile("www\\.mediafire[a-zA-Z0-a.=?/&%]+").matcher(html);
         matcher.find();
