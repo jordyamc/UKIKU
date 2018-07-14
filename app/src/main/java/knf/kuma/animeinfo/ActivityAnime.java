@@ -198,13 +198,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                 favoriteObject = new FavoriteObject(object);
                 holder.setTitle(object.name);
                 holder.loadImg(PatternUtil.getCover(object.aid), v -> startActivity(new Intent(ActivityAnime.this, ActivityImgFull.class).setData(Uri.parse(PatternUtil.getCover(object.aid))).putExtra("title", object.name), ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityAnime.this, holder.imageView, "img").toBundle()));
-                if (dao.isFav(favoriteObject.key)) {
-                    holder.setFABState(true);
-                } else if (seeingDAO.getByAid(favoriteObject.aid) != null) {
-                    holder.setFABSeeing();
-                } else {
-                    holder.setFABState(false);
-                }
+                holder.setFABState(dao.isFav(favoriteObject.key), seeingDAO.getByAid(favoriteObject.aid) != null);
                 holder.showFAB();
                 supportInvalidateOptionsMenu();
                 RecommendHelper.registerAll(genres, RankType.CHECK);
@@ -224,7 +218,9 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         setResult();
         boolean isfav = dao.isFav(favoriteObject.key);
         boolean isSeeing = seeingDAO.getByAid(favoriteObject.aid) != null;
-        if (isfav) {
+        if (isfav && isSeeing)
+            onFabLongClicked(actionButton);
+        else if (isfav) {
             holder.setFABState(false);
             dao.deleteFav(favoriteObject);
             RecommendHelper.registerAll(genres, RankType.UNFAV);
@@ -242,30 +238,58 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         final SeeingObject seeingObject = seeingDAO.getByAid(favoriteObject.aid);
         boolean isfav = dao.isFav(favoriteObject.key);
         boolean isSeeing = seeingObject != null;
-        if (!isfav) {
-            if (isSeeing) {
-                new MaterialDialog.Builder(this)
-                        .content("¿Convertir en favorito?")
-                        .positiveText("si")
-                        .negativeText("no")
-                        .neutralText("dropear")
-                        .onPositive((dialog, which) -> {
-                            seeingDAO.remove(seeingObject);
+        if ((isfav && isSeeing) || isSeeing) {
+            new MaterialDialog.Builder(this)
+                    .content("¿Convertir en favorito?")
+                    .positiveText("si")
+                    .negativeText("no")
+                    .neutralText("dropear")
+                    .onPositive((dialog, which) -> {
+                        if (isfav)
+                            dao.deleteFav(favoriteObject);
+                        else
                             dao.addFav(favoriteObject);
-                            holder.setFABState(true);
-                            RecommendHelper.registerAll(genres, RankType.FAV);
-                        })
-                        .onNeutral((dialog, which) -> {
-                            seeingDAO.remove(seeingObject);
-                            holder.setFABState(false);
-                            RecommendHelper.registerAll(genres, RankType.UNFOLLOW);
-                        }).build().show();
-            } else {
-                holder.setFABSeeing();
-                seeingDAO.add(SeeingObject.fromAnime(favoriteObject));
-                RecommendHelper.registerAll(genres, RankType.FOLLOW);
-                Toaster.toast("Agregado a animes seguidos");
-            }
+                        seeingDAO.remove(seeingObject);
+                        holder.setFABState(true);
+                        RecommendHelper.registerAll(genres, RankType.FAV);
+                    })
+                    .onNeutral((dialog, which) -> {
+                        seeingDAO.remove(seeingObject);
+                        holder.setFABState(isfav);
+                        RecommendHelper.registerAll(genres, RankType.UNFOLLOW);
+                    }).build().show();
+        } else if (!isfav) {
+            new MaterialDialog.Builder(this)
+                    .items("Seguir", "Seguir y favorito")
+                    .itemsCallbackSingleChoice(0, (dialog, itemView, which, text) -> {
+                        switch (which) {
+                            case 0:
+                                seeingDAO.add(SeeingObject.fromAnime(favoriteObject));
+                                holder.setFABSeeing();
+                                RecommendHelper.registerAll(genres, RankType.FOLLOW);
+                                Toaster.toast("Agregado a animes seguidos");
+                                break;
+                            case 1:
+                                dao.addFav(favoriteObject);
+                                seeingDAO.add(SeeingObject.fromAnime(favoriteObject));
+                                holder.setFABState(true, true);
+                                RecommendHelper.registerAll(genres, RankType.FAV);
+                                RecommendHelper.registerAll(genres, RankType.FOLLOW);
+                                Toaster.toast("Agregado a animes seguidos y favoritos");
+                                break;
+                        }
+
+                        return true;
+                    })
+                    .positiveText("aceptar")
+                    .negativeText("cancelar")
+                    .build().show();
+
+        } else {
+            seeingDAO.add(SeeingObject.fromAnime(favoriteObject));
+            holder.setFABState(true, true);
+            RecommendHelper.registerAll(genres, RankType.FOLLOW);
+            Toaster.toast("Agregado a animes seguidos");
         }
     }
 

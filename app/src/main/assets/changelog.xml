@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="45" version="1.4.7">
+        <change type="change">Se podra añadir animes a seguidos y favoritos</change>
+    </release>
     <release code="44" version="1.4.6">
         <change type="fix">Errores generales</change>
     </release>

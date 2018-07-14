@@ -132,6 +132,19 @@ public class AnimeActivityHolder {
         fab.post(() -> fab.setImageResource(R.drawable.ic_seeing));
     }
 
+    public void setFABState(final boolean isFav, final boolean isSeeing) {
+        fab.post(() -> {
+            if (isFav && isSeeing)
+                fab.setImageResource(R.drawable.ic_star_heart);
+            else if (isSeeing)
+                fab.setImageResource(R.drawable.ic_seeing);
+            else if (isFav)
+                fab.setImageResource(R.drawable.heart_full);
+            else
+                fab.setImageResource(R.drawable.heart_empty);
+        });
+    }
+
     public void showFAB() {
         fab.post(() -> {
             fab.setEnabled(true);
