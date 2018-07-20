@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="46" version="1.5">
+        <change type="fix">Errores generales</change>
+        <change type="new">Compartir links de episodios</change>
+        <change type="new">Descarga/Streaming abriendo links de episodios</change>
+    </release>
     <release code="45" version="1.4.7">
         <change type="change">Se podra añadir animes a seguidos y favoritos</change>
     </release>

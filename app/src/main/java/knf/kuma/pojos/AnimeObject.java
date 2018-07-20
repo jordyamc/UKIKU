@@ -109,7 +109,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
         try {
             AnimeInfo animeInfo = new AnimeInfo(findDataScript(scripts).html());
             this.day = animeInfo.day;
-            this.chapters = WebInfo.AnimeChapter.create(name, aid, animeInfo);
+            this.chapters = WebInfo.AnimeChapter.create(animeInfo);
         } catch (Exception e) {
             //
         }
@@ -302,7 +302,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
                 this.number = "Episodio " + num;
                 this.link = "https://animeflv.net/ver/" + sid + "/" + info.sid + "-" + num;
                 this.eid = sid;
-                this.img = "https://animeflv.net/uploads/animes/screenshots/" + info.aid + "/" + num + "/th_3.jpg";
+                this.img = "https://animeflv.net/uploads/animes/screenshots/" + info.aid + "/" + num + "/3.jpg";
                 this.key = Integer.parseInt(eid);
                 this.aid = info.aid;
             }
@@ -329,7 +329,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
                 return chapters;
             }
 
-            public static List<AnimeChapter> create(String name, String aid, AnimeInfo info) {
+            public static List<AnimeChapter> create(AnimeInfo info) {
                 List<AnimeChapter> chapters = new ArrayList<>();
                 try {
                     for (Map.Entry<String, String> entry : info.epMap.entrySet()) {

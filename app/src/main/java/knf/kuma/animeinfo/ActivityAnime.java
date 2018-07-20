@@ -335,8 +335,8 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
     private void share() {
         try {
             startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND)
-                    .setType("text/plain").putExtra(Intent.EXTRA_SUBJECT, favoriteObject.name)
-                    .putExtra(Intent.EXTRA_TEXT, favoriteObject.link), "Compartir"));
+                    .setType("text/plain")
+                    .putExtra(Intent.EXTRA_TEXT, favoriteObject.name + "\n" + favoriteObject.link), "Compartir"));
             Answers.getInstance().logShare(new ShareEvent().putContentName(favoriteObject.name).putContentId(favoriteObject.aid));
         } catch (ActivityNotFoundException e) {
             Toaster.toast("No se encontraron aplicaciones para enviar");

@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -116,9 +117,9 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 }
             });
         holder.setCastingObserver(fragment, s -> {
-            holder.setDownloaded(isPlayAvailable(chapter.eid, d_file), chapter.eid.equals(s));
+            holder.setDownloaded(isPlayAvailable(d_file, downloadObject), chapter.eid.equals(s));
             if (!chapter.eid.equals(s))
-                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.eid, d_file));
+                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(d_file, downloadObject));
         });
         holder.chapter.setTextColor(context.getResources().getColor(chaptersDAO.chapterIsSeen(chapter.eid) ? EAHelper.getThemeColor(context) : R.color.textPrimary));
         holder.separator.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
@@ -129,7 +130,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 menu.inflate(R.menu.chapter_casting_menu);
                 if (canPlay(d_file))
                     menu.getMenu().findItem(R.id.download).setVisible(false);
-            } else if (isPlayAvailable(chapter.eid, d_file)) {
+            } else if (isPlayAvailable(d_file, downloadObject)) {
                 menu.inflate(R.menu.chapter_downloaded_menu);
                 if (!CastUtil.get().connected())
                     menu.getMenu().findItem(R.id.cast).setVisible(false);
@@ -217,7 +218,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                         });
                         break;
                     case R.id.queue:
-                        if (isPlayAvailable(chapter.eid, d_file)) {
+                        if (isPlayAvailable(d_file, downloadObject)) {
                             QueueManager.add(Uri.fromFile(d_file), true, chapter);
                             holder.setQueue(true, true);
                         } else
@@ -233,6 +234,12 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                 public void onCast(String url) {
                                 }
                             });
+                        break;
+                    case R.id.share:
+                        fragment.getActivity().startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND)
+                                .setType("text/plain")
+                                .putExtra(Intent.EXTRA_TEXT, chapter.getEpTitle() + "\n" + chapter.link), "Compartir"));
+                        break;
                 }
                 return true;
             });
@@ -252,7 +259,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
             touchListener.startDragSelection(holder.getAdapterPosition());
             return true;
         });
-        if (!isNetworkAvailable && !isPlayAvailable(chapter.eid, d_file)) {
+        if (!isNetworkAvailable && !isPlayAvailable(d_file, downloadObject)) {
             holder.actions.setVisibility(View.GONE);
         } else {
             holder.actions.setVisibility(View.VISIBLE);
@@ -266,8 +273,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
         }
     }
 
-    private boolean isPlayAvailable(String eid, File file) {
-        DownloadObject downloadObject = downloadsDAO.getByEid(eid);
+    private boolean isPlayAvailable(File file, DownloadObject downloadObject) {
         return (file != null && file.exists()) || (downloadObject != null && downloadObject.isDownloading());
     }
 

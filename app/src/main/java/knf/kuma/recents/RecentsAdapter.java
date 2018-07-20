@@ -230,6 +230,11 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
     }
 
     @Override
+    public long getItemId(int position) {
+        return list.get(position).key;
+    }
+
+    @Override
     public int getItemCount() {
         return list.size();
     }

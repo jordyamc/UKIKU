@@ -250,7 +250,7 @@ public class RecommendActivity extends AppCompatActivity {
     private void showBlacklist() {
         List<String> blacklist = GenreStatusObject.getNames(CacheDB.INSTANCE.genresDAO().getBlacklist());
         BlacklistDialog dialog = new BlacklistDialog();
-        dialog.init(blacklist, new BlacklistDialog.MultichoiseListener() {
+        dialog.init(blacklist, new BlacklistDialog.MultiChoiceListener() {
             @Override
             public void onOkay(List<String> selected) {
                 setBlacklist(selected);

@@ -67,9 +67,11 @@ public class DownloadService extends IntentService {
                 outputStream = new BufferedOutputStream(FileAccessHelper.INSTANCE.getOutputStream(current.file), 1024);
             } else {
                 Log.e("Download error", "Code: " + response.code());
+                errorNotification();
                 downloadsDAO.delete(current);
                 QueueManager.remove(current.eid);
                 response.close();
+                cancelForeground();
                 return;
             }
             current.state = DownloadObject.DOWNLOADING;
@@ -184,10 +186,13 @@ public class DownloadService extends IntentService {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         cancelForeground();
-        errorNotification();
         FileAccessHelper.INSTANCE.delete(file);
-        downloadsDAO.delete(current);
-        QueueManager.remove(current.eid);
+        if (current != null) {
+            if (manager != null)
+                errorNotification();
+            downloadsDAO.delete(current);
+            QueueManager.remove(current.eid);
+        }
         super.onTaskRemoved(rootIntent);
     }
 }

@@ -62,6 +62,12 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
+    <style name="AppTheme.Dialog.Base" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
     <style name="AppTheme.Button.Dropbox" parent="Widget.AppCompat.Button.Colored">
         <item name="android:colorButtonNormal">@color/dropbox</item>
         <item name="android:textColor">@android:color/white</item>

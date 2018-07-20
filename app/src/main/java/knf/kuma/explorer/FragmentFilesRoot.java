@@ -12,6 +12,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import knf.kuma.R;
 import knf.kuma.pojos.ExplorerObject;
+import xdroid.toaster.Toaster;
 
 public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.SelectedListener, FragmentChapters.ClearInterface, ExplorerCreator.EmptyListener {
 
@@ -19,7 +20,6 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     private FragmentChapters chapters;
     private boolean isFiles = true;
     private String name;
-    private Boolean isRestored = false;
     private OnFileStateChange stateChange;
 
     public FragmentFilesRoot() {
@@ -55,7 +55,8 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     }
 
     private void setFragment(boolean isFiles, @Nullable ExplorerObject object) {
-        stateChange.onChange(isFiles);
+        if (stateChange != null)
+            stateChange.onChange(isFiles);
         this.isFiles = isFiles;
         this.name = object != null ? object.name : null;
         ExplorerCreator.IS_FILES = isFiles;
@@ -79,7 +80,6 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         if (savedInstanceState != null) {
             this.isFiles = savedInstanceState.getBoolean("isFiles", true);
             this.name = savedInstanceState.getString("name");
-            this.isRestored = savedInstanceState.getBoolean("isRestored", false);
         }
         setFragment(ExplorerCreator.IS_FILES, ExplorerCreator.FILES_NAME);
         if (!ExplorerCreator.IS_CREATED)
@@ -91,7 +91,6 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         super.onSaveInstanceState(outState);
         outState.putBoolean("isFiles", isFiles);
         outState.putString("name", name);
-        outState.putBoolean("isRestored", true);
     }
 
     public void setStateChange(OnFileStateChange stateChange) {
@@ -99,13 +98,17 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
     }
 
     public void onRemoveAll() {
-        if (name != null && chapters != null)
+        if (name != null && chapters != null && getActivity() != null)
             new MaterialDialog.Builder(getActivity())
                     .content("¿Eliminar todos los capitulos de " + name + "?")
                     .positiveText("Eliminar")
                     .negativeText("Cancelar")
-                    .onPositive((dialog, which) -> chapters.deleteAll())
+                    .onPositive((dialog, which) -> {
+                        if (chapters != null)
+                            chapters.deleteAll();
+                    })
                     .build().show();
+        else Toaster.toast("Error al borrar episodios");
     }
 
     @Override

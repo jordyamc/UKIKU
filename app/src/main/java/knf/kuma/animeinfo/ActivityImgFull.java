@@ -72,7 +72,7 @@ public class ActivityImgFull extends AppCompatActivity implements PopupMenu.OnMe
             case R.id.share:
                 Intent intent = new Intent(Intent.ACTION_SEND)
                         .setType("image/*")
-                        .putExtra(Intent.EXTRA_SUBJECT, getIntent().getStringExtra("title"))
+                        .putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra("title"))
                         .putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),bitmap , "", "")));
                 startActivity(Intent.createChooser(intent, "Compartir..."));
                 break;

@@ -219,6 +219,53 @@ public class EAHelper {
         }
     }
 
+    @StyleRes
+    public static int getThemeDialog(Context context) {
+        if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))
+            return R.style.AppTheme_NoActionBar;
+        switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")) {
+            default:
+            case "0":
+                return R.style.AppTheme_Dialog_Base;
+            case "1":
+                return R.style.AppTheme_Dialog_Pink;
+            case "2":
+                return R.style.AppTheme_Dialog_Purple;
+            case "3":
+                return R.style.AppTheme_Dialog_DeepPurple;
+            case "4":
+                return R.style.AppTheme_Dialog_Indigo;
+            case "5":
+                return R.style.AppTheme_Dialog_Blue;
+            case "6":
+                return R.style.AppTheme_Dialog_LightBlue;
+            case "7":
+                return R.style.AppTheme_Dialog_Cyan;
+            case "8":
+                return R.style.AppTheme_Dialog_Teal;
+            case "9":
+                return R.style.AppTheme_Dialog_Green;
+            case "10":
+                return R.style.AppTheme_Dialog_LightGreen;
+            case "11":
+                return R.style.AppTheme_Dialog_Lime;
+            case "12":
+                return R.style.AppTheme_Dialog_Yellow;
+            case "13":
+                return R.style.AppTheme_Dialog_Amber;
+            case "14":
+                return R.style.AppTheme_Dialog_Orange;
+            case "15":
+                return R.style.AppTheme_Dialog_DeepOrange;
+            case "16":
+                return R.style.AppTheme_Dialog_Brown;
+            case "17":
+                return R.style.AppTheme_Dialog_Gray;
+            case "18":
+                return R.style.AppTheme_Dialog_BlueGray;
+        }
+    }
+
     @DrawableRes
     public static int getThemeImg(Context context) {
         if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))

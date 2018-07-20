@@ -12,5 +12,7 @@
     <item
         android:id="@+id/queue"
         android:title="AÑADIR A COLA"/>
-
+    <item
+        android:id="@+id/share"
+        android:title="COMPARTIR"/>
 </menu>

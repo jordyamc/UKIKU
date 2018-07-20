@@ -1,7 +1,6 @@
 package knf.kuma.recommended;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -17,7 +16,7 @@ public class BlacklistDialog extends DialogFragment {
     private List<String> genres = getGenres();
     private List<String> selected = new ArrayList<>();
     @NonNull
-    private MultichoiseListener listener;
+    private MultiChoiceListener listener;
 
     public static List<String> getGenres() {
         return Arrays.asList(
@@ -64,7 +63,7 @@ public class BlacklistDialog extends DialogFragment {
                 "Yuri");
     }
 
-    public void init(List<String> selected, MultichoiseListener listener) {
+    public void init(List<String> selected, MultiChoiceListener listener) {
         this.selected = selected;
         this.listener = listener;
     }
@@ -74,27 +73,16 @@ public class BlacklistDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Lista negra")
-                .setMultiChoiceItems(genres.toArray(new String[genres.size()]), getStates(), new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int index, boolean isSelected) {
-                        if (isSelected) {
-                            selected.add(genres.get(index));
-                        } else {
-                            selected.remove(genres.get(index));
-                        }
+                .setMultiChoiceItems(genres.toArray(new String[0]), getStates(), (dialogInterface, index, isSelected) -> {
+                    if (isSelected) {
+                        selected.add(genres.get(index));
+                    } else {
+                        selected.remove(genres.get(index));
                     }
-                }).setPositiveButton("SELECCIONAR", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Collections.sort(selected);
-                        listener.onOkay(selected);
-                    }
-                }).setNegativeButton("CERRAR", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                }).setPositiveButton("SELECCIONAR", (dialogInterface, i) -> {
+                    Collections.sort(selected);
+                    listener.onOkay(selected);
+                }).setNegativeButton("CERRAR", (dialogInterface, i) -> dialogInterface.dismiss()).create();
     }
 
     private boolean[] getStates() {
@@ -106,7 +94,7 @@ public class BlacklistDialog extends DialogFragment {
         return states;
     }
 
-    public interface MultichoiseListener {
+    public interface MultiChoiceListener {
         void onOkay(List<String> selected);
     }
 }

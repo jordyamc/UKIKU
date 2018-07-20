@@ -146,4 +146,78 @@
     <style name="AppTheme.NoActionBar.BlueGray" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentBlueGrey</item>
     </style>
+
+    <!--Dialog-->
+
+    <style name="AppTheme.Dialog.Pink" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentPink</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Purple" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentPurple</item>
+    </style>
+
+    <style name="AppTheme.Dialog.DeepPurple" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentDeepPurple</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Indigo" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentIndigo</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Blue" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentBlue</item>
+    </style>
+
+    <style name="AppTheme.Dialog.LightBlue" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentLightBlue</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Cyan" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentCyan</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Teal" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentTeal</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Green" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentGreen</item>
+    </style>
+
+    <style name="AppTheme.Dialog.LightGreen" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentLightGreen</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Lime" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentLime</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Yellow" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentYellow</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Amber" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentAmber</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Orange" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentOrange</item>
+    </style>
+
+    <style name="AppTheme.Dialog.DeepOrange" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentDeepOrange</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Brown" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentBrown</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Gray" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentGray</item>
+    </style>
+
+    <style name="AppTheme.Dialog.BlueGray" parent="AppTheme.Dialog.Base">
+        <item name="colorAccent">@color/colorAccentBlueGrey</item>
+    </style>
 </resources>
