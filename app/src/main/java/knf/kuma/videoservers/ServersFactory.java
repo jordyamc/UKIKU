@@ -163,15 +163,16 @@ public class ServersFactory {
                                             showOptions(server, false);
                                         } else {
                                             switch (text.toString().toLowerCase()) {
-                                                case "mega":
+                                                case "mega 1":
+                                                case "mega 2":
                                                     context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
+                                                    serversInterface.onFinish(false, false);
                                                     break;
                                                 default:
-                                                    if (isStream) {
+                                                    if (isStream)
                                                         startStreaming(server.getOption());
-                                                    } else {
+                                                    else
                                                         startDownload(server.getOption());
-                                                    }
                                                     break;
                                             }
                                         }
@@ -207,12 +208,11 @@ public class ServersFactory {
                                                 showOptions(server, true);
                                             } else {
                                                 switch (Server.getNames(servers).get(d.getSelectedIndex()).toLowerCase()) {
+                                                    case "mega 1":
+                                                    case "mega 2":
                                                     case "zippyshare":
                                                         Toaster.toast("No soportado en CAST");
                                                         showServerList();
-                                                        break;
-                                                    case "mega":
-                                                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
                                                         break;
                                                     default:
                                                         serversInterface.onCast(server.getOption().url);

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="47" version="1.6">
+        <change type="fix">Errores generales</change>
+        <change type="new">Importar videos a la app</change>
+        <change type="new">Descarga/Streaming desde notificacion de reciente</change>
+        <change type="change">Mejoras generales</change>
+    </release>
     <release code="46" version="1.5">
         <change type="fix">Errores generales</change>
         <change type="new">Compartir links de episodios</change>

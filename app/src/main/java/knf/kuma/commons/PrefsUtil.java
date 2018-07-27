@@ -49,4 +49,8 @@ public class PrefsUtil {
     public static boolean isDirectoryFinished() {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false);
     }
+
+    public static boolean showImport() {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_import", false);
+    }
 }

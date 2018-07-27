@@ -1,6 +1,6 @@
 package knf.kuma.directory;
 
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.os.Bundle;
@@ -27,7 +27,7 @@ public class DirectoryPageFragment extends BottomFragment {
     ProgressBar progress;
     private RecyclerView.LayoutManager manager;
     private DirectorypageAdapter adapter;
-    private boolean isFirst=true;
+    private boolean isFirst = true;
 
     public DirectoryPageFragment() {
     }
@@ -43,122 +43,73 @@ public class DirectoryPageFragment extends BottomFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        DirectoryViewModel model= ViewModelProviders.of(getActivity()).get(DirectoryViewModel.class);
-        adapter=new DirectorypageAdapter(this);
-        switch (getArguments().getInt("type",0)){
-            case 0:
-                model.getAnimes(getContext()).observe(this, new Observer<PagedList<AnimeObject>>() {
-                    @Override
-                    public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                        hideProgress();
-                        adapter.submitList(animeObjects);
-                        makeAnimation();
-                    }
-                });
-                break;
-            case 1:
-                model.getOvas(getContext()).observe(this, new Observer<PagedList<AnimeObject>>() {
-                    @Override
-                    public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                        hideProgress();
-                        adapter.submitList(animeObjects);
-                        makeAnimation();
-                    }
-                });
-                break;
-            case 2:
-                model.getMovies(getContext()).observe(this, new Observer<PagedList<AnimeObject>>() {
-                    @Override
-                    public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                        hideProgress();
-                        adapter.submitList(animeObjects);
-                        makeAnimation();
-                    }
-                });
-                break;
-        }
+        DirectoryViewModel model = ViewModelProviders.of(getActivity()).get(DirectoryViewModel.class);
+        adapter = new DirectorypageAdapter(this);
+        getLiveData(model).observe(this, animeObjects -> {
+            hideProgress();
+            adapter.submitList(animeObjects);
+            makeAnimation();
+        });
         recyclerView.setAdapter(adapter);
     }
 
-    public void onChangeOrder(){
-        if (getActivity()!=null){
-            DirectoryViewModel model= ViewModelProviders.of(getActivity()).get(DirectoryViewModel.class);
-            adapter=new DirectorypageAdapter(this);
-            switch (getArguments().getInt("type",0)){
-                case 0:
-                    model.getAnimes(getContext()).observe(this, new Observer<PagedList<AnimeObject>>() {
-                        @Override
-                        public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                            hideProgress();
-                            adapter.submitList(animeObjects);
-                            makeAnimation();
-                        }
-                    });
-                    break;
-                case 1:
-                    model.getOvas(getContext()).observe(this, new Observer<PagedList<AnimeObject>>() {
-                        @Override
-                        public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                            hideProgress();
-                            adapter.submitList(animeObjects);
-                            makeAnimation();
-                        }
-                    });
-                    break;
-                case 2:
-                    model.getMovies(getContext()).observe(this, new Observer<PagedList<AnimeObject>>() {
-                        @Override
-                        public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                            hideProgress();
-                            adapter.submitList(animeObjects);
-                            makeAnimation();
-                        }
-                    });
-                    break;
-            }
-            recyclerView.setAdapter(adapter);
+    private LiveData<PagedList<AnimeObject>> getLiveData(DirectoryViewModel model) {
+        switch (getArguments().getInt("type", 0)) {
+            default:
+            case 0:
+                return model.getAnimes(getContext());
+            case 1:
+                return model.getOvas(getContext());
+            case 2:
+                return model.getMovies(getContext());
         }
     }
 
-    private void hideProgress(){
-        progress.post(new Runnable() {
-            @Override
-            public void run() {
-                progress.setVisibility(View.GONE);
-            }
-        });
+    public void onChangeOrder() {
+        if (getActivity() != null && adapter != null && recyclerView != null) {
+            getLiveData(ViewModelProviders.of(getActivity()).get(DirectoryViewModel.class)).observe(this, animeObjects -> {
+                hideProgress();
+                adapter.submitList(animeObjects);
+                makeAnimation();
+            });
+        }
     }
 
-    private void makeAnimation(){
-        if (isFirst){
+    private void hideProgress() {
+        progress.post(() -> progress.setVisibility(View.GONE));
+    }
+
+    private void makeAnimation() {
+        if (isFirst) {
             recyclerView.scheduleLayoutAnimation();
-            isFirst=false;
+            isFirst = false;
         }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(getLayout(),container,false);
-        ButterKnife.bind(this,view);
-        manager=recyclerView.getLayoutManager();
+        View view = inflater.inflate(getLayout(), container, false);
+        ButterKnife.bind(this, view);
+        manager = recyclerView.getLayoutManager();
         recyclerView.setLayoutManager(manager);
-        isFirst=true;
+        isFirst = true;
         return view;
     }
 
     @LayoutRes
-    private int getLayout(){
-        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString("lay_type","0").equals("0")){
+    private int getLayout() {
+        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString("lay_type", "0").equals("0")) {
             return R.layout.recycler_dir;
-        }else {
+        } else {
             return R.layout.recycler_dir_grid;
         }
     }
 
     @Override
     public void onReselect() {
-        manager.smoothScrollToPosition(recyclerView,null,0);
+        if (recyclerView != null && manager != null)
+            manager.smoothScrollToPosition(recyclerView, null, 0);
     }
 
     enum DirType {

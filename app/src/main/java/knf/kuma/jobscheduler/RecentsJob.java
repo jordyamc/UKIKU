@@ -36,6 +36,7 @@ import knf.kuma.pojos.NotificationObj;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.Recents;
 import knf.kuma.recents.RecentsNotReceiver;
+import knf.kuma.videoservers.DownloadDialogActivity;
 import pl.droidsonroids.jspoon.Jspoon;
 
 public class RecentsJob extends Job {
@@ -123,6 +124,7 @@ public class RecentsJob extends Job {
                 .setOnlyAlertOnce(true)
                 .setContentIntent(PendingIntent.getActivity(getContext(), (int) System.currentTimeMillis(), getAnimeIntent(animeObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setDeleteIntent(PendingIntent.getBroadcast(getContext(), (int) System.currentTimeMillis(), obj.getBroadcast(getContext()), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(android.R.drawable.stat_sys_download_done, "Acciones", PendingIntent.getActivity(getContext(), (int) System.currentTimeMillis(), getChapIntent(recentObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setGroup(RECENTS_GROUP)
                 .build();
         notificationDAO.add(obj);
@@ -147,7 +149,17 @@ public class RecentsJob extends Job {
                 .putExtra("title", object.name)
                 .putExtra("aid", object.aid)
                 .putExtra("img", object.img)
-                .putExtra("notification", true);
+                .putExtra("notification", true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    @NonNull
+    private Intent getChapIntent(RecentObject object, NotificationObj notificationObj) {
+        return new Intent(getContext(), DownloadDialogActivity.class)
+                .setData(Uri.parse(object.url))
+                .putExtras(notificationObj.getBroadcast(getContext()))
+                .putExtra("notification", true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 
     private void notifySummary() {

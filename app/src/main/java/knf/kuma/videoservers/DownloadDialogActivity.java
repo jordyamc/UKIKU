@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
+import knf.kuma.pojos.NotificationObj;
 
 public class DownloadDialogActivity extends AppCompatActivity {
 
@@ -76,6 +77,7 @@ public class DownloadDialogActivity extends AppCompatActivity {
                             ServersFactory.start(DownloadDialogActivity.this, getIntent().getDataString(), object, which == 1, new ServersFactory.ServersInterface() {
                                 @Override
                                 public void onFinish(boolean started, boolean success) {
+                                    removeNotification();
                                     finish();
                                 }
 
@@ -96,5 +98,10 @@ public class DownloadDialogActivity extends AppCompatActivity {
         Matcher matcher = Pattern.compile(regex).matcher(st);
         matcher.find();
         return matcher.group(1);
+    }
+
+    private void removeNotification() {
+        if (getIntent().getBooleanExtra("notification", false))
+            sendBroadcast(NotificationObj.fromIntent(getIntent()).getBroadcast(this));
     }
 }

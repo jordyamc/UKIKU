@@ -30,7 +30,7 @@ public class SearchAdapter extends PagedListAdapter<AnimeObject,SearchAdapter.It
 
         @Override
         public boolean areContentsTheSame(@NonNull AnimeObject oldItem, @NonNull AnimeObject newItem) {
-            return oldItem.name.equals(newItem.name);
+            return oldItem.name.equals(newItem.name) && oldItem.aid.equals(newItem.aid);
         }
     };
     private Fragment fragment;

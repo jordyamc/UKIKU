@@ -1,8 +1,6 @@
 package knf.kuma.search;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.paging.PagedList;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -27,7 +25,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
-import knf.kuma.pojos.AnimeObject;
 import knf.kuma.recommended.RankType;
 import knf.kuma.recommended.RecommendHelper;
 
@@ -62,16 +59,13 @@ public class SearchFragment extends BottomFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         model=ViewModelProviders.of(getActivity()).get(SearchViewModel.class);
-        model.getSearch("", "").observe(this, new Observer<PagedList<AnimeObject>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                adapter.submitList(animeObjects);
-                errorView.setVisibility(animeObjects.size()==0?View.VISIBLE:View.GONE);
-                if (isFirst) {
-                    progressBar.setVisibility(View.GONE);
-                    isFirst=false;
-                    recyclerView.scheduleLayoutAnimation();
-                }
+        model.setSearch("", "", this, animeObjects -> {
+            adapter.submitList(animeObjects);
+            errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
+            if (isFirst) {
+                progressBar.setVisibility(View.GONE);
+                isFirst = false;
+                recyclerView.scheduleLayoutAnimation();
             }
         });
     }
@@ -86,54 +80,40 @@ public class SearchFragment extends BottomFragment {
         recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_fall_down));
         adapter=new SearchAdapter(this);
         recyclerView.setAdapter(adapter);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                GenresDialog dialog = new GenresDialog();
-                dialog.init(getGenres(), selected, new GenresDialog.MultichoiseListener() {
-                    @Override
-                    public void onOkay(List<String> s) {
-                        selected = s;
-                        setFabIcon();
-                        setSearch(query);
-                    }
-                });
-                dialog.show(getChildFragmentManager(), "genres");
-            }
+        fab.setOnClickListener(view1 -> {
+            GenresDialog dialog = new GenresDialog();
+            dialog.init(getGenres(), selected, s -> {
+                selected = s;
+                setFabIcon();
+                setSearch(query);
+            });
+            dialog.show(getChildFragmentManager(), "genres");
         });
         return view;
     }
 
     public void setSearch(String q) {
         this.query = q.trim();
-        model.getSearch(q.trim(), getGenresString()).observe(this, new Observer<PagedList<AnimeObject>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                if (animeObjects!=null) {
-                    adapter.submitList(animeObjects);
-                    errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
-                    Answers.getInstance().logSearch(new SearchEvent().putQuery(query));
-                    if (!getGenresString().equals(""))
-                        Answers.getInstance().logSearch(new SearchEvent().putQuery(getGenresString()));
-                }
-                if (isFirst) {
-                    progressBar.setVisibility(View.GONE);
-                    isFirst = false;
-                    recyclerView.scheduleLayoutAnimation();
-                }else {
-                    manager.smoothScrollToPosition(recyclerView, null, 0);
-                }
+        model.setSearch(q.trim(), getGenresString(), this, animeObjects -> {
+            if (animeObjects != null) {
+                adapter.submitList(animeObjects);
+                errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
+                Answers.getInstance().logSearch(new SearchEvent().putQuery(query));
+                if (!getGenresString().equals(""))
+                    Answers.getInstance().logSearch(new SearchEvent().putQuery(getGenresString()));
+            }
+            if (isFirst) {
+                progressBar.setVisibility(View.GONE);
+                isFirst = false;
+                recyclerView.scheduleLayoutAnimation();
+            } else {
+                manager.smoothScrollToPosition(recyclerView, null, 0);
             }
         });
     }
 
     private void setFabIcon() {
-        fab.post(new Runnable() {
-            @Override
-            public void run() {
-                fab.setImageResource(getFabIcon());
-            }
-        });
+        fab.post(() -> fab.setImageResource(getFabIcon()));
     }
 
     @NonNull

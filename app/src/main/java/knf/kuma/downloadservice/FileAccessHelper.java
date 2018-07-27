@@ -161,6 +161,25 @@ public class FileAccessHelper {
         }
     }
 
+    public FileOutputStream getFileOutputStream(String file_name) {
+        try {
+            if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
+                File file = new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name));
+                if (!file.exists())
+                    file.mkdirs();
+                file = new File(file, file_name);
+                if (!file.exists())
+                    file.createNewFile();
+                return new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
+            } else {
+                return new FileOutputStream(context.getContentResolver().openFileDescriptor(find(DocumentFile.fromTreeUri(context, getTreeUri()), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).getUri(), "rw").getFileDescriptor());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public InputStream getInputStream(String file_name) {
         try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {

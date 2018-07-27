@@ -1,15 +1,22 @@
 package knf.kuma.commons;
 
 import android.annotation.TargetApi;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
 import android.support.annotation.Nullable;
+import android.util.Pair;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -148,5 +155,37 @@ public final class FileUtil {
         return out;
     }
 
+    public static LiveData<Pair<Integer, Boolean>> movefile(InputStream inputStream, OutputStream outputStream/*,MoveCallback callback*/) {
+        final MutableLiveData<Pair<Integer, Boolean>> liveData = new MutableLiveData<>();
+        AsyncTask.execute(() -> {
+            try {
+                /*ChannelTools.fastChannelCopy(Channels.newChannel(inputStream),Channels.newChannel(outputStream));
+                callback.onMove(true);*/
+                long total = inputStream.available();
+                byte[] buffer = new byte[32 * 1024];
+                int read;
+                long current = 0;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                    current += read;
+                    int prog = (int) ((current * 100) / total);
+                    new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(new Pair<>(prog, false)));
+                }
+                inputStream.close();
+                outputStream.flush();
+                outputStream.close();
+                new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(new Pair<>(100, true)));
+            } catch (Exception e) {
+                e.printStackTrace();
+                new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(new Pair<>(-1, true)));
+                //callback.onMove(false);
+            }
+        });
+        return liveData;
+    }
+
+    interface MoveCallback {
+        void onMove(boolean success);
+    }
 
 }

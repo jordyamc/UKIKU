@@ -27,10 +27,12 @@ import com.squareup.picasso.Callback;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
+import knf.kuma.animeinfo.fragments.ChaptersFragment;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
@@ -85,7 +87,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
     @Override
     public void onBindViewHolder(@NonNull final ChapterImgHolder holder, int position) {
         final AnimeObject.WebInfo.AnimeChapter chapter = chapters.get(position);
-        final DownloadObject downloadObject = downloadsDAO.getByEid(chapter.eid);
+        AtomicReference<DownloadObject> downloadObject = new AtomicReference<>(downloadsDAO.getByEid(chapter.eid));
         final File d_file = FileAccessHelper.INSTANCE.getFile(chapter.getFileName());
         if (selected.contains(position)) {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(EAHelper.getThemeColorLight(context)));
@@ -98,8 +100,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
             String casting = CastUtil.get().getCasting().getValue();
             if (object == null)
                 holder.setDownloaded(false, casting != null && casting.equals(chapter.eid));
-            if (object != null && downloadObject != null)
-                downloadObject.state = object.state;
+            downloadObject.set(object);
 
         });
         if (!Network.isConnected() || chapter.img == null)
@@ -117,9 +118,9 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 }
             });
         holder.setCastingObserver(fragment, s -> {
-            holder.setDownloaded(isPlayAvailable(d_file, downloadObject), chapter.eid.equals(s));
+            holder.setDownloaded(isPlayAvailable(d_file, downloadObject.get()), chapter.eid.equals(s));
             if (!chapter.eid.equals(s))
-                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(d_file, downloadObject));
+                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(d_file, downloadObject.get()));
         });
         holder.chapter.setTextColor(context.getResources().getColor(chaptersDAO.chapterIsSeen(chapter.eid) ? EAHelper.getThemeColor(context) : R.color.textPrimary));
         holder.separator.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
@@ -130,7 +131,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 menu.inflate(R.menu.chapter_casting_menu);
                 if (canPlay(d_file))
                     menu.getMenu().findItem(R.id.download).setVisible(false);
-            } else if (isPlayAvailable(d_file, downloadObject)) {
+            } else if (isPlayAvailable(d_file, downloadObject.get())) {
                 menu.inflate(R.menu.chapter_downloaded_menu);
                 if (!CastUtil.get().connected())
                     menu.getMenu().findItem(R.id.cast).setVisible(false);
@@ -139,6 +140,8 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
             }
             if (QueueManager.isInQueue(chapter.eid))
                 menu.getMenu().findItem(R.id.queue).setVisible(false);
+            if (!PrefsUtil.showImport())
+                menu.getMenu().findItem(R.id.import_file).setVisible(false);
             menu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.play:
@@ -170,8 +173,8 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                 .positiveText("CONFIRMAR")
                                 .negativeText("CANCELAR")
                                 .onPositive((dialog, which) -> {
-                                    if (downloadObject != null)
-                                        downloadObject.state = -8;
+                                    if (downloadObject.get() != null)
+                                        downloadObject.get().state = -8;
                                     chapter.isDownloaded = false;
                                     holder.setDownloaded(false, false);
                                     FileAccessHelper.INSTANCE.delete(chapter.getFileName());
@@ -218,7 +221,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                         });
                         break;
                     case R.id.queue:
-                        if (isPlayAvailable(d_file, downloadObject)) {
+                        if (isPlayAvailable(d_file, downloadObject.get())) {
                             QueueManager.add(Uri.fromFile(d_file), true, chapter);
                             holder.setQueue(true, true);
                         } else
@@ -240,6 +243,10 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                 .setType("text/plain")
                                 .putExtra(Intent.EXTRA_TEXT, chapter.getEpTitle() + "\n" + chapter.link), "Compartir"));
                         break;
+                    case R.id.import_file:
+                        if (fragment != null)
+                            ((ChaptersFragment) fragment).onMove(chapter.getFileName());
+                        break;
                 }
                 return true;
             });
@@ -259,7 +266,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
             touchListener.startDragSelection(holder.getAdapterPosition());
             return true;
         });
-        if (!isNetworkAvailable && !isPlayAvailable(d_file, downloadObject)) {
+        if (!isNetworkAvailable && !isPlayAvailable(d_file, downloadObject.get())) {
             holder.actions.setVisibility(View.GONE);
         } else {
             holder.actions.setVisibility(View.VISIBLE);

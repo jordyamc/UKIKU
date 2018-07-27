@@ -1,15 +1,12 @@
 package knf.kuma.animeinfo.viewholders;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener;
 import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor;
@@ -73,84 +70,52 @@ public class AnimeChaptersHolder {
                                 .positiveText("visto")
                                 .negativeText("no visto")
                                 .neutralText("cancelar")
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        final MaterialDialog d = new MaterialDialog.Builder(context)
-                                                .content("Marcando...")
-                                                .progress(true, 0)
-                                                .cancelable(false)
-                                                .build();
-                                        d.show();
-                                        AsyncTask.execute(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
-                                                for (int i : adapter.getSelection()) {
-                                                    dao.addChapter(chapters.get(i));
-                                                }
-                                                SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
-                                                SeeingObject seeingObject = seeingDAO.getByAid(chapters.get(0).aid);
-                                                if (seeingObject != null) {
-                                                    seeingObject.chapter = chapters.get(0).number;
-                                                    seeingDAO.update(seeingObject);
-                                                }
-                                                recyclerView.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        adapter.deselectAll();
-                                                    }
-                                                });
-                                                d.dismiss();
-                                            }
-                                        });
-                                    }
+                                .onPositive((dialog, which) -> {
+                                    final MaterialDialog d = new MaterialDialog.Builder(context)
+                                            .content("Marcando...")
+                                            .progress(true, 0)
+                                            .cancelable(false)
+                                            .build();
+                                    d.show();
+                                    AsyncTask.execute(() -> {
+                                        ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
+                                        for (int i13 : adapter.getSelection()) {
+                                            dao.addChapter(chapters.get(i13));
+                                        }
+                                        SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
+                                        SeeingObject seeingObject = seeingDAO.getByAid(chapters.get(0).aid);
+                                        if (seeingObject != null) {
+                                            seeingObject.chapter = chapters.get(0).number;
+                                            seeingDAO.update(seeingObject);
+                                        }
+                                        recyclerView.post(() -> adapter.deselectAll());
+                                        d.dismiss();
+                                    });
                                 })
-                                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        final MaterialDialog d = new MaterialDialog.Builder(context)
-                                                .content("Marcando...")
-                                                .progress(true, 0)
-                                                .cancelable(false)
-                                                .build();
-                                        d.show();
-                                        AsyncTask.execute(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
-                                                for (int i : adapter.getSelection()) {
-                                                    dao.deleteChapter(chapters.get(i));
-                                                }
-                                                SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
-                                                SeeingObject seeingObject = seeingDAO.getByAid(chapters.get(0).aid);
-                                                if (seeingObject != null) {
-                                                    seeingObject.chapter = chapters.get(0).number;
-                                                    seeingDAO.update(seeingObject);
-                                                }
-                                                recyclerView.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        adapter.deselectAll();
-                                                    }
-                                                });
-                                                d.dismiss();
-                                            }
-                                        });
-                                    }
+                                .onNegative((dialog, which) -> {
+                                    final MaterialDialog d = new MaterialDialog.Builder(context)
+                                            .content("Marcando...")
+                                            .progress(true, 0)
+                                            .cancelable(false)
+                                            .build();
+                                    d.show();
+                                    AsyncTask.execute(() -> {
+                                        ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
+                                        for (int i12 : adapter.getSelection()) {
+                                            dao.deleteChapter(chapters.get(i12));
+                                        }
+                                        SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
+                                        SeeingObject seeingObject = seeingDAO.getByAid(chapters.get(0).aid);
+                                        if (seeingObject != null) {
+                                            seeingObject.chapter = chapters.get(0).number;
+                                            seeingDAO.update(seeingObject);
+                                        }
+                                        recyclerView.post(() -> adapter.deselectAll());
+                                        d.dismiss();
+                                    });
                                 })
-                                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        adapter.deselectAll();
-                                    }
-                                })
-                                .cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        adapter.deselectAll();
-                                    }
-                                }).build().show();
+                                .onNeutral((dialog, which) -> adapter.deselectAll())
+                                .cancelListener(dialog -> adapter.deselectAll()).build().show();
                     }
                 }).withMode(DragSelectionProcessor.Mode.Simple))
                 .withMaxScrollDistance(32);
@@ -159,12 +124,9 @@ public class AnimeChaptersHolder {
     public void setAdapter(Fragment fragment, List<AnimeObject.WebInfo.AnimeChapter> chapters) {
         this.chapters = chapters;
         this.adapter = new AnimeChaptersAdapter(fragment, chapters, touchListener);
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                recyclerView.setAdapter(adapter);
-                recyclerView.addOnItemTouchListener(touchListener);
-            }
+        recyclerView.post(() -> {
+            recyclerView.setAdapter(adapter);
+            recyclerView.addOnItemTouchListener(touchListener);
         });
     }
 
@@ -189,12 +151,7 @@ public class AnimeChaptersHolder {
             if (chapter != null) {
                 final int position = chapters.indexOf(chapter);
                 if (position >= 0)
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            manager.smoothScrollToPosition(recyclerView, null, position);
-                        }
-                    });
+                    recyclerView.post(() -> manager.smoothScrollToPosition(recyclerView, null, position));
             }
         }
     }

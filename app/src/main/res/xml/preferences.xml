@@ -44,6 +44,11 @@
             android:key="download_type"
             android:summary="%s"
             android:title="Descargas"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_import"
+            android:key="show_import"
+            android:title="Importar archivos"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Reproducción">

@@ -138,18 +138,18 @@ public class Repository {
     }
 
     public LiveData<PagedList<AnimeObject>> getSearch() {
-        return getSeacrh("");
+        return getSearch("");
     }
 
-    public LiveData<PagedList<AnimeObject>> getSeacrh(String query) {
+    public LiveData<PagedList<AnimeObject>> getSearch(String query) {
         if (query.equals("")) {
-            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getAll(), 25).build();
+            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getAll(), 25).setInitialLoadKey(0).build();
         } else if (query.trim().matches("^#\\d+$")) {
-            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchID(query.replace("#", "")), 25).build();
+            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchID(query.replace("#", "")), 25).setInitialLoadKey(0).build();
         } else if (PatternUtil.isCustomSearch(query)) {
             return getFiltered(query, null);
         } else {
-            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearch("%" + query + "%"), 25).build();
+            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearch("%" + query + "%"), 25).setInitialLoadKey(0).build();
         }
     }
 
@@ -162,43 +162,43 @@ public class Repository {
         switch (PatternUtil.getCustomAttr(query).toLowerCase()) {
             case "emision":
                 if (genres == null)
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchS(f_query, "En emisión"), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchS(f_query, "En emisión"), 25).setInitialLoadKey(0).build();
                 else
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchSG(f_query, "En emisión", genres), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchSG(f_query, "En emisión", genres), 25).setInitialLoadKey(0).build();
             case "finalizado":
                 if (genres == null)
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchS(f_query, "Finalizado"), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchS(f_query, "Finalizado"), 25).setInitialLoadKey(0).build();
                 else
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchSG(f_query, "Finalizado", genres), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchSG(f_query, "Finalizado", genres), 25).setInitialLoadKey(0).build();
             case "anime":
                 if (genres == null)
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTY(f_query, "Anime"), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTY(f_query, "Anime"), 25).setInitialLoadKey(0).build();
                 else
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTYG(f_query, "Anime", genres), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTYG(f_query, "Anime", genres), 25).setInitialLoadKey(0).build();
             case "ova":
                 if (genres == null)
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTY(f_query, "OVA"), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTY(f_query, "OVA"), 25).setInitialLoadKey(0).build();
                 else
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTYG(f_query, "OVA", genres), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTYG(f_query, "OVA", genres), 25).setInitialLoadKey(0).build();
             case "pelicula":
                 if (genres == null)
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTY(f_query, "Película"), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTY(f_query, "Película"), 25).setInitialLoadKey(0).build();
                 else
-                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTYG(f_query, "Película", genres), 25).build();
+                    return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTYG(f_query, "Película", genres), 25).setInitialLoadKey(0).build();
             default:
                 return genres == null ?
-                        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearch(f_query), 25).build() :
-                        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTG(f_query, genres), 25).build();
+                        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearch(f_query), 25).setInitialLoadKey(0).build() :
+                        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTG(f_query, genres), 25).setInitialLoadKey(0).build();
         }
     }
 
-    public LiveData<PagedList<AnimeObject>> getSeacrh(String query, String genres) {
+    public LiveData<PagedList<AnimeObject>> getSearch(String query, String genres) {
         if (query.equals("")) {
-            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchG(genres), 25).build();
+            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchG(genres), 25).setInitialLoadKey(0).build();
         } else if (PatternUtil.isCustomSearch(query)) {
             return getFiltered(query, genres);
         } else {
-            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTG("%" + query + "%", genres), 25).build();
+            return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTG("%" + query + "%", genres), 25).setInitialLoadKey(0).build();
         }
     }
 
