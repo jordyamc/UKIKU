@@ -2,7 +2,7 @@
 
 ## ¿Qué es UKIKU?
 
-Es una app derivada de mi antiguo proyecto [Animeflv App](https://github.com/jordyamc/Animeflv), tiene casi las mismas funciones, pero hecha desde cero para dispositivos con Android 5 o superior, esta pensada para tener mejor rendimiento y optimización, así como menor tamaño de APK (~6MB)
+Es una app derivada de mi antiguo proyecto [Animeflv App](https://github.com/jordyamc/Animeflv), tiene casi las mismas funciones, pero hecha desde cero para dispositivos con Android 5 o superior, esta pensada para tener mejor rendimiento y optimización, así como menor tamaño de [APK](https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk) (~6MB)
 
 ## ¿Por que un proyecto tan grande no tiene publicidad y es código abierto?
 
