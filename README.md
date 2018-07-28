@@ -1,4 +1,3 @@
-# UKIKU
 ![](https://github.com/jordyamc/UKIKU/blob/master/web/img/UKIKU%20Facebook.png)
 
 ## ¿Qué es UKIKU?
