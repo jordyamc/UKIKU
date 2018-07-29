@@ -1,5 +1,9 @@
 ![](https://github.com/jordyamc/UKIKU/blob/master/web/img/UKIKU%20Facebook.png)
 
+[![GitHub last commit](https://img.shields.io/github/last-commit/google/skia.svg)](https://github.com/jordyamc/UKIKU)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/jordyamc/UKIKU)
+[![GitHub forks](https://img.shields.io/github/forks/badges/shields.svg?style=social&label=Fork)](https://github.com/jordyamc/UKIKU)
+
 ## ¿Qué es UKIKU?
 
 Es una app derivada de mi antiguo proyecto [Animeflv App](https://github.com/jordyamc/Animeflv), tiene casi las mismas funciones, pero hecha desde cero para dispositivos con Android 5 o superior, esta pensada para tener mejor rendimiento y optimización, así como menor tamaño de [APK](https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk) (~6MB)
