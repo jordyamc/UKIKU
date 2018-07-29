@@ -14,4 +14,4 @@ Soy un programador por hobby, no tengo experiencia profesional en la programaci�
 
 ## ¿Como puedo modificar este proyecto?
 
-En la wiki de éste repositorio encontrarás los pasos para hacerlo!
+En la [wiki](https://github.com/jordyamc/UKIKU/wiki) de éste repositorio encontrarás los pasos para hacerlo!
