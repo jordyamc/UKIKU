@@ -1,7 +1,7 @@
 ![](https://github.com/jordyamc/UKIKU/blob/master/web/img/UKIKU%20Facebook.png)
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/google/skia.svg)](https://github.com/jordyamc/UKIKU)
-[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/jordyamc/UKIKU)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/jordyamc/UKIKU/blob/master/LICENSE)
 [![GitHub forks](https://img.shields.io/github/forks/jordyamc/UKIKU.svg)](https://github.com/jordyamc/UKIKU/network)
 
 ## ¿Qué es UKIKU?
