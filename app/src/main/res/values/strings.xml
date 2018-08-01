@@ -92,6 +92,24 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+    <string-array name="buffer_size">
+        <item>1kb</item>
+        <item>2kb</item>
+        <item>4kb</item>
+        <item>8kb</item>
+        <item>16kb</item>
+        <item>32kb</item>
+        <item>64kb</item>
+    </string-array>
+    <string-array name="buffer_size_values">
+        <item>1</item>
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+        <item>32</item>
+        <item>64</item>
+    </string-array>
 
     <string name="shortcut_fav_short">Favoritos</string>
     <string name="shortcut_fav_long">Animes favoritos</string>

@@ -135,10 +135,11 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 menu.inflate(R.menu.chapter_downloaded_menu);
                 if (!CastUtil.get().connected())
                     menu.getMenu().findItem(R.id.cast).setVisible(false);
-            } else {
+            } else if (isNetworkAvailable)
                 menu.inflate(R.menu.chapter_menu);
-            }
-            if (QueueManager.isInQueue(chapter.eid))
+            else
+                menu.inflate(R.menu.chapter_menu_offline);
+            if (QueueManager.isInQueue(chapter.eid) && menu.getMenu().findItem(R.id.queue) != null)
                 menu.getMenu().findItem(R.id.queue).setVisible(false);
             if (!PrefsUtil.showImport())
                 menu.getMenu().findItem(R.id.import_file).setVisible(false);
@@ -177,7 +178,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                         downloadObject.get().state = -8;
                                     chapter.isDownloaded = false;
                                     holder.setDownloaded(false, false);
-                                    FileAccessHelper.INSTANCE.delete(chapter.getFileName());
+                                    FileAccessHelper.INSTANCE.delete(chapter.getFileName(), this::notifyDataSetChanged);
                                     CacheDB.INSTANCE.downloadsDAO().deleteByEid(chapter.eid);
                                     QueueManager.remove(chapter.eid);
                                 }).build().show();
@@ -266,11 +267,6 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
             touchListener.startDragSelection(holder.getAdapterPosition());
             return true;
         });
-        if (!isNetworkAvailable && !isPlayAvailable(d_file, downloadObject.get())) {
-            holder.actions.setVisibility(View.GONE);
-        } else {
-            holder.actions.setVisibility(View.VISIBLE);
-        }
     }
 
     private void updateSeeing(String chapter) {

@@ -49,6 +49,14 @@
             android:icon="@drawable/ic_import"
             android:key="show_import"
             android:title="Importar archivos"/>
+        <ListPreference
+            android:defaultValue="32"
+            android:entries="@array/buffer_size"
+            android:entryValues="@array/buffer_size_values"
+            android:icon="@drawable/ic_buffer"
+            android:key="buffer_size"
+            android:summary="%s"
+            android:title="Tamaño de buffer"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Reproducción">

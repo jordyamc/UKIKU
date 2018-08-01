@@ -245,6 +245,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
                     .negativeText("no")
                     .neutralText("dropear")
                     .onPositive((dialog, which) -> {
+                        dao.addFav(favoriteObject);
                         seeingDAO.remove(seeingObject);
                         holder.setFABState(true);
                         RecommendHelper.registerAll(genres, RankType.FAV);

@@ -1,6 +1,5 @@
 package knf.kuma.explorer;
 
-import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
@@ -12,13 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.database.CacheDB;
-import knf.kuma.pojos.DownloadObject;
 
 public class FragmentDownloads extends FragmentBase {
     @BindView(R.id.recycler)
@@ -39,15 +35,12 @@ public class FragmentDownloads extends FragmentBase {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        CacheDB.INSTANCE.downloadsDAO().getActive().observe(this, new Observer<List<DownloadObject>>() {
-            @Override
-            public void onChanged(List<DownloadObject> downloadObjects) {
-                progress.setVisibility(View.GONE);
-                error.setVisibility(downloadObjects.size() == 0 ? View.VISIBLE : View.GONE);
-                if (isFirst || downloadObjects.size() == 0) {
-                    isFirst = false;
-                    recyclerView.setAdapter(new DownloadingAdapter(FragmentDownloads.this, downloadObjects));
-                }
+        CacheDB.INSTANCE.downloadsDAO().getActive().observe(this, downloadObjects -> {
+            progress.setVisibility(View.GONE);
+            error.setVisibility(downloadObjects.size() == 0 ? View.VISIBLE : View.GONE);
+            if (isFirst || downloadObjects.size() == 0) {
+                isFirst = false;
+                recyclerView.setAdapter(new DownloadingAdapter(FragmentDownloads.this, downloadObjects));
             }
         });
     }

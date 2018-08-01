@@ -29,12 +29,7 @@ public class RecyclerRefreshHolder {
     }
 
     public void setRecyclerAdapter(final RecyclerView.Adapter adapter){
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                recyclerView.setAdapter(adapter);
-            }
-        });
+        recyclerView.post(() -> recyclerView.setAdapter(adapter));
     }
 
     public void scrollToTop(){
@@ -42,20 +37,10 @@ public class RecyclerRefreshHolder {
     }
 
     public void setRefreshing(final boolean refreshing){
-        refreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                refreshLayout.setRefreshing(refreshing);
-            }
-        });
+        refreshLayout.post(() -> refreshLayout.setRefreshing(refreshing));
     }
 
     public void setError(final boolean visible) {
-        error.post(new Runnable() {
-            @Override
-            public void run() {
-                error.setVisibility(visible ? View.VISIBLE : View.GONE);
-            }
-        });
+        error.post(() -> error.setVisibility(visible ? View.VISIBLE : View.GONE));
     }
 }

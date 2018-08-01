@@ -74,25 +74,25 @@ public class FileAccessHelper {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
-    public File getFile(String file_name){
+    public File getFile(String file_name) {
         try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
                 return new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
             } else {
-                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(),context),"UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
+                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new File(Environment.getDataDirectory(),"test.txt");
+            return new File(Environment.getDataDirectory(), "test.txt");
         }
     }
 
-    public File getDownloadsDirectory(String file_name){
+    public File getDownloadsDirectory(String file_name) {
         try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
                 return new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + file_name);
             } else {
-                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(),context),"UKIKU/downloads/" + file_name);
+                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "UKIKU/downloads/" + file_name);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,12 +100,12 @@ public class FileAccessHelper {
         }
     }
 
-    public File getDownloadsDirectory(){
+    public File getDownloadsDirectory() {
         try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
                 return new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads");
             } else {
-                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(),context),"UKIKU/downloads");
+                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "UKIKU/downloads");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,7 +113,11 @@ public class FileAccessHelper {
         }
     }
 
-    public void delete(final String file_name){
+    public void delete(String file_name) {
+        delete(file_name, null);
+    }
+
+    public void delete(final String file_name, DeleteListener listener) {
         try {
             AsyncTask.execute(() -> {
                 if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
@@ -122,6 +126,8 @@ public class FileAccessHelper {
                     File dir = file.getParentFile();
                     if (dir.listFiles() == null || dir.listFiles().length == 0)
                         dir.delete();
+                    if (listener != null)
+                        listener.onDelete();
                 } else {
                     try {
                         DocumentFile documentFile = DocumentFile.fromTreeUri(context, getTreeUri());
@@ -132,6 +138,8 @@ public class FileAccessHelper {
                             if (dir != null && dir.listFiles().length == 0)
                                 dir.delete();
                         }
+                        if (listener != null)
+                            listener.onDelete();
                     } catch (Exception e) {
                         //e.printStackTrace();
                     }
@@ -142,7 +150,7 @@ public class FileAccessHelper {
         }
     }
 
-    public OutputStream getOutputStream(String file_name){
+    public OutputStream getOutputStream(String file_name) {
         try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
                 File file = new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name));
@@ -153,7 +161,7 @@ public class FileAccessHelper {
                     file.createNewFile();
                 return new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
             } else {
-                return context.getContentResolver().openOutputStream(find(DocumentFile.fromTreeUri(context, getTreeUri()), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).getUri(),"rw");
+                return context.getContentResolver().openOutputStream(find(DocumentFile.fromTreeUri(context, getTreeUri()), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).getUri(), "rw");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,7 +216,7 @@ public class FileAccessHelper {
                 if (documentFile != null && documentFile.exists()) {
                     find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
                 }
-                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(),context),"UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists();
+                return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -276,7 +284,7 @@ public class FileAccessHelper {
     public Uri getDataUri(String file_name) {
         try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
-                return FileProvider.getUriForFile(context,"knf.kuma.fileprovider",new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
+                return FileProvider.getUriForFile(context, "knf.kuma.fileprovider", new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
             } else {
                 DocumentFile documentFile = DocumentFile.fromTreeUri(context, getTreeUri());
                 if (documentFile != null && documentFile.exists()) {
@@ -330,5 +338,9 @@ public class FileAccessHelper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public interface DeleteListener {
+        void onDelete();
     }
 }

@@ -17,14 +17,22 @@ public class DetailsDescriptionPresenter
         this.bodyColor = bodyColor;
     }
 
+    DetailsDescriptionPresenter() {
+        this.titleColor = 0;
+        this.bodyColor = 0;
+    }
+
     @Override
     protected void onBindDescription(AbstractDetailsDescriptionPresenter.ViewHolder viewHolder, Object itemData) {
         AnimeObject animeObject = (AnimeObject) itemData;
         viewHolder.getTitle().setText(animeObject.name);
         viewHolder.getSubtitle().setText(animeObject.getGenresString());
         viewHolder.getBody().setText(animeObject.description);
-        viewHolder.getTitle().setTextColor(titleColor);
-        viewHolder.getSubtitle().setTextColor(bodyColor);
-        viewHolder.getBody().setTextColor(bodyColor);
+        if (titleColor != 0)
+            viewHolder.getTitle().setTextColor(titleColor);
+        if (bodyColor != 0) {
+            viewHolder.getSubtitle().setTextColor(bodyColor);
+            viewHolder.getBody().setTextColor(bodyColor);
+        }
     }
 }

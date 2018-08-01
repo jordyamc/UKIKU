@@ -67,8 +67,9 @@ public class ChaptersFragment extends BottomFragment {
 
     public void onMove(String to) {
         this.move_file = to;
-        startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT)
+        startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
+                .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 .setType("video/mp4"), 55698);
     }
 
@@ -83,18 +84,22 @@ public class ChaptersFragment extends BottomFragment {
                         .cancelable(false)
                         .build();
                 dialog.show();
-                FileUtil.movefile(getContext().getContentResolver().openInputStream(data.getData()), FileAccessHelper.INSTANCE.getOutputStream(move_file)).observe(this, pair -> {
-                    if (pair != null) {
-                        if (pair.second) {
-                            if (pair.first == -1) {
-                                Toaster.toast("Error al importar");
-                                FileAccessHelper.INSTANCE.delete(move_file);
+                FileUtil.moveFile(getContext().getContentResolver(), data.getData(), FileAccessHelper.INSTANCE.getOutputStream(move_file)).observe(this, pair -> {
+                    try {
+                        if (pair != null) {
+                            if (pair.second) {
+                                if (pair.first == -1) {
+                                    Toaster.toast("Error al importar");
+                                    FileAccessHelper.INSTANCE.delete(move_file);
+                                } else
+                                    Toaster.toast("Importado exitosamente");
+                                holder.getAdapter().notifyDataSetChanged();
+                                dialog.dismiss();
                             } else
-                                Toaster.toast("Importado exitosamente");
-                            holder.getAdapter().notifyDataSetChanged();
-                            dialog.dismiss();
-                        } else
-                            dialog.setProgress(pair.first);
+                                dialog.setProgress(pair.first);
+                        }
+                    } catch (Exception e) {
+                        Toaster.toast("Error al importar");
                     }
                 });
             } catch (Exception e) {

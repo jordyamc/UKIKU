@@ -6,6 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
+import java.util.Locale;
+
 import knf.kuma.database.BaseConverter;
 import knf.kuma.videoservers.Headers;
 
@@ -79,6 +81,22 @@ public class DownloadObject {
 
     public boolean isDownloading() {
         return state == DOWNLOADING || state == PENDING;
+    }
+
+    public String getSize() {
+        /*if (t_bytes == -1)
+            return "";
+        String size = formatSize(t_bytes);
+        if (size.endsWith(".0"))
+            size = size.substring(0, size.lastIndexOf("."));
+        return size;*/
+        return progress + "%";
+    }
+
+    private String formatSize(long v) {
+        if (v < 1024) return v + " B";
+        int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
+        return String.format(Locale.US, "%.1f%sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
     }
 
     public void reset() {

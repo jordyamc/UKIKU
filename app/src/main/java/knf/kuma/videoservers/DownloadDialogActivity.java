@@ -1,5 +1,7 @@
 package knf.kuma.videoservers;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -57,9 +59,13 @@ public class DownloadDialogActivity extends AppCompatActivity {
                 AnimeObject.WebInfo.AnimeChapter chapter = new AnimeObject.WebInfo.AnimeChapter(Integer.parseInt(aid), "Episodio " + num, eid, getIntent().getDataString(), name, aid);
                 object = DownloadObject.fromChapter(chapter, false);
                 runOnUiThread(() -> {
-                    if (dialog != null)
+                    try {
                         dialog.dismiss();
-                    showSelectDialog();
+                        showSelectDialog();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        finish();
+                    }
                 });
             } catch (Exception e) {
                 e.printStackTrace();
@@ -77,7 +83,8 @@ public class DownloadDialogActivity extends AppCompatActivity {
                             ServersFactory.start(DownloadDialogActivity.this, getIntent().getDataString(), object, which == 1, new ServersFactory.ServersInterface() {
                                 @Override
                                 public void onFinish(boolean started, boolean success) {
-                                    removeNotification();
+                                    if (success)
+                                        removeNotification();
                                     finish();
                                 }
 
@@ -101,7 +108,10 @@ public class DownloadDialogActivity extends AppCompatActivity {
     }
 
     private void removeNotification() {
-        if (getIntent().getBooleanExtra("notification", false))
-            sendBroadcast(NotificationObj.fromIntent(getIntent()).getBroadcast(this));
+        if (getIntent().getBooleanExtra("notification", false)) {
+            NotificationObj obj = NotificationObj.fromIntent(getIntent());
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(obj.key);
+            sendBroadcast(obj.getBroadcast(this));
+        }
     }
 }

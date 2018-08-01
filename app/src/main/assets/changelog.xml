@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="48" version="1.6.1">
+        <change type="fix">Errores generales</change>
+        <change type="new">Configurar buffer de descarga</change>
+        <change type="change">Mejoras al importar</change>
+    </release>
     <release code="47" version="1.6">
         <change type="fix">Errores generales</change>
         <change type="new">Importar videos a la app</change>

@@ -2,6 +2,7 @@ package knf.kuma.explorer;
 
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -35,9 +36,10 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
         this.downloadObjects = downloadObjects;
     }
 
+    @NonNull
     @Override
-    public DownloadingItem onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new DownloadingItem(LayoutInflater.from(parent.getContext()).inflate(getLayout(), parent, false));
+    public DownloadingItem onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        return new DownloadingItem(LayoutInflater.from(viewGroup.getContext()).inflate(getLayout(), viewGroup, false));
     }
 
     @LayoutRes
@@ -50,10 +52,11 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
     }
 
     @Override
-    public void onBindViewHolder(final DownloadingItem holder, int position) {
+    public void onBindViewHolder(@NonNull final DownloadingItem holder, int position) {
         final DownloadObject downloadObject = downloadObjects.get(position);
         holder.title.setText(downloadObject.name);
         holder.chapter.setText(downloadObject.chapter);
+        holder.size.setText(downloadObject.getSize());
         holder.progress.setMax(100);
         if (downloadObject.state == DownloadObject.PENDING) {
             holder.progress.setIndeterminate(true);
@@ -90,6 +93,7 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
                     } else {
                         holder.progress.setIndeterminate(false);
                         holder.progress.setProgress(object.progress);
+                        holder.size.setText(object.getSize());
                     }
                 }
             } catch (Exception e) {
@@ -108,12 +112,14 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
         TextView title;
         @BindView(R.id.chapter)
         TextView chapter;
+        @BindView(R.id.size)
+        TextView size;
         @BindView(R.id.action)
         ImageButton action;
         @BindView(R.id.progress)
         ProgressBar progress;
 
-        public DownloadingItem(View itemView) {
+        DownloadingItem(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

@@ -15,6 +15,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.util.concurrent.TimeUnit;
 
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.pojos.DownloadObject;
@@ -35,6 +36,7 @@ public class DownloadService extends IntentService {
     private DownloadObject current;
 
     private String file;
+    private int bufferSize = PrefsUtil.bufferSize();
 
     public DownloadService() {
         super("Download service");
@@ -64,7 +66,7 @@ public class DownloadService extends IntentService {
             BufferedInputStream inputStream = new BufferedInputStream(response.body().byteStream());
             BufferedOutputStream outputStream;
             if (response.code() == 200 || response.code() == 206) {
-                outputStream = new BufferedOutputStream(FileAccessHelper.INSTANCE.getOutputStream(current.file), 32 * 1024);
+                outputStream = new BufferedOutputStream(FileAccessHelper.INSTANCE.getOutputStream(current.file), bufferSize * 1024);
             } else {
                 Log.e("Download error", "Code: " + response.code());
                 errorNotification();
@@ -76,9 +78,9 @@ public class DownloadService extends IntentService {
             }
             current.state = DownloadObject.DOWNLOADING;
             downloadsDAO.update(current);
-            byte data[] = new byte[32 * 1024];
+            byte data[] = new byte[bufferSize * 1024];
             int count;
-            while ((count = inputStream.read(data, 0, 32 * 1024)) >= 0) {
+            while ((count = inputStream.read(data, 0, bufferSize * 1024)) >= 0) {
                 DownloadObject revised = downloadsDAO.getByEid(intent.getStringExtra("eid"));
                 if (revised == null) {
                     FileAccessHelper.INSTANCE.delete(file);

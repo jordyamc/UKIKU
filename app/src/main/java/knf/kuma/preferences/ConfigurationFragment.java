@@ -4,9 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
@@ -20,6 +20,7 @@ import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import knf.kuma.BuildConfig;
 import knf.kuma.Main;
 import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
@@ -43,19 +44,16 @@ public class ConfigurationFragment extends PreferenceFragment {
         getPreferenceManager().getSharedPreferences().edit().putBoolean("daynigth_permission", Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)).apply();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED))
             getPreferenceScreen().findPreference("daynigth_permission").setEnabled(false);
-        getPreferenceScreen().findPreference("daynigth_permission").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                boolean check = (Boolean) o;
-                if (check && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 5587);
-                    } else if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        getPreferenceManager().getSharedPreferences().edit().putBoolean("daynigth_permission", true).apply();
-                        getPreferenceScreen().findPreference("daynigth_permission").setEnabled(false);
-                    }
-                return true;
-            }
+        getPreferenceScreen().findPreference("daynigth_permission").setOnPreferenceChangeListener((preference, o) -> {
+            boolean check = (Boolean) o;
+            if (check && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 5587);
+                } else if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    getPreferenceManager().getSharedPreferences().edit().putBoolean("daynigth_permission", true).apply();
+                    getPreferenceScreen().findPreference("daynigth_permission").setEnabled(false);
+                }
+            return true;
         });
         getPreferenceScreen().findPreference("download_type").setOnPreferenceChangeListener((preference, o) -> {
             if (o.equals("1") && !FileAccessHelper.INSTANCE.canDownload(ConfigurationFragment.this, (String) o))
@@ -115,8 +113,17 @@ public class ConfigurationFragment extends PreferenceFragment {
                 return true;
             });
         else {
-            getPreferenceScreen().findPreference("theme_color").setSummary("Resuleve el secreto para desbloquear");
+            getPreferenceScreen().findPreference("theme_color").setSummary("Resuelve el secreto para desbloquear");
             getPreferenceScreen().findPreference("theme_color").setEnabled(false);
+        }
+        if (BuildConfig.DEBUG) {
+            getPreferenceScreen().findPreference("reset_recents").setOnPreferenceClickListener(preference -> {
+                AsyncTask.execute(() -> {
+                    CacheDB.INSTANCE.recentsDAO().clear();
+                    RecentsJob.run();
+                });
+                return true;
+            });
         }
     }
 

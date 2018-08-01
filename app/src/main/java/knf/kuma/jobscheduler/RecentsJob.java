@@ -21,6 +21,7 @@ import org.jsoup.Jsoup;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import knf.kuma.BuildConfig;
 import knf.kuma.Main;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
@@ -72,6 +73,12 @@ public class RecentsJob extends Job {
                     .build().schedule();
     }
 
+    public static void run() {
+        new JobRequest.Builder(TAG)
+                .startNow()
+                .build().schedule();
+    }
+
     @NonNull
     @Override
     protected Result onRunJob(@NonNull Params params) {
@@ -80,7 +87,7 @@ public class RecentsJob extends Job {
             Recents recents = Jspoon.create().adapter(Recents.class).fromHtml(Jsoup.connect("https://animeflv.net/").cookies(BypassUtil.getMapCookie(getContext())).userAgent(BypassUtil.userAgent).get().outerHtml());
             List<RecentObject> objects = RecentObject.create(recents.list);
             List<RecentObject> local = recentsDAO.getAll();
-            if (local.size() == 0)
+            if (local.size() == 0 && !BuildConfig.DEBUG)
                 return Result.SUCCESS;
             if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("notify_favs", false)) {
                 notifyFavChaps(local, objects);

@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import java.util.List;
 
@@ -34,5 +35,6 @@ public class RecentsNotReceiver extends BroadcastReceiver {
             if (objs.size()<=1)
                 ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(RecentsJob.KEY_SUMMARY);
         }
+        Log.e("Not remove", "Received");
     }
 }

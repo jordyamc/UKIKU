@@ -100,18 +100,24 @@ public class AnimeChaptersHolder {
                                             .build();
                                     d.show();
                                     AsyncTask.execute(() -> {
-                                        ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
-                                        for (int i12 : adapter.getSelection()) {
-                                            dao.deleteChapter(chapters.get(i12));
+                                        try {
+                                            ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
+                                            for (int i12 : adapter.getSelection()) {
+                                                dao.deleteChapter(chapters.get(i12));
+                                            }
+                                            SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
+                                            SeeingObject seeingObject = seeingDAO.getByAid(chapters.get(0).aid);
+                                            if (seeingObject != null) {
+                                                seeingObject.chapter = chapters.get(0).number;
+                                                seeingDAO.update(seeingObject);
+                                            }
+                                            recyclerView.post(() -> adapter.deselectAll());
+                                            d.dismiss();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            if (d.isShowing())
+                                                d.dismiss();
                                         }
-                                        SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
-                                        SeeingObject seeingObject = seeingDAO.getByAid(chapters.get(0).aid);
-                                        if (seeingObject != null) {
-                                            seeingObject.chapter = chapters.get(0).number;
-                                            seeingDAO.update(seeingObject);
-                                        }
-                                        recyclerView.post(() -> adapter.deselectAll());
-                                        d.dismiss();
                                     });
                                 })
                                 .onNeutral((dialog, which) -> adapter.deselectAll())

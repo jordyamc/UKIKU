@@ -53,4 +53,8 @@ public class PrefsUtil {
     public static boolean showImport() {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_import", false);
     }
+
+    public static int bufferSize() {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("buffer_size", "32"));
+    }
 }

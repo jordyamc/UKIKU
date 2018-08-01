@@ -90,13 +90,17 @@ public class TVAnimesDetailsFragment extends DetailsSupportFragment implements O
                             ClassPresenterSelector selector = new ClassPresenterSelector();
                             FullWidthDetailsOverviewRowPresenter rowPresenter =
                                     new CustomFullWidthDetailsOverviewRowPresenter(
-                                            new DetailsDescriptionPresenter(swatch.getTitleTextColor(), swatch.getBodyTextColor()));
-                            rowPresenter.setBackgroundColor(swatch.getRgb());
-                            float[] hsv = new float[3];
-                            int color = swatch.getRgb();
-                            Color.colorToHSV(color, hsv);
-                            hsv[2] *= 0.8f; // value component
-                            rowPresenter.setActionsBackgroundColor(Color.HSVToColor(hsv));
+                                            swatch == null ?
+                                                    new DetailsDescriptionPresenter() :
+                                                    new DetailsDescriptionPresenter(swatch.getTitleTextColor(), swatch.getBodyTextColor()));
+                            if (swatch != null) {
+                                rowPresenter.setBackgroundColor(swatch.getRgb());
+                                float[] hsv = new float[3];
+                                int color = swatch.getRgb();
+                                Color.colorToHSV(color, hsv);
+                                hsv[2] *= 0.8f;
+                                rowPresenter.setActionsBackgroundColor(Color.HSVToColor(hsv));
+                            }
                             selector.addClassPresenter(DetailsOverviewRow.class, rowPresenter);
                             selector.addClassPresenter(ChaptersListRow.class, new ChaptersListPresenter(getLastSeen(chapters)));
                             selector.addClassPresenter(ListRow.class, new ListRowPresenter());

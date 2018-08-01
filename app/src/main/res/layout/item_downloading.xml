@@ -2,6 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -22,18 +23,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/title"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
@@ -44,29 +45,42 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textSize="18sp"/>
 
-                <TextView
-                    android:id="@+id/chapter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                <ImageButton
+                    android:id="@+id/action"
+                    style="@style/Base.Widget.AppCompat.Button.Borderless"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
                     android:layout_marginEnd="8dp"
-                    android:lines="1"
-                    android:text="Chapter #"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="?colorAccent"
-                    android:textSize="16sp"/>
+                    android:background="@drawable/background_ripple"
+                    app:srcCompat="@drawable/ic_delete"/>
+
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/action"
-                style="@style/Base.Widget.AppCompat.Button.Borderless"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/background_ripple"
-                app:srcCompat="@drawable/ic_delete"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical">
 
+                <TextView
+                    android:id="@+id/chapter"
+                    android:layout_width="0dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Chapter #"
+                    android:textColor="?colorAccent"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    tools:text="Size"/>
+            </LinearLayout>
         </LinearLayout>
 
         <ProgressBar

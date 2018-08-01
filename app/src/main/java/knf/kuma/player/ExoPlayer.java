@@ -178,22 +178,19 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
     @OnClick(R.id.pip)
     @TargetApi(Build.VERSION_CODES.N)
     void onPip(View view) {
-        /*view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isInPictureInPictureMode())
+        try {
+            if (!isInPictureInPictureMode()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    PictureInPictureParams params = new PictureInPictureParams.Builder()
+                            .setAspectRatio(new Rational(exoPlayerView.getWidth(), exoPlayerView.getHeight()))
+                            .build();
+                    enterPictureInPictureMode(params);
+                } else {
                     enterPictureInPictureMode();
+                }
             }
-        });*/
-        if (!isInPictureInPictureMode()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                PictureInPictureParams params = new PictureInPictureParams.Builder()
-                        .setAspectRatio(new Rational(exoPlayerView.getWidth(), exoPlayerView.getHeight()))
-                        .build();
-                enterPictureInPictureMode(params);
-            } else {
-                enterPictureInPictureMode();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -208,26 +205,20 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (!isInPictureInPictureMode) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    top.setVisibility(View.VISIBLE);
-                    bottom.setVisibility(View.VISIBLE);
-                    //pip_exit.setVisibility(View.GONE);
-                }
+            runOnUiThread(() -> {
+                top.setVisibility(View.VISIBLE);
+                bottom.setVisibility(View.VISIBLE);
+                //pip_exit.setVisibility(View.GONE);
             });
             /*getApplication().startActivity(new Intent(this, getClass())
                     .putExtra("isReorder", true)
                     .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));*/
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    top.setVisibility(View.GONE);
-                    bottom.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.GONE);
-                    //pip_exit.setVisibility(View.VISIBLE);
-                }
+            runOnUiThread(() -> {
+                top.setVisibility(View.GONE);
+                bottom.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                //pip_exit.setVisibility(View.VISIBLE);
             });
         }
     }
@@ -292,12 +283,7 @@ public class ExoPlayer extends AppCompatActivity implements Player.EventListener
 
     @Override
     public void onLoadingChanged(final boolean isLoading) {
-        progressBar.post(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-            }
-        });
+        progressBar.post(() -> progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE));
     }
 
     @Override
