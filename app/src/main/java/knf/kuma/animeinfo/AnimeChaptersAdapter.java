@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
@@ -179,7 +181,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                         downloadObject.get().state = -8;
                                     chapter.isDownloaded = false;
                                     holder.setDownloaded(false, false);
-                                    FileAccessHelper.INSTANCE.delete(chapter.getFileName(), this::notifyDataSetChanged);
+                                    FileAccessHelper.INSTANCE.delete(chapter.getFileName(), () -> new Handler(Looper.getMainLooper()).post(this::notifyDataSetChanged));
                                     //CacheDB.INSTANCE.downloadsDAO().deleteByEid(chapter.eid);
                                     DownloadManager.cancel(chapter.eid);
                                     QueueManager.remove(chapter.eid);
