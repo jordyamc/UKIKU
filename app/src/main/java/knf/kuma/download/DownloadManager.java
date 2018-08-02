@@ -209,7 +209,8 @@ public class DownloadManager {
         if (downloadObject != null) {
             downloadDao.delete(downloadObject);
             notificationManager.cancel(Integer.parseInt(downloadObject.eid));
-            fetch.delete(downloadObject.getDid());
+            if (downloadObject.did != null)
+                fetch.delete(downloadObject.getDid());
         }
     }
 

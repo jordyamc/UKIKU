@@ -104,6 +104,7 @@ public class DownloadObject {
     }
 
     public long getEta() {
+        if (eta == null) return -1;
         return Long.parseLong(eta);
     }
 
@@ -112,6 +113,7 @@ public class DownloadObject {
     }
 
     public long getSpeed() {
+        if (speed == null) return 0;
         return Long.parseLong(speed);
     }
 
