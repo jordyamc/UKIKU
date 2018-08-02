@@ -46,6 +46,11 @@
             android:title="Descargas"/>
         <SwitchPreference
             android:defaultValue="false"
+            android:icon="@drawable/ic_hide_pref"
+            android:key="hide_chaps"
+            android:title="Ocultar de galeria"/>
+        <SwitchPreference
+            android:defaultValue="false"
             android:icon="@drawable/ic_import"
             android:key="show_import"
             android:title="Importar archivos"/>

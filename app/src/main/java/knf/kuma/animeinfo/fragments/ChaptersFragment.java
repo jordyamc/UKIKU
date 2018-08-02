@@ -21,7 +21,7 @@ import knf.kuma.animeinfo.AnimeViewModel;
 import knf.kuma.animeinfo.viewholders.AnimeChaptersHolder;
 import knf.kuma.commons.FileUtil;
 import knf.kuma.commons.PrefsUtil;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.pojos.AnimeObject;
 import xdroid.toaster.Toaster;
 

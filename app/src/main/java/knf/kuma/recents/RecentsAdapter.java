@@ -42,7 +42,8 @@ import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.database.dao.FavsDAO;
 import knf.kuma.database.dao.RecordsDAO;
 import knf.kuma.directory.DirectoryService;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.DownloadManager;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
 import knf.kuma.pojos.RecentObject;
@@ -94,10 +95,14 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                 object.downloadState = -8;
                 object.isDownloading = false;
             } else {
-                object.isDownloading = (downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING);
+                object.isDownloading = downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING || downloadObject.state == DownloadObject.PAUSED;
                 object.downloadState = downloadObject.state;
                 File file = FileAccessHelper.INSTANCE.getFile(object.getFileName());
                 object.isChapterDownloaded = file.exists();
+                if (downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING)
+                    holder.down_icon.setImageResource(R.drawable.ic_download);
+                else if (downloadObject.state == DownloadObject.PAUSED)
+                    holder.down_icon.setImageResource(R.drawable.ic_pause_normal);
             }
             holder.setState(isNetworkAvailable, object.isChapterDownloaded || object.isDownloading);
         });
@@ -115,7 +120,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                                 .negativeText("CANCELAR")
                                 .onPositive((dialog, which) -> {
                                     FileAccessHelper.INSTANCE.delete(object.getFileName());
-                                    downloadsDAO.deleteByEid(object.eid);
+                                    //downloadsDAO.deleteByEid(object.eid);
+                                    DownloadManager.cancel(object.eid);
                                     QueueManager.remove(object.eid);
                                     object.isChapterDownloaded = false;
                                     holder.setState(isNetworkAvailable, false);
@@ -370,6 +376,10 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                                 progressBar.setProgress(object.progress, true);
                             else
                                 progressBar.setProgress(object.progress);
+                            break;
+                        case DownloadObject.PAUSED:
+                            progressBar.setVisibility(View.VISIBLE);
+                            progressBar.setIndeterminate(false);
                             break;
                         default:
                             progressBar.setVisibility(View.GONE);

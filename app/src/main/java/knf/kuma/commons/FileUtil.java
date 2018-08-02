@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Locale;
 
+import knf.kuma.download.FileAccessHelper;
+
 public final class FileUtil {
 
     private static final String PRIMARY_VOLUME_NAME = "primary";
@@ -186,5 +188,40 @@ public final class FileUtil {
             }
         });
         return liveData;
+    }
+
+    public static void moveFile(String file_name, MoveCallback callback) {
+        AsyncTask.execute(() -> {
+            try {
+                InputStream inputStream = FileAccessHelper.INSTANCE.getTmpInputStream(file_name);
+                OutputStream outputStream = FileAccessHelper.INSTANCE.getOutputStream(file_name);
+                long total = inputStream.available();
+                byte[] buffer = new byte[32 * 1024];
+                int read;
+                long current = 0;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                    current += read;
+                    int prog = (int) ((current * 100) / total);
+                    callback.onProgress(new Pair<>(prog, false));
+                }
+                inputStream.close();
+                outputStream.flush();
+                outputStream.close();
+                try {
+                    FileAccessHelper.INSTANCE.getTmpFile(file_name).delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                callback.onProgress(new Pair<>(100, true));
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onProgress(new Pair<>(-1, true));
+            }
+        });
+    }
+
+    public interface MoveCallback {
+        void onProgress(Pair<Integer, Boolean> pair);
     }
 }

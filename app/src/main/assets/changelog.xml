@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="49" version="1.7">
+        <change type="fix">Errores generales</change>
+        <change type="new">Administrador de descargas rehecho</change>
+        <change type="change">Descargas paralelas</change>
+        <change type="change">Pausar descargas</change>
+        <change type="change">Tiempo estimado de descarga</change>
+    </release>
     <release code="48" version="1.6.1">
         <change type="fix">Errores generales</change>
         <change type="new">Configurar buffer de descarga</change>

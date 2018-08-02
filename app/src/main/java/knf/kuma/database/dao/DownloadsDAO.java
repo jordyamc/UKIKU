@@ -16,10 +16,13 @@ import knf.kuma.pojos.DownloadObject;
 @Dao
 public interface DownloadsDAO {
     @Query("SELECT * FROM downloadobject")
-    DataSource.Factory<Integer,DownloadObject> getAll();
+    DataSource.Factory<Integer, DownloadObject> getAll();
 
     @Query("SELECT * FROM downloadobject WHERE eid LIKE :eid")
     DownloadObject getByEid(String eid);
+
+    @Query("SELECT * FROM downloadobject WHERE did = :did")
+    DownloadObject getByDid(int did);
 
     @Query("SELECT * FROM downloadobject WHERE file LIKE :name")
     DownloadObject getByFile(String name);

@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import knf.kuma.database.BaseConverter;
 import knf.kuma.videoservers.Headers;
@@ -14,6 +15,8 @@ import knf.kuma.videoservers.Headers;
 @Entity
 @TypeConverters({BaseConverter.class})
 public class DownloadObject {
+    @Ignore
+    public static final int PAUSED = -2;
     @Ignore
     public static final int PENDING = -1;
     @Ignore
@@ -27,6 +30,9 @@ public class DownloadObject {
     public String link;
     public String name;
     public String chapter;
+    public String did;
+    public String eta;
+    public String speed;
     public Headers headers;
     @Ignore
     public String title;
@@ -38,13 +44,16 @@ public class DownloadObject {
     public boolean canResume;
     public int state;
 
-    public DownloadObject(int key, String eid, String file, String link, String name, String chapter, Headers headers, int progress, long d_bytes, long t_bytes, boolean canResume, int state) {
+    public DownloadObject(int key, String eid, String file, String link, String name, String chapter, String did, String eta, String speed, Headers headers, int progress, long d_bytes, long t_bytes, boolean canResume, int state) {
         this.key = key;
         this.eid = eid;
         this.file = file;
         this.link = link;
         this.name = name;
         this.chapter = chapter;
+        this.did = did;
+        this.eta = eta;
+        this.speed = speed;
         this.headers = headers;
         this.title = name + chapter.substring(chapter.lastIndexOf(" "));
         this.progress = progress;
@@ -61,6 +70,9 @@ public class DownloadObject {
         this.name = name;
         this.addQueue = addQueue;
         this.chapter = chapter;
+        this.did = "0";
+        this.eta = "-1";
+        this.speed = "0";
         this.title = name + chapter.substring(chapter.lastIndexOf(" "));
         this.progress = 0;
         this.d_bytes = 0;
@@ -81,6 +93,63 @@ public class DownloadObject {
 
     public boolean isDownloading() {
         return state == DOWNLOADING || state == PENDING;
+    }
+
+    public int getDid() {
+        return Integer.parseInt(did);
+    }
+
+    public void setDid(int did) {
+        this.did = String.valueOf(did);
+    }
+
+    public long getEta() {
+        return Long.parseLong(eta);
+    }
+
+    public void setEta(long eta) {
+        this.eta = String.valueOf(eta);
+    }
+
+    public long getSpeed() {
+        return Long.parseLong(speed);
+    }
+
+    public void setSpeed(long speed) {
+        this.speed = String.valueOf(speed);
+    }
+
+    public String getTime() {
+        try {
+            long duration = getEta();
+            if (duration == -1)
+                return "Desconocido";
+            else if (duration == -2)
+                return "Moviendo...";
+            long hours = TimeUnit.MILLISECONDS.toHours(duration);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
+            StringBuilder builder = new StringBuilder();
+            if (hours > 0) {
+                builder.append(hours);
+                builder.append("h");
+            }
+            if (minutes > 0) {
+                if (minutes <= 9)
+                    builder.append("0");
+                builder.append(minutes);
+                builder.append("m");
+            }
+            if (seconds <= 9) {
+                builder.append("0");
+            }
+            builder.append(seconds);
+            builder.append("s");
+            return builder.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public String getSize() {

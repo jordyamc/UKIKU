@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import xdroid.toaster.Toaster;

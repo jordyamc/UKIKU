@@ -32,12 +32,12 @@ import knf.kuma.database.dao.FavsDAO;
 import knf.kuma.database.dao.NotificationDAO;
 import knf.kuma.database.dao.RecentsDAO;
 import knf.kuma.database.dao.SeeingDAO;
+import knf.kuma.download.DownloadDialogActivity;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.NotificationObj;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.Recents;
 import knf.kuma.recents.RecentsNotReceiver;
-import knf.kuma.videoservers.DownloadDialogActivity;
 import pl.droidsonroids.jspoon.Jspoon;
 
 public class RecentsJob extends Job {

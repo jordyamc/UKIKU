@@ -44,7 +44,8 @@ import knf.kuma.database.dao.ChaptersDAO;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.database.dao.RecordsDAO;
 import knf.kuma.database.dao.SeeingDAO;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.DownloadManager;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
 import knf.kuma.pojos.RecordObject;
@@ -179,7 +180,8 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                     chapter.isDownloaded = false;
                                     holder.setDownloaded(false, false);
                                     FileAccessHelper.INSTANCE.delete(chapter.getFileName(), this::notifyDataSetChanged);
-                                    CacheDB.INSTANCE.downloadsDAO().deleteByEid(chapter.eid);
+                                    //CacheDB.INSTANCE.downloadsDAO().deleteByEid(chapter.eid);
+                                    DownloadManager.cancel(chapter.eid);
                                     QueueManager.remove(chapter.eid);
                                 }).build().show();
                         break;
@@ -417,6 +419,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                             progressBar.setVisibility(View.VISIBLE);
                             progressBar.setIndeterminate(true);
                             break;
+                        case DownloadObject.PAUSED:
                         case DownloadObject.DOWNLOADING:
                             progressBar.setVisibility(View.VISIBLE);
                             progressBar.setIndeterminate(false);

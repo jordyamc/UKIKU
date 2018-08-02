@@ -20,8 +20,9 @@ import knf.kuma.commons.Network;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.directory.DirectoryService;
-import knf.kuma.downloadservice.DownloadService;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.DownloadManager;
+import knf.kuma.download.DownloadService;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.jobscheduler.JobsCreator;
 import knf.kuma.jobscheduler.RecentsJob;
 import knf.kuma.jobscheduler.UpdateJob;
@@ -57,6 +58,7 @@ public class App extends Application {
         Network.init(this);
         CacheDB.init(this);
         CastUtil.init(this);
+        DownloadManager.init(this);
         FileAccessHelper.init(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels();

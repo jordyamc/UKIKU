@@ -15,7 +15,7 @@ import java.util.Locale;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.database.dao.ExplorerDAO;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.ExplorerObject;
 

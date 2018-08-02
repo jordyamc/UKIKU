@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
 import java.util.List;
 
 import knf.kuma.database.CacheDB;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.player.ExoPlayer;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.QueueObject;

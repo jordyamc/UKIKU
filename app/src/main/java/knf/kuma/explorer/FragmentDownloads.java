@@ -1,8 +1,6 @@
 package knf.kuma.explorer;
 
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -38,7 +36,7 @@ public class FragmentDownloads extends FragmentBase {
         CacheDB.INSTANCE.downloadsDAO().getActive().observe(this, downloadObjects -> {
             progress.setVisibility(View.GONE);
             error.setVisibility(downloadObjects.size() == 0 ? View.VISIBLE : View.GONE);
-            if (isFirst || downloadObjects.size() == 0) {
+            if (isFirst || downloadObjects.size() == 0 || (recyclerView.getAdapter() != null && downloadObjects.size() > recyclerView.getAdapter().getItemCount())) {
                 isFirst = false;
                 recyclerView.setAdapter(new DownloadingAdapter(FragmentDownloads.this, downloadObjects));
             }
@@ -48,18 +46,9 @@ public class FragmentDownloads extends FragmentBase {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(getLayout(), container, false);
+        View view = inflater.inflate(R.layout.recycler_downloading, container, false);
         ButterKnife.bind(this, view);
         return view;
-    }
-
-    @LayoutRes
-    private int getLayout() {
-        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString("lay_type", "0").equals("0")) {
-            return R.layout.recycler_downloading;
-        } else {
-            return R.layout.recycler_downloading_grid;
-        }
     }
 
     @Override

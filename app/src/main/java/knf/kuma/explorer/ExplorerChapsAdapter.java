@@ -37,7 +37,7 @@ import knf.kuma.database.dao.ChaptersDAO;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.database.dao.ExplorerDAO;
 import knf.kuma.database.dao.RecordsDAO;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.ExplorerObject;
 import knf.kuma.pojos.RecordObject;

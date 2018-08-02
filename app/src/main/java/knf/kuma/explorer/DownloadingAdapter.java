@@ -1,21 +1,16 @@
 package knf.kuma.explorer;
 
-import android.preference.PreferenceManager;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -23,13 +18,15 @@ import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
+import knf.kuma.download.DownloadManager;
 import knf.kuma.pojos.DownloadObject;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.DownloadingItem> {
 
     private Fragment fragment;
     private DownloadsDAO downloadsDAO = CacheDB.INSTANCE.downloadsDAO();
-    private List<DownloadObject> downloadObjects = new ArrayList<>();
+    private List<DownloadObject> downloadObjects;
 
     public DownloadingAdapter(Fragment fragment, List<DownloadObject> downloadObjects) {
         this.fragment = fragment;
@@ -39,16 +36,7 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
     @NonNull
     @Override
     public DownloadingItem onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new DownloadingItem(LayoutInflater.from(viewGroup.getContext()).inflate(getLayout(), viewGroup, false));
-    }
-
-    @LayoutRes
-    private int getLayout() {
-        if (PreferenceManager.getDefaultSharedPreferences(fragment.getContext()).getString("lay_type", "0").equals("0")) {
-            return R.layout.item_downloading;
-        } else {
-            return R.layout.item_downloading_grid;
-        }
+        return new DownloadingItem(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_downloading_extra, viewGroup, false));
     }
 
     @Override
@@ -56,7 +44,7 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
         final DownloadObject downloadObject = downloadObjects.get(position);
         holder.title.setText(downloadObject.name);
         holder.chapter.setText(downloadObject.chapter);
-        holder.size.setText(downloadObject.getSize());
+        holder.eta.setText(downloadObject.getTime());
         holder.progress.setMax(100);
         if (downloadObject.state == DownloadObject.PENDING) {
             holder.progress.setIndeterminate(true);
@@ -65,7 +53,18 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
             holder.progress.setIndeterminate(false);
             holder.progress.setProgress(downloadObject.progress);
         }
-        holder.action.setOnClickListener(v -> {
+        holder.action.setOnClickListener(view -> {
+            if (downloadObject.state == DownloadObject.DOWNLOADING) {
+                downloadObject.state = DownloadObject.PAUSED;
+                holder.action.setText("REANUDAR");
+                DownloadManager.pause(downloadObject.getDid());
+            } else if (downloadObject.state == DownloadObject.PAUSED) {
+                downloadObject.state = DownloadObject.PENDING;
+                holder.action.setText("PAUSAR");
+                DownloadManager.resume(downloadObject.getDid());
+            }
+        });
+        holder.cancel.setOnClickListener(v -> {
             try {
                 new MaterialDialog.Builder(fragment.getContext())
                         .content("¿Cancelar descarga del " + downloadObject.chapter.toLowerCase() + " de " + downloadObject.name + "?")
@@ -74,7 +73,8 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
                         .onPositive((dialog, which) -> {
                             downloadObjects.remove(holder.getAdapterPosition());
                             notifyItemRemoved(holder.getAdapterPosition());
-                            downloadsDAO.deleteByEid(downloadObject.eid);
+                            //downloadsDAO.deleteByEid(downloadObject.eid);
+                            DownloadManager.cancel(downloadObject.eid);
                         }).build().show();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -82,18 +82,26 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
         });
         downloadsDAO.getLiveByKey(downloadObject.key).observe(fragment, object -> {
             try {
-                Log.e("Download Updated", object == null ? "Not exist" : "Progress: " + object.progress);
                 if (object == null || object.state == DownloadObject.COMPLETED) {
                     downloadObjects.remove(holder.getAdapterPosition());
                     notifyItemRemoved(holder.getAdapterPosition());
                 } else {
+                    downloadObject.state = object.state;
                     if (object.state == DownloadObject.PENDING) {
                         holder.progress.setIndeterminate(true);
                         holder.progress.setProgress(0);
                     } else {
+                        switch (downloadObject.state) {
+                            case DownloadObject.DOWNLOADING:
+                                holder.action.setText("PAUSAR");
+                                break;
+                            case DownloadObject.PAUSED:
+                                holder.action.setText("REANUDAR");
+                                break;
+                        }
                         holder.progress.setIndeterminate(false);
                         holder.progress.setProgress(object.progress);
-                        holder.size.setText(object.getSize());
+                        holder.eta.setText(object.getTime());
                     }
                 }
             } catch (Exception e) {
@@ -112,12 +120,14 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
         TextView title;
         @BindView(R.id.chapter)
         TextView chapter;
-        @BindView(R.id.size)
-        TextView size;
+        @BindView(R.id.eta)
+        TextView eta;
         @BindView(R.id.action)
-        ImageButton action;
+        Button action;
+        @BindView(R.id.cancel)
+        Button cancel;
         @BindView(R.id.progress)
-        ProgressBar progress;
+        MaterialProgressBar progress;
 
         DownloadingItem(View itemView) {
             super(itemView);

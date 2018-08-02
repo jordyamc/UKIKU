@@ -13,7 +13,7 @@ import java.util.List;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
 @Entity

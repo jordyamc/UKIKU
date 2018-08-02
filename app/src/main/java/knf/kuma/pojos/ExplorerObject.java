@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import xdroid.toaster.Toaster;
 
 @Entity

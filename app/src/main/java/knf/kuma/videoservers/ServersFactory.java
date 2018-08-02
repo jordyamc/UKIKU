@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -25,11 +24,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.kuma.BuildConfig;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.database.CacheDB;
-import knf.kuma.downloadservice.DownloadService;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.DownloadManager;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.player.ExoPlayer;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
@@ -281,6 +281,7 @@ public class ServersFactory {
     }
 
     private void startDownload(Option option) {
+        if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url);
         if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid)) {
             final File d_file = FileAccessHelper.INSTANCE.getFile(chapter.getFileName());
             CacheDB.INSTANCE.queueDAO().add(new QueueObject(Uri.fromFile(d_file), true, chapter));
@@ -288,14 +289,13 @@ public class ServersFactory {
         Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
         downloadObject.link = option.url;
         downloadObject.headers = option.headers;
-        CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
-        ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));
-        serversInterface.onFinish(true, true);
+        /*CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
+        ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));*/
+        serversInterface.onFinish(true, DownloadManager.start(downloadObject));
     }
 
     public void get(MaterialDialog dialog) {
         try {
-            Log.e("Url", url);
             Document main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get();
             Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
             List<Server> servers = new ArrayList<>();

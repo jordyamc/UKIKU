@@ -27,7 +27,7 @@ import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.directory.DirectoryService;
 import knf.kuma.directory.DirectoryUpdateService;
-import knf.kuma.downloadservice.FileAccessHelper;
+import knf.kuma.download.FileAccessHelper;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
 import knf.kuma.widgets.emision.WEmisionProvider;
@@ -116,6 +116,10 @@ public class ConfigurationFragment extends PreferenceFragment {
             getPreferenceScreen().findPreference("theme_color").setSummary("Resuelve el secreto para desbloquear");
             getPreferenceScreen().findPreference("theme_color").setEnabled(false);
         }
+        getPreferenceScreen().findPreference("hide_chaps").setOnPreferenceChangeListener((preference, o) -> {
+            FileAccessHelper.INSTANCE.checkNoMedia((boolean) o);
+            return true;
+        });
         if (BuildConfig.DEBUG) {
             getPreferenceScreen().findPreference("reset_recents").setOnPreferenceClickListener(preference -> {
                 AsyncTask.execute(() -> {
