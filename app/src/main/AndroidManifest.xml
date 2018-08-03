@@ -160,6 +160,7 @@
                 android:resource="@xml/widget_emision"/>
         </receiver>
         <receiver android:name=".download.DownloadReceiver"/>
+        <receiver android:name=".recents.RecentsNotReceiver"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

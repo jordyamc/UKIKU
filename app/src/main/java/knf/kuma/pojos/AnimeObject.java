@@ -10,7 +10,6 @@ import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-import android.text.Html;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -92,9 +91,9 @@ public class AnimeObject implements Comparable<AnimeObject> {
         this.key = Integer.parseInt(webInfo.aid);
         this.webInfo = webInfo;
         this.aid = webInfo.aid;
-        this.name = Html.fromHtml(webInfo.name).toString();
+        this.name = PatternUtil.fromHtml(webInfo.name);
         this.img = "https://animeflv.net" + webInfo.img;
-        this.description = Html.fromHtml(webInfo.description).toString();
+        this.description = PatternUtil.fromHtml(webInfo.description);
         this.type = getType(webInfo.type);
         this.state = getState(webInfo.state);
         this.day = webInfo.emisionDay;

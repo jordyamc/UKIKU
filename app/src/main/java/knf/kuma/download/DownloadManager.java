@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.util.Pair;
 
 import com.crashlytics.android.Crashlytics;
@@ -35,9 +35,9 @@ import knf.kuma.videoservers.ServersFactory;
 import okhttp3.OkHttpClient;
 
 public class DownloadManager {
-    public static final int ACTION_PAUSE = 0;
-    public static final int ACTION_RESUME = 1;
-    public static final int ACTION_CANCEL = 2;
+    static final int ACTION_PAUSE = 0;
+    static final int ACTION_RESUME = 1;
+    static final int ACTION_CANCEL = 2;
     private static final String CHANNEL = "service.Downloads";
     private static final String CHANNEL_ONGOING = "service.Downloads.Ongoing";
     private static Context context;
@@ -45,11 +45,15 @@ public class DownloadManager {
     private static DownloadsDAO downloadDao = CacheDB.INSTANCE.downloadsDAO();
     private static NotificationManager notificationManager;
 
+    public static void setParalelDownloads(String newValue) {
+        if (fetch != null) fetch.setDownloadConcurrentLimit(Integer.parseInt(newValue));
+    }
+
     public static void init(Context context) {
         DownloadManager.context = context;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         FetchConfiguration configuration = new FetchConfiguration.Builder(context)
-                .setDownloadConcurrentLimit(3)
+                .setDownloadConcurrentLimit(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("max_parallel_downloads", "3")))
                 .enableLogging(BuildConfig.DEBUG)
                 .enableRetryOnNetworkGain(true)
                 .setHttpDownloader(new OkHttpDownloader(new OkHttpClient.Builder().followRedirects(true).followSslRedirects(true).build()))
@@ -110,8 +114,10 @@ public class DownloadManager {
                 DownloadObject object = downloadDao.getByDid(download.getId());
                 if (object != null)
                     errorNotification(object);
+                downloadDao.delete(object);
                 throwable.printStackTrace();
                 fetch.delete(download.getId());
+                throwable.printStackTrace();
                 Crashlytics.logException(throwable);
             }
 
@@ -196,7 +202,9 @@ public class DownloadManager {
                 for (Pair<String, String> header : downloadObject.headers.getHeaders())
                     request.addHeader(header.first, header.second);
             downloadObject.setDid(request.getId());
-            fetch.enqueue(request, result -> downloadDao.insert(downloadObject), result -> Log.e("Not queued", result.getThrowable().getMessage()));
+            fetch.enqueue(request, result -> downloadDao.insert(downloadObject), result -> {
+                if (result.getThrowable() != null) result.getThrowable().printStackTrace();
+            });
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -232,19 +240,21 @@ public class DownloadManager {
 
     private static void updateNotification(DownloadObject downloadObject, boolean isPaused) {
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context, CHANNEL_ONGOING)
-                .setSmallIcon(isPaused ? R.drawable.ic_pause_not : android.R.drawable.stat_sys_download)
+                .setSmallIcon(isPaused ? R.drawable.ic_pause_not : downloadObject.getEta() == -2 ? R.drawable.ic_move : android.R.drawable.stat_sys_download)
                 .setContentTitle(downloadObject.name)
                 .setContentText(downloadObject.chapter)
-                .setOnlyAlertOnce(!isPaused)
+                .setOnlyAlertOnce(!isPaused || downloadObject.getEta() == -2)
                 .setProgress(100, downloadObject.progress, downloadObject.state == DownloadObject.PENDING)
                 .setOngoing(true)
                 .setSound(null)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
-        if (isPaused)
-            notification.addAction(R.drawable.ic_play_not, "Reanudar", getPending(downloadObject, ACTION_RESUME));
-        else
-            notification.addAction(R.drawable.ic_pause_not, "Pausar", getPending(downloadObject, ACTION_PAUSE));
-        notification.addAction(R.drawable.ic_delete, "Cancelar", getPending(downloadObject, ACTION_CANCEL));
+        if (downloadObject.getEta() != -2) {
+            if (isPaused)
+                notification.addAction(R.drawable.ic_play_not, "Reanudar", getPending(downloadObject, ACTION_RESUME));
+            else
+                notification.addAction(R.drawable.ic_pause_not, "Pausar", getPending(downloadObject, ACTION_PAUSE));
+            notification.addAction(R.drawable.ic_delete, "Cancelar", getPending(downloadObject, ACTION_CANCEL));
+        }
         if (!isPaused)
             notification.setSubText(downloadObject.getTime());
         notificationManager.notify(Integer.parseInt(downloadObject.eid), notification.build());

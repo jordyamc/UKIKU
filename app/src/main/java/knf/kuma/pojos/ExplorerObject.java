@@ -80,7 +80,7 @@ public class ExplorerObject {
         this.name = object.name;
         this.aid = object.aid;
         File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.fileName);
-        file_list = file.listFiles();
+        file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
         if (file_list == null || file_list.length == 0)
             throw new IllegalStateException("Directory empty: " + object.fileName);
         this.count = file_list.length;
@@ -93,15 +93,14 @@ public class ExplorerObject {
             try {
                 chapters = new ArrayList<>();
                 File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
-                this.file_list = file.listFiles();
-                for (File chap : file_list) {
+                this.file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
+                for (File chap: file_list)
                     try {
                         String file_name = chap.getName();
                         chapters.add(new FileDownObj(context, name, aid, PatternUtil.getNumFromfile(file_name), file_name, chap));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
                 this.count = chapters.size();
                 if (count == 0)
                     Log.e("Directory empty", fileName);

@@ -44,6 +44,14 @@
             android:key="download_type"
             android:summary="%s"
             android:title="Descargas"/>
+        <ListPreference
+            android:defaultValue="3"
+            android:entries="@array/parallel_count"
+            android:entryValues="@array/parallel_count"
+            android:icon="@drawable/ic_download_multiple"
+            android:key="max_parallel_downloads"
+            android:summary="Máximo %s"
+            android:title="Descargas paralelas"/>
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_hide_pref"

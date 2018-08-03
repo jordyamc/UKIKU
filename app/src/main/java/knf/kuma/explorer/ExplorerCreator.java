@@ -34,7 +34,7 @@ public class ExplorerCreator {
             if (root.exists()) {
                 postState("Buscando animes");
                 List<ExplorerObject> list = new ArrayList<>();
-                File[] files = root.listFiles();
+                File[] files = root.listFiles(File::isDirectory);
                 if (files != null) {
                     List<String> names = new ArrayList<>();
                     int progress = 0;

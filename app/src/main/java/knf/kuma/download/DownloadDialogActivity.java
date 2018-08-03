@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import knf.kuma.commons.EAHelper;
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
 import knf.kuma.pojos.NotificationObj;
@@ -41,7 +42,7 @@ public class DownloadDialogActivity extends AppCompatActivity {
         AsyncTask.execute(() -> {
             try {
                 Document document = Jsoup.connect(getIntent().getDataString()).get();
-                String name = document.select("nav.Brdcrmb.fa-home a[href^=/anime/]").first().text();
+                String name = PatternUtil.fromHtml(document.select("nav.Brdcrmb.fa-home a[href^=/anime/]").first().text());
                 String aid = null;
                 String eid = extract(getIntent().getDataString(), "^.*/(\\d+)/.*$");
                 String num = null;

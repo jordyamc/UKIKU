@@ -1,5 +1,7 @@
 package knf.kuma.commons;
 
+import android.os.Build;
+import android.text.Html;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -12,9 +14,16 @@ import java.util.regex.Pattern;
 import knf.kuma.pojos.AnimeObject;
 
 public class PatternUtil {
-    public static String getLinkNumber(String link){
-        Pattern pattern=Pattern.compile("/(\\d+)[/.]");
-        Matcher matcher=pattern.matcher(link);
+    public static String fromHtml(String html) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY).toString();
+        else
+            return Html.fromHtml(html).toString();
+    }
+
+    public static String getLinkNumber(String link) {
+        Pattern pattern = Pattern.compile("/(\\d+)[/.]");
+        Matcher matcher = pattern.matcher(link);
         matcher.find();
         return matcher.group(1);
     }
@@ -47,60 +56,60 @@ public class PatternUtil {
         return matcher.group(1);
     }
 
-    public static String getLinkId(String link){
-        Matcher matcher=Pattern.compile("^.*/(.*)-\\d+$").matcher(link);
+    public static String getLinkId(String link) {
+        Matcher matcher = Pattern.compile("^.*/(.*)-\\d+$").matcher(link);
         matcher.find();
         return matcher.group(1);
     }
 
-    public static String getLinkNum(String link){
-        Matcher matcher=Pattern.compile("^.*-(\\d+)$").matcher(link);
+    public static String getLinkNum(String link) {
+        Matcher matcher = Pattern.compile("^.*-(\\d+)$").matcher(link);
         matcher.find();
         return matcher.group(1);
     }
 
-    public static String getFileName(String link){
+    public static String getFileName(String link) {
         try {
-            Matcher matcher=Pattern.compile("^.*/(.*-\\d+\\.?\\d*)$").matcher(link);
+            Matcher matcher = Pattern.compile("^.*/(.*-\\d+\\.?\\d*)$").matcher(link);
             matcher.find();
             return matcher.group(1) + ".mp4";
-        }catch (Exception e){
-            Log.e("Pattern","No name found in: "+link,e);
+        } catch (Exception e) {
+            Log.e("Pattern", "No name found in: " + link, e);
             return "N-F.mp4";
         }
     }
 
-    public static String getRootFileName(String link){
+    public static String getRootFileName(String link) {
         try {
-            Matcher matcher=Pattern.compile("^.*/([a-z\\-\\d]+).*$").matcher(link);
+            Matcher matcher = Pattern.compile("^.*/([a-z\\-\\d]+).*$").matcher(link);
             matcher.find();
             return matcher.group(1);
-        }catch (Exception e){
-            Log.e("Pattern","No name found in: "+link,e);
+        } catch (Exception e) {
+            Log.e("Pattern", "No name found in: " + link, e);
             return "N-F";
         }
     }
 
-    public static String getNameFromFile(String file){
-        Matcher matcher=Pattern.compile("^.*\\$(.*)-\\d+\\.?\\d*\\.mp4$").matcher(file);
+    public static String getNameFromFile(String file) {
+        Matcher matcher = Pattern.compile("^.*\\$(.*)-\\d+\\.?\\d*\\.mp4$").matcher(file);
         matcher.find();
-        return matcher.group(1)+"/";
+        return matcher.group(1) + "/";
     }
 
-    public static String getNumFromfile(String file){
-        Matcher matcher=Pattern.compile("^.*\\$[a-z-0-9]*-(\\d+)\\.mp4$").matcher(file);
-        matcher.find();
-        return matcher.group(1);
-    }
-
-    public static String getEidFromfile(String file){
-        Matcher matcher=Pattern.compile("^(\\d+)\\$.*$").matcher(file);
+    public static String getNumFromfile(String file) {
+        Matcher matcher = Pattern.compile("^.*\\$[a-z-0-9]*-(\\d+)\\.mp4$").matcher(file);
         matcher.find();
         return matcher.group(1);
     }
 
-    public static String extractLink(String html){
-        Matcher matcher=Pattern.compile("https?://[a-zA-Z0-a.=?/&]+").matcher(html);
+    public static String getEidFromfile(String file) {
+        Matcher matcher = Pattern.compile("^(\\d+)\\$.*$").matcher(file);
+        matcher.find();
+        return matcher.group(1);
+    }
+
+    public static String extractLink(String html) {
+        Matcher matcher = Pattern.compile("https?://[a-zA-Z0-a.=?/&]+").matcher(html);
         matcher.find();
         return matcher.group(0);
     }
@@ -123,8 +132,8 @@ public class PatternUtil {
         return matcher.group(1);
     }
 
-    public static String getAnimeUrl(String chapter,String aid){
-        return "https://animeflv.net/anime/"+aid+chapter.substring(chapter.lastIndexOf("/"),chapter.lastIndexOf("-"));
+    public static String getAnimeUrl(String chapter, String aid) {
+        return "https://animeflv.net/anime/" + aid + chapter.substring(chapter.lastIndexOf("/"), chapter.lastIndexOf("-"));
     }
 
     public static String getCover(String aid) {
@@ -145,25 +154,25 @@ public class PatternUtil {
         return map;
     }
 
-    public static boolean isCustomSearch(String s){
+    public static boolean isCustomSearch(String s) {
         return s.matches("^:[a-z]+:.*$");
     }
 
-    public static String getCustomSearch(String s){
-        Matcher matcher=Pattern.compile("^:[a-z]+:(.*$)").matcher(s);
+    public static String getCustomSearch(String s) {
+        Matcher matcher = Pattern.compile("^:[a-z]+:(.*$)").matcher(s);
         matcher.find();
         return matcher.group(1);
     }
 
-    public static String getCustomAttr(String s){
-        Matcher matcher=Pattern.compile("^:([a-z]+):.*$").matcher(s);
+    public static String getCustomAttr(String s) {
+        Matcher matcher = Pattern.compile("^:([a-z]+):.*$").matcher(s);
         matcher.find();
         return matcher.group(1);
     }
 
-    public static List<String> getEids(List<AnimeObject.WebInfo.AnimeChapter> chapters){
-        List<String> eids=new ArrayList<>();
-        for (AnimeObject.WebInfo.AnimeChapter chapter:chapters){
+    public static List<String> getEids(List<AnimeObject.WebInfo.AnimeChapter> chapters) {
+        List<String> eids = new ArrayList<>();
+        for (AnimeObject.WebInfo.AnimeChapter chapter: chapters) {
             eids.add(chapter.eid);
         }
         return eids;

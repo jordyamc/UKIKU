@@ -29,6 +29,7 @@ public class FileAccessHelper {
     public static final int SD_REQUEST = 51247;
     public static FileAccessHelper INSTANCE;
     private Context context;
+    public static boolean NOMEDIA_CREATING = false;
 
     private FileAccessHelper(Context context) {
         this.context = context;
@@ -120,27 +121,48 @@ public class FileAccessHelper {
         return file.contains(context.getFilesDir().getAbsolutePath());
     }
 
-    public void checkNoMedia() {
-        checkNoMedia(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("hide_chaps", false));
-    }
-
     public void checkNoMedia(boolean noMediaNeeded) {
+        NOMEDIA_CREATING = true;
         AsyncTask.execute(() -> {
             try {
                 File file = new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads");
                 if (!file.exists())
                     file.mkdirs();
-                file = new File(file, ".nomedia");
-                if (noMediaNeeded)
-                    if (!file.exists())
-                        file.createNewFile();
-                    else if (file.exists())
-                        file.delete();
+                File root = new File(file, ".nomedia");
+                if (noMediaNeeded && !root.exists())
+                    root.createNewFile();
+                else if (!noMediaNeeded && root.exists())
+                    root.delete();
+                File[] list = file.listFiles(File::isDirectory);
+                if (list != null && list.length > 0)
+                    for (File current: list) {
+                        File inside = new File(current, ".nomedia");
+                        if (noMediaNeeded && !inside.exists())
+                            inside.createNewFile();
+                        else if (!noMediaNeeded && inside.exists())
+                            inside.delete();
+                    }
                 if (getTreeUri() != null) {
-                    DocumentFile documentFile = find(DocumentFile.fromTreeUri(context, getTreeUri()), "UKIKU/downloads/.nomedia");
-                    if (!noMediaNeeded)
-                        documentFile.delete();
+                    DocumentFile documentRoot = find(DocumentFile.fromTreeUri(context, getTreeUri()), "UKIKU/downloads");
+                    DocumentFile nomediaRoot = documentRoot.findFile(".nomedia");
+                    if (noMediaNeeded && (nomediaRoot == null || !nomediaRoot.exists()))
+                        documentRoot.createFile("application/nomedia", ".nomedia");
+                    else if (!noMediaNeeded && (nomediaRoot != null && nomediaRoot.exists()))
+                        nomediaRoot.delete();
+                    DocumentFile[] documentList = documentRoot.listFiles();
+                    if (documentList.length > 0)
+                        for (DocumentFile dFile: documentList) {
+                            if (dFile.isDirectory()) {
+                                DocumentFile inside = dFile.findFile(".nomedia");
+                                if (noMediaNeeded && (inside == null || !inside.exists()))
+                                    dFile.createFile("application/nomedia", ".nomedia");
+                                else if (!noMediaNeeded && (inside != null && inside.exists()))
+                                    inside.delete();
+                            }
+                        }
                 }
+                Toaster.toast("Archivos nomedia " + (noMediaNeeded ? "creados" : "eliminados"));
+                NOMEDIA_CREATING = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -373,7 +395,7 @@ public class FileAccessHelper {
     }
 
     private DocumentFile find(DocumentFile root, String path, boolean create) throws Exception {
-        for (String name : path.split("/")) {
+        for (String name: path.split("/")) {
             DocumentFile file = root.findFile(name);
             if (file == null || !file.exists()) {
                 if (create)

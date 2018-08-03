@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.BaseConverter;
 import knf.kuma.videoservers.Headers;
 
@@ -49,7 +50,7 @@ public class DownloadObject {
         this.eid = eid;
         this.file = file;
         this.link = link;
-        this.name = name;
+        this.name = PatternUtil.fromHtml(name);
         this.chapter = chapter;
         this.did = did;
         this.eta = eta;
@@ -67,7 +68,7 @@ public class DownloadObject {
     public DownloadObject(String eid, String file, String name, String chapter, boolean addQueue) {
         this.eid = eid;
         this.file = file;
-        this.name = name;
+        this.name = PatternUtil.fromHtml(name);
         this.addQueue = addQueue;
         this.chapter = chapter;
         this.did = "0";
@@ -83,12 +84,12 @@ public class DownloadObject {
 
     @NonNull
     public static DownloadObject fromRecent(RecentObject object) {
-        return new DownloadObject(object.eid, object.getFileName(), object.name, object.chapter, false);
+        return new DownloadObject(object.eid, object.getFileName(), PatternUtil.fromHtml(object.name), object.chapter, false);
     }
 
     @NonNull
     public static DownloadObject fromChapter(AnimeObject.WebInfo.AnimeChapter chapter, boolean addQueue) {
-        return new DownloadObject(chapter.eid, chapter.getFileName(), chapter.name, chapter.number, addQueue);
+        return new DownloadObject(chapter.eid, chapter.getFileName(), PatternUtil.fromHtml(chapter.name), chapter.number, addQueue);
     }
 
     public boolean isDownloading() {

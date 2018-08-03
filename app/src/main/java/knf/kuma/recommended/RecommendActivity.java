@@ -71,12 +71,7 @@ public class RecommendActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         setAdapter();
     }
 
@@ -94,110 +89,102 @@ public class RecommendActivity extends AppCompatActivity {
     }
 
     private void setAdapter() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    List<GenreStatusObject> status = CacheDB.INSTANCE.genresDAO().getTop();
-                    setState("Revisando generos");
-                    if (status.size() == 3) {
-                        setState("Buscando sugerencias");
-                        final SectionedRecyclerViewAdapter sectionedAdapter = new SectionedRecyclerViewAdapter();
-                        List<AnimeObject> abc = getList(status.get(0), status.get(1), status.get(2));
-                        List<AnimeObject> ab = getList(status.get(0), status.get(1));
-                        ab.removeAll(abc);
-                        List<AnimeObject> ac = getList(status.get(0), status.get(2));
-                        ac.removeAll(abc);
-                        ac.removeAll(ab);
-                        List<AnimeObject> bc = getList(status.get(1), status.get(2));
-                        bc.removeAll(abc);
-                        bc.removeAll(ab);
-                        bc.removeAll(ac);
-                        List<AnimeObject> a = getList(status.get(0));
-                        a.removeAll(abc);
-                        a.removeAll(ab);
-                        a.removeAll(ac);
-                        a.removeAll(bc);
-                        List<AnimeObject> b = getList(status.get(1));
-                        b.removeAll(abc);
-                        b.removeAll(ab);
-                        b.removeAll(ac);
-                        b.removeAll(bc);
-                        b.removeAll(a);
-                        List<AnimeObject> c = getList(status.get(2));
-                        c.removeAll(abc);
-                        c.removeAll(ab);
-                        c.removeAll(ac);
-                        c.removeAll(bc);
-                        c.removeAll(a);
-                        c.removeAll(b);
-                        setState("Filtrando lista");
-                        removeFavs(abc, ab, ac, bc, a, b, c);
-                        if (abc.size() > 0)
-                            sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0), status.get(1), status.get(2)), abc, isGrid()));
-                        if (ab.size() > 0)
-                            sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0), status.get(1)), ab, isGrid()));
-                        if (ac.size() > 0)
-                            sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0), status.get(2)), ac, isGrid()));
-                        if (bc.size() > 0)
-                            sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(1), status.get(2)), bc, isGrid()));
-                        if (a.size() > 0)
-                            sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0)), a, isGrid()));
-                        if (b.size() > 0)
-                            sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(1)), b, isGrid()));
-                        if (c.size() > 0)
-                            sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(2)), c, isGrid()));
-                        final RecyclerView.LayoutManager layoutManager;
-                        if (isGrid()) {
-                            GridLayoutManager grid = new GridLayoutManager(RecommendActivity.this, getResources().getInteger(R.integer.span_count));
-                            grid.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                                @Override
-                                public int getSpanSize(int position) {
+        AsyncTask.execute(() -> {
+            try {
+                List<GenreStatusObject> status = CacheDB.INSTANCE.genresDAO().getTop();
+                setState("Revisando generos");
+                if (status.size() == 3) {
+                    setState("Buscando sugerencias");
+                    final SectionedRecyclerViewAdapter sectionedAdapter = new SectionedRecyclerViewAdapter();
+                    List<AnimeObject> abc = getList(status.get(0), status.get(1), status.get(2));
+                    List<AnimeObject> ab = getList(status.get(0), status.get(1));
+                    ab.removeAll(abc);
+                    List<AnimeObject> ac = getList(status.get(0), status.get(2));
+                    ac.removeAll(abc);
+                    ac.removeAll(ab);
+                    List<AnimeObject> bc = getList(status.get(1), status.get(2));
+                    bc.removeAll(abc);
+                    bc.removeAll(ab);
+                    bc.removeAll(ac);
+                    List<AnimeObject> a = getList(status.get(0));
+                    a.removeAll(abc);
+                    a.removeAll(ab);
+                    a.removeAll(ac);
+                    a.removeAll(bc);
+                    List<AnimeObject> b = getList(status.get(1));
+                    b.removeAll(abc);
+                    b.removeAll(ab);
+                    b.removeAll(ac);
+                    b.removeAll(bc);
+                    b.removeAll(a);
+                    List<AnimeObject> c = getList(status.get(2));
+                    c.removeAll(abc);
+                    c.removeAll(ab);
+                    c.removeAll(ac);
+                    c.removeAll(bc);
+                    c.removeAll(a);
+                    c.removeAll(b);
+                    setState("Filtrando lista");
+                    removeFavs(abc, ab, ac, bc, a, b, c);
+                    if (abc.size() > 0)
+                        sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0), status.get(1), status.get(2)), abc, isGrid()));
+                    if (ab.size() > 0)
+                        sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0), status.get(1)), ab, isGrid()));
+                    if (ac.size() > 0)
+                        sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0), status.get(2)), ac, isGrid()));
+                    if (bc.size() > 0)
+                        sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(1), status.get(2)), bc, isGrid()));
+                    if (a.size() > 0)
+                        sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(0)), a, isGrid()));
+                    if (b.size() > 0)
+                        sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(1)), b, isGrid()));
+                    if (c.size() > 0)
+                        sectionedAdapter.addSection(new MultipleSection(RecommendActivity.this, getStringTitle(status.get(2)), c, isGrid()));
+                    final RecyclerView.LayoutManager layoutManager;
+                    if (isGrid()) {
+                        GridLayoutManager grid = new GridLayoutManager(RecommendActivity.this, getResources().getInteger(R.integer.span_count));
+                        grid.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                            @Override
+                            public int getSpanSize(int position) {
+                                try {
                                     switch (sectionedAdapter.getSectionItemViewType(position)) {
                                         case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
                                             return getResources().getInteger(R.integer.span_count);
                                         default:
                                             return 1;
                                     }
-                                }
-                            });
-                            layoutManager = grid;
-                        } else {
-                            layoutManager = new LinearLayoutManager(RecommendActivity.this);
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (recyclerView != null) {
-                                    loading.setVisibility(View.GONE);
-                                    recyclerView.setLayoutManager(layoutManager);
-                                    recyclerView.setAdapter(sectionedAdapter);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    return getResources().getInteger(R.integer.span_count);
                                 }
                             }
                         });
+                        layoutManager = grid;
                     } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (error != null) {
-                                    loading.setVisibility(View.GONE);
-                                    error.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
+                        layoutManager = new LinearLayoutManager(RecommendActivity.this);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Crashlytics.logException(e);
-                    Toaster.toast("Error al cargar recomendados");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (loading != null)
-                                loading.setVisibility(View.GONE);
+                    runOnUiThread(() -> {
+                        if (recyclerView != null) {
+                            loading.setVisibility(View.GONE);
+                            recyclerView.setLayoutManager(layoutManager);
+                            recyclerView.setAdapter(sectionedAdapter);
                         }
                     });
-                }
+                } else
+                    runOnUiThread(() -> {
+                        if (error != null) {
+                            loading.setVisibility(View.GONE);
+                            error.setVisibility(View.VISIBLE);
+                        }
+                    });
+            } catch (Exception e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+                Toaster.toast("Error al cargar recomendados");
+                runOnUiThread(() -> {
+                    if (loading != null)
+                        loading.setVisibility(View.GONE);
+                });
             }
         });
     }
@@ -238,54 +225,40 @@ public class RecommendActivity extends AppCompatActivity {
     }
 
     private void setState(final String stateString) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (state != null)
-                    state.setText(stateString);
-            }
+        runOnUiThread(() -> {
+            if (state != null)
+                state.setText(stateString);
         });
     }
 
     private void showBlacklist() {
         List<String> blacklist = GenreStatusObject.getNames(CacheDB.INSTANCE.genresDAO().getBlacklist());
         BlacklistDialog dialog = new BlacklistDialog();
-        dialog.init(blacklist, new BlacklistDialog.MultiChoiceListener() {
-            @Override
-            public void onOkay(List<String> selected) {
-                setBlacklist(selected);
-            }
-        });
+        dialog.init(blacklist, this::setBlacklist);
         dialog.show(getSupportFragmentManager(), "Blacklist");
     }
 
     private void setBlacklist(final List<String> selected) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (String s : selected)
-                    RecommendHelper.block(s);
-                for (GenreStatusObject object : CacheDB.INSTANCE.genresDAO().getAll())
-                    if (object.isBlocked() && !selected.contains(object.name))
-                        RecommendHelper.reset(object.name);
-                resetSuggestions();
-            }
+        AsyncTask.execute(() -> {
+            for (String s: selected)
+                RecommendHelper.block(s);
+            for (GenreStatusObject object: CacheDB.INSTANCE.genresDAO().getAll())
+                if (object.isBlocked() && !selected.contains(object.name))
+                    RecommendHelper.reset(object.name);
+            resetSuggestions();
         });
     }
 
     private void resetSuggestions() {
         setState("Iniciando búsqueda");
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                SectionedRecyclerViewAdapter adapter = ((SectionedRecyclerViewAdapter) recyclerView.getAdapter());
-                if (adapter != null) {
-                    adapter.removeAllSections();
-                    recyclerView.setAdapter(adapter);
-                    loading.setVisibility(View.VISIBLE);
-                    error.setVisibility(View.GONE);
-                    setAdapter();
-                }
+        runOnUiThread(() -> {
+            SectionedRecyclerViewAdapter adapter = ((SectionedRecyclerViewAdapter) recyclerView.getAdapter());
+            if (adapter != null) {
+                adapter.removeAllSections();
+                recyclerView.setAdapter(adapter);
+                loading.setVisibility(View.VISIBLE);
+                error.setVisibility(View.GONE);
+                setAdapter();
             }
         });
     }

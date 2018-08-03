@@ -4,7 +4,6 @@ import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.text.Html;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ public class RecentObject {
             throw new IllegalStateException("Aid and Eid must be numbers");
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
-        this.name = Html.fromHtml(webInfo.name).toString();
+        this.name = PatternUtil.fromHtml(webInfo.name);
         this.chapter = webInfo.chapter.trim();
         this.url = "https://animeflv.net" + webInfo.url;
         this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");
@@ -116,7 +115,7 @@ public class RecentObject {
     private void populate(AnimeDAO dao, WebInfo webInfo) {
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
-        this.name = Html.fromHtml(webInfo.name).toString();
+        this.name = PatternUtil.fromHtml(webInfo.name);
         this.chapter = webInfo.chapter.trim();
         this.url = "https://animeflv.net" + webInfo.url;
         this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");

@@ -52,7 +52,6 @@ import knf.kuma.commons.PicassoSingle;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.directory.DirectoryFragment;
 import knf.kuma.directory.DirectoryService;
-import knf.kuma.download.FileAccessHelper;
 import knf.kuma.emision.EmisionActivity;
 import knf.kuma.explorer.ExplorerActivity;
 import knf.kuma.favorite.FavoriteFragment;
@@ -148,7 +147,6 @@ public class Main extends AppCompatActivity
         RecentsNotReceiver.removeAll(this);
         Updatechecker.check(this, this);
         ChangelogActivity.check(this);
-        FileAccessHelper.INSTANCE.checkNoMedia();
         EAHelper.clear1();
     }
 

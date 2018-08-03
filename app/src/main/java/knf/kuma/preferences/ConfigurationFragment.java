@@ -27,6 +27,7 @@ import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.directory.DirectoryService;
 import knf.kuma.directory.DirectoryUpdateService;
+import knf.kuma.download.DownloadManager;
 import knf.kuma.download.FileAccessHelper;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
@@ -117,7 +118,16 @@ public class ConfigurationFragment extends PreferenceFragment {
             getPreferenceScreen().findPreference("theme_color").setEnabled(false);
         }
         getPreferenceScreen().findPreference("hide_chaps").setOnPreferenceChangeListener((preference, o) -> {
-            FileAccessHelper.INSTANCE.checkNoMedia((boolean) o);
+            if (!FileAccessHelper.NOMEDIA_CREATING) {
+                FileAccessHelper.INSTANCE.checkNoMedia((boolean) o);
+                return true;
+            } else {
+                ((SwitchPreference) getPreferenceScreen().findPreference("hide_chaps")).setChecked(!((boolean) o));
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("max_parallel_downloads").setOnPreferenceChangeListener((preference, o) -> {
+            DownloadManager.setParalelDownloads((String) o);
             return true;
         });
         if (BuildConfig.DEBUG) {

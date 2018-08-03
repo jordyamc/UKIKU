@@ -97,14 +97,17 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
         } else {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardview_background));
         }
+        holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(d_file, downloadObject.get()));
         chapter.isDownloaded = canPlay(d_file);
         holder.setDownloadObserver(downloadsDAO.getLiveByEid(chapter.eid), fragment, object -> {
             holder.setDownloadState(object);
             String casting = CastUtil.get().getCasting().getValue();
-            if (object == null)
-                holder.setDownloaded(false, casting != null && casting.equals(chapter.eid));
+            boolean isCasting = casting != null && casting.equals(chapter.eid);
+            if (!isCasting)
+                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(d_file, object));
+            else
+                holder.setDownloaded(isPlayAvailable(d_file, object), true);
             downloadObject.set(object);
-
         });
         if (!Network.isConnected() || chapter.img == null)
             holder.imageView.setVisibility(View.GONE);
@@ -121,9 +124,10 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 }
             });
         holder.setCastingObserver(fragment, s -> {
-            holder.setDownloaded(isPlayAvailable(d_file, downloadObject.get()), chapter.eid.equals(s));
             if (!chapter.eid.equals(s))
                 holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(d_file, downloadObject.get()));
+            else
+                holder.setDownloaded(isPlayAvailable(d_file, downloadObject.get()), chapter.eid.equals(s));
         });
         holder.chapter.setTextColor(context.getResources().getColor(chaptersDAO.chapterIsSeen(chapter.eid) ? EAHelper.getThemeColor(context) : R.color.textPrimary));
         holder.separator.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
