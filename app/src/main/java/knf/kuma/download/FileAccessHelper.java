@@ -118,9 +118,13 @@ public class FileAccessHelper {
     }
 
     boolean isTempFile(String file) {
-        String path = FileUtil.getFullPathFromTreeUri(getTreeUri(), context);
-        if (path == null) return false;
-        return file.contains(path);
+        try {
+            String path = FileUtil.getFullPathFromTreeUri(getTreeUri(), context);
+            if (path == null) return false;
+            return file.contains(path);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void checkNoMedia(boolean noMediaNeeded) {
