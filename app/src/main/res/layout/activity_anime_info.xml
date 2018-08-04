@@ -92,7 +92,7 @@
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/heart_empty"/>
 
-    <WebView
+    <knf.kuma.custom.WrapWebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

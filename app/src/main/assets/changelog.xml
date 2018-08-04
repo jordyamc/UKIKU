@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="52" version="1.7.3">
+        <change type="fix">Errores generales</change>
+        <change type="new">Servidor Fenix</change>
+        <change type="new">Servidor Natsuki</change>
+        <change type="change">Las descargas ahora mostraran tiempo restante y velocidad de
+            descarga
+        </change>
+    </release>
     <release code="51" version="1.7.2">
         <change type="fix">Errores generales</change>
     </release>

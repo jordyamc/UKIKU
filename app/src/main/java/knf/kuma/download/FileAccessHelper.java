@@ -28,8 +28,8 @@ import xdroid.toaster.Toaster;
 public class FileAccessHelper {
     public static final int SD_REQUEST = 51247;
     public static FileAccessHelper INSTANCE;
-    private Context context;
     public static boolean NOMEDIA_CREATING = false;
+    private Context context;
 
     private FileAccessHelper(Context context) {
         this.context = context;
@@ -89,7 +89,7 @@ public class FileAccessHelper {
     }
 
     public File getTmpFile(String file_name) {
-        return new File(context.getFilesDir(), "downloads/" + PatternUtil.getNameFromFile(file_name));
+        return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name));
     }
 
     public File getFileCreate(String file_name) {
@@ -103,7 +103,7 @@ public class FileAccessHelper {
                     file.createNewFile();
                 return file;
             } else {
-                File file = new File(context.getFilesDir(), "downloads/" + PatternUtil.getNameFromFile(file_name));
+                File file = new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name));
                 if (!file.exists())
                     file.mkdirs();
                 file = new File(file, file_name);
@@ -117,8 +117,10 @@ public class FileAccessHelper {
         }
     }
 
-    public boolean isTempFile(String file) {
-        return file.contains(context.getFilesDir().getAbsolutePath());
+    boolean isTempFile(String file) {
+        String path = FileUtil.getFullPathFromTreeUri(getTreeUri(), context);
+        if (path == null) return false;
+        return file.contains(path);
     }
 
     public void checkNoMedia(boolean noMediaNeeded) {
@@ -291,7 +293,7 @@ public class FileAccessHelper {
 
     public InputStream getTmpInputStream(String file_name) {
         try {
-            return new FileInputStream(new File(context.getFilesDir(), "downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
+            return new FileInputStream(new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

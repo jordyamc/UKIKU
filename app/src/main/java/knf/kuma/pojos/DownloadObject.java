@@ -97,6 +97,7 @@ public class DownloadObject {
     }
 
     public int getDid() {
+        if (did == null) return 0;
         return Integer.parseInt(did);
     }
 
@@ -113,9 +114,15 @@ public class DownloadObject {
         this.eta = String.valueOf(eta);
     }
 
-    public long getSpeed() {
-        if (speed == null) return 0;
-        return Long.parseLong(speed);
+    private String getSpeed() {
+        if (speed == null) return "0kB/s";
+        long s = Long.parseLong(speed);
+        if (s < 1024)
+            return s + "B/s";
+        else if (s < 1024000)
+            return String.format(Locale.getDefault(), "%.0fkB/s", s / 1024f);
+        else
+            return String.format(Locale.getDefault(), "%.1fMB/s", s / 1024000f);
     }
 
     public void setSpeed(long speed) {
@@ -125,10 +132,6 @@ public class DownloadObject {
     public String getTime() {
         try {
             long duration = getEta();
-            if (duration == -1)
-                return "Desconocido";
-            else if (duration == -2)
-                return "Moviendo...";
             long hours = TimeUnit.MILLISECONDS.toHours(duration);
             long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
             long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
@@ -155,6 +158,17 @@ public class DownloadObject {
         }
     }
 
+    public String getSubtext() {
+        long duration = getEta();
+        if (duration == -1)
+            return "Desconocido";
+        else if (duration == -2)
+            return "Moviendo...";
+        else {
+            return getTime() + ", " + getSpeed();
+        }
+    }
+
     public String getSize() {
         /*if (t_bytes == -1)
             return "";
@@ -169,13 +183,6 @@ public class DownloadObject {
         if (v < 1024) return v + " B";
         int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
         return String.format(Locale.US, "%.1f%sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
-    }
-
-    public void reset() {
-        progress = 0;
-        d_bytes = 0;
-        t_bytes = -1;
-        canResume = false;
     }
 
 }

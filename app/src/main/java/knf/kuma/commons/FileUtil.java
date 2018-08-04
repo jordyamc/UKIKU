@@ -127,20 +127,20 @@ public final class FileUtil {
 
         final HashSet<String> out = new HashSet<>();
         String reg = "(?i).*vold.*(vfat|ntfs|exfat|fat32|ext3|ext4).*rw.*";
-        String s = "";
+        StringBuilder s = new StringBuilder();
         try {
             final Process process = new ProcessBuilder().command("mount").redirectErrorStream(true).start();
             process.waitFor();
             final InputStream is = process.getInputStream();
             final byte[] buffer = new byte[1024];
             while (is.read(buffer) != -1) {
-                s = s + new String(buffer);
+                s.append(new String(buffer));
             }
             is.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        final String[] lines = s.split("\n");
+        final String[] lines = s.toString().split("\n");
         for (String line : lines) {
             if (!line.toLowerCase(Locale.US).contains("asec")) {
                 if (line.matches(reg)) {

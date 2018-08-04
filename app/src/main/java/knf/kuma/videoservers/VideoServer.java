@@ -120,6 +120,8 @@ public class VideoServer implements Parcelable {
         public static final String CLUP = "Clup";
         public static final String FIRE = "Fire";
         public static final String MANGO = "Mango";
+        public static final String NATSUKI = "Natsuki";
+        public static final String FENIX = "Fenix";
         public static final String RV = "RV";
         public static final String MP4UPLOAD = "Mp4Upload";
         public static final String YOURUPLOAD = "YourUpload";
@@ -135,6 +137,8 @@ public class VideoServer implements Parcelable {
                     HYPERION,
                     OKRU,
                     FIRE,
+                    NATSUKI,
+                    FENIX,
                     RV,
                     YOURUPLOAD,
                     ZIPPYSHARE,

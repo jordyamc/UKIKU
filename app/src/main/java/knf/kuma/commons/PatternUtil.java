@@ -137,7 +137,6 @@ public class PatternUtil {
     }
 
     public static String getCover(String aid) {
-        //TODO: Check img availability
         return "https://m.animeflv.net/uploads/animes/covers/" + aid + ".jpg";
     }
 

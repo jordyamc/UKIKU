@@ -1,5 +1,6 @@
 package knf.kuma.download;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.util.Pair;
 
 import com.crashlytics.android.Crashlytics;
@@ -40,6 +42,7 @@ public class DownloadManager {
     static final int ACTION_CANCEL = 2;
     private static final String CHANNEL = "service.Downloads";
     private static final String CHANNEL_ONGOING = "service.Downloads.Ongoing";
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
     private static Fetch fetch;
     private static DownloadsDAO downloadDao = CacheDB.INSTANCE.downloadsDAO();
@@ -88,13 +91,16 @@ public class DownloadManager {
                 if (object != null) {
                     if (FileAccessHelper.INSTANCE.isTempFile(download.getFile())) {
                         object.setEta(-2);
+                        downloadDao.update(object);
                         FileUtil.moveFile(object.file, pair -> {
                             if (!pair.second) {
                                 object.progress = pair.first;
                                 updateNotification(object, false);
-                            } else if (pair.first == -1)
+                                downloadDao.update(object);
+                            } else if (pair.first == -1) {
+                                downloadDao.delete(object);
                                 errorNotification(object);
-                            else {
+                            } else {
                                 object.progress = 100;
                                 object.state = DownloadObject.COMPLETED;
                                 downloadDao.update(object);
@@ -156,6 +162,7 @@ public class DownloadManager {
                 DownloadObject object = downloadDao.getByDid(download.getId());
                 if (object != null) {
                     object.state = DownloadObject.PAUSED;
+                    object.setEta(-1);
                     downloadDao.update(object);
                     updateNotification(object, true);
                 }
@@ -202,8 +209,10 @@ public class DownloadManager {
                 for (Pair<String, String> header : downloadObject.headers.getHeaders())
                     request.addHeader(header.first, header.second);
             downloadObject.setDid(request.getId());
-            fetch.enqueue(request, result -> downloadDao.insert(downloadObject), result -> {
+            downloadDao.insert(downloadObject);
+            fetch.enqueue(request, result -> Log.e("Download", "Queued " + result.getId()), result -> {
                 if (result.getThrowable() != null) result.getThrowable().printStackTrace();
+                downloadDao.delete(downloadObject);
             });
             return true;
         } catch (Exception e) {
@@ -234,7 +243,7 @@ public class DownloadManager {
         resume(downloadObject.getDid());
     }
 
-    public static void resume(int did) {
+    static void resume(int did) {
         AsyncTask.execute(() -> fetch.resume(did));
     }
 
@@ -256,7 +265,7 @@ public class DownloadManager {
             notification.addAction(R.drawable.ic_delete, "Cancelar", getPending(downloadObject, ACTION_CANCEL));
         }
         if (!isPaused)
-            notification.setSubText(downloadObject.getTime());
+            notification.setSubText(downloadObject.getSubtext());
         notificationManager.notify(Integer.parseInt(downloadObject.eid), notification.build());
     }
 

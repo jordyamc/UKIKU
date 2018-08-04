@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -50,7 +51,6 @@ import knf.kuma.pojos.RecentObject;
 import knf.kuma.pojos.RecordObject;
 import knf.kuma.queue.QueueManager;
 import knf.kuma.videoservers.ServersFactory;
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import xdroid.toaster.Toaster;
 
 public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHolder> {
@@ -267,7 +267,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
         @BindView(R.id.fav_icon)
         ImageView fav_icon;
         @BindView(R.id.progress)
-        MaterialProgressBar progressBar;
+        ProgressBar progressBar;
 
         private LiveData<AnimeObject.WebInfo.AnimeChapter> chapterLiveData = new MutableLiveData<>();
         private LiveData<DownloadObject> downloadLiveData = new MutableLiveData<>();

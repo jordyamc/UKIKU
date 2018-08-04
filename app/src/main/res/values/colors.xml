@@ -49,6 +49,8 @@
     <color name="divider">#000</color>
     <color name="textPrimary">#000</color>
     <color name="textSecondary">#323232</color>
+    <color name="textPrimaryInverse">#fff</color>
+    <color name="textSecondaryInverse">#bebebe</color>
 
     <color name="material_light_primary_text">#DE000000</color>
     <color name="material_light_hint_text">#61000000</color>

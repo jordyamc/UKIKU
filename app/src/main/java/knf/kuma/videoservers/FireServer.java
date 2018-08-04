@@ -11,7 +11,7 @@ import knf.kuma.commons.PatternUtil;
 import static knf.kuma.videoservers.VideoServer.Names.FIRE;
 
 public class FireServer extends Server {
-    public FireServer(Context context, String baseLink) {
+    FireServer(Context context, String baseLink) {
         super(context, baseLink);
     }
 

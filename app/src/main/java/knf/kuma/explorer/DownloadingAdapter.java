@@ -1,5 +1,6 @@
 package knf.kuma.explorer;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +30,7 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
     private DownloadsDAO downloadsDAO = CacheDB.INSTANCE.downloadsDAO();
     private List<DownloadObject> downloadObjects;
 
-    public DownloadingAdapter(Fragment fragment, List<DownloadObject> downloadObjects) {
+    DownloadingAdapter(Fragment fragment, List<DownloadObject> downloadObjects) {
         this.fragment = fragment;
         this.downloadObjects = downloadObjects;
     }
@@ -39,17 +41,23 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
         return new DownloadingItem(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_downloading_extra, viewGroup, false));
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final DownloadingItem holder, int position) {
         final DownloadObject downloadObject = downloadObjects.get(position);
         holder.title.setText(downloadObject.name);
         holder.chapter.setText(downloadObject.chapter);
-        holder.eta.setText(downloadObject.getTime());
+        holder.eta.setText(downloadObject.getSubtext());
         holder.progress.setMax(100);
         if (downloadObject.state == DownloadObject.PENDING) {
+            holder.eta.setVisibility(View.GONE);
             holder.progress.setIndeterminate(true);
             holder.progress.setProgress(0);
         } else {
+            if (downloadObject.state == DownloadObject.PAUSED)
+                holder.eta.setVisibility(View.GONE);
+            else
+                holder.eta.setVisibility(View.VISIBLE);
             holder.progress.setIndeterminate(false);
             holder.progress.setProgress(downloadObject.progress);
         }
@@ -57,16 +65,16 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
             if (downloadObject.state == DownloadObject.DOWNLOADING) {
                 downloadObject.state = DownloadObject.PAUSED;
                 holder.action.setText("REANUDAR");
-                DownloadManager.pause(downloadObject.getDid());
+                DownloadManager.pause(downloadObject);
             } else if (downloadObject.state == DownloadObject.PAUSED) {
                 downloadObject.state = DownloadObject.PENDING;
                 holder.action.setText("PAUSAR");
-                DownloadManager.resume(downloadObject.getDid());
+                DownloadManager.resume(downloadObject);
             }
         });
         holder.cancel.setOnClickListener(v -> {
             try {
-                new MaterialDialog.Builder(fragment.getContext())
+                new MaterialDialog.Builder(Objects.requireNonNull(fragment.getContext()))
                         .content("¿Cancelar descarga del " + downloadObject.chapter.toLowerCase() + " de " + downloadObject.name + "?")
                         .positiveText("CONFIRMAR")
                         .negativeText("CANCELAR")
@@ -88,20 +96,23 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
                 } else {
                     downloadObject.state = object.state;
                     if (object.state == DownloadObject.PENDING) {
+                        holder.eta.setVisibility(View.GONE);
                         holder.progress.setIndeterminate(true);
                         holder.progress.setProgress(0);
                     } else {
                         switch (downloadObject.state) {
                             case DownloadObject.DOWNLOADING:
                                 holder.action.setText("PAUSAR");
+                                holder.eta.setVisibility(View.VISIBLE);
                                 break;
                             case DownloadObject.PAUSED:
                                 holder.action.setText("REANUDAR");
+                                holder.eta.setVisibility(View.GONE);
                                 break;
                         }
                         holder.progress.setIndeterminate(false);
                         holder.progress.setProgress(object.progress);
-                        holder.eta.setText(object.getTime());
+                        holder.eta.setText(object.getSubtext());
                     }
                 }
             } catch (Exception e) {

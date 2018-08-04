@@ -23,6 +23,8 @@ public abstract class Server implements Comparable<Server> {
     private static List<Server> getServers(Context context, String base) {
         return Arrays.asList(
                 new FireServer(context, base),
+                new NatsukiServer(context, base),
+                new FenixServer(context, base),
                 new HyperionServer(context, base),
                 new IzanagiServer(context, base),
                 new MangoServer(context, base),
@@ -36,7 +38,7 @@ public abstract class Server implements Comparable<Server> {
     }
 
     public static Server check(Context context, String base) {
-        for (Server server : getServers(context, base)) {
+        for (Server server: getServers(context, base)) {
             if (server.isValid())
                 return server;
         }
@@ -45,7 +47,7 @@ public abstract class Server implements Comparable<Server> {
 
     private static int findPosition(List<Server> servers, String name) {
         int i = 0;
-        for (Server server : servers) {
+        for (Server server: servers) {
             if (server.getName().equals(name))
                 return i;
             i++;
@@ -55,7 +57,7 @@ public abstract class Server implements Comparable<Server> {
 
     public static boolean existServer(List<Server> servers, int position) {
         String name = VideoServer.Names.getDownloadServers()[position - 1];
-        for (Server server : servers) {
+        for (Server server: servers) {
             if (server.getName().equals(name))
                 return true;
         }
@@ -69,7 +71,7 @@ public abstract class Server implements Comparable<Server> {
 
     public static List<String> getNames(List<Server> servers) {
         List<String> names = new ArrayList<>();
-        for (Server server : servers) {
+        for (Server server: servers) {
             names.add(server.getName());
         }
         return names;
