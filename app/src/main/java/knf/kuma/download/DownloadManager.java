@@ -104,6 +104,7 @@ public class DownloadManager {
                                 object.progress = 100;
                                 object.state = DownloadObject.COMPLETED;
                                 downloadDao.update(object);
+                                notificationManager.cancel(Integer.parseInt(object.eid));
                                 completedNotification(object);
                             }
                         });
@@ -206,7 +207,7 @@ public class DownloadManager {
             File file = FileAccessHelper.INSTANCE.getFileCreate(downloadObject.file);
             Request request = new Request(downloadObject.link, file.getAbsolutePath());
             if (downloadObject.headers != null)
-                for (Pair<String, String> header : downloadObject.headers.getHeaders())
+                for (Pair<String, String> header: downloadObject.headers.getHeaders())
                     request.addHeader(header.first, header.second);
             downloadObject.setDid(request.getId());
             downloadDao.insert(downloadObject);
