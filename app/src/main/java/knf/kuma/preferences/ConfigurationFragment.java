@@ -24,6 +24,7 @@ import knf.kuma.BuildConfig;
 import knf.kuma.Main;
 import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.directory.DirectoryService;
 import knf.kuma.directory.DirectoryUpdateService;
@@ -59,6 +60,23 @@ public class ConfigurationFragment extends PreferenceFragment {
         getPreferenceScreen().findPreference("download_type").setOnPreferenceChangeListener((preference, o) -> {
             if (o.equals("1") && !FileAccessHelper.INSTANCE.canDownload(ConfigurationFragment.this, (String) o))
                 Toaster.toast("Por favor selecciona la raiz de tu SD");
+            return true;
+        });
+        if (PrefsUtil.getDownloaderType() == 0) {
+            getPreferenceScreen().findPreference("max_parallel_downloads").setEnabled(false);
+            getPreferenceScreen().findPreference("buffer_size").setEnabled(true);
+        } else {
+            getPreferenceScreen().findPreference("max_parallel_downloads").setEnabled(true);
+            getPreferenceScreen().findPreference("buffer_size").setEnabled(false);
+        }
+        getPreferenceScreen().findPreference("downloader_type").setOnPreferenceChangeListener((preference, o) -> {
+            if (o.equals("0")) {
+                getPreferenceScreen().findPreference("max_parallel_downloads").setEnabled(false);
+                getPreferenceScreen().findPreference("buffer_size").setEnabled(true);
+            } else {
+                getPreferenceScreen().findPreference("max_parallel_downloads").setEnabled(true);
+                getPreferenceScreen().findPreference("buffer_size").setEnabled(false);
+            }
             return true;
         });
         getPreferenceScreen().findPreference("theme_option").setOnPreferenceChangeListener((preference, o) -> {
@@ -127,7 +145,7 @@ public class ConfigurationFragment extends PreferenceFragment {
             }
         });
         getPreferenceScreen().findPreference("max_parallel_downloads").setOnPreferenceChangeListener((preference, o) -> {
-            DownloadManager.setParalelDownloads((String) o);
+            DownloadManager.setParallelDownloads((String) o);
             return true;
         });
         if (BuildConfig.DEBUG) {

@@ -39,6 +39,9 @@ public interface DownloadsDAO {
     @Query("SELECT count(*) FROM downloadobject WHERE state=-1")
     int countPending();
 
+    @Query("SELECT count(*) FROM downloadobject WHERE state=-1 OR state=0")
+    int countActive();
+
     @Query("DELETE FROM downloadobject WHERE eid LIKE :eid")
     void deleteByEid(String eid);
 

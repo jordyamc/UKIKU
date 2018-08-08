@@ -1,7 +1,5 @@
 package knf.kuma.download;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -110,10 +108,7 @@ public class DownloadDialogActivity extends AppCompatActivity {
     }
 
     private void removeNotification() {
-        if (getIntent().getBooleanExtra("notification", false)) {
-            NotificationObj obj = NotificationObj.fromIntent(getIntent());
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(obj.key);
-            sendBroadcast(obj.getBroadcast(this));
-        }
+        if (getIntent().getBooleanExtra("notification", false))
+            sendBroadcast(NotificationObj.fromIntent(getIntent()).getBroadcast(this));
     }
 }

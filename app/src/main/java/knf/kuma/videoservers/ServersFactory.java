@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -27,8 +28,10 @@ import java.util.List;
 import knf.kuma.BuildConfig;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.download.DownloadManager;
+import knf.kuma.download.DownloadService;
 import knf.kuma.download.FileAccessHelper;
 import knf.kuma.player.ExoPlayer;
 import knf.kuma.pojos.AnimeObject;
@@ -144,7 +147,7 @@ public class ServersFactory {
                                 dialog.show();
                                 AsyncTask.execute(() -> {
                                     try {
-                                        final VideoServer server = servers.get(selected).getVideoServer();
+                                        final VideoServer server = servers.get(selected).getVerified();
                                         dialog.dismiss();
                                         if (server == null && servers.size() == 1) {
                                             Toaster.toast("Error en servidor, intente mas tarde");
@@ -196,7 +199,7 @@ public class ServersFactory {
                                     dialog.show();
                                     AsyncTask.execute(() -> {
                                         try {
-                                            final VideoServer server = servers.get(selected).getVideoServer();
+                                            final VideoServer server = servers.get(selected).getVerified();
                                             dialog.dismiss();
                                             if (server == null && servers.size() == 1) {
                                                 Toaster.toast("Error en servidor, intente mas tarde");
@@ -282,16 +285,17 @@ public class ServersFactory {
 
     private void startDownload(Option option) {
         if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url);
-        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid)) {
-            final File d_file = FileAccessHelper.INSTANCE.getFile(chapter.getFileName());
-            CacheDB.INSTANCE.queueDAO().add(new QueueObject(Uri.fromFile(d_file), true, chapter));
-        }
+        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid))
+            CacheDB.INSTANCE.queueDAO().add(new QueueObject(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(chapter.getFileName())), true, chapter));
         Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
         downloadObject.link = option.url;
         downloadObject.headers = option.headers;
-        /*CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
-        ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));*/
-        serversInterface.onFinish(true, DownloadManager.start(downloadObject));
+        if (PrefsUtil.getDownloaderType() == 0) {
+            CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
+            ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));
+            serversInterface.onFinish(true, true);
+        } else
+            serversInterface.onFinish(true, DownloadManager.start(downloadObject));
     }
 
     public void get(MaterialDialog dialog) {
@@ -299,7 +303,7 @@ public class ServersFactory {
             Document main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get();
             Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
             List<Server> servers = new ArrayList<>();
-            for (Element e : descargas) {
+            for (Element e: descargas) {
                 String z = e.attr("href");
                 z = z.substring(z.lastIndexOf("http"));
                 Server server = Server.check(context, z);
@@ -308,7 +312,7 @@ public class ServersFactory {
             }
             Elements s_script = main.select("script");
             String j = "";
-            for (Element element : s_script) {
+            for (Element element: s_script) {
                 String s_el = element.outerHtml();
                 if (s_el.contains("var video = [];")) {
                     j = s_el;
@@ -316,7 +320,7 @@ public class ServersFactory {
                 }
             }
             String[] parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*\\]");
-            for (String baseLink : parts) {
+            for (String baseLink: parts) {
                 Server server = Server.check(context, baseLink);
                 if (server != null)
                     servers.add(server);

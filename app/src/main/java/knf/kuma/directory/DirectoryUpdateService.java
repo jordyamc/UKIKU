@@ -26,6 +26,7 @@ import pl.droidsonroids.jspoon.Jspoon;
 public class DirectoryUpdateService extends IntentService {
     public static int NOT_CODE = 5599;
     public static String CHANNEL = "directory_update";
+    private long CURRENT_TIME = System.currentTimeMillis();
     private static boolean running = false;
     private NotificationManager manager;
     private int count = 0;
@@ -105,6 +106,7 @@ public class DirectoryUpdateService extends IntentService {
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_dir_update)
                 .setColor(Color.parseColor("#e53935"))
+                .setWhen(CURRENT_TIME)
                 .build();
         manager.notify(NOT_CODE, notification);
     }
@@ -116,6 +118,7 @@ public class DirectoryUpdateService extends IntentService {
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_dir_update)
                 .setColor(Color.parseColor("#e53935"))
+                .setWhen(CURRENT_TIME)
                 .build();
     }
 

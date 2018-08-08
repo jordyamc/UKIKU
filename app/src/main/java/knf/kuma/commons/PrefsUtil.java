@@ -57,4 +57,8 @@ public class PrefsUtil {
     public static int bufferSize() {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("buffer_size", "32"));
     }
+
+    public static int getDownloaderType() {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1"));
+    }
 }

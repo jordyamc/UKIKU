@@ -42,7 +42,7 @@ import knf.kuma.pojos.SeeingObject;
         ExplorerObject.class,
         GenreStatusObject.class,
         QueueObject.class
-}, version = 7)
+}, version = 8)
 public abstract class CacheDB extends RoomDatabase {
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -84,12 +84,18 @@ public abstract class CacheDB extends RoomDatabase {
             database.execSQL("ALTER TABLE `downloadobject`  ADD COLUMN `speed` TEXT");
         }
     };
+    public static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE `downloadobject`  ADD COLUMN `time` INTEGER NOT NULL DEFAULT 0");
+        }
+    };
     public static CacheDB INSTANCE;
 
     public static void init(Context context) {
         INSTANCE = Room.databaseBuilder(context, CacheDB.class, "cache-db")
                 .allowMainThreadQueries()
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7).build();
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8).build();
     }
 
     public abstract RecentsDAO recentsDAO();

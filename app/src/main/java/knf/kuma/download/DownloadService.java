@@ -61,7 +61,9 @@ public class DownloadService extends IntentService {
                 }
             Response response = new OkHttpClient().newBuilder()
                     .connectTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(10, TimeUnit.SECONDS).build().newCall(request.build()).execute();
+                    .readTimeout(10, TimeUnit.SECONDS)
+                    .followRedirects(true)
+                    .followSslRedirects(true).build().newCall(request.build()).execute();
             current.t_bytes = response.body().contentLength();
             BufferedInputStream inputStream = new BufferedInputStream(response.body().byteStream());
             BufferedOutputStream outputStream;
@@ -120,6 +122,7 @@ public class DownloadService extends IntentService {
                 .setProgress(100, current.progress, false)
                 .setOngoing(true)
                 .setSound(null)
+                .setWhen(current.time)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
         int pending = downloadsDAO.countPending();
         if (pending > 0)
@@ -138,6 +141,7 @@ public class DownloadService extends IntentService {
                 .setContentIntent(ServersFactory.getPlayIntent(this, current.name, file))
                 .setOngoing(false)
                 .setAutoCancel(true)
+                .setWhen(current.time)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
         manager.notify(Integer.parseInt(current.eid), notification);
@@ -161,6 +165,7 @@ public class DownloadService extends IntentService {
                 .setContentTitle(current.name)
                 .setContentText("Error al descargar " + current.chapter.toLowerCase())
                 .setOngoing(false)
+                .setWhen(current.time)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
         manager.notify(Integer.parseInt(current.eid), notification);
@@ -175,6 +180,7 @@ public class DownloadService extends IntentService {
                 .setProgress(100, current.progress, true)
                 .setOngoing(true)
                 .setSound(null)
+                .setWhen(current.time)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build();
     }

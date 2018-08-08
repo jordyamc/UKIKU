@@ -42,6 +42,7 @@ public class DownloadObject {
     public int progress;
     public long d_bytes;
     public long t_bytes;
+    public long time;
     public boolean canResume;
     public int state;
 
@@ -78,6 +79,7 @@ public class DownloadObject {
         this.progress = 0;
         this.d_bytes = 0;
         this.t_bytes = -1;
+        this.time = System.currentTimeMillis();
         this.canResume = false;
         this.state = PENDING;
     }
@@ -159,6 +161,8 @@ public class DownloadObject {
     }
 
     public String getSubtext() {
+        if (!canResume)
+            return getSize();
         long duration = getEta();
         if (duration == -1)
             return "Desconocido";

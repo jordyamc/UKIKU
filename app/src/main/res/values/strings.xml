@@ -117,14 +117,22 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+    <string-array name="downloader_type">
+        <item>Clásico</item>
+        <item>Multiple</item>
+    </string-array>
+    <string-array name="downloader_type_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
     <string name="shortcut_fav_short">Favoritos</string>
     <string name="shortcut_fav_long">Animes favoritos</string>
     <string name="shortcut_dir_short">Directorio</string>
     <string name="shortcut_dir_long">Animes en directorio</string>
     <string name="shortcut_explorer_short">Explorador</string>
     <string name="shortcut_explorer_long">Explorador</string>
-    <string name="shortcut_emision_short">Emision</string>
-    <string name="shortcut_emision_long">Animes en emision</string>
+    <string name="shortcut_emision_short">Emisión</string>
+    <string name="shortcut_emision_long">Animes en emisión</string>
 
     <string-array name="theme_colors">
         <item>Rojo</item>

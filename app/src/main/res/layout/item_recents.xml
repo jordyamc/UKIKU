@@ -132,13 +132,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
                     <Button
                         android:id="@+id/streaming"
                         style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="STREAMING"/>
 
                     <Button
@@ -146,8 +148,8 @@
                         style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="DESCARGA"
-                        />
+                        android:layout_weight="1"
+                        android:text="DESCARGA"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

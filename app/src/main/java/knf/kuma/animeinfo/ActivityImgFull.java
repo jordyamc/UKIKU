@@ -47,7 +47,8 @@ public class ActivityImgFull extends AppCompatActivity implements PopupMenu.OnMe
 
             @Override
             public void onError() {
-
+                Toaster.toast("Error al cargar imagen");
+                finish();
             }
         });
         imageView.setOnLongClickListener(v -> {

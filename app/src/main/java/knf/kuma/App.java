@@ -74,6 +74,7 @@ public class App extends Application {
             manager.createNotificationChannel(new NotificationChannel(RecentsJob.CHANNEL_RECENTS, "Capitulos recientes", NotificationManager.IMPORTANCE_HIGH));
             manager.createNotificationChannel(new NotificationChannel(DownloadService.CHANNEL, "Descargas", NotificationManager.IMPORTANCE_HIGH));
             manager.createNotificationChannel(new NotificationChannel(DownloadService.CHANNEL_ONGOING, "Descargas en progreso", NotificationManager.IMPORTANCE_LOW));
+            manager.createNotificationChannel(new NotificationChannel(DownloadManager.CHANNEL_FOREGROUND, "Administrador de descargas", NotificationManager.IMPORTANCE_MIN));
             manager.createNotificationChannel(new NotificationChannel(UpdateJob.CHANNEL, "Actualización de la app", NotificationManager.IMPORTANCE_DEFAULT));
         }
     }

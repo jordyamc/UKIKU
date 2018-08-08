@@ -105,7 +105,7 @@ public class TVServersFactory {
         AsyncTask.execute(() -> {
             try {
                 String text = servers.get(position).getName();
-                final VideoServer server = servers.get(position).getVideoServer();
+                final VideoServer server = servers.get(position).getVerified();
                 dialog.dismiss();
                 if (server == null && servers.size() == 1) {
                     Toaster.toast("Error en servidor, intente mas tarde");

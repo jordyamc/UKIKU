@@ -147,6 +147,7 @@
         <service
             android:name=".widgets.emision.WEmisionService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
+        <service android:name=".download.DownloadManager"/>
 
         <receiver
             android:name=".widgets.emision.WEmisionProvider"

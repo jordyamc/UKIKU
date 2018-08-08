@@ -89,7 +89,7 @@ public class FileAccessHelper {
     }
 
     public File getTmpFile(String file_name) {
-        return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name));
+        return new File(FileUtil.getFullPathFromTreeUri(getTreeUri(), context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
     }
 
     public File getFileCreate(String file_name) {

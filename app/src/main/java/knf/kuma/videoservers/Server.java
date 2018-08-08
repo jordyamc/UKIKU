@@ -3,10 +3,17 @@ package knf.kuma.videoservers;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public abstract class Server implements Comparable<Server> {
     int TIMEOUT = 10000;
@@ -85,9 +92,41 @@ public abstract class Server implements Comparable<Server> {
     public abstract VideoServer getVideoServer();
 
     @Nullable
-    public VideoServer getLink() {
+    private VideoServer verify(@Nullable VideoServer videoServer) {
+        if (videoServer == null)
+            return null;
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .followRedirects(true)
+                .followSslRedirects(true).build();
+        for (Option option: new ArrayList<>(videoServer.options))
+            try {
+                Request.Builder request = new Request.Builder()
+                        .url(option.url);
+                if (option.headers != null)
+                    for (Pair<String, String> pair: option.headers.getHeaders())
+                        request.addHeader(pair.first, pair.second);
+                Response response = client.newCall(request.build()).execute();
+                if (!response.isSuccessful()) {
+                    Log.e("Remove Option", "Server: " + option.server + "\nUrl: " + option.url + "\nCode: " + response.code());
+                    videoServer.options.remove(option);
+                }
+                if (response.body() != null)
+                    response.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                videoServer.options.remove(option);
+            }
+        if (videoServer.options.size() == 0)
+            return null;
+        return videoServer;
+    }
+
+    @Nullable
+    public VideoServer getVerified() {
         if (server == null)
-            server = getVideoServer();
+            server = verify(getVideoServer());
         return server;
     }
 

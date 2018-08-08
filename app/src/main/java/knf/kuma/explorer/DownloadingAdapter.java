@@ -49,6 +49,7 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
         holder.chapter.setText(downloadObject.chapter);
         holder.eta.setText(downloadObject.getSubtext());
         holder.progress.setMax(100);
+        holder.action.setVisibility(downloadObject.canResume ? View.VISIBLE : View.INVISIBLE);
         if (downloadObject.state == DownloadObject.PENDING) {
             holder.eta.setVisibility(View.GONE);
             holder.progress.setIndeterminate(true);
@@ -79,10 +80,13 @@ public class DownloadingAdapter extends RecyclerView.Adapter<DownloadingAdapter.
                         .positiveText("CONFIRMAR")
                         .negativeText("CANCELAR")
                         .onPositive((dialog, which) -> {
-                            downloadObjects.remove(holder.getAdapterPosition());
-                            notifyItemRemoved(holder.getAdapterPosition());
-                            //downloadsDAO.deleteByEid(downloadObject.eid);
-                            DownloadManager.cancel(downloadObject.eid);
+                            try {
+                                downloadObjects.remove(holder.getAdapterPosition());
+                                notifyItemRemoved(holder.getAdapterPosition());
+                                DownloadManager.cancel(downloadObject.eid);
+                            } catch (Exception e) {
+                                //
+                            }
                         }).build().show();
             } catch (Exception e) {
                 e.printStackTrace();

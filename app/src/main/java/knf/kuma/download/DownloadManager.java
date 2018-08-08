@@ -4,13 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.Pair;
 
@@ -36,7 +40,8 @@ import knf.kuma.pojos.DownloadObject;
 import knf.kuma.videoservers.ServersFactory;
 import okhttp3.OkHttpClient;
 
-public class DownloadManager {
+public class DownloadManager extends Service {
+    public static final String CHANNEL_FOREGROUND = "service.LifeSaver";
     static final int ACTION_PAUSE = 0;
     static final int ACTION_RESUME = 1;
     static final int ACTION_CANCEL = 2;
@@ -48,7 +53,7 @@ public class DownloadManager {
     private static DownloadsDAO downloadDao = CacheDB.INSTANCE.downloadsDAO();
     private static NotificationManager notificationManager;
 
-    public static void setParalelDownloads(String newValue) {
+    public static void setParallelDownloads(String newValue) {
         if (fetch != null) fetch.setDownloadConcurrentLimit(Integer.parseInt(newValue));
     }
 
@@ -107,6 +112,7 @@ public class DownloadManager {
                                 notificationManager.cancel(Integer.parseInt(object.eid));
                                 completedNotification(object);
                             }
+                            stopIfNeeded();
                         });
                     } else {
                         object.state = DownloadObject.COMPLETED;
@@ -114,6 +120,7 @@ public class DownloadManager {
                         completedNotification(object);
                     }
                 }
+                stopIfNeeded();
             }
 
             @Override
@@ -126,6 +133,7 @@ public class DownloadManager {
                 fetch.delete(download.getId());
                 throwable.printStackTrace();
                 Crashlytics.logException(throwable);
+                stopIfNeeded();
             }
 
             @Override
@@ -141,6 +149,7 @@ public class DownloadManager {
                     downloadDao.update(object);
                     updateNotification(object, false);
                 }
+                ContextCompat.startForegroundService(context, new Intent(context, DownloadManager.class));
             }
 
             @Override
@@ -167,6 +176,7 @@ public class DownloadManager {
                     downloadDao.update(object);
                     updateNotification(object, true);
                 }
+                stopIfNeeded();
             }
 
             @Override
@@ -174,6 +184,7 @@ public class DownloadManager {
                 DownloadObject object = downloadDao.getByDid(download.getId());
                 if (object != null) {
                     object.state = DownloadObject.PENDING;
+                    object.time = System.currentTimeMillis();
                     downloadDao.update(object);
                     updateNotification(object, false);
                 }
@@ -184,6 +195,7 @@ public class DownloadManager {
                 DownloadObject object = downloadDao.getByDid(download.getId());
                 if (object != null)
                     notificationManager.cancel(object.getDid());
+                stopIfNeeded();
             }
 
             @Override
@@ -191,6 +203,7 @@ public class DownloadManager {
                 DownloadObject object = downloadDao.getByDid(download.getId());
                 if (object != null)
                     notificationManager.cancel(object.getDid());
+                stopIfNeeded();
             }
 
             @Override
@@ -198,6 +211,7 @@ public class DownloadManager {
                 DownloadObject object = downloadDao.getByDid(download.getId());
                 if (object != null)
                     notificationManager.cancel(object.getDid());
+                stopIfNeeded();
             }
         });
     }
@@ -210,6 +224,7 @@ public class DownloadManager {
                 for (Pair<String, String> header: downloadObject.headers.getHeaders())
                     request.addHeader(header.first, header.second);
             downloadObject.setDid(request.getId());
+            downloadObject.canResume = true;
             downloadDao.insert(downloadObject);
             fetch.enqueue(request, result -> Log.e("Download", "Queued " + result.getId()), result -> {
                 if (result.getThrowable() != null) result.getThrowable().printStackTrace();
@@ -255,8 +270,9 @@ public class DownloadManager {
                 .setContentText(downloadObject.chapter)
                 .setOnlyAlertOnce(!isPaused || downloadObject.getEta() == -2)
                 .setProgress(100, downloadObject.progress, downloadObject.state == DownloadObject.PENDING)
-                .setOngoing(true)
+                .setOngoing(!isPaused)
                 .setSound(null)
+                .setWhen(downloadObject.time)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
         if (downloadObject.getEta() != -2) {
             if (isPaused)
@@ -279,6 +295,7 @@ public class DownloadManager {
                 .setContentIntent(ServersFactory.getPlayIntent(context, downloadObject.name, downloadObject.file))
                 .setOngoing(false)
                 .setAutoCancel(true)
+                .setWhen(downloadObject.time)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
         notificationManager.notify(Integer.parseInt(downloadObject.eid), notification);
@@ -292,9 +309,19 @@ public class DownloadManager {
                 .setContentTitle(downloadObject.name)
                 .setContentText("Error al descargar " + downloadObject.chapter.toLowerCase())
                 .setOngoing(false)
+                .setWhen(downloadObject.time)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
         notificationManager.notify(Integer.parseInt(downloadObject.eid), notification);
+    }
+
+    private static Notification foregroundNotification() {
+        return new NotificationCompat.Builder(context, CHANNEL_FOREGROUND)
+                .setSmallIcon(R.drawable.ic_service)
+                .setSubText("Descargas en proceso")
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .build();
     }
 
     private static void updateMedia(DownloadObject downloadObject) {
@@ -313,5 +340,31 @@ public class DownloadManager {
                 .putExtra("eid", downloadObject.eid)
                 .putExtra("action", action);
         return PendingIntent.getBroadcast(context, downloadObject.key + action, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+    private static void stopIfNeeded() {
+        if (downloadDao.countActive() == 0)
+            ContextCompat.startForegroundService(context, new Intent(context, DownloadManager.class).setAction("stop.foregrouns"));
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent.getAction() != null && intent.getAction().equals("stop.foregrouns")) {
+            stopForeground(true);
+            stopSelf();
+        }
+        return Service.START_STICKY;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        startForeground(23498, foregroundNotification());
     }
 }

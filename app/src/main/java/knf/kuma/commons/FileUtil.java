@@ -196,7 +196,7 @@ public final class FileUtil {
                 InputStream inputStream = FileAccessHelper.INSTANCE.getTmpInputStream(file_name);
                 OutputStream outputStream = FileAccessHelper.INSTANCE.getOutputStream(file_name);
                 long total = inputStream.available();
-                byte[] buffer = new byte[32 * 1024];
+                byte[] buffer = new byte[64 * 1024];
                 int read;
                 long current = 0;
                 while ((read = inputStream.read(buffer)) != -1) {
@@ -209,7 +209,10 @@ public final class FileUtil {
                 outputStream.flush();
                 outputStream.close();
                 try {
-                    FileAccessHelper.INSTANCE.getTmpFile(file_name).delete();
+                    File file = FileAccessHelper.INSTANCE.getTmpFile(file_name);
+                    file.delete();
+                    if (file.getParentFile().list().length == 0)
+                        file.getParentFile().delete();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

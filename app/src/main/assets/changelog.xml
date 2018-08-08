@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="54" version="1.7.5">
+        <change type="fix">Errores generales</change>
+        <change type="change">Cambiar administrador de descargas</change>
+        <change type="change">Mejora en notificaciones de descarga</change>
+        <change type="change">Mejora en iconos de atajos</change>
+    </release>
     <release code="53" version="1.7.4">
         <change type="fix">Errores generales</change>
     </release>

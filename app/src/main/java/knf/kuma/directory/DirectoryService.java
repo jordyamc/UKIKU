@@ -45,6 +45,7 @@ public class DirectoryService extends IntentService {
     public static int NOT_CODE = 5598;
     public static String CHANNEL = "directory_update";
     private static boolean RUNNING = false;
+    private long CURRENT_TIME = System.currentTimeMillis();
     private static MutableLiveData<Integer> liveStatus = new MutableLiveData<>();
     private NotificationManager manager;
     private int count = 0;
@@ -97,7 +98,7 @@ public class DirectoryService extends IntentService {
         int partialCount = 0;
         if (strings.size() == 0)
             Log.e("Directory Getter", "No pending pages");
-        for (final String s : strings) {
+        for (final String s: new LinkedHashSet<>(strings)) {
             partialCount++;
             if (!Network.isConnected()) {
                 Log.e("Directory Getter", "Processed " + partialCount + " pages before disconnection");
@@ -202,6 +203,7 @@ public class DirectoryService extends IntentService {
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_directory_not)
                 .setColor(Color.parseColor("#e53935"))
+                .setWhen(CURRENT_TIME)
                 .setSound(null)
                 .build();
         notShow(NOT_CODE, notification);
@@ -215,6 +217,7 @@ public class DirectoryService extends IntentService {
                 .setSmallIcon(R.drawable.ic_directory_not)
                 .setSound(null, AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setColor(Color.parseColor("#e53935"))
+                .setWhen(CURRENT_TIME)
                 .build();
     }
 
