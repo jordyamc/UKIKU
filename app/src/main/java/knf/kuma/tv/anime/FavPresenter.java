@@ -1,8 +1,8 @@
 package knf.kuma.tv.anime;
 
-import android.support.v17.leanback.widget.Presenter;
 import android.view.ViewGroup;
 
+import androidx.leanback.widget.Presenter;
 import knf.kuma.pojos.FavoriteObject;
 import knf.kuma.tv.cards.FavCardView;
 

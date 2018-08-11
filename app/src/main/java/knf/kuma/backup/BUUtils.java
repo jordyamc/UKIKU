@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -48,6 +47,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import knf.kuma.backup.objects.BackupObject;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.AnimeObject;

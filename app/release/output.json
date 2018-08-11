@@ -6,8 +6,8 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 54,
-      "versionName": "1.7.5",
+      "versionCode": 55,
+      "versionName": "1.8",
       "enabled": true,
       "outputFile": "app-release.apk",
       "fullName": "release",

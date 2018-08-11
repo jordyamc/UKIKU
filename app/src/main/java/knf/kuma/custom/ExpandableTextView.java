@@ -6,9 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +15,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import knf.kuma.R;
 
 @SuppressWarnings("unused")
@@ -124,73 +124,65 @@ public class ExpandableTextView extends LinearLayout
         textContent = charSequence;
         textView.setText(charSequence.toString());
         ViewTreeObserver viewTreeObserver = textView.getViewTreeObserver();
-        viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                if (!isInitTextView) {
-                    return true;
-                }
-                textLines = textView.getLineCount();
-                Log.e("Expandable","Lines: "+textLines);
-                isExpandNeeded = textLines > expandLines;
-                isInitTextView = false;
-                if (isExpandNeeded) {
-                    isShrink = true;
-                    doAnimation(textLines, expandLines, WHAT_ANIMATION_END);
-                } else {
-                    isShrink = false;
-                    doNotExpand();
-                }
+        viewTreeObserver.addOnPreDrawListener(() -> {
+            if (!isInitTextView) {
                 return true;
             }
+            textLines = textView.getLineCount();
+            Log.e("Expandable", "Lines: " + textLines);
+            isExpandNeeded = textLines > expandLines;
+            isInitTextView = false;
+            if (isExpandNeeded) {
+                isShrink = true;
+                doAnimation(textLines, expandLines, WHAT_ANIMATION_END);
+            } else {
+                isShrink = false;
+                doNotExpand();
+            }
+            return true;
         });
     }
 
     private void doAnimation(final int startIndex, final int endIndex,
                              final int what) {
 
-        thread = new Thread(new Runnable() {
+        thread = new Thread(() -> {
 
-            @Override
-            public void run() {
+            if (startIndex < endIndex) {
+                // 如果起止行数小于结束行数，那么往下展开至结束行数
+                // if open index smaller than end index ,do expand action
+                int count = startIndex;
+                while (count++ < endIndex) {
+                    Message msg = handler.obtainMessage(WHAT, count, 0);
 
-                if (startIndex < endIndex) {
-                    // 如果起止行数小于结束行数，那么往下展开至结束行数
-                    // if open index smaller than end index ,do expand action
-                    int count = startIndex;
-                    while (count++ < endIndex) {
-                        Message msg = handler.obtainMessage(WHAT, count, 0);
-
-                        try {
-                            Thread.sleep(sleepTime);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        handler.sendMessage(msg);
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } else if (startIndex > endIndex) {
-                    // 如果起止行数大于结束行数，那么往上折叠至结束行数
-                    // if open index bigger than end index ,do shrink action
-                    int count = startIndex;
-                    while (count-- > endIndex) {
-                        Message msg = handler.obtainMessage(WHAT, count, 0);
-                        try {
-                            Thread.sleep(sleepTime);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
 
-                        handler.sendMessage(msg);
-                    }
+                    handler.sendMessage(msg);
                 }
+            } else if (startIndex > endIndex) {
+                // 如果起止行数大于结束行数，那么往上折叠至结束行数
+                // if open index bigger than end index ,do shrink action
+                int count = startIndex;
+                while (count-- > endIndex) {
+                    Message msg = handler.obtainMessage(WHAT, count, 0);
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-                // 动画结束后发送结束的信号
-                // animation end,send signal
-                Message msg = handler.obtainMessage(what, endIndex, 0);
-                handler.sendMessage(msg);
-
+                    handler.sendMessage(msg);
+                }
             }
+
+            // 动画结束后发送结束的信号
+            // animation end,send signal
+            Message msg = handler.obtainMessage(what, endIndex, 0);
+            handler.sendMessage(msg);
 
         });
 

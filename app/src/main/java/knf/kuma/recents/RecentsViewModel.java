@@ -1,11 +1,11 @@
 package knf.kuma.recents;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.RecentObject;
 import knf.kuma.retrofit.Repository;

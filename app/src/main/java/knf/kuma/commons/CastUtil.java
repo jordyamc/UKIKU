@@ -1,7 +1,6 @@
 package knf.kuma.commons;
 
 import android.app.Activity;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -13,6 +12,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.jetbrains.annotations.Contract;
 
+import androidx.lifecycle.MutableLiveData;
 import es.munix.multidisplaycast.CastControlsActivity;
 import es.munix.multidisplaycast.CastManager;
 import es.munix.multidisplaycast.interfaces.CastListener;

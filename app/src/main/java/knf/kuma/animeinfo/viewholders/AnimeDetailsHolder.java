@@ -1,15 +1,13 @@
 package knf.kuma.animeinfo.viewholders;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -18,6 +16,10 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 
 import java.util.List;
 
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
@@ -27,6 +29,7 @@ import knf.kuma.animeinfo.AnimeTagsAdapter;
 import knf.kuma.custom.ExpandableTV;
 import knf.kuma.pojos.AnimeObject;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
+import xdroid.toaster.Toaster;
 
 public class AnimeDetailsHolder {
     @BindViews({R.id.card_title, R.id.card_desc, R.id.card_details, R.id.card_genres, R.id.card_related})
@@ -63,14 +66,23 @@ public class AnimeDetailsHolder {
     public void populate(final Fragment fragment, final AnimeObject object) {
         new Handler(Looper.getMainLooper()).post(() -> {
             title.setText(object.name);
+            cardViews.get(0).setOnLongClickListener(view -> {
+                try {
+                    ClipboardManager clipboard = (ClipboardManager) fragment.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("Anime title", object.name);
+                    clipboard.setPrimaryClip(clip);
+                    Toaster.toast("Título copiado");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toaster.toast("Error al copiar título");
+                }
+                return true;
+            });
             showCard(cardViews.get(0));
             if (object.description != null && !object.description.trim().equals("")) {
-                desc.setIndicator(expand_icon);
-                desc.setText(object.description.trim());
+                desc.setTextAndIndicator(object.description.trim(), expand_icon);
                 desc.setAnimationDuration(300);
-                desc.setExpandInterpolator(new LinearInterpolator());
-                desc.setCollapseInterpolator(new LinearInterpolator());
-                View.OnClickListener onClickListener = view -> expand_icon.post(() -> {
+                View.OnClickListener onClickListener = view -> new Handler(Looper.getMainLooper()).post(() -> {
                     expand_icon.setImageResource(desc.isExpanded() ? R.drawable.action_expand : R.drawable.action_shrink);
                     desc.toggle();
                 });
@@ -95,17 +107,15 @@ public class AnimeDetailsHolder {
         });
     }
 
-    private void showCard(final View view) {
+    private void showCard(final CardView view) {
         RETARD += 125;
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             view.setVisibility(View.VISIBLE);
-            if (desc.getLayout() != null) {
-                if (desc.getLineCount() <= 4)
-                    expand_icon.setVisibility(View.GONE);
-            }
             Animation animation = AnimationUtils.makeInChildBottomAnimation(view.getContext());
             animation.setDuration(250);
             view.startAnimation(animation);
+            if (cardViews.indexOf(view) == 1)
+                desc.checkIndicator();
         }, RETARD);
     }
 

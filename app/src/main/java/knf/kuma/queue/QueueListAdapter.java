@@ -1,7 +1,5 @@
 package knf.kuma.queue;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +10,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
@@ -33,12 +33,7 @@ public class QueueListAdapter extends RecyclerView.Adapter<QueueListAdapter.List
         QueueObject object = list.get(position);
         holder.chapter.setText(object.chapter.number);
         holder.icon.setImageResource(object.isFile ? R.drawable.ic_chap_down : R.drawable.ic_web);
-        holder.action_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                remove(holder.getAdapterPosition());
-            }
-        });
+        holder.action_delete.setOnClickListener(v -> remove(holder.getAdapterPosition()));
     }
 
     @Override
@@ -59,9 +54,11 @@ public class QueueListAdapter extends RecyclerView.Adapter<QueueListAdapter.List
     }
 
     public void remove(int position) {
-        CacheDB.INSTANCE.queueDAO().remove(list.get(position));
-        list.remove(position);
-        notifyItemRemoved(position);
+        if (position != -1) {
+            CacheDB.INSTANCE.queueDAO().remove(list.get(position));
+            list.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
     class ListItemHolder extends RecyclerView.ViewHolder {

@@ -6,12 +6,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.media.AudioAttributes;
 import android.os.Build;
-import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.evernote.android.job.JobManager;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import es.munix.multidisplaycast.CastManager;
 import io.branch.referral.Branch;
 import io.fabric.sdk.android.Fabric;
@@ -50,10 +50,10 @@ public class App extends Application {
                 }
             }
         });*/
-        PrefsUtil.init(this);
+        PrefsUtil.INSTANCE.init(this);
         Fabric.with(this, new Crashlytics(), new Answers());
         Branch.getAutoInstance(this);
-        AppCompatDelegate.setDefaultNightMode(Integer.parseInt(PrefsUtil.getThemeOption()));
+        AppCompatDelegate.setDefaultNightMode(Integer.parseInt(PrefsUtil.INSTANCE.getThemeOption()));
         CastManager.register(this);
         Network.init(this);
         CacheDB.init(this);

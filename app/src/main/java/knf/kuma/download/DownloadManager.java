@@ -12,9 +12,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.Pair;
 
@@ -32,6 +29,9 @@ import com.tonyodev.fetch2okhttp.OkHttpDownloader;
 import java.io.File;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import knf.kuma.R;
 import knf.kuma.commons.FileUtil;
 import knf.kuma.database.CacheDB;
@@ -221,7 +221,7 @@ public class DownloadManager extends Service {
             File file = FileAccessHelper.INSTANCE.getFileCreate(downloadObject.file);
             Request request = new Request(downloadObject.link, file.getAbsolutePath());
             if (downloadObject.headers != null)
-                for (Pair<String, String> header: downloadObject.headers.getHeaders())
+                for (Pair<String, String> header : downloadObject.headers.getHeaders())
                     request.addHeader(header.first, header.second);
             downloadObject.setDid(request.getId());
             downloadObject.canResume = true;
@@ -318,7 +318,7 @@ public class DownloadManager extends Service {
     private static Notification foregroundNotification() {
         return new NotificationCompat.Builder(context, CHANNEL_FOREGROUND)
                 .setSmallIcon(R.drawable.ic_service)
-                .setSubText("Descargas en proceso")
+                .setSubText("Descargas en progreso")
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .build();
@@ -355,7 +355,7 @@ public class DownloadManager extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getAction() != null && intent.getAction().equals("stop.foregrouns")) {
+        if (intent != null && intent.getAction() != null && intent.getAction().equals("stop.foregrouns")) {
             stopForeground(true);
             stopSelf();
         }

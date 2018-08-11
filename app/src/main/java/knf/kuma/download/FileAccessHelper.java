@@ -9,11 +9,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
-import android.support.v4.provider.DocumentFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +16,11 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.fragment.app.Fragment;
 import knf.kuma.commons.FileUtil;
 import knf.kuma.commons.PatternUtil;
 import xdroid.toaster.Toaster;
@@ -206,36 +206,31 @@ public class FileAccessHelper {
     }
 
     public void delete(final String file_name, DeleteListener listener) {
-        try {
-            AsyncTask.execute(() -> {
+        AsyncTask.execute(() -> {
+            try {
                 if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0").equals("0")) {
                     File file = new File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
                     file.delete();
                     File dir = file.getParentFile();
                     if (dir.listFiles() == null || dir.listFiles().length == 0)
                         dir.delete();
-                    if (listener != null)
-                        listener.onDelete();
                 } else {
-                    try {
-                        DocumentFile documentFile = DocumentFile.fromTreeUri(context, getTreeUri());
-                        if (documentFile != null && documentFile.exists()) {
-                            DocumentFile file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
-                            file.delete();
-                            DocumentFile dir = file.getParentFile();
-                            if (dir != null && dir.listFiles().length == 0)
-                                dir.delete();
-                        }
-                        if (listener != null)
-                            listener.onDelete();
-                    } catch (Exception e) {
-                        //e.printStackTrace();
+                    DocumentFile documentFile = DocumentFile.fromTreeUri(context, getTreeUri());
+                    if (documentFile != null && documentFile.exists()) {
+                        DocumentFile file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name);
+                        file.delete();
+                        DocumentFile dir = file.getParentFile();
+                        if (dir != null && dir.listFiles().length == 0)
+                            dir.delete();
                     }
                 }
-            });
-        } catch (Exception e) {
-            //e.printStackTrace();
-        }
+                if (listener != null)
+                    listener.onDelete();
+            } catch (Exception e) {
+                if (listener != null)
+                    listener.onDelete();
+            }
+        });
     }
 
     public OutputStream getOutputStream(String file_name) {

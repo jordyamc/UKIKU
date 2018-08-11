@@ -133,6 +133,11 @@
             android:icon="@drawable/ic_sectioned_favs"
             android:key="fav_sections"
             android:title="Favoritos por categoria"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_number"
+            android:key="show_fav_count"
+            android:title="Indicador de favoritos"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Personalización">

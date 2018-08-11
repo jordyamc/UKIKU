@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="55" version="1.8">
+        <change type="fix">Errores generales</change>
+        <change type="new">Indicadores numericos en algunas partes de la app</change>
+        <change type="change">Migración a librerias androidx</change>
+    </release>
     <release code="54" version="1.7.5">
         <change type="fix">Errores generales</change>
         <change type="change">Cambiar administrador de descargas</change>

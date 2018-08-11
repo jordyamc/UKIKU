@@ -4,18 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import org.jsoup.HttpStatusException;
@@ -26,9 +21,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import knf.kuma.R;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.commons.SSLSkipper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
@@ -45,8 +46,8 @@ public class DirectoryService extends IntentService {
     public static int NOT_CODE = 5598;
     public static String CHANNEL = "directory_update";
     private static boolean RUNNING = false;
-    private long CURRENT_TIME = System.currentTimeMillis();
     private static MutableLiveData<Integer> liveStatus = new MutableLiveData<>();
+    private long CURRENT_TIME = System.currentTimeMillis();
     private NotificationManager manager;
     private int count = 0;
     private int page = 0;
@@ -82,6 +83,8 @@ public class DirectoryService extends IntentService {
         }
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         AnimeDAO animeDAO = CacheDB.INSTANCE.animeDAO();
+        if (!PrefsUtil.INSTANCE.isDirectoryFinished())
+            count = animeDAO.getCount();
         SSLSkipper.skip();
         Jspoon jspoon = Jspoon.create();
         setStatus(STATE_PARTIAL);
@@ -98,7 +101,7 @@ public class DirectoryService extends IntentService {
         int partialCount = 0;
         if (strings.size() == 0)
             Log.e("Directory Getter", "No pending pages");
-        for (final String s: new LinkedHashSet<>(strings)) {
+        for (final String s : new LinkedHashSet<>(strings)) {
             partialCount++;
             if (!Network.isConnected()) {
                 Log.e("Directory Getter", "Processed " + partialCount + " pages before disconnection");
@@ -198,8 +201,7 @@ public class DirectoryService extends IntentService {
     private void updateNotification() {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL)
                 .setOngoing(true)
-                .setContentTitle("Creando directorio")
-                .setContentText("Agregados: " + count)
+                .setSubText("Agregados: " + count)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_directory_not)
                 .setColor(Color.parseColor("#e53935"))
@@ -212,10 +214,10 @@ public class DirectoryService extends IntentService {
     private Notification getStartNotification() {
         return new NotificationCompat.Builder(this, "directory_update")
                 .setOngoing(true)
-                .setContentTitle("Verificando directorio")
+                .setSubText("Verificando directorio")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_directory_not)
-                .setSound(null, AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setSound(null, AudioManager.STREAM_NOTIFICATION)
                 .setColor(Color.parseColor("#e53935"))
                 .setWhen(CURRENT_TIME)
                 .build();

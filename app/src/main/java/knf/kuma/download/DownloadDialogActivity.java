@@ -2,8 +2,6 @@ package knf.kuma.download;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -14,6 +12,8 @@ import org.jsoup.nodes.Document;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.pojos.AnimeObject;

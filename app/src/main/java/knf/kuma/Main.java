@@ -5,23 +5,15 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,9 +25,20 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
 import org.cryse.widget.persistentsearch.PersistentSearchView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.munix.multidisplaycast.CastManager;
@@ -50,6 +53,7 @@ import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.EAMActivity;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.commons.PrefsUtil;
+import knf.kuma.database.CacheDB;
 import knf.kuma.directory.DirectoryFragment;
 import knf.kuma.directory.DirectoryService;
 import knf.kuma.emision.EmisionActivity;
@@ -70,6 +74,8 @@ import knf.kuma.search.SearchFragment;
 import knf.kuma.seeing.SeeingActivity;
 import knf.kuma.updater.UpdateActivity;
 import knf.kuma.updater.Updatechecker;
+import q.rorbin.badgeview.Badge;
+import q.rorbin.badgeview.QBadgeView;
 import xdroid.toaster.Toaster;
 
 import static knf.kuma.commons.BypassUtil.clearCookies;
@@ -97,15 +103,16 @@ public class Main extends AppCompatActivity
     BottomNavigationView bottomNavigationView;
     @BindView(R.id.webview)
     WebView webView;
-
     BottomFragment selectedFragment;
     BottomFragment tmpfragment;
-
     ImageButton map;
     ImageButton migrate;
     ImageButton info;
     ImageButton login;
-
+    TextView badge_emission;
+    TextView badge_seeing;
+    TextView badge_queue;
+    private Badge badgeView;
     private boolean readyToFinish = false;
 
     @Override
@@ -133,9 +140,9 @@ public class Main extends AppCompatActivity
         if (savedInstanceState == null) {
             checkServices();
             startChange();
-        } else {
+        } else
             returnSelectFragment();
-        }
+        subscribeBadges();
     }
 
     private void checkServices() {
@@ -155,6 +162,9 @@ public class Main extends AppCompatActivity
         login = navigationView.getHeaderView(0).findViewById(R.id.action_login);
         migrate = navigationView.getHeaderView(0).findViewById(R.id.action_migrate);
         map = navigationView.getHeaderView(0).findViewById(R.id.action_map);
+        badge_emission = (TextView) navigationView.getMenu().findItem(R.id.drawer_emision).getActionView();
+        badge_seeing = (TextView) navigationView.getMenu().findItem(R.id.drawer_seeing).getActionView();
+        badge_queue = (TextView) navigationView.getMenu().findItem(R.id.drawer_queue).getActionView();
         navigationView.getHeaderView(0).findViewById(R.id.img).setBackgroundResource(EAHelper.getThemeImg(this));
         info.setOnClickListener(v -> AppInfo.open(Main.this));
         login.setOnClickListener(v -> BackUpActivity.start(Main.this));
@@ -173,6 +183,61 @@ public class Main extends AppCompatActivity
             case DRIVE:
                 backupLocation.setText("Google Drive");
                 break;
+        }
+    }
+
+    private void subscribeBadges() {
+        BottomNavigationMenuView bottomNavigationMenuView =
+                (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
+        try {
+            View v = bottomNavigationMenuView.getChildAt(1);
+            if (badgeView == null) {
+                badgeView = new QBadgeView(this)
+                        .bindTarget(v)
+                        .setExactMode(true)
+                        .setShowShadow(false)
+                        .setGravityOffset(5, 5, true)
+                        .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight(this)));
+                CacheDB.INSTANCE.favsDAO().getCountLive().observe(this, integer -> {
+                    if (badgeView != null)
+                        if (PrefsUtil.INSTANCE.getShowFavIndicator())
+                            badgeView.setBadgeNumber(integer);
+                        else
+                            badgeView.hide(false);
+                });
+                PrefsUtil.INSTANCE.getLiveShowFavIndicator().observe(this, aBoolean -> {
+                    if (badgeView != null) {
+                        if (aBoolean)
+                            badgeView.setBadgeNumber(CacheDB.INSTANCE.favsDAO().getCount());
+                        else
+                            badgeView.hide(false);
+                    }
+                });
+            }
+            badge_emission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)));
+            badge_emission.setTypeface(null, Typeface.BOLD);
+            badge_emission.setGravity(Gravity.CENTER_VERTICAL);
+            badge_seeing.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)));
+            badge_seeing.setTypeface(null, Typeface.BOLD);
+            badge_seeing.setGravity(Gravity.CENTER_VERTICAL);
+            badge_queue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)));
+            badge_queue.setTypeface(null, Typeface.BOLD);
+            badge_queue.setGravity(Gravity.CENTER_VERTICAL);
+            PrefsUtil.INSTANCE.getLiveEmissionBlackList().observe(this, strings ->
+                    CacheDB.INSTANCE.animeDAO().getInEmission(strings).observe(this, integer -> {
+                        badge_emission.setText(String.valueOf(integer));
+                        badge_emission.setVisibility(integer == 0 ? View.GONE : View.VISIBLE);
+                    }));
+            CacheDB.INSTANCE.seeingDAO().getCountLive().observe(this, integer -> {
+                badge_seeing.setText(String.valueOf(integer));
+                badge_seeing.setVisibility(integer == 0 ? View.GONE : View.VISIBLE);
+            });
+            CacheDB.INSTANCE.queueDAO().getCountLive().observe(this, integer -> {
+                badge_queue.setText(String.valueOf(integer));
+                badge_queue.setVisibility(integer == 0 ? View.GONE : View.VISIBLE);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -267,7 +332,7 @@ public class Main extends AppCompatActivity
             getMenuInflater().inflate(R.menu.main, menu);
         } else if (selectedFragment instanceof FavoriteFragment) {
             getMenuInflater().inflate(R.menu.fav_menu, menu);
-            switch (PrefsUtil.getFavsOrder()) {
+            switch (PrefsUtil.INSTANCE.getFavsOrder()) {
                 case 0:
                     menu.findItem(R.id.by_name).setChecked(true);
                     break;
@@ -275,11 +340,11 @@ public class Main extends AppCompatActivity
                     menu.findItem(R.id.by_id).setChecked(true);
                     break;
             }
-            if (!PrefsUtil.showFavSections())
+            if (!PrefsUtil.INSTANCE.showFavSections())
                 menu.findItem(R.id.action_new_category).setVisible(false);
         } else if (selectedFragment instanceof DirectoryFragment) {
             getMenuInflater().inflate(R.menu.dir_menu, menu);
-            switch (PrefsUtil.getDirOrder()) {
+            switch (PrefsUtil.INSTANCE.getDirOrder()) {
                 case 0:
                     menu.findItem(R.id.by_name_dir).setChecked(true);
                     break;
@@ -308,19 +373,19 @@ public class Main extends AppCompatActivity
                     ((FavoriteFragment) selectedFragment).showNewCategoryDialog(null);
                 break;
             case R.id.by_name:
-                PrefsUtil.setFavsOrder(0);
+                PrefsUtil.INSTANCE.setFavsOrder(0);
                 changeOrder();
                 break;
             case R.id.by_name_dir:
-                PrefsUtil.setDirOrder(0);
+                PrefsUtil.INSTANCE.setDirOrder(0);
                 changeOrder();
                 break;
             case R.id.by_votes:
-                PrefsUtil.setDirOrder(1);
+                PrefsUtil.INSTANCE.setDirOrder(1);
                 changeOrder();
                 break;
             case R.id.by_id:
-                PrefsUtil.setFavsOrder(1);
+                PrefsUtil.INSTANCE.setFavsOrder(1);
                 changeOrder();
                 break;
         }
@@ -444,6 +509,13 @@ public class Main extends AppCompatActivity
                 break;
             case 3:
                 bottomNavigationView.setSelectedItemId(R.id.action_bottom_settings);
+                break;
+            case 4:
+                selectedFragment = RecentFragment.get();
+                searchView.openSearch();
+                tmpfragment = selectedFragment;
+                setFragment(SearchFragment.get(getIntent().getStringExtra("search_query")));
+                searchView.setSearchString(getIntent().getStringExtra("search_query"), false);
                 break;
         }
     }

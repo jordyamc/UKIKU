@@ -1,7 +1,7 @@
 package knf.kuma.tv.details;
 
-import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.RowPresenter;
+import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.RowPresenter;
 
 public class ChaptersListPresenter extends ListRowPresenter {
 

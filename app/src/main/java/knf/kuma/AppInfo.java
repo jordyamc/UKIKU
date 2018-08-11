@@ -3,8 +3,6 @@ package knf.kuma;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder;
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity;
@@ -12,6 +10,8 @@ import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import knf.kuma.changelog.ChangelogActivity;
 import knf.kuma.commons.EAHelper;
 import xdroid.toaster.Toaster;

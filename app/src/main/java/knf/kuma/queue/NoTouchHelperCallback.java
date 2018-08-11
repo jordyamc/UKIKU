@@ -1,7 +1,7 @@
 package knf.kuma.queue;
 
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class NoTouchHelperCallback extends ItemTouchHelper.Callback {
 

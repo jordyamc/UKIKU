@@ -1,9 +1,10 @@
 package knf.kuma.tv.details;
 
-import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.Presenter;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.leanback.widget.FullWidthDetailsOverviewRowPresenter;
+import androidx.leanback.widget.Presenter;
 
 public class CustomFullWidthDetailsOverviewRowPresenter extends FullWidthDetailsOverviewRowPresenter {
 
@@ -20,11 +21,11 @@ public class CustomFullWidthDetailsOverviewRowPresenter extends FullWidthDetails
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
 
         lp.setMarginStart(v.getResources().getDimensionPixelSize(
-                android.support.v17.leanback.R.dimen.lb_details_v2_logo_margin_start));
-        lp.topMargin = v.getResources().getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_details_v2_blank_height) - lp.height / 2;
+                androidx.leanback.R.dimen.lb_details_v2_logo_margin_start));
+        lp.topMargin = v.getResources().getDimensionPixelSize(androidx.leanback.R.dimen.lb_details_v2_blank_height) - lp.height / 2;
 
-        float offset = v.getResources().getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_details_v2_actions_height) + v
-                .getResources().getDimensionPixelSize(android.support.v17.leanback.R.dimen.lb_details_v2_description_margin_top) + (lp.height / 2);
+        float offset = v.getResources().getDimensionPixelSize(androidx.leanback.R.dimen.lb_details_v2_actions_height) + v
+                .getResources().getDimensionPixelSize(androidx.leanback.R.dimen.lb_details_v2_description_margin_top) + (lp.height / 2);
 
         switch (viewHolder.getState()) {
             case STATE_FULL:

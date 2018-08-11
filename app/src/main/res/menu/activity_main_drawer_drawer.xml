@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:tools="http://schemas.android.com/tools"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
       tools:showIn="navigation_view">
     <item
         android:id="@+id/drawer_explorer"
@@ -9,15 +10,18 @@
     <item
         android:id="@+id/drawer_emision"
         android:icon="@drawable/ic_emision"
-        android:title="Emisión"/>
+        android:title="Emisión"
+        app:actionViewClass="android.widget.TextView"/>
     <item
         android:id="@+id/drawer_seeing"
         android:icon="@drawable/ic_seeing_drawer"
-        android:title="Siguiendo"/>
+        android:title="Siguiendo"
+        app:actionViewClass="android.widget.TextView"/>
     <item
         android:id="@+id/drawer_queue"
         android:icon="@drawable/ic_clock"
-        android:title="Pendientes"/>
+        android:title="Pendientes"
+        app:actionViewClass="android.widget.TextView"/>
     <item
         android:id="@+id/drawer_suggestions"
         android:icon="@drawable/ic_suggestions"

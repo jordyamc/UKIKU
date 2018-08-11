@@ -1,12 +1,8 @@
 package knf.kuma.emision;
 
-import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +16,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
@@ -66,18 +65,15 @@ public class EmisionFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (getContext() != null)
-            CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, new Observer<List<AnimeObject>>() {
-                @Override
-                public void onChanged(@Nullable List<AnimeObject> animeObjects) {
-                    progressBar.setVisibility(View.GONE);
-                    if (isFirst && animeObjects != null && animeObjects.size() != 0) {
-                        isFirst = false;
-                        adapter.update(animeObjects);
-                        recyclerView.scheduleLayoutAnimation();
-                        checkStates(animeObjects);
-                    }
-                    error.setVisibility((animeObjects == null || animeObjects.size() == 0) ? View.VISIBLE : View.GONE);
+            CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, animeObjects -> {
+                progressBar.setVisibility(View.GONE);
+                if (isFirst && animeObjects != null && animeObjects.size() != 0) {
+                    isFirst = false;
+                    adapter.update(animeObjects);
+                    recyclerView.scheduleLayoutAnimation();
+                    checkStates(animeObjects);
                 }
+                error.setVisibility((animeObjects == null || animeObjects.size() == 0) ? View.VISIBLE : View.GONE);
             });
     }
 
@@ -103,18 +99,15 @@ public class EmisionFragment extends Fragment {
         });
     }
 
-    public void reloadList() {
+    void reloadList() {
         if (getContext() != null)
-            CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, new Observer<List<AnimeObject>>() {
-                @Override
-                public void onChanged(@Nullable List<AnimeObject> animeObjects) {
-                    error.setVisibility(View.GONE);
-                    if (animeObjects != null && animeObjects.size() != 0)
-                        adapter.update(animeObjects);
-                    else adapter.update(new ArrayList<AnimeObject>());
-                    if (animeObjects == null || animeObjects.size() == 0)
-                        error.setVisibility(View.VISIBLE);
-                }
+            CacheDB.INSTANCE.animeDAO().getByDay(getArguments().getInt("day", 1), getBlacklist()).observe(this, animeObjects -> {
+                error.setVisibility(View.GONE);
+                if (animeObjects != null && animeObjects.size() != 0)
+                    adapter.update(animeObjects);
+                else adapter.update(new ArrayList<>());
+                if (animeObjects == null || animeObjects.size() == 0)
+                    error.setVisibility(View.VISIBLE);
             });
     }
 
@@ -122,6 +115,6 @@ public class EmisionFragment extends Fragment {
         if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("show_hidden", false))
             return new LinkedHashSet<>();
         else
-            return PreferenceManager.getDefaultSharedPreferences(getContext()).getStringSet("emision_blacklist", new LinkedHashSet<String>());
+            return PreferenceManager.getDefaultSharedPreferences(getContext()).getStringSet("emision_blacklist", new LinkedHashSet<>());
     }
 }

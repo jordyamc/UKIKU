@@ -36,6 +36,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter android:label="@string/app_name">
@@ -53,11 +54,11 @@
                     android:pathPrefix="/get.php"
                     android:scheme="http"/>
             </intent-filter>
-
             <intent-filter>
                 <data
                     android:host="open"
                     android:scheme="ukiku"/>
+
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -75,6 +76,7 @@
             android:theme="@style/AppTheme.TV.Browser">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -162,9 +164,10 @@
         </receiver>
         <receiver android:name=".download.DownloadReceiver"/>
         <receiver android:name=".recents.RecentsNotReceiver"/>
+        <receiver android:name=".slices.AnimeLoad"/>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="knf.kuma.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -176,7 +179,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
@@ -219,6 +221,22 @@
                     android:scheme="http"/>
             </intent-filter>
         </activity>
+
+        <provider
+            android:name=".slices.AnimeSlice"
+            android:authorities="knf.kuma.slices"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.app.slice.category.SLICE"/>
+
+                <data
+                    android:host="knf"
+                    android:pathPrefix="/"
+                    android:scheme="http"/>
+            </intent-filter>
+        </provider>
     </application>
 
 </manifest>

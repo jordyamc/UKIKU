@@ -1,11 +1,11 @@
 package knf.kuma.videoservers;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import androidx.annotation.Nullable;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.PatternUtil;
 

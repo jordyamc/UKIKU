@@ -2,11 +2,6 @@ package knf.kuma.tv.exoplayer;
 
 import android.content.Context;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v17.leanback.R;
-import android.support.v17.leanback.media.PlaybackGlueHost;
-import android.support.v17.leanback.media.PlayerAdapter;
-import android.support.v17.leanback.media.SurfaceHolderGlueHost;
 import android.util.Pair;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -21,6 +16,12 @@ import com.google.android.exoplayer2.Player.DiscontinuityReason;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.util.ErrorMessageProvider;
+
+import androidx.annotation.Nullable;
+import androidx.leanback.R;
+import androidx.leanback.media.PlaybackGlueHost;
+import androidx.leanback.media.PlayerAdapter;
+import androidx.leanback.media.SurfaceHolderGlueHost;
 
 /**
  * Leanback {@code PlayerAdapter} implementation for {@link SimpleExoPlayer}.

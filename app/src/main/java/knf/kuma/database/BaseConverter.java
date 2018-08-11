@@ -1,11 +1,11 @@
 package knf.kuma.database;
 
-import android.arch.persistence.room.TypeConverter;
 import android.net.Uri;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import androidx.room.TypeConverter;
 import knf.kuma.videoservers.Headers;
 
 public class BaseConverter {

@@ -1,9 +1,9 @@
 package knf.kuma.tv.exoplayer;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
+import androidx.annotation.Nullable;
 import knf.kuma.tv.TVBaseActivity;
 
 public class TVPlayer extends TVBaseActivity {

@@ -1,9 +1,9 @@
 package knf.kuma.animeinfo;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.retrofit.Repository;

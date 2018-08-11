@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/cardview_background"
+    android:elevation="16dp"
+    android:orientation="vertical"
+    android:theme="@style/AppTheme">
+
+    <TextView
+        android:id="@+id/tv_bottom_sheet_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:text="Marcar episodios"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/action_seen"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_option_seen"
+        android:drawablePadding="32dp"
+        android:drawableTint="?colorControlNormal"
+        android:focusable="true"
+        android:gravity="start|center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Marcar como vistos"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/action_unseen"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_option_not_seen"
+        android:drawablePadding="32dp"
+        android:drawableTint="?colorControlNormal"
+        android:focusable="true"
+        android:gravity="start|center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Marcar como no vistos"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="16sp"/>
+
+</LinearLayout>

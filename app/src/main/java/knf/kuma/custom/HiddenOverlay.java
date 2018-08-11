@@ -1,13 +1,13 @@
 package knf.kuma.custom;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
 import butterknife.ButterKnife;
 import knf.kuma.R;
 

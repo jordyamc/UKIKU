@@ -10,16 +10,16 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import knf.kuma.BuildConfig;
 import knf.kuma.Main;
 import knf.kuma.R;
@@ -62,7 +62,7 @@ public class ConfigurationFragment extends PreferenceFragment {
                 Toaster.toast("Por favor selecciona la raiz de tu SD");
             return true;
         });
-        if (PrefsUtil.getDownloaderType() == 0) {
+        if (PrefsUtil.INSTANCE.getDownloaderType() == 0) {
             getPreferenceScreen().findPreference("max_parallel_downloads").setEnabled(false);
             getPreferenceScreen().findPreference("buffer_size").setEnabled(true);
         } else {

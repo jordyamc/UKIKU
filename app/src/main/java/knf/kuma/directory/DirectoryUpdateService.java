@@ -5,8 +5,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.jsoup.Jsoup;
@@ -14,6 +12,8 @@ import org.jsoup.nodes.Document;
 
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import knf.kuma.R;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
@@ -101,8 +101,7 @@ public class DirectoryUpdateService extends IntentService {
     private void updateNotification() {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL)
                 .setOngoing(true)
-                .setContentTitle("Actualizando directorio")
-                .setContentText("Recreados: " + count)
+                .setSubText("Recreados: " + count)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_dir_update)
                 .setColor(Color.parseColor("#e53935"))
@@ -112,9 +111,9 @@ public class DirectoryUpdateService extends IntentService {
     }
 
     private Notification getStartNotification() {
-        return new NotificationCompat.Builder(this, "directory_update")
+        return new NotificationCompat.Builder(this, CHANNEL)
                 .setOngoing(true)
-                .setContentTitle("Actualizando directorio")
+                .setSubText("Actualizando directorio")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_dir_update)
                 .setColor(Color.parseColor("#e53935"))

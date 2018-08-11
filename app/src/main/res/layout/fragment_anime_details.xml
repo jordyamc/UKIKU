@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -16,7 +16,7 @@
         android:paddingTop="25dp"
         android:paddingBottom="10dp">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,6 +27,9 @@
             android:visibility="gone"
             app:cardCornerRadius="2dp"
             app:cardElevation="2dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             app:contentPadding="8dp">
 
             <LinearLayout
@@ -50,9 +53,9 @@
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textSize="16sp"/>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/card_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,6 +92,7 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_gravity="center_vertical"
+                        android:background="@drawable/background_ripple"
                         android:tint="?colorControlNormal"
                         app:srcCompat="@drawable/action_expand"/>
                 </LinearLayout>
@@ -99,7 +103,6 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:ellipsize="end"
-                    android:maxLines="4"
                     android:text="TEST"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textSize="16sp"/>
@@ -113,9 +116,9 @@
                     app:tvea_expandLines="4"
                     app:tvea_shrinkBitmap="@drawable/action_shrink"/>-->
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/card_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -245,9 +248,9 @@
                     android:numStars="5"
                     android:padding="8dp"/>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/card_genres"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -272,7 +275,7 @@
                     android:textAppearance="@android:style/TextAppearance.Material.Title"
                     android:textColor="?colorAccent"/>
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_genres"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -280,9 +283,9 @@
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/item_chip"/>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/card_related"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -307,7 +310,7 @@
                     android:textAppearance="@android:style/TextAppearance.Material.Title"
                     android:textColor="?colorAccent"/>
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_related"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -315,6 +318,6 @@
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/item_related"/>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+</androidx.core.widget.NestedScrollView>

@@ -9,7 +9,7 @@ public class FavSorter implements Comparator<FavoriteObject> {
 
     @Override
     public int compare(FavoriteObject o1, FavoriteObject o2) {
-        switch (PrefsUtil.getFavsOrder()) {
+        switch (PrefsUtil.INSTANCE.getFavsOrder()) {
             default:
             case 0:
                 return o1.name.compareTo(o2.name);

@@ -1,7 +1,5 @@
 package knf.kuma.favorite;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import knf.kuma.database.CacheDB;
 import knf.kuma.favorite.objects.FavSorter;
 import knf.kuma.favorite.objects.InfoContainer;

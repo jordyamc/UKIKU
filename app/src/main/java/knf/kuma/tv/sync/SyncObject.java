@@ -1,7 +1,6 @@
 package knf.kuma.tv.sync;
 
-import android.support.annotation.DrawableRes;
-
+import androidx.annotation.DrawableRes;
 import knf.kuma.R;
 
 public class SyncObject {

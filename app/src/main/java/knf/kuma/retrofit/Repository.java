@@ -1,13 +1,7 @@
 package knf.kuma.retrofit;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.LivePagedListBuilder;
-import android.arch.paging.PagedList;
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -16,6 +10,12 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.NoSSLOkHttpClient;

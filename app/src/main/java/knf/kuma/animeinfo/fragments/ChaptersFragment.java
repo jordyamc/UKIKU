@@ -1,11 +1,8 @@
 package knf.kuma.animeinfo.fragments;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +12,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 import knf.kuma.BottomFragment;
 import knf.kuma.R;
 import knf.kuma.animeinfo.AnimeViewModel;
@@ -42,7 +42,7 @@ public class ChaptersFragment extends BottomFragment {
         ViewModelProviders.of(getActivity()).get(AnimeViewModel.class).getLiveData().observe(this, object -> {
             if (object != null) {
                 List<AnimeObject.WebInfo.AnimeChapter> chapters = object.chapters;
-                if (PrefsUtil.isChapsAsc())
+                if (PrefsUtil.INSTANCE.isChapsAsc())
                     Collections.reverse(chapters);
                 holder.setAdapter(ChaptersFragment.this, chapters);
                 holder.goToChapter();
@@ -55,7 +55,7 @@ public class ChaptersFragment extends BottomFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.recycler_chapters, container, false);
-        holder = new AnimeChaptersHolder(getContext(), view);
+        holder = new AnimeChaptersHolder(getContext(), view, getChildFragmentManager());
         return view;
     }
 

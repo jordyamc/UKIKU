@@ -3,8 +3,8 @@ package knf.kuma.tv.search;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 
+import androidx.annotation.Nullable;
 import knf.kuma.tv.TVBaseActivity;
 
 public class TVSearch extends TVBaseActivity {

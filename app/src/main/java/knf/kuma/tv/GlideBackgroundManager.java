@@ -6,10 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v17.leanback.app.BackgroundManager;
-import android.support.v7.graphics.Palette;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -18,6 +14,11 @@ import com.bumptech.glide.request.transition.Transition;
 import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.leanback.app.BackgroundManager;
+import androidx.palette.graphics.Palette;
 
 public class GlideBackgroundManager {
 

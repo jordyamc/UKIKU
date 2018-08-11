@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v17.leanback.widget.Presenter;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.leanback.widget.Presenter;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.AnimeObject;

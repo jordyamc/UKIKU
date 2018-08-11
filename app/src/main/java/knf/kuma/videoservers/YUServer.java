@@ -1,11 +1,11 @@
 package knf.kuma.videoservers;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.jsoup.Jsoup;
 
+import androidx.annotation.Nullable;
 import knf.kuma.commons.PatternUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

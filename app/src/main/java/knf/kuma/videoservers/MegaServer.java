@@ -1,11 +1,12 @@
 package knf.kuma.videoservers;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 
 import java.net.URLDecoder;
+
+import androidx.annotation.Nullable;
 
 import static knf.kuma.videoservers.VideoServer.Names.MEGA;
 

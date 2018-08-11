@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
 
 import com.crashlytics.android.Crashlytics;
 import com.evernote.android.job.Job;
@@ -21,6 +19,8 @@ import org.jsoup.Jsoup;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import knf.kuma.BuildConfig;
 import knf.kuma.Main;
 import knf.kuma.R;

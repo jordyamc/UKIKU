@@ -1,8 +1,7 @@
 package knf.kuma.tv.details;
 
-import android.support.annotation.ColorInt;
-import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
-
+import androidx.annotation.ColorInt;
+import androidx.leanback.widget.AbstractDetailsDescriptionPresenter;
 import knf.kuma.pojos.AnimeObject;
 
 public class DetailsDescriptionPresenter

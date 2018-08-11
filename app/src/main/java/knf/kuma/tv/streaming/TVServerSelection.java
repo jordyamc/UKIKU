@@ -1,9 +1,10 @@
 package knf.kuma.tv.streaming;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v17.leanback.app.GuidedStepSupportFragment;
-import android.support.v4.app.FragmentActivity;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.leanback.app.GuidedStepSupportFragment;
 
 public class TVServerSelection extends FragmentActivity {
     @Override

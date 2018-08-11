@@ -1,17 +1,11 @@
 package knf.kuma.animeinfo;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,10 +15,16 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 import com.crashlytics.android.answers.ShareEvent;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import knf.kuma.R;
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder;
 import knf.kuma.commons.EAHelper;
@@ -238,7 +238,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
         final SeeingObject seeingObject = seeingDAO.getByAid(favoriteObject.aid);
         boolean isfav = dao.isFav(favoriteObject.key);
         boolean isSeeing = seeingObject != null;
-        if ((isfav && isSeeing) || isSeeing) {
+        if (isSeeing) {
             new MaterialDialog.Builder(this)
                     .content("¿Convertir en favorito?")
                     .positiveText("si")

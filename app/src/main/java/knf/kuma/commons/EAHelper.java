@@ -2,9 +2,6 @@ package knf.kuma.commons;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StyleRes;
 import android.util.Log;
 
 import com.crashlytics.android.answers.Answers;
@@ -13,6 +10,9 @@ import com.crashlytics.android.answers.LevelStartEvent;
 
 import org.jetbrains.annotations.Nullable;
 
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StyleRes;
 import knf.kuma.R;
 import xdroid.toaster.Toaster;
 

@@ -1,15 +1,5 @@
 package knf.kuma.pojos;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverter;
-import android.arch.persistence.room.TypeConverters;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -29,6 +19,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.IconCompat;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
 import knf.kuma.animeinfo.AnimeInfo;
 import knf.kuma.commons.PatternUtil;
 import pl.droidsonroids.jspoon.ElementConverter;
@@ -64,6 +65,8 @@ public class AnimeObject implements Comparable<AnimeObject> {
     @Ignore
     public List<WebInfo.AnimeRelated> related;
     public List<WebInfo.AnimeChapter> chapters;
+    @Ignore
+    public IconCompat icon;
 
     public AnimeObject(int key, String link, String sid, String name, String fileName, WebInfo webInfo, String type, String state, Day day) {
         this.key = key;

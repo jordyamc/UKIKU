@@ -3,11 +3,11 @@ package knf.kuma.backup;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import knf.kuma.R;
 import knf.kuma.backup.screens.MigrateDirectoryFragment;
 import knf.kuma.backup.screens.MigrateSuccessFragment;
@@ -32,7 +32,7 @@ public class MigrationActivity extends AppCompatActivity implements DirectorySer
         super.onResume();
         if (MigrateVersionFragment.getInstalledCode(this) < 252)
             setFragment(new MigrateVersionFragment());
-        else if (!PrefsUtil.isDirectoryFinished()) {
+        else if (!PrefsUtil.INSTANCE.isDirectoryFinished()) {
             DirectoryService.run(this);
             setFragment(MigrateDirectoryFragment.get(this));
         } else

@@ -6,8 +6,6 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
 
@@ -15,6 +13,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
@@ -36,7 +36,7 @@ public class DownloadService extends IntentService {
     private DownloadObject current;
 
     private String file;
-    private int bufferSize = PrefsUtil.bufferSize();
+    private int bufferSize = PrefsUtil.INSTANCE.bufferSize();
 
     public DownloadService() {
         super("Download service");

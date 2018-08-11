@@ -1,13 +1,6 @@
 package knf.kuma.search;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +9,18 @@ import android.widget.ProgressBar;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.SearchEvent;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.BottomFragment;
@@ -42,9 +42,9 @@ public class SearchFragment extends BottomFragment {
     private SearchAdapter adapter;
     private LinearLayoutManager manager;
 
-    private boolean isFirst=true;
+    private boolean isFirst = true;
 
-    private String query="";
+    private String query = "";
 
     private List<String> selected = new ArrayList<>();
 
@@ -52,14 +52,20 @@ public class SearchFragment extends BottomFragment {
     }
 
     public static SearchFragment get() {
-        return new SearchFragment();
+        return get("");
+    }
+
+    public static SearchFragment get(@Nullable String query) {
+        SearchFragment fragment = new SearchFragment();
+        fragment.query = query;
+        return fragment;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        model=ViewModelProviders.of(getActivity()).get(SearchViewModel.class);
-        model.setSearch("", "", this, animeObjects -> {
+        model = ViewModelProviders.of(getActivity()).get(SearchViewModel.class);
+        model.setSearch(query, "", this, animeObjects -> {
             adapter.submitList(animeObjects);
             errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
             if (isFirst) {
@@ -75,10 +81,10 @@ public class SearchFragment extends BottomFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         ButterKnife.bind(this, view);
-        manager=new LinearLayoutManager(getContext());
+        manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
         recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_fall_down));
-        adapter=new SearchAdapter(this);
+        adapter = new SearchAdapter(this);
         recyclerView.setAdapter(adapter);
         fab.setOnClickListener(view1 -> {
             GenresDialog dialog = new GenresDialog();
@@ -94,22 +100,23 @@ public class SearchFragment extends BottomFragment {
 
     public void setSearch(String q) {
         this.query = q.trim();
-        model.setSearch(q.trim(), getGenresString(), this, animeObjects -> {
-            if (animeObjects != null) {
-                adapter.submitList(animeObjects);
-                errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
-                Answers.getInstance().logSearch(new SearchEvent().putQuery(query));
-                if (!getGenresString().equals(""))
-                    Answers.getInstance().logSearch(new SearchEvent().putQuery(getGenresString()));
-            }
-            if (isFirst) {
-                progressBar.setVisibility(View.GONE);
-                isFirst = false;
-                recyclerView.scheduleLayoutAnimation();
-            } else {
-                manager.smoothScrollToPosition(recyclerView, null, 0);
-            }
-        });
+        if (model != null)
+            model.setSearch(q.trim(), getGenresString(), this, animeObjects -> {
+                if (animeObjects != null) {
+                    adapter.submitList(animeObjects);
+                    errorView.setVisibility(animeObjects.size() == 0 ? View.VISIBLE : View.GONE);
+                    Answers.getInstance().logSearch(new SearchEvent().putQuery(query));
+                    if (!getGenresString().equals(""))
+                        Answers.getInstance().logSearch(new SearchEvent().putQuery(getGenresString()));
+                }
+                if (isFirst) {
+                    progressBar.setVisibility(View.GONE);
+                    isFirst = false;
+                    recyclerView.scheduleLayoutAnimation();
+                } else {
+                    manager.smoothScrollToPosition(recyclerView, null, 0);
+                }
+            });
     }
 
     private void setFabIcon() {
@@ -117,13 +124,13 @@ public class SearchFragment extends BottomFragment {
     }
 
     @NonNull
-    private String getGenresString(){
-        if (selected.size()==0){
+    private String getGenresString() {
+        if (selected.size() == 0) {
             return "";
-        }else {
+        } else {
             RecommendHelper.registerAll(selected, RankType.SEARCH);
-            StringBuilder builder=new StringBuilder("%");
-            for (String genre:selected){
+            StringBuilder builder = new StringBuilder("%");
+            for (String genre : selected) {
                 builder.append(genre)
                         .append("%");
             }

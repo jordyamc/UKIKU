@@ -1,20 +1,11 @@
 package knf.kuma.animeinfo;
 
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +22,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
@@ -148,7 +148,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                 menu.inflate(R.menu.chapter_menu_offline);
             if (QueueManager.isInQueue(chapter.eid) && menu.getMenu().findItem(R.id.queue) != null)
                 menu.getMenu().findItem(R.id.queue).setVisible(false);
-            if (!PrefsUtil.showImport())
+            if (!PrefsUtil.INSTANCE.showImport())
                 menu.getMenu().findItem(R.id.import_file).setVisible(false);
             menu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
@@ -419,7 +419,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
 
         void setDownloadState(DownloadObject object) {
             progressBar.post(() -> {
-                if (object != null && PrefsUtil.showProgress())
+                if (object != null && PrefsUtil.INSTANCE.showProgress())
                     switch (object.state) {
                         case DownloadObject.PENDING:
                             progressBar.setVisibility(View.VISIBLE);

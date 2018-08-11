@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
@@ -13,6 +11,8 @@ import com.evernote.android.job.JobRequest;
 
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import knf.kuma.commons.Network;
 import knf.kuma.directory.DirectoryUpdateService;
 import xdroid.toaster.Toaster;

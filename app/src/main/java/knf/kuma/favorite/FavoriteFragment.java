@@ -1,12 +1,6 @@
 package knf.kuma.favorite;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +11,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.BottomFragment;
@@ -57,7 +57,7 @@ public class FavoriteFragment extends BottomFragment implements FavsSectionAdapt
             if (favoriteObjects == null || favoriteObjects.size() == 0) {
                 error_layout.setVisibility(View.VISIBLE);
                 adapter.updateList(new ArrayList<>());
-            } else if (PrefsUtil.showFavSections()) {
+            } else if (PrefsUtil.INSTANCE.showFavSections()) {
                 error_layout.setVisibility(View.GONE);
                 InfoContainer container = FavSectionHelper.getInfoContainer(edited);
                 if (container.needReload) {
@@ -87,7 +87,7 @@ public class FavoriteFragment extends BottomFragment implements FavsSectionAdapt
         ButterKnife.bind(this, view);
         manager = recyclerView.getLayoutManager();
         adapter = new FavsSectionAdapter(this, recyclerView);
-        if (PrefsUtil.getLayType().equals("1") && PrefsUtil.showFavSections()) {
+        if (PrefsUtil.INSTANCE.getLayType().equals("1") && PrefsUtil.INSTANCE.showFavSections()) {
             ((GridLayoutManager) manager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
@@ -108,7 +108,7 @@ public class FavoriteFragment extends BottomFragment implements FavsSectionAdapt
 
     @LayoutRes
     private int getLayout() {
-        if (PrefsUtil.getLayType().equals("0")) {
+        if (PrefsUtil.INSTANCE.getLayType().equals("0")) {
             return R.layout.recycler_favs;
         } else {
             return R.layout.recycler_favs_grid;
@@ -250,7 +250,7 @@ public class FavoriteFragment extends BottomFragment implements FavsSectionAdapt
             count++;
             if (count == 3) {
                 if (adapter != null)
-                    Toaster.toast("Tienes " + adapter.getItemCount() + " animes en favoritos");
+                    Toaster.toast("Tienes " + CacheDB.INSTANCE.favsDAO().getCount() + " animes en favoritos");
                 count = 0;
             }
 

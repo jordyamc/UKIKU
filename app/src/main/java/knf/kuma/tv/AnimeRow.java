@@ -1,6 +1,6 @@
 package knf.kuma.tv;
 
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ArrayObjectAdapter;
 
 public class AnimeRow {
 

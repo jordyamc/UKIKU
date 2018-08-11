@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.core.content.ContextCompat;
 import knf.kuma.BuildConfig;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
@@ -290,7 +290,7 @@ public class ServersFactory {
         Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
         downloadObject.link = option.url;
         downloadObject.headers = option.headers;
-        if (PrefsUtil.getDownloaderType() == 0) {
+        if (PrefsUtil.INSTANCE.getDownloaderType() == 0) {
             CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
             ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));
             serversInterface.onFinish(true, true);

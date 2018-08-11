@@ -1,11 +1,12 @@
 package knf.kuma.tv;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.support.v17.leanback.widget.BaseCardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
+
+import androidx.annotation.LayoutRes;
+import androidx.leanback.widget.BaseCardView;
 
 public abstract class BindableCardView<T> extends BaseCardView {
 

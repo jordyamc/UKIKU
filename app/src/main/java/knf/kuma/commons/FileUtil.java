@@ -1,8 +1,6 @@
 package knf.kuma.commons;
 
 import android.annotation.TargetApi;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
@@ -12,7 +10,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
-import android.support.annotation.Nullable;
 import android.util.Pair;
 
 import java.io.File;
@@ -23,6 +20,9 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Locale;
 
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import knf.kuma.download.FileAccessHelper;
 
 public final class FileUtil {
@@ -164,7 +164,7 @@ public final class FileUtil {
             try {
                 InputStream inputStream = resolver.openInputStream(uri);
                 long total = inputStream.available();
-                byte[] buffer = new byte[32 * 1024];
+                byte[] buffer = new byte[128 * 1024];
                 int read;
                 long current = 0;
                 while ((read = inputStream.read(buffer)) != -1) {
@@ -196,7 +196,7 @@ public final class FileUtil {
                 InputStream inputStream = FileAccessHelper.INSTANCE.getTmpInputStream(file_name);
                 OutputStream outputStream = FileAccessHelper.INSTANCE.getOutputStream(file_name);
                 long total = inputStream.available();
-                byte[] buffer = new byte[64 * 1024];
+                byte[] buffer = new byte[128 * 1024];
                 int read;
                 long current = 0;
                 while ((read = inputStream.read(buffer)) != -1) {
