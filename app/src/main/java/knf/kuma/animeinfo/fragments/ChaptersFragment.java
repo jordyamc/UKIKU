@@ -94,7 +94,11 @@ public class ChaptersFragment extends BottomFragment {
                                 } else
                                     Toaster.toast("Importado exitosamente");
                                 holder.getAdapter().notifyDataSetChanged();
-                                dialog.dismiss();
+                                try {
+                                    dialog.dismiss();
+                                } catch (Exception e) {
+                                    //
+                                }
                             } else
                                 dialog.setProgress(pair.first);
                         }

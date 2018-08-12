@@ -104,7 +104,11 @@ public class ActivityImgFull extends AppCompatActivity implements PopupMenu.OnMe
                 e.printStackTrace();
                 Toaster.toast("Error al guardar imagen");
             }
-            dialog.dismiss();
+            try {
+                dialog.dismiss();
+            } catch (Exception e) {
+                //
+            }
         });
     }
 

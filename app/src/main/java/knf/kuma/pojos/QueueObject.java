@@ -9,11 +9,13 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.RoomWarnings;
 import androidx.room.TypeConverters;
 import knf.kuma.database.BaseConverter;
 
 @Entity
 @TypeConverters({BaseConverter.class})
+@SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 public class QueueObject {
     @PrimaryKey
     public int id;

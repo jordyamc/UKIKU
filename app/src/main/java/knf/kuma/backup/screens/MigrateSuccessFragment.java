@@ -78,7 +78,11 @@ public class MigrateSuccessFragment extends Fragment {
                 Toaster.toast("Error al migrar datos");
             }
             if (dialog.isShowing())
-                dialog.dismiss();
+                try {
+                    dialog.dismiss();
+                } catch (Exception e) {
+                    //
+                }
         });
     }
 }

@@ -127,7 +127,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                                     holder.setState(isNetworkAvailable, false);
                                 }).build().show();
                     } else {
-                        ServersFactory.start(context, object.url, DownloadObject.fromRecent(object), true, new ServersFactory.ServersInterface() {
+                        ServersFactory.start(context, fragment.getChildFragmentManager(), object.url, DownloadObject.fromRecent(object), true, new ServersFactory.ServersInterface() {
                             @Override
                             public void onFinish(boolean started, boolean success) {
                                 if (!started && success) {
@@ -180,7 +180,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
                     !object.isDownloading &&
                     object.downloadState != DownloadObject.PENDING) {
                 holder.setLocked(true);
-                ServersFactory.start(context, object.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(object), false, new ServersFactory.ServersInterface() {
+                ServersFactory.start(context, fragment.getChildFragmentManager(), object.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(object), false, new ServersFactory.ServersInterface() {
                     @Override
                     public void onFinish(boolean started, boolean success) {
                         if (started) {

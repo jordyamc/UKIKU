@@ -1,7 +1,6 @@
 package knf.kuma.search;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import java.util.ArrayList;
@@ -31,27 +30,16 @@ public class GenresDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Generos")
-                .setMultiChoiceItems(genres.toArray(new String[genres.size()]), getStates(), new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int index, boolean isSelected) {
-                        if (isSelected){
-                            selected.add(genres.get(index));
-                        }else {
-                            selected.remove(genres.get(index));
-                        }
+                .setMultiChoiceItems(genres.toArray(new String[genres.size()]), getStates(), (dialogInterface, index, isSelected) -> {
+                    if (isSelected) {
+                        selected.add(genres.get(index));
+                    } else {
+                        selected.remove(genres.get(index));
                     }
-                }).setPositiveButton("BUSCAR", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Collections.sort(selected);
-                        listener.onOkay(selected);
-                    }
-                }).setNegativeButton("CERRAR", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                }).setPositiveButton("BUSCAR", (dialogInterface, i) -> {
+                    Collections.sort(selected);
+                    listener.onOkay(selected);
+                }).setNegativeButton("CERRAR", (dialogInterface, i) -> dialogInterface.dismiss()).create();
     }
 
     private boolean[] getStates(){

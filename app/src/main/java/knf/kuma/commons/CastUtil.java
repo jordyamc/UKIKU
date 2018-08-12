@@ -103,39 +103,28 @@ public class CastUtil implements CastListener, PlayStatusListener {
     }
 
     private void startLoading(final Activity activity){
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    getLoading(activity).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                getLoading(activity).show();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
     private void stopLoading(){
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (loading != null)
-                        loading.dismiss();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                if (loading != null)
+                    loading.dismiss();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
     private void setEid(final String eid){
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                castingEid.setValue(eid);
-            }
-        });
+        new Handler(Looper.getMainLooper()).post(() -> castingEid.setValue(eid));
     }
 
     public void openControls(){

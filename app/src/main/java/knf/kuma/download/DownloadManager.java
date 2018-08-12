@@ -126,14 +126,15 @@ public class DownloadManager extends Service {
             @Override
             public void onError(Download download, Error error, Throwable throwable) {
                 DownloadObject object = downloadDao.getByDid(download.getId());
-                if (object != null)
+                if (object != null) {
                     errorNotification(object);
-                downloadDao.delete(object);
-                throwable.printStackTrace();
-                fetch.delete(download.getId());
-                throwable.printStackTrace();
-                Crashlytics.logException(throwable);
-                stopIfNeeded();
+                    downloadDao.delete(object);
+                    throwable.printStackTrace();
+                    fetch.delete(download.getId());
+                    throwable.printStackTrace();
+                    Crashlytics.logException(throwable);
+                    stopIfNeeded();
+                }
             }
 
             @Override

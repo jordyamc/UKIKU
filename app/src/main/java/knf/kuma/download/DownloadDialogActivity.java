@@ -2,7 +2,6 @@ package knf.kuma.download;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -55,12 +54,15 @@ public class DownloadDialogActivity extends AppCompatActivity {
                             break;
                     }
                 }
-                Log.e("Download deep", "\nName: " + name + "\nAid: " + aid + "\nEid: " + eid + "\nNum: " + num);
                 AnimeObject.WebInfo.AnimeChapter chapter = new AnimeObject.WebInfo.AnimeChapter(Integer.parseInt(aid), "Episodio " + num, eid, getIntent().getDataString(), name, aid);
                 object = DownloadObject.fromChapter(chapter, false);
                 runOnUiThread(() -> {
                     try {
                         dialog.dismiss();
+                    } catch (Exception e) {
+                        //
+                    }
+                    try {
                         showSelectDialog();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -80,7 +82,7 @@ public class DownloadDialogActivity extends AppCompatActivity {
                 .items(new String[]{"Descarga", "Streaming"})
                 .itemsCallbackSingleChoice(0, (dialog, itemView, which, text) -> {
                     runOnUiThread(() ->
-                            ServersFactory.start(DownloadDialogActivity.this, getIntent().getDataString(), object, which == 1, new ServersFactory.ServersInterface() {
+                            ServersFactory.start(DownloadDialogActivity.this, getSupportFragmentManager(), getIntent().getDataString(), object, which == 1, new ServersFactory.ServersInterface() {
                                 @Override
                                 public void onFinish(boolean started, boolean success) {
                                     if (success)

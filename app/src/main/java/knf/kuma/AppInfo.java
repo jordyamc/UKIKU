@@ -41,7 +41,7 @@ public class AppInfo extends MaterialAboutActivity {
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_patreon), "Patreon", false, Uri.parse("https://www.patreon.com/animeflvapp")));
         MaterialAboutCard.Builder extraCard = new MaterialAboutCard.Builder();
         extraCard.title("Extras");
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_web), "Página web", true, Uri.parse("http://ukiku.ga")));
+        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_web), "Página web", true, Uri.parse("https://ukiku.ga")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_github), "Proyecto en github", true, Uri.parse("https://github.com/jordyamc/UKIKU")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_facebook), "Facebook", true, Uri.parse("https://www.facebook.com/ukikuapp")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_facebook_group), "Grupo de Facebook", true, Uri.parse("https://www.facebook.com/groups/ukikugroup/")));

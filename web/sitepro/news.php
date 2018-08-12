@@ -66,7 +66,7 @@
 			</div></div><div class="wb_cont_outer"></div><div class="wb_cont_bg"></div></div>
 <div class="vbox wb_container" id="wb_footer">
 	
-<div class="wb_cont_inner" style="height: 134px;"><div id="wb_element_instance11" class="wb_element" style=" line-height: normal;"><p class="wb-stl-footer">© 2018 <a data-name="http://ukiku.ga" href="http://ukiku.ga">ukiku.ga</a></p>
+<div class="wb_cont_inner" style="height: 134px;"><div id="wb_element_instance11" class="wb_element" style=" line-height: normal;"><p class="wb-stl-footer">© 2018 <a data-name="https://ukiku.ga" href="https://ukiku.ga">ukiku.ga</a></p>
 </div><div id="wb_element_instance13" class="wb_element" style="text-align: center; width: 100%;"><div class="wb_footer"></div><script type="text/javascript">
 			$(function() {
 				var footer = $(".wb_footer");

@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>http://ukiku.ezyro.com/home/</loc><changefreq>weekly</changefreq></url></urlset>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://ukiku.ga/</loc>
+        <changefreq>never</changefreq>
+    </url>
+</urlset>

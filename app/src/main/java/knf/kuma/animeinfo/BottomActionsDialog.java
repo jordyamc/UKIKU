@@ -36,20 +36,31 @@ public class BottomActionsDialog extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.lay_bottom_actions, container, false);
         ButterKnife.bind(this, view);
         action_seen.setOnClickListener(view1 -> {
-            callback.onSelect(STATE_SEEN);
-            dismiss();
+            if (callback != null)
+                callback.onSelect(STATE_SEEN);
+            safeDismiss();
         });
         action_unseen.setOnClickListener(view1 -> {
-            callback.onSelect(STATE_UNSEEN);
-            dismiss();
+            if (callback != null)
+                callback.onSelect(STATE_UNSEEN);
+            safeDismiss();
         });
         return view;
+    }
+
+    private void safeDismiss() {
+        try {
+            dismiss();
+        } catch (Exception e) {
+            //
+        }
     }
 
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        callback.onDismiss();
+        if (callback != null)
+            callback.onDismiss();
     }
 
     public interface ActionsCallback {

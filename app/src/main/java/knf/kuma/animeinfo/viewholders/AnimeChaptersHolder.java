@@ -82,7 +82,7 @@ public class AnimeChaptersHolder {
                                     case BottomActionsDialog.STATE_SEEN:
                                         AsyncTask.execute(() -> {
                                             ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
-                                            for (int i13 : adapter.getSelection()) {
+                                            for (int i13 : new ArrayList<>(adapter.getSelection())) {
                                                 dao.addChapter(chapters.get(i13));
                                             }
                                             SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
@@ -92,14 +92,14 @@ public class AnimeChaptersHolder {
                                                 seeingDAO.update(seeingObject);
                                             }
                                             recyclerView.post(() -> adapter.deselectAll());
-                                            d.dismiss();
+                                            safeDismiss(d);
                                         });
                                         break;
                                     case BottomActionsDialog.STATE_UNSEEN:
                                         AsyncTask.execute(() -> {
                                             try {
                                                 ChaptersDAO dao = CacheDB.INSTANCE.chaptersDAO();
-                                                for (int i12 : adapter.getSelection()) {
+                                                for (int i12 : new ArrayList<>(adapter.getSelection())) {
                                                     dao.deleteChapter(chapters.get(i12));
                                                 }
                                                 SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
@@ -109,11 +109,11 @@ public class AnimeChaptersHolder {
                                                     seeingDAO.update(seeingObject);
                                                 }
                                                 recyclerView.post(() -> adapter.deselectAll());
-                                                d.dismiss();
+                                                safeDismiss(d);
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                                 if (d.isShowing())
-                                                    d.dismiss();
+                                                    safeDismiss(d);
                                             }
                                         });
                                         break;
@@ -162,6 +162,14 @@ public class AnimeChaptersHolder {
                 if (position >= 0)
                     recyclerView.post(() -> manager.smoothScrollToPosition(recyclerView, null, position));
             }
+        }
+    }
+
+    private void safeDismiss(MaterialDialog dialog) {
+        try {
+            dialog.dismiss();
+        } catch (Exception e) {
+            //
         }
     }
 }

@@ -25,10 +25,12 @@ import java.util.Collections;
 import java.util.List;
 
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import knf.kuma.BuildConfig;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.PrefsUtil;
+import knf.kuma.custom.DialogWraper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.download.DownloadManager;
 import knf.kuma.download.DownloadService;
@@ -42,6 +44,7 @@ import xdroid.toaster.Toaster;
 
 public class ServersFactory {
     private Context context;
+    private FragmentManager fragmentManager;
     private String url;
     private AnimeObject.WebInfo.AnimeChapter chapter;
     private DownloadObject downloadObject;
@@ -51,8 +54,9 @@ public class ServersFactory {
     private List<Server> servers = new ArrayList<>();
     private int selected = 0;
 
-    private ServersFactory(Context context, String url, AnimeObject.WebInfo.AnimeChapter chapter, boolean isStream, boolean addQueue, ServersInterface serversInterface) {
+    private ServersFactory(Context context, FragmentManager fragmentManager, String url, AnimeObject.WebInfo.AnimeChapter chapter, boolean isStream, boolean addQueue, ServersInterface serversInterface) {
         this.context = context;
+        this.fragmentManager = fragmentManager;
         this.url = url;
         this.chapter = chapter;
         this.downloadObject = DownloadObject.fromChapter(chapter, addQueue);
@@ -60,38 +64,39 @@ public class ServersFactory {
         this.serversInterface = serversInterface;
     }
 
-    private ServersFactory(Context context, String url, DownloadObject downloadObject, boolean isStream, ServersInterface serversInterface) {
+    private ServersFactory(Context context, FragmentManager fragmentManager, String url, DownloadObject downloadObject, boolean isStream, ServersInterface serversInterface) {
         this.context = context;
+        this.fragmentManager = fragmentManager;
         this.url = url;
         this.downloadObject = downloadObject;
         this.isStream = isStream;
         this.serversInterface = serversInterface;
     }
 
-    public static void start(final Context context, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final boolean addQueue, final ServersInterface serversInterface) {
-        final MaterialDialog dialog = new MaterialDialog.Builder(context)
+    public static void start(final Context context, FragmentManager fragmentManager, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final boolean addQueue, final ServersInterface serversInterface) {
+        final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
                 .content("Obteniendo servidores")
                 .progress(true, 0)
-                .build();
-        dialog.show();
+                .build());
+        dialog.show(fragmentManager, "getting servers");
         AsyncTask.execute(() -> {
-            ServersFactory factory = new ServersFactory(context, url, chapter, isStream, addQueue, serversInterface);
+            ServersFactory factory = new ServersFactory(context, fragmentManager, url, chapter, isStream, addQueue, serversInterface);
             factory.get(dialog);
         });
     }
 
-    public static void start(final Context context, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final ServersInterface serversInterface) {
-        start(context, url, chapter, isStream, false, serversInterface);
+    public static void start(final Context context, FragmentManager fragmentManager, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final ServersInterface serversInterface) {
+        start(context, fragmentManager, url, chapter, isStream, false, serversInterface);
     }
 
-    public static void start(final Context context, final String url, final DownloadObject downloadObject, final boolean isStream, final ServersInterface serversInterface) {
-        final MaterialDialog dialog = new MaterialDialog.Builder(context)
+    public static void start(final Context context, FragmentManager fragmentManager, final String url, final DownloadObject downloadObject, final boolean isStream, final ServersInterface serversInterface) {
+        final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
                 .content("Obteniendo servidores")
                 .progress(true, 0)
-                .build();
-        dialog.show();
+                .build());
+        dialog.show(fragmentManager, "getting servers");
         AsyncTask.execute(() -> {
-            ServersFactory factory = new ServersFactory(context, url, downloadObject, isStream, serversInterface);
+            ServersFactory factory = new ServersFactory(context, fragmentManager, url, downloadObject, isStream, serversInterface);
             factory.get(dialog);
         });
     }
@@ -131,27 +136,28 @@ public class ServersFactory {
             try {
                 if (servers.size() == 0) {
                     Toaster.toast("Sin servidores disponibles");
-                    serversInterface.onFinish(false, false);
+                    callOnFinish(false, false);
                 } else {
                     MaterialDialog.Builder builder = new MaterialDialog.Builder(context)
                             .title("Selecciona servidor")
                             .items(Server.getNames(servers))
-                            .autoDismiss(true)
+                            .autoDismiss(false)
                             .itemsCallbackSingleChoice(selected, (d, itemView, which, text) -> {
                                 selected = which;
-                                d.dismiss();
-                                final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                safeDismiss(d);
+                                final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
                                         .content("Obteniendo link")
                                         .progress(true, 0)
-                                        .build();
-                                dialog.show();
+                                        .cancelable(false)
+                                        .build());
+                                dialog.show(fragmentManager, "getting link");
                                 AsyncTask.execute(() -> {
                                     try {
                                         final VideoServer server = servers.get(selected).getVerified();
-                                        dialog.dismiss();
+                                        safeDismiss(dialog);
                                         if (server == null && servers.size() == 1) {
                                             Toaster.toast("Error en servidor, intente mas tarde");
-                                            serversInterface.onFinish(false, false);
+                                            callOnFinish(false, false);
                                         } else if (server == null) {
                                             servers.remove(selected);
                                             selected = 0;
@@ -169,7 +175,7 @@ public class ServersFactory {
                                                 case "mega 1":
                                                 case "mega 2":
                                                     context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(server.getOption().url)));
-                                                    serversInterface.onFinish(false, false);
+                                                    callOnFinish(false, false);
                                                     break;
                                                 default:
                                                     if (isStream)
@@ -186,24 +192,26 @@ public class ServersFactory {
                                 return true;
                             }).positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
                             .negativeText("CANCELAR")
-                            .onNegative((dialog, which) -> serversInterface.onFinish(false, false)).cancelListener(dialog -> serversInterface.onFinish(false, false));
+                            .onNegative((dialog, which) -> callOnFinish(false, false))
+                            .onAny((dialog, which) -> safeDismiss(dialog))
+                            .cancelListener(dialog -> callOnFinish(false, false));
                     if (isStream && CastUtil.get().connected())
                         builder.neutralText("CAST")
                                 .onNeutral((d, which) -> {
                                     selected = d.getSelectedIndex();
-                                    d.dismiss();
-                                    final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                    safeDismiss(d);
+                                    final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
                                             .content("Obteniendo link")
                                             .progress(true, 0)
-                                            .build();
-                                    dialog.show();
+                                            .build());
+                                    dialog.show(fragmentManager, "getting links");
                                     AsyncTask.execute(() -> {
                                         try {
                                             final VideoServer server = servers.get(selected).getVerified();
-                                            dialog.dismiss();
+                                            safeDismiss(dialog);
                                             if (server == null && servers.size() == 1) {
                                                 Toaster.toast("Error en servidor, intente mas tarde");
-                                                serversInterface.onFinish(false, false);
+                                                callOnFinish(false, false);
                                             } else if (server == null) {
                                                 Toaster.toast("Error en servidor");
                                                 showServerList();
@@ -218,7 +226,7 @@ public class ServersFactory {
                                                         showServerList();
                                                         break;
                                                     default:
-                                                        serversInterface.onCast(server.getOption().url);
+                                                        callOnCast(server.getOption().url);
                                                         break;
                                                 }
                                             }
@@ -239,14 +247,14 @@ public class ServersFactory {
     private void showOptions(final VideoServer server, final boolean isCast) {
         new Handler(Looper.getMainLooper()).post(() -> {
             try {
-                new MaterialDialog.Builder(context)
+                DialogWraper.wrap(new MaterialDialog.Builder(context)
                         .title(server.name)
                         .items(Option.getNames(server.options))
-                        .autoDismiss(true)
+                        .autoDismiss(false)
                         .itemsCallbackSingleChoice(0, (dialog, itemView, which, text) -> {
-                            dialog.dismiss();
+                            safeDismiss(dialog);
                             if (isCast) {
-                                serversInterface.onCast(server.options.get(which).url);
+                                callOnCast(server.options.get(which).url);
                             } else if (isStream) {
                                 startStreaming(server.options.get(which));
                             } else {
@@ -256,10 +264,8 @@ public class ServersFactory {
                         })
                         .positiveText(downloadObject.addQueue ? "AÑADIR" : "INICIAR")
                         .negativeText("ATRAS")
-                        .cancelListener(dialog -> {
-                            Log.e("Download", "ShowList from canceled");
-                            showServerList();
-                        }).build().show();
+                        .onAny((dialog, which) -> safeDismiss(dialog))
+                        .cancelListener(dialog -> showServerList()).build()).show(fragmentManager, "options");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -280,7 +286,7 @@ public class ServersFactory {
                 context.startActivity(intent);
             }
         }
-        serversInterface.onFinish(false, true);
+        callOnFinish(false, true);
     }
 
     private void startDownload(Option option) {
@@ -293,17 +299,17 @@ public class ServersFactory {
         if (PrefsUtil.INSTANCE.getDownloaderType() == 0) {
             CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
             ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));
-            serversInterface.onFinish(true, true);
+            callOnFinish(true, true);
         } else
-            serversInterface.onFinish(true, DownloadManager.start(downloadObject));
+            callOnFinish(true, DownloadManager.start(downloadObject));
     }
 
-    public void get(MaterialDialog dialog) {
+    public void get(DialogWraper dialog) {
         try {
             Document main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get();
             Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
             List<Server> servers = new ArrayList<>();
-            for (Element e: descargas) {
+            for (Element e : descargas) {
                 String z = e.attr("href");
                 z = z.substring(z.lastIndexOf("http"));
                 Server server = Server.check(context, z);
@@ -312,7 +318,7 @@ public class ServersFactory {
             }
             Elements s_script = main.select("script");
             String j = "";
-            for (Element element: s_script) {
+            for (Element element : s_script) {
                 String s_el = element.outerHtml();
                 if (s_el.contains("var video = [];")) {
                     j = s_el;
@@ -320,21 +326,47 @@ public class ServersFactory {
                 }
             }
             String[] parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*\\]");
-            for (String baseLink: parts) {
+            for (String baseLink : parts) {
                 Server server = Server.check(context, baseLink);
                 if (server != null)
                     servers.add(server);
             }
             Collections.sort(servers);
             this.servers = servers;
-            dialog.dismiss();
+            safeDismiss(dialog);
             showServerList();
         } catch (Exception e) {
             e.printStackTrace();
             this.servers = new ArrayList<>();
-            dialog.dismiss();
-            serversInterface.onFinish(false, false);
+            safeDismiss(dialog);
+            callOnFinish(false, false);
         }
+    }
+
+    private void safeDismiss(DialogWraper dialog) {
+        try {
+            dialog.dismiss();
+        } catch (Exception e) {
+            //
+        }
+    }
+
+    private void safeDismiss(MaterialDialog dialog) {
+        try {
+            dialog.dismiss();
+        } catch (Exception e) {
+            //
+        }
+    }
+
+    private void callOnFinish(boolean started, boolean success) {
+        if (serversInterface != null)
+            serversInterface.onFinish(started, success);
+    }
+
+    private void callOnCast(String url) {
+        if (serversInterface != null)
+            serversInterface.onCast(url);
     }
 
     public interface ServersInterface {

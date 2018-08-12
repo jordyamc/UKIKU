@@ -7,12 +7,15 @@
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content="App para ver y descargar anime" />
 	<meta name="keywords" content="anime descargar gratis online app sin anuncios premium ovas pelicula dragon ball one piece" />
+	<meta name="nosnippet">
 	<!-- Facebook Open Graph -->
 	<meta name="og:title" content="UKIKU - Página Oficial" />
-	<meta name="og:description" content="App para ver y descargar anime" />
+	<meta name="og:description" content="Página oficial de UKIKU, app para ver y descargar anime, solo Android 5+" />
+	<meta name="description" content="Página oficial de UKIKU, app para ver y descargar anime, solo Android 5+" />
 	<meta name="og:image" content="{{base_url}}gallery_gen/500166f32a78d6a767eff2182d492e63.png" />
 	<meta name="og:type" content="article" />
 	<meta name="og:url" content="{{curr_url}}" />
+	<link rel="amphtml" href="https://ukiku.ga/amp/index.html">
 	<!-- Facebook Open Graph end -->
 		
 	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -29,6 +32,30 @@
 	<!--[if lt IE 9]>
 	<script src="js/html5shiv.min.js"></script>
 	<![endif]-->
+	    <script type="application/ld+json">
+	    {
+	    "@context" : "http://schema.org",
+	    "@type" : "MobileApplication",
+	    "name" : "UKIKU",
+	    "image" : "https://ukiku.ga/gallery_gen/426d03e067942f73910b0ad925811791_67x67.png",
+	    "url" : "https://ukiku.ga/",
+	    "applicationCategory" : "descarga y streaming de anime",
+	    "operatingSystem": "Android 5",
+	    "downloadUrl" : "https://ukiku.ga/get.php",
+	    "screenshot" : "https://ukiku.ga/gallery_gen/500166f32a78d6a767eff2182d492e63_400x690.png",
+	    "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "17"
+          }
+	    },
+	    "author": {
+            "@type": "Person",
+            "name": "Jordy Mendoza",
+            "email": "mailto:jordyamc@hotmail.com"
+            }
+        }
+	    </script>
 </head>
 
 
@@ -67,7 +94,7 @@
 			</div></div><div class="wb_cont_outer"></div><div class="wb_cont_bg"></div></div>
 <div class="vbox wb_container" id="wb_footer">
 	
-<div class="wb_cont_inner" style="height: 134px;"><div id="wb_element_instance1" class="wb_element" style=" line-height: normal;"><p class="wb-stl-footer">© 2018 <a data-name="http://ukiku.ga" href="http://ukiku.ga">ukiku.ga</a></p>
+<div class="wb_cont_inner" style="height: 134px;"><div id="wb_element_instance1" class="wb_element" style=" line-height: normal;"><p class="wb-stl-footer">© 2018 <a data-name="https://ukiku.ga" href="https://ukiku.ga">ukiku.ga</a></p>
 </div><div id="wb_element_instance9" class="wb_element" style="text-align: center; width: 100%;"><div class="wb_footer"></div><script type="text/javascript">
 			$(function() {
 				var footer = $(".wb_footer");

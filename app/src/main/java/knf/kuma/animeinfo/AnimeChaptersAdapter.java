@@ -192,7 +192,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                                 }).build().show();
                         break;
                     case R.id.download:
-                        ServersFactory.start(context, chapter.link, chapter, false, new ServersFactory.ServersInterface() {
+                        ServersFactory.start(context, fragment.getChildFragmentManager(), chapter.link, chapter, false, new ServersFactory.ServersInterface() {
                             @Override
                             public void onFinish(boolean started, boolean success) {
                                 if (started) {
@@ -208,7 +208,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                         });
                         break;
                     case R.id.streaming:
-                        ServersFactory.start(context, chapter.link, chapter, true, new ServersFactory.ServersInterface() {
+                        ServersFactory.start(context, fragment.getChildFragmentManager(), chapter.link, chapter, true, new ServersFactory.ServersInterface() {
                             @Override
                             public void onFinish(boolean started, boolean success) {
                                 if (!started && success) {
@@ -234,7 +234,7 @@ public class AnimeChaptersAdapter extends RecyclerView.Adapter<AnimeChaptersAdap
                             QueueManager.add(Uri.fromFile(d_file), true, chapter);
                             holder.setQueue(true, true);
                         } else
-                            ServersFactory.start(context, chapter.link, chapter, true, true, new ServersFactory.ServersInterface() {
+                            ServersFactory.start(context, fragment.getChildFragmentManager(), chapter.link, chapter, true, true, new ServersFactory.ServersInterface() {
                                 @Override
                                 public void onFinish(boolean started, boolean success) {
                                     if (success) {
