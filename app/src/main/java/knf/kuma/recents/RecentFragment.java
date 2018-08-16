@@ -48,7 +48,7 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
         adapter = new RecentsAdapter(this, holder.recyclerView);
         holder.recyclerView.setAdapter(adapter);
         holder.setRefreshing(true);
-        EAHelper.enter1(getContext(), "R");
+        EAHelper.enter1("R");
         return view;
     }
 
@@ -67,7 +67,7 @@ public class RecentFragment extends BottomFragment implements SwipeRefreshLayout
 
     @Override
     public void onReselect() {
-        EAHelper.enter1(getContext(), "R");
+        EAHelper.enter1("R");
         if (holder != null) holder.scrollToTop();
     }
 }

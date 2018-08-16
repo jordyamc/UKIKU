@@ -1,5 +1,6 @@
 package knf.kuma.animeinfo;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.annotation.NonNull;
@@ -18,10 +21,13 @@ import knf.kuma.R;
 public class BottomActionsDialog extends BottomSheetDialogFragment {
     public static final int STATE_SEEN = 0;
     public static final int STATE_UNSEEN = 1;
+    public static final int STATE_IMPORT_MULTIPLE = 2;
     @BindView(R.id.action_seen)
     TextView action_seen;
     @BindView(R.id.action_unseen)
     TextView action_unseen;
+    @BindView(R.id.action_import_all)
+    TextView action_import_all;
     private ActionsCallback callback;
 
     public static BottomActionsDialog newInstance(ActionsCallback callback) {
@@ -45,7 +51,28 @@ public class BottomActionsDialog extends BottomSheetDialogFragment {
                 callback.onSelect(STATE_UNSEEN);
             safeDismiss();
         });
+        action_import_all.setOnClickListener(view1 -> {
+            if (callback != null)
+                callback.onSelect(STATE_IMPORT_MULTIPLE);
+            safeDismiss();
+        });
         return view;
+    }
+
+    @Override
+    @NonNull
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setOnShowListener(dialogInterface -> {
+            try {
+                BottomSheetDialog d = (BottomSheetDialog) dialogInterface;
+                View bottomSheetInternal = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+                BottomSheetBehavior.from(bottomSheetInternal).setState(BottomSheetBehavior.STATE_EXPANDED);
+            } catch (Exception e) {
+                //
+            }
+        });
+        return dialog;
     }
 
     private void safeDismiss() {

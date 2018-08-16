@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.InflateException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -173,7 +174,11 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(EAHelper.getThemeNA(this));
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_anime_info);
+        try {
+            setContentView(R.layout.activity_anime_info);
+        } catch (InflateException e) {
+            setContentView(R.layout.activity_anime_info_nwv);
+        }
         if (getIntent().getBooleanExtra("notification", false))
             sendBroadcast(NotificationObj.fromIntent(getIntent()).getBroadcast(this));
         holder = new AnimeActivityHolder(this);

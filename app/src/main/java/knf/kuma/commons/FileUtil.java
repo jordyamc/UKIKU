@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.Nullable;
@@ -186,6 +187,51 @@ public final class FileUtil {
                 e.printStackTrace();
                 new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(new Pair<>(-1, true)));
             }
+        });
+        return liveData;
+    }
+
+    public static LiveData<Pair<Pair<String, Integer>, Boolean>> moveFiles(ContentResolver resolver, List<Pair<Uri, String>> pairs) {
+        final MutableLiveData<Pair<Pair<String, Integer>, Boolean>> liveData = new MutableLiveData<>();
+        AsyncTask.execute(() -> {
+            String ps = "Importando archivos: %d/%d";
+            int g_total = pairs.size();
+            int g_count = 0;
+            int success = 0;
+            for (Pair<Uri, String> pair : pairs) {
+                try {
+                    InputStream inputStream = resolver.openInputStream(pair.first);
+                    OutputStream outputStream = FileAccessHelper.INSTANCE.getOutputStream(pair.second);
+                    long total = inputStream.available();
+                    byte[] buffer = new byte[128 * 1024];
+                    int read;
+                    long current = 0;
+                    while ((read = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, read);
+                        current += read;
+                        int prog = (int) ((current * 100) / total);
+                        int finalG_count = g_count;
+                        new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(new Pair<>(new Pair<>(String.format(Locale.US, ps, finalG_count, g_total), prog), false)));
+                    }
+                    inputStream.close();
+                    outputStream.flush();
+                    outputStream.close();
+                    int finalG_count = g_count;
+                    new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(new Pair<>(new Pair<>(String.format(Locale.US, ps, finalG_count, g_total), 100), false)));
+                    try {
+                        DocumentsContract.deleteDocument(resolver, pair.first);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    success++;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    FileAccessHelper.INSTANCE.delete(pair.second);
+                }
+                g_count++;
+            }
+            int finalSuccess = success;
+            new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(new Pair<>(new Pair<>(String.format(Locale.US, ps, g_total, g_total), finalSuccess), true)));
         });
         return liveData;
     }

@@ -1,8 +1,8 @@
 package knf.kuma.commons;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.LevelEndEvent;
@@ -10,32 +10,51 @@ import com.crashlytics.android.answers.LevelStartEvent;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StyleRes;
 import knf.kuma.R;
+import knf.kuma.database.EADB;
+import knf.kuma.pojos.EAObject;
 import xdroid.toaster.Toaster;
 
 public class EAHelper {
-    private static final String CODE1 = "FRRDCRFFR";
-    private static final String CODE2 = "146523764";
+    private static String CODE1;
+    private static String CODE2;
     private static String CURRENT_1 = "";
     private static String CURRENT_2 = "";
 
-    public static void checkStart(Context context, String query) {
-        if (context != null && getPhase(context) == 0 && query.equals("easteregg")) {
-            Toaster.toastLong("FRRDCRFFR");
+    public static void init(Context context) {
+        SharedPreferences manager = PreferenceManager.getDefaultSharedPreferences(context);
+        CODE1 = manager.getString("ea_code1", generate(context, "ea_code1", new String[]{"R", "F", "D", "C"}));
+        CODE2 = manager.getString("ea_code2", generate(context, "ea_code2", new String[]{"1", "2", "3", "4", "5", "6", "7"}));
+    }
+
+    public static void checkStart(String query) {
+        if (getPhase() == 0 && query.equals("easteregg")) {
+            Toaster.toastLong(CODE1);
             Answers.getInstance().logLevelStart(new LevelStartEvent().putLevelName("Easter Egg"));
-            setUnlocked(context, 0);
+            setUnlocked(0);
         }
     }
 
-    public static void enter1(Context context, String part) {
-        if (context != null && isPart0Unlocked(context) && getPhase(context) == 1) {
+    private static String generate(Context context, String key, String[] array) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            builder.append(array[new Random().nextInt(array.length - 1)]);
+        }
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(key, builder.toString()).apply();
+        return builder.toString();
+    }
+
+    public static void enter1(String part) {
+        if (isPart0Unlocked() && getPhase() == 1) {
             CURRENT_1 += part;
             if (CURRENT_1.equals(CODE1)) {
-                setUnlocked(context, 1);
-                Toaster.toastLong("LMMJVSD \u2192 US \u2192 146523764");
+                setUnlocked(1);
+                Toaster.toastLong("LMMJVSD \u2192 US \u2192 " + CODE2);
                 clear1();
                 Answers.getInstance().logLevelEnd(new LevelEndEvent().putLevelName("Easter Egg Phase 1").putScore(0));
             } else if (!CODE1.startsWith(CURRENT_1)) {
@@ -49,11 +68,11 @@ public class EAHelper {
         CURRENT_1 = "";
     }
 
-    public static void enter2(Context context, String part) {
-        if (context != null && isPart1Unlocked(context) && getPhase(context) == 2) {
+    public static void enter2(String part) {
+        if (isPart1Unlocked() && getPhase() == 2) {
             CURRENT_2 += part;
             if (CURRENT_2.equals(CODE2)) {
-                setUnlocked(context, 2);
+                setUnlocked(2);
                 Toaster.toastLong("El tesoro esta en Akihabara");
                 clear2();
                 Answers.getInstance().logLevelEnd(new LevelEndEvent().putLevelName("Easter Egg Phase 2").putScore(0));
@@ -61,7 +80,6 @@ public class EAHelper {
                 clear2();
                 CURRENT_2 += part;
             }
-            Log.e("EA", CURRENT_2);
         }
     }
 
@@ -69,65 +87,60 @@ public class EAHelper {
         CURRENT_2 = "";
     }
 
-    static void enter3(Context context) {
-        if (context != null && isPart2Unlocked(context) && getPhase(context) == 3)
-            setUnlocked(context, 3);
+    static void enter3() {
+        if (isPart2Unlocked() && getPhase() == 3)
+            setUnlocked(3);
     }
 
-    private static boolean isPart0Unlocked(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ea_0_unlock", false);
+    private static boolean isPart0Unlocked() {
+        return EADB.INSTANCE.eaDAO().isUnlocked(0);
     }
 
-    private static boolean isPart1Unlocked(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ea_1_unlock", false);
+    private static boolean isPart1Unlocked() {
+        return EADB.INSTANCE.eaDAO().isUnlocked(1);
     }
 
-    private static boolean isPart2Unlocked(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ea_2_unlock", false);
+    private static boolean isPart2Unlocked() {
+        return EADB.INSTANCE.eaDAO().isUnlocked(2);
     }
 
-    private static boolean isPart3Unlocked(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ea_3_unlock", false);
+    private static boolean isPart3Unlocked() {
+        return EADB.INSTANCE.eaDAO().isUnlocked(3);
     }
 
-    public static int getPhase(Context context) {
-        if (context == null)
-            return 0;
-        if (isPart3Unlocked(context))
+    public static int getPhase() {
+        if (isPart3Unlocked())
             return 4;
-        else if (isPart2Unlocked(context))
+        else if (isPart2Unlocked())
             return 3;
-        else if (isPart1Unlocked(context))
+        else if (isPart1Unlocked())
             return 2;
-        else if (isPart0Unlocked(context))
+        else if (isPart0Unlocked())
             return 1;
         else return 0;
     }
 
     @Nullable
-    public static String getEAMessage(Context context) {
-        if (context == null)
-            return null;
-        if (isPart3Unlocked(context))
+    public static String getEAMessage() {
+        if (isPart3Unlocked())
             return "Disfruta de la recompensa";
-        else if (isPart2Unlocked(context))
+        else if (isPart2Unlocked())
             return "El tesoro esta en Akihabara";
-        else if (isPart1Unlocked(context))
-            return "LMMJVSD \u2192 US \u2192 146523764";
-        else if (isPart0Unlocked(context))
-            return "FRRDCRFFR";
+        else if (isPart1Unlocked())
+            return "LMMJVSD \u2192 US \u2192 " + CODE2;
+        else if (isPart0Unlocked())
+            return CODE1;
         else
             return null;
     }
 
-    private static void setUnlocked(Context context, int phase) {
-        if (context != null)
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("ea_" + phase + "_unlock", true).apply();
+    private static void setUnlocked(int phase) {
+        EADB.INSTANCE.eaDAO().unlock(new EAObject(phase));
     }
 
     @StyleRes
     public static int getTheme(Context context) {
-        if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))
+        if (context == null || !isPart0Unlocked() || !isPart1Unlocked() || !isPart2Unlocked() | !isPart3Unlocked())
             return R.style.AppTheme;
         switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")) {
             default:
@@ -174,7 +187,7 @@ public class EAHelper {
 
     @StyleRes
     public static int getThemeNA(Context context) {
-        if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))
+        if (context == null || !isPart0Unlocked() || !isPart1Unlocked() || !isPart2Unlocked() | !isPart3Unlocked())
             return R.style.AppTheme_NoActionBar;
         switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")) {
             default:
@@ -221,7 +234,7 @@ public class EAHelper {
 
     @StyleRes
     public static int getThemeDialog(Context context) {
-        if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))
+        if (context == null || !isPart0Unlocked() || !isPart1Unlocked() || !isPart2Unlocked() | !isPart3Unlocked())
             return R.style.AppTheme_NoActionBar;
         switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")) {
             default:
@@ -268,7 +281,7 @@ public class EAHelper {
 
     @DrawableRes
     public static int getThemeImg(Context context) {
-        if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))
+        if (context == null || !isPart0Unlocked() || !isPart1Unlocked() || !isPart2Unlocked() | !isPart3Unlocked())
             return R.drawable.side_nav_bar;
         switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")) {
             default:
@@ -315,7 +328,7 @@ public class EAHelper {
 
     @ColorRes
     public static int getThemeColor(Context context) {
-        if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))
+        if (context == null || !isPart0Unlocked() || !isPart1Unlocked() || !isPart2Unlocked() | !isPart3Unlocked())
             return R.color.colorAccent;
         switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")) {
             default:
@@ -362,7 +375,7 @@ public class EAHelper {
 
     @ColorRes
     public static int getThemeColorLight(Context context) {
-        if (context == null || !isPart0Unlocked(context) || !isPart1Unlocked(context) || !isPart2Unlocked(context) | !isPart3Unlocked(context))
+        if (context == null || !isPart0Unlocked() || !isPart1Unlocked() || !isPart2Unlocked() | !isPart3Unlocked())
             return R.color.colorAccentLight;
         switch (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")) {
             default:

@@ -22,12 +22,12 @@ public class BottomPreferencesFragment extends BottomFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        EAHelper.enter1(getContext(), "C");
+        EAHelper.enter1("C");
         return inflater.inflate(R.layout.fragment_preferences,container,false);
     }
 
     @Override
     public void onReselect() {
-        EAHelper.enter1(getContext(), "C");
+        EAHelper.enter1("C");
     }
 }

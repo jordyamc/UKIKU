@@ -87,7 +87,7 @@ public class EmisionActivity extends AppCompatActivity implements TabLayout.OnTa
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        EAHelper.enter2(this, String.valueOf(getDayByPos(tab.getPosition())));
+        EAHelper.enter2(String.valueOf(getDayByPos(tab.getPosition())));
     }
 
     @Override
@@ -97,7 +97,7 @@ public class EmisionActivity extends AppCompatActivity implements TabLayout.OnTa
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-        EAHelper.enter2(this, String.valueOf(getDayByPos(tab.getPosition())));
+        EAHelper.enter2(String.valueOf(getDayByPos(tab.getPosition())));
     }
 
     private int getDayByPos(int pos) {

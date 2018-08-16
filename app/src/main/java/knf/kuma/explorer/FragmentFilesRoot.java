@@ -93,11 +93,11 @@ public class FragmentFilesRoot extends FragmentBase implements FragmentFiles.Sel
         outState.putString("name", name);
     }
 
-    public void setStateChange(OnFileStateChange stateChange) {
+    void setStateChange(OnFileStateChange stateChange) {
         this.stateChange = stateChange;
     }
 
-    public void onRemoveAll() {
+    void onRemoveAll() {
         if (name != null && chapters != null && getActivity() != null)
             new MaterialDialog.Builder(getActivity())
                     .content("¿Eliminar todos los capitulos de " + name + "?")

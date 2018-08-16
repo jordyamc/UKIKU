@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="57" version="1.9">
+        <change type="fix">Errores generales</change>
+        <change type="new">Importacion multiple</change>
+        <change type="change">Cambio en easteregg, se necesita completar de nuevo</change>
+    </release>
     <release code="56" version="1.8.1">
         <change type="fix">Errores generales</change>
     </release>

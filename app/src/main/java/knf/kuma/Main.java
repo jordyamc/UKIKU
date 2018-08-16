@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.InflateException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.google.android.material.navigation.NavigationView;
 import org.cryse.widget.persistentsearch.PersistentSearchView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -102,6 +104,7 @@ public class Main extends AppCompatActivity
     @BindView(R.id.bottomNavigation)
     BottomNavigationView bottomNavigationView;
     @BindView(R.id.webview)
+    @Nullable
     WebView webView;
     BottomFragment selectedFragment;
     BottomFragment tmpfragment;
@@ -125,7 +128,11 @@ public class Main extends AppCompatActivity
             return;
         }
         Fabric.with(this);
-        setContentView(R.layout.activity_main_drawer);
+        try {
+            setContentView(R.layout.activity_main_drawer);
+        } catch (InflateException e) {
+            setContentView(R.layout.activity_main_drawer_nwv);
+        }
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -171,7 +178,7 @@ public class Main extends AppCompatActivity
         migrate.setOnClickListener(v -> MigrationActivity.start(Main.this));
         map.setOnClickListener(v -> EAMActivity.start(Main.this));
         migrate.setVisibility((BUUtils.isAnimeflvInstalled(this) && DirectoryService.isDirectoryFinished(this)) ? View.VISIBLE : View.GONE);
-        map.setVisibility(EAHelper.getPhase(this) == 3 ? View.VISIBLE : View.GONE);
+        map.setVisibility(EAHelper.getPhase() == 3 ? View.VISIBLE : View.GONE);
         TextView backupLocation = navigationView.getHeaderView(0).findViewById(R.id.backupLocation);
         switch (BUUtils.getType(this)) {
             case LOCAL:
@@ -277,7 +284,7 @@ public class Main extends AppCompatActivity
 
             @Override
             public void onSearchTermChanged(String term) {
-                EAHelper.checkStart(Main.this, term);
+                EAHelper.checkStart(term);
                 if (selectedFragment instanceof SearchFragment)
                     ((SearchFragment) selectedFragment).setSearch(term);
             }
@@ -591,34 +598,35 @@ public class Main extends AppCompatActivity
     }
 
     private void checkBypass() {
-        AsyncTask.execute(() -> {
-            if (isNeeded(this) && !isLoading) {
-                isLoading = true;
-                Log.e("CloudflareBypass", "is needed");
-                clearCookies();
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    webView.getSettings().setJavaScriptEnabled(true);
-                    webView.setWebViewClient(new WebViewClient() {
-                        @Override
-                        public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-                            Log.e("CloudflareBypass", "Override " + url);
-                            if (url.equals("https://animeflv.net/")) {
-                                Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"));
-                                saveCookies(Main.this);
-                                Toaster.toast("Bypass actualizado");
-                                PicassoSingle.clear();
-                                onNeedRecreate();
+        if (webView != null)
+            AsyncTask.execute(() -> {
+                if (isNeeded(this) && !isLoading) {
+                    isLoading = true;
+                    Log.e("CloudflareBypass", "is needed");
+                    clearCookies();
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        webView.getSettings().setJavaScriptEnabled(true);
+                        webView.setWebViewClient(new WebViewClient() {
+                            @Override
+                            public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+                                Log.e("CloudflareBypass", "Override " + url);
+                                if (url.equals("https://animeflv.net/")) {
+                                    Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"));
+                                    saveCookies(Main.this);
+                                    Toaster.toast("Bypass actualizado");
+                                    PicassoSingle.clear();
+                                    onNeedRecreate();
+                                }
+                                isLoading = false;
+                                return false;
                             }
-                            isLoading = false;
-                            return false;
-                        }
+                        });
+                        webView.getSettings().setUserAgentString(userAgent);
+                        webView.loadUrl("https://animeflv.net/");
                     });
-                    webView.getSettings().setUserAgentString(userAgent);
-                    webView.loadUrl("https://animeflv.net/");
-                });
-            } else {
-                Log.e("CloudflareBypass", "Not needed");
-            }
-        });
+                } else {
+                    Log.e("CloudflareBypass", "Not needed");
+                }
+            });
     }
 }

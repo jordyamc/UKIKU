@@ -15,7 +15,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:text="Marcar episodios"
+        android:text="Episodios"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="16sp"/>
 
@@ -50,6 +50,23 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="Marcar como no vistos"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/action_import_all"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_import"
+        android:drawablePadding="32dp"
+        android:drawableTint="?colorControlNormal"
+        android:focusable="true"
+        android:gravity="start|center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Importar archivos"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="16sp"/>
 

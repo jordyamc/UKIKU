@@ -6,7 +6,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,6 +27,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import knf.kuma.R;
 import knf.kuma.commons.BypassUtil;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.commons.SSLSkipper;
@@ -199,28 +199,35 @@ public class DirectoryService extends IntentService {
     }
 
     private void updateNotification() {
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, CHANNEL)
                 .setOngoing(true)
-                .setSubText("Agregados: " + count)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_directory_not)
-                .setColor(Color.parseColor("#e53935"))
+                .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
                 .setWhen(CURRENT_TIME)
-                .setSound(null)
-                .build();
-        notShow(NOT_CODE, notification);
+                .setSound(null);
+        if (PrefsUtil.INSTANCE.getCollapseDirectoryNotification())
+            notification.setSubText("Creando directorio: " + count);
+        else
+            notification
+                    .setContentTitle("Creando directorio")
+                    .setContentText("Agregados: " + count);
+        notShow(NOT_CODE, notification.build());
     }
 
     private Notification getStartNotification() {
-        return new NotificationCompat.Builder(this, "directory_update")
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, "directory_update")
                 .setOngoing(true)
-                .setSubText("Verificando directorio")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_directory_not)
                 .setSound(null, AudioManager.STREAM_NOTIFICATION)
-                .setColor(Color.parseColor("#e53935"))
-                .setWhen(CURRENT_TIME)
-                .build();
+                .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+                .setWhen(CURRENT_TIME);
+        if (PrefsUtil.INSTANCE.getCollapseDirectoryNotification())
+            notification.setSubText("Verificando directorio");
+        else
+            notification.setContentTitle("Verificando directorio");
+        return notification.build();
     }
 
     private void setStatus(int status) {

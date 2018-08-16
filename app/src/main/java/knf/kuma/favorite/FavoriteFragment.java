@@ -102,7 +102,7 @@ public class FavoriteFragment extends BottomFragment implements FavsSectionAdapt
             });
         }
         recyclerView.setAdapter(adapter);
-        EAHelper.enter1(getContext(), "F");
+        EAHelper.enter1("F");
         return view;
     }
 
@@ -244,7 +244,7 @@ public class FavoriteFragment extends BottomFragment implements FavsSectionAdapt
 
     @Override
     public void onReselect() {
-        EAHelper.enter1(getContext(), "F");
+        EAHelper.enter1("F");
         if (manager != null) {
             manager.smoothScrollToPosition(recyclerView, null, 0);
             count++;

@@ -26,6 +26,7 @@ import java.util.List;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import knf.kuma.App;
 import knf.kuma.BuildConfig;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
@@ -74,15 +75,19 @@ public class ServersFactory {
     }
 
     public static void start(final Context context, FragmentManager fragmentManager, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final boolean addQueue, final ServersInterface serversInterface) {
-        final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
-                .content("Obteniendo servidores")
-                .progress(true, 0)
-                .build());
-        dialog.show(fragmentManager, "getting servers");
-        AsyncTask.execute(() -> {
-            ServersFactory factory = new ServersFactory(context, fragmentManager, url, chapter, isStream, addQueue, serversInterface);
-            factory.get(dialog);
-        });
+        try {
+            final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
+                    .content("Obteniendo servidores")
+                    .progress(true, 0)
+                    .build());
+            dialog.show(fragmentManager, "getting servers");
+            AsyncTask.execute(() -> {
+                ServersFactory factory = new ServersFactory(context, fragmentManager, url, chapter, isStream, addQueue, serversInterface);
+                factory.get(dialog);
+            });
+        } catch (Exception e) {
+            //
+        }
     }
 
     public static void start(final Context context, FragmentManager fragmentManager, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final ServersInterface serversInterface) {
@@ -90,15 +95,19 @@ public class ServersFactory {
     }
 
     public static void start(final Context context, FragmentManager fragmentManager, final String url, final DownloadObject downloadObject, final boolean isStream, final ServersInterface serversInterface) {
-        final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
-                .content("Obteniendo servidores")
-                .progress(true, 0)
-                .build());
-        dialog.show(fragmentManager, "getting servers");
-        AsyncTask.execute(() -> {
-            ServersFactory factory = new ServersFactory(context, fragmentManager, url, downloadObject, isStream, serversInterface);
-            factory.get(dialog);
-        });
+        try {
+            final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
+                    .content("Obteniendo servidores")
+                    .progress(true, 0)
+                    .build());
+            dialog.show(fragmentManager, "getting servers");
+            AsyncTask.execute(() -> {
+                ServersFactory factory = new ServersFactory(context, fragmentManager, url, downloadObject, isStream, serversInterface);
+                factory.get(dialog);
+            });
+        } catch (Exception e) {
+            //
+        }
     }
 
     public static void startPlay(Context context, String title, String file_name) {
@@ -131,6 +140,22 @@ public class ServersFactory {
         }
     }
 
+    private static void safeDismiss(DialogWraper dialog) {
+        try {
+            dialog.dismiss();
+        } catch (Exception e) {
+            //
+        }
+    }
+
+    private static void safeDismiss(MaterialDialog dialog) {
+        try {
+            dialog.dismiss();
+        } catch (Exception e) {
+            //
+        }
+    }
+
     private void showServerList() {
         new Handler(Looper.getMainLooper()).post(() -> {
             try {
@@ -150,7 +175,7 @@ public class ServersFactory {
                                         .progress(true, 0)
                                         .cancelable(false)
                                         .build());
-                                dialog.show(fragmentManager, "getting link");
+                                safeShow(dialog, "getting link");
                                 AsyncTask.execute(() -> {
                                     try {
                                         final VideoServer server = servers.get(selected).getVerified();
@@ -204,7 +229,7 @@ public class ServersFactory {
                                             .content("Obteniendo link")
                                             .progress(true, 0)
                                             .build());
-                                    dialog.show(fragmentManager, "getting links");
+                                    safeShow(dialog, "getting links");
                                     AsyncTask.execute(() -> {
                                         try {
                                             final VideoServer server = servers.get(selected).getVerified();
@@ -235,7 +260,7 @@ public class ServersFactory {
                                         }
                                     });
                                 });
-                    builder.build().show();
+                    safeShow(DialogWraper.wrap(builder.build()), "server selection");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -270,38 +295,6 @@ public class ServersFactory {
                 e.printStackTrace();
             }
         });
-    }
-
-    private void startStreaming(Option option) {
-        if (chapter != null && downloadObject.addQueue) {
-            QueueManager.add(Uri.parse(option.url), false, chapter);
-        } else {
-            Answers.getInstance().logCustom(new CustomEvent("Streaming").putCustomAttribute("Server", option.server));
-            if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")) {
-                context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title", downloadObject.title));
-            } else {
-                Intent intent = new Intent(Intent.ACTION_VIEW)
-                        .setDataAndType(Uri.parse(option.url), "video/mp4")
-                        .putExtra("title", downloadObject.title);
-                context.startActivity(intent);
-            }
-        }
-        callOnFinish(false, true);
-    }
-
-    private void startDownload(Option option) {
-        if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url);
-        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid))
-            CacheDB.INSTANCE.queueDAO().add(new QueueObject(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(chapter.getFileName())), true, chapter));
-        Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
-        downloadObject.link = option.url;
-        downloadObject.headers = option.headers;
-        if (PrefsUtil.INSTANCE.getDownloaderType() == 0) {
-            CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
-            ContextCompat.startForegroundService(context, new Intent(context, DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));
-            callOnFinish(true, true);
-        } else
-            callOnFinish(true, DownloadManager.start(downloadObject));
     }
 
     public void get(DialogWraper dialog) {
@@ -343,17 +336,50 @@ public class ServersFactory {
         }
     }
 
-    private void safeDismiss(DialogWraper dialog) {
+    private void startStreaming(Option option) {
+        if (chapter != null && downloadObject.addQueue) {
+            QueueManager.add(Uri.parse(option.url), false, chapter);
+        } else {
+            Answers.getInstance().logCustom(new CustomEvent("Streaming").putCustomAttribute("Server", option.server));
+            if (PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("player_type", "0").equals("0")) {
+                App.getContext().startActivity(new Intent(App.getContext(), ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title", downloadObject.title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            } else {
+                Intent intent = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(Uri.parse(option.url), "video/mp4")
+                        .putExtra("title", downloadObject.title)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                App.getContext().startActivity(intent);
+            }
+        }
+        callOnFinish(false, true);
+    }
+
+    private void startDownload(Option option) {
+        if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url);
+        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid))
+            CacheDB.INSTANCE.queueDAO().add(new QueueObject(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(chapter.getFileName())), true, chapter));
+        Answers.getInstance().logCustom(new CustomEvent("Download").putCustomAttribute("Server", option.server));
+        downloadObject.link = option.url;
+        downloadObject.headers = option.headers;
+        if (PrefsUtil.INSTANCE.getDownloaderType() == 0) {
+            CacheDB.INSTANCE.downloadsDAO().insert(downloadObject);
+            ContextCompat.startForegroundService(App.getContext(), new Intent(App.getContext(), DownloadService.class).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)));
+            callOnFinish(true, true);
+        } else
+            callOnFinish(true, DownloadManager.start(downloadObject));
+    }
+
+    private void safeShow(DialogWraper dialog, String tag) {
         try {
-            dialog.dismiss();
+            dialog.show(fragmentManager, tag);
         } catch (Exception e) {
             //
         }
     }
 
-    private void safeDismiss(MaterialDialog dialog) {
+    private void safeShow(MaterialDialog dialog) {
         try {
-            dialog.dismiss();
+            dialog.show();
         } catch (Exception e) {
             //
         }

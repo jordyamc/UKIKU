@@ -34,7 +34,7 @@ public class DirectoryFragment extends BottomFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_directory, container, false);
         fragmentHolder = new DirMainFragmentHolder(view, getChildFragmentManager());
-        EAHelper.enter1(getContext(), "D");
+        EAHelper.enter1("D");
         return view;
     }
 
@@ -45,7 +45,7 @@ public class DirectoryFragment extends BottomFragment {
 
     @Override
     public void onReselect() {
-        EAHelper.enter1(getContext(), "D");
+        EAHelper.enter1("D");
         if (fragmentHolder != null)
             fragmentHolder.onReselect();
     }

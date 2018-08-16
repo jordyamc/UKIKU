@@ -125,7 +125,7 @@ public class ConfigurationFragment extends PreferenceFragment {
             }
             return false;
         });
-        if (EAHelper.getPhase(getActivity()) == 4)
+        if (EAHelper.getPhase() == 4)
             getPreferenceScreen().findPreference("theme_color").setOnPreferenceChangeListener((preference, newValue) -> {
                 startActivity(new Intent(getActivity(), Main.class).putExtra("start_position", 3));
                 getActivity().finish();

@@ -76,7 +76,7 @@ public class EAMActivity extends FragmentActivity implements OnMapReadyCallback 
             @Override
             public boolean onMarkerClick(Marker m) {
                 if (m.equals(marker)) {
-                    EAHelper.enter3(EAMActivity.this);
+                    EAHelper.enter3();
                     Answers.getInstance().logLevelEnd(new LevelEndEvent().putLevelName("Easter Egg Phase 3").putScore(0));
                     Answers.getInstance().logLevelEnd(new LevelEndEvent().putLevelName("Easter Egg").putScore(0));
                     konfettiView.build()

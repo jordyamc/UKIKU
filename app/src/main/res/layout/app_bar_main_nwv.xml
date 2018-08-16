@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:activity="knf.kuma.Main">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?colorPrimary"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <org.cryse.widget.persistentsearch.PersistentSearchView
+            android:id="@+id/searchview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:elevation="8dp"
+            android:visibility="gone"
+            app:layout_anchor="@+id/appBar"
+            app:layout_anchorGravity="center"
+            app:persistentSV_displayMode="menuItem"
+            app:persistentSV_editHintText="Buscar"
+            app:persistentSV_editHintTextColor="@android:color/darker_gray"
+            app:persistentSV_editTextColor="@android:color/black"
+            app:persistentSV_homeButtonMode="arrow"
+            app:persistentSV_searchCardElevation="2dp"
+            app:persistentSV_searchTextColor="@android:color/black"/>
+
+        <FrameLayout
+            android:id="@+id/root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        android:visibility="visible"
+        app:elevation="8dp"
+        app:itemBackground="?colorPrimary"
+        app:itemIconTint="@drawable/bottom_state"
+        app:itemTextColor="@drawable/bottom_state"
+        app:menu="@menu/bottom_menu"/>
+
+</LinearLayout>

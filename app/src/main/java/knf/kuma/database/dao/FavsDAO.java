@@ -8,12 +8,14 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RoomWarnings;
 import androidx.room.TypeConverters;
 import knf.kuma.database.BaseConverter;
 import knf.kuma.pojos.FavoriteObject;
 
 @Dao
 @TypeConverters(BaseConverter.class)
+@SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
 public interface FavsDAO {
     @Query("SELECT * FROM favoriteobject ORDER BY name")
     LiveData<List<FavoriteObject>> getAll();

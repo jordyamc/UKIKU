@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.graphics.Color;
 import android.util.Log;
 
 import org.jsoup.Jsoup;
@@ -14,9 +13,12 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import knf.kuma.R;
 import knf.kuma.commons.BypassUtil;
+import knf.kuma.commons.EAHelper;
 import knf.kuma.commons.Network;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.pojos.AnimeObject;
@@ -26,8 +28,8 @@ import pl.droidsonroids.jspoon.Jspoon;
 public class DirectoryUpdateService extends IntentService {
     public static int NOT_CODE = 5599;
     public static String CHANNEL = "directory_update";
-    private long CURRENT_TIME = System.currentTimeMillis();
     private static boolean running = false;
+    private long CURRENT_TIME = System.currentTimeMillis();
     private NotificationManager manager;
     private int count = 0;
     private int page = 0;
@@ -99,26 +101,31 @@ public class DirectoryUpdateService extends IntentService {
     }
 
     private void updateNotification() {
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, CHANNEL)
                 .setOngoing(true)
-                .setSubText("Recreados: " + count)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_dir_update)
-                .setColor(Color.parseColor("#e53935"))
-                .setWhen(CURRENT_TIME)
-                .build();
-        manager.notify(NOT_CODE, notification);
+                .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+                .setWhen(CURRENT_TIME);
+        if (PrefsUtil.INSTANCE.getCollapseDirectoryNotification())
+            notification.setSubText("Actualizando directorio: " + count);
+        else
+            notification
+                    .setContentTitle("Actualizando directorio")
+                    .setContentText("Actualizados: " + count);
+        manager.notify(NOT_CODE, notification.build());
     }
 
     private Notification getStartNotification() {
-        return new NotificationCompat.Builder(this, CHANNEL)
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, CHANNEL)
                 .setOngoing(true)
                 .setSubText("Actualizando directorio")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_dir_update)
-                .setColor(Color.parseColor("#e53935"))
-                .setWhen(CURRENT_TIME)
-                .build();
+                .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+                .setWhen(CURRENT_TIME);
+
+        return notification.build();
     }
 
     @Override

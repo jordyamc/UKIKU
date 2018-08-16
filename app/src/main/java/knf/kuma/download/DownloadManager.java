@@ -34,6 +34,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import knf.kuma.R;
 import knf.kuma.commons.FileUtil;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.DownloadsDAO;
 import knf.kuma.pojos.DownloadObject;
@@ -317,12 +318,15 @@ public class DownloadManager extends Service {
     }
 
     private static Notification foregroundNotification() {
-        return new NotificationCompat.Builder(context, CHANNEL_FOREGROUND)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_FOREGROUND)
                 .setSmallIcon(R.drawable.ic_service)
-                .setSubText("Descargas en progreso")
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .build();
+                .setPriority(NotificationCompat.PRIORITY_MIN);
+        if (PrefsUtil.INSTANCE.getCollapseDirectoryNotification())
+            builder.setSubText("Descargas en progreso");
+        else
+            builder.setContentTitle("Descargas en progreso");
+        return builder.build();
     }
 
     private static void updateMedia(DownloadObject downloadObject) {

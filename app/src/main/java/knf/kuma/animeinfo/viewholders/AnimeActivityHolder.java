@@ -19,6 +19,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
@@ -55,6 +56,7 @@ public class AnimeActivityHolder {
     @BindView(R.id.fab)
     public FloatingActionButton fab;
     @BindView(R.id.webview)
+    @Nullable
     WebView webView;
 
     private Intent intent;
@@ -96,6 +98,7 @@ public class AnimeActivityHolder {
                     animePagerAdapter.onChaptersReselect();
             }
         });
+        checkBypass(activity);
     }
 
     public void setTitle(final String title) {
@@ -181,35 +184,36 @@ public class AnimeActivityHolder {
     }
 
     public void checkBypass(Context context) {
-        AsyncTask.execute(() -> {
-            if (isNeeded(context) && !isLoading) {
-                isLoading = true;
-                Log.e("CloudflareBypass", "is needed");
-                clearCookies();
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    webView.getSettings().setJavaScriptEnabled(true);
-                    webView.setWebViewClient(new WebViewClient() {
-                        @Override
-                        public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-                            Log.e("CloudflareBypass", "Override " + url);
-                            if (url.equals("https://animeflv.net/")) {
-                                Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"));
-                                saveCookies(context);
-                                Toaster.toast("Bypass actualizado");
-                                PicassoSingle.clear();
-                                innerInterface.onNeedRecreate();
+        if (webView != null)
+            AsyncTask.execute(() -> {
+                if (isNeeded(context) && !isLoading) {
+                    isLoading = true;
+                    Log.e("CloudflareBypass", "is needed");
+                    clearCookies();
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        webView.getSettings().setJavaScriptEnabled(true);
+                        webView.setWebViewClient(new WebViewClient() {
+                            @Override
+                            public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+                                Log.e("CloudflareBypass", "Override " + url);
+                                if (url.equals("https://animeflv.net/")) {
+                                    Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"));
+                                    saveCookies(context);
+                                    Toaster.toast("Bypass actualizado");
+                                    PicassoSingle.clear();
+                                    innerInterface.onNeedRecreate();
+                                }
+                                isLoading = false;
+                                return false;
                             }
-                            isLoading = false;
-                            return false;
-                        }
+                        });
+                        webView.getSettings().setUserAgentString(userAgent);
+                        webView.loadUrl("https://animeflv.net/");
                     });
-                    webView.getSettings().setUserAgentString(userAgent);
-                    webView.loadUrl("https://animeflv.net/");
-                });
-            } else {
-                Log.e("CloudflareBypass", "Not needed");
-            }
-        });
+                } else {
+                    Log.e("CloudflareBypass", "Not needed");
+                }
+            });
     }
 
     public interface Interface {

@@ -138,6 +138,12 @@
             android:icon="@drawable/ic_number"
             android:key="show_fav_count"
             android:title="Indicador de favoritos"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_collapse"
+            android:key="collapse_dir_nots"
+            android:summary="Crear y actualizar directorio"
+            android:title="Notificaciones pequeñas"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Personalización">

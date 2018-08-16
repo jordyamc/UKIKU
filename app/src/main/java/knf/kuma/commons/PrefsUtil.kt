@@ -11,10 +11,10 @@ object PrefsUtil {
     private var context: Context? = null
 
     val layType: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0")
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0")!!
 
     val themeOption: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")!!
 
     var favsOrder: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("favs_order", 0)
@@ -35,6 +35,9 @@ object PrefsUtil {
 
     val showFavIndicator: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_fav_count", true)
+
+    val collapseDirectoryNotification: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("collapse_dir_nots", true)
 
     fun init(context: Context) {
         PrefsUtil.context = context

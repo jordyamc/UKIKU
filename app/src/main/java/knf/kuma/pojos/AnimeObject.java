@@ -429,10 +429,14 @@ public class AnimeObject implements Comparable<AnimeObject> {
 
         @TypeConverter
         public String chaptersToString(List<WebInfo.AnimeChapter> list) {
-            Gson gson = new Gson();
-            Type type = new TypeToken<List<WebInfo.AnimeChapter>>() {
-            }.getType();
-            return gson.toJson(list, type);
+            try {
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<WebInfo.AnimeChapter>>() {
+                }.getType();
+                return gson.toJson(list, type);
+            } catch (Exception e) {
+                return "{}";
+            }
         }
 
         @TypeConverter
