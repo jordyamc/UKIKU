@@ -47,9 +47,7 @@ public class AppInfo extends MaterialAboutActivity {
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_facebook_group), "Grupo de Facebook", true, Uri.parse("https://www.facebook.com/groups/ukikugroup/")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_discord), "Discord", false, Uri.parse("https://discord.gg/6hzpua6")));
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(AppInfo.this, getDrawable(R.drawable.ic_beta), "Grupo Beta", false, Uri.parse("https://t.me/joinchat/A3tvqEKOzGVyaZhQPc14_Q")));
-        final String ea = EAHelper.getEAMessage();
-        if (ea != null)
-            extraCard.addItem(new MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction(() -> Toaster.toastLong(ea)).build());
+        extraCard.addItem(new MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction(() -> Toaster.toastLong(EAHelper.getEAMessage())).build());
         return new MaterialAboutList.Builder()
                 .addCard(infoCard.build())
                 .addCard(authorCard.build())

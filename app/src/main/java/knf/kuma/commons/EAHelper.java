@@ -131,7 +131,7 @@ public class EAHelper {
         else if (isPart0Unlocked())
             return CODE1;
         else
-            return null;
+            return "\u26B2 easteregg";
     }
 
     private static void setUnlocked(int phase) {

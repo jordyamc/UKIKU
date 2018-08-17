@@ -146,6 +146,7 @@
             android:title="Notificaciones pequeñas"/>
     </PreferenceCategory>
     <PreferenceCategory
+        android:key="category_design"
         android:title="Personalización">
         <ListPreference
             android:defaultValue="0"

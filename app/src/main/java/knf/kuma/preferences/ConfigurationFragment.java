@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
@@ -131,7 +133,19 @@ public class ConfigurationFragment extends PreferenceFragment {
                 getActivity().finish();
                 return true;
             });
-        else {
+        else if (EAHelper.getPhase() == 0) {
+            PreferenceCategory category = ((PreferenceCategory) getPreferenceScreen().findPreference("category_design"));
+            category.removePreference(getPreferenceScreen().findPreference("theme_color"));
+            Preference pref = new Preference(getActivity());
+            pref.setTitle("Color de tema");
+            pref.setSummary("Resuelve el secreto para desbloquear");
+            pref.setIcon(R.drawable.ic_palette);
+            pref.setOnPreferenceClickListener(preference -> {
+                Toaster.toast(EAHelper.getEAMessage());
+                return true;
+            });
+            category.addPreference(pref);
+        } else {
             getPreferenceScreen().findPreference("theme_color").setSummary("Resuelve el secreto para desbloquear");
             getPreferenceScreen().findPreference("theme_color").setEnabled(false);
         }
