@@ -110,6 +110,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
     private void completeInfo(List<Element> scripts) {
         try {
             AnimeInfo animeInfo = new AnimeInfo(findDataScript(scripts).html());
+            this.name = PatternUtil.fromHtml(animeInfo.title);
             this.day = animeInfo.day;
             this.chapters = WebInfo.AnimeChapter.create(animeInfo);
         } catch (Exception e) {
@@ -212,22 +213,22 @@ public class AnimeObject implements Comparable<AnimeObject> {
     public static class WebInfo {
         @Selector(value = "div.Image img[src]", attr = "src", format = "/(\\d+)[/.]")
         public String aid;
-        @Selector(value = "meta[property='og:title']", attr = "content", format = "^ ?(.+ ?O?n?l?i?n?e?) Online", defValue = "Error")
+        @Selector(value = "meta[property='og:title']", attr = "content", format = "^ ?V?e?r? ?A?n?i?m?e? ?(.+ ?O?n?l?i?n?e?) Online", defValue = "Error")
         @ColumnInfo(name = "web_name")
         public String name;
         @Selector(value = "div.Image img[src]", attr = "src")
         public String img;
         @Selector(value = "div.Description p", defValue = "Sin descripcion")
         public String description;
-        @Selector(value = "div.Ficha div.Container span", attr = "class")
+        @Selector(value = "span[class^=Type]", attr = "class")
         @ColumnInfo(name = "web_type")
         public String type;
         @Selector(value = "aside.SidebarA.BFixed p", attr = "class")
         @ColumnInfo(name = "web_state")
         public String state;
-        @Selector(value = "meta[itemprop='ratingValue']", attr = "content")
+        @Selector(value = "span.vtprmd")
         public String rate_stars;
-        @Selector(value = "meta[itemprop='ratingCount']", attr = "content")
+        @Selector(value = "span#votes_nmbr")
         public String rate_count;
         @Selector(value = "span.Date.fa-calendar", converter = DayConverter.class)
         public Day emisionDay;

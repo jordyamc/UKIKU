@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="58" version="1.9.1">
+        <change type="fix">Errores generales</change>
+        <change type="change">Botón cast en información de anime</change>
+        <change type="change">Filtrado por ID en directorio</change>
+    </release>
     <release code="57" version="1.9">
         <change type="fix">Errores generales</change>
         <change type="new">Importacion multiple</change>

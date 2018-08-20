@@ -6,8 +6,8 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 57,
-      "versionName": "1.9",
+      "versionCode": 58,
+      "versionName": "1.9.1",
       "enabled": true,
       "outputFile": "app-release.apk",
       "fullName": "release",

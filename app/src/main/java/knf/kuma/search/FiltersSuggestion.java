@@ -35,6 +35,7 @@ public class FiltersSuggestion implements SearchSuggestionsBuilder {
             items.add(new SearchItem("Animes",":anime:",SearchItem.TYPE_SEARCH_ITEM_CUSTOM, drawable));
             items.add(new SearchItem("Ovas",":ova:",SearchItem.TYPE_SEARCH_ITEM_CUSTOM, drawable));
             items.add(new SearchItem("Películas",":pelicula:",SearchItem.TYPE_SEARCH_ITEM_CUSTOM, drawable));
+            items.add(new SearchItem("Personalizado", ":personalizado:", SearchItem.TYPE_SEARCH_ITEM_CUSTOM, drawable));
         }
         return items;
     }

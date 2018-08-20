@@ -86,17 +86,26 @@ public interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY rate_stars DESC")
     DataSource.Factory<Integer, AnimeObject> getAnimeDirVotes();
 
+    @Query("SELECT * FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` ASC")
+    DataSource.Factory<Integer, AnimeObject> getAnimeDirID();
+
     @Query("SELECT * FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY name")
     DataSource.Factory<Integer, AnimeObject> getOvaDir();
 
     @Query("SELECT * FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY rate_stars DESC")
     DataSource.Factory<Integer, AnimeObject> getOvaDirVotes();
 
+    @Query("SELECT * FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY `key` ASC")
+    DataSource.Factory<Integer, AnimeObject> getOvaDirID();
+
     @Query("SELECT * FROM AnimeObject WHERE type LIKE 'Película' ORDER BY name")
     DataSource.Factory<Integer, AnimeObject> getMovieDir();
 
     @Query("SELECT * FROM AnimeObject WHERE type LIKE 'Película' ORDER BY rate_stars DESC")
     DataSource.Factory<Integer, AnimeObject> getMovieDirVotes();
+
+    @Query("SELECT * FROM AnimeObject WHERE type LIKE 'Película' ORDER BY `key` ASC")
+    DataSource.Factory<Integer, AnimeObject> getMovieDirID();
 
     @Query("SELECT * FROM AnimeObject WHERE fileName LIKE :file")
     AnimeObject getByFile(String file);

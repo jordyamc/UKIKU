@@ -114,6 +114,8 @@ public class Repository {
                 return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getAnimeDir(), 25).build();
             case 1:
                 return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getAnimeDirVotes(), 25).build();
+            case 2:
+                return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getAnimeDirID(), 25).build();
         }
     }
 
@@ -124,6 +126,8 @@ public class Repository {
                 return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getOvaDir(), 25).build();
             case 1:
                 return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getOvaDirVotes(), 25).build();
+            case 2:
+                return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getOvaDirID(), 25).build();
         }
     }
 
@@ -134,6 +138,8 @@ public class Repository {
                 return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getMovieDir(), 25).build();
             case 1:
                 return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getMovieDirVotes(), 25).build();
+            case 2:
+                return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getMovieDirID(), 25).build();
         }
     }
 
@@ -155,7 +161,8 @@ public class Repository {
 
     @NonNull
     private LiveData<PagedList<AnimeObject>> getFiltered(String query, @Nullable String genres) {
-        String f_query = PatternUtil.getCustomSearch(query).trim();
+        String t_query = PatternUtil.getCustomSearch(query).trim();
+        String f_query = t_query;
         if (!f_query.equals(""))
             f_query = "%" + f_query + "%";
         else f_query = "%";
@@ -185,6 +192,12 @@ public class Repository {
                     return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTY(f_query, "Película"), 25).setInitialLoadKey(0).build();
                 else
                     return new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTYG(f_query, "Película", genres), 25).setInitialLoadKey(0).build();
+            case "personalizado":
+                if (t_query.equals(""))
+                    t_query = "%";
+                return genres == null ?
+                        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearch(t_query), 25).setInitialLoadKey(0).build() :
+                        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearchTG(t_query, genres), 25).setInitialLoadKey(0).build();
             default:
                 return genres == null ?
                         new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getSearch(f_query), 25).setInitialLoadKey(0).build() :

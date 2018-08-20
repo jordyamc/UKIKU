@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import es.munix.multidisplaycast.CastManager;
 import knf.kuma.R;
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder;
 import knf.kuma.commons.EAHelper;
@@ -321,6 +322,7 @@ public class ActivityAnime extends AppCompatActivity implements AnimeActivityHol
     public boolean onCreateOptionsMenu(Menu menu) {
         if (favoriteObject != null) {
             getMenuInflater().inflate(R.menu.menu_anime_info, menu);
+            CastManager.getInstance().registerForActivity(this, menu, R.id.castMenu);
         }
         return true;
     }

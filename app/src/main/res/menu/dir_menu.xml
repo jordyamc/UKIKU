@@ -21,7 +21,10 @@
                     android:title="Nombre"/>
                 <item
                     android:id="@+id/by_votes"
-                    android:title="Puntuacion"/>
+                    android:title="Puntuación"/>
+                <item
+                    android:id="@+id/by_id_dir"
+                    android:title="ID"/>
             </group>
         </menu>
     </item>

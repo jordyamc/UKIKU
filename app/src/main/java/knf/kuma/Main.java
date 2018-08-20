@@ -358,6 +358,10 @@ public class Main extends AppCompatActivity
                 case 1:
                     menu.findItem(R.id.by_votes).setChecked(true);
                     break;
+                case 2:
+                    menu.findItem(R.id.by_id_dir).setChecked(true);
+                    break;
+
             }
         } else {
             getMenuInflater().inflate(R.menu.main, menu);
@@ -393,6 +397,10 @@ public class Main extends AppCompatActivity
                 break;
             case R.id.by_id:
                 PrefsUtil.INSTANCE.setFavsOrder(1);
+                changeOrder();
+                break;
+            case R.id.by_id_dir:
+                PrefsUtil.INSTANCE.setDirOrder(2);
                 changeOrder();
                 break;
         }
@@ -481,8 +489,9 @@ public class Main extends AppCompatActivity
     private void returnFragment() {
         if (tmpfragment != null) {
             setFragment(tmpfragment);
-        }
-        tmpfragment = null;
+            tmpfragment = null;
+        } else if (bottomNavigationView != null)
+            bottomNavigationView.setSelectedItemId(R.id.action_bottom_recents);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
@@ -562,6 +571,7 @@ public class Main extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         //BypassUtil.check(this);
+        supportInvalidateOptionsMenu();
         checkBypass();
         if (navigationView != null)
             new Handler(Looper.getMainLooper()).post(() -> {

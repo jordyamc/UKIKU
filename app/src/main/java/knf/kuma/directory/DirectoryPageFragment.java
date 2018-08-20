@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.UiThread;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedList;
@@ -28,6 +29,7 @@ public class DirectoryPageFragment extends BottomFragment {
     private RecyclerView.LayoutManager manager;
     private DirectorypageAdapter adapter;
     private boolean isFirst = true;
+    private boolean listUpdated = false;
 
     public DirectoryPageFragment() {
     }
@@ -45,6 +47,21 @@ public class DirectoryPageFragment extends BottomFragment {
         super.onActivityCreated(savedInstanceState);
         DirectoryViewModel model = ViewModelProviders.of(getActivity()).get(DirectoryViewModel.class);
         adapter = new DirectorypageAdapter(this);
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                if (positionStart == 0)
+                    scrollTop();
+            }
+
+            @Override
+            public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+                if (toPosition == 0)
+                    scrollTop();
+            }
+        });
         getLiveData(model).observe(this, animeObjects -> {
             hideProgress();
             adapter.submitList(animeObjects);
@@ -69,8 +86,10 @@ public class DirectoryPageFragment extends BottomFragment {
         if (getActivity() != null && adapter != null && recyclerView != null) {
             getLiveData(ViewModelProviders.of(getActivity()).get(DirectoryViewModel.class)).observe(this, animeObjects -> {
                 hideProgress();
+                listUpdated = true;
                 adapter.submitList(animeObjects);
                 makeAnimation();
+                scrollTop();
             });
         }
     }
@@ -83,6 +102,15 @@ public class DirectoryPageFragment extends BottomFragment {
         if (isFirst) {
             recyclerView.scheduleLayoutAnimation();
             isFirst = false;
+        }
+    }
+
+    @UiThread
+    private void scrollTop() {
+        try {
+            recyclerView.smoothScrollToPosition(0);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

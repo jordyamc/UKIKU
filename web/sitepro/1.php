@@ -32,30 +32,34 @@
 	<!--[if lt IE 9]>
 	<script src="js/html5shiv.min.js"></script>
 	<![endif]-->
-	    <script type="application/ld+json">
-	    {
-	    "@context" : "http://schema.org",
-	    "@type" : "MobileApplication",
-	    "name" : "UKIKU",
-	    "image" : "https://ukiku.ga/gallery_gen/426d03e067942f73910b0ad925811791_67x67.png",
-	    "url" : "https://ukiku.ga/",
-	    "applicationCategory" : "descarga y streaming de anime",
-	    "operatingSystem": "Android 5",
-	    "downloadUrl" : "https://ukiku.ga/get.php",
-	    "screenshot" : "https://ukiku.ga/gallery_gen/500166f32a78d6a767eff2182d492e63_400x690.png",
-	    "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "17"
-          }
-	    },
-	    "author": {
-            "@type": "Person",
-            "name": "Jordy Mendoza",
-            "email": "mailto:jordyamc@hotmail.com"
+	<script type="application/ld+json">
+        {
+    	    "@context" : "http://schema.org",
+    	    "@type" : "MobileApplication",
+    	    "name" : "UKIKU",
+    	    "image" : "https://ukiku.ga/img/icon.png",
+    	    "url" : "https://ukiku.ga/",
+    	    "applicationCategory" : "http://schema.org/MobileApplication",
+    	    "operatingSystem": "ANDROID 5",
+    	    "downloadUrl" : "https://ukiku.ga/get.php",
+    	    "screenshot" : "https://ukiku.ga/gallery_gen/500166f32a78d6a767eff2182d492e63_400x690.png",
+    	    "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "reviewCount": "17"
+            },
+    	    "author": {
+                "@type": "Person",
+                "name": "Jordy Mendoza",
+                "email": "mailto:jordyamc@hotmail.com"
+            },
+            "offers": {
+                "@type": "Offer",
+                "price": "0.00",
+                "priceCurrency": "USD"
             }
         }
-	    </script>
+    </script>
 </head>
 
 

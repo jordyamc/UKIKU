@@ -85,6 +85,21 @@ public class SearchFragment extends BottomFragment {
         recyclerView.setLayoutManager(manager);
         recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_fall_down));
         adapter = new SearchAdapter(this);
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+                if (toPosition == 0)
+                    manager.smoothScrollToPosition(recyclerView, null, 0);
+            }
+
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                if (positionStart == 0)
+                    manager.smoothScrollToPosition(recyclerView, null, 0);
+            }
+        });
         recyclerView.setAdapter(adapter);
         fab.setOnClickListener(view1 -> {
             GenresDialog dialog = new GenresDialog();
@@ -113,8 +128,6 @@ public class SearchFragment extends BottomFragment {
                     progressBar.setVisibility(View.GONE);
                     isFirst = false;
                     recyclerView.scheduleLayoutAnimation();
-                } else {
-                    manager.smoothScrollToPosition(recyclerView, null, 0);
                 }
             });
     }
