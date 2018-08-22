@@ -110,7 +110,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
     private void completeInfo(List<Element> scripts) {
         try {
             AnimeInfo animeInfo = new AnimeInfo(findDataScript(scripts).html());
-            this.name = PatternUtil.fromHtml(animeInfo.title);
+            //this.name = PatternUtil.fromHtml(animeInfo.title);
             this.day = animeInfo.day;
             this.chapters = WebInfo.AnimeChapter.create(animeInfo);
         } catch (Exception e) {
