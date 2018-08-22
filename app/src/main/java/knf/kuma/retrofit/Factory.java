@@ -9,8 +9,8 @@ import retrofit2.http.Path;
 
 public interface Factory {
     @GET(".")
-    Call<Recents> getRecents(@Header("Cookie") String cookies, @Header("User-Agent") String userAgent);
+    Call<Recents> getRecents(@Header("Cookie") String cookies, @Header("User-Agent") String userAgent, @Header("Referer") String referer);
 
     @GET("{rest}")
-    Call<AnimeObject.WebInfo> getAnime(@Header("Cookie") String cookies, @Header("User-Agent") String userAgent, @Path("rest") String rest);
+    Call<AnimeObject.WebInfo> getAnime(@Header("Cookie") String cookies, @Header("User-Agent") String userAgent, @Header("Referer") String referer, @Path("rest") String rest);
 }

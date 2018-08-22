@@ -125,6 +125,20 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+    <string-array name="autobackup">
+        <item>Nunca</item>
+        <item>Diariamente</item>
+        <item>Cada 3 días</item>
+        <item>Cada 5 días</item>
+        <item>Semanalmente</item>
+    </string-array>
+    <string-array name="autobackup_values">
+        <item>0</item>
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+    </string-array>
     <string name="shortcut_fav_short">Favoritos</string>
     <string name="shortcut_fav_long">Animes favoritos</string>
     <string name="shortcut_dir_short">Directorio</string>

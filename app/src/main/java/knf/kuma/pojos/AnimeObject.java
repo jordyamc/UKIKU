@@ -226,9 +226,9 @@ public class AnimeObject implements Comparable<AnimeObject> {
         @Selector(value = "aside.SidebarA.BFixed p", attr = "class")
         @ColumnInfo(name = "web_state")
         public String state;
-        @Selector(value = "span.vtprmd")
+        @Selector(value = "span.vtprmd", defValue = "0.0")
         public String rate_stars;
-        @Selector(value = "span#votes_nmbr")
+        @Selector(value = "span#votes_nmbr", defValue = "0")
         public String rate_count;
         @Selector(value = "span.Date.fa-calendar", converter = DayConverter.class)
         public Day emisionDay;

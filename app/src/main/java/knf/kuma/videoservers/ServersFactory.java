@@ -36,7 +36,6 @@ import knf.kuma.database.CacheDB;
 import knf.kuma.download.DownloadManager;
 import knf.kuma.download.DownloadService;
 import knf.kuma.download.FileAccessHelper;
-import knf.kuma.player.ExoPlayer;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.DownloadObject;
 import knf.kuma.pojos.QueueObject;
@@ -113,7 +112,10 @@ public class ServersFactory {
     public static void startPlay(Context context, String title, String file_name) {
         File file = FileAccessHelper.INSTANCE.getFile(file_name);
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")) {
-            context.startActivity(new Intent(context, ExoPlayer.class).setData(Uri.fromFile(file)).putExtra("isFile", true).putExtra("title", title));
+            context.startActivity(PrefsUtil.INSTANCE.getPlayerIntent()
+                    .setData(Uri.fromFile(file))
+                    .putExtra("isFile", true)
+                    .putExtra("title", title));
         } else {
             Intent intent = new Intent(Intent.ACTION_VIEW, FileAccessHelper.INSTANCE.getDataUri(file_name))
                     .setDataAndType(FileAccessHelper.INSTANCE.getDataUri(file_name), "video/mp4")
@@ -130,7 +132,11 @@ public class ServersFactory {
     public static PendingIntent getPlayIntent(Context context, String title, String file_name) {
         File file = FileAccessHelper.INSTANCE.getFile(file_name);
         if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0").equals("0")) {
-            return PendingIntent.getActivity(context, Math.abs(file_name.hashCode()), new Intent(context, ExoPlayer.class).setData(Uri.fromFile(file)).putExtra("isFile", true).putExtra("title", getEpTitle(title, file_name)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_UPDATE_CURRENT);
+            return PendingIntent.getActivity(context, Math.abs(file_name.hashCode()),
+                    PrefsUtil.INSTANCE.getPlayerIntent()
+                            .setData(Uri.fromFile(file)).putExtra("isFile", true)
+                            .putExtra("title", getEpTitle(title, file_name))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             Intent intent = new Intent(Intent.ACTION_VIEW, FileAccessHelper.INSTANCE.getDataUri(file_name))
                     .setDataAndType(FileAccessHelper.INSTANCE.getDataUri(file_name), "video/mp4")
@@ -342,7 +348,11 @@ public class ServersFactory {
         } else {
             Answers.getInstance().logCustom(new CustomEvent("Streaming").putCustomAttribute("Server", option.server));
             if (PreferenceManager.getDefaultSharedPreferences(App.getContext()).getString("player_type", "0").equals("0")) {
-                App.getContext().startActivity(new Intent(App.getContext(), ExoPlayer.class).setData(Uri.parse(option.url)).putExtra("title", downloadObject.title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                App.getContext().startActivity(
+                        PrefsUtil.INSTANCE.getPlayerIntent()
+                                .setData(Uri.parse(option.url))
+                                .putExtra("title", downloadObject.title)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             } else {
                 Intent intent = new Intent(Intent.ACTION_VIEW)
                         .setDataAndType(Uri.parse(option.url), "video/mp4")

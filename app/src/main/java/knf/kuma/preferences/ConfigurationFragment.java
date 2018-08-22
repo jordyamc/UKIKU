@@ -7,11 +7,14 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
@@ -25,15 +28,19 @@ import androidx.core.view.ViewCompat;
 import knf.kuma.BuildConfig;
 import knf.kuma.Main;
 import knf.kuma.R;
+import knf.kuma.backup.BUUtils;
 import knf.kuma.commons.EAHelper;
+import knf.kuma.commons.Network;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.directory.DirectoryService;
 import knf.kuma.directory.DirectoryUpdateService;
 import knf.kuma.download.DownloadManager;
 import knf.kuma.download.FileAccessHelper;
+import knf.kuma.jobscheduler.BackupJob;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import knf.kuma.jobscheduler.RecentsJob;
+import knf.kuma.pojos.AutoBackupObject;
 import knf.kuma.widgets.emision.WEmisionProvider;
 import xdroid.toaster.Toaster;
 
@@ -57,6 +64,43 @@ public class ConfigurationFragment extends PreferenceFragment {
                     getPreferenceManager().getSharedPreferences().edit().putBoolean("daynigth_permission", true).apply();
                     getPreferenceScreen().findPreference("daynigth_permission").setEnabled(false);
                 }
+            return true;
+        });
+        if (BUUtils.getType(getActivity()) != BUUtils.BUType.LOCAL) {
+            if (Network.isConnected()) {
+                BUUtils.init(getActivity(), () -> {
+                    getPreferenceScreen().findPreference("auto_backup").setSummary("Cargando...");
+                    BUUtils.search("autobackup", backupObject ->
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                try {
+                                    if (backupObject != null) {
+                                        AutoBackupObject autobackupObject = (AutoBackupObject) backupObject;
+                                        if (backupObject.equals(new AutoBackupObject(getActivity())))
+                                            getPreferenceScreen().findPreference("auto_backup").setSummary("%s");
+                                        else
+                                            getPreferenceScreen().findPreference("auto_backup").setSummary("Solo " + autobackupObject.name);
+                                    } else {
+                                        getPreferenceManager().getSharedPreferences().edit().putString("auto_backup", "0").apply();
+                                        getPreferenceScreen().findPreference("auto_backup").setSummary("%s");
+                                    }
+                                    getPreferenceScreen().findPreference("auto_backup").setEnabled(true);
+                                } catch (Exception e) {
+                                    getPreferenceScreen().findPreference("auto_backup").setSummary("Error al buscar archivo");
+                                }
+                            }));
+                }, true);
+            } else {
+                getPreferenceScreen().findPreference("auto_backup").setSummary("Sin internet");
+            }
+        } else {
+            getPreferenceScreen().findPreference("auto_backup").setSummary("Sin cuenta para respaldos");
+        }
+        getPreferenceScreen().findPreference("auto_backup").setOnPreferenceChangeListener((preference, o) -> {
+            BackupJob.reSchedule(Integer.valueOf((String) o));
+            BUUtils.backup(new AutoBackupObject(getActivity()), backupObject -> {
+                if (backupObject != null)
+                    Log.e("Backup override", backupObject.name);
+            });
             return true;
         });
         getPreferenceScreen().findPreference("download_type").setOnPreferenceChangeListener((preference, o) -> {

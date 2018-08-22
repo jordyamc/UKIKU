@@ -33,6 +33,15 @@
             android:key="dir_update_time"
             android:summary="%s"
             android:title="Recrear directorio"/>
+        <ListPreference
+            android:defaultValue="0"
+            android:enabled="false"
+            android:entries="@array/autobackup"
+            android:entryValues="@array/autobackup_values"
+            android:icon="@drawable/ic_cloud_upload"
+            android:key="auto_backup"
+            android:summary="%s"
+            android:title="Auto respaldo"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Almacenamiento">
@@ -98,6 +107,11 @@
             android:key="player_resize"
             android:summary="%s"
             android:title="Redimensión de video"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_experimental"
+            android:key="experimental_player"
+            android:title="Reproductor experimental"/>
         <!--<SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_cast_conf"

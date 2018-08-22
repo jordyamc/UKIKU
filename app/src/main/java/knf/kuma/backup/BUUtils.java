@@ -46,11 +46,15 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.Nullable;
 import knf.kuma.backup.objects.BackupObject;
 import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.AnimeObject;
+import knf.kuma.pojos.AutoBackupObject;
+import knf.kuma.pojos.FakeAutoBackup;
 import knf.kuma.pojos.FavoriteObject;
 import knf.kuma.pojos.RecordObject;
 import knf.kuma.pojos.SeeingObject;
@@ -75,6 +79,10 @@ public class BUUtils {
             startClient(getType(), true);
     }
 
+    public static void init(Context context) {
+        startClient(context, getType(context));
+    }
+
     public static boolean isLogedIn() {
         return DRC != null || DBC != null;
     }
@@ -83,7 +91,16 @@ public class BUUtils {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
         if (account != null)
             DRC = Drive.getDriveResourceClient(activity, account);
-        loginInterface.onLogin();
+        if (loginInterface != null)
+            loginInterface.onLogin();
+    }
+
+    public static void setDriveClient(Context context) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
+        if (account != null)
+            DRC = Drive.getDriveResourceClient(context, account);
+        if (loginInterface != null)
+            loginInterface.onLogin();
     }
 
     public static void setDropBoxClient(String token) {
@@ -94,11 +111,28 @@ public class BUUtils {
                     .build();
             DBC = new DbxClientV2(requestConfig, token);
         }
-        loginInterface.onLogin();
+        if (loginInterface != null)
+            loginInterface.onLogin();
+    }
+
+    public static void setDropBoxClient(Context context, String token) {
+        if (token != null) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("db_token", token).apply();
+            DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("dropbox_app")
+                    .withHttpRequestor(new OkHttp3Requestor(OkHttp3Requestor.defaultOkHttpClient()))
+                    .build();
+            DBC = new DbxClientV2(requestConfig, token);
+        }
+        if (loginInterface != null)
+            loginInterface.onLogin();
     }
 
     private static String getDBToken() {
         return PreferenceManager.getDefaultSharedPreferences(activity).getString("db_token", null);
+    }
+
+    private static String getDBToken(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("db_token", null);
     }
 
     private static void clearDBToken() {
@@ -133,6 +167,18 @@ public class BUUtils {
                 } else {
                     Auth.startOAuth2Authentication(activity, "qtjow4hsk06vt19");
                 }
+                break;
+        }
+    }
+
+    public static void startClient(Context context, BUType type) {
+        switch (type) {
+            case DRIVE:
+                setDriveClient(context);
+                break;
+            case DROPBOX:
+                if (getDBToken(context) != null)
+                    setDropBoxClient(context, getDBToken(context));
                 break;
         }
     }
@@ -186,6 +232,17 @@ public class BUUtils {
         }
     }
 
+    public static void search(Context context, final String id, final SearchInterface searchInterface) {
+        switch (getType(context)) {
+            case DRIVE:
+                searchDriveNC(id, searchInterface);
+                break;
+            case DROPBOX:
+                searchDropbox(id, searchInterface);
+                break;
+        }
+    }
+
     public static void backup(final String id, final BackupInterface backupInterface) {
         switch (getType()) {
             case DRIVE:
@@ -193,6 +250,55 @@ public class BUUtils {
                 break;
             case DROPBOX:
                 backupDropbox(id, backupInterface);
+                break;
+        }
+    }
+
+    public static void backupNUI(Context context, final String id, final BackupInterface backupInterface) {
+        switch (getType(context)) {
+            case DRIVE:
+                backupDriveNUI(id, backupInterface);
+                break;
+            case DROPBOX:
+                backupDropboxNUI(id, backupInterface);
+                break;
+        }
+    }
+
+    public static void backupAllNUI(Context context) {
+        AtomicInteger i = new AtomicInteger(0);
+        BackupInterface backupInterface = backupObject -> i.getAndIncrement();
+        backupNUI(context, "favs", backupInterface);
+        backupNUI(context, "history", backupInterface);
+        backupNUI(context, "following", backupInterface);
+        backupNUI(context, "seen", backupInterface);
+        while (i.get() != 4) {
+            //
+        }
+    }
+
+    public static AutoBackupObject waitAutoBackup(Context context) {
+        AtomicReference<AutoBackupObject> object = new AtomicReference<>(new FakeAutoBackup());
+        search(context, "autobackup", backupObject -> {
+            try {
+                object.set((AutoBackupObject) backupObject);
+            } catch (Exception e) {
+                object.set(null);
+            }
+        });
+        while (object.get() instanceof FakeAutoBackup) {
+            //
+        }
+        return object.get();
+    }
+
+    public static void backup(AutoBackupObject backupObject, AutoBackupInterface backupInterface) {
+        switch (getType()) {
+            case DRIVE:
+                backupDrive(backupObject, backupInterface);
+                break;
+            case DROPBOX:
+                backupDropbox(backupObject, backupInterface);
                 break;
         }
     }
@@ -253,6 +359,44 @@ public class BUUtils {
         });
     }
 
+    private static void searchDriveNC(final String id, final SearchInterface searchInterface) {
+        AsyncTask.execute(() -> {
+            try {
+                final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
+                appFolderTask.continueWithTask(task -> {
+                    DriveFolder appfolder = appFolderTask.getResult();
+                    Query query = new Query.Builder()
+                            .addFilter(Filters.contains(SearchableField.TITLE, id))
+                            .build();
+                    return DRC.queryChildren(appfolder, query);
+                }).continueWithTask(task -> {
+                    MetadataBuffer metadata = task.getResult();
+                    if (metadata.getCount() > 0) {
+                        DriveFile driveFile = metadata.get(0).getDriveId().asDriveFile();
+                        metadata.release();
+                        return DRC.openFile(driveFile, DriveFile.MODE_READ_ONLY);
+                    } else {
+                        metadata.release();
+                        return null;
+                    }
+                }).addOnSuccessListener(driveContents -> {
+                    try {
+                        searchInterface.onResponse(new Gson().fromJson(new InputStreamReader(driveContents.getInputStream()), getType(id)));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        searchInterface.onResponse(null);
+                    }
+                }).addOnFailureListener(e -> {
+                    e.printStackTrace();
+                    searchInterface.onResponse(null);
+                });
+            } catch (Exception e) {
+                Crashlytics.logException(e);
+                searchInterface.onResponse(null);
+            }
+        });
+    }
+
     private static void backupDropbox(final String id, final BackupInterface backupInterface) {
         final MaterialDialog dialog = new MaterialDialog.Builder(activity)
                 .content("Respaldando...")
@@ -276,6 +420,37 @@ public class BUUtils {
         });
     }
 
+    private static void backupDropboxNUI(final String id, final BackupInterface backupInterface) {
+        AsyncTask.execute(() -> {
+            try {
+                BackupObject backupObject = new BackupObject(getList(id));
+                DBC.files().uploadBuilder("/" + id)
+                        .withMute(true)
+                        .withMode(WriteMode.OVERWRITE)
+                        .uploadAndFinish(new ByteArrayInputStream(new Gson().toJson(backupObject, getType(id)).getBytes(StandardCharsets.UTF_8)));
+                backupInterface.onResponse(backupObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+                backupInterface.onResponse(null);
+            }
+        });
+    }
+
+    private static void backupDropbox(AutoBackupObject backupObject, final AutoBackupInterface backupInterface) {
+        AsyncTask.execute(() -> {
+            try {
+                DBC.files().uploadBuilder("/autobackup")
+                        .withMute(true)
+                        .withMode(WriteMode.OVERWRITE)
+                        .uploadAndFinish(new ByteArrayInputStream(new Gson().toJson(backupObject, getType("autobackup")).getBytes(StandardCharsets.UTF_8)));
+                backupInterface.onResponse(backupObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+                backupInterface.onResponse(null);
+            }
+        });
+    }
+
     private static void backupDrive(final String id, final BackupInterface backupInterface) {
         final MaterialDialog dialog = new MaterialDialog.Builder(activity)
                 .content("Respaldando...")
@@ -294,30 +469,99 @@ public class BUUtils {
                                 .build();
                         return DRC.queryChildren(appFolderTask.getResult(), query);
                     }).continueWithTask(task -> {
-                        MetadataBuffer metadata = task.getResult();
-                        if (metadata.getCount() > 0)
-                            DRC.delete(metadata.get(0).getDriveId().asDriveResource());
-                        metadata.release();
-                        DriveContents contents = driveContents.getResult();
-                        OutputStream outputStream = contents.getOutputStream();
+                MetadataBuffer metadata = task.getResult();
+                if (metadata.getCount() > 0)
+                    DRC.delete(metadata.get(0).getDriveId().asDriveResource());
+                metadata.release();
+                DriveContents contents = driveContents.getResult();
+                OutputStream outputStream = contents.getOutputStream();
 
-                        try (Writer writer = new OutputStreamWriter(outputStream)) {
-                            writer.write(new Gson().toJson(backupObject, getType(id)));
-                        }
-                        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                                .setTitle(id)
-                                .setMimeType("application/json")
-                                .setStarred(true)
-                                .build();
+                try (Writer writer = new OutputStreamWriter(outputStream)) {
+                    writer.write(new Gson().toJson(backupObject, getType(id)));
+                }
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setTitle(id)
+                        .setMimeType("application/json")
+                        .setStarred(true)
+                        .build();
 
-                        return DRC.createFile(appFolderTask.getResult(), changeSet, contents);
+                return DRC.createFile(appFolderTask.getResult(), changeSet, contents);
             }).addOnSuccessListener(activity, driveFile -> {
-                        closeDialog(dialog);
-                        backupInterface.onResponse(backupObject);
+                closeDialog(dialog);
+                backupInterface.onResponse(backupObject);
             }).addOnFailureListener(activity, e -> {
-                        closeDialog(dialog);
-                        backupInterface.onResponse(null);
+                closeDialog(dialog);
+                backupInterface.onResponse(null);
             });
+        });
+    }
+
+    private static void backupDriveNUI(final String id, final BackupInterface backupInterface) {
+        AsyncTask.execute(() -> {
+            final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
+            final Task<DriveContents> driveContents = DRC.createContents();
+            final BackupObject backupObject = new BackupObject(getList(id));
+            Tasks.whenAll(appFolderTask, driveContents)
+                    .continueWithTask(task -> {
+                        Query query = new Query.Builder()
+                                .addFilter(Filters.contains(SearchableField.TITLE, id))
+                                .build();
+                        return DRC.queryChildren(appFolderTask.getResult(), query);
+                    }).continueWithTask(task -> {
+                MetadataBuffer metadata = task.getResult();
+                if (metadata.getCount() > 0)
+                    DRC.delete(metadata.get(0).getDriveId().asDriveResource());
+                metadata.release();
+                DriveContents contents = driveContents.getResult();
+                OutputStream outputStream = contents.getOutputStream();
+
+                try (Writer writer = new OutputStreamWriter(outputStream)) {
+                    writer.write(new Gson().toJson(backupObject, getType(id)));
+                }
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setTitle(id)
+                        .setMimeType("application/json")
+                        .setStarred(true)
+                        .build();
+
+                return DRC.createFile(appFolderTask.getResult(), changeSet, contents);
+            })
+                    .addOnSuccessListener(activity, driveFile -> backupInterface.onResponse(backupObject))
+                    .addOnFailureListener(activity, e -> backupInterface.onResponse(null));
+        });
+    }
+
+    private static void backupDrive(AutoBackupObject backupObject, final AutoBackupInterface backupInterface) {
+        AsyncTask.execute(() -> {
+            final Task<DriveFolder> appFolderTask = DRC.getAppFolder();
+            final Task<DriveContents> driveContents = DRC.createContents();
+            Tasks.whenAll(appFolderTask, driveContents)
+                    .continueWithTask(task -> {
+                        Query query = new Query.Builder()
+                                .addFilter(Filters.contains(SearchableField.TITLE, "autobackup"))
+                                .build();
+                        return DRC.queryChildren(appFolderTask.getResult(), query);
+                    }).continueWithTask(task -> {
+                MetadataBuffer metadata = task.getResult();
+                if (metadata.getCount() > 0)
+                    DRC.delete(metadata.get(0).getDriveId().asDriveResource());
+                metadata.release();
+                DriveContents contents = driveContents.getResult();
+                OutputStream outputStream = contents.getOutputStream();
+
+                try (Writer writer = new OutputStreamWriter(outputStream)) {
+                    writer.write(new Gson().toJson(backupObject, getType("autobackup")));
+                }
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setTitle("autobackup")
+                        .setMimeType("application/json")
+                        .setStarred(true)
+                        .build();
+
+                return DRC.createFile(appFolderTask.getResult(), changeSet, contents);
+            })
+                    .addOnSuccessListener(activity, driveFile -> backupInterface.onResponse(backupObject))
+                    .addOnFailureListener(activity, e -> backupInterface.onResponse(null));
         });
     }
 
@@ -437,6 +681,9 @@ public class BUUtils {
             case "seen":
                 return new TypeToken<BackupObject<AnimeObject.WebInfo.AnimeChapter>>() {
                 }.getType();
+            case "autobackup":
+                return new TypeToken<AutoBackupObject>() {
+                }.getType();
             default:
                 return new TypeToken<BackupObject>() {
                 }.getType();
@@ -473,6 +720,10 @@ public class BUUtils {
 
     public interface BackupInterface {
         void onResponse(@Nullable BackupObject backupObject);
+    }
+
+    public interface AutoBackupInterface {
+        void onResponse(@Nullable AutoBackupObject backupObject);
     }
 
 }

@@ -9,6 +9,9 @@ public class BackupObject<T> {
     public String date;
     public List<T> data;
 
+    public BackupObject() {
+    }
+
     public BackupObject(List<T> data) {
         this.date = new SimpleDateFormat("dd/MM/yyyy kk:mm", Locale.getDefault()).format(Calendar.getInstance().getTime());
         this.data = data;

@@ -17,6 +17,8 @@ public class JobsCreator implements JobCreator {
                 return new DirUpdateJob();
             case UpdateJob.TAG:
                 return new UpdateJob();
+            case BackupJob.TAG:
+                return new BackupJob();
             default:
                 return null;
         }

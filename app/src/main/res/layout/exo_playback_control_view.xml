@@ -8,7 +8,7 @@
     <RelativeLayout
         android:id="@+id/lay_top"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_gravity="top|center_horizontal">
 
         <View
@@ -26,8 +26,9 @@
             android:lines="1"
             android:padding="8dp"
             android:text="Title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="#b3ffffff"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.PopupMenu.Large"
+            android:textColor="#b3ffffff"
+            android:textSize="14sp"/>
 
         <!--<ImageButton
             android:id="@+id/c_pip"

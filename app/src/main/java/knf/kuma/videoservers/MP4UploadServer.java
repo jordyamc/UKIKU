@@ -2,13 +2,15 @@ package knf.kuma.videoservers;
 
 import android.content.Context;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import androidx.annotation.Nullable;
+import knf.kuma.commons.BypassUtil;
+import knf.kuma.commons.PatternUtil;
 
 import static knf.kuma.videoservers.VideoServer.Names.MP4UPLOAD;
 
@@ -19,7 +21,7 @@ public class MP4UploadServer extends Server {
 
     @Override
     public boolean isValid() {
-        return baseLink.contains("server=mp4");
+        return baseLink.contains("s=mp4upload");
     }
 
     @Override
@@ -30,7 +32,7 @@ public class MP4UploadServer extends Server {
     @Nullable
     @Override
     public VideoServer getVideoServer() {
-        String server_link = "https://www.mp4upload.com/embed-" + baseLink.substring(baseLink.indexOf("value=") + 6, baseLink.lastIndexOf("\"")) + ".html";
+        /*String server_link = "https://www.mp4upload.com/embed-" + baseLink.substring(baseLink.indexOf("value=") + 6, baseLink.lastIndexOf("\"")) + ".html";
         try {
             String data = Jsoup.connect(server_link).get().outerHtml();
             data = unpack(data).replaceAll(".+\"file\":\"", "").replaceAll("\".+$","");
@@ -40,7 +42,15 @@ public class MP4UploadServer extends Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return null;*/
+        try {
+            String down_link = PatternUtil.extractLink(baseLink);
+            String link = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text()).getString("file");
+            return new VideoServer(MP4UPLOAD, new Option(getName(), null, link));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 

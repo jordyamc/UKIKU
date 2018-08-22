@@ -8,9 +8,9 @@ import android.preference.PreferenceManager;
 
 import java.util.List;
 
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.download.FileAccessHelper;
-import knf.kuma.player.ExoPlayer;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.pojos.QueueObject;
 import knf.kuma.pojos.RecordObject;
@@ -59,7 +59,7 @@ public class QueueManager {
     }
 
     private static void startQueueInternal(Context context, List<QueueObject> list) {
-        Intent intent = new Intent(context, ExoPlayer.class)
+        Intent intent = PrefsUtil.INSTANCE.getPlayerIntent()
                 .putExtra("isPlayList", true)
                 .putExtra("playlist", list.get(0).chapter.aid)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

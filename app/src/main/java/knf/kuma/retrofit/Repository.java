@@ -41,18 +41,17 @@ public class Repository {
 
     public void reloadRecents(Context context) {
         if (Network.isConnected()) {
-            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(context), BypassUtil.userAgent).enqueue(new Callback<Recents>() {
+            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net").enqueue(new Callback<Recents>() {
                 @Override
                 public void onResponse(@NonNull Call<Recents> call, @NonNull Response<Recents> response) {
                     try {
-                        if (response.isSuccessful() && response.code() == 200) {
+                        if (response.isSuccessful()) {
                             final List<RecentObject> objects = RecentObject.create(response.body().list);
                             RecentsDAO dao = CacheDB.INSTANCE.recentsDAO();
                             dao.clear();
                             dao.setCache(objects);
-                        } else {
-                            onFailure(call, new Exception("HTTP " + String.valueOf(response.code())));
-                        }
+                        } else
+                            onFailure(call, new Exception("HTTP " + response.code()));
                     } catch (Exception e) {
                         e.printStackTrace();
                         onFailure(call, e);
@@ -77,7 +76,7 @@ public class Repository {
             final AnimeDAO dao = CacheDB.INSTANCE.animeDAO();
             if (!Network.isConnected() && dao.existLink(link))
                 return CacheDB.INSTANCE.animeDAO().getAnime(link);
-            getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, rest).enqueue(new Callback<AnimeObject.WebInfo>() {
+            getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(new Callback<AnimeObject.WebInfo>() {
                 @Override
                 public void onResponse(@NonNull Call<AnimeObject.WebInfo> call, @NonNull Response<AnimeObject.WebInfo> response) {
                     try {

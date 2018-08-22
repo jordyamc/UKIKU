@@ -2,8 +2,11 @@ package knf.kuma.commons
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.preference.PreferenceManager
 import androidx.lifecycle.LiveData
+import knf.kuma.player.CustomExoPlayer
+import knf.kuma.player.VideoActivity
 import java.util.*
 
 @SuppressLint("StaticFieldLeak")
@@ -36,6 +39,9 @@ object PrefsUtil {
     val showFavIndicator: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_fav_count", true)
 
+    private val useExperimentalPlayer: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("experimental_player", false)
+
     val collapseDirectoryNotification: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("collapse_dir_nots", true)
 
@@ -61,6 +67,13 @@ object PrefsUtil {
 
     fun getLiveEmissionBlackList(): LiveData<Set<String>> {
         return PreferenceManager.getDefaultSharedPreferences(context).stringSetLiveData("emision_blacklist", LinkedHashSet())
+    }
+
+    fun getPlayerIntent(): Intent {
+        return if (useExperimentalPlayer)
+            Intent(context, VideoActivity::class.java)
+        else
+            Intent(context, CustomExoPlayer::class.java)
     }
 
     fun getLiveShowFavIndicator(): LiveData<Boolean> {

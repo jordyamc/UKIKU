@@ -156,7 +156,7 @@ public class AnimeChaptersHolder {
                             public void onDismiss() {
                                 adapter.deselectAll();
                             }
-                        }).show(fragmentManager, "actions_dialog");
+                        }).safeShow(fragmentManager, "actions_dialog");
                     }
                 }).withMode(DragSelectionProcessor.Mode.Simple))
                 .withMaxScrollDistance(32);

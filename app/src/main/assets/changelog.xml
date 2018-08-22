@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="59" version="1.9.2">
+        <change type="fix">Errores generales</change>
+        <change type="new">Opción para auto respaldar periodicamente</change>
+    </release>
     <release code="58" version="1.9.1">
         <change type="fix">Errores generales</change>
         <change type="change">Botón cast en información de anime</change>

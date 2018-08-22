@@ -51,8 +51,16 @@
                     android:scheme="http"/>
                 <data
                     android:host="ukiku.ga"
+                    android:pathPrefix="/*"
+                    android:scheme="https"/>
+                <data
+                    android:host="ukiku.ga"
                     android:pathPrefix="/get.php"
                     android:scheme="http"/>
+                <data
+                    android:host="ukiku.ga"
+                    android:pathPrefix="/get.php"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter>
                 <data
@@ -97,7 +105,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".player.ExoPlayer"
+            android:name=".player.CustomExoPlayer"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:immersive="true"
             android:launchMode="singleTask"
@@ -221,6 +229,14 @@
                     android:scheme="http"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".player.VideoActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:immersive="true"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:screenOrientation="sensorLandscape"
+            android:supportsPictureInPicture="true"/>
 
         <provider
             android:name=".slices.AnimeSlice"

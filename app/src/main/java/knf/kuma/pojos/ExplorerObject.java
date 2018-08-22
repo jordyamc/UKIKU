@@ -187,7 +187,9 @@ public class ExplorerObject {
 
         @Override
         public int compareTo(@NonNull FileDownObj o) {
-            return eid.compareTo(o.eid);
+            int num1 = Integer.parseInt(chapter.substring(chapter.lastIndexOf(" ") + 1));
+            int num2 = Integer.parseInt(o.chapter.substring(o.chapter.lastIndexOf(" ") + 1));
+            return Integer.compare(num1, num2);
         }
     }
 

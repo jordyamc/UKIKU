@@ -28,8 +28,12 @@ public class EAHelper {
 
     public static void init(Context context) {
         SharedPreferences manager = PreferenceManager.getDefaultSharedPreferences(context);
-        CODE1 = manager.getString("ea_code1", generate(context, "ea_code1", new String[]{"R", "F", "D", "C"}));
-        CODE2 = manager.getString("ea_code2", generate(context, "ea_code2", new String[]{"1", "2", "3", "4", "5", "6", "7"}));
+        CODE1 = manager.getString("ea_code1", null);
+        CODE2 = manager.getString("ea_code2", null);
+        if (CODE1 == null)
+            CODE1 = generate(context, "ea_code1", new String[]{"R", "F", "D", "C"});
+        if (CODE2 == null)
+            CODE2 = generate(context, "ea_code2", new String[]{"1", "2", "3", "4", "5", "6", "7"});
     }
 
     public static void checkStart(String query) {

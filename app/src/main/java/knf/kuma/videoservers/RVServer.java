@@ -5,7 +5,6 @@ import android.content.Context;
 import org.jsoup.Jsoup;
 
 import androidx.annotation.Nullable;
-import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.PatternUtil;
 
 import static knf.kuma.videoservers.VideoServer.Names.RV;
@@ -32,22 +31,22 @@ public class RVServer extends Server {
             String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
             String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replaceAll("&q=720p|&q=480p|&q=360p", "");
             if (down_link.contains("&server=rv"))
-                down_link = PatternUtil.getRapidLink(Jsoup.connect(down_link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().outerHtml()).replaceAll("&q=720p|&q=480p|&q=360p", "");
+                down_link = PatternUtil.getRapidLink(down_link);
             VideoServer videoServer = new VideoServer(RV);
             try {
-                String jsoup720 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=720p").get().html());
+                String jsoup720 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=720p#").data("block", "1").post().html());
                 videoServer.addOption(new Option(getName(), "720p", jsoup720));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                String jsoup480 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=480p").get().html());
+                String jsoup480 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=480p#").data("block", "1").post().html());
                 videoServer.addOption(new Option(getName(), "480p", jsoup480));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                String jsoup360 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=360p").get().html());
+                String jsoup360 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=360p#").data("block", "1").post().html());
                 videoServer.addOption(new Option(getName(), "360p", jsoup360));
             } catch (Exception e) {
                 e.printStackTrace();

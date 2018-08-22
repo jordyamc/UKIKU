@@ -29,10 +29,10 @@ public class PatternUtil {
     }
 
     public static String getRapidLink(String link) {
-        Pattern pattern = Pattern.compile("\"(.*rapidvideo.*)\"");
+        Pattern pattern = Pattern.compile("value=([\\w#.]+)");
         Matcher matcher = pattern.matcher(link);
         matcher.find();
-        return matcher.group(1);
+        return "https://www.rapidvideo.com/e/" + matcher.group(1);
     }
 
     public static String getRapidVideoLink(String link) {

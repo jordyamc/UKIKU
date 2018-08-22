@@ -26,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -570,7 +571,7 @@ public class Main extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        //BypassUtil.check(this);
+        Crashlytics.setString("screen", "Main");
         supportInvalidateOptionsMenu();
         checkBypass();
         if (navigationView != null)

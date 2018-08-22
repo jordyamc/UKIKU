@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
@@ -46,6 +47,8 @@ public class AnimeDetailsHolder {
     TextView state;
     @BindView(R.id.aid)
     TextView id;
+    @BindView(R.id.lay_score)
+    LinearLayout lay_score;
     @BindView(R.id.rating_count)
     TextView rating_count;
     @BindView(R.id.ratingBar)
@@ -93,8 +96,12 @@ public class AnimeDetailsHolder {
             type.setText(object.type);
             state.setText(getStateString(object.state, object.day));
             id.setText(object.aid);
-            rating_count.setText(object.rate_count);
-            ratingBar.setRating(Float.parseFloat(object.rate_stars));
+            if (object.rate_stars == null || object.rate_stars.equals("0.0"))
+                lay_score.setVisibility(View.GONE);
+            else {
+                rating_count.setText(object.rate_count);
+                ratingBar.setRating(Float.parseFloat(object.rate_stars));
+            }
             showCard(cardViews.get(2));
             if (object.genres.size() != 0) {
                 recyclerView_genres.setAdapter(new AnimeTagsAdapter(fragment.getContext(), object.genres));

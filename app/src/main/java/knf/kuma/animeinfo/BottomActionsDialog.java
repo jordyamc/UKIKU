@@ -14,6 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.kuma.R;
@@ -73,6 +74,14 @@ public class BottomActionsDialog extends BottomSheetDialogFragment {
             }
         });
         return dialog;
+    }
+
+    public void safeShow(FragmentManager manager, String tag) {
+        try {
+            show(manager, tag);
+        } catch (Exception e) {
+            //
+        }
     }
 
     private void safeDismiss() {
