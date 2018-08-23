@@ -526,8 +526,8 @@ public class BUUtils {
 
                 return DRC.createFile(appFolderTask.getResult(), changeSet, contents);
             })
-                    .addOnSuccessListener(activity, driveFile -> backupInterface.onResponse(backupObject))
-                    .addOnFailureListener(activity, e -> backupInterface.onResponse(null));
+                    .addOnSuccessListener(driveFile -> backupInterface.onResponse(backupObject))
+                    .addOnFailureListener(e -> backupInterface.onResponse(null));
         });
     }
 

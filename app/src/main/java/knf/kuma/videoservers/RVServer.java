@@ -32,21 +32,22 @@ public class RVServer extends Server {
             String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replaceAll("&q=720p|&q=480p|&q=360p", "");
             if (down_link.contains("&server=rv"))
                 down_link = PatternUtil.getRapidLink(down_link);
+            boolean needPost = Jsoup.connect(down_link).get().html().contains("Please click on this button to open this video");
             VideoServer videoServer = new VideoServer(RV);
             try {
-                String jsoup720 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=720p#").data("block", "1").post().html());
+                String jsoup720 = PatternUtil.getRapidVideoLink(getHtml(down_link + "&q=720p", needPost));
                 videoServer.addOption(new Option(getName(), "720p", jsoup720));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                String jsoup480 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=480p#").data("block", "1").post().html());
+                String jsoup480 = PatternUtil.getRapidVideoLink(getHtml(down_link + "&q=480p", needPost));
                 videoServer.addOption(new Option(getName(), "480p", jsoup480));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                String jsoup360 = PatternUtil.getRapidVideoLink(Jsoup.connect(down_link + "&q=360p#").data("block", "1").post().html());
+                String jsoup360 = PatternUtil.getRapidVideoLink(getHtml(down_link + "&q=360p", needPost));
                 videoServer.addOption(new Option(getName(), "360p", jsoup360));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -57,6 +58,17 @@ public class RVServer extends Server {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private String getHtml(String link, boolean needPost) {
+        try {
+            if (needPost)
+                return Jsoup.connect(link + "#").data("block", "1").post().html();
+            else
+                return Jsoup.connect(link).get().html();
+        } catch (Exception e) {
+            return "";
         }
     }
 }

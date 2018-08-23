@@ -60,7 +60,8 @@ public class ChangelogActivity extends AppCompatActivity {
                                     .negativeText("Omitir")
                                     .onPositive((dialog, which) -> ChangelogActivity.open(activity))
                                     .onAny((dialog, which) -> PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply())
-                                    .cancelListener(dialog -> PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply()).build().show();
+                                    .cancelListener(dialog -> PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply())
+                                    .build().show();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

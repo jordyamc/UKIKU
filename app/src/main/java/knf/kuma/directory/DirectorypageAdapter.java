@@ -22,7 +22,7 @@ import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PicassoSingle;
 import knf.kuma.pojos.AnimeObject;
 
-public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,DirectorypageAdapter.ItemHolder> {
+public class DirectorypageAdapter extends PagedListAdapter<AnimeObject, DirectorypageAdapter.ItemHolder> {
 
     private static final DiffUtil.ItemCallback<AnimeObject> DIFF_CALLBACK = new DiffUtil.ItemCallback<AnimeObject>() {
         @Override
@@ -36,10 +36,12 @@ public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,Directory
         }
     };
     private Fragment fragment;
+    private String layType;
 
     DirectorypageAdapter(Fragment fragment) {
         super(DIFF_CALLBACK);
         this.fragment = fragment;
+        this.layType = PreferenceManager.getDefaultSharedPreferences(fragment.getContext()).getString("lay_type", "0");
     }
 
     @NonNull
@@ -49,18 +51,18 @@ public class DirectorypageAdapter extends PagedListAdapter<AnimeObject,Directory
     }
 
     @LayoutRes
-    private int getLayType(){
-        if (PreferenceManager.getDefaultSharedPreferences(fragment.getContext()).getString("lay_type","0").equals("0")){
+    private int getLayType() {
+        if (layType.equals("0")) {
             return R.layout.item_dir;
-        }else {
+        } else {
             return R.layout.item_dir_grid;
         }
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ItemHolder holder, int position) {
-        final AnimeObject object=getItem(position);
-        if (object!=null){
+        final AnimeObject object = getItem(position);
+        if (object != null) {
             PicassoSingle.get(fragment.getContext()).load(PatternUtil.getCover(object.aid)).into(holder.imageView);
             holder.textView.setText(object.name);
             holder.cardView.setOnClickListener(view -> ActivityAnime.open(fragment, object, holder.imageView));

@@ -45,7 +45,6 @@ import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.munix.multidisplaycast.CastManager;
-import io.fabric.sdk.android.Fabric;
 import knf.kuma.backup.BUUtils;
 import knf.kuma.backup.BackUpActivity;
 import knf.kuma.backup.MigrationActivity;
@@ -128,7 +127,6 @@ public class Main extends AppCompatActivity
             finish();
             return;
         }
-        Fabric.with(this);
         try {
             setContentView(R.layout.activity_main_drawer);
         } catch (InflateException e) {
