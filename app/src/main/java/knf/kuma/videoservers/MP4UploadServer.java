@@ -32,17 +32,6 @@ public class MP4UploadServer extends Server {
     @Nullable
     @Override
     public VideoServer getVideoServer() {
-        /*String server_link = "https://www.mp4upload.com/embed-" + baseLink.substring(baseLink.indexOf("value=") + 6, baseLink.lastIndexOf("\"")) + ".html";
-        try {
-            String data = Jsoup.connect(server_link).get().outerHtml();
-            data = unpack(data).replaceAll(".+\"file\":\"", "").replaceAll("\".+$","");
-
-            return new VideoServer(MP4UPLOAD, new Option(getName(), null, data));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;*/
         try {
             String down_link = PatternUtil.extractLink(baseLink);
             String link = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text()).getString("file");

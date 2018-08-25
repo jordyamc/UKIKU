@@ -112,26 +112,20 @@ public class VideoServer implements Parcelable {
     }
 
     public static class Names {
-        public static final String IZANAGI = "Izanagi";
-        public static final String MINHATECA = "Minhateca";
-        public static final String YOTTA = "Yotta";
-        public static final String HYPERION = "Hyperion";
-        public static final String OKRU = "Okru";
-        public static final String CLUP = "Clup";
-        public static final String FIRE = "Fire";
-        public static final String MANGO = "Mango";
-        public static final String NATSUKI = "Natsuki";
-        public static final String FENIX = "Fenix";
-        public static final String RV = "RV";
-        public static final String MP4UPLOAD = "Mp4Upload";
-        public static final String YOURUPLOAD = "YourUpload";
-        public static final String ZIPPYSHARE = "Zippyshare";
-        public static final String _4SYNC = "4Sync";
-        public static final String MEGA = "Mega";
-        public static final String ANIMEFLV = "Animeflv";
-        public static final String MARU = "Maru";
+        static final String IZANAGI = "Izanagi";
+        static final String HYPERION = "Hyperion";
+        static final String OKRU = "Okru";
+        static final String FIRE = "Fire";
+        static final String MANGO = "Mango";
+        static final String NATSUKI = "Natsuki";
+        static final String FENIX = "Fenix";
+        static final String RV = "RV";
+        static final String MP4UPLOAD = "Mp4Upload";
+        static final String YOURUPLOAD = "YourUpload";
+        static final String ZIPPYSHARE = "Zippyshare";
+        static final String MEGA = "Mega";
 
-        public static String[] getDownloadServers() {
+        static String[] getDownloadServers() {
             return new String[]{
                     IZANAGI,
                     HYPERION,

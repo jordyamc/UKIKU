@@ -40,7 +40,6 @@ public abstract class Server implements Comparable<Server> {
                 new RVServer(context, base),
                 new YUServer(context, base),
                 new MP4UploadServer(context, base)
-                //new ZippyServer(context, base)
         );
     }
 
