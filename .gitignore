@@ -8,3 +8,5 @@
 /captures
 .externalNativeBuild
 /app/google-services.json
+/app/src/main/java/knf/kuma/commons/EAHelper.java
+/app/src/main/res/values/styles_colors.xml
