@@ -1,6 +1,5 @@
 package knf.kuma.changelog;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -30,6 +29,7 @@ import io.fabric.sdk.android.services.concurrency.AsyncTask;
 import knf.kuma.R;
 import knf.kuma.changelog.objects.Changelog;
 import knf.kuma.commons.EAHelper;
+import knf.kuma.custom.DialogWrapper;
 import knf.kuma.jobscheduler.DirUpdateJob;
 import xdroid.toaster.Toaster;
 
@@ -45,7 +45,7 @@ public class ChangelogActivity extends AppCompatActivity {
         context.startActivity(new Intent(context, ChangelogActivity.class));
     }
 
-    public static void check(final Activity activity) {
+    public static void check(final AppCompatActivity activity) {
         AsyncTask.execute(() -> {
             try {
                 int c_code = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0);
@@ -54,14 +54,16 @@ public class ChangelogActivity extends AppCompatActivity {
                     runWVersion(p_code);
                     new Handler(Looper.getMainLooper()).post(() -> {
                         try {
-                            new MaterialDialog.Builder(activity)
+                            DialogWrapper.wrap(
+                                    new MaterialDialog.Builder(activity)
                                     .content("Nueva versión, ¿Leer Changelog?")
                                     .positiveText("Leer")
                                     .negativeText("Omitir")
                                     .onPositive((dialog, which) -> ChangelogActivity.open(activity))
                                     .onAny((dialog, which) -> PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply())
                                     .cancelListener(dialog -> PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", p_code).apply())
-                                    .build().show();
+                                            .build()
+                            ).safeShow(activity.getSupportFragmentManager(), "changelog-dialog");
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

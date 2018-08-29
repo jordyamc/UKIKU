@@ -31,7 +31,7 @@ import knf.kuma.BuildConfig;
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.CastUtil;
 import knf.kuma.commons.PrefsUtil;
-import knf.kuma.custom.DialogWraper;
+import knf.kuma.custom.DialogWrapper;
 import knf.kuma.database.CacheDB;
 import knf.kuma.download.DownloadManager;
 import knf.kuma.download.DownloadService;
@@ -75,7 +75,7 @@ public class ServersFactory {
 
     public static void start(final Context context, FragmentManager fragmentManager, final String url, final AnimeObject.WebInfo.AnimeChapter chapter, final boolean isStream, final boolean addQueue, final ServersInterface serversInterface) {
         try {
-            final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
+            final DialogWrapper dialog = DialogWrapper.wrap(new MaterialDialog.Builder(context)
                     .content("Obteniendo servidores")
                     .progress(true, 0)
                     .build());
@@ -95,7 +95,7 @@ public class ServersFactory {
 
     public static void start(final Context context, FragmentManager fragmentManager, final String url, final DownloadObject downloadObject, final boolean isStream, final ServersInterface serversInterface) {
         try {
-            final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
+            final DialogWrapper dialog = DialogWrapper.wrap(new MaterialDialog.Builder(context)
                     .content("Obteniendo servidores")
                     .progress(true, 0)
                     .build());
@@ -146,7 +146,7 @@ public class ServersFactory {
         }
     }
 
-    private static void safeDismiss(DialogWraper dialog) {
+    private static void safeDismiss(DialogWrapper dialog) {
         try {
             dialog.dismiss();
         } catch (Exception e) {
@@ -176,7 +176,7 @@ public class ServersFactory {
                             .itemsCallbackSingleChoice(selected, (d, itemView, which, text) -> {
                                 selected = which;
                                 safeDismiss(d);
-                                final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
+                                final DialogWrapper dialog = DialogWrapper.wrap(new MaterialDialog.Builder(context)
                                         .content("Obteniendo link")
                                         .progress(true, 0)
                                         .cancelable(false)
@@ -231,7 +231,7 @@ public class ServersFactory {
                                 .onNeutral((d, which) -> {
                                     selected = d.getSelectedIndex();
                                     safeDismiss(d);
-                                    final DialogWraper dialog = DialogWraper.wrap(new MaterialDialog.Builder(context)
+                                    final DialogWrapper dialog = DialogWrapper.wrap(new MaterialDialog.Builder(context)
                                             .content("Obteniendo link")
                                             .progress(true, 0)
                                             .build());
@@ -266,7 +266,7 @@ public class ServersFactory {
                                         }
                                     });
                                 });
-                    safeShow(DialogWraper.wrap(builder.build()), "server selection");
+                    safeShow(DialogWrapper.wrap(builder.build()), "server selection");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -278,7 +278,7 @@ public class ServersFactory {
     private void showOptions(final VideoServer server, final boolean isCast) {
         new Handler(Looper.getMainLooper()).post(() -> {
             try {
-                DialogWraper.wrap(new MaterialDialog.Builder(context)
+                DialogWrapper.wrap(new MaterialDialog.Builder(context)
                         .title(server.name)
                         .items(Option.getNames(server.options))
                         .autoDismiss(false)
@@ -303,7 +303,7 @@ public class ServersFactory {
         });
     }
 
-    public void get(DialogWraper dialog) {
+    public void get(DialogWrapper dialog) {
         try {
             Document main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get();
             Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
@@ -379,7 +379,7 @@ public class ServersFactory {
             callOnFinish(true, DownloadManager.start(downloadObject));
     }
 
-    private void safeShow(DialogWraper dialog, String tag) {
+    private void safeShow(DialogWrapper dialog, String tag) {
         try {
             dialog.show(fragmentManager, tag);
         } catch (Exception e) {

@@ -56,7 +56,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
     private DownloadsDAO downloadsDAO = CacheDB.INSTANCE.downloadsDAO();
     private ChaptersDAO chaptersDAO = CacheDB.INSTANCE.chaptersDAO();
     private RecordsDAO recordsDAO = CacheDB.INSTANCE.recordsDAO();
-    private ExplorerDAO explorerDAO=CacheDB.INSTANCE.explorerDAO();
+    private ExplorerDAO explorerDAO = CacheDB.INSTANCE.explorerDAO();
 
     ExplorerChapsAdapter(Fragment fragment, ExplorerObject explorerObject, FragmentChapters.ClearInterface clearInterface) {
         this.fragment = fragment;
@@ -119,6 +119,7 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
     }
 
     private void delete(ExplorerObject.FileDownObj obj, final int position) {
+        if (position < 0) return;
         FileAccessHelper.INSTANCE.delete(obj.fileName);
         downloadsDAO.deleteByEid(obj.eid);
         QueueManager.remove(obj.eid);
@@ -127,8 +128,8 @@ public class ExplorerChapsAdapter extends RecyclerView.Adapter<ExplorerChapsAdap
         if (explorerObject.chapters.size() == 0) {
             explorerDAO.delete(explorerObject);
             clearInterface.onClear();
-        }else {
-            explorerObject.count=explorerObject.chapters.size();
+        } else {
+            explorerObject.count = explorerObject.chapters.size();
             explorerDAO.update(explorerObject);
         }
     }

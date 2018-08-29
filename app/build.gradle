@@ -26,8 +26,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 60
-        versionName "1.9.3"
+        versionCode 61
+        versionName "1.9.4"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -85,7 +85,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-cast:16.0.1'
     implementation 'com.google.android.gms:play-services-drive:15.0.1'
     implementation 'com.google.android.gms:play-services-auth:16.0.0'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-rc01'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.0.0-rc01'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'

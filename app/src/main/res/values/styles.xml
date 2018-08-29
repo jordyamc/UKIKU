@@ -97,6 +97,10 @@
         <item name="android:colorButtonNormal">#000</item>
     </style>
 
+    <style name="AppTheme.Audiowide" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:fontFamily">@font/audiowide</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>

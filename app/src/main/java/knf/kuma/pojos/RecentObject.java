@@ -89,8 +89,6 @@ public class RecentObject {
     }
 
     private void populate(WebInfo webInfo) {
-        if (!isNumeric(webInfo.aid) || !isNumeric(webInfo.eid))
-            throw new IllegalStateException("Aid and Eid must be numbers");
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
         this.name = PatternUtil.fromHtml(webInfo.name);
@@ -112,6 +110,8 @@ public class RecentObject {
     }
 
     private void populate(AnimeDAO dao, WebInfo webInfo) {
+        if (!isNumeric(webInfo.aid) || !isNumeric(webInfo.eid))
+            throw new IllegalStateException("Aid and Eid must be numbers");
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
         this.name = PatternUtil.fromHtml(webInfo.name);

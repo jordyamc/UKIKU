@@ -158,9 +158,14 @@ public class Main extends AppCompatActivity
         RecentsJob.schedule(this);
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);
+        EAHelper.clear1();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         Updatechecker.check(this, this);
         ChangelogActivity.check(this);
-        EAHelper.clear1();
     }
 
     private void setNavigationButtons() {

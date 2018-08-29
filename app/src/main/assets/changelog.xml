@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="61" version="1.9.4">
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="60" version="1.9.3">
         <change type="fix">Errores generales</change>
     </release>
