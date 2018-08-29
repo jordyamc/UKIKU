@@ -11,6 +11,7 @@ import android.os.Build;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.evernote.android.job.JobManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -59,27 +60,12 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         JobManager.create(this).addJobCreator(new JobsCreator());
-        /*Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, Throwable e) {
-                *//*if (!(e instanceof InternalError)) {
-                    if (!(e instanceof OutOfMemoryError)) {
-
-                    }
-                }*//*
-                try {
-                    File file=new File(getExternalFilesDir(Environment.getDataDirectory().getAbsolutePath()),System.currentTimeMillis()+".txt");
-                    file.createNewFile();
-                    e.printStackTrace(new PrintStream(file));
-                    System.exit(0);
-                }catch (Exception ex){
-                    //ex
-                }
-            }
-        });*/
         CONTEXT = this;
         PrefsUtil.INSTANCE.init(this);
-        Fabric.with(this, new Crashlytics(), new Answers());
+        Fabric.with(this,
+                new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build(),
+                new Answers()
+        );
         Branch.getAutoInstance(this);
         AppCompatDelegate.setDefaultNightMode(Integer.parseInt(PrefsUtil.INSTANCE.getThemeOption()));
         CastManager.register(this);

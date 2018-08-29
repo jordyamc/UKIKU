@@ -99,6 +99,7 @@
 
     <style name="AppTheme.Audiowide" parent="ThemeOverlay.AppCompat.Dark">
         <item name="android:fontFamily">@font/audiowide</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
