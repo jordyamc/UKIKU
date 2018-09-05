@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import knf.kuma.R
+import knf.kuma.commons.EAHelper
 import kotlinx.android.synthetic.main.exo_playback_control_view.*
 import kotlinx.android.synthetic.main.player_view.*
 
@@ -35,6 +36,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
     private lateinit var playerHolder: PlayerHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.player_view)
         volumeControlStream = AudioManager.STREAM_MUSIC
@@ -42,10 +44,11 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
             playerState.position = savedInstanceState.getLong("position", 0)
             playerState.window = savedInstanceState.getInt("window", 0)
         }
-        player.setControllerVisibilityListener { hideUI() }
+        hideUI()
         player.setResizeMode(getResizeMode())
         createMediaSession()
         createPlayer()
+        skip.setOnClickListener { playerHolder.skip() }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isInPictureInPictureMode)
             player.useController = false
     }
@@ -62,7 +65,8 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_IMMERSIVE)
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        window.addFlags(View.KEEP_SCREEN_ON)
     }
 
     private fun getResizeMode(): Int {
@@ -153,6 +157,11 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
     // ExoPlayer related functions.
     private fun createPlayer() {
         playerHolder = PlayerHolder(this, playerState, player, intent)
+        if (!intent.getBooleanExtra("isPlayList", false)) {
+            exo_next.visibility = View.GONE
+            exo_prev.visibility = View.GONE
+        }
+        //player.overlayFrameLayout.setOnTouchListener(BVListener(this))
     }
 
     private fun startPlayer() {

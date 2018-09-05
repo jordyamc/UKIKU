@@ -19,6 +19,9 @@ object PrefsUtil {
     val themeOption: String
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")!!
 
+    val themeColor: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")!!
+
     var favsOrder: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("favs_order", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("favs_order", value).apply()
@@ -44,6 +47,9 @@ object PrefsUtil {
 
     val collapseDirectoryNotification: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("collapse_dir_nots", true)
+
+    val showRecentImage: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("recent_image", true)
 
     fun init(context: Context) {
         PrefsUtil.context = context

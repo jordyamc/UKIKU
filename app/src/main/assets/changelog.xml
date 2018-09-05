@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="62" version="1.9.5">
+        <change type="fix">Errores generales</change>
+        <change type="new">Botón en reproductor para saltar 1:25min(Oppening)</change>
+        <change type="new">Carátula del anime en notificacion de reciente</change>
+        <change type="change">Mejora al ocultar barras en reproductor interno</change>
+    </release>
     <release code="61" version="1.9.4">
         <change type="fix">Errores generales</change>
     </release>

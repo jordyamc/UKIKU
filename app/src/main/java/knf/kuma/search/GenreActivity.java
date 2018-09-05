@@ -10,9 +10,7 @@ import android.widget.ProgressBar;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
 import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -20,7 +18,6 @@ import butterknife.ButterKnife;
 import knf.kuma.R;
 import knf.kuma.commons.EAHelper;
 import knf.kuma.database.CacheDB;
-import knf.kuma.pojos.AnimeObject;
 
 public class GenreActivity extends AppCompatActivity {
     @BindView(R.id.toolbar)
@@ -48,25 +45,17 @@ public class GenreActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down));
         adapter = new GenreAdapter(this);
         recyclerView.setAdapter(adapter);
-        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getAllGenre("%" + getIntent().getStringExtra("name") + "%"), 25).build().observe(this, new Observer<PagedList<AnimeObject>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<AnimeObject> animeObjects) {
-                adapter.submitList(animeObjects);
-                if (isFirst) {
-                    progressBar.setVisibility(View.GONE);
-                    isFirst = false;
-                    recyclerView.scheduleLayoutAnimation();
-                }
+        new LivePagedListBuilder<>(CacheDB.INSTANCE.animeDAO().getAllGenre("%" + getIntent().getStringExtra("name") + "%"), 25).build().observe(this, animeObjects -> {
+            adapter.submitList(animeObjects);
+            if (isFirst) {
+                progressBar.setVisibility(View.GONE);
+                isFirst = false;
+                recyclerView.scheduleLayoutAnimation();
             }
         });
     }

@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -26,7 +25,7 @@ import knf.kuma.pojos.AnimeObject;
 public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Context context;
     private Fragment fragment;
-    private List<AnimeObject.WebInfo.AnimeRelated> list=new ArrayList<>();
+    private List<AnimeObject.WebInfo.AnimeRelated> list;
     private AnimeDAO dao= CacheDB.INSTANCE.animeDAO();
 
     public AnimeRelatedAdapter(Fragment fragment, List<AnimeObject.WebInfo.AnimeRelated> list) {
@@ -36,7 +35,8 @@ public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case 0:
                 return new RelatedHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_related, parent, false));
@@ -84,7 +84,7 @@ public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @BindView(R.id.relation)
         TextView relation;
 
-        public RelatedHolder(View itemView) {
+        RelatedHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
         }
@@ -98,7 +98,7 @@ public class AnimeRelatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @BindView(R.id.relation)
         TextView relation;
 
-        public RelatedNoImgHolder(View itemView) {
+        RelatedNoImgHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
         }

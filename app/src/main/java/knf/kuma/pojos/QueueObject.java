@@ -2,6 +2,7 @@ package knf.kuma.pojos;
 
 import android.net.Uri;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import knf.kuma.database.BaseConverter;
 @Entity
 @TypeConverters({BaseConverter.class})
 @SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
-public class QueueObject {
+public class QueueObject implements Serializable {
     @PrimaryKey
     public int id;
     public boolean isFile;

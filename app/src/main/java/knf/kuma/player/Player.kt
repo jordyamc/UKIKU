@@ -90,6 +90,12 @@ class PlayerHolder(private val context: Context,
         }
     }
 
+    fun skip() {
+        with(audioFocusPlayer) {
+            seekTo(currentWindowIndex, currentPosition + 85000)
+        }
+    }
+
     fun saveState() {
         with(audioFocusPlayer) {
             with(playerState) {

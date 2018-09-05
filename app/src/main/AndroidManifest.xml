@@ -176,7 +176,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="knf.kuma.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -240,7 +240,7 @@
 
         <provider
             android:name=".slices.AnimeSlice"
-            android:authorities="knf.kuma.slices"
+            android:authorities="${applicationId}.slices"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>

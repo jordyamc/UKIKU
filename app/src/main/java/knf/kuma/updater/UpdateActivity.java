@@ -35,6 +35,7 @@ import androidx.core.content.FileProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import knf.kuma.BuildConfig;
 import knf.kuma.R;
 import xdroid.toaster.Toaster;
 
@@ -115,7 +116,7 @@ public class UpdateActivity extends AppCompatActivity {
         File file = getUpdate();
         if (file.exists())
             file.delete();
-        new ThinDownloadManager().add(new DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk"))
+        new ThinDownloadManager().add(new DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/" + BuildConfig.BUILD_TYPE + "/app-release.apk"))
                 .setDestinationURI(Uri.fromFile(file))
                 .setDownloadResumable(false)
                 .setStatusListener(new DownloadStatusListenerV1() {

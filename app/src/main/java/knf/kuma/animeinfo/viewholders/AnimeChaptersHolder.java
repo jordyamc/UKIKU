@@ -80,7 +80,7 @@ public class AnimeChaptersHolder {
                             public void onSelect(int state) {
                                 try {
                                     final MaterialDialog d = new MaterialDialog.Builder(context)
-                                            .content("Marcando...")
+                                            .content("Procesando...")
                                             .progress(true, 0)
                                             .cancelable(false)
                                             .build();

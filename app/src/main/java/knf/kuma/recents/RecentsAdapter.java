@@ -224,7 +224,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ItemHold
         super.onViewRecycled(holder);
     }
 
-    public void updateList(List<RecentObject> list) {
+    void updateList(List<RecentObject> list) {
         this.isNetworkAvailable = Network.isConnected();
         final boolean wasEmpty = this.list.size() == 0;
         this.list = list;

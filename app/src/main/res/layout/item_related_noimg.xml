@@ -15,12 +15,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:alpha="0.12"
-            android:background="@color/divider"/>
-
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"

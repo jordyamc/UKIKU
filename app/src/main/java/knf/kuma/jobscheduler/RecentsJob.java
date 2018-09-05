@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
@@ -17,15 +18,19 @@ import com.evernote.android.job.JobRequest;
 import org.jsoup.Jsoup;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import knf.kuma.BuildConfig;
 import knf.kuma.Main;
 import knf.kuma.R;
 import knf.kuma.animeinfo.ActivityAnime;
 import knf.kuma.commons.BypassUtil;
+import knf.kuma.commons.PicassoSingle;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.database.dao.FavsDAO;
@@ -44,7 +49,7 @@ public class RecentsJob extends Job {
     public static final String CHANNEL_RECENTS = "channel.RECENTS";
     public static final int KEY_SUMMARY = 55971;
     static final String TAG = "recents-job";
-    public final String RECENTS_GROUP = "recents-group";
+    private final String RECENTS_GROUP = "recents-group";
     private RecentsDAO recentsDAO = CacheDB.INSTANCE.recentsDAO();
     private FavsDAO favsDAO = CacheDB.INSTANCE.favsDAO();
     private SeeingDAO seeingDAO = CacheDB.INSTANCE.seeingDAO();
@@ -54,7 +59,7 @@ public class RecentsJob extends Job {
 
     public static void schedule(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int time = Integer.valueOf(preferences.getString("recents_time", "1")) * 15;
+        int time = Integer.valueOf(Objects.requireNonNull(preferences.getString("recents_time", "1"))) * 15;
         if (time > 0 && JobManager.instance().getAllJobRequestsForTag(TAG).size() == 0)
             new JobRequest.Builder(TAG)
                     .setPeriodic(TimeUnit.MINUTES.toMillis(time))
@@ -127,6 +132,7 @@ public class RecentsJob extends Job {
                 .setContentTitle(recentObject.name)
                 .setContentText(recentObject.chapter)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setLargeIcon(getBitmap(recentObject))
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(PendingIntent.getActivity(getContext(), (int) System.currentTimeMillis(), getAnimeIntent(animeObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
@@ -139,7 +145,18 @@ public class RecentsJob extends Job {
         notifySummary();
     }
 
-    private AnimeObject getAnime(RecentObject recentObject) throws Exception {
+    @Nullable
+    private Bitmap getBitmap(RecentObject object) {
+        try {
+            if (PrefsUtil.INSTANCE.getShowRecentImage())
+                return PicassoSingle.get(getContext()).load(object.img).get();
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private AnimeObject getAnime(@NonNull RecentObject recentObject) throws Exception {
         AnimeObject animeObject = animeDAO.getByAid(recentObject.aid);
         if (animeObject == null) {
             animeObject = new AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect(recentObject.anime).get().outerHtml()));
@@ -149,7 +166,7 @@ public class RecentsJob extends Job {
     }
 
     @NonNull
-    private Intent getAnimeIntent(AnimeObject object, NotificationObj notificationObj) {
+    private Intent getAnimeIntent(@NonNull AnimeObject object, @NonNull NotificationObj notificationObj) {
         return new Intent(getContext(), ActivityAnime.class)
                 .setData(Uri.parse(object.link))
                 .putExtras(notificationObj.getBroadcast(getContext()))
@@ -161,7 +178,7 @@ public class RecentsJob extends Job {
     }
 
     @NonNull
-    private Intent getChapIntent(RecentObject object, NotificationObj notificationObj) {
+    private Intent getChapIntent(@NonNull RecentObject object, @NonNull NotificationObj notificationObj) {
         return new Intent(getContext(), DownloadDialogActivity.class)
                 .setData(Uri.parse(object.url))
                 .putExtras(notificationObj.getBroadcast(getContext()))

@@ -25,6 +25,12 @@
             android:summaryOff="Se notificaran todos los capitulos"
             android:summaryOn="Se notificaran capitulos solo si estan en favoritos"
             android:title="Solo favoritos"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_img"
+            android:key="recent_image"
+            android:summary="Episodios recientes"
+            android:title="Portada en notificación"/>
         <ListPreference
             android:defaultValue="7"
             android:entries="@array/dir_options"

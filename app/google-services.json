@@ -65,6 +65,66 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928658019079:android:a7cac1303812e50a",
+        "android_client_info": {
+          "package_name": "knf.kuma.tv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "928658019079-qf4eeqn4vnbsj6et3lk9fogscbe68hjb.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "928658019079-2k0rlp99re31433e2ucv4ebdon7q667q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.tv",
+            "certificate_hash": "b239693f42a944b7eca4203d8d9e4022cd1dd4a3"
+          }
+        },
+        {
+          "client_id": "928658019079-hgjiu6s7i1ni32b42ssbebel17gn4hfa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.tv",
+            "certificate_hash": "97490ab8d7b370ab43a3a6475dc4402c19bb7571"
+          }
+        },
+        {
+          "client_id": "928658019079-d6qk9htt89gen0gntmf5bqvotepckcgn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.tv",
+            "certificate_hash": "e53f97d45da9e4f3443817b5ba19419ddce84e50"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1ecwPZp5LJQF33DMi4w7awCPn_hReQvU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "928658019079-qf4eeqn4vnbsj6et3lk9fogscbe68hjb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

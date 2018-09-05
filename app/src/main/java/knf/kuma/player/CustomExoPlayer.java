@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Rational;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -32,7 +31,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -42,6 +40,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,13 +53,17 @@ import knf.kuma.database.CacheDB;
 import knf.kuma.pojos.QueueObject;
 import xdroid.toaster.Toaster;
 
-public class CustomExoPlayer extends AppCompatActivity implements Player.EventListener, PlaybackControlView.VisibilityListener {
+public class CustomExoPlayer extends AppCompatActivity implements Player.EventListener {
     @BindView(R.id.player)
     SimpleExoPlayerView exoPlayerView;
     @BindView(R.id.title)
     TextView title;
     @BindView(R.id.pip)
     ImageButton pip;
+    @BindView(R.id.exo_next)
+    ImageButton next;
+    @BindView(R.id.exo_prev)
+    ImageButton prev;
     @BindView(R.id.progress)
     ProgressBar progressBar;
 
@@ -78,29 +81,6 @@ public class CustomExoPlayer extends AppCompatActivity implements Player.EventLi
     private int listPosition = 0;
     private List<QueueObject> playList = new ArrayList<>();
 
-    private static void addVisibilityListener(SimpleExoPlayerView playerView, PlaybackControlView.VisibilityListener listener) {
-        PlaybackControlView playbackControlView = findPlaybackControlView(playerView);
-        if (playbackControlView != null)
-            playbackControlView.setVisibilityListener(listener);
-    }
-
-    private static PlaybackControlView findPlaybackControlView(ViewGroup viewGroup) {
-        for (int i = 0; i < viewGroup.getChildCount(); i++) {
-            View child = viewGroup.getChildAt(i);
-
-            if (child instanceof PlaybackControlView)
-                return (PlaybackControlView) child;
-
-            if (child instanceof ViewGroup) {
-                PlaybackControlView result = findPlaybackControlView((ViewGroup) child);
-                if (result != null)
-                    return result;
-            }
-        }
-
-        return null;
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(EAHelper.getTheme(this));
@@ -109,11 +89,12 @@ public class CustomExoPlayer extends AppCompatActivity implements Player.EventLi
         ButterKnife.bind(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
             pip.setVisibility(View.VISIBLE);
-        addVisibilityListener(exoPlayerView, this);
+        hideUI();
         exoPlayerView.setResizeMode(getResizeMode());
         exoPlayerView.requestFocus();
         if (savedInstanceState != null)
             currentPosition = savedInstanceState.getLong("position", C.TIME_UNSET);
+        checkPlaylist(getIntent());
         initPlayer(getIntent());
     }
 
@@ -123,8 +104,18 @@ public class CustomExoPlayer extends AppCompatActivity implements Player.EventLi
         outState.putLong("position", currentPosition);
     }
 
+    private void hideUI() {
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
     private int getResizeMode() {
-        switch (PreferenceManager.getDefaultSharedPreferences(this).getString("player_resize", "0")) {
+        switch (Objects.requireNonNull(PreferenceManager.getDefaultSharedPreferences(this).getString("player_resize", "0"))) {
             default:
             case "0":
                 return AspectRatioFrameLayout.RESIZE_MODE_FIT;
@@ -203,6 +194,12 @@ public class CustomExoPlayer extends AppCompatActivity implements Player.EventLi
         }
     }
 
+    @OnClick(R.id.skip)
+    void onSkip(View view) {
+        if (player != null)
+            player.seekTo(player.getCurrentWindowIndex(), player.getCurrentPosition() + 85000);
+    }
+
     @OnClick(R.id.pip_exit)
     void onExitPip(View view) {
         getApplication().startActivity(new Intent(this, getClass())
@@ -232,12 +229,23 @@ public class CustomExoPlayer extends AppCompatActivity implements Player.EventLi
         }
     }
 
+    private void checkPlaylist(Intent intent) {
+        if (!intent.getBooleanExtra("isPlayList", false)) {
+            next.setVisibility(View.GONE);
+            prev.setVisibility(View.GONE);
+        } else {
+            next.setVisibility(View.VISIBLE);
+            prev.setVisibility(View.VISIBLE);
+        }
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
         releasePlayer();
         currentPosition = 0;
         resumeWindow = C.INDEX_UNSET;
+        checkPlaylist(intent);
         initPlayer(intent);
         super.onNewIntent(intent);
     }
@@ -250,13 +258,6 @@ public class CustomExoPlayer extends AppCompatActivity implements Player.EventLi
 
     @Override
     protected void onResume() {
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
         initPlayer(getIntent());
         super.onResume();
     }
@@ -358,17 +359,5 @@ public class CustomExoPlayer extends AppCompatActivity implements Player.EventLi
     @Override
     public void onSeekProcessed() {
 
-    }
-
-    @Override
-    public void onVisibilityChange(int visibility) {
-        if (visibility != View.VISIBLE)
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE);
     }
 }

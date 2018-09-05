@@ -19,6 +19,7 @@ import java.util.List;
 
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -64,6 +65,7 @@ public class AnimeDetailsHolder {
         recyclerView_genres.setLayoutManager(ChipsLayoutManager.newBuilder(view.getContext()).build());
         recyclerView_genres.addItemDecoration(new SpacingItemDecoration(5, 5));
         recyclerView_related.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        recyclerView_related.addItemDecoration(new DividerItemDecoration(view.getContext(), LinearLayout.VERTICAL));
     }
 
     public void populate(final Fragment fragment, final AnimeObject object) {

@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -75,37 +74,26 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         getMenuInflater().inflate(R.menu.menu_play_queue, list_toolbar.getMenu());
-        list_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.play:
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                        QueueManager.startQueue(getApplicationContext(), listAdapter.getList());
-                        break;
-                    case R.id.clear:
-                        new MaterialDialog.Builder(QueueActivity.this)
-                                .content("¿Remover los episodios pendientes?")
-                                .positiveText("remover")
-                                .negativeText("cancelar")
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                        QueueManager.remove(listAdapter.getList());
-                                    }
-                                }).build().show();
-                        break;
-                }
-                return true;
+        list_toolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.play:
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    QueueManager.startQueue(getApplicationContext(), listAdapter.getList());
+                    break;
+                case R.id.clear:
+                    new MaterialDialog.Builder(QueueActivity.this)
+                            .content("¿Remover los episodios pendientes?")
+                            .positiveText("remover")
+                            .negativeText("cancelar")
+                            .onPositive((dialog, which) -> {
+                                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                QueueManager.remove(listAdapter.getList());
+                            }).build().show();
+                    break;
             }
+            return true;
         });
         bottomSheetBehavior = BottomSheetBehavior.from(cardView);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -126,23 +114,22 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
         listAdapter = new QueueListAdapter();
         list_recyclerView.setAdapter(listAdapter);
         reload();
+        if (savedInstanceState != null && savedInstanceState.getBoolean("isOpen", false))
+            onSelect((QueueObject) savedInstanceState.getSerializable("current"));
     }
 
     private void reload() {
         currentData.removeObservers(this);
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true)) {
             currentData = CacheDB.INSTANCE.queueDAO().getAll();
-            currentData.observe(this, new Observer<List<QueueObject>>() {
-                @Override
-                public void onChanged(@Nullable List<QueueObject> list) {
-                    error_view.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
-                    QueueAnimesAdapter animesAdapter = new QueueAnimesAdapter(QueueActivity.this);
-                    recyclerView.setAdapter(animesAdapter);
-                    dettachHelper();
-                    mItemTouchHelper = new ItemTouchHelper(new NoTouchHelperCallback());
-                    mItemTouchHelper.attachToRecyclerView(recyclerView);
-                    animesAdapter.update(QueueObject.getOne(list));
-                }
+            currentData.observe(this, list -> {
+                error_view.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
+                QueueAnimesAdapter animesAdapter = new QueueAnimesAdapter(QueueActivity.this);
+                recyclerView.setAdapter(animesAdapter);
+                dettachHelper();
+                mItemTouchHelper = new ItemTouchHelper(new NoTouchHelperCallback());
+                mItemTouchHelper.attachToRecyclerView(recyclerView);
+                animesAdapter.update(QueueObject.getOne(list));
             });
         } else {
             currentData = CacheDB.INSTANCE.queueDAO().getAllAsort();
@@ -223,12 +210,7 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
 
     @Override
     public void onListCleared() {
-        error_view.post(new Runnable() {
-            @Override
-            public void run() {
-                error_view.setVisibility(View.VISIBLE);
-            }
-        });
+        error_view.post(() -> error_view.setVisibility(View.VISIBLE));
     }
 
     @Override
@@ -277,6 +259,16 @@ public class QueueActivity extends AppCompatActivity implements QueueAnimesAdapt
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (current != null) {
+            outState.putSerializable("current", current);
+            outState.putBoolean("isOpen", true);
+        } else
+            outState.putBoolean("isOpen", false);
     }
 
     @Override

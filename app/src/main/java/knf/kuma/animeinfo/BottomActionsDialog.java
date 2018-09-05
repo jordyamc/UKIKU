@@ -23,6 +23,7 @@ public class BottomActionsDialog extends BottomSheetDialogFragment {
     public static final int STATE_SEEN = 0;
     public static final int STATE_UNSEEN = 1;
     public static final int STATE_IMPORT_MULTIPLE = 2;
+    public static final int STATE_DOWNLOAD_MULTIPLE = 3; //TODO: Multiple downloads
     @BindView(R.id.action_seen)
     TextView action_seen;
     @BindView(R.id.action_unseen)

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="knf.kuma">
+
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false"/>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:banner="@drawable/tv_banner"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:resizeableActivity="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".Main"
+            android:enabled="false"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".tv.ui.TVMain"
+            android:banner="@drawable/tv_banner"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.TV.Browser">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="ukiku.ga"
+                    android:pathPrefix="/*"
+                    android:scheme="http"/>
+                <data
+                    android:host="ukiku.ga"
+                    android:pathPrefix="/*"
+                    android:scheme="https"/>
+                <data
+                    android:host="ukiku.ga"
+                    android:pathPrefix="/get.php"
+                    android:scheme="http"/>
+                <data
+                    android:host="ukiku.ga"
+                    android:pathPrefix="/get.php"
+                    android:scheme="https"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
+        </activity>
+        <activity
+            android:name=".animeinfo.ActivityAnime"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/anime/"
+                    android:scheme="https"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".player.CustomExoPlayer"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:immersive="true"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:screenOrientation="sensorLandscape"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name=".animeinfo.ActivityImgFull"
+            android:theme="@style/AppTheme.FullScreen"/>
+        <activity android:name=".record.RecordActivity"/>
+        <activity android:name=".seeing.SeeingActivity"/>
+        <activity android:name=".emision.EmisionActivity"/>
+        <activity android:name=".explorer.ExplorerActivity"/>
+        <activity
+            android:name=".updater.UpdateActivity"
+            android:excludeFromRecents="true"/>
+        <activity android:name=".random.RandomActivity"/>
+        <activity android:name=".changelog.ChangelogActivity"/>
+        <activity
+            android:name=".backup.BackUpActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Translucent"/>
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <data android:scheme="db-qtjow4hsk06vt19"/>
+
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".backup.MigrationActivity"
+            android:theme="@style/AppTheme.Translucent"/>
+        <activity
+            android:name=".AppInfo"
+            android:theme="@style/AppTheme.AppInfo"/>
+        <activity android:name=".recommended.RecommendActivity"/>
+        <activity android:name=".recommended.RankingActivity"/>
+        <activity android:name=".search.GenreActivity"/>
+
+        <service android:name=".directory.DirectoryService"/>
+        <service android:name=".directory.DirectoryUpdateService"/>
+        <service android:name=".download.DownloadService"/>
+        <service
+            android:name=".widgets.emision.WEmisionService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+        <service android:name=".download.DownloadManager"/>
+
+        <receiver
+            android:name=".widgets.emision.WEmisionProvider"
+            android:label="Emisión">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_emision"/>
+        </receiver>
+        <receiver android:name=".download.DownloadReceiver"/>
+        <receiver android:name=".recents.RecentsNotReceiver"/>
+        <receiver android:name=".slices.AnimeLoad"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/path_providers"/>
+        </provider>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
+
+        <activity
+            android:name=".commons.EAMActivity"
+            android:label="@string/title_activity_eam">
+        </activity>
+        <activity android:name=".queue.QueueActivity"/>
+        <activity
+            android:name=".tv.streaming.TVServerSelection"
+            android:theme="@style/AppTheme.TV.Guided"/>
+        <activity
+            android:name=".tv.exoplayer.TVPlayer"
+            android:theme="@style/AppTheme.TV.Base"/>
+        <activity
+            android:name=".tv.details.TVAnimesDetails"
+            android:theme="@style/AppTheme.TV.Details"/>
+        <activity
+            android:name=".tv.search.TVSearch"
+            android:theme="@style/AppTheme.TV.Base"/>
+        <activity android:name=".commons.BypassUtil"/>
+        <activity
+            android:name=".download.DownloadDialogActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.AppCompat.DayNight.Dialog">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/ver/"
+                    android:scheme="https"/>
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/ver/"
+                    android:scheme="http"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".player.VideoActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:immersive="true"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:screenOrientation="sensorLandscape"
+            android:supportsPictureInPicture="true"/>
+
+        <provider
+            android:name=".slices.AnimeSlice"
+            android:authorities="${applicationId}.slices"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.app.slice.category.SLICE"/>
+
+                <data
+                    android:host="knf"
+                    android:pathPrefix="/"
+                    android:scheme="http"/>
+            </intent-filter>
+        </provider>
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false"/>
+    </application>
+
+</manifest>

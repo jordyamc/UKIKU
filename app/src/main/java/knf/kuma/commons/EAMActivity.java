@@ -9,8 +9,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.LevelEndEvent;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -63,35 +61,24 @@ public class EAMActivity extends FragmentActivity implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        // Add a marker in Sydney and move the camera
         LatLng point = new LatLng(35.702067, 139.774528);
         marker = mMap.addMarker(new MarkerOptions().position(point).title("Easter Egg completado!").visible(false).icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVD(this, R.drawable.ic_treasure))));
-        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-                marker.setVisible(mMap.getCameraPosition().zoom >= 13);
+        googleMap.setOnCameraMoveListener(() -> marker.setVisible(mMap.getCameraPosition().zoom >= 13));
+        googleMap.setOnMarkerClickListener(m -> {
+            if (m.equals(marker)) {
+                EAHelper.enter3();
+                konfettiView.build()
+                        .addColors(Color.BLUE, Color.RED, Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                        .setDirection(0.0, 359.0)
+                        .setSpeed(4f, 7f)
+                        .setFadeOutEnabled(true)
+                        .setTimeToLive(2000)
+                        .addShapes(Shape.RECT, Shape.CIRCLE)
+                        .addSizes(new Size(12, 6f), new Size(16, 6f))
+                        .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
+                        .streamFor(300, 10000L);
             }
-        });
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker m) {
-                if (m.equals(marker)) {
-                    EAHelper.enter3();
-                    Answers.getInstance().logLevelEnd(new LevelEndEvent().putLevelName("Easter Egg Phase 3").putScore(0));
-                    Answers.getInstance().logLevelEnd(new LevelEndEvent().putLevelName("Easter Egg").putScore(0));
-                    konfettiView.build()
-                            .addColors(Color.BLUE, Color.RED, Color.YELLOW, Color.GREEN, Color.MAGENTA)
-                            .setDirection(0.0, 359.0)
-                            .setSpeed(4f, 7f)
-                            .setFadeOutEnabled(true)
-                            .setTimeToLive(2000)
-                            .addShapes(Shape.RECT, Shape.CIRCLE)
-                            .addSizes(new Size(12, 6f), new Size(16, 6f))
-                            .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
-                            .streamFor(300, 10000L);
-                }
-                return false;
-            }
+            return false;
         });
     }
 

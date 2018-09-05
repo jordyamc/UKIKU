@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.jsoup.nodes.Element;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import pl.droidsonroids.jspoon.annotation.Selector;
 
 @Entity(indices = @Index(value = {"name", "link", "aid", "type", "state", "fileName"}, unique = true))
 @TypeConverters(AnimeObject.Converter.class)
-public class AnimeObject implements Comparable<AnimeObject> {
+public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     @PrimaryKey
     public int key;
     public String link;
@@ -220,10 +221,10 @@ public class AnimeObject implements Comparable<AnimeObject> {
         public String img;
         @Selector(value = "div.Description p", defValue = "Sin descripcion")
         public String description;
-        @Selector(value = "span[class^=Type]", attr = "class")
+        @Selector(value = "span[class^=Type]", attr = "class", defValue = "Desconocido")
         @ColumnInfo(name = "web_type")
         public String type;
-        @Selector(value = "aside.SidebarA.BFixed p", attr = "class")
+        @Selector(value = "aside.SidebarA.BFixed p", attr = "class", defValue = "Desconocido")
         @ColumnInfo(name = "web_state")
         public String state;
         @Selector(value = "span.vtprmd", defValue = "0.0")
@@ -254,7 +255,7 @@ public class AnimeObject implements Comparable<AnimeObject> {
         }
 
         @Entity
-        public static class AnimeChapter implements Comparable<AnimeChapter> {
+        public static class AnimeChapter implements Comparable<AnimeChapter>, Serializable {
             @PrimaryKey
             public int key;
             public String number;
