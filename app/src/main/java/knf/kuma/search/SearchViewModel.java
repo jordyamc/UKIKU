@@ -9,13 +9,13 @@ import androidx.paging.PagedList;
 import knf.kuma.pojos.AnimeObject;
 import knf.kuma.retrofit.Repository;
 
-class SearchViewModel extends ViewModel {
+public class SearchViewModel extends ViewModel {
     private Repository repository = new Repository();
 
     private LiveData<PagedList<AnimeObject>> liveData = new MutableLiveData<>();
     private Observer<PagedList<AnimeObject>> observer;
 
-    void setSearch(String query, String genres, LifecycleOwner owner, Observer<PagedList<AnimeObject>> observer) {
+    public void setSearch(String query, String genres, LifecycleOwner owner, Observer<PagedList<AnimeObject>> observer) {
         if (this.observer != null)
             liveData.removeObserver(this.observer);
         this.observer = observer;
