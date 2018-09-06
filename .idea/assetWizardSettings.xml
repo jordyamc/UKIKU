@@ -8,6 +8,17 @@
             <PersistentState>
               <option name="children">
                 <map>
+                  <entry key="confirmationStep">
+                    <value>
+                      <PersistentState>
+                        <option name="values">
+                          <map>
+                            <entry key="resourceDirectory" value="playstore" />
+                          </map>
+                        </option>
+                      </PersistentState>
+                    </value>
+                  </entry>
                   <entry key="imageAssetPanel">
                     <value>
                       <PersistentState>
@@ -41,19 +52,25 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                      <entry key="foregroundImage">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="scalingPercent" value="73" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                     </map>
                                   </option>
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="f5f5f5" />
-                                      <entry key="backgroundLayerName" value="ic_shortcut" />
-                                      <entry key="foregroundAssetType" value="CLIP_ART" />
-                                      <entry key="foregroundLayerName" value="ic_fav_shortcut" />
-                                      <entry key="generateLegacyIcon" value="false" />
-                                      <entry key="generateRoundIcon" value="false" />
-                                      <entry key="generateWebIcon" value="false" />
-                                      <entry key="outputName" value="ic_shortcut_fav" />
+                                      <entry key="backgroundColor" value="000000" />
+                                      <entry key="foregroundImage" value="C:\Users\jordy\Desktop\Proyectos\java\UKIKU\ukiku-logo-play.psd" />
+                                      <entry key="foregroundLayerName" value="ic_launcher_foregound" />
                                       <entry key="showGrid" value="true" />
                                     </map>
                                   </option>
