@@ -75,7 +75,7 @@ import knf.kuma.search.FiltersSuggestion;
 import knf.kuma.search.SearchFragment;
 import knf.kuma.seeing.SeeingActivity;
 import knf.kuma.updater.UpdateActivity;
-import knf.kuma.updater.Updatechecker;
+import knf.kuma.updater.UpdateChecker;
 import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 import xdroid.toaster.Toaster;
@@ -90,7 +90,7 @@ public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemReselectedListener,
-        Updatechecker.CheckListener,
+        UpdateChecker.CheckListener,
         BypassUtil.BypassListener {
 
     @BindView(R.id.toolbar)
@@ -164,7 +164,7 @@ public class Main extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Updatechecker.check(this, this);
+        UpdateChecker.check(this, this);
         ChangelogActivity.check(this);
     }
 

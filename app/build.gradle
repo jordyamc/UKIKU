@@ -46,6 +46,10 @@ android {
             initWith release
             applicationIdSuffix ".tv"
         }
+        playstore {
+            initWith release
+            applicationIdSuffix ".playstore"
+        }
     }
     sourceSets {
         androidTest.assets.srcDirs +=

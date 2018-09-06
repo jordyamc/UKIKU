@@ -63,7 +63,7 @@ class BVListener(val activity: AppCompatActivity) : View.OnTouchListener {
                     v?.performClick()
 
                 //finger move to screen
-                val x2 = event.x
+                //val x2 = event.x
                 val y2 = event.y
 
                 diffX = Math.ceil((event.x - downX).toDouble()).toLong()

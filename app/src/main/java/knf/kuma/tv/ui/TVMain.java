@@ -18,9 +18,9 @@ import knf.kuma.recents.RecentsNotReceiver;
 import knf.kuma.tv.TVBaseActivity;
 import knf.kuma.tv.TVServersFactory;
 import knf.kuma.updater.UpdateActivity;
-import knf.kuma.updater.Updatechecker;
+import knf.kuma.updater.UpdateChecker;
 
-public class TVMain extends TVBaseActivity implements TVServersFactory.ServersInterface, Updatechecker.CheckListener {
+public class TVMain extends TVBaseActivity implements TVServersFactory.ServersInterface, UpdateChecker.CheckListener {
 
     private TVMainFragment fragment;
     private TVServersFactory serversFactory;
@@ -34,7 +34,7 @@ public class TVMain extends TVBaseActivity implements TVServersFactory.ServersIn
         RecentsJob.schedule(this);
         DirUpdateJob.schedule(this);
         RecentsNotReceiver.removeAll(this);
-        Updatechecker.check(this, this);
+        UpdateChecker.check(this, this);
         Answers.getInstance().logCustom(new CustomEvent("TV UI"));
     }
 

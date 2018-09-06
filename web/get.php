@@ -5,7 +5,7 @@
  * Date: 31/01/2018
  * Time: 05:39 PM
  */
-if (is_old_android()) {
+if (is_old_android() && !isset($_GET['force'])) {
     echo "<h1>Lo sentimos, esta app solo esta disponible para Android 5 o superior :(</h1>";
 } else {
     header("Location: https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk");
