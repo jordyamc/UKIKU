@@ -11,7 +11,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.util.Rational
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
@@ -161,7 +160,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
             exo_next.visibility = View.GONE
             exo_prev.visibility = View.GONE
         }
-        //player.overlayFrameLayout.setOnTouchListener(BVListener(this))
+        //exoPlayer.overlayFrameLayout.setOnTouchListener(BVListener(this))
     }
 
     private fun startPlayer() {
@@ -194,7 +193,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
     }
 
     override fun onChangeTitle(title: String) {
-        findViewById<TextView>(R.id.title).text = title
+        video_title.text = title
     }
 
     override fun onLoadingChange(loading: Boolean) {

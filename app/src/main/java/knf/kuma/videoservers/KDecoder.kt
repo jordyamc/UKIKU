@@ -5,7 +5,7 @@ class KDecoder {
         fun decodeMango(url: String, mask: Int): String? {
             val key = "=/+9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA"
             val result = StringBuffer()
-            val u = url.replace("[^A-Za-z0-9\\+\\/\\=]".toRegex(), "")
+            val u = url.replace("[^A-Za-z0-9+/=]".toRegex(), "")
             var idx = 0
             while (idx < u.length) {
                 val a = key.indexOf(u.substring(idx, idx + 1))

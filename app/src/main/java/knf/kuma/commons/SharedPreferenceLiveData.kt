@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 
 abstract class SharedPreferenceLiveData<T>(val sharedPrefs: SharedPreferences,
                                            val key: String,
-                                           val defValue: T) : LiveData<T>() {
+                                           private val defValue: T) : LiveData<T>() {
 
     private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == this.key) {

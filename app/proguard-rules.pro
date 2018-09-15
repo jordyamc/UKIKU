@@ -60,6 +60,9 @@
 -keepclassmembers public class * implements pl.droidsonroids.jspoon.ElementConverter {
    public <init>(...);
 }
+-keepclassmembernames class kotlinx.** {
+    volatile <fields>;
+}
 -keep public class * extends java.lang.Exception
 -keep class org.jsoup.**{*;}
 -keeppackagenames org.jsoup.nodes

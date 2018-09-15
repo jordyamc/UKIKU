@@ -74,10 +74,11 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <style name="AppTheme.Dialog.Base" parent="Theme.AppCompat.DayNight.Dialog">
+    <style name="AppTheme.Dialog.Base" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <style name="AppTheme.Button.Dropbox" parent="Widget.AppCompat.Button.Colored">
@@ -109,15 +110,23 @@
         <item name="android:colorButtonNormal">#000</item>
     </style>
 
-    <style name="AppTheme.Audiowide" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="android:fontFamily">@font/audiowide</item>
-        <item name="android:textSize">20sp</item>
-    </style>
-
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
     <style name="AppTheme.Cardview" parent="CardView.Light"/>
+
+    <style name="FontMediumStyle">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="AppTheme.Splash" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/drawable_splash</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
 
 </resources>

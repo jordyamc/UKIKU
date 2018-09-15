@@ -16,7 +16,7 @@ import pl.droidsonroids.jspoon.annotation.Selector;
 
 @Entity
 public class RecentObject {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     public int key;
     @Ignore
     public String aid;
@@ -69,7 +69,7 @@ public class RecentObject {
     }
 
     public String getFileName() {
-        return eid + "$" + PatternUtil.getFileName(url);
+        return eid + "$" + PatternUtil.INSTANCE.getFileName(url);
     }
 
     public String getEpTitle() {
@@ -89,17 +89,18 @@ public class RecentObject {
     }
 
     private void populate(WebInfo webInfo) {
+        this.key = Integer.parseInt(webInfo.eid);
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
-        this.name = PatternUtil.fromHtml(webInfo.name);
+        this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
         this.chapter = webInfo.chapter.trim();
         this.url = "https://animeflv.net" + webInfo.url;
         this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");
         this.isNew = chapter.matches("^.* [10]$");
-        this.anime = PatternUtil.getAnimeUrl(this.url, this.aid);
+        this.anime = PatternUtil.INSTANCE.getAnimeUrl(this.url, this.aid);
         File file = FileAccessHelper.INSTANCE.getFile(getFileName());
         DownloadObject downloadObject = CacheDB.INSTANCE.downloadsDAO().getByEid(eid);
-        this.isChapterDownloaded = (file != null) && file.exists();
+        this.isChapterDownloaded = file.exists();
         this.isDownloading = downloadObject != null && downloadObject.state == DownloadObject.DOWNLOADING;
         if (downloadObject != null) {
             this.downloadState = downloadObject.state;
@@ -110,35 +111,19 @@ public class RecentObject {
     }
 
     private void populate(AnimeDAO dao, WebInfo webInfo) {
-        if (!isNumeric(webInfo.aid) || !isNumeric(webInfo.eid))
+        if (isNotNumeric(webInfo.aid) || isNotNumeric(webInfo.eid))
             throw new IllegalStateException("Aid and Eid must be numbers");
-        this.aid = webInfo.aid;
-        this.eid = webInfo.eid;
-        this.name = PatternUtil.fromHtml(webInfo.name);
-        this.chapter = webInfo.chapter.trim();
-        this.url = "https://animeflv.net" + webInfo.url;
-        this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");
-        this.isNew = chapter.matches("^.* 1$| 0$| Preestreno$| [10] ?:.*$");
-        this.anime = PatternUtil.getAnimeUrl(this.url, this.aid);
-        File file = FileAccessHelper.INSTANCE.getFile(getFileName());
-        DownloadObject downloadObject = CacheDB.INSTANCE.downloadsDAO().getByEid(eid);
-        this.isChapterDownloaded = (file != null) && file.exists();
-        this.isDownloading = downloadObject != null && downloadObject.state == DownloadObject.DOWNLOADING;
-        if (downloadObject != null) {
-            this.downloadState = downloadObject.state;
-        } else {
-            this.downloadState = -8;
-        }
+        populate(webInfo);
         this.animeObject = dao.getByAid(aid);
     }
 
-    private boolean isNumeric(String number) {
+    private boolean isNotNumeric(String number) {
         try {
             Integer.parseInt(number);
-            return true;
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return true;
         }
     }
 

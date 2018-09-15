@@ -1,18 +1,17 @@
 buildscript {
-    ext.kotlin_version = '1.2.60'
     repositories {
         maven { url 'https://maven.fabric.io/public' }
         mavenCentral()
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'io.fabric.tools:gradle:1.25.4'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
 repositories {
@@ -25,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 63
-        versionName "1.9.6"
+        versionCode 64
+        versionName "2.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -69,9 +68,12 @@ configurations.all {
 
 allprojects {
     repositories {
+        google()
+        jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+        maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
     }
 }
 
@@ -82,14 +84,14 @@ dependencies {
     implementation 'androidx.preference:preference:1.0.0-rc02'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-rc02'
-    implementation 'com.google.android.material:material:1.0.0-rc01'
+    implementation 'com.google.android.material:material:1.0.0-rc02'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.0.0-rc02'
     implementation 'androidx.cardview:cardview:1.0.0-rc02'
     implementation 'androidx.mediarouter:mediarouter:1.0.0-beta01'
     implementation 'androidx.recyclerview:recyclerview:1.0.0-rc02'
     implementation 'androidx.leanback:leanback:1.0.0-rc02'
     implementation 'androidx.palette:palette:1.0.0-rc02'
-    implementation 'com.google.android.gms:play-services-cast:16.0.1'
+    implementation 'com.google.android.gms:play-services-cast:16.0.2'
     implementation 'com.google.android.gms:play-services-drive:15.0.1'
     implementation 'com.google.android.gms:play-services-auth:16.0.0'
     implementation 'com.google.firebase:firebase-core:16.0.3'
@@ -98,15 +100,15 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
     implementation 'androidx.annotation:annotation:1.0.0-rc02'
     implementation 'androidx.slice:slice-builders:1.0.0-rc02'
-    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0-rc01'
+    kapt 'androidx.lifecycle:lifecycle-compiler:2.0.0-rc01'
     implementation 'androidx.room:room-runtime:2.0.0-rc01'
-    annotationProcessor 'androidx.room:room-compiler:2.0.0-rc01'
+    kapt 'androidx.room:room-compiler:2.0.0-rc01'
     androidTestImplementation 'androidx.room:room-testing:2.0.0-rc01'
     implementation 'com.google.dagger:dagger-android-support:2.16'
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
+    kapt 'com.google.dagger:dagger-android-processor:2.16'
     implementation 'androidx.paging:paging-runtime:2.0.0-rc01'
     implementation 'com.jakewharton:butterknife:9.0.0-SNAPSHOT'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-SNAPSHOT'
+    kapt 'com.jakewharton:butterknife-compiler:9.0.0-SNAPSHOT'
     implementation 'pl.droidsonroids:jspoon:1.2.2'
     implementation 'pl.droidsonroids.retrofit2:converter-jspoon:1.2.2'
     implementation 'org.jsoup:jsoup:1.10.3'
@@ -123,7 +125,11 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-core:2.7.0'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.7.0'
     implementation "com.google.android.exoplayer:extension-mediasession:2.7.0"
-    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    //MaterialDialogs
+    implementation 'com.afollestad.material-dialogs:core:2.0.0-alpha09'
+    implementation 'com.afollestad.material-dialogs:input:2.0.0-alpha09'
+    implementation 'com.afollestad.material-dialogs:color:2.0.0-alpha09'
+    //---------------
     implementation 'com.shamanland:xdroid-toaster:0.3.0'
     implementation 'com.github.MFlisar:DragSelectRecyclerView:0.3'
     implementation 'com.mani:ThinDownloadManager:1.4.0'
@@ -139,9 +145,14 @@ dependencies {
     implementation 'com.tonyodev.fetch2okhttp:fetch2okhttp:2.2.0-RC3'
     implementation 'q.rorbin:badgeview:1.1.3'
     implementation 'com.jaredrummler:android-device-names:1.1.7'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+    implementation 'com.afollestad:aesthetic:0.6.1'
+    kapt 'com.github.bumptech.glide:compiler:4.7.1'
     testImplementation 'junit:junit:4.12'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.2.60'
+    //Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.anko:anko:0.10.5"
+    implementation "org.jetbrains.anko:anko-coroutines:0.10.5"
+    //------
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
@@ -153,6 +164,16 @@ dependencies {
     }
     implementation('io.branch.sdk.android:library:2.17.1@aar') {
         transitive = true
+    }
+}
+
+kapt {
+    generateStubs = true
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
     }
 }
 apply plugin: 'com.google.gms.google-services'

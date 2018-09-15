@@ -21,10 +21,10 @@ public class DirectoryPage {
     public List<AnimeObject> getAnimes(Context context, AnimeDAO animeDAO, Jspoon jspoon, UpdateInterface updateInterface) {
         List<AnimeObject> animeObjects = new ArrayList<>();
         for (String link : links) {
-            if (Network.isConnected()) {
+            if (Network.INSTANCE.isConnected()) {
                 if (!animeDAO.existLink("https://animeflv.net" + link))
                     try {
-                        AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).validateTLSCertificates(true).get().outerHtml());
+                        AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.Companion.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).validateTLSCertificates(true).get().outerHtml());
                         animeObjects.add(new AnimeObject("https://animeflv.net" + link, webInfo));
                         Log.e("Directory Getter", "Added: https://animeflv.net" + link);
                         updateInterface.onAdd();
@@ -43,9 +43,9 @@ public class DirectoryPage {
     public List<AnimeObject> getAnimesRecreate(Context context, Jspoon jspoon, UpdateInterface updateInterface) {
         List<AnimeObject> animeObjects = new ArrayList<>();
         for (String link : links) {
-            if (Network.isConnected()) {
+            if (Network.INSTANCE.isConnected()) {
                 try {
-                    AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).get().outerHtml());
+                    AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.Companion.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).get().outerHtml());
                     animeObjects.add(new AnimeObject("https://animeflv.net" + link, webInfo));
                     Log.e("Directory Getter", "Replaced: https://animeflv.net" + link);
                     updateInterface.onAdd();

@@ -164,6 +164,12 @@
             android:key="collapse_dir_nots"
             android:summary="Crear y actualizar directorio"
             android:title="Notificaciones pequeñas"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_scale"
+            android:key="scale_img"
+            android:summary="Portada en pantalla completa"
+            android:title="Mejor calidad de imagen"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="category_design"

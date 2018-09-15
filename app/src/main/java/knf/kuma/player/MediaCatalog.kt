@@ -9,7 +9,7 @@ import knf.kuma.database.CacheDB
  */
 
 open class MediaCatalog(private val list: MutableList<MediaDescriptionCompat>, private val intent: Intent) :
-        List<MediaDescriptionCompat> by list {
+        MutableList<MediaDescriptionCompat> by list {
 
     companion object : MediaCatalog(mutableListOf(), Intent())
 

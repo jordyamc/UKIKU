@@ -31,9 +31,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Main"
+            android:name=".SplashActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -77,6 +77,10 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts"/>
         </activity>
+        <activity
+            android:name=".Main"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".tv.ui.TVMain"
             android:banner="@drawable/tv_banner"
@@ -155,7 +159,7 @@
         <service android:name=".directory.DirectoryUpdateService"/>
         <service android:name=".download.DownloadService"/>
         <service
-            android:name=".widgets.emision.WEmisionService"
+            android:name=".widgets.emision.WEmissionService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
         <service android:name=".download.DownloadManager"/>
 
@@ -208,7 +212,6 @@
         <activity
             android:name=".tv.search.TVSearch"
             android:theme="@style/AppTheme.TV.Base"/>
-        <activity android:name=".commons.BypassUtil"/>
         <activity
             android:name=".download.DownloadDialogActivity"
             android:excludeFromRecents="true"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="knf.kuma">
 
     <uses-feature
@@ -39,7 +40,8 @@
         <activity
             android:name=".tv.ui.TVMain"
             android:banner="@drawable/tv_banner"
-            android:screenOrientation="landscape"
+            android:screenOrientation="sensorLandscape"
+            tools:replace="android:screenOrientation"
             android:theme="@style/AppTheme.TV.Browser">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -142,7 +144,7 @@
         <service android:name=".directory.DirectoryUpdateService"/>
         <service android:name=".download.DownloadService"/>
         <service
-            android:name=".widgets.emision.WEmisionService"
+            android:name=".widgets.emision.WEmissionService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
         <service android:name=".download.DownloadManager"/>
 
@@ -185,17 +187,24 @@
         <activity android:name=".queue.QueueActivity"/>
         <activity
             android:name=".tv.streaming.TVServerSelection"
+            android:screenOrientation="sensorLandscape"
+            tools:replace="android:screenOrientation"
             android:theme="@style/AppTheme.TV.Guided"/>
         <activity
             android:name=".tv.exoplayer.TVPlayer"
+            android:screenOrientation="sensorLandscape"
+            tools:replace="android:screenOrientation"
             android:theme="@style/AppTheme.TV.Base"/>
         <activity
             android:name=".tv.details.TVAnimesDetails"
+            android:screenOrientation="sensorLandscape"
+            tools:replace="android:screenOrientation"
             android:theme="@style/AppTheme.TV.Details"/>
         <activity
             android:name=".tv.search.TVSearch"
+            android:screenOrientation="sensorLandscape"
+            tools:replace="android:screenOrientation"
             android:theme="@style/AppTheme.TV.Base"/>
-        <activity android:name=".commons.BypassUtil"/>
         <activity
             android:name=".download.DownloadDialogActivity"
             android:excludeFromRecents="true"

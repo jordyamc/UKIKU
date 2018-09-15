@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="64" version="2.0">
+        <change type="fix">Errores generales</change>
+        <change type="new">Migración de Java a Kotlin</change>
+        <change type="new">Mejoras de estabilidad</change>
+        <change type="new">Launch screen al iniciar la app</change>
+        <change type="change">Algunos dialogos cambiados a snackbar</change>
+    </release>
     <release code="63" version="1.9.6">
         <change type="fix">Errores generales</change>
     </release>

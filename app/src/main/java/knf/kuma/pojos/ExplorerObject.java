@@ -47,7 +47,7 @@ public class ExplorerObject {
     public String path;
     public List<FileDownObj> chapters = new ArrayList<>();
     @Ignore
-    MutableLiveData<List<FileDownObj>> liveData = new MutableLiveData<>();
+    private MutableLiveData<List<FileDownObj>> liveData = new MutableLiveData<>();
     @Ignore
     private boolean isProcessed = false;
     @Ignore
@@ -74,7 +74,7 @@ public class ExplorerObject {
         if (object == null)
             throw new IllegalStateException("Anime not found!!!");
         this.key = object.key;
-        this.img = PatternUtil.getCover(object.aid);
+        this.img = PatternUtil.INSTANCE.getCover(object.aid);
         this.link = object.link;
         this.fileName = object.fileName;
         this.name = object.name;
@@ -97,7 +97,7 @@ public class ExplorerObject {
                 for (File chap: file_list)
                     try {
                         String file_name = chap.getName();
-                        chapters.add(new FileDownObj(context, name, aid, PatternUtil.getNumFromfile(file_name), file_name, chap));
+                        chapters.add(new FileDownObj(context, name, aid, PatternUtil.INSTANCE.getNumFromfile(file_name), file_name, chap));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -118,6 +118,7 @@ public class ExplorerObject {
         });
     }
 
+    @NonNull
     public LiveData<List<FileDownObj>> getLiveData(Context context) {
         if (!isProcessed && !isProcessing) process(context);
         else if (isProcessed || chapters.size() > 0)
@@ -139,11 +140,11 @@ public class ExplorerObject {
         public String fileName;
         public String link;
 
-        public FileDownObj(Context context, String title, String aid, String chapter, String name, File file) {
+        FileDownObj(Context context, String title, String aid, String chapter, String name, File file) {
             this.title = title;
             this.chapter = chapter;
             this.aid = aid;
-            this.eid = PatternUtil.getEidFromfile(name);
+            this.eid = PatternUtil.INSTANCE.getEidFromfile(name);
             this.fileName = name;
             this.path = file.getAbsolutePath();
             this.time = getTime(context, file);

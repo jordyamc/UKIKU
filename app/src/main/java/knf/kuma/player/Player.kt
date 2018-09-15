@@ -32,7 +32,7 @@ class PlayerHolder(private val context: Context,
     private var listPosition = 0
     private val mediaCatalog: MediaCatalog
 
-    // Create the player instance.
+    // Create the exoPlayer instance.
     init {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val audioAttributes = AudioAttributesCompat.Builder()
@@ -41,6 +41,7 @@ class PlayerHolder(private val context: Context,
                 .build()
         playerCallback = context as PlayerCallback
         mediaCatalog = MediaCatalog(mutableListOf(), intent)
+        playerCallback.onChangeTitle(mediaCatalog[listPosition].title!!.toString())
         if (mediaCatalog.size == 1) playerCallback.onChangeTitle(mediaCatalog[0].title.toString())
         audioFocusPlayer = AudioFocusWrapper(
                 audioAttributes,
@@ -80,12 +81,12 @@ class PlayerHolder(private val context: Context,
         Log.i("Player", "SimpleExoPlayer is started")
     }
 
-    // Stop playback and release resources, but re-use the player instance.
+    // Stop playback and release resources, but re-use the exoPlayer instance.
     fun stop() {
         with(audioFocusPlayer) {
             // Save state
             saveState()
-            // Stop the player (and release it's resources). The player instance can be reused.
+            // Stop the exoPlayer (and release it's resources). The exoPlayer instance can be reused.
             stop(true)
         }
     }
@@ -106,9 +107,9 @@ class PlayerHolder(private val context: Context,
         }
     }
 
-    // Destroy the player instance.
+    // Destroy the exoPlayer instance.
     fun release() {
-        audioFocusPlayer.release() // player instance can't be used again.
+        audioFocusPlayer.release() // exoPlayer instance can't be used again.
     }
 
     /**

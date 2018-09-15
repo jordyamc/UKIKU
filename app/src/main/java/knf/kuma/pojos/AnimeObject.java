@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,7 +86,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     @Ignore
     public AnimeObject(String link, WebInfo webInfo) {
         this.link = link;
-        this.fileName = PatternUtil.getRootFileName(link);
+        this.fileName = PatternUtil.INSTANCE.getRootFileName(link);
         this.sid = extract(link);
         this.webInfo = webInfo;
         populate(webInfo);
@@ -95,9 +96,9 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         this.key = Integer.parseInt(webInfo.aid);
         this.webInfo = webInfo;
         this.aid = webInfo.aid;
-        this.name = PatternUtil.fromHtml(webInfo.name);
+        this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
         this.img = "https://animeflv.net" + webInfo.img;
-        this.description = PatternUtil.fromHtml(webInfo.description);
+        this.description = PatternUtil.INSTANCE.fromHtml(webInfo.description);
         this.type = getType(webInfo.type);
         this.state = getState(webInfo.state);
         this.day = webInfo.emisionDay;
@@ -110,9 +111,9 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
     private void completeInfo(List<Element> scripts) {
         try {
-            AnimeInfo animeInfo = new AnimeInfo(findDataScript(scripts).html());
+            AnimeInfo animeInfo = new AnimeInfo(Objects.requireNonNull(findDataScript(scripts)).html());
             //this.name = PatternUtil.fromHtml(animeInfo.title);
-            this.day = animeInfo.day;
+            this.day = animeInfo.getDay();
             this.chapters = WebInfo.AnimeChapter.create(animeInfo);
         } catch (Exception e) {
             //
@@ -131,7 +132,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     }
 
     private String extract(String link) {
-        return PatternUtil.getLinkNumber(link);
+        return PatternUtil.INSTANCE.getLinkNumber(link);
     }
 
     private String getType(String className) {
@@ -239,7 +240,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         public List<AnimeRelated> related = new ArrayList<>();
         @Ignore
         @Selector("script[type=text/javascript]:not([src])")
-        public List<Element> scripts;
+        List<Element> scripts;
         /*@Selector("ul.ListCaps li,ul.ListEpisodes li,ul#episodeList li")
         public List<Element> chapters = new ArrayList<>();*/
 
@@ -301,14 +302,14 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             @Ignore
             public AnimeChapter(AnimeInfo info, String num, String sid) {
-                this.name = info.title;
+                this.name = info.getTitle();
                 this.chapterType = ChapterType.NEW;
                 this.number = "Episodio " + num;
-                this.link = "https://animeflv.net/ver/" + sid + "/" + info.sid + "-" + num;
+                this.link = "https://animeflv.net/ver/" + sid + "/" + info.getSid() + "-" + num;
                 this.eid = sid;
-                this.img = "https://animeflv.net/uploads/animes/screenshots/" + info.aid + "/" + num + "/3.jpg";
+                this.img = "https://animeflv.net/uploads/animes/screenshots/" + info.getAid() + "/" + num + "/3.jpg";
                 this.key = Integer.parseInt(eid);
-                this.aid = info.aid;
+                this.aid = info.getAid();
             }
 
             @Ignore
@@ -336,7 +337,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             public static List<AnimeChapter> create(AnimeInfo info) {
                 List<AnimeChapter> chapters = new ArrayList<>();
                 try {
-                    for (Map.Entry<String, String> entry : info.epMap.entrySet()) {
+                    for (Map.Entry<String, String> entry : info.getEpMap().entrySet()) {
                         try {
                             chapters.add(new AnimeChapter(info, entry.getKey(), entry.getValue()));
                         } catch (Exception e) {
@@ -351,7 +352,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             }
 
             public String getFileName() {
-                return eid + "$" + PatternUtil.getFileName(link);
+                return eid + "$" + PatternUtil.INSTANCE.getFileName(link);
             }
 
             public String getEpTitle() {

@@ -20,11 +20,12 @@
             android:layout_width="60dp"
             android:layout_height="85dp"
             android:scaleType="centerCrop"
-            android:transitionName="imgRel"/>
+            android:transitionName="imgRel"
+            android:visibility="visible"/>
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="85dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="2dp"
             android:layout_weight="1">
