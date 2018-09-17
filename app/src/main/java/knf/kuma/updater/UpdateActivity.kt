@@ -20,9 +20,11 @@ import com.crashlytics.android.Crashlytics
 import com.thin.downloadmanager.DownloadRequest
 import com.thin.downloadmanager.DownloadStatusListenerV1
 import com.thin.downloadmanager.ThinDownloadManager
-import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.commons.getUpdateDir
 import kotlinx.android.synthetic.main.activity_updater.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import xdroid.toaster.Toaster
 import java.io.File
 
@@ -88,22 +90,22 @@ class UpdateActivity : AppCompatActivity() {
         val file = update
         if (file.exists())
             file.delete()
-        ThinDownloadManager().add(DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/" + BuildConfig.BUILD_TYPE + "/app-release.apk"))
+        ThinDownloadManager().add(DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/$getUpdateDir/app-release.apk"))
                 .setDestinationURI(Uri.fromFile(file))
                 .setDownloadResumable(false)
                 .setStatusListener(object : DownloadStatusListenerV1 {
-                    override fun onDownloadComplete(downloadRequest: DownloadRequest) {
+                    override fun onDownloadComplete(downloadRequest: DownloadRequest?) {
                         prepareForIntall()
                     }
 
-                    override fun onDownloadFailed(downloadRequest: DownloadRequest, errorCode: Int, errorMessage: String) {
+                    override fun onDownloadFailed(downloadRequest: DownloadRequest?, errorCode: Int, errorMessage: String?) {
                         Log.e("Update Error", "Code: $errorCode Message: $errorMessage")
                         Toaster.toast("Error al actualizar: $errorMessage")
                         Crashlytics.logException(IllegalStateException("Update failed\nCode: $errorCode Message: $errorMessage"))
                         finish()
                     }
 
-                    override fun onProgress(downloadRequest: DownloadRequest, totalBytes: Long, downloadedBytes: Long, progress: Int) {
+                    override fun onProgress(downloadRequest: DownloadRequest?, totalBytes: Long, downloadedBytes: Long, progress: Int) {
                         setDownProgress(progress)
                     }
                 }))
@@ -126,12 +128,16 @@ class UpdateActivity : AppCompatActivity() {
     }
 
     private fun setDownProgress(p: Int) {
-        runOnUiThread {
-            with(progress) {
-                isIndeterminate = false
-                progress = p
+        launch(UI) {
+            try {
+                with(progress) {
+                    isIndeterminate = false
+                    progress = p
+                }
+                progress_text.text = String.format("%d%%", p)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            progress_text.text = String.format("%s%", p.toString())
         }
     }
 

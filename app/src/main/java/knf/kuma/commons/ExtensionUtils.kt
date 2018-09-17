@@ -40,6 +40,12 @@ fun getPackage(): String {
     return if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "release") "knf.kuma" else "knf.kuma.${BuildConfig.BUILD_TYPE}"
 }
 
+val getUpdateDir: String
+    get() = when (BuildConfig.BUILD_TYPE) {
+        "debug", "release" -> "release"
+        else -> BuildConfig.BUILD_TYPE
+    }
+
 fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
     try {
         this.func()

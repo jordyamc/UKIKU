@@ -92,6 +92,7 @@ class Main : AppCompatActivity(),
     private lateinit var badgeQueue: TextView
     private var badgeView: Badge? = null
     private var readyToFinish = false
+    private var isFirst = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeNA(this))
@@ -493,8 +494,11 @@ class Main : AppCompatActivity(),
                 BUUtils.BUType.DRIVE -> backupLocation.text = "Google Drive"
             }
         }
-        UpdateChecker.check(this, this)
-        ChangelogActivity.check(this)
+        if (isFirst) {
+            isFirst = false
+            UpdateChecker.check(this, this)
+            ChangelogActivity.check(this)
+        }
     }
 
     override fun onNeedRecreate() {

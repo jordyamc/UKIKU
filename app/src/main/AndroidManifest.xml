@@ -124,7 +124,8 @@
         <activity android:name=".explorer.ExplorerActivity"/>
         <activity
             android:name=".updater.UpdateActivity"
-            android:excludeFromRecents="true"/>
+            android:excludeFromRecents="true"
+            android:exported="true"/>
         <activity android:name=".random.RandomActivity"/>
         <activity android:name=".changelog.ChangelogActivity"/>
         <activity
