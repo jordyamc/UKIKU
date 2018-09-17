@@ -27,7 +27,7 @@ import java.util.*
 import java.util.regex.Pattern
 
 class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallback {
-    private lateinit var holder: AnimeChaptersHolder
+    private var holder: AnimeChaptersHolder? = null
     private var moveFile: String? = null
     private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
     private lateinit var snackManager: SnackProgressBarManager
@@ -39,8 +39,8 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                 val chapters = animeObject.chapters
                 if (PrefsUtil.isChapsAsc)
                     chapters!!.reverse()
-                holder.setAdapter(this@ChaptersFragment, chapters!!)
-                holder.goToChapter()
+                holder?.setAdapter(this@ChaptersFragment, chapters!!)
+                holder?.goToChapter()
             }
         })
     }
@@ -50,7 +50,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
         retainInstance = true
         val view = inflater.inflate(R.layout.recycler_chapters, container, false)
         holder = AnimeChaptersHolder(view, childFragmentManager, this)
-        snackManager = SnackProgressBarManager(holder.recyclerView)
+        snackManager = SnackProgressBarManager(holder?.recyclerView!!)
                 .setProgressBarColor(EAHelper.getThemeColor(context))
                 .setOverlayLayoutAlpha(0.4f)
                 .setOverlayLayoutColor(android.R.color.background_dark)
@@ -58,7 +58,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
     }
 
     override fun onReselect() {
-        holder.smoothGoToChapter()
+        holder?.smoothGoToChapter()
     }
 
     fun onMove(to: String) {
@@ -91,7 +91,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK)
             try {
-                holder.adapter?.isImporting = true
+                holder?.adapter?.isImporting = true
                 if (data!!.clipData == null || data.clipData?.itemCount ?: 0 == 0) {
                     if (moveFile == null && chapters.size > 0) {
                         val uri = data.data
@@ -113,10 +113,10 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                                         FileAccessHelper.INSTANCE.delete(moveFile!!)
                                     } else
                                         Toaster.toast("Importado exitosamente")
-                                    holder.adapter!!.notifyDataSetChanged()
+                                    holder?.adapter?.notifyDataSetChanged()
                                     moveFile = null
                                     snackManager.dismiss()
-                                    holder.adapter?.isImporting = false
+                                    holder?.adapter?.isImporting = false
                                 } else
                                     snackManager.setProgress(pair.first)
                             }
@@ -151,10 +151,10 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                                 if (pairBooleanPair != null) {
                                     if (pairBooleanPair.second) {
                                         Toaster.toast("Importados " + pairBooleanPair.first.second + " archivos exitosamente")
-                                        holder.adapter!!.notifyDataSetChanged()
+                                        holder?.adapter?.notifyDataSetChanged()
                                         chapters = ArrayList()
                                         snackManager.dismiss()
-                                        holder.adapter?.isImporting = false
+                                        holder?.adapter?.isImporting = false
                                     } else {
                                         snackbar.setMessage(pairBooleanPair.first.first)
                                         snackManager.setProgress(pairBooleanPair.first.second)

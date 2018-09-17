@@ -122,7 +122,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
         TVSearch.start(context!!)
     }
 
-    override fun onItemClicked(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
+    override fun onItemClicked(itemViewHolder: Presenter.ViewHolder?, item: Any?, rowViewHolder: RowPresenter.ViewHolder?, row: Row?) {
         if (item is RecentObject) {
             TVServersFactory.start(activity as Activity, item.url!!, AnimeObject.WebInfo.AnimeChapter.fromRecent(item), activity as TVServersFactory.ServersInterface)
         } else if (item is RecordObject) {
@@ -177,7 +177,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
         waitingLogin = false
     }
 
-    override fun onItemSelected(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
+    override fun onItemSelected(itemViewHolder: Presenter.ViewHolder?, item: Any?, rowViewHolder: RowPresenter.ViewHolder?, row: Row?) {
         /*String img=null;
         if (item instanceof RecentObject){
             img=PatternUtil.getCover(((RecentObject)item).aid);

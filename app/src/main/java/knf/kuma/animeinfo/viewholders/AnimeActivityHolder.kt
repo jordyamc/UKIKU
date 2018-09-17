@@ -17,10 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityOptionsCompat
 import androidx.viewpager.widget.ViewPager
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
-import butterknife.OnLongClick
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -34,30 +30,25 @@ import knf.kuma.commons.BypassUtil.Companion.isNeeded
 import knf.kuma.commons.BypassUtil.Companion.saveCookies
 import knf.kuma.commons.BypassUtil.Companion.userAgent
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.bind
+import knf.kuma.commons.optionalBind
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk25.coroutines.onLongClick
 import xdroid.toaster.Toaster
 
 @SuppressLint("RestrictedApi")
 class AnimeActivityHolder(activity: AppCompatActivity) {
-    @BindView(R.id.appBar)
-    lateinit var appBarLayout: AppBarLayout
-    @BindView(R.id.collapsingToolbar)
-    lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
-    @BindView(R.id.img)
-    lateinit var imageView: ImageView
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-    @BindView(R.id.tabs)
-    lateinit var tabLayout: TabLayout
-    @BindView(R.id.pager)
-    lateinit var pager: ViewPager
-    @BindView(R.id.fab)
-    lateinit var fab: FloatingActionButton
-    @BindView(R.id.webview)
-    @JvmField
-    var webView: WebView? = null
+    val appBarLayout: AppBarLayout by bind(activity, R.id.appBar)
+    private val collapsingToolbarLayout: CollapsingToolbarLayout by bind(activity, R.id.collapsingToolbar)
+    val imageView: ImageView by bind(activity, R.id.img)
+    val toolbar: Toolbar by bind(activity, R.id.toolbar)
+    private val tabLayout: TabLayout by bind(activity, R.id.tabs)
+    val pager: ViewPager by bind(activity, R.id.pager)
+    val fab: FloatingActionButton by bind(activity, R.id.fab)
+    private val webView: WebView? by optionalBind(activity, R.id.webview)
 
     private val intent: Intent = activity.intent
     private val animePagerAdapter: AnimePagerAdapter = AnimePagerAdapter(activity.supportFragmentManager)
@@ -69,7 +60,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     private val drawableHalfStar: Drawable by lazy { activity.getDrawable(R.drawable.ic_seeing) }
 
     init {
-        ButterKnife.bind(this, activity.findViewById<View>(android.R.id.content))
         fab.visibility = View.INVISIBLE
         populate(activity)
         pager.offscreenPageLimit = 2
@@ -96,6 +86,9 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
                     animePagerAdapter.onChaptersReselect()
             }
         })
+        fab.onClick { innerInterface.onFabClicked(fab) }
+        fab.onLongClick { innerInterface.onFabLongClicked(fab) }
+        imageView.onClick { innerInterface.onImgClicked(imageView) }
         checkBypass(activity)
     }
 
@@ -108,22 +101,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
             PicassoSingle[imageView.context].load(link).noPlaceholder().into(imageView)
             imageView.setOnClickListener(listener)
         }
-    }
-
-    @OnClick(R.id.fab)
-    internal fun onFabClick(actionButton: FloatingActionButton) {
-        innerInterface.onFabClicked(actionButton)
-    }
-
-    @OnLongClick(R.id.fab)
-    internal fun onFabLongClick(actionButton: FloatingActionButton): Boolean {
-        innerInterface.onFabLongClicked(actionButton)
-        return true
-    }
-
-    @OnClick(R.id.img)
-    internal fun onImgClick(imageView: ImageView) {
-        innerInterface.onImgClicked(imageView)
     }
 
     fun setFABState(isFav: Boolean) {

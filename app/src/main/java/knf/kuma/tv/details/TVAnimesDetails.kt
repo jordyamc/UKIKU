@@ -29,7 +29,7 @@ class TVAnimesDetails : TVBaseActivity(), TVServersFactory.ServersInterface {
         if (fragment != null && success) {
             fragment!!.onStartStreaming()
             launch(UI) {
-                serversFactory!!.viewHolder.view.apply {
+                serversFactory!!.viewHolder?.view?.apply {
                     findViewById<View>(R.id.indicator).visibility = View.VISIBLE
                     invalidate()
                 }

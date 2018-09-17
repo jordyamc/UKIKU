@@ -2,7 +2,6 @@ package knf.kuma.tv
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import android.util.Log
 import androidx.leanback.widget.Presenter
 import com.crashlytics.android.answers.Answers
@@ -23,9 +22,8 @@ import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
-import java.util.*
 
-class TVServersFactory private constructor(private val activity: Activity, private val url: String, private val chapter: AnimeObject.WebInfo.AnimeChapter, val viewHolder: Presenter.ViewHolder, private val serversInterface: ServersInterface) {
+class TVServersFactory private constructor(private val activity: Activity, private val url: String, private val chapter: AnimeObject.WebInfo.AnimeChapter, val viewHolder: Presenter.ViewHolder?, private val serversInterface: ServersInterface) {
     private val downloadObject: DownloadObject = DownloadObject.fromChapter(chapter, false)
 
     private var servers: MutableList<Server> = ArrayList()
@@ -39,10 +37,9 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                     Toaster.toast("Sin servidores disponibles")
                     serversInterface.onFinish(false, false)
                 } else {
-                    val bundle = Bundle()
-                    bundle.putStringArrayList(TVServerSelectionFragment.SERVERS_DATA, Server.getNames(servers) as ArrayList<String>)
                     activity.startActivityForResult(Intent(activity, TVServerSelection::class.java)
-                            .putExtras(bundle), REQUEST_CODE_LIST)
+                            .putExtra(TVServerSelectionFragment.SERVERS_DATA, Server.getNames(servers) as ArrayList),
+                            REQUEST_CODE_LIST)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -89,11 +86,10 @@ class TVServersFactory private constructor(private val activity: Activity, priva
 
     private fun showOptions(server: VideoServer) {
         this.current = server
-        val bundle = Bundle()
-        bundle.putStringArrayList(TVServerSelectionFragment.VIDEO_DATA, Option.getNames(server.options) as ArrayList<String>)
-        bundle.putString("name", server.name)
         activity.startActivityForResult(Intent(activity, TVServerSelection::class.java)
-                .putExtras(bundle), REQUEST_CODE_OPTION)
+                .putExtra("name", server.name)
+                .putExtra(TVServerSelectionFragment.VIDEO_DATA, Option.getNames(server.options) as ArrayList),
+                REQUEST_CODE_OPTION)
     }
 
     private fun startStreaming(option: Option) {
@@ -162,7 +158,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
 
         fun start(activity: Activity, url: String, chapter: AnimeObject.WebInfo.AnimeChapter, viewHolder: Presenter.ViewHolder?, serversInterface: ServersInterface) {
             doAsync {
-                val factory = TVServersFactory(activity, url, chapter, viewHolder!!, serversInterface)
+                val factory = TVServersFactory(activity, url, chapter, viewHolder, serversInterface)
                 serversInterface.onReady(factory)
                 factory.get()
             }

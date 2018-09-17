@@ -37,17 +37,17 @@ class ExplorerActivity : AppCompatActivity(), OnFileStateChange {
         menuInflater.inflate(R.menu.menu_explorer_connected, menu)
         if (isExplorerFiles)
             menu.findItem(R.id.delete_all).isVisible = false
-        if (!CastUtil.get()!!.connected())
+        if (!CastUtil.get().connected())
             menu.findItem(R.id.casting).isVisible = false
         else {
-            CastUtil.get()!!.casting.observe(this, Observer { s ->
+            CastUtil.get().casting.observe(this, Observer { s ->
                 try {
                     if (s == CastUtil.NO_PLAYING) {
                         menu.findItem(R.id.casting).isEnabled = false
                     } else {
                         menu.findItem(R.id.casting).isEnabled = true
                         menu.findItem(R.id.casting).setOnMenuItemClickListener {
-                            CastUtil.get()!!.openControls()
+                            CastUtil.get().openControls()
                             true
                         }
                     }

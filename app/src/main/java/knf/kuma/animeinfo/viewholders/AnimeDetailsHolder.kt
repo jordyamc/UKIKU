@@ -52,48 +52,56 @@ class AnimeDetailsHolder(view: View) {
     fun populate(fragment: Fragment, animeObject: AnimeObject) {
         launch(UI) {
             title.text = animeObject.name
-            cardViews[0].setOnLongClickListener {
-                try {
-                    val clipboard = fragment.context!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("Anime title", animeObject.name)
-                    clipboard.primaryClip = clip
-                    Toaster.toast("Título copiado")
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toaster.toast("Error al copiar título")
-                }
-
-                true
-            }
-            showCard(cardViews[0])
-            if (animeObject.description != null && animeObject.description!!.trim { it <= ' ' } != "") {
-                desc.setTextAndIndicator(animeObject.description!!.trim { it <= ' ' }, expandIcon)
-                desc.setAnimationDuration(300)
-                val onClickListener = View.OnClickListener {
-                    launch(UI) {
-                        expandIcon.setImageResource(if (desc.isExpanded) R.drawable.action_expand else R.drawable.action_shrink)
-                        desc.toggle()
+            try {
+                cardViews[0].setOnLongClickListener {
+                    try {
+                        val clipboard = fragment.context!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText("Anime title", animeObject.name)
+                        clipboard.primaryClip = clip
+                        Toaster.toast("Título copiado")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toaster.toast("Error al copiar título")
                     }
+                    true
                 }
-                desc.setOnClickListener(onClickListener)
-                expandIcon.setOnClickListener(onClickListener)
-                showCard(cardViews[1])
+                showCard(cardViews[0])
+            } catch (e: Exception) {
             }
-            type.text = animeObject.type
-            state.text = getStateString(animeObject.state!!, animeObject.day!!)
-            id.text = animeObject.aid
-            if (animeObject.rate_stars == null || animeObject.rate_stars == "0.0")
-                layScore.visibility = View.GONE
-            else {
-                ratingCount.text = animeObject.rate_count
-                ratingBar.rating = java.lang.Float.parseFloat(animeObject.rate_stars!!)
+            try {
+                if (animeObject.description != null && animeObject.description!!.trim { it <= ' ' } != "") {
+                    desc.setTextAndIndicator(animeObject.description!!.trim { it <= ' ' }, expandIcon)
+                    desc.setAnimationDuration(300)
+                    val onClickListener = View.OnClickListener {
+                        launch(UI) {
+                            expandIcon.setImageResource(if (desc.isExpanded) R.drawable.action_expand else R.drawable.action_shrink)
+                            desc.toggle()
+                        }
+                    }
+                    desc.setOnClickListener(onClickListener)
+                    expandIcon.setOnClickListener(onClickListener)
+                    showCard(cardViews[1])
+                }
+            } catch (e: Exception) {
             }
-            showCard(cardViews[2])
-            if (animeObject.genres!!.isNotEmpty()) {
+            try {
+                type.text = animeObject.type
+                state.text = getStateString(animeObject.state!!, animeObject.day!!)
+                id.text = animeObject.aid
+                if (animeObject.rate_stars == null || animeObject.rate_stars == "0.0")
+                    layScore.visibility = View.GONE
+                else {
+                    ratingCount.text = animeObject.rate_count
+                    ratingBar.rating = java.lang.Float.parseFloat(animeObject.rate_stars!!)
+                }
+                showCard(cardViews[2])
+            } catch (e: Exception) {
+            }
+            if (animeObject.genres?.isNotEmpty() == true) {
                 recyclerViewGenres.adapter = AnimeTagsAdapter(fragment.context!!, animeObject.genres!!)
                 showCard(cardViews[3])
             }
-            if (animeObject.related!!.isNotEmpty()) {
+            if (animeObject.related?.isNotEmpty() == true) {
                 recyclerViewRelated.adapter = AnimeRelatedAdapter(fragment, animeObject.related!!)
                 showCard(cardViews[4])
             }

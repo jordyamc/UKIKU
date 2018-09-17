@@ -83,7 +83,7 @@ open class VideoServer : Parcelable {
             val filtered = ArrayList<VideoServer>()
             for (videoServer in videoServers) {
                 if (!names.contains(videoServer.name)) {
-                    names.add(videoServer.name!!)
+                    names.add(videoServer.name)
                     filtered.add(videoServer)
                 }
             }
@@ -93,7 +93,7 @@ open class VideoServer : Parcelable {
         fun getNames(videoServers: MutableList<VideoServer>): MutableList<String> {
             val names = ArrayList<String>()
             for (videoServer in videoServers) {
-                names.add(videoServer.name!!)
+                names.add(videoServer.name)
             }
             return names
         }

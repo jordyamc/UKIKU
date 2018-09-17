@@ -18,8 +18,10 @@ public class AutoBackupObject extends BackupObject {
 
     @SuppressLint("HardwareIds")
     public AutoBackupObject(Context context) {
-        this.name = DeviceName.getDeviceName();
-        this.device_id = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (context != null) {
+            this.name = DeviceName.getDeviceName();
+            this.device_id = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
     }
 
     @Override

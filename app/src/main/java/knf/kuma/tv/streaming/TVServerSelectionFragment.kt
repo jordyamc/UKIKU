@@ -48,12 +48,13 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
         const val SERVERS_DATA = "list_data"
         const val IS_SERVER_DATA = "is_server"
 
-        operator fun get(servers: ArrayList<String>, name: String, isServerData: Boolean): TVServerSelectionFragment {
+        operator fun get(servers: ArrayList<String>, name: String?, isServerData: Boolean): TVServerSelectionFragment {
             val fragment = TVServerSelectionFragment()
             val bundle = Bundle()
             bundle.putStringArrayList(SERVERS_DATA, servers)
             bundle.putBoolean(IS_SERVER_DATA, isServerData)
-            bundle.putString("server_name", name)
+            if (name != null)
+                bundle.putString("server_name", name)
             fragment.arguments = bundle
             return fragment
         }

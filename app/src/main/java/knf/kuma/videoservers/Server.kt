@@ -32,7 +32,7 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 .readTimeout(10, TimeUnit.SECONDS)
                 .followRedirects(true)
                 .followSslRedirects(true).build()
-        for (option in ArrayList(videoServer.options!!))
+        for (option in ArrayList(videoServer.options))
             try {
                 val request = Request.Builder()
                         .url(option.url!!)
@@ -42,16 +42,16 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 val response = client.newCall(request.build()).execute()
                 if (!response.isSuccessful) {
                     Log.e("Remove Option", "Server: " + option.server + "\nUrl: " + option.url + "\nCode: " + response.code())
-                    videoServer.options!!.remove(option)
+                    videoServer.options.remove(option)
                 }
                 if (response.body() != null)
                     response.close()
             } catch (e: Exception) {
                 e.printStackTrace()
-                videoServer.options!!.remove(option)
+                videoServer.options.remove(option)
             }
 
-        return if (videoServer.options!!.size == 0) null else videoServer
+        return if (videoServer.options.size == 0) null else videoServer
     }
 
     override fun compareTo(other: Server): Int {

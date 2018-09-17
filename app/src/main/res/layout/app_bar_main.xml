@@ -60,11 +60,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?colorPrimary"
-        android:visibility="visible"
-        app:elevation="8dp"
         app:itemBackground="?colorPrimary"
         app:itemIconTint="@drawable/bottom_state"
         app:itemTextColor="@drawable/bottom_state"
+        app:elevation="8dp"
         app:menu="@menu/bottom_menu"/>
 
     <knf.kuma.custom.WrapWebView

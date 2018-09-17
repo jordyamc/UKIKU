@@ -123,6 +123,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     fun showNewCategoryDialog(favoriteObject: FavoriteObject?) {
         edited = favoriteObject
+
         showNewCategoryDialog(favoriteObject == null, null)
     }
 
@@ -212,14 +213,14 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
             } else {
                 MaterialDialog(context!!).safeShow {
                     title(text = "Mover a...")
-                            .listItemsSingleChoice(items = categories, initialSelection = categories.indexOf(favoriteObject.category)) { _, _, text ->
-                                if (text != favoriteObject.category) {
-                                    edited = favoriteObject
-                                    edited!!.category = if (text == "Sin categoría") "_NONE_" else text
-                                    CacheDB.INSTANCE.favsDAO().addFav(edited!!)
-                                } else
-                                    Toaster.toast("Error al mover")
-                            }
+                    listItemsSingleChoice(items = categories, initialSelection = categories.indexOf(favoriteObject.category)) { _, _, text ->
+                        if (text != favoriteObject.category) {
+                            edited = favoriteObject
+                            edited!!.category = if (text == "Sin categoría") "_NONE_" else text
+                            CacheDB.INSTANCE.favsDAO().addFav(edited!!)
+                        } else
+                            Toaster.toast("Error al mover")
+                    }
                     positiveButton(text = "mover")
                     negativeButton(text = "nuevo") {
                         edited = favoriteObject

@@ -1,19 +1,25 @@
 package knf.kuma.commons
 
 import android.app.Activity
+import android.content.Context
 import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.preference.PreferenceFragmentCompat
 import com.afollestad.aesthetic.AestheticActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import okhttp3.OkHttpClient
@@ -107,6 +113,29 @@ fun <T : View> Activity.bind(@IdRes res: Int): Lazy<T> {
     return lazy { findViewById<T>(res) }
 }
 
+fun <T : View> AnimeActivityHolder.bind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T> {
+    @Suppress("UNCHECKED_CAST")
+    return lazy { activity.findViewById<T>(res) }
+}
+
+fun <T : View> AnimeActivityHolder.optionalBind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T?> {
+    @Suppress("UNCHECKED_CAST")
+    return lazy { activity.findViewById<T?>(res) }
+}
+
+fun <T : View> Activity.optionalBind(@IdRes res: Int): Lazy<T?> {
+    @Suppress("UNCHECKED_CAST")
+    return lazy { findViewById<T?>(res) }
+}
+
 fun Request.execute(): Response {
     return OkHttpClient().newBuilder().build().newCall(this).execute()
+}
+
+val PreferenceFragmentCompat.safeContext: Context
+    get() = context!!
+
+@ColorInt
+fun Int.resolveColor(context: Context): Int {
+    return ContextCompat.getColor(context, this)
 }

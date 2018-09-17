@@ -21,7 +21,7 @@ class AestheticUtils {
         fun setDefaults(context: Context) {
             if (Aesthetic.isFirstTime)
                 Aesthetic.config {
-                    //activityTheme(if (isDarkMode) R.style.Theme_AppCompat_NoActionBar else R.style.Theme_AppCompat_NoActionBar)
+                    activityTheme(if (isDarkMode(context)) R.style.Theme_AppCompat_NoActionBar else R.style.Theme_AppCompat_Light_NoActionBar)
                     isDark(isDarkMode(context))
                     colorPrimary(primaryColor(context))
                     colorStatusBarAuto()
@@ -30,7 +30,7 @@ class AestheticUtils {
                     navigationViewMode(NavigationViewMode.SELECTED_ACCENT)
                     bottomNavigationBackgroundMode(BottomNavBgMode.PRIMARY)
                     bottomNavigationIconTextMode(BottomNavIconTextMode.SELECTED_ACCENT)
-                    swipeRefreshLayoutColors(EAHelper.getThemeColor(context), EAHelper.getThemeColorLight(context), primaryColor(context))
+                    swipeRefreshLayoutColorsRes(EAHelper.getThemeColor(context), EAHelper.getThemeColorLight(context), primaryColorRes(context))
                 }
         }
 
@@ -45,6 +45,23 @@ class AestheticUtils {
                 }
         }
 
+        fun updateIsDarkMode(context: Context, isDark: Boolean) {
+            if (isDark != isDarkMode(context)) {
+                preferences(context).edit().putBoolean("theme_isDark", isDark).apply()
+                Aesthetic.config {
+                    activityTheme(if (isDarkMode(context)) R.style.Theme_AppCompat_NoActionBar else R.style.Theme_AppCompat_Light_NoActionBar)
+                    isDark(isDark)
+                }
+            }
+        }
+
+        fun updateAccentColor(context: Context, value: String) {
+            Aesthetic.config {
+                colorAccentRes(EAHelper.getThemeColor(value))
+                swipeRefreshLayoutColorsRes(EAHelper.getThemeColor(value), EAHelper.getThemeColorLight(value), primaryColorRes(context))
+            }
+        }
+
         private fun isDarkMode(context: Context): Boolean {
             return preferences(context).getBoolean("theme_isDark", false)
         }
@@ -57,6 +74,12 @@ class AestheticUtils {
         private fun primaryColor(context: Context): Int {
             return if (isCustomMode(context)) preferences(context).getInt("theme_primary", ContextCompat.getColor(context, R.color.colorPrimary))
             else ContextCompat.getColor(context, R.color.colorPrimary)
+        }
+
+        @ColorRes
+        private fun primaryColorRes(context: Context): Int {
+            return if (isCustomMode(context)) preferences(context).getInt("theme_primary", R.color.colorPrimary)
+            else R.color.colorPrimary
         }
 
         @ColorRes

@@ -118,7 +118,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                             }
 
                             override fun onCast(url: String?) {
-                                CastUtil.get().play(fragment.activity as Activity, view, recentObject.eid!!, url, recentObject.name!!, recentObject.chapter!!, recentObject.aid!!, true)
+                                CastUtil.get().play(fragment.activity as? Activity, view, recentObject.eid!!, url, recentObject.name!!, recentObject.chapter!!, recentObject.aid!!, true)
                                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
                                 recordsDAO.add(RecordObject.fromRecent(recentObject))
                                 holder.setSeen(true)
@@ -215,7 +215,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             if (CastUtil.get().connected() &&
                     recentObject.isChapterDownloaded && (obj == null || obj.state == DownloadObject.COMPLETED)) {
                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
-                CastUtil.get().play(fragment.activity as Activity, view, recentObject.eid!!, SelfServer.start(recentObject.fileName, true), recentObject.name!!, recentObject.chapter!!, recentObject.aid!!, true)
+                CastUtil.get().play(fragment.activity as? Activity, view, recentObject.eid!!, SelfServer.start(recentObject.fileName, true), recentObject.name!!, recentObject.chapter!!, recentObject.aid!!, true)
             }
             true
         }
@@ -223,11 +223,11 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
 
     private fun setOrientation(block: Boolean) {
         if (block)
-            (fragment.activity as AppCompatActivity).requestedOrientation = when {
+            (fragment.activity as? AppCompatActivity)?.requestedOrientation = when {
                 context.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
-        else (fragment.activity as AppCompatActivity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
     }
 
     override fun onViewRecycled(holder: ItemHolder) {

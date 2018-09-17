@@ -306,7 +306,7 @@ class FileAccessHelper private constructor(private val context: Context) {
         }
     }
 
-    fun canDownload(fragment: android.app.Fragment, value: String): Boolean {
+    fun canDownload(fragment: Fragment, value: String): Boolean {
         return if (value == "0") {
             true
         } else {
@@ -364,8 +364,8 @@ class FileAccessHelper private constructor(private val context: Context) {
         return fRoot
     }
 
-    fun isUriValid(uri: Uri): Boolean {
-        return if (isSDCardRoot(uri)) {
+    fun isUriValid(uri: Uri?): Boolean {
+        return if (uri != null && isSDCardRoot(uri)) {
             context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("tree_uri", uri.toString()).apply()
             true

@@ -14,6 +14,8 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.safeShow
 import knf.kuma.jobscheduler.DirUpdateJob
 import kotlinx.android.synthetic.main.recycler_changelog.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
@@ -87,14 +89,16 @@ class ChangelogActivity : AppCompatActivity() {
                     val pCode = activity.packageManager.getPackageInfo(activity.packageName, 0).versionCode
                     if (pCode > cCode && cCode != 0) {
                         runWVersion(pCode)
-                        MaterialDialog(activity).safeShow {
-                            message(text = "Nueva versión, ¿Leer Changelog?")
-                            positiveButton(text = "Leer") {
-                                ChangelogActivity.open(activity)
-                                PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply()
+                        launch(UI) {
+                            MaterialDialog(activity).safeShow {
+                                message(text = "Nueva versión, ¿Leer Changelog?")
+                                positiveButton(text = "Leer") {
+                                    ChangelogActivity.open(activity)
+                                    PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply()
+                                }
+                                negativeButton(text = "Omitir") { PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply() }
+                                setOnCancelListener { PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply() }
                             }
-                            negativeButton(text = "Omitir") { PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply() }
-                            setOnCancelListener { PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply() }
                         }
                     } else
                         PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply()

@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.Crashlytics
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
@@ -83,7 +84,7 @@ class Main : AppCompatActivity(),
     private val drawer by bind<DrawerLayout>(R.id.drawer_layout)
     private val navigationView by bind<NavigationView>(R.id.nav_view)
     private val bottomNavigationView by bind<BottomNavigationView>(R.id.bottomNavigation)
-    private val webView: WebView? by bind(R.id.webview)
+    private val webView: WebView? by optionalBind(R.id.webview)
     internal var selectedFragment: BottomFragment? = null
     private var tmpfragment: BottomFragment? = null
     private lateinit var badgeEmission: TextView
@@ -105,6 +106,7 @@ class Main : AppCompatActivity(),
         } catch (e: InflateException) {
             setContentView(R.layout.activity_main_drawer_nwv)
         }
+        //setDefaults()
         setSupportActionBar(toolbar)
         val toggle = ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -132,14 +134,6 @@ class Main : AppCompatActivity(),
             DirUpdateJob.schedule(this@Main)
             RecentsNotReceiver.removeAll(this@Main)
             EAHelper.clear1()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        launch(UI) {
-            UpdateChecker.check(this@Main, this@Main)
-            ChangelogActivity.check(this@Main)
         }
     }
 
@@ -196,6 +190,10 @@ class Main : AppCompatActivity(),
                             badgeView!!.hide(false)
                     }
                 })
+                PreferenceManager.getDefaultSharedPreferences(this).stringLiveData("theme_color", "0")
+                        .observe(this, Observer {
+                            (badgeView as? QBadgeView)?.badgeBackgroundColor = ContextCompat.getColor(this, EAHelper.getThemeColorLight(it))
+                        })
             }
             badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
             badgeEmission.setTypeface(null, Typeface.BOLD)
@@ -487,7 +485,7 @@ class Main : AppCompatActivity(),
         Crashlytics.setString("screen", "Main")
         invalidateOptionsMenu()
         checkBypass()
-        runOnUiThread {
+        launch(UI) {
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             when (BUUtils.getType(this@Main)) {
                 BUUtils.BUType.LOCAL -> backupLocation.text = "Almacenamiento local"
@@ -495,6 +493,8 @@ class Main : AppCompatActivity(),
                 BUUtils.BUType.DRIVE -> backupLocation.text = "Google Drive"
             }
         }
+        UpdateChecker.check(this, this)
+        ChangelogActivity.check(this)
     }
 
     override fun onNeedRecreate() {
@@ -519,10 +519,9 @@ class Main : AppCompatActivity(),
                     isLoading = true
                     Log.e("CloudflareBypass", "is needed")
                     clearCookies()
-                    runOnUiThread {
+                    launch(UI) {
                         webView!!.settings.javaScriptEnabled = true
                         webView!!.webViewClient = object : WebViewClient() {
-
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                 Log.e("CloudflareBypass", "Override ${request?.url}")
                                 if (request?.url.toString() == "https://animeflv.net/") {

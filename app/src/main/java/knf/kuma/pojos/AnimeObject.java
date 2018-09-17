@@ -48,7 +48,6 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     public String fileName;
     @Embedded
     public WebInfo webInfo;
-
     @Ignore
     public String aid;
     @Ignore

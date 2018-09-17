@@ -35,7 +35,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
         //return isConnected;
     }
 
-    fun play(context: Context, view: View, eid: String, url: String?, title: String, chapter: String, preview: String, isAid: Boolean) {
+    fun play(context: Context?, view: View, eid: String, url: String?, title: String, chapter: String, preview: String, isAid: Boolean) {
         var fUrl = url
         var fPreview = preview
         try {

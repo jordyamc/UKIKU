@@ -43,7 +43,7 @@ class RVServer(context: Context, baseLink: String) : Server(context, baseLink) {
                     e.printStackTrace()
                 }
 
-                return if (videoServer.options!!.size > 0) videoServer else null
+                return if (videoServer.options.size > 0) videoServer else null
             } catch (e: Exception) {
                 e.printStackTrace()
                 return null

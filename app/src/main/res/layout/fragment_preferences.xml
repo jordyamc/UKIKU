@@ -8,6 +8,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <fragment
+        android:tag="fragment_preferences"
         android:name="knf.kuma.preferences.ConfigurationFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

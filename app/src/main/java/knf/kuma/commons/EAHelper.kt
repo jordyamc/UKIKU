@@ -271,10 +271,62 @@ object EAHelper {
     }
 
     @ColorRes
+    fun getThemeColor(value: String): Int {
+        when (value) {
+            "0" -> return R.color.colorAccent
+            "1" -> return R.color.colorAccentPink
+            "2" -> return R.color.colorAccentPurple
+            "3" -> return R.color.colorAccentDeepPurple
+            "4" -> return R.color.colorAccentIndigo
+            "5" -> return R.color.colorAccentBlue
+            "6" -> return R.color.colorAccentLightBlue
+            "7" -> return R.color.colorAccentCyan
+            "8" -> return R.color.colorAccentTeal
+            "9" -> return R.color.colorAccentGreen
+            "10" -> return R.color.colorAccentLightGreen
+            "11" -> return R.color.colorAccentLime
+            "12" -> return R.color.colorAccentYellow
+            "13" -> return R.color.colorAccentAmber
+            "14" -> return R.color.colorAccentOrange
+            "15" -> return R.color.colorAccentDeepOrange
+            "16" -> return R.color.colorAccentBrown
+            "17" -> return R.color.colorAccentGray
+            "18" -> return R.color.colorAccentBlueGrey
+            else -> return R.color.colorAccent
+        }
+    }
+
+    @ColorRes
     fun getThemeColorLight(context: Context?): Int {
         if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
             return R.color.colorAccentLight
         when (PrefsUtil.themeColor) {
+            "0" -> return R.color.colorAccentLight
+            "1" -> return R.color.colorAccentPinkLight
+            "2" -> return R.color.colorAccentPurpleLight
+            "3" -> return R.color.colorAccentDeepPurpleLight
+            "4" -> return R.color.colorAccentIndigoLight
+            "5" -> return R.color.colorAccentBlueLight
+            "6" -> return R.color.colorAccentLightBlueLight
+            "7" -> return R.color.colorAccentCyanLight
+            "8" -> return R.color.colorAccentTealLight
+            "9" -> return R.color.colorAccentGreenLight
+            "10" -> return R.color.colorAccentLightGreenLight
+            "11" -> return R.color.colorAccentLimeLight
+            "12" -> return R.color.colorAccentYellowLight
+            "13" -> return R.color.colorAccentAmberLight
+            "14" -> return R.color.colorAccentOrangeLight
+            "15" -> return R.color.colorAccentDeepOrangeLight
+            "16" -> return R.color.colorAccentBrownLight
+            "17" -> return R.color.colorAccentGrayLight
+            "18" -> return R.color.colorAccentBlueGreyLight
+            else -> return R.color.colorAccentLight
+        }
+    }
+
+    @ColorRes
+    fun getThemeColorLight(value: String): Int {
+        when (value) {
             "0" -> return R.color.colorAccentLight
             "1" -> return R.color.colorAccentPinkLight
             "2" -> return R.color.colorAccentPurpleLight
