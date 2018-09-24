@@ -8,26 +8,32 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.notSameContent
 import knf.kuma.custom.HiddenOverlay
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.item_emision.view.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.doAsync
 import java.util.*
 
 class EmisionAdapter internal constructor(private val fragment: Fragment) : RecyclerView.Adapter<EmisionAdapter.EmisionItem>() {
 
     var list: MutableList<AnimeObject> = ArrayList()
 
-    private var blacklist: MutableSet<String>? = null
+    private var blacklist: MutableSet<String>
     private var showHidden: Boolean = false
 
     init {
-        this.blacklist = PreferenceManager.getDefaultSharedPreferences(fragment.context).getStringSet("emision_blacklist", LinkedHashSet())
+        this.blacklist = PreferenceManager.getDefaultSharedPreferences(fragment.context).getStringSet("emision_blacklist", LinkedHashSet())!!
         this.showHidden = PreferenceManager.getDefaultSharedPreferences(fragment.context).getBoolean("show_hidden", false)
     }
 
@@ -39,10 +45,10 @@ class EmisionAdapter internal constructor(private val fragment: Fragment) : Recy
         val animeObject = list[position]
         PicassoSingle[fragment.context!!].load(PatternUtil.getCover(animeObject.aid!!)).into(holder.imageView)
         holder.title.text = animeObject.name
-        holder.hiddenOverlay.setHidden(blacklist!!.contains(animeObject.aid!!), false)
-        holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView, true, true) }
+        holder.hiddenOverlay.setHidden(blacklist.contains(animeObject.aid!!), false)
+        holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView, false, true) }
         holder.cardView.setOnLongClickListener {
-            val removed: Boolean = if (blacklist!!.contains(animeObject.aid!!)) {
+            val removed: Boolean = if (blacklist.contains(animeObject.aid!!)) {
                 updateList(true, animeObject.aid)
                 true
             } else {
@@ -62,19 +68,32 @@ class EmisionAdapter internal constructor(private val fragment: Fragment) : Recy
         return list.size
     }
 
-    fun update(list: MutableList<AnimeObject>) {
-        this.blacklist = PreferenceManager.getDefaultSharedPreferences(fragment.context).getStringSet("emision_blacklist", LinkedHashSet())
-        this.showHidden = PreferenceManager.getDefaultSharedPreferences(fragment.context).getBoolean("show_hidden", false)
-        this.list = list
-        notifyDataSetChanged()
+    fun update(list: MutableList<AnimeObject>, callback: () -> Unit) {
+        if (PrefsUtil.useSmoothAnimations)
+            doAsync {
+                this@EmisionAdapter.blacklist = PreferenceManager.getDefaultSharedPreferences(fragment.context).getStringSet("emision_blacklist", LinkedHashSet())!!
+                this@EmisionAdapter.showHidden = PreferenceManager.getDefaultSharedPreferences(fragment.context).getBoolean("show_hidden", false)
+                val result = DiffUtil.calculateDiff(EmissionDiff(this@EmisionAdapter.list, list), true)
+                launch(UI) {
+                    this@EmisionAdapter.list = list
+                    result.dispatchUpdatesTo(this@EmisionAdapter)
+                    callback.invoke()
+                }
+            }
+        else if (this.list notSameContent list) {
+            blacklist = PreferenceManager.getDefaultSharedPreferences(fragment.context).getStringSet("emision_blacklist", LinkedHashSet())!!
+            showHidden = PreferenceManager.getDefaultSharedPreferences(fragment.context).getBoolean("show_hidden", false)
+            this.list = list
+            notifyDataSetChanged()
+        }
     }
 
     private fun updateList(remove: Boolean, aid: String?) {
         this.blacklist = LinkedHashSet(PreferenceManager.getDefaultSharedPreferences(fragment.context).getStringSet("emision_blacklist", LinkedHashSet()))
         if (remove)
-            blacklist!!.remove(aid)
+            blacklist.remove(aid)
         else
-            blacklist!!.add(aid!!)
+            blacklist.add(aid!!)
         PreferenceManager.getDefaultSharedPreferences(fragment.context).edit().putStringSet("emision_blacklist", blacklist).apply()
         WEmisionProvider.update(fragment.context!!)
     }
@@ -91,5 +110,26 @@ class EmisionAdapter internal constructor(private val fragment: Fragment) : Recy
         val imageView: ImageView = itemView.img
         val hiddenOverlay: HiddenOverlay = itemView.hidden
         val title: TextView = itemView.title
+    }
+}
+
+internal class EmissionDiff(
+        private val oldList: MutableList<AnimeObject>,
+        private val newList: MutableList<AnimeObject>) : DiffUtil.Callback() {
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition] == newList[newItemPosition]
+    }
+
+    override fun getOldListSize(): Int {
+        return oldList.size
+    }
+
+    override fun getNewListSize(): Int {
+        return newList.size
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return true
     }
 }

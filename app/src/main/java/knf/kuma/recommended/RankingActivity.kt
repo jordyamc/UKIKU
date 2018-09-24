@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
@@ -21,7 +20,6 @@ class RankingActivity : AppCompatActivity() {
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.recycler_ranking)
-        ButterKnife.bind(this)
         setSupportActionBar(toolbar)
         with(supportActionBar!!) {
             setDisplayHomeAsUpEnabled(true)

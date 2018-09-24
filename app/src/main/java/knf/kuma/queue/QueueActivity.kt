@@ -1,5 +1,6 @@
 package knf.kuma.queue
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,30 +18,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.*
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.bind
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import xdroid.toaster.Toaster
 
 class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedListener, QueueAllAdapter.OnStartDragListener {
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-    @BindView(R.id.recycler)
-    lateinit var recyclerView: RecyclerView
-    @BindView(R.id.list_toolbar)
-    lateinit var listToolbar: Toolbar
-    @BindView(R.id.list_recycler)
-    lateinit var listRecyclerView: RecyclerView
-    @BindView(R.id.bottom_card)
-    lateinit var cardView: CardView
-    @BindView(R.id.error)
-    lateinit var errorView: View
+    val toolbar: Toolbar by bind(R.id.toolbar)
+    val recyclerView: RecyclerView by bind(R.id.recycler)
+    private val listToolbar: Toolbar by bind(R.id.list_toolbar)
+    private val listRecyclerView: RecyclerView by bind(R.id.list_recycler)
+    val cardView: CardView by bind(R.id.bottom_card)
+    val errorView: View by bind(R.id.error)
     internal var bottomSheetBehavior: BottomSheetBehavior<CardView>? = null
     private var listAdapter: QueueListAdapter? = null
 
@@ -58,11 +52,11 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
             R.layout.activity_queue_grid
         }
 
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
         setContentView(layout)
-        ButterKnife.bind(this)
         toolbar.title = "Pendientes"
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowHomeEnabled(false)
@@ -88,8 +82,8 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
             true
         }
         bottomSheetBehavior = BottomSheetBehavior.from(cardView)
-        bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-        bottomSheetBehavior!!.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior?.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN)
                     current = null
@@ -101,8 +95,11 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
         })
         setLayoutManager(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true))
         listRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayout.VERTICAL))
-        listAdapter = QueueListAdapter()
+        listAdapter = QueueListAdapter { closeSheet() }
         listRecyclerView.adapter = listAdapter
+        /*Aesthetic.get().colorAccent().take(1).subscribe {
+            listToolbar.backgroundColor = it
+        }*/
         reload()
         if (savedInstanceState != null && savedInstanceState.getBoolean("isOpen", false))
             onSelect(savedInstanceState.getSerializable("current") as QueueObject)
@@ -131,7 +128,7 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
                     recyclerView.adapter = allAdapter
                     dettachHelper()
                     mItemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(allAdapter))
-                    mItemTouchHelper!!.attachToRecyclerView(recyclerView)
+                    mItemTouchHelper?.attachToRecyclerView(recyclerView)
                     allAdapter.update(list)
                     currentData.removeObserver(this)
                 }
@@ -141,7 +138,7 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
 
     private fun dettachHelper() {
         if (mItemTouchHelper != null)
-            mItemTouchHelper!!.attachToRecyclerView(null)
+            mItemTouchHelper?.attachToRecyclerView(null)
     }
 
     private fun clearInterfaces() {
@@ -161,8 +158,7 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
 
     override fun onSelect(queueObject: QueueObject) {
         if (queueObject.equalsAnime(current)) {
-            current = null
-            bottomSheetBehavior!!.setState(BottomSheetBehavior.STATE_HIDDEN)
+            closeSheet()
         } else {
             listToolbar.title = queueObject.chapter.name
             val liveData = CacheDB.INSTANCE.queueDAO().getByAid(queueObject.chapter.aid)
@@ -179,6 +175,11 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
                 }
             })
         }
+    }
+
+    private fun closeSheet() {
+        current = null
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     override fun onStartDrag(holder: RecyclerView.ViewHolder) {

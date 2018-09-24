@@ -36,7 +36,6 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.sdk25.coroutines.onLongClick
 import xdroid.toaster.Toaster
 
 @SuppressLint("RestrictedApi")
@@ -87,7 +86,7 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
             }
         })
         fab.onClick { innerInterface.onFabClicked(fab) }
-        fab.onLongClick { innerInterface.onFabLongClicked(fab) }
+        //fab.onLongClick { innerInterface.onFabLongClicked(fab) }
         imageView.onClick { innerInterface.onImgClicked(imageView) }
         checkBypass(activity)
     }
@@ -111,7 +110,7 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
         launch(UI) { fab.setImageDrawable(drawableHalfStar) }
     }
 
-    fun setFABState(isFav: Boolean, isSeeing: Boolean) {
+    fun setFABState(isFav: Boolean, isSeeing: Boolean = false) {
         launch(UI) {
             fab.setImageDrawable(when {
                 isFav && isSeeing -> drawableStarHeart

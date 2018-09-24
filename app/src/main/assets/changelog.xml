@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="67" version="2.1">
+        <change type="fix">Error en pantalla de actualización</change>
+        <change type="change">Mejoras graficas en algunas partes</change>
+        <change type="change">Mejoras al modificar categorias en favoritos</change>
+        <change type="new">Opcion para cambiar tono de notificación en recientes</change>
+        <change type="new">Seccion de Siguiendo recreada</change>
+    </release>
     <release code="66" version="2.0.2">
         <change type="fix">Error en pantalla de actualización</change>
     </release>

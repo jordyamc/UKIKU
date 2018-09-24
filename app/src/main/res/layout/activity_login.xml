@@ -34,8 +34,7 @@
                 layout="@layout/activity_login_main"/>
 
             <include
-                layout="@layout/activity_login_buttons"
-                />
+                layout="@layout/activity_login_buttons"/>
 
         </RelativeLayout>
 

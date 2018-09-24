@@ -305,7 +305,7 @@ class SnackProgressBarManager(view: View) {
      *
      * @param viewsToMove Views to be animated along with the SnackProgressBar.
      */
-    fun setViewsToMove(viewsToMove: Array<View>): SnackProgressBarManager {
+    private fun setViewsToMove(viewsToMove: Array<View>): SnackProgressBarManager {
         this.viewsToMove = viewsToMove
         return this
     }

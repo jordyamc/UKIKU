@@ -21,12 +21,12 @@ public class QueueObject implements Serializable {
     @PrimaryKey
     public int id;
     public boolean isFile;
-    public Uri uri;
+    public String uri;
     public long time;
     @Embedded
     public AnimeObject.WebInfo.AnimeChapter chapter;
 
-    public QueueObject(int id, boolean isFile, Uri uri, long time, AnimeObject.WebInfo.AnimeChapter chapter) {
+    public QueueObject(int id, boolean isFile, String uri, long time, AnimeObject.WebInfo.AnimeChapter chapter) {
         this.id = id;
         this.isFile = isFile;
         this.uri = uri;
@@ -37,10 +37,17 @@ public class QueueObject implements Serializable {
     @Ignore
     public QueueObject(Uri uri, boolean isFile, AnimeObject.WebInfo.AnimeChapter chapter) {
         this.id = chapter.key;
-        this.uri = uri;
+        this.uri = uri.toString();
         this.isFile = isFile;
         this.time = System.currentTimeMillis();
         this.chapter = chapter;
+    }
+
+    public static Uri[] getUris(List<QueueObject> list) {
+        List<Uri> uris = new ArrayList<>();
+        for (QueueObject object : list)
+            uris.add(object.getUri());
+        return uris.toArray(new Uri[]{});
     }
 
     public static List<QueueObject> getOne(List<QueueObject> list) {
@@ -62,11 +69,8 @@ public class QueueObject implements Serializable {
         return titles.toArray(new String[]{});
     }
 
-    public static Uri[] getUris(List<QueueObject> list) {
-        List<Uri> uris = new ArrayList<>();
-        for (QueueObject object : list)
-            uris.add(object.uri);
-        return uris.toArray(new Uri[]{});
+    public Uri getUri() {
+        return Uri.parse(uri);
     }
 
     public String getTitle() {

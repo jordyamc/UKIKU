@@ -10,6 +10,7 @@ import android.provider.DocumentsContract
 import android.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.crashlytics.android.Crashlytics
 import knf.kuma.download.FileAccessHelper
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
@@ -151,7 +152,7 @@ object FileUtil {
         }
     }
 
-    fun moveFile(resolver: ContentResolver, uri: Uri, outputStream: OutputStream): LiveData<Pair<Int, Boolean>> {
+    fun moveFile(resolver: ContentResolver, uri: Uri, outputStream: OutputStream, delete: Boolean = true): LiveData<Pair<Int, Boolean>> {
         val liveData = MutableLiveData<Pair<Int, Boolean>>()
         doAsync {
             try {
@@ -171,7 +172,8 @@ object FileUtil {
                 outputStream.flush()
                 outputStream.close()
                 try {
-                    DocumentsContract.deleteDocument(resolver, uri)
+                    if (delete)
+                        DocumentsContract.deleteDocument(resolver, uri)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -179,6 +181,7 @@ object FileUtil {
                 launch(UI) { liveData.setValue(Pair(100, true)) }
             } catch (e: Exception) {
                 e.printStackTrace()
+                Crashlytics.logException(e)
                 launch(UI) { liveData.setValue(Pair(-1, true)) }
             }
         }

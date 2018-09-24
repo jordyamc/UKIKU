@@ -34,7 +34,7 @@ class CommentsDialog(private val chapters: MutableList<AnimeObject.WebInfo.Anime
     @SuppressLint("SetJavaScriptEnabled")
     fun show(activity: Activity) {
         val dialog = MaterialDialog(activity)
-                .customView(R.layout.layout_comments_dialog)
+                .customView(R.layout.layout_comments_dialog, noVerticalPadding = true)
         with(dialog.getCustomView()!!) {
             spinner = findViewById(R.id.spinner)
             progressBar = findViewById(R.id.progress)

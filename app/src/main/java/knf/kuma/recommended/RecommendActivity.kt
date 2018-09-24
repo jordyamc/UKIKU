@@ -15,12 +15,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.crashlytics.android.Crashlytics
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.bind
+import knf.kuma.commons.removeAll
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.GenreStatusObject
@@ -34,16 +34,11 @@ import java.util.*
  */
 
 class RecommendActivity : AppCompatActivity() {
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-    @BindView(R.id.recycler)
-    lateinit var recyclerView: RecyclerView
-    @BindView(R.id.error)
-    lateinit var error: LinearLayout
-    @BindView(R.id.loading)
-    lateinit var loading: LinearLayout
-    @BindView(R.id.state)
-    lateinit var state: TextView
+    val toolbar: Toolbar by bind(R.id.toolbar)
+    val recyclerView: RecyclerView by bind(R.id.recycler)
+    val error: LinearLayout by bind(R.id.error)
+    val loading: LinearLayout by bind(R.id.loading)
+    val state: TextView by bind(R.id.state)
     private val dao = CacheDB.INSTANCE.animeDAO()
     private val favsDAO = CacheDB.INSTANCE.favsDAO()
     private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
@@ -63,7 +58,6 @@ class RecommendActivity : AppCompatActivity() {
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
         setContentView(layout)
-        ButterKnife.bind(this)
         toolbar.title = "Sugeridos"
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowHomeEnabled(false)
@@ -84,30 +78,15 @@ class RecommendActivity : AppCompatActivity() {
                     val ab = getList(status[0], status[1])
                     ab.removeAll(abc)
                     val ac = getList(status[0], status[2])
-                    ac.removeAll(abc)
-                    ac.removeAll(ab)
+                    ac.removeAll(abc, ab)
                     val bc = getList(status[1], status[2])
-                    bc.removeAll(abc)
-                    bc.removeAll(ab)
-                    bc.removeAll(ac)
+                    bc.removeAll(abc, ab, ac)
                     val a = getList(status[0])
-                    a.removeAll(abc)
-                    a.removeAll(ab)
-                    a.removeAll(ac)
-                    a.removeAll(bc)
+                    a.removeAll(abc, ab, ac, bc)
                     val b = getList(status[1])
-                    b.removeAll(abc)
-                    b.removeAll(ab)
-                    b.removeAll(ac)
-                    b.removeAll(bc)
-                    b.removeAll(a)
+                    b.removeAll(abc, ab, ac, bc, a)
                     val c = getList(status[2])
-                    c.removeAll(abc)
-                    c.removeAll(ab)
-                    c.removeAll(ac)
-                    c.removeAll(bc)
-                    c.removeAll(a)
-                    c.removeAll(b)
+                    c.removeAll(abc, ab, ac, bc, a, b)
                     setState("Filtrando lista")
                     removeFavs(abc, ab, ac, bc, a, b, c)
                     if (abc.size > 0)
@@ -149,7 +128,6 @@ class RecommendActivity : AppCompatActivity() {
                         loading.visibility = View.GONE
                         recyclerView.layoutManager = layoutManager
                         recyclerView.adapter = sectionedAdapter
-
                     }
                 } else
                     runOnUiThread {
@@ -163,7 +141,6 @@ class RecommendActivity : AppCompatActivity() {
                 Crashlytics.logException(e)
                 Toaster.toast("Error al cargar recomendados")
                 runOnUiThread {
-
                     loading.visibility = View.GONE
                 }
             }
@@ -207,7 +184,6 @@ class RecommendActivity : AppCompatActivity() {
 
     private fun setState(stateString: String) {
         runOnUiThread {
-
             state.text = stateString
         }
     }

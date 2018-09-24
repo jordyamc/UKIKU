@@ -1,6 +1,8 @@
 package knf.kuma.tv.search
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
@@ -21,8 +23,14 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
         arrayObjectAdapter = ArrayObjectAdapter(ListRowPresenter())
         setSearchResultProvider(this)
         setOnItemViewClickedListener(this)
-        if (context!!.packageManager.hasSystemFeature("amazon.hardware.fire_tv"))
+        if (context?.packageManager?.hasSystemFeature("amazon.hardware.fire_tv") == true)
             setSpeechRecognitionCallback(this)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (savedInstanceState != null)
+            startRecognition()
     }
 
     private fun checkPermissions() {
@@ -40,12 +48,20 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
     }
 
     override fun recognizeSpeech() {
-
+        startActivityForResult(recognizerIntent, 5589)
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
         setResult(query)
         return true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            5589 -> if (resultCode == Activity.RESULT_OK)
+                setSearchQuery(data, true)
+        }
     }
 
     private fun setResult(query: String) {
@@ -55,8 +71,8 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
                 liveData.removeObservers(activity!!)
                 arrayObjectAdapter!!.clear()
                 val objectAdapter = ArrayObjectAdapter(AnimePresenter())
-                for (`object` in animeObjects)
-                    objectAdapter.add(`object`)
+                for (animeObject in animeObjects)
+                    objectAdapter.add(animeObject)
                 val headerItem = HeaderItem(if (animeObjects.isNotEmpty()) "Resultados para '$query'" else "Sin resultados")
                 arrayObjectAdapter!!.add(ListRow(headerItem, objectAdapter))
             })

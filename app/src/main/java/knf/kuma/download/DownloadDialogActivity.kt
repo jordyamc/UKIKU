@@ -91,6 +91,7 @@ class DownloadDialogActivity : AppCompatActivity() {
                     }
                 })
             }
+            setOnCancelListener { finish() }
         }
     }
 

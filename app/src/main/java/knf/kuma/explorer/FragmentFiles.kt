@@ -11,22 +11,17 @@ import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import knf.kuma.R
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.find
 
 class FragmentFiles : Fragment() {
-    @BindView(R.id.recycler)
     lateinit var recyclerView: RecyclerView
-    @BindView(R.id.error)
     lateinit var error: View
-    @BindView(R.id.progress)
     lateinit var progressBar: ProgressBar
-    @BindView(R.id.state)
     lateinit var state: TextView
     private var listener: SelectedListener? = null
     private var adapter: ExplorerFilesAdapter? = null
@@ -43,7 +38,7 @@ class FragmentFiles : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         CacheDB.INSTANCE.explorerDAO().all.observe(this, Observer { explorerObjects ->
-            adapter!!.update(explorerObjects)
+            adapter?.update(explorerObjects)
             if (explorerObjects.isNotEmpty()) {
                 progressBar.visibility = View.GONE
                 state.visibility = View.GONE
@@ -61,10 +56,17 @@ class FragmentFiles : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
-        ButterKnife.bind(this, view)
+        recyclerView = view.find(R.id.recycler)
+        error = view.find(R.id.error)
+        progressBar = view.find(R.id.progress)
+        state = view.find(R.id.state)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         adapter = ExplorerFilesAdapter(this, listener)
         recyclerView.adapter = adapter
-        return view
     }
 
     fun onEmpty() {

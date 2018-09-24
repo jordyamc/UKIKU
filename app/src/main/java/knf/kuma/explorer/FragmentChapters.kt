@@ -10,19 +10,16 @@ import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import knf.kuma.R
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 
 class FragmentChapters : Fragment() {
-    @BindView(R.id.recycler)
     lateinit var recyclerView: RecyclerView
-    @BindView(R.id.progress)
     lateinit var progressBar: ProgressBar
     internal var adapter: ExplorerChapsAdapter? = null
     private var clearInterface: ClearInterface? = null
@@ -38,7 +35,8 @@ class FragmentChapters : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
-        ButterKnife.bind(this, view)
+        recyclerView = view.find(R.id.recycler)
+        progressBar = view.find(R.id.progress)
         return view
     }
 

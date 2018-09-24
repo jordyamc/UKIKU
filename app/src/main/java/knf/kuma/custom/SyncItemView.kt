@@ -15,7 +15,7 @@ class SyncItemView : RelativeLayout {
 
     private var cardTitle: String? = "Error"
     private var showDivider = true
-    private var actionId: String? = "neutral"
+    private var actionId: String = "neutral"
 
     var bakup: BackupObject<*>? = null
         private set
@@ -44,7 +44,7 @@ class SyncItemView : RelativeLayout {
         val array = context.obtainStyledAttributes(attrs, R.styleable.SyncItemView)
         cardTitle = array.getString(R.styleable.SyncItemView_si_title)
         showDivider = array.getBoolean(R.styleable.SyncItemView_si_showDivider, true)
-        actionId = array.getString(R.styleable.SyncItemView_si_actionId)
+        actionId = array.getString(R.styleable.SyncItemView_si_actionId) ?: "neutral"
         array.recycle()
     }
 
@@ -58,15 +58,15 @@ class SyncItemView : RelativeLayout {
     fun enableBackup(backupObject: BackupObject<*>?, onClick: OnClick) {
         post {
             if (Network.isConnected) {
-                backup!!.isEnabled = true
+                backup?.isEnabled = true
                 if (backupObject == null) {
                     date.text = "Sin respaldo"
                 } else {
                     date.text = backupObject.date
-                    restore!!.isEnabled = true
+                    restore?.isEnabled = true
                 }
-                backup!!.setOnClickListener { onClick.onAction(this@SyncItemView, actionId, true) }
-                restore!!.setOnClickListener { onClick.onAction(this@SyncItemView, actionId, false) }
+                backup?.setOnClickListener { onClick.onAction(this@SyncItemView, actionId, true) }
+                restore?.setOnClickListener { onClick.onAction(this@SyncItemView, actionId, false) }
             } else {
                 date.text = "Sin internet"
             }
@@ -77,14 +77,14 @@ class SyncItemView : RelativeLayout {
     fun clear() {
         bakup = null
         post {
-            backup!!.isEnabled = false
-            restore!!.isEnabled = false
-            date!!.text = "Cargando..."
+            backup?.isEnabled = false
+            restore?.isEnabled = false
+            date?.text = "Cargando..."
         }
     }
 
     fun init(onClick: OnClick) {
-        BUUtils.search(actionId!!, object : BUUtils.SearchInterface {
+        BUUtils.search(actionId, object : BUUtils.SearchInterface {
             override fun onResponse(backupObject: BackupObject<*>?) {
                 bakup = backupObject
                 enableBackup(bakup, onClick)
@@ -93,6 +93,6 @@ class SyncItemView : RelativeLayout {
     }
 
     interface OnClick {
-        fun onAction(syncItemView: SyncItemView, id: String?, isBackup: Boolean)
+        fun onAction(syncItemView: SyncItemView, id: String, isBackup: Boolean)
     }
 }

@@ -11,7 +11,6 @@ import android.preference.PreferenceManager
 import android.util.Rational
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import butterknife.OnClick
 import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
@@ -28,6 +27,7 @@ import com.google.android.exoplayer2.upstream.FileDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import kotlinx.android.synthetic.main.exo_playback_control_view.*
@@ -60,6 +60,7 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
             pip.visibility = View.VISIBLE
         pip.setOnClickListener { onPip() }
+        pip_exit.setOnClickListener { onExitPip() }
         skip.setOnClickListener { onSkip() }
         hideUI()
         player.setResizeMode(resizeMode)
@@ -94,12 +95,12 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
             if (intent.getBooleanExtra("isPlayList", false)) {
                 val sourceList = ArrayList<MediaSource>()
                 playList = CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist"))
-                video_title.text = playList[0].title
-                for (`object` in playList) {
-                    if (`object`.isFile)
-                        sourceList.add(ExtractorMediaSource.Factory(FileDataSourceFactory()).createMediaSource(`object`.uri))
+                noCrash { video_title.text = playList[0].title }
+                for (queueObject in playList) {
+                    if (queueObject.isFile)
+                        sourceList.add(ExtractorMediaSource.Factory(FileDataSourceFactory()).createMediaSource(queueObject.getUri()))
                     else
-                        sourceList.add(ExtractorMediaSource.Factory(DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(`object`.uri))
+                        sourceList.add(ExtractorMediaSource.Factory(DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(queueObject.getUri()))
                 }
                 source = ConcatenatingMediaSource(*sourceList.toTypedArray())
             } else if (!intent.getBooleanExtra("isFile", false)) {
@@ -151,8 +152,7 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
             exoPlayer!!.seekTo(exoPlayer!!.currentWindowIndex, exoPlayer!!.currentPosition + 85000)
     }
 
-    @OnClick(R.id.pip_exit)
-    internal fun onExitPip() {
+    private fun onExitPip() {
         application.startActivity(Intent(this, javaClass)
                 .putExtra("isReorder", true)
                 .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))

@@ -16,8 +16,8 @@ class RankingAdapter : RecyclerView.Adapter<RankingAdapter.RankHolder>() {
     private var total = 0
 
     init {
-        for (statusObject in list)
-            total += statusObject.count
+        if (list.isNotEmpty())
+            total = list[0].count
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RankHolder {

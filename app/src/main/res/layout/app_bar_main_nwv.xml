@@ -35,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:elevation="8dp"
+            android:tag=":aesthetic_ignore"
             android:visibility="gone"
             app:layout_anchor="@+id/appBar"
             app:layout_anchorGravity="center"

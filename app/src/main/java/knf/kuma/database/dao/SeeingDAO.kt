@@ -15,8 +15,14 @@ interface SeeingDAO {
     @get:Query("SELECT * FROM seeingobject ORDER BY title")
     val allRaw: MutableList<SeeingObject>
 
+    @Query("SELECT * FROM seeingobject WHERE state=:state ORDER BY title")
+    fun getLiveByState(state: Int): LiveData<List<SeeingObject>>
+
     @get:Query("SELECT count(*) FROM seeingobject")
     val countLive: LiveData<Int>
+
+    @get:Query("SELECT count(*) FROM seeingobject WHERE state=1")
+    val countWatchingLive: LiveData<Int>
 
     @Query("SELECT * FROM seeingobject WHERE aid LIKE :aid")
     fun getByAid(aid: String): SeeingObject?

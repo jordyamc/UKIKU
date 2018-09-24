@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +20,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
@@ -38,7 +38,6 @@ import knf.kuma.videoservers.ServersFactory
 import kotlinx.android.synthetic.main.item_recents.view.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import xdroid.toaster.Toaster
 import java.util.*
 
@@ -128,9 +127,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                 launch(UI) {
                                     if (boolean) {
                                         holder.progressBar.isIndeterminate = true
-                                        holder.progressBar.visibility = View.VISIBLE
+                                        holder.progressBarRoot.visibility = View.VISIBLE
                                     } else
-                                        holder.progressBar.visibility = View.GONE
+                                        holder.progressBarRoot.visibility = View.GONE
                                 }
                             }
 
@@ -191,9 +190,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                         launch(UI) {
                             if (boolean) {
                                 holder.progressBar.isIndeterminate = true
-                                holder.progressBar.visibility = View.VISIBLE
+                                holder.progressBarRoot.visibility = View.VISIBLE
                             } else
-                                holder.progressBar.visibility = View.GONE
+                                holder.progressBarRoot.visibility = View.GONE
                         }
                     }
 
@@ -267,7 +266,8 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         val downIcon: ImageView = itemView.down_icon
         private val newIcon: ImageView = itemView.new_icon
         private val favIcon: ImageView = itemView.fav_icon
-        val progressBar: MaterialProgressBar = itemView.progress
+        val progressBar: ProgressBar = itemView.progress
+        val progressBarRoot: View = itemView.progress_root
 
         private var chapterLiveData: LiveData<AnimeObject.WebInfo.AnimeChapter> = MutableLiveData()
         private var downloadLiveData: LiveData<DownloadObject> = MutableLiveData()
@@ -275,10 +275,6 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         private var chapterObserver: Observer<AnimeObject.WebInfo.AnimeChapter>? = null
         private var downloadObserver: Observer<DownloadObject>? = null
         private var castingObserver: Observer<String>? = null
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
 
         fun setChapterObserver(chapterLiveData: LiveData<AnimeObject.WebInfo.AnimeChapter>, owner: LifecycleOwner, observer: Observer<AnimeObject.WebInfo.AnimeChapter>) {
             this.chapterLiveData = chapterLiveData
@@ -365,11 +361,11 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 if (downloadObject != null && PrefsUtil.showProgress())
                     when (downloadObject.state) {
                         DownloadObject.PENDING -> {
-                            progressBar.visibility = View.VISIBLE
+                            progressBarRoot.visibility = View.VISIBLE
                             progressBar.isIndeterminate = true
                         }
                         DownloadObject.DOWNLOADING -> {
-                            progressBar.visibility = View.VISIBLE
+                            progressBarRoot.visibility = View.VISIBLE
                             progressBar.isIndeterminate = false
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                                 progressBar.setProgress(downloadObject.progress, true)
@@ -377,13 +373,13 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                 progressBar.progress = downloadObject.progress
                         }
                         DownloadObject.PAUSED -> {
-                            progressBar.visibility = View.VISIBLE
+                            progressBarRoot.visibility = View.VISIBLE
                             progressBar.isIndeterminate = false
                         }
-                        else -> progressBar.visibility = View.GONE
+                        else -> progressBarRoot.visibility = View.GONE
                     }
                 else
-                    progressBar.visibility = View.GONE
+                    progressBarRoot.visibility = View.GONE
             }
         }
     }

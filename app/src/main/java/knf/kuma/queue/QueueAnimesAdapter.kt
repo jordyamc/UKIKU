@@ -10,12 +10,12 @@ import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.bind
+import knf.kuma.commons.notSameContent
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import java.util.*
@@ -58,8 +58,10 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
     }
 
     fun update(list: MutableList<QueueObject>) {
-        this.list = list
-        notifyDataSetChanged()
+        if (this.list notSameContent list) {
+            this.list = list
+            notifyDataSetChanged()
+        }
     }
 
     fun clear() {
@@ -71,17 +73,9 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
     }
 
     internal inner class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @BindView(R.id.card)
-        lateinit var cardView: CardView
-        @BindView(R.id.img)
-        lateinit var imageView: ImageView
-        @BindView(R.id.title)
-        lateinit var title: TextView
-        @BindView(R.id.type)
-        lateinit var type: TextView
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
+        val cardView: CardView by itemView.bind(R.id.card)
+        val imageView: ImageView by itemView.bind(R.id.img)
+        val title: TextView by itemView.bind(R.id.title)
+        val type: TextView by itemView.bind(R.id.type)
     }
 }

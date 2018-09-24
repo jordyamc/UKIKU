@@ -22,7 +22,8 @@
             app:expandedTitleMarginBottom="?actionBarSize"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:toolbarId="@id/toolbar">
 
             <ImageView
                 android:id="@+id/img"
@@ -31,7 +32,7 @@
                 android:adjustViewBounds="true"
                 android:clickable="true"
                 android:fitsSystemWindows="true"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:scaleType="centerCrop"
                 android:transitionName="img"
                 app:layout_collapseMode="parallax"/>
@@ -57,6 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:background="@android:color/transparent"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:tabMode="scrollable"
                 app:tabTextColor="@android:color/white">

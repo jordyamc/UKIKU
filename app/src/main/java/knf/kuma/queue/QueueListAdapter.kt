@@ -8,12 +8,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import knf.kuma.commons.notSameContent
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import kotlinx.android.synthetic.main.item_queue.view.*
 import java.util.*
 
-internal class QueueListAdapter : RecyclerView.Adapter<QueueListAdapter.ListItemHolder>() {
+internal class QueueListAdapter(val callback: () -> Unit) : RecyclerView.Adapter<QueueListAdapter.ListItemHolder>() {
     private var current = "0000"
     var list: MutableList<QueueObject> = ArrayList()
 
@@ -33,7 +34,7 @@ internal class QueueListAdapter : RecyclerView.Adapter<QueueListAdapter.ListItem
     }
 
     fun update(aid: String, list: MutableList<QueueObject>) {
-        if (current != aid) {
+        if (current != aid && this.list notSameContent list) {
             current = aid
             this.list = list
             notifyDataSetChanged()
@@ -45,6 +46,7 @@ internal class QueueListAdapter : RecyclerView.Adapter<QueueListAdapter.ListItem
             CacheDB.INSTANCE.queueDAO().remove(list[position])
             list.removeAt(position)
             notifyItemRemoved(position)
+            if (list.isEmpty()) callback.invoke()
         }
     }
 

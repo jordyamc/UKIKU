@@ -6,9 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.preference.PreferenceManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.crashlytics.android.Crashlytics
 import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
@@ -20,8 +22,10 @@ import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PicassoSingle
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.create
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadDialogActivity
+import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.NotificationObj
 import knf.kuma.pojos.RecentObject
@@ -88,20 +92,31 @@ class RecentsJob : Job() {
     private fun notifyRecent(recentObject: RecentObject) {
         val animeObject = getAnime(recentObject)
         val obj = NotificationObj(Integer.parseInt(recentObject.eid!!), NotificationObj.RECENT)
-        val notification = NotificationCompat.Builder(context, CHANNEL_RECENTS)
-                .setSmallIcon(R.drawable.ic_new_recent)
-                .setColor(ContextCompat.getColor(context, R.color.colorAccent))
-                .setContentTitle(recentObject.name)
-                .setContentText(recentObject.chapter)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setLargeIcon(getBitmap(recentObject))
-                .setAutoCancel(true)
-                .setOnlyAlertOnce(true)
-                .setContentIntent(PendingIntent.getActivity(context, System.currentTimeMillis().toInt(), getAnimeIntent(animeObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
-                .setDeleteIntent(PendingIntent.getBroadcast(context, System.currentTimeMillis().toInt(), obj.getBroadcast(context), PendingIntent.FLAG_UPDATE_CURRENT))
-                .addAction(android.R.drawable.stat_sys_download_done, "Acciones", PendingIntent.getActivity(context, System.currentTimeMillis().toInt(), getChapIntent(recentObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
-                .setGroup(RECENTS_GROUP)
-                .build()
+        val notification = NotificationCompat.Builder(context, CHANNEL_RECENTS).create {
+            setSmallIcon(R.drawable.ic_new_recent)
+            color = ContextCompat.getColor(context, R.color.colorAccent)
+            setContentTitle(recentObject.name)
+            setContentText(recentObject.chapter)
+            priority = NotificationCompat.PRIORITY_MAX
+            val tone = FileAccessHelper.INSTANCE.toneFile
+            if (tone != null) {
+                setSound(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            val uri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tone)
+                            context.grantUriPermission("com.android.systemui", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            uri
+                        } else
+                            Uri.fromFile(tone)
+                )
+            }
+            setLargeIcon(getBitmap(recentObject))
+            setAutoCancel(true)
+            setOnlyAlertOnce(true)
+            setContentIntent(PendingIntent.getActivity(context, System.currentTimeMillis().toInt(), getAnimeIntent(animeObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
+            setDeleteIntent(PendingIntent.getBroadcast(context, System.currentTimeMillis().toInt(), obj.getBroadcast(context), PendingIntent.FLAG_UPDATE_CURRENT))
+            addAction(android.R.drawable.stat_sys_download_done, "Acciones", PendingIntent.getActivity(context, System.currentTimeMillis().toInt(), getChapIntent(recentObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
+            setGroup(RECENTS_GROUP)
+        }.build()
         notificationDAO.add(obj)
         manager!!.notify(obj.key, notification)
         notifySummary()

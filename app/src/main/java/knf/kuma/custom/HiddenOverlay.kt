@@ -7,7 +7,6 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
-import butterknife.ButterKnife
 import knf.kuma.R
 
 class HiddenOverlay : LinearLayout {
@@ -27,11 +26,6 @@ class HiddenOverlay : LinearLayout {
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.view_hidden_overlay, this)
-    }
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        ButterKnife.bind(this)
     }
 
     fun setHidden(hidden: Boolean, animate: Boolean) {

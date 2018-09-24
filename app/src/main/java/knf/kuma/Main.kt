@@ -69,6 +69,8 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.cryse.widget.persistentsearch.PersistentSearchView
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.hintTextColor
+import org.jetbrains.anko.textColor
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
@@ -194,6 +196,10 @@ class Main : AppCompatActivity(),
                 PreferenceManager.getDefaultSharedPreferences(this).stringLiveData("theme_color", "0")
                         .observe(this, Observer {
                             (badgeView as? QBadgeView)?.badgeBackgroundColor = ContextCompat.getColor(this, EAHelper.getThemeColorLight(it))
+                            badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
+                            badgeSeeing.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
+                            badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
+                            navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg(it))
                         })
             }
             badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
@@ -211,7 +217,7 @@ class Main : AppCompatActivity(),
                     badgeEmission.visibility = if (integer == 0) View.GONE else View.VISIBLE
                 })
             })
-            CacheDB.INSTANCE.seeingDAO().countLive.observe(this, Observer { integer ->
+            CacheDB.INSTANCE.seeingDAO().countWatchingLive.observe(this, Observer { integer ->
                 badgeSeeing.text = integer.toString()
                 badgeSeeing.visibility = if (integer == 0) View.GONE else View.VISIBLE
             })
@@ -227,7 +233,8 @@ class Main : AppCompatActivity(),
 
     @TargetApi(Build.VERSION_CODES.M)
     private fun checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 55498)
     }
 
@@ -248,7 +255,10 @@ class Main : AppCompatActivity(),
     }
 
     private fun setSearch() {
-        (searchView.findViewById<View>(R.id.edittext_search) as EditText).inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        val searchEdit = searchView.findViewById(R.id.edittext_search) as EditText
+        searchEdit.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        searchEdit.textColor = ContextCompat.getColor(this, android.R.color.black)
+        searchEdit.hintTextColor = ContextCompat.getColor(this, android.R.color.darker_gray)
         searchView.setSuggestionBuilder(FiltersSuggestion(this))
         searchView.setSearchListener(object : PersistentSearchView.SearchListener {
             override fun onSearchCleared() {
@@ -333,7 +343,7 @@ class Main : AppCompatActivity(),
                 setFragment(SearchFragment.get())
             }
             R.id.action_new_category -> if (selectedFragment is FavoriteFragment)
-                (selectedFragment as FavoriteFragment).showNewCategoryDialog(null)
+                (selectedFragment as FavoriteFragment).showNewCategory(null)
             R.id.by_name -> {
                 PrefsUtil.favsOrder = 0
                 changeOrder()
@@ -447,8 +457,8 @@ class Main : AppCompatActivity(),
                 selectedFragment = RecentFragment.get()
                 searchView.openSearch()
                 tmpfragment = selectedFragment
-                setFragment(SearchFragment[intent.getStringExtra("search_query")])
-                searchView.setSearchString(intent.getStringExtra("search_query"), false)
+                setFragment(SearchFragment[intent.getStringExtra("search_query") ?: ""])
+                searchView.setSearchString(intent.getStringExtra("search_query") ?: "", false)
             }
             else -> setFragment(RecentFragment.get())
         }

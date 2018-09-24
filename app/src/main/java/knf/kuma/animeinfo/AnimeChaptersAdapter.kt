@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.cardview.widget.CardView
@@ -20,8 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.squareup.picasso.Callback
@@ -39,7 +38,6 @@ import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import xdroid.toaster.Toaster
 import java.io.File
 import java.util.*
@@ -81,9 +79,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         chapter.isDownloaded = canPlay(dFile)
         if (processingPosition == holder.adapterPosition) {
             holder.progressBar.isIndeterminate = true
-            holder.progressBar.visibility = View.VISIBLE
+            holder.progressBarRoot.visibility = View.VISIBLE
         } else
-            holder.progressBar.visibility = View.GONE
+            holder.progressBarRoot.visibility = View.GONE
         holder.setDownloadObserver(downloadsDAO.getLiveByEid(chapter.eid), fragment, Observer { downloadObject1 ->
             holder.setDownloadState(downloadObject1)
             val casting = CastUtil.get().casting.value
@@ -189,9 +187,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 launch(UI) {
                                     if (boolean) {
                                         holder.progressBar.isIndeterminate = true
-                                        holder.progressBar.visibility = View.VISIBLE
+                                        holder.progressBarRoot.visibility = View.VISIBLE
                                     } else
-                                        holder.progressBar.visibility = View.GONE
+                                        holder.progressBarRoot.visibility = View.GONE
                                 }
                             }
 
@@ -249,9 +247,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 launch(UI) {
                                     if (boolean) {
                                         holder.progressBar.isIndeterminate = true
-                                        holder.progressBar.visibility = View.VISIBLE
+                                        holder.progressBarRoot.visibility = View.VISIBLE
                                     } else
-                                        holder.progressBar.visibility = View.GONE
+                                        holder.progressBarRoot.visibility = View.GONE
                                 }
                             }
 
@@ -345,29 +343,19 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     }
 
     inner class ChapterImgHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @BindView(R.id.card)
-        lateinit var cardView: CardView
-        @BindView(R.id.separator)
-        lateinit var separator: View
-        @BindView(R.id.img)
-        lateinit var imageView: ImageView
-        @BindView(R.id.chapter)
-        lateinit var chapter: TextView
-        @BindView(R.id.in_down)
-        lateinit var inDown: ImageView
-        @BindView(R.id.actions)
-        lateinit var actions: ImageButton
-        @BindView(R.id.progress)
-        lateinit var progressBar: MaterialProgressBar
+        val cardView: CardView by itemView.bind(R.id.card)
+        val separator: View by itemView.bind(R.id.separator)
+        val imageView: ImageView by itemView.bind(R.id.img)
+        val chapter: TextView by itemView.bind(R.id.chapter)
+        private val inDown: ImageView by itemView.bind(R.id.in_down)
+        val actions: ImageButton by itemView.bind(R.id.actions)
+        val progressBar: ProgressBar by itemView.bind(R.id.progress)
+        val progressBarRoot: View by itemView.bind(R.id.progress_root)
 
         private var downloadLiveData: LiveData<DownloadObject> = MutableLiveData()
 
         private var downloadObserver: Observer<DownloadObject>? = null
         private var castingObserver: Observer<String>? = null
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
 
         fun setDownloadObserver(downloadLiveData: LiveData<DownloadObject>, owner: LifecycleOwner?, observer: Observer<DownloadObject>) {
             this.downloadLiveData = downloadLiveData
@@ -424,21 +412,21 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                 if (downloadObject != null && PrefsUtil.showProgress())
                     when (downloadObject.state) {
                         DownloadObject.PENDING -> {
-                            progressBar.visibility = View.VISIBLE
+                            progressBarRoot.visibility = View.VISIBLE
                             progressBar.isIndeterminate = true
                         }
                         DownloadObject.PAUSED, DownloadObject.DOWNLOADING -> {
-                            progressBar.visibility = View.VISIBLE
+                            progressBarRoot.visibility = View.VISIBLE
                             progressBar.isIndeterminate = false
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                                 progressBar.setProgress(downloadObject.progress, true)
                             else
                                 progressBar.progress = downloadObject.progress
                         }
-                        else -> progressBar.visibility = View.GONE
+                        else -> progressBarRoot.visibility = View.GONE
                     }
                 else
-                    progressBar.visibility = View.GONE
+                    progressBarRoot.visibility = View.GONE
             }
         }
     }

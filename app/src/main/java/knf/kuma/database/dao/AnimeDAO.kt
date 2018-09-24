@@ -13,6 +13,9 @@ interface AnimeDAO {
     @get:Query("SELECT * FROM AnimeObject")
     val allList: LiveData<MutableList<AnimeObject>>
 
+    @get:Query("SELECT count(*) FROM AnimeObject")
+    val allListCount: LiveData<Int>
+
     @get:Query("SELECT * FROM AnimeObject ORDER BY name")
     val all: DataSource.Factory<Int, AnimeObject>
 

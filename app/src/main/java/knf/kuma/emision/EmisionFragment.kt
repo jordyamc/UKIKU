@@ -41,12 +41,16 @@ class EmisionFragment : Fragment() {
                 progress.visibility = View.GONE
                 if (isFirst && animeObjects != null && animeObjects.isNotEmpty()) {
                     isFirst = false
-                    adapter!!.update(animeObjects as MutableList<AnimeObject>)
+                    adapter?.update(animeObjects as MutableList<AnimeObject>) { smoothScroll() }
                     recycler.scheduleLayoutAnimation()
                     checkStates(animeObjects)
                 }
                 error.visibility = if (animeObjects == null || animeObjects.isEmpty()) View.VISIBLE else View.GONE
             })
+    }
+
+    private fun smoothScroll() {
+        //recycler.layoutManager?.smoothScrollToPosition(recycler,null,0)
     }
 
     private fun checkStates(animeObjects: MutableList<AnimeObject>?) {
@@ -58,7 +62,7 @@ class EmisionFragment : Fragment() {
                         val animeObject1 = AnimeObject(animeObject.link!!, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(document.outerHtml()))
                         if (animeObject1.state != "En emisión") {
                             dao.updateAnime(animeObject1)
-                            adapter!!.remove(adapter!!.list.indexOf(animeObject))
+                            adapter?.remove(adapter!!.list.indexOf(animeObject))
                             WEmisionProvider.update(context!!)
                         }
                     } catch (e: Exception) {
@@ -77,9 +81,9 @@ class EmisionFragment : Fragment() {
             CacheDB.INSTANCE.animeDAO().getByDay(arguments!!.getInt("day", 1), blacklist!!).observe(this, Observer { animeObjects ->
                 error!!.visibility = View.GONE
                 if (animeObjects != null && animeObjects.isNotEmpty())
-                    adapter!!.update(animeObjects as MutableList<AnimeObject>)
+                    adapter?.update(animeObjects as MutableList<AnimeObject>) { smoothScroll() }
                 else
-                    adapter!!.update(ArrayList())
+                    adapter?.update(ArrayList()) { smoothScroll() }
                 if (animeObjects == null || animeObjects.isEmpty())
                     error!!.visibility = View.VISIBLE
             })

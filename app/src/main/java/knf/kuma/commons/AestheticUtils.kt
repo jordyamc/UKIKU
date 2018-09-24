@@ -19,30 +19,34 @@ class AestheticUtils {
 
     companion object {
         fun setDefaults(context: Context) {
-            if (Aesthetic.isFirstTime)
-                Aesthetic.config {
-                    activityTheme(if (isDarkMode(context)) R.style.Theme_AppCompat_NoActionBar else R.style.Theme_AppCompat_Light_NoActionBar)
-                    isDark(isDarkMode(context))
-                    colorPrimary(primaryColor(context))
-                    colorStatusBarAuto()
-                    colorNavigationBarAuto()
-                    colorAccentRes(accentColor(context))
-                    navigationViewMode(NavigationViewMode.SELECTED_ACCENT)
-                    bottomNavigationBackgroundMode(BottomNavBgMode.PRIMARY)
-                    bottomNavigationIconTextMode(BottomNavIconTextMode.SELECTED_ACCENT)
-                    swipeRefreshLayoutColorsRes(EAHelper.getThemeColor(context), EAHelper.getThemeColorLight(context), primaryColorRes(context))
-                }
+            noCrash {
+                if (Aesthetic.isFirstTime)
+                    Aesthetic.config {
+                        activityTheme(if (isDarkMode(context)) R.style.Theme_AppCompat_NoActionBar else R.style.Theme_AppCompat_Light_NoActionBar)
+                        isDark(isDarkMode(context))
+                        colorPrimary(primaryColor(context))
+                        colorStatusBarAuto()
+                        colorNavigationBarAuto()
+                        colorAccentRes(accentColor(context))
+                        navigationViewMode(NavigationViewMode.SELECTED_ACCENT)
+                        bottomNavigationBackgroundMode(BottomNavBgMode.PRIMARY)
+                        bottomNavigationIconTextMode(BottomNavIconTextMode.SELECTED_ACCENT)
+                        swipeRefreshLayoutColorsRes(EAHelper.getThemeColor(context), EAHelper.getThemeColorLight(context), primaryColorRes(context))
+                    }
+            }
         }
 
         fun setDefaultsTranslucent(context: Context) {
-            if (Aesthetic.isFirstTime)
-                Aesthetic.config {
-                    activityTheme(if (isDarkMode(context)) R.style.Theme_AppCompat_Light_Dialog else R.style.Theme_AppCompat_Dialog)
-                    isDark(isDarkMode(context))
-                    colorStatusBar(Color.TRANSPARENT)
-                    colorNavigationBar(Color.TRANSPARENT)
-                    colorWindowBackground(Color.TRANSPARENT)
-                }
+            noCrash {
+                if (Aesthetic.isFirstTime)
+                    Aesthetic.config {
+                        activityTheme(if (isDarkMode(context)) R.style.Theme_AppCompat_Light_Dialog else R.style.Theme_AppCompat_Dialog)
+                        isDark(isDarkMode(context))
+                        colorStatusBar(Color.TRANSPARENT)
+                        colorNavigationBar(Color.TRANSPARENT)
+                        colorWindowBackground(Color.TRANSPARENT)
+                    }
+            }
         }
 
         fun updateIsDarkMode(context: Context, isDark: Boolean) {

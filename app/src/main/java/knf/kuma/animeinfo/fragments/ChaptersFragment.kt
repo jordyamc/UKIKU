@@ -140,7 +140,6 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                         } catch (e: Exception) {
                             //
                         }
-
                     }
                     if (moveRequests.size == 0) {
                         Toaster.toast("No se pudo inferir el numero de los episodios")
@@ -150,13 +149,14 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                             try {
                                 if (pairBooleanPair != null) {
                                     if (pairBooleanPair.second) {
-                                        Toaster.toast("Importados " + pairBooleanPair.first.second + " archivos exitosamente")
+                                        Toaster.toast("Importados ${pairBooleanPair.first.second} archivos exitosamente")
                                         holder?.adapter?.notifyDataSetChanged()
                                         chapters = ArrayList()
                                         snackManager.dismiss()
                                         holder?.adapter?.isImporting = false
                                     } else {
                                         snackbar.setMessage(pairBooleanPair.first.first)
+                                        snackManager.updateTo(snackbar)
                                         snackManager.setProgress(pairBooleanPair.first.second)
                                     }
                                 }

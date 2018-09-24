@@ -43,7 +43,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
      *
      * @param collapseInterpolator the interpolator
      */
-    var collapseInterpolator: TimeInterpolator? = null
+    private var collapseInterpolator: TimeInterpolator? = null
     private var animationDuration: Long = 0
     private var animating: Boolean = false
     /**
@@ -98,7 +98,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
      *
      * @return true if expanded, false otherwise.
      */
-    fun expand(): Boolean {
+    private fun expand(): Boolean {
         if (!this.isExpanded && !this.animating && this.mMaxLines >= 0) {
             // notify listener
             this.notifyOnExpand()
@@ -167,7 +167,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
      *
      * @return true if collapsed, false otherwise.
      */
-    fun collapse(): Boolean {
+    private fun collapse(): Boolean {
         if (this.isExpanded && !this.animating && this.mMaxLines >= 0) {
             // notify listener
             this.notifyOnCollapse()

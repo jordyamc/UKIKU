@@ -10,7 +10,7 @@ import knf.kuma.database.dao.*
 import knf.kuma.pojos.*
 
 @Database(entities = [RecentObject::class, AnimeObject::class, FavoriteObject::class, AnimeObject.WebInfo.AnimeChapter::class, NotificationObj::class, DownloadObject::class, RecordObject::class, SeeingObject::class, ExplorerObject::class, GenreStatusObject::class, QueueObject::class],
-        version = 10)
+        version = 11)
 abstract class CacheDB : RoomDatabase() {
 
     abstract fun recentsDAO(): RecentsDAO
@@ -85,18 +85,24 @@ abstract class CacheDB : RoomDatabase() {
                 database.execSQL("ALTER TABLE `recentobject_tmp` RENAME TO `recentobject`")
             }
         }
+
+        private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `seeingobject`  ADD COLUMN `state` INTEGER NOT NULL DEFAULT 1")
+            }
+        }
         lateinit var INSTANCE: CacheDB
 
         fun init(context: Context) {
             INSTANCE = Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
                     .allowMainThreadQueries()
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build()
         }
 
         fun createAndGet(context: Context): CacheDB {
             return Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
                     .allowMainThreadQueries()
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build()
         }
     }
 

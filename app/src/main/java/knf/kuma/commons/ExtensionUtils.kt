@@ -11,6 +11,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceFragmentCompat
@@ -25,6 +26,7 @@ import kotlinx.coroutines.experimental.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import java.io.File
 
 fun Toolbar.changeToolbarFont() {
     for (i in 0 until childCount) {
@@ -119,6 +121,11 @@ fun <T : View> Activity.bind(@IdRes res: Int): Lazy<T> {
     return lazy { findViewById<T>(res) }
 }
 
+fun <T : View> View.bind(@IdRes res: Int): Lazy<T> {
+    @Suppress("UNCHECKED_CAST")
+    return lazy { findViewById<T>(res) }
+}
+
 fun <T : View> AnimeActivityHolder.bind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T> {
     @Suppress("UNCHECKED_CAST")
     return lazy { activity.findViewById<T>(res) }
@@ -139,9 +146,48 @@ fun Request.execute(): Response {
 }
 
 val PreferenceFragmentCompat.safeContext: Context
-    get() = context!!
+    get() = context!!.applicationContext
 
 @ColorInt
 fun Int.resolveColor(context: Context): Int {
     return ContextCompat.getColor(context, this)
+}
+
+fun noCrash(enableLog: Boolean = true, func: () -> Unit) {
+    try {
+        func()
+    } catch (e: Exception) {
+        if (enableLog)
+            e.printStackTrace()
+    }
+}
+
+fun <T> MutableList<T>.removeAll(vararg elements: Collection<T>) {
+    elements.forEach {
+        removeAll(it)
+    }
+}
+
+infix fun <T> Collection<T>?.notSameContent(collection: Collection<T>?) =
+        collection.let {
+            !(this != null && it != null && this.size == it.size && this.containsAll<T>(it))
+        }
+
+infix fun <T> Collection<T>?.isSameContent(collection: Collection<T>?) =
+        collection.let {
+            this != null && it != null && this.size == it.size && this.containsAll<T>(it)
+        }
+
+fun NotificationCompat.Builder.create(func: NotificationCompat.Builder.() -> Unit): NotificationCompat.Builder {
+    this.func()
+    return this
+}
+
+fun File.safeDelete(log: Boolean = false) {
+    try {
+        delete()
+    } catch (e: Exception) {
+        if (log)
+            e.printStackTrace()
+    }
 }

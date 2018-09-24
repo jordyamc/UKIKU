@@ -84,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 android:background="?colorAccent"
+                android:tag=":aesthetic_ignore"
                 app:title="Title"
                 app:titleTextAppearance="@style/TextAppearance.AppCompat.Subhead"
                 app:titleTextColor="@android:color/white"/>

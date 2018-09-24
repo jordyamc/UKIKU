@@ -55,13 +55,6 @@ class VideoPlayerGlue(
         //adapter.add(mSkipNextAction);
     }
 
-    override fun onCreateSecondaryActions(adapter: ArrayObjectAdapter?) {
-        super.onCreateSecondaryActions(adapter)
-        /*adapter.add(mThumbsDownAction);
-        adapter.add(mThumbsUpAction);
-        adapter.add(mRepeatAction);*/
-    }
-
     override fun onActionClicked(action: Action) {
         if (shouldDispatchAction(action)) {
             dispatchAction(action)

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/watching"
+        android:title="Viendo"/>
+    <item
+        android:id="@+id/considering"
+        android:title="Considerando"/>
+    <item
+        android:id="@+id/completed"
+        android:title="Completado"/>
+    <item
+        android:id="@+id/droped"
+        android:title="Dropeado"/>
+</menu>

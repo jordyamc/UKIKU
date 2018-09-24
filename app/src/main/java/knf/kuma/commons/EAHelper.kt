@@ -242,6 +242,32 @@ object EAHelper {
         }
     }
 
+    @DrawableRes
+    fun getThemeImg(value: String): Int {
+        when (value) {
+            "0" -> return R.drawable.side_nav_bar
+            "1" -> return R.drawable.side_nav_bar_pink
+            "2" -> return R.drawable.side_nav_bar_purple
+            "3" -> return R.drawable.side_nav_bar_deep_purple
+            "4" -> return R.drawable.side_nav_bar_indigo
+            "5" -> return R.drawable.side_nav_bar_blue
+            "6" -> return R.drawable.side_nav_bar_light_blue
+            "7" -> return R.drawable.side_nav_bar_cyan
+            "8" -> return R.drawable.side_nav_bar_teal
+            "9" -> return R.drawable.side_nav_bar_green
+            "10" -> return R.drawable.side_nav_bar_light_green
+            "11" -> return R.drawable.side_nav_bar_lime
+            "12" -> return R.drawable.side_nav_bar_yellow
+            "13" -> return R.drawable.side_nav_bar_amber
+            "14" -> return R.drawable.side_nav_bar_orange
+            "15" -> return R.drawable.side_nav_bar_deep_orange
+            "16" -> return R.drawable.side_nav_bar_brown
+            "17" -> return R.drawable.side_nav_bar_gray
+            "18" -> return R.drawable.side_nav_bar_blue_gray
+            else -> return R.drawable.side_nav_bar
+        }
+    }
+
     @ColorRes
     fun getThemeColor(context: Context?): Int {
         if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)

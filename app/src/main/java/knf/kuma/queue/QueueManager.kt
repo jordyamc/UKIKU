@@ -64,7 +64,7 @@ object QueueManager {
     }
 
     private fun startQueueExternal(context: Context, list: MutableList<QueueObject>) {
-        val startUri = if (list[0].isFile) FileAccessHelper.INSTANCE.getDataUri(list[0].chapter.fileName) else list[0].uri
+        val startUri = if (list[0].isFile) FileAccessHelper.INSTANCE.getDataUri(list[0].chapter.fileName) else list[0].getUri()
         val titles = QueueObject.getTitles(list)
         val uris = QueueObject.getUris(list)
         uris[0] = startUri!!

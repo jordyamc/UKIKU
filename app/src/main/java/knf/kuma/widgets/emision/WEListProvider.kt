@@ -35,7 +35,7 @@ class WEListProvider internal constructor(private val context: Context) : Remote
         items.clear()
         val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)!!)
         for (obj in list) {
-            items.add(WEListItem(obj.key!!, obj.link!!, obj.name!!, obj.aid!!, obj.img!!))
+            items.add(WEListItem(obj.key, obj.link!!, obj.name!!, obj.aid!!, obj.img!!))
         }
     }
 

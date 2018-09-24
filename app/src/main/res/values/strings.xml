@@ -5,12 +5,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
-
     <string name="directory_channel_title">Actualizacion de directorio</string>
-    <string name="directory_channel_desc">Servicio en segundo plano para actualizar el directorio</string>
-
-    <string name="io.branch.apiKey" translatable="false">key_live_gos8mZF3SuGUJ45nY7BKnddawsklPytr</string>
 
     <string-array name="theme_options">
         <item>Automático</item>
@@ -138,6 +133,13 @@
         <item>3</item>
         <item>5</item>
         <item>7</item>
+    </string-array>
+    <string-array name="list_states">
+        <item>Ninguno</item>
+        <item>Viendo</item>
+        <item>Considerando</item>
+        <item>Completado</item>
+        <item>Dropeado</item>
     </string-array>
     <string name="shortcut_fav_short">Favoritos</string>
     <string name="shortcut_fav_long">Animes favoritos</string>

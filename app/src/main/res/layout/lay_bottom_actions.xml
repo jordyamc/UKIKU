@@ -9,7 +9,6 @@
     android:theme="@style/AppTheme">
 
     <TextView
-        android:id="@+id/tv_bottom_sheet_heading"
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:layout_marginStart="16dp"

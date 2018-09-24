@@ -11,8 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.SearchEvent
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -20,17 +18,14 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
+import org.jetbrains.anko.find
 import java.util.*
 
 class SearchFragment : BottomFragment() {
-    @BindView(R.id.recycler)
     lateinit var recyclerView: RecyclerView
-    @BindView(R.id.fab)
     lateinit var fab: FloatingActionButton
-    @BindView(R.id.progress)
     lateinit var progressBar: ProgressBar
-    @BindView(R.id.error)
-    lateinit var errorView: View
+    private lateinit var errorView: View
 
     private var model: SearchViewModel? = null
     private var adapter: SearchAdapter? = null
@@ -38,7 +33,7 @@ class SearchFragment : BottomFragment() {
 
     private var isFirst = true
 
-    private var query: String? = ""
+    private var query: String = ""
 
     private var selected: MutableList<String> = ArrayList()
 
@@ -119,10 +114,10 @@ class SearchFragment : BottomFragment() {
                 "Yaoi",
                 "Yuri")
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         model = ViewModelProviders.of(activity!!).get(SearchViewModel::class.java)
-        model!!.setSearch(query!!, "", this, Observer { animeObjects ->
+        model?.setSearch(query, "", this, Observer { animeObjects ->
             adapter!!.submitList(animeObjects)
             errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
             if (isFirst) {
@@ -135,12 +130,20 @@ class SearchFragment : BottomFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
-        ButterKnife.bind(this, view)
+        recyclerView = view.find(R.id.recycler)
+        fab = view.find(R.id.fab)
+        progressBar = view.find(R.id.progress)
+        errorView = view.find(R.id.error)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         manager = LinearLayoutManager(context)
         recyclerView.layoutManager = manager
         recyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(context, R.anim.layout_fall_down)
         adapter = SearchAdapter(this)
-        adapter!!.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                 super.onItemRangeMoved(fromPosition, toPosition, itemCount)
                 if (toPosition == 0)
@@ -165,26 +168,24 @@ class SearchFragment : BottomFragment() {
             })
             dialog.show(childFragmentManager, "genres")
         }
-        return view
     }
 
-    fun setSearch(q: String?) {
-        this.query = q!!.trim { it <= ' ' }
-        if (model != null)
-            model!!.setSearch(q.trim { it <= ' ' }, genresString, this, Observer { animeObjects ->
-                if (animeObjects != null) {
-                    adapter!!.submitList(animeObjects)
-                    errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
-                    Answers.getInstance().logSearch(SearchEvent().putQuery(query))
-                    if (genresString != "")
-                        Answers.getInstance().logSearch(SearchEvent().putQuery(genresString))
-                }
-                if (isFirst) {
-                    progressBar.visibility = View.GONE
-                    isFirst = false
-                    recyclerView.scheduleLayoutAnimation()
-                }
-            })
+    fun setSearch(q: String) {
+        this.query = q.trim { it <= ' ' }
+        model?.setSearch(q.trim { it <= ' ' }, genresString, this, Observer { animeObjects ->
+            if (animeObjects != null) {
+                adapter!!.submitList(animeObjects)
+                errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
+                Answers.getInstance().logSearch(SearchEvent().putQuery(query))
+                if (genresString != "")
+                    Answers.getInstance().logSearch(SearchEvent().putQuery(genresString))
+            }
+            if (isFirst) {
+                progressBar.visibility = View.GONE
+                isFirst = false
+                recyclerView.scheduleLayoutAnimation()
+            }
+        })
     }
 
     private fun setFabIcon() {
@@ -198,7 +199,7 @@ class SearchFragment : BottomFragment() {
     companion object {
 
         @JvmOverloads
-        operator fun get(query: String? = ""): SearchFragment {
+        operator fun get(query: String = ""): SearchFragment {
             val fragment = SearchFragment()
             fragment.query = query
             return fragment

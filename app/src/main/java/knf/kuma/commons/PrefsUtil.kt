@@ -51,6 +51,9 @@ object PrefsUtil {
     val showRecentImage: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("recent_image", true)
 
+    val useSmoothAnimations: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("smooth_animations", true)
+
     fun init(context: Context) {
         PrefsUtil.context = context
     }

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
-import butterknife.ButterKnife
 import knf.kuma.R
 
 class SeenAnimeOverlay : LinearLayout {
@@ -27,11 +26,6 @@ class SeenAnimeOverlay : LinearLayout {
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.view_seen_overlay, this)
-    }
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        ButterKnife.bind(this)
     }
 
     fun setSeen(seen: Boolean, animate: Boolean) {

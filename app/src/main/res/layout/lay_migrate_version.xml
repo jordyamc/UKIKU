@@ -45,7 +45,6 @@
                 android:textStyle="bold"/>
 
             <TextView
-                android:id="@+id/tv_version_good"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"

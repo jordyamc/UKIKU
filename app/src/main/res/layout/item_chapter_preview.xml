@@ -47,6 +47,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:paddingStart="8dp"
+                    android:paddingEnd="0dp"
                     android:text="Episodio #"
                     android:textAppearance="@android:style/TextAppearance.Material.Title"
                     android:textSize="18sp"/>
@@ -70,17 +71,20 @@
             </LinearLayout>
         </LinearLayout>
 
-        <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-            android:id="@+id/progress"
-            style="@style/Widget.MaterialProgressBar.ProgressBar"
+        <FrameLayout
+            android:id="@+id/progress_root"
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_alignParentBottom="true"
-            android:progress="50"
-            android:visibility="gone"
-            app:mpb_progressStyle="horizontal"
-            app:mpb_setBothDrawables="true"
-            app:mpb_useIntrinsicPadding="false"/>
+            android:layout_alignParentBottom="true">
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                />
+        </FrameLayout>
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

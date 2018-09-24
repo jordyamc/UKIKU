@@ -7,11 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.crashlytics.android.Crashlytics
+import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
 import knf.kuma.backup.objects.FavList
 import knf.kuma.backup.objects.SeenList
-import knf.kuma.commons.createIndeterminateSnackbar
 import knf.kuma.commons.safeDismiss
+import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
 import kotlinx.android.synthetic.main.lay_migrate_success.view.*
 import org.jetbrains.anko.doAsync
@@ -41,7 +42,7 @@ class MigrateSuccessFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val snackbar = root.createIndeterminateSnackbar("Migrando...")
+        val snackbar = root.showSnackbar("Migrando...", Snackbar.LENGTH_INDEFINITE)
         doAsync {
             try {
                 when (requestCode) {

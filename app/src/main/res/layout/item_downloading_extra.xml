@@ -60,15 +60,18 @@
             </LinearLayout>
         </LinearLayout>
 
-        <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-            android:id="@+id/progress"
-            style="@style/Widget.MaterialProgressBar.ProgressBar"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:progress="50"
-            app:mpb_progressStyle="horizontal"
-            app:mpb_setBothDrawables="true"
-            app:mpb_useIntrinsicPadding="false"/>
+            android:layout_height="3dp">
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"/>
+        </FrameLayout>
 
         <View
             android:layout_width="match_parent"

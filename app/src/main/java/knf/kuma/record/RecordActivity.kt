@@ -14,26 +14,20 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.bind
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecordObject
 
 class RecordActivity : AppCompatActivity() {
-
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-    @BindView(R.id.recycler)
-    lateinit var recyclerView: RecyclerView
-    @BindView(R.id.progress)
-    lateinit var progressBar: ProgressBar
-    @BindView(R.id.error)
-    lateinit var error: View
+    val toolbar: Toolbar by bind(R.id.toolbar)
+    val recyclerView: RecyclerView by bind(R.id.recycler)
+    val progressBar: ProgressBar by bind(R.id.progress)
+    val error: View by bind(R.id.error)
     private var adapter: RecordsAdapter? = null
     private var animate = true
     private var isFirst = true
@@ -50,7 +44,6 @@ class RecordActivity : AppCompatActivity() {
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
         setContentView(layout)
-        ButterKnife.bind(this)
         toolbar.title = "Historial"
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowHomeEnabled(false)

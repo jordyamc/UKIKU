@@ -9,7 +9,7 @@ import knf.kuma.directory.DirPagerAdapter
 import kotlinx.android.synthetic.main.fragment_directory.view.*
 
 class DirMainFragmentHolder(view: View, manager: FragmentManager) {
-    internal val tabLayout: TabLayout = view.tabs
+    private val tabLayout: TabLayout = view.tabs
     internal val pager: ViewPager = view.pager
     private val adapter: DirPagerAdapter
 

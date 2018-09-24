@@ -10,13 +10,6 @@
         <attr name="tvea_textShrink" format="string"/>
         <attr name="tvea_textExpand" format="string"/>
     </declare-styleable>
-    <declare-styleable name="CustomSeekBarPreference">
-        <attr name="cs_max" format="integer"/>
-        <attr name="cs_min" format="integer"/>
-        <attr name="cs_step" format="integer"/>
-        <attr name="cs_mask" format="string"/>
-        <attr name="cs_zero_value" format="string"/>
-    </declare-styleable>
     <declare-styleable name="SyncItemView">
         <attr name="si_title" format="string"/>
         <attr name="si_showDivider" format="boolean"/>

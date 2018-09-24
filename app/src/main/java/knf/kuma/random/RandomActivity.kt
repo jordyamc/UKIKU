@@ -14,23 +14,19 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.github.stephenvinouze.materialnumberpickercore.MaterialNumberPicker
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.bind
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 
 class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-    @BindView(R.id.refresh)
-    lateinit var refreshLayout: SwipeRefreshLayout
-    @BindView(R.id.recycler)
-    lateinit var recyclerView: RecyclerView
+    val toolbar: Toolbar by bind(R.id.toolbar)
+    private val refreshLayout: SwipeRefreshLayout by bind(R.id.refresh)
+    val recyclerView: RecyclerView by bind(R.id.recycler)
     private var adapter: RandomAdapter? = null
 
     private val layout: Int
@@ -45,16 +41,16 @@ class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
         setContentView(layout)
-        ButterKnife.bind(this)
         toolbar.title = "Random"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         refreshLayout.setOnRefreshListener(this)
         adapter = RandomAdapter(this)
         recyclerView.adapter = adapter
         refreshLayout.isRefreshing = true
+        refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(this), EAHelper.getThemeColorLight(this), R.color.colorPrimary)
         refreshList()
     }
 
@@ -63,7 +59,7 @@ class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             CacheDB.INSTANCE.animeDAO().getRandom(PreferenceManager.getDefaultSharedPreferences(this@RandomActivity).getInt("random_limit", 25))
                     .observe(this@RandomActivity, Observer { animeObjects ->
                         refreshLayout.isRefreshing = false
-                        adapter!!.update(animeObjects)
+                        adapter?.update(animeObjects)
                         recyclerView.scheduleLayoutAnimation()
                     })
         }, 1200)

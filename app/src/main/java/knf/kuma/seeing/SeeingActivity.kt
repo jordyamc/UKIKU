@@ -3,85 +3,55 @@ package knf.kuma.seeing
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
-import android.view.View
-import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
-import com.google.android.material.snackbar.Snackbar
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
-import knf.kuma.commons.safeDismiss
-import knf.kuma.database.CacheDB
-import knf.kuma.pojos.SeeingObject
+import knf.kuma.commons.bind
 
 class SeeingActivity : AppCompatActivity() {
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-    @BindView(R.id.recycler)
-    lateinit var recyclerView: RecyclerView
-    @BindView(R.id.error)
-    lateinit var error: View
-    private var adapter: SeeingAdapter? = null
-    private var internalMove = false
-    private var isFirst = true
-
-    private val layout: Int
-        @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(this).getString("lay_type", "0") == "0") {
-            R.layout.activity_seening
-        } else {
-            R.layout.activity_seening_grid
-        }
+    val toolbar: Toolbar by bind(R.id.toolbar)
+    val tabs: TabLayout by bind(R.id.tabs)
+    val pager: ViewPager by bind(R.id.pager)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
-        setContentView(layout)
-        ButterKnife.bind(this)
+        setContentView(R.layout.activity_seening)
         toolbar.title = "Siguiendo"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
         toolbar.setNavigationOnClickListener { finish() }
-        adapter = SeeingAdapter(this)
-        recyclerView.adapter = adapter
-        val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                return false
+        pager.adapter = SeeingPagerAdapter(supportFragmentManager)
+        pager.offscreenPageLimit = 5
+        tabs.setupWithViewPager(pager)
+        tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                (pager.adapter as? SeeingPagerAdapter)!!.fragmentList[pager.currentItem].onSelected()
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val seeingObject = adapter!!.list[position]
-                internalMove = true
-                adapter!!.remove(position)
-                val snackbar = Snackbar.make(recyclerView, "Anime dropeado", Snackbar.LENGTH_LONG)
-                snackbar.setAction("Deshacer") {
-                    error.post { error.visibility = View.GONE }
-                    snackbar.safeDismiss()
-                    internalMove = true
-                    adapter!!.undo(seeingObject, position)
-                }
-                snackbar.show()
+            override fun onTabUnselected(p0: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabSelected(p0: TabLayout.Tab?) {
+
             }
         })
-        touchHelper.attachToRecyclerView(recyclerView)
-        CacheDB.INSTANCE.seeingDAO().all.observe(this, Observer { list ->
-            error.visibility = if (list!!.isEmpty()) View.VISIBLE else View.GONE
-            if (!internalMove) {
-                adapter!!.update(list as MutableList<SeeingObject>)
-                if (isFirst) {
-                    isFirst = false
-                    recyclerView.scheduleLayoutAnimation()
-                }
-            } else {
-                internalMove = false
+        pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+            }
+
+            override fun onPageSelected(position: Int) {
+                (pager.adapter as? SeeingPagerAdapter)!!.fragmentList[position].clickCount = 0
             }
         })
     }

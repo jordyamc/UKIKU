@@ -15,14 +15,9 @@ import androidx.annotation.LayoutRes
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
-import knf.kuma.commons.CastUtil
-import knf.kuma.commons.PicassoSingle
-import knf.kuma.commons.SelfServer
-import knf.kuma.commons.safeShow
+import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
@@ -162,21 +157,11 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
     }
 
     inner class ChapItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @BindView(R.id.card)
-        lateinit var cardView: CardView
-        @BindView(R.id.img)
-        lateinit var imageView: ImageView
-        @BindView(R.id.seen)
-        lateinit var seenOverlay: SeenAnimeOverlay
-        @BindView(R.id.chapter)
-        lateinit var chapter: TextView
-        @BindView(R.id.time)
-        lateinit var time: TextView
-        @BindView(R.id.action)
-        lateinit var action: ImageButton
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
+        val cardView: CardView by itemView.bind(R.id.card)
+        val imageView: ImageView by itemView.bind(R.id.img)
+        val seenOverlay: SeenAnimeOverlay by itemView.bind(R.id.seen)
+        val chapter: TextView by itemView.bind(R.id.chapter)
+        val time: TextView by itemView.bind(R.id.time)
+        val action: ImageButton by itemView.bind(R.id.action)
     }
 }

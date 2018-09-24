@@ -59,23 +59,23 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
         }
         viewModel = ViewModelProviders.of(this@ActivityAnime).get(AnimeViewModel::class.java)
         if (intent.getBooleanExtra("aid_only", false))
-            viewModel!!.init(intent.getStringExtra("aid"))
+            viewModel?.init(intent.getStringExtra("aid"))
         else
-            viewModel!!.init(this@ActivityAnime, intent.dataString!!, intent.getBooleanExtra("persist", true))
+            viewModel?.init(this@ActivityAnime, intent.dataString!!, intent.getBooleanExtra("persist", true))
         holder = AnimeActivityHolder(this@ActivityAnime)
         launch(UI) {
             if (intent.getBooleanExtra("notification", false))
                 sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
-            setSupportActionBar(holder!!.toolbar)
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-            supportActionBar!!.setDisplayShowHomeEnabled(false)
-            holder!!.toolbar.setNavigationOnClickListener { closeActivity() }
+            setSupportActionBar(holder?.toolbar)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setDisplayShowHomeEnabled(false)
+            holder?.toolbar?.setNavigationOnClickListener { closeActivity() }
             load()
         }
     }
 
     private fun load() {
-        viewModel!!.liveData!!.observe(this, Observer { animeObject ->
+        viewModel?.liveData?.observe(this, Observer { animeObject ->
             launch(UI) {
                 if (animeObject != null) {
                     Crashlytics.setString("screen", "Anime: " + animeObject.name)
@@ -83,8 +83,8 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                     chapters = animeObject.chapters!!
                     genres = animeObject.genres!!
                     favoriteObject = FavoriteObject(animeObject)
-                    holder!!.setTitle(animeObject.name!!)
-                    holder!!.loadImg(PatternUtil.getCover(animeObject.aid!!), View.OnClickListener {
+                    holder?.setTitle(animeObject.name!!)
+                    holder?.loadImg(PatternUtil.getCover(animeObject.aid!!), View.OnClickListener {
                         startActivity(
                                 Intent(this@ActivityAnime, ActivityImgFull::class.java)
                                         .setData(Uri.parse(PatternUtil.getCover(animeObject.aid!!)))
@@ -92,8 +92,8 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                                 .toBundle()
                         )
                     })
-                    holder!!.setFABState(dao.isFav(favoriteObject!!.key), seeingDAO.getByAid(favoriteObject!!.aid!!) != null)
-                    holder!!.showFAB()
+                    holder?.setFABState(dao.isFav(favoriteObject!!.key)/*, seeingDAO.getByAid(favoriteObject!!.aid!!) != null*/)
+                    holder?.showFAB()
                     invalidateOptionsMenu()
                     RecommendHelper.registerAll(genres, RankType.CHECK)
                 } else {
@@ -112,17 +112,17 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
         launch(UI) {
             setResult()
             val isfav = dao.isFav(favoriteObject!!.key)
-            val isSeeing = seeingDAO.getByAid(favoriteObject!!.aid!!) != null
+            val isSeeing = /*seeingDAO.getByAid(favoriteObject!!.aid!!) != null*/false
             if (isfav && isSeeing)
                 onFabLongClicked(actionButton)
             else if (isfav) {
-                holder!!.setFABState(false)
+                holder?.setFABState(false)
                 dao.deleteFav(favoriteObject!!)
                 RecommendHelper.registerAll(genres, RankType.UNFAV)
             } else if (isSeeing) {
                 onFabLongClicked(actionButton)
             } else {
-                holder!!.setFABState(true)
+                holder?.setFABState(true)
                 dao.addFav(favoriteObject!!)
                 RecommendHelper.registerAll(genres, RankType.FAV)
             }
@@ -141,17 +141,17 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                             0 -> {
                                 dao.addFav(favoriteObject!!)
                                 seeingDAO.remove(seeingObject!!)
-                                holder!!.setFABState(true)
+                                holder?.setFABState(true)
                                 RecommendHelper.registerAll(genres, RankType.FAV)
                             }
                             1 -> {
                                 dao.deleteFav(favoriteObject!!)
-                                holder!!.setFABSeeing()
+                                holder?.setFABSeeing()
                                 RecommendHelper.registerAll(genres, RankType.UNFAV)
                             }
                             2 -> {
                                 seeingDAO.remove(seeingObject!!)
-                                holder!!.setFABState(isfav)
+                                holder?.setFABState(isfav)
                                 RecommendHelper.registerAll(genres, RankType.UNFOLLOW)
                             }
                         }
@@ -163,14 +163,14 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                         when (index) {
                             0 -> {
                                 seeingDAO.add(SeeingObject.fromAnime(favoriteObject!!))
-                                holder!!.setFABSeeing()
+                                holder?.setFABSeeing()
                                 RecommendHelper.registerAll(genres, RankType.FOLLOW)
                                 Toaster.toast("Agregado a animes seguidos")
                             }
                             1 -> {
                                 dao.addFav(favoriteObject!!)
                                 seeingDAO.add(SeeingObject.fromAnime(favoriteObject!!))
-                                holder!!.setFABState(true, true)
+                                holder?.setFABState(true, true)
                                 RecommendHelper.registerAll(genres, RankType.FAV)
                                 RecommendHelper.registerAll(genres, RankType.FOLLOW)
                                 Toaster.toast("Agregado a animes seguidos y favoritos")
@@ -180,7 +180,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                 }
             } else {
                 seeingDAO.add(SeeingObject.fromAnime(favoriteObject!!))
-                holder!!.setFABState(true, true)
+                holder?.setFABState(true, true)
                 RecommendHelper.registerAll(genres, RankType.FOLLOW)
                 Toaster.toast("Agregado a animes seguidos")
             }
@@ -197,7 +197,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
     override fun onNeedRecreate() {
         try {
             if (!intent.getBooleanExtra("aid_only", false)) {
-                viewModel!!.reload(this, intent.dataString!!, intent.getBooleanExtra("persist", true))
+                viewModel?.reload(this, intent.dataString!!, intent.getBooleanExtra("persist", true))
                 load()
             }
         } catch (e: Exception) {
@@ -235,7 +235,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
     }
 
     private fun closeActivity() {
-        holder!!.hideFABForce()
+        holder?.hideFABForce()
         if (intent.getBooleanExtra("from_fav", false) && isEdited) {
             finish()
         } else if (intent.getBooleanExtra("noTransition", false)) {

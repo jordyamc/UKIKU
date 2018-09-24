@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.activity_login_buttons.*
 import kotlinx.android.synthetic.main.activity_login_main.*
 
 class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView.OnClick {
-    private lateinit var syncItems: MutableList<SyncItemView>
+    private val syncItems: MutableList<SyncItemView> by lazy { arrayListOf(sync_favs, sync_history, sync_following, sync_seen) }
     private var waitingLogin = false
 
     private val backColor: Int
@@ -45,7 +45,6 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        syncItems = arrayListOf(sync_favs, sync_history, sync_following, sync_seen)
         BUUtils.init(this, savedInstanceState == null)
         login_dropbox.setOnClickListener { onDropBoxLogin() }
         login_drive.setOnClickListener { onDriveLogin() }
@@ -81,9 +80,9 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
         BUUtils.startClient(BUUtils.BUType.DRIVE, false)
     }
 
-    override fun onAction(syncItemView: SyncItemView, id: String?, isBackup: Boolean) {
+    override fun onAction(syncItemView: SyncItemView, id: String, isBackup: Boolean) {
         if (isBackup)
-            BUUtils.backup(colorChanger, id!!, object : BUUtils.BackupInterface {
+            BUUtils.backup(colorChanger, id, object : BUUtils.BackupInterface {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject == null)
                         colorChanger.showSnackbar("Error al respaldar")
@@ -91,7 +90,7 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
                 }
             })
         else
-            BUUtils.restoreDialog(colorChanger, id!!, syncItemView.bakup!!)
+            BUUtils.restoreDialog(colorChanger, id, syncItemView.bakup!!)
     }
 
     private fun onLogOut() {

@@ -26,12 +26,12 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(RecentsViewModel::class.java)
-        viewModel!!.dbLiveData.observe(this, Observer { objects ->
+        viewModel?.dbLiveData?.observe(this, Observer { objects ->
             launch(UI) {
                 if (objects != null) {
-                    holder!!.setError(objects.isEmpty())
-                    holder!!.setRefreshing(false)
-                    adapter!!.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
+                    holder?.setError(objects.isEmpty())
+                    holder?.setRefreshing(false)
+                    adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
                 }
             }
         })
@@ -41,10 +41,10 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.recycler_refresh_fragment, container, false)
         holder = RecyclerRefreshHolder(view)
-        holder!!.refreshLayout.setOnRefreshListener(this@RecentFragment)
+        holder?.refreshLayout?.setOnRefreshListener(this@RecentFragment)
         adapter = RecentsAdapter(this@RecentFragment, holder!!.recyclerView)
-        holder!!.recyclerView.adapter = adapter
-        holder!!.setRefreshing(true)
+        holder?.recyclerView?.adapter = adapter
+        holder?.setRefreshing(true)
         EAHelper.enter1("R")
         return view
     }
@@ -55,9 +55,9 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun updateList() {
         if (!Network.isConnected) {
-            holder!!.setRefreshing(false)
+            holder?.setRefreshing(false)
         } else {
-            viewModel!!.reload(context!!)
+            viewModel?.reload(context!!)
         }
     }
 

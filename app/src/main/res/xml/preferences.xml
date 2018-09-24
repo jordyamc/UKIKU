@@ -39,6 +39,11 @@
             android:key="dir_update_time"
             android:summary="%s"
             android:title="Recrear directorio"/>
+        <Preference
+            android:icon="@drawable/ic_note"
+            android:key="custom_tone"
+            android:summary="Sistema"
+            android:title="Tono de notificación"/>
         <ListPreference
             android:defaultValue="0"
             android:enabled="false"
@@ -170,6 +175,11 @@
             android:key="scale_img"
             android:summary="Portada en pantalla completa"
             android:title="Mejor calidad de imagen"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_animations"
+            android:key="smooth_animations"
+            android:title="Mejorar animaciones"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="category_design"

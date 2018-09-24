@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import knf.kuma.commons.notSameContent
 import knf.kuma.pojos.QueueObject
 import kotlinx.android.synthetic.main.item_queue_full.view.*
 import java.util.*
@@ -43,8 +44,10 @@ internal class QueueAllAdapter internal constructor(activity: Activity) : Recycl
     }
 
     fun update(list: MutableList<QueueObject>) {
-        this.list = list
-        notifyDataSetChanged()
+        if (this.list notSameContent list) {
+            this.list = list
+            notifyDataSetChanged()
+        }
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int) {

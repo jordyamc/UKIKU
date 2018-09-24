@@ -16,5 +16,5 @@
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/item_chapter"/>
+        tools:listitem="@layout/item_chapter_preview"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

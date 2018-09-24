@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -16,7 +17,6 @@ import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.pojos.DownloadObject
 import kotlinx.android.synthetic.main.item_downloading_extra.view.*
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 
 class DownloadingAdapter internal constructor(private val fragment: Fragment, private val downloadObjects: MutableList<DownloadObject>) : RecyclerView.Adapter<DownloadingAdapter.DownloadingItem>() {
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
@@ -114,6 +114,6 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
         val eta: TextView = itemView.eta
         val action: Button = itemView.action
         val cancel: Button = itemView.cancel
-        val progress: MaterialProgressBar = itemView.progress
+        val progress: ProgressBar = itemView.progress
     }
 }

@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-
 import androidx.annotation.LayoutRes
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
@@ -14,16 +13,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.pojos.AnimeObject
+import org.jetbrains.anko.find
 
 class DirectoryPageFragment : BottomFragment() {
-    @BindView(R.id.recycler)
     lateinit var recyclerView: RecyclerView
-    @BindView(R.id.progress)
     lateinit var progress: ProgressBar
     private var manager: RecyclerView.LayoutManager? = null
     private var adapter: DirectoryPageAdapter? = null
@@ -42,7 +38,7 @@ class DirectoryPageFragment : BottomFragment() {
         super.onActivityCreated(savedInstanceState)
         val model = ViewModelProviders.of(activity!!).get(DirectoryViewModel::class.java)
         adapter = DirectoryPageAdapter(this)
-        adapter!!.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 if (positionStart == 0)
@@ -107,16 +103,20 @@ class DirectoryPageFragment : BottomFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
-        ButterKnife.bind(this, view)
-        manager = recyclerView.layoutManager
-        recyclerView.layoutManager = manager
-        isFirst = true
+        recyclerView = view.find(R.id.recycler)
+        progress = view.find(R.id.progress)
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        manager = recyclerView.layoutManager
+        recyclerView.layoutManager = manager
+        isFirst = true
+    }
+
     override fun onReselect() {
-        if (manager != null)
-            manager!!.smoothScrollToPosition(recyclerView, null, 0)
+        manager?.smoothScrollToPosition(recyclerView, null, 0)
     }
 
     enum class DirType(var value: Int) {

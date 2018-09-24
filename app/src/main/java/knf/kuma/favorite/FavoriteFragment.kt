@@ -10,13 +10,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import knf.kuma.BottomFragment
@@ -27,15 +26,16 @@ import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.FavSection
 import knf.kuma.pojos.FavoriteObject
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 import java.util.*
 
 class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
-
-    @BindView(R.id.recycler)
     lateinit var recyclerView: RecyclerView
-    @BindView(R.id.error)
-    lateinit var errorLayout: LinearLayout
+    private lateinit var errorLayout: LinearLayout
     private var edited: FavoriteObject? = null
     private var manager: RecyclerView.LayoutManager? = null
     private var adapter: FavsSectionAdapter? = null
@@ -62,16 +62,16 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                 errorLayout.visibility = View.GONE
                 val container = FavSectionHelper.getInfoContainer(edited)
                 if (container.needReload) {
-                    adapter!!.updateList(favoriteObjects)
+                    adapter?.updateList(favoriteObjects)
                     if (isFirst) {
                         isFirst = false
                         recyclerView.scheduleLayoutAnimation()
                     }
                 } else
-                    adapter!!.updatePosition(container)
+                    adapter?.updatePosition(container)
             } else {
                 errorLayout.visibility = View.GONE
-                adapter!!.updateList(favoriteObjects)
+                adapter?.updateList(favoriteObjects)
                 if (isFirst) {
                     isFirst = false
                     recyclerView.scheduleLayoutAnimation()
@@ -83,7 +83,13 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
-        ButterKnife.bind(this, view)
+        recyclerView = view.find(R.id.recycler)
+        errorLayout = view.find(R.id.error)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         manager = recyclerView.layoutManager
         adapter = FavsSectionAdapter(this, recyclerView)
         if (PrefsUtil.layType == "1" && PrefsUtil.showFavSections()) {
@@ -102,17 +108,16 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         }
         recyclerView.adapter = adapter
         EAHelper.enter1("F")
-        return view
     }
 
     fun onChangeOrder() {
         if (activity != null)
             ViewModelProviders.of(activity!!).get(FavoriteViewModel::class.java).getData().observe(this, Observer { favoriteObjects ->
                 if (favoriteObjects == null || favoriteObjects.isEmpty()) {
-                    adapter!!.updateList(ArrayList())
+                    adapter?.updateList(ArrayList())
                     errorLayout.post { errorLayout.visibility = View.VISIBLE }
                 } else {
-                    adapter!!.updateList(favoriteObjects)
+                    adapter?.updateList(favoriteObjects)
                     if (isFirst) {
                         isFirst = false
                         recyclerView.scheduleLayoutAnimation()
@@ -123,18 +128,17 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     fun showNewCategoryDialog(favoriteObject: FavoriteObject?) {
         edited = favoriteObject
-
         showNewCategoryDialog(favoriteObject == null, null)
     }
 
     private fun showNewCategoryDialog(isEmpty: Boolean, name: String?) {
         val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
         MaterialDialog(context!!).safeShow {
-            title(text = "Nueva categoría")
+            title(text = "${if (name == null) "Nueva" else "Renombrar"} categoría")
             input(hint = "Nombre", prefill = name, waitForPositiveButton = false) { dialog, charSequence ->
                 dialog.setActionButtonEnabled(WhichButton.POSITIVE, charSequence.isNotEmpty())
             }
-            positiveButton(text = "crear") {
+            positiveButton(text = if (name == null) "Crear" else "Renombrar") {
                 val input = it.getInputField()!!.text.toString()
                 if (categories.contains(input)) {
                     Toaster.toast("Esta categoría ya existe")
@@ -143,12 +147,115 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                     if (isEmpty)
                         showNewCategoryInit(false, input)
                     else {
-                        edited!!.category = input
+                        edited?.category = input
                         CacheDB.INSTANCE.favsDAO().addFav(edited!!)
                         edited = null
                     }
                 }
             }
+        }
+    }
+
+    fun showNewCategory(prefill: String? = null) {
+        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
+        MaterialDialog(context!!).safeShow {
+            title(text = "Nueva categoría")
+            input(hint = "Nombre", prefill = prefill, waitForPositiveButton = false) { dialog, charSequence ->
+                dialog.setActionButtonEnabled(WhichButton.POSITIVE, charSequence.isNotEmpty())
+            }
+            positiveButton(text = "Crear") {
+                val input = it.getInputField()!!.text.toString()
+                if (categories.contains(input)) {
+                    Toaster.toast("Esta categoría ya existe")
+                    showNewCategory(input)
+                } else {
+                    doAsync {
+                        if (edited != null) {
+                            edited?.category = input
+                            CacheDB.INSTANCE.favsDAO().addFav(edited!!)
+                        }
+                        launch(UI) {
+                            showAddToCategory(edited == null, input)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showCategoryRename(name: String) {
+        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
+        MaterialDialog(context!!).safeShow {
+            title(text = "Renombrar categoría")
+            input(hint = "Nombre", prefill = name, waitForPositiveButton = false) { dialog, charSequence ->
+                dialog.setActionButtonEnabled(WhichButton.POSITIVE, charSequence.isNotEmpty())
+            }
+            positiveButton(text = "Renombrar") {
+                val input = it.getInputField()!!.text.toString()
+                if (categories.contains(input)) {
+                    Toaster.toast("Esta categoría ya existe")
+                    showCategoryRename(name)
+                } else {
+                    doAsync {
+                        val objects = CacheDB.INSTANCE.favsDAO().getAllInCategory(name)
+                        for (favoriteObject in objects) {
+                            favoriteObject.category = input
+                        }
+                        CacheDB.INSTANCE.favsDAO().addAll(objects)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showAddToCategory(needAnimes: Boolean, name: String) {
+        val fName = if (name == "Sin categoría") FavoriteObject.CATEGORY_NONE else name
+        val favoriteObjects = CacheDB.INSTANCE.favsDAO().getNotInCategory(fName)
+        if (favoriteObjects.isEmpty()) {
+            if (needAnimes)
+                Toaster.toast("Necesitas favoritos para crear una categoría")
+            else
+                Toaster.toast("No hay mas animes para agregar")
+        } else {
+            MaterialDialog(context!!).safeShow {
+                title(text = name)
+                listItemsMultiChoice(items = FavoriteObject.getNames(favoriteObjects)) { _, indices, _ ->
+                    if (needAnimes && indices.isEmpty()) {
+                        Toaster.toast("La nueva categoría necesita animes!")
+                        showAddToCategory(needAnimes, name)
+                    } else {
+                        doAsync {
+                            edited = null
+                            val list = ArrayList<FavoriteObject>()
+                            for (i in indices) {
+                                val favoriteObject = favoriteObjects[i]
+                                favoriteObject.category = fName
+                                list.add(favoriteObject)
+                            }
+                            CacheDB.INSTANCE.favsDAO().addAll(list)
+                        }
+                    }
+                }
+                positiveButton(text = "agregar")
+                if (!needAnimes)
+                    negativeButton(text = "Cancelar")
+            }
+        }
+    }
+
+    private fun showDeleteCategory(name: String) {
+        MaterialDialog(context!!).safeShow {
+            message(text = "¿Desea eliminar esta categoría?")
+            positiveButton(text = "Eliminar") {
+                doAsync {
+                    val objects = CacheDB.INSTANCE.favsDAO().getAllInCategory(name)
+                    for (favoriteObject in objects) {
+                        favoriteObject.category = FavoriteObject.CATEGORY_NONE
+                    }
+                    CacheDB.INSTANCE.favsDAO().addAll(objects)
+                }
+            }
+            negativeButton(text = "Cancelar")
         }
     }
 
@@ -201,7 +308,20 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     }
 
     override fun onEdit(category: String) {
-        showNewCategoryInit(true, category)
+        if (category == "Sin categoría")
+            showAddToCategory(false, category)
+        else
+            MaterialDialog(context!!).safeShow {
+                title(text = category)
+                listItems(items = listOf("Renombrar", "Agregar animes", "Eliminar sección")) { _, index, _ ->
+                    when (index) {
+                        0 -> showCategoryRename(category)
+                        1 -> showAddToCategory(false, category)
+                        2 -> showDeleteCategory(category)
+                    }
+                }
+            }
+        //showNewCategoryInit(true, category)
     }
 
     override fun onSelect(favoriteObject: FavoriteObject) {
@@ -209,22 +329,24 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
             val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
             if (categories.size <= 1) {
                 edited = favoriteObject
-                showNewCategoryDialog(false, null)
+                showNewCategory(null)
             } else {
                 MaterialDialog(context!!).safeShow {
                     title(text = "Mover a...")
                     listItemsSingleChoice(items = categories, initialSelection = categories.indexOf(favoriteObject.category)) { _, _, text ->
-                        if (text != favoriteObject.category) {
-                            edited = favoriteObject
-                            edited!!.category = if (text == "Sin categoría") "_NONE_" else text
-                            CacheDB.INSTANCE.favsDAO().addFav(edited!!)
-                        } else
-                            Toaster.toast("Error al mover")
+                        doAsync {
+                            if (text != favoriteObject.category) {
+                                edited = favoriteObject
+                                edited?.category = if (text == "Sin categoría") "_NONE_" else text
+                                CacheDB.INSTANCE.favsDAO().addFav(edited!!)
+                            } else
+                                Toaster.toast("Error al mover")
+                        }
                     }
                     positiveButton(text = "mover")
                     negativeButton(text = "nuevo") {
                         edited = favoriteObject
-                        showNewCategoryDialog(false, null)
+                        showNewCategory(null)
                     }
                 }
             }

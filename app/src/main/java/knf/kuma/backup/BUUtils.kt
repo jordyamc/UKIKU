@@ -20,12 +20,13 @@ import com.google.android.gms.drive.query.Filters
 import com.google.android.gms.drive.query.Query
 import com.google.android.gms.drive.query.SearchableField
 import com.google.android.gms.tasks.Tasks
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import knf.kuma.backup.objects.BackupObject
-import knf.kuma.commons.createIndeterminateSnackbar
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.safeShow
+import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.*
 import org.jetbrains.anko.doAsync
@@ -355,7 +356,7 @@ object BUUtils {
     }
 
     private fun backupDropbox(view: View, id: String, backupInterface: BackupInterface) {
-        val snackbar = view.createIndeterminateSnackbar("Respaldando...")
+        val snackbar = view.showSnackbar("Respaldando...", Snackbar.LENGTH_INDEFINITE)
         doAsync {
             try {
                 val backupObject = BackupObject(getList(id))
@@ -404,7 +405,7 @@ object BUUtils {
     }
 
     private fun backupDrive(view: View, id: String, backupInterface: BackupInterface) {
-        val snackbar = view.createIndeterminateSnackbar("Respaldando...")
+        val snackbar = view.showSnackbar("Respaldando...", Snackbar.LENGTH_INDEFINITE)
         doAsync {
             val appFolderTask = DRC!!.appFolder
             val driveContents = DRC!!.createContents()
@@ -515,7 +516,7 @@ object BUUtils {
     }
 
     private fun restore(view: View, replace: Boolean, id: String, backupObject: BackupObject<*>) {
-        val snackbar = view.createIndeterminateSnackbar("Restaurando...")
+        val snackbar = view.showSnackbar("Restaurando...", Snackbar.LENGTH_INDEFINITE)
         doAsync {
             try {
                 when (id) {

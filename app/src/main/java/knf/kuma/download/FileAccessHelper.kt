@@ -67,6 +67,16 @@ class FileAccessHelper private constructor(private val context: Context) {
         return File(FileUtil.getFullPathFromTreeUri(treeUri, context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
     }
 
+    val toneFile: File
+        get() {
+            return File(context.getExternalFilesDir(null), "custom_tone")
+        }
+
+    fun setToneFile(enable: Boolean) {
+        if (!enable) toneFile.delete()
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("is_custom_tone", enable).apply()
+    }
+
     fun getFileCreate(file_name: String): File? {
         return try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {

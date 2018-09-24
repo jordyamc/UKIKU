@@ -38,9 +38,9 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
         internal const val ANIMATION_DURATION = 250L      // animation duration as per BaseTransientBottomBar
     }
 
-    internal val backgroundLayout by lazy { snackProgressBar_layout_background }
-    internal val mainLayout by lazy { snackProgressBar_layout_main }
-    internal val actionNextLineLayout by lazy { snackProgressBar_layout_actionNextLine }
+    private val backgroundLayout by lazy { snackProgressBar_layout_background }
+    private val mainLayout by lazy { snackProgressBar_layout_main }
+    private val actionNextLineLayout by lazy { snackProgressBar_layout_actionNextLine }
     internal val iconImage by lazy { snackProgressBar_img_icon }
     internal val messageText by lazy { snackProgressBar_txt_message }
     internal val actionText by lazy { snackProgressBar_txt_action }

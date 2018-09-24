@@ -1,84 +1,165 @@
 package knf.kuma.seeing
 
 import android.app.Activity
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.annotation.LayoutRes
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.bind
+import knf.kuma.commons.notSameContent
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.doAsync
 import java.util.*
 
-internal class SeeingAdapter(private val activity: Activity) : RecyclerView.Adapter<SeeingAdapter.SeeingItem>() {
+internal class SeeingAdapter(private val activity: Activity, private val isFullList: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var list: MutableList<SeeingObject> = ArrayList()
+    var list: List<SeeingObject> = ArrayList()
     private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
 
-    private val layout: Int
-        @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(activity).getString("lay_type", "0") == "0") {
-            R.layout.item_record
-        } else {
-            R.layout.item_record_grid
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            0 -> SeeingItem(LayoutInflater.from(parent.context).inflate(R.layout.item_record_grid, parent, false))
+            else -> SeeingItemNormal(LayoutInflater.from(parent.context).inflate(R.layout.item_dir_grid, parent, false))
         }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SeeingItem {
-        return SeeingItem(LayoutInflater.from(parent.context).inflate(layout, parent, false))
     }
 
-    override fun onBindViewHolder(holder: SeeingItem, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty())
+            super.onBindViewHolder(holder, position, payloads)
+        else if (holder is SeeingItem) {
+            holder.chapter.text = getCardText(list[position])
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val seeingObject = list[position]
-        val lastChapter = seeingObject.lastChapter
-        PicassoSingle[activity].load(PatternUtil.getCover(seeingObject.aid!!)).into(holder.imageView)
-        holder.title.text = seeingObject.title
-        holder.chapter.text = lastChapter?.number ?: "No empezado"
-        holder.cardView.setOnClickListener { ActivityAnime.open(activity, seeingObject, holder.imageView) }
+        if (holder is SeeingItem)
+            holder.chapter.text = getCardText(seeingObject)
+        (holder as SeeingItemNormal).apply {
+            PicassoSingle[activity].load(PatternUtil.getCover(seeingObject.aid!!)).into(imageView)
+            title.text = seeingObject.title
+            cardView.setOnClickListener { ActivityAnime.open(activity, seeingObject, imageView) }
+            cardView.setOnLongClickListener { it ->
+                val popupMenu = PopupMenu(activity, it)
+                popupMenu.inflate(R.menu.menu_seeing)
+                when (seeingObject.state) {
+                    SeeingObject.STATE_WATCHING -> popupMenu.menu.findItem(R.id.watching).isVisible = false
+                    SeeingObject.STATE_CONSIDERING -> popupMenu.menu.findItem(R.id.considering).isVisible = false
+                    SeeingObject.STATE_COMPLETED -> popupMenu.menu.findItem(R.id.completed).isVisible = false
+                    SeeingObject.STATE_DROPED -> popupMenu.menu.findItem(R.id.droped).isVisible = false
+                }
+                popupMenu.setOnMenuItemClickListener { menuItem ->
+                    doAsync {
+                        when (menuItem.itemId) {
+                            R.id.watching -> seeingDAO.update(seeingObject.also { it.state = 1 })
+                            R.id.considering -> seeingDAO.update(seeingObject.also { it.state = 2 })
+                            R.id.completed -> seeingDAO.update(seeingObject.also { it.state = 3 })
+                            R.id.droped -> seeingDAO.update(seeingObject.also { it.state = 4 })
+                        }
+                        if (isFullList)
+                            launch(UI) {
+                                (holder as SeeingItem).chapter.text = getCardText(seeingObject)
+                            }
+                    }
+                    true
+                }
+                popupMenu.show()
+                true
+            }
+        }
+    }
+
+    private fun getCardText(seeingObject: SeeingObject): String {
+        return if (isFullList) {
+            getStateText(seeingObject.state)
+        } else {
+            val lastChapter = seeingObject.lastChapter
+            lastChapter?.number ?: "No empezado"
+        }
+    }
+
+    private fun getStateText(state: Int): String {
+        return when (state) {
+            1 -> "Viendo"
+            2 -> "Considerando"
+            3 -> "Completado"
+            else -> "Dropeado"
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        val seeingObject = list[position]
+        return when {
+            isFullList || seeingObject.state in 0..1 -> 0
+            else -> 1
+        }
     }
 
     override fun getItemCount(): Int {
         return list.size
     }
 
-    fun update(list: MutableList<SeeingObject>) {
-        this.list = list
-        notifyDataSetChanged()
+    fun update(list: List<SeeingObject>) {
+        if (this.list notSameContent list) {
+            doAsync {
+                val result = DiffUtil.calculateDiff(SeeingDiff(this@SeeingAdapter.list, list))
+                launch(UI) {
+                    this@SeeingAdapter.list = list
+                    result.dispatchUpdatesTo(this@SeeingAdapter)
+                }
+            }
+        }
     }
 
-    fun undo(seeingObject: SeeingObject, position: Int) {
-        seeingDAO.add(seeingObject)
-        list.add(position, seeingObject)
-        notifyItemInserted(position)
+    internal inner class SeeingItem(itemView: View) : SeeingItemNormal(itemView) {
+        val chapter: TextView by itemView.bind(R.id.chapter)
     }
 
-    fun remove(position: Int) {
-        seeingDAO.remove(list[position])
-        list.removeAt(position)
-        notifyItemRemoved(position)
+    internal open inner class SeeingItemNormal(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val cardView: CardView by itemView.bind(R.id.card)
+        val imageView: ImageView by itemView.bind(R.id.img)
+        val title: TextView by itemView.bind(R.id.title)
     }
 
-    internal inner class SeeingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @BindView(R.id.card)
-        lateinit var cardView: CardView
-        @BindView(R.id.img)
-        lateinit var imageView: ImageView
-        @BindView(R.id.title)
-        lateinit var title: TextView
-        @BindView(R.id.chapter)
-        lateinit var chapter: TextView
+    internal inner class SeeingDiff(private val oldList: List<SeeingObject>, private val newList: List<SeeingObject>) : DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].aid == newList[newItemPosition].aid
+        }
 
-        init {
-            ButterKnife.bind(this, itemView)
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            return if (isFullList) {
+                getStateText(newList[newItemPosition].state)
+            } else {
+                newList[newItemPosition].chapter
+            }
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return when {
+                isFullList -> oldList[oldItemPosition].state == newList[newItemPosition].state
+                oldList[oldItemPosition].state == 1 -> oldList[oldItemPosition].chapter == newList[newItemPosition].chapter
+                else -> true
+            }
         }
     }
 }

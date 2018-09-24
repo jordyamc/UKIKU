@@ -55,6 +55,7 @@ class DirectoryService : IntentService("Directory update") {
             stopSelf()
             cancelForeground()
         }
+        setStatus(STATE_VERIFYING)
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
         if (!PrefsUtil.isDirectoryFinished)
@@ -217,6 +218,7 @@ class DirectoryService : IntentService("Directory update") {
         const val STATE_FULL = 1
         const val STATE_FINISHED = 2
         const val STATE_INTERRUPTED = 3
+        const val STATE_VERIFYING = 4
         var NOT_CODE = 5598
         var CHANNEL = "directory_update"
         var isRunning = false

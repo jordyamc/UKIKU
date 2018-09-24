@@ -22,7 +22,7 @@ open class MediaCatalog(private val list: MutableList<MediaDescriptionCompat>, p
                         with(MediaDescriptionCompat.Builder()) {
                             setTitle(it.title)
                             setMediaId(count.toString())
-                            setMediaUri(it.uri)
+                            setMediaUri(it.getUri())
                             build()
                         })
                 count++
