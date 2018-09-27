@@ -252,6 +252,16 @@ class DownloadManager : Service() {
             pause(downloadObject.getDid())
         }
 
+        fun pauseAll() {
+            fetch?.getDownloadsWithStatus(Status.DOWNLOADING, Func { it ->
+                val list = mutableListOf<Int>()
+                it.forEach {
+                    list.add(it.id)
+                }
+                fetch?.pause(list)
+            })
+        }
+
         fun pause(did: Int) {
             doAsync { fetch!!.pause(did) }
         }

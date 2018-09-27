@@ -164,6 +164,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         AppCompatDelegate.setDefaultNightMode((o as String).toInt())
                         PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("theme_value", o).apply()
                         WEmisionProvider.update(activity!!)
+                        activity?.recreate()
                         //AestheticUtils.updateIsDarkMode(this@ConfigurationFragment.context!!, o == "2")
                         true
                     }

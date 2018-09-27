@@ -4,9 +4,12 @@ import fi.iki.elonen.NanoHTTPD
 import knf.kuma.download.FileAccessHelper
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.IOException
 import java.io.InputStream
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -58,7 +61,32 @@ object SelfServer {
         }
 
         private fun serveWeb(header: Map<String, String>, url: String): NanoHTTPD.Response {
-            var res: NanoHTTPD.Response?
+            var res: NanoHTTPD.Response? = null
+            val okHttpClient = OkHttpClient()
+            val request = Request.Builder().url(url)
+            val response = okHttpClient.newCall(request.build()).execute()
+            val body = response.body()
+            val total = body?.contentLength() ?: 0
+            val inputStream = body?.byteStream()
+            val pipedIn = PipedInputStream()
+            val pipedOut = PipedOutputStream(pipedIn)
+            if (inputStream != null) {
+                doAsync {
+                    noCrash {
+                        val b = ByteArray(16 * 1024)
+                        var len = inputStream.read(b, 0, 16 * 1024)
+                        while (len != -1) {
+                            pipedOut.write(b, 0, len)
+                            len = inputStream.read(b, 0, 16 * 1024)
+                        }
+                        pipedOut.flush()
+                        response.close()
+                    }
+                }
+                Thread.sleep(400)
+                res = createResponse(NanoHTTPD.Response.Status.OK, "video/mp4", pipedIn, total)
+            }
+            /*var res: NanoHTTPD.Response?
             val mime = "video/mp4"
             try {
                 val okHttpClient = OkHttpClient()
@@ -115,7 +143,7 @@ object SelfServer {
                 }
             } catch (e: Exception) {
                 res = getResponse("Forbidden: Reading file failed")
-            }
+            }*/
 
             return res ?: getResponse("Error 404: File not found")
         }

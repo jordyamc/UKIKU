@@ -241,6 +241,7 @@
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"/>
+        <activity android:name=".custom.ThemedControlsActivity"/>
 
         <provider
             android:name=".slices.AnimeSlice"

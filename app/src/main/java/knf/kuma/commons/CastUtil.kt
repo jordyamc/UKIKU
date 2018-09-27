@@ -8,10 +8,10 @@ import android.util.Log
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
-import es.munix.multidisplaycast.CastControlsActivity
 import es.munix.multidisplaycast.CastManager
 import es.munix.multidisplaycast.interfaces.CastListener
 import es.munix.multidisplaycast.interfaces.PlayStatusListener
+import knf.kuma.custom.ThemedControlsActivity
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.annotations.Contract
@@ -19,7 +19,6 @@ import xdroid.toaster.Toaster
 
 class CastUtil private constructor(private val context: Context) : CastListener, PlayStatusListener {
     val casting = MutableLiveData<String>()
-    private var isConnected = false
 
     private var loading: Snackbar? = null
 
@@ -40,11 +39,11 @@ class CastUtil private constructor(private val context: Context) : CastListener,
         var fPreview = preview
         try {
             if (connected()) {
-                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("samsung_mode", false) && !url!!.endsWith(":" + SelfServer.HTTP_PORT))
+                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("force_local_cast", false) && !url!!.endsWith(":" + SelfServer.HTTP_PORT))
                     fUrl = SelfServer.start(url, false)
                 if (!url!!.endsWith(":" + SelfServer.HTTP_PORT))
                     SelfServer.stop()
-                Log.e("Cast", url)
+                Log.e("Cast", fUrl)
                 startLoading(view)
                 setEid(eid)
                 if (isAid)
@@ -61,41 +60,33 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     fun onDestroy() {
-        CastManager.getInstance().unsetCastListener(javaClass.simpleName)
-        CastManager.getInstance().unsetPlayStatusListener(javaClass.simpleName)
+        loading?.safeDismiss()
+        loading = null
         CastManager.getInstance().onDestroy()
     }
 
     override fun isConnected() {
-        isConnected = true
+
     }
 
     override fun isDisconnected() {
-        isConnected = false
+        setEid(NO_PLAYING)
     }
 
     private fun getLoading(view: View): Snackbar {
-        return view.showSnackbar("Cargando...", duration = Snackbar.LENGTH_INDEFINITE).also { loading = it }
+        return view.showSnackbar("Cargando...", duration = Snackbar.LENGTH_INDEFINITE)
     }
 
     private fun startLoading(view: View) {
         launch(UI) {
-            try {
-                getLoading(view)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            loading = getLoading(view)
         }
     }
 
     private fun stopLoading() {
         launch(UI) {
-            try {
-                if (loading != null)
-                    loading!!.dismiss()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            loading?.safeDismiss()
+            loading = null
         }
     }
 
@@ -106,16 +97,20 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     fun openControls() {
-        context.startActivity(Intent(context, CastControlsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        context.startActivity(Intent(context, ThemedControlsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
     override fun onPlayStatusChanged(playStatus: Int) {
         when (playStatus) {
             PlayStatusListener.STATUS_START_PLAYING -> {
+                Log.e("Status", "On start playing")
                 stopLoading()
                 openControls()
             }
-            PlayStatusListener.STATUS_FINISHED, PlayStatusListener.STATUS_STOPPED -> setEid(NO_PLAYING)
+            PlayStatusListener.STATUS_FINISHED, PlayStatusListener.STATUS_STOPPED -> {
+                stopLoading()
+                setEid(NO_PLAYING)
+            }
             PlayStatusListener.STATUS_NOT_SUPPORT_LISTENER -> {
                 stopLoading()
                 setEid(NO_PLAYING)
@@ -129,7 +124,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     override fun onTotalDurationObtained(totalDuration: Long) {
-
+        Log.e("Duration", totalDuration.toString())
     }
 
     override fun onSuccessSeek() {

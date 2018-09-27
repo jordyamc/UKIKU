@@ -1,5 +1,6 @@
 package knf.kuma.seeing
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,14 +32,27 @@ class SeeingFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_seeing, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        error_text.text = when (arguments?.getInt("state", 0)) {
-            1 -> "No estas viendo ningun anime"
-            2 -> "No consideras ningun anime"
-            3 -> "No has terminado ningun anime"
-            4 -> "No has dropeado ningun anime"
-            else -> "No has marcado ningun anime"
+        when (arguments?.getInt("state", 0)) {
+            1 -> {
+                error_text.text = "No estas viendo ningun anime"
+                error_img.setImageResource(R.drawable.ic_watching)
+            }
+            2 -> {
+                error_text.text = "No consideras ningun anime"
+                error_img.setImageResource(R.drawable.ic_considering)
+            }
+            3 -> {
+                error_text.text = "No has terminado ningun anime"
+                error_img.setImageResource(R.drawable.ic_completed)
+            }
+            4 -> {
+                error_text.text = "No has dropeado ningun anime"
+                error_img.setImageResource(R.drawable.ic_droped)
+            }
+            else -> error_text.text = "No has marcado ningun anime"
         }
         recycler.adapter = adapter
     }

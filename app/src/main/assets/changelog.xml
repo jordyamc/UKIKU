@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="68" version="2.1.1">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Arreglos menores con CAST</change>
+        <change type="change">Mejora en imagenes de error en siguiendo</change>
+    </release>
     <release code="67" version="2.1">
-        <change type="fix">Error en pantalla de actualización</change>
+        <change type="fix">Errores generales</change>
         <change type="change">Mejoras graficas en algunas partes</change>
         <change type="change">Mejoras al modificar categorias en favoritos</change>
         <change type="new">Opcion para cambiar tono de notificación en recientes</change>

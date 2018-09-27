@@ -22,6 +22,7 @@ import com.thin.downloadmanager.DownloadStatusListenerV1
 import com.thin.downloadmanager.ThinDownloadManager
 import knf.kuma.R
 import knf.kuma.commons.getUpdateDir
+import knf.kuma.download.DownloadManager
 import kotlinx.android.synthetic.main.activity_updater.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
@@ -112,6 +113,7 @@ class UpdateActivity : AppCompatActivity() {
     }
 
     private fun install() {
+        DownloadManager.pauseAll()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "knf.kuma.fileprovider", update))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)

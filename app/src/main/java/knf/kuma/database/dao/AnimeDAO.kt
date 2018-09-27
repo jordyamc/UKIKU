@@ -19,6 +19,9 @@ interface AnimeDAO {
     @get:Query("SELECT * FROM AnimeObject ORDER BY name")
     val all: DataSource.Factory<Int, AnimeObject>
 
+    @get:Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión'")
+    val allInEmission: List<AnimeObject>
+
     @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY name")
     val animeDir: DataSource.Factory<Int, AnimeObject>
 

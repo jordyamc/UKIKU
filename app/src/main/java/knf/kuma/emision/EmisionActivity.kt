@@ -55,8 +55,7 @@ class EmisionActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
         val show = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_hidden", false)
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("show_hidden", !show).apply()
         invalidateOptionsMenu()
-        if (pagerAdapter != null)
-            pagerAdapter!!.reloadPages()
+        pagerAdapter?.reloadPages()
         return super.onOptionsItemSelected(item)
     }
 

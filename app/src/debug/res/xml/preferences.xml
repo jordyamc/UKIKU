@@ -125,8 +125,8 @@
             android:title="Reproductor experimental"/>
         <!--<SwitchPreference
             android:defaultValue="false"
-            android:icon="@drawable/ic_cast_conf"
-            android:key="samsung_mode"
+            android:icon="@drawable/ic_samsung_tv"
+            android:key="force_local_cast"
             android:summary="Usar cast local para animes descargados y streaming"
             android:title="Cast local"/>-->
     </PreferenceCategory>

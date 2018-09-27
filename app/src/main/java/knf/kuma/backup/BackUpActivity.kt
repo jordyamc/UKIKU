@@ -21,6 +21,7 @@ import com.dropbox.core.android.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import knf.kuma.R
 import knf.kuma.backup.objects.BackupObject
+import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showSnackbar
 import knf.kuma.custom.SyncItemView
@@ -81,16 +82,20 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
     }
 
     override fun onAction(syncItemView: SyncItemView, id: String, isBackup: Boolean) {
-        if (isBackup)
-            BUUtils.backup(colorChanger, id, object : BUUtils.BackupInterface {
-                override fun onResponse(backupObject: BackupObject<*>?) {
-                    if (backupObject == null)
-                        colorChanger.showSnackbar("Error al respaldar")
-                    syncItemView.enableBackup(backupObject, this@BackUpActivity)
-                }
-            })
-        else
-            BUUtils.restoreDialog(colorChanger, id, syncItemView.bakup!!)
+        noCrash {
+            if (isBackup)
+                BUUtils.backup(colorChanger, id, object : BUUtils.BackupInterface {
+                    override fun onResponse(backupObject: BackupObject<*>?) {
+                        noCrash {
+                            if (backupObject == null)
+                                colorChanger.showSnackbar("Error al respaldar")
+                            syncItemView.enableBackup(backupObject, this@BackUpActivity)
+                        }
+                    }
+                })
+            else
+                BUUtils.restoreDialog(colorChanger, id, syncItemView.bakup!!)
+        }
     }
 
     private fun onLogOut() {

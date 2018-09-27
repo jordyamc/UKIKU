@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.app.SearchSupportFragment
 import androidx.leanback.widget.*
 import androidx.lifecycle.Observer
+import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.tv.anime.AnimePresenter
@@ -48,7 +49,9 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
     }
 
     override fun recognizeSpeech() {
-        startActivityForResult(recognizerIntent, 5589)
+        noCrash {
+            startActivityForResult(recognizerIntent, 5589)
+        }
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {

@@ -17,7 +17,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.directory.viewholders.DirMainFragmentHolder
 
 class DirectoryFragment : BottomFragment() {
-    private lateinit var fragmentHolder: DirMainFragmentHolder
+    private var fragmentHolder: DirMainFragmentHolder? = null
     private var snackbar: Snackbar? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -57,12 +57,12 @@ class DirectoryFragment : BottomFragment() {
     }
 
     fun onChangeOrder() {
-        fragmentHolder.onChangeOrder()
+        fragmentHolder?.onChangeOrder()
     }
 
     override fun onReselect() {
         EAHelper.enter1("D")
-        fragmentHolder.onReselect()
+        fragmentHolder?.onReselect()
     }
 
     companion object {

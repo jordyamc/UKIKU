@@ -117,7 +117,11 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
                 val result = DiffUtil.calculateDiff(SeeingDiff(this@SeeingAdapter.list, list))
                 launch(UI) {
                     this@SeeingAdapter.list = list
-                    result.dispatchUpdatesTo(this@SeeingAdapter)
+                    try {
+                        result.dispatchUpdatesTo(this@SeeingAdapter)
+                    } catch (e: Exception) {
+                        notifyDataSetChanged()
+                    }
                 }
             }
         }

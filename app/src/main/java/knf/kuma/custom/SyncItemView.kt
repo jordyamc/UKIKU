@@ -9,6 +9,7 @@ import knf.kuma.R
 import knf.kuma.backup.BUUtils
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.Network
+import knf.kuma.commons.noCrash
 import kotlinx.android.synthetic.main.sync_item_layout.view.*
 
 class SyncItemView : RelativeLayout {
@@ -57,18 +58,20 @@ class SyncItemView : RelativeLayout {
 
     fun enableBackup(backupObject: BackupObject<*>?, onClick: OnClick) {
         post {
-            if (Network.isConnected) {
-                backup?.isEnabled = true
-                if (backupObject == null) {
-                    date.text = "Sin respaldo"
+            noCrash {
+                if (Network.isConnected) {
+                    backup?.isEnabled = true
+                    if (backupObject == null)
+                        date.text = "Sin respaldo"
+                    else {
+                        date.text = backupObject.date
+                        restore?.isEnabled = true
+                    }
+                    backup?.setOnClickListener { noCrash { onClick.onAction(this@SyncItemView, actionId, true) } }
+                    restore?.setOnClickListener { noCrash { onClick.onAction(this@SyncItemView, actionId, false) } }
                 } else {
-                    date.text = backupObject.date
-                    restore?.isEnabled = true
+                    date.text = "Sin internet"
                 }
-                backup?.setOnClickListener { onClick.onAction(this@SyncItemView, actionId, true) }
-                restore?.setOnClickListener { onClick.onAction(this@SyncItemView, actionId, false) }
-            } else {
-                date.text = "Sin internet"
             }
         }
 

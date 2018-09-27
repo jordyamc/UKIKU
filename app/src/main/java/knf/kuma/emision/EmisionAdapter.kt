@@ -68,15 +68,23 @@ class EmisionAdapter internal constructor(private val fragment: Fragment) : Recy
         return list.size
     }
 
-    fun update(list: MutableList<AnimeObject>, callback: () -> Unit) {
+    fun update(list: MutableList<AnimeObject>, animate: Boolean = true, callback: () -> Unit) {
         if (PrefsUtil.useSmoothAnimations)
             doAsync {
                 this@EmisionAdapter.blacklist = PreferenceManager.getDefaultSharedPreferences(fragment.context).getStringSet("emision_blacklist", LinkedHashSet())!!
                 this@EmisionAdapter.showHidden = PreferenceManager.getDefaultSharedPreferences(fragment.context).getBoolean("show_hidden", false)
-                val result = DiffUtil.calculateDiff(EmissionDiff(this@EmisionAdapter.list, list), true)
+                val result = if (animate) DiffUtil.calculateDiff(EmissionDiff(this@EmisionAdapter.list, list), true) else null
+                this@EmisionAdapter.list = list
                 launch(UI) {
-                    this@EmisionAdapter.list = list
-                    result.dispatchUpdatesTo(this@EmisionAdapter)
+                    try {
+                        if (animate)
+                            result?.dispatchUpdatesTo(this@EmisionAdapter)
+                        else
+                            notifyDataSetChanged()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        notifyDataSetChanged()
+                    }
                     callback.invoke()
                 }
             }

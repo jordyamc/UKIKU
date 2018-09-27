@@ -121,6 +121,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
                                 recordsDAO.add(RecordObject.fromRecent(recentObject))
                                 holder.setSeen(true)
+                                holder.setLocked(false)
                             }
 
                             override fun onProgressIndicator(boolean: Boolean) {

@@ -22,9 +22,9 @@ class ExplorerActivity : AppCompatActivity(), OnFileStateChange {
         setContentView(R.layout.activity_explorer)
         toolbar.title = "Explorador"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
-        toolbar!!.setNavigationOnClickListener { onBackPressed() }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        toolbar?.setNavigationOnClickListener { onBackPressed() }
         if (savedInstanceState == null)
             ExplorerCreator.onDestroy()
         pager.offscreenPageLimit = 2

@@ -18,6 +18,7 @@ import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import knf.kuma.jobscheduler.DirUpdateJob
+import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DirectoryPage
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
@@ -63,10 +64,20 @@ class DirectoryService : IntentService("Directory update") {
         SSLSkipper.skip()
         val jspoon = Jspoon.create()
         setStatus(STATE_PARTIAL)
+        doEmissionRefresh(jspoon, animeDAO)
         doPartialSearch(jspoon, animeDAO)
         setStatus(STATE_FULL)
         doFullSearch(jspoon, animeDAO)
         cancelForeground()
+    }
+
+    private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
+        animeDAO.allInEmission.forEach {
+            noCrash {
+                val animeObject = AnimeObject(it.link, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(Jsoup.connect(it.link).cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get().outerHtml()))
+                animeDAO.updateAnime(animeObject)
+            }
+        }
     }
 
     @SuppressLint("ApplySharedPref")

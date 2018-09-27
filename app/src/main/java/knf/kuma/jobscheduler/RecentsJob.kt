@@ -99,7 +99,7 @@ class RecentsJob : Job() {
             setContentText(recentObject.chapter)
             priority = NotificationCompat.PRIORITY_MAX
             val tone = FileAccessHelper.INSTANCE.toneFile
-            if (tone != null) {
+            if (tone.exists())
                 setSound(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             val uri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tone)
@@ -108,7 +108,6 @@ class RecentsJob : Job() {
                         } else
                             Uri.fromFile(tone)
                 )
-            }
             setLargeIcon(getBitmap(recentObject))
             setAutoCancel(true)
             setOnlyAlertOnce(true)
@@ -118,7 +117,7 @@ class RecentsJob : Job() {
             setGroup(RECENTS_GROUP)
         }.build()
         notificationDAO.add(obj)
-        manager!!.notify(obj.key, notification)
+        manager?.notify(obj.key, notification)
         notifySummary()
     }
 
@@ -173,7 +172,7 @@ class RecentsJob : Job() {
                 .setDeleteIntent(PendingIntent.getBroadcast(context, System.currentTimeMillis().toInt(), summaryBroadcast, PendingIntent.FLAG_UPDATE_CURRENT))
                 .build()
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("group_notifications", true))
-            manager!!.notify(KEY_SUMMARY, notification)
+            manager?.notify(KEY_SUMMARY, notification)
     }
 
     companion object {

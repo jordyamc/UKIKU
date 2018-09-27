@@ -39,9 +39,10 @@ class EmisionFragment : Fragment() {
         if (context != null)
             CacheDB.INSTANCE.animeDAO().getByDay(arguments!!.getInt("day", 1), blacklist!!).observe(this, Observer { animeObjects ->
                 progress.visibility = View.GONE
-                if (isFirst && animeObjects != null && animeObjects.isNotEmpty()) {
+                if (animeObjects != null)
+                    adapter?.update(animeObjects as MutableList<AnimeObject>, false) { smoothScroll() }
+                if (isFirst) {
                     isFirst = false
-                    adapter?.update(animeObjects as MutableList<AnimeObject>) { smoothScroll() }
                     recycler.scheduleLayoutAnimation()
                     checkStates(animeObjects)
                 }
@@ -79,7 +80,7 @@ class EmisionFragment : Fragment() {
     internal fun reloadList() {
         if (context != null)
             CacheDB.INSTANCE.animeDAO().getByDay(arguments!!.getInt("day", 1), blacklist!!).observe(this, Observer { animeObjects ->
-                error!!.visibility = View.GONE
+                error?.visibility = View.GONE
                 if (animeObjects != null && animeObjects.isNotEmpty())
                     adapter?.update(animeObjects as MutableList<AnimeObject>) { smoothScroll() }
                 else
