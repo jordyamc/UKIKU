@@ -7,6 +7,7 @@ import android.net.Uri
 import android.preference.PreferenceManager
 
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.notNull
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
@@ -36,8 +37,9 @@ object QueueManager {
         CacheDB.INSTANCE.queueDAO().remove(list)
     }
 
-    fun remove(eid: String) {
-        CacheDB.INSTANCE.queueDAO().removeByEID(eid)
+    fun remove(eid: String?) {
+        if (eid.notNull())
+            CacheDB.INSTANCE.queueDAO().removeByEID(eid!!)
     }
 
     fun removeAll(aid: String) {

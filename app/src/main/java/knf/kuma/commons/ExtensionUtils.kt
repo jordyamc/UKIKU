@@ -191,3 +191,11 @@ fun File.safeDelete(log: Boolean = false) {
             e.printStackTrace()
     }
 }
+
+fun Any?.isNull(): Boolean {
+    return this == null
+}
+
+fun Any?.notNull(): Boolean {
+    return this != null
+}

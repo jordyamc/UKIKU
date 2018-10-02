@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import knf.kuma.commons.FileUtil
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.getPackage
+import knf.kuma.commons.isNull
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.*
@@ -172,11 +173,13 @@ class FileAccessHelper private constructor(private val context: Context) {
     }
 
     @JvmOverloads
-    fun delete(file_name: String, listener: DeleteListener? = null) {
+    fun delete(file_name: String?, listener: DeleteListener? = null) {
+        if (file_name.isNull())
+            return
         doAsync {
             try {
                 if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
-                    val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                    val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
                     file.delete()
                     val dir = file.parentFile
                     if (dir.listFiles() == null || dir.listFiles().isEmpty())
@@ -184,7 +187,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                 } else {
                     val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
                     if (documentFile != null && documentFile.exists()) {
-                        val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
                         file!!.delete()
                         val dir = file.parentFile
                         if (dir != null && dir.listFiles().isEmpty())

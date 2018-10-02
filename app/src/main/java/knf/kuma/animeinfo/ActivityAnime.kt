@@ -217,7 +217,11 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_share -> share()
-            R.id.action_comments -> CommentsDialog(chapters).show(this)
+            R.id.action_comments ->
+                if (chapters.isNotEmpty())
+                    CommentsDialog(chapters).show(this)
+                else
+                    Toaster.toast("Aun no hay episodios!")
         }
         return true
     }

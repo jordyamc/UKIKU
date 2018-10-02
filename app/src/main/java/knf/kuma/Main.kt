@@ -52,6 +52,7 @@ import knf.kuma.favorite.FavoriteFragment
 import knf.kuma.jobscheduler.DirUpdateJob
 import knf.kuma.jobscheduler.RecentsJob
 import knf.kuma.jobscheduler.UpdateJob
+import knf.kuma.news.NewsActivity
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.queue.QueueActivity
 import knf.kuma.random.RandomActivity
@@ -388,6 +389,7 @@ class Main : AppCompatActivity(),
             R.id.drawer_emision -> EmisionActivity.open(this)
             R.id.drawer_queue -> QueueActivity.open(this)
             R.id.drawer_suggestions -> RecommendActivity.open(this)
+            R.id.drawer_news -> NewsActivity.open(this)
             R.id.drawer_records -> RecordActivity.open(this)
             R.id.drawer_seeing -> SeeingActivity.open(this)
             R.id.drawer_random -> RandomActivity.open(this)
@@ -516,7 +518,8 @@ class Main : AppCompatActivity(),
     }
 
     override fun onDestroy() {
-        CastUtil.get().onDestroy()
+        if (!isChangingConfigurations)
+            CastUtil.get().onDestroy()
         super.onDestroy()
     }
 
@@ -534,8 +537,8 @@ class Main : AppCompatActivity(),
                     Log.e("CloudflareBypass", "is needed")
                     clearCookies()
                     launch(UI) {
-                        webView!!.settings.javaScriptEnabled = true
-                        webView!!.webViewClient = object : WebViewClient() {
+                        webView?.settings?.javaScriptEnabled = true
+                        webView?.webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                 Log.e("CloudflareBypass", "Override ${request?.url}")
                                 if (request?.url.toString() == "https://animeflv.net/") {
@@ -549,8 +552,8 @@ class Main : AppCompatActivity(),
                                 return false
                             }
                         }
-                        webView!!.settings.userAgentString = userAgent
-                        webView!!.loadUrl("https://animeflv.net/")
+                        webView?.settings?.userAgentString = userAgent
+                        webView?.loadUrl("https://animeflv.net/")
                     }
                 } else {
                     Log.e("CloudflareBypass", "Not needed")

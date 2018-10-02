@@ -27,6 +27,10 @@
         android:icon="@drawable/ic_suggestions"
         android:title="Sugerencias"/>
     <item
+        android:id="@+id/drawer_news"
+        android:icon="@drawable/ic_news"
+        android:title="Noticias"/>
+    <item
         android:id="@+id/drawer_records"
         android:icon="@drawable/ic_record"
         android:title="Historial"/>

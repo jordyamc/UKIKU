@@ -39,8 +39,9 @@ class GenresDialog : DialogFragment() {
                         selected.remove(genres[index])
                 }.setPositiveButton("BUSCAR") { _, _ ->
                     selected.sort()
-                    listener!!.onOkay(selected)
-                }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }.create()
+                    listener?.onOkay(selected)
+                }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }
+                .create()
     }
 
     override fun show(manager: FragmentManager, tag: String) {
@@ -49,7 +50,14 @@ class GenresDialog : DialogFragment() {
         } catch (e: Exception) {
             //
         }
+    }
 
+    override fun dismiss() {
+        try {
+            super.dismiss()
+        } catch (e: Exception) {
+            //
+        }
     }
 
     interface MultiChoiceListener {

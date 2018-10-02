@@ -242,6 +242,8 @@
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"/>
         <activity android:name=".custom.ThemedControlsActivity"/>
+        <activity android:name=".news.NewsActivity"/>
+        <activity android:name=".news.NewsDetailsActivity"/>
 
         <provider
             android:name=".slices.AnimeSlice"

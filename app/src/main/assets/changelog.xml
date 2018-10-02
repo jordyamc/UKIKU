@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="69" version="2.2">
+        <change type="fix">Errores generales</change>
+        <change type="new">Sección simple de noticias</change>
+    </release>
     <release code="68" version="2.1.1">
         <change type="fix">Errores generales</change>
         <change type="fix">Arreglos menores con CAST</change>

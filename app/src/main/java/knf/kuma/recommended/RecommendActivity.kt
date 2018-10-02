@@ -131,10 +131,8 @@ class RecommendActivity : AppCompatActivity() {
                     }
                 } else
                     runOnUiThread {
-
                         loading.visibility = View.GONE
                         error.visibility = View.VISIBLE
-
                     }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -152,7 +150,7 @@ class RecommendActivity : AppCompatActivity() {
         for (list in lists) {
             val removeList = ArrayList<AnimeObject>()
             for (animeObject in list)
-                if (favsDAO.isFav(animeObject.key) || seeingDAO.isSeeing(animeObject.aid!!)!!)
+                if (favsDAO.isFav(animeObject.key) || seeingDAO.isSeeing(animeObject.aid!!))
                     removeList.add(animeObject)
             list.removeAll(removeList)
         }

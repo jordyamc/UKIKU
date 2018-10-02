@@ -27,8 +27,8 @@ interface SeeingDAO {
     @Query("SELECT * FROM seeingobject WHERE aid LIKE :aid")
     fun getByAid(aid: String): SeeingObject?
 
-    @Query("SELECT count(*) FROM seeingobject WHERE aid LIKE :aid")
-    fun isSeeing(aid: String): Boolean?
+    @Query("SELECT count(*) FROM seeingobject WHERE aid = :aid")
+    fun isSeeing(aid: String): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun add(seeingObject: SeeingObject)

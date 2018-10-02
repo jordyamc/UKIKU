@@ -11,6 +11,8 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.notNull
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.queue.QueueManager
@@ -78,16 +80,16 @@ class DownloadService : IntentService("Download service") {
                 cancelForeground()
                 return
             }
-            current!!.state = DownloadObject.DOWNLOADING
+            current?.state = DownloadObject.DOWNLOADING
             downloadsDAO.update(current!!)
             val data = ByteArray(bufferSize * 1024)
             var count: Int = inputStream.read(data, 0, bufferSize * 1024)
             while (count >= 0) {
                 val revised = downloadsDAO.getByEid(intent.getStringExtra("eid"))
                 if (revised == null) {
-                    FileAccessHelper.INSTANCE.delete(file!!)
+                    FileAccessHelper.INSTANCE.delete(file)
                     downloadsDAO.delete(current!!)
-                    QueueManager.remove(current!!.eid!!)
+                    QueueManager.remove(current?.eid)
                     cancelForeground()
                     return
                 }
@@ -108,9 +110,9 @@ class DownloadService : IntentService("Download service") {
             completedNotification()
         } catch (e: Exception) {
             e.printStackTrace()
-            FileAccessHelper.INSTANCE.delete(file!!)
+            FileAccessHelper.INSTANCE.delete(file)
             downloadsDAO.delete(current!!)
-            QueueManager.remove(current!!.eid!!)
+            QueueManager.remove(current?.eid)
             errorNotification()
         }
 
@@ -171,24 +173,25 @@ class DownloadService : IntentService("Download service") {
                 .setWhen(current!!.time)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
-        manager!!.notify(current!!.eid!!.toInt(), notification)
+        manager?.notify(current?.eid?.toInt() ?: 0, notification)
         cancelForeground()
     }
 
     private fun cancelForeground() {
         stopForeground(true)
-        if (manager != null)
-            manager!!.cancel(DOWNLOADING_ID)
+        manager?.cancel(DOWNLOADING_ID)
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
-        cancelForeground()
-        FileAccessHelper.INSTANCE.delete(file!!)
-        if (current != null) {
-            if (manager != null)
-                errorNotification()
-            downloadsDAO.delete(current!!)
-            QueueManager.remove(current!!.eid!!)
+        noCrash {
+            cancelForeground()
+            FileAccessHelper.INSTANCE.delete(file)
+            if (current.notNull()) {
+                if (manager.notNull())
+                    errorNotification()
+                downloadsDAO.delete(current!!)
+                QueueManager.remove(current?.eid)
+            }
         }
         super.onTaskRemoved(rootIntent)
     }
