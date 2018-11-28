@@ -25,17 +25,17 @@ import com.crashlytics.android.answers.ShareEvent
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import es.munix.multidisplaycast.CastManager
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.*
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.widgets.emision.WEListItem
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import xdroid.toaster.Toaster
 import java.util.*
 
@@ -63,7 +63,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
         else
             viewModel?.init(this@ActivityAnime, intent.dataString!!, intent.getBooleanExtra("persist", true))
         holder = AnimeActivityHolder(this@ActivityAnime)
-        launch(UI) {
+        doOnUI {
             if (intent.getBooleanExtra("notification", false))
                 sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
             setSupportActionBar(holder?.toolbar)
@@ -76,7 +76,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
 
     private fun load() {
         viewModel?.liveData?.observe(this, Observer { animeObject ->
-            launch(UI) {
+            doOnUI {
                 if (animeObject != null) {
                     Crashlytics.setString("screen", "Anime: " + animeObject.name)
                     Answers.getInstance().logContentView(ContentViewEvent().putContentName(animeObject.name).putContentType(animeObject.type).putContentId(animeObject.aid))
@@ -109,7 +109,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
     }
 
     override fun onFabClicked(actionButton: FloatingActionButton) {
-        launch(UI) {
+        doOnUI {
             setResult()
             val isfav = dao.isFav(favoriteObject!!.key)
             val isSeeing = /*seeingDAO.getByAid(favoriteObject!!.aid!!) != null*/false
@@ -125,6 +125,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                 holder?.setFABState(true)
                 dao.addFav(favoriteObject!!)
                 RecommendHelper.registerAll(genres, RankType.FAV)
+                AchievementManager.onFavAdded(favoriteObject!!)
             }
         }
     }
@@ -232,6 +233,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                     .setType("text/plain")
                     .putExtra(Intent.EXTRA_TEXT, favoriteObject!!.name + "\n" + favoriteObject!!.link), "Compartir"))
             Answers.getInstance().logShare(ShareEvent().putContentName(favoriteObject!!.name).putContentId(favoriteObject!!.aid))
+            AchievementManager.onShare()
         } catch (e: ActivityNotFoundException) {
             Toaster.toast("No se encontraron aplicaciones para enviar")
         }

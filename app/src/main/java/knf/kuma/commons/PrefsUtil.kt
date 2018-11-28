@@ -30,6 +30,10 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("dir_order", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("dir_order", value).apply()
 
+    var achievementsVersion: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("achievements_version", 0)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("achievements_version", value).apply()
+
     val isChapsAsc: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("asc_chapters", false)
 
@@ -53,6 +57,18 @@ object PrefsUtil {
 
     val useSmoothAnimations: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("smooth_animations", true)
+
+    var isAchievementsOmited: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("achievements_omited", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("achievements_omited", value).apply()
+
+    var lastStart: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("last_start", System.currentTimeMillis())
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("last_start", value).apply()
+
+    var firstStart: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("first_start", 0)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("first_start", value).apply()
 
     fun init(context: Context) {
         PrefsUtil.context = context

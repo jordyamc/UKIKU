@@ -21,7 +21,7 @@ import knf.kuma.favorite.objects.InfoContainer
 import knf.kuma.pojos.FavoriteObject
 import java.util.*
 
-class FavsSectionAdapter(private val fragment: Fragment, private val recyclerView: RecyclerView) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FavsSectionAdapter(private val fragment: Fragment, private val recyclerView: RecyclerView, private val showSections: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val context: Context?
     private val listener: OnMoveListener
@@ -58,10 +58,11 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
             holder.title.text = favoriteObject.name
             holder.type.text = favoriteObject.type
             holder.cardView.setOnClickListener { ActivityAnime.open(fragment, favoriteObject, holder.imageView) }
-            holder.cardView.setOnLongClickListener {
-                listener.onSelect(favoriteObject)
-                true
-            }
+            if (showSections)
+                holder.cardView.setOnLongClickListener {
+                    listener.onSelect(favoriteObject)
+                    true
+                }
         }
     }
 

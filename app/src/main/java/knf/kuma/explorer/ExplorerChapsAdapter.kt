@@ -26,8 +26,6 @@ import knf.kuma.pojos.ExplorerObject
 import knf.kuma.pojos.RecordObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import java.io.File
 import java.io.FileOutputStream
@@ -64,7 +62,7 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
             recordsDAO.add(RecordObject.fromDownloaded(chapObject))
             holder.seenOverlay.setSeen(true, true)
             if (CastUtil.get().connected()) {
-                CastUtil.get().play(fragment.activity!!, recyclerView, chapObject.eid, SelfServer.start(chapObject.fileName, true), chapObject.title, "Episodio " + chapObject.chapter, chapObject.aid, true)
+                CastUtil.get().play(fragment.activity!!, recyclerView, chapObject.eid, SelfServer.start(chapObject.fileName, true), chapObject.title, "Episodio " + chapObject.chapter, chapObject.chapPreviewLink, chapObject.thumb.isNull())
             } else {
                 ServersFactory.startPlay(context!!, chapObject.chapTitle, chapObject.fileName)
             }
@@ -79,7 +77,7 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
             }
             true
         }
-        holder.action.setOnClickListener { _ ->
+        holder.action.setOnClickListener {
             MaterialDialog(context!!).safeShow {
                 message(text = "¿Eliminar el episodio ${chapObject.chapter} de ${chapObject.title}?")
                 positiveButton(text = "CONFIRMAR") {
@@ -96,14 +94,14 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
 
     private fun delete(obj: ExplorerObject.FileDownObj, position: Int) {
         if (position < 0) return
-        FileAccessHelper.INSTANCE.delete(obj.fileName)
+        FileAccessHelper.INSTANCE.delete(obj.fileName, true)
         downloadsDAO.deleteByEid(obj.eid)
         QueueManager.remove(obj.eid)
         explorerObject.chapters.removeAt(position)
-        launch(UI) { notifyItemRemoved(position) }
+        doOnUI { notifyItemRemoved(position) }
         if (explorerObject.chapters.size == 0) {
             explorerDAO.delete(explorerObject)
-            clearInterface!!.onClear()
+            clearInterface?.onClear()
         } else {
             explorerObject.count = explorerObject.chapters.size
             explorerDAO.update(explorerObject)
@@ -113,10 +111,10 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
     internal fun deleteAll() {
         doAsync {
             for ((i, obj) in explorerObject.chapters.withIndex()) {
-                FileAccessHelper.INSTANCE.delete(obj.fileName)
+                FileAccessHelper.INSTANCE.delete(obj.fileName, true)
                 downloadsDAO.deleteByEid(obj.eid)
                 QueueManager.remove(obj.eid)
-                launch(UI) {
+                doOnUI {
                     notifyItemRemoved(i)
                 }
             }
@@ -128,6 +126,7 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
     private fun loadThumb(fileDownObj: ExplorerObject.FileDownObj, imageView: ImageView?) {
         val file = File(context!!.cacheDir, explorerObject.fileName + "_" + fileDownObj.chapter.toLowerCase() + ".png")
         if (file.exists()) {
+            fileDownObj.thumb = file
             PicassoSingle[context].load(file).into(imageView)
         } else {
             doAsync {
@@ -138,10 +137,11 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
                     } else {
                         file.createNewFile()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(file))
-                        launch(UI) { PicassoSingle[this@ExplorerChapsAdapter.context].load(file).into(imageView) }
+                        fileDownObj.thumb = file
+                        doOnUI { PicassoSingle[this@ExplorerChapsAdapter.context].load(file).into(imageView) }
                     }
                 } catch (e: Exception) {
-                    launch(UI) { PicassoSingle[this@ExplorerChapsAdapter.context].load(R.drawable.ic_no_thumb).fit().into(imageView) }
+                    doOnUI { PicassoSingle[this@ExplorerChapsAdapter.context].load(R.drawable.ic_no_thumb).fit().into(imageView) }
                 }
             }
         }

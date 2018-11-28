@@ -8,9 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.isSameContent
 import kotlinx.android.synthetic.main.item_news.view.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<NewsAdapter.NewsHolder>() {
 
@@ -30,6 +31,7 @@ class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<NewsAd
         holder.title.text = newsObject.title
         holder.description.text = newsObject.description
         holder.card.onClick {
+            AchievementManager.onNewsOpened()
             NewsCreator.openNews(activity, newsObject, holder.card, holder.title, holder.description)
         }
     }

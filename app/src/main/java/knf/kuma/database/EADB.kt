@@ -14,7 +14,7 @@ abstract class EADB : RoomDatabase() {
     abstract fun eaDAO(): EaDAO
 
     companion object {
-        var INSTANCE: EADB? = null
+        lateinit var INSTANCE: EADB
 
         fun init(context: Context) {
             INSTANCE = Room.databaseBuilder(context, EADB::class.java, "ee-db")

@@ -18,6 +18,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.github.stephenvinouze.materialnumberpickercore.MaterialNumberPicker
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.bind
 import knf.kuma.commons.safeShow
@@ -28,6 +29,7 @@ class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     private val refreshLayout: SwipeRefreshLayout by bind(R.id.refresh)
     val recyclerView: RecyclerView by bind(R.id.recycler)
     private var adapter: RandomAdapter? = null
+    private var counter = 0
 
     private val layout: Int
         @LayoutRes
@@ -55,6 +57,9 @@ class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     }
 
     private fun refreshList() {
+        counter++
+        if (counter >= 15)
+            AchievementManager.unlock(32)
         Handler().postDelayed({
             CacheDB.INSTANCE.animeDAO().getRandom(PreferenceManager.getDefaultSharedPreferences(this@RandomActivity).getInt("random_limit", 25))
                     .observe(this@RandomActivity, Observer { animeObjects ->

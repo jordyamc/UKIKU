@@ -1,16 +1,12 @@
 package knf.kuma.retrofit
 
 import android.content.Context
-import android.preference.PreferenceManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.crashlytics.android.Crashlytics
-import knf.kuma.commons.BypassUtil
-import knf.kuma.commons.Network
-import knf.kuma.commons.NoSSLOkHttpClient
-import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.RecentObject
@@ -98,29 +94,32 @@ class Repository {
         return data
     }
 
-    fun getAnimeDir(context: Context): LiveData<PagedList<AnimeObject>> {
-        return when (PreferenceManager.getDefaultSharedPreferences(context).getInt("dir_order", 0)) {
+    fun getAnimeDir(): LiveData<PagedList<AnimeObject>> {
+        return when (PrefsUtil.dirOrder) {
             0 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDir, 25).build()
             1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirVotes, 25).build()
             2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirID, 25).build()
+            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirAdded, 25).build()
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDir, 25).build()
         }
     }
 
-    fun getOvaDir(context: Context): LiveData<PagedList<AnimeObject>> {
-        return when (PreferenceManager.getDefaultSharedPreferences(context).getInt("dir_order", 0)) {
+    fun getOvaDir(): LiveData<PagedList<AnimeObject>> {
+        return when (PrefsUtil.dirOrder) {
             0 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDir, 25).build()
             1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirVotes, 25).build()
             2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirID, 25).build()
+            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirAdded, 25).build()
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDir, 25).build()
         }
     }
 
-    fun getMovieDir(context: Context): LiveData<PagedList<AnimeObject>> {
-        return when (PreferenceManager.getDefaultSharedPreferences(context).getInt("dir_order", 0)) {
+    fun getMovieDir(): LiveData<PagedList<AnimeObject>> {
+        return when (PrefsUtil.dirOrder) {
             0 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDir, 25).build()
             1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirVotes, 25).build()
             2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirID, 25).build()
+            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirAdded, 25).build()
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDir, 25).build()
         }
     }

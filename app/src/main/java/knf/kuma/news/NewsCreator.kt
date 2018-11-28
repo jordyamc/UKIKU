@@ -10,8 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import knf.kuma.commons.doOnUI
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -49,12 +48,12 @@ object NewsCreator {
                             title, link, date, author, categories, description, content, commentsFeed, commentsCount
                     ))
                 }
-                launch(UI) {
+                doOnUI {
                     liveData.value = news
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                launch(UI) {
+                doOnUI {
                     liveData.value = null
                 }
             }
@@ -62,7 +61,7 @@ object NewsCreator {
     }
 
     fun destroy() {
-        launch(UI) {
+        doOnUI {
             liveData.value = null
         }
     }

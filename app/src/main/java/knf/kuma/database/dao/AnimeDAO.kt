@@ -31,6 +31,9 @@ interface AnimeDAO {
     @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` ASC")
     val animeDirID: DataSource.Factory<Int, AnimeObject>
 
+    @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` DESC")
+    val animeDirAdded: DataSource.Factory<Int, AnimeObject>
+
     @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY name")
     val ovaDir: DataSource.Factory<Int, AnimeObject>
 
@@ -40,6 +43,9 @@ interface AnimeDAO {
     @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY `key` ASC")
     val ovaDirID: DataSource.Factory<Int, AnimeObject>
 
+    @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY `key` DESC")
+    val ovaDirAdded: DataSource.Factory<Int, AnimeObject>
+
     @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'Película' ORDER BY name")
     val movieDir: DataSource.Factory<Int, AnimeObject>
 
@@ -48,6 +54,9 @@ interface AnimeDAO {
 
     @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'Película' ORDER BY `key` ASC")
     val movieDirID: DataSource.Factory<Int, AnimeObject>
+
+    @get:Query("SELECT * FROM AnimeObject WHERE type LIKE 'Película' ORDER BY `key` DESC")
+    val movieDirAdded: DataSource.Factory<Int, AnimeObject>
 
     @get:Query("SELECT count(*) FROM AnimeObject")
     val count: Int
@@ -126,6 +135,12 @@ interface AnimeDAO {
 
     @Query("SELECT count(*) FROM AnimeObject WHERE link LIKE :link")
     fun existLink(link: String): Boolean
+
+    @Query("SELECT count(*) FROM animeobject WHERE aid = :aid AND genres LIKE :genre")
+    fun hasGenre(aid: String, genre: String): Boolean
+
+    @Query("SELECT count(*) FROM animeobject WHERE aid = :aid AND state = 'Finalizado'")
+    fun isCompleted(aid: String): Boolean
 
     @Query("SELECT * FROM AnimeObject WHERE link LIKE :link")
     fun getByLink(link: String): AnimeObject?

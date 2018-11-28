@@ -2,13 +2,12 @@ package knf.kuma.favorite
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
 import knf.kuma.favorite.objects.FavSorter
 import knf.kuma.favorite.objects.InfoContainer
 import knf.kuma.pojos.FavSection
 import knf.kuma.pojos.FavoriteObject
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import java.util.*
 
@@ -72,7 +71,7 @@ object FavSectionHelper {
     }
 
     private fun setLiveData(list: MutableList<FavoriteObject>) {
-        launch(UI) { liveData.setValue(list) }
+        doOnUI { liveData.setValue(list) }
     }
 
     fun reload() {

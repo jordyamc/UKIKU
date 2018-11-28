@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.safeShow
@@ -210,7 +211,7 @@ object BUUtils {
         }
     }
 
-    private fun backupNUI(context: Context, id: String, backupInterface: BackupInterface) {
+    fun backupNUI(context: Context, id: String, backupInterface: BackupInterface) {
         when (getType(context)) {
             BUUtils.BUType.DRIVE -> backupDriveNUI(id, backupInterface)
             BUUtils.BUType.DROPBOX -> backupDropboxNUI(id, backupInterface)
@@ -288,15 +289,15 @@ object BUUtils {
                     val query = Query.Builder()
                             .addFilter(Filters.contains(SearchableField.TITLE, id))
                             .build()
-                    DRC!!.queryChildren(appfolder, query)
+                    DRC!!.queryChildren(appfolder!!, query)
                 }.continueWithTask<DriveContents> { task ->
                     val metadata = task.result
-                    if (metadata.count > 0) {
-                        val driveFile = metadata.get(0).driveId.asDriveFile()
+                    if (metadata?.count ?: 0 > 0) {
+                        val driveFile = metadata!!.get(0).driveId.asDriveFile()
                         metadata.release()
                         DRC!!.openFile(driveFile, DriveFile.MODE_READ_ONLY)
                     } else {
-                        metadata.release()
+                        metadata?.release()
                         null
                     }
                 }.addOnSuccessListener(activity!!) { driveContents ->
@@ -326,15 +327,15 @@ object BUUtils {
                     val query = Query.Builder()
                             .addFilter(Filters.contains(SearchableField.TITLE, id))
                             .build()
-                    DRC!!.queryChildren(appfolder, query)
+                    DRC!!.queryChildren(appfolder!!, query)
                 }.continueWithTask<DriveContents> { task ->
                     val metadata = task.result
-                    if (metadata.count > 0) {
-                        val driveFile = metadata.get(0).driveId.asDriveFile()
+                    if (metadata?.count ?: 0 > 0) {
+                        val driveFile = metadata!!.get(0).driveId.asDriveFile()
                         metadata.release()
                         DRC!!.openFile(driveFile, DriveFile.MODE_READ_ONLY)
                     } else {
-                        metadata.release()
+                        metadata?.release()
                         null
                     }
                 }.addOnSuccessListener { driveContents ->
@@ -410,20 +411,19 @@ object BUUtils {
             val appFolderTask = DRC!!.appFolder
             val driveContents = DRC!!.createContents()
             val backupObject = BackupObject(getList(id))
-            Tasks.whenAll(appFolderTask, driveContents)
+            val result = Tasks.whenAll(appFolderTask, driveContents)
                     .continueWithTask {
                         val query = Query.Builder()
                                 .addFilter(Filters.contains(SearchableField.TITLE, id))
                                 .build()
-                        DRC!!.queryChildren(appFolderTask.result, query)
+                        DRC!!.queryChildren(appFolderTask.result!!, query)
                     }.continueWithTask { task ->
                         val metadata = task.result
-                        if (metadata.count > 0)
-                            DRC!!.delete(metadata.get(0).driveId.asDriveResource())
-                        metadata.release()
+                        if (metadata?.count ?: 0 > 0)
+                            DRC!!.delete(metadata!!.get(0).driveId.asDriveResource())
+                        metadata?.release()
                         val contents = driveContents.result
-                        val outputStream = contents.outputStream
-
+                        val outputStream = contents?.outputStream
                         OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType(id))) }
                         val changeSet = MetadataChangeSet.Builder()
                                 .setTitle(id)
@@ -431,7 +431,7 @@ object BUUtils {
                                 .setStarred(true)
                                 .build()
 
-                        DRC!!.createFile(appFolderTask.result, changeSet, contents)
+                        DRC!!.createFile(appFolderTask.result!!, changeSet, contents)
                     }.addOnSuccessListener(activity!!) {
                         snackbar.safeDismiss()
                         backupInterface.onResponse(backupObject)
@@ -447,19 +447,19 @@ object BUUtils {
             val appFolderTask = DRC!!.appFolder
             val driveContents = DRC!!.createContents()
             val backupObject = BackupObject(getList(id))
-            Tasks.whenAll(appFolderTask, driveContents)
+            val result = Tasks.whenAll(appFolderTask, driveContents)
                     .continueWithTask {
                         val query = Query.Builder()
                                 .addFilter(Filters.contains(SearchableField.TITLE, id))
                                 .build()
-                        DRC!!.queryChildren(appFolderTask.result, query)
+                        DRC!!.queryChildren(appFolderTask.result!!, query)
                     }.continueWithTask { task ->
                         val metadata = task.result
-                        if (metadata.count > 0)
-                            DRC!!.delete(metadata.get(0).driveId.asDriveResource())
-                        metadata.release()
+                        if (metadata?.count ?: 0 > 0)
+                            DRC!!.delete(metadata!!.get(0).driveId.asDriveResource())
+                        metadata?.release()
                         val contents = driveContents.result
-                        val outputStream = contents.outputStream
+                        val outputStream = contents?.outputStream
 
                         OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType(id))) }
                         val changeSet = MetadataChangeSet.Builder()
@@ -468,7 +468,7 @@ object BUUtils {
                                 .setStarred(true)
                                 .build()
 
-                        DRC!!.createFile(appFolderTask.result, changeSet, contents)
+                        DRC!!.createFile(appFolderTask.result!!, changeSet, contents)
                     }
                     .addOnSuccessListener { backupInterface.onResponse(backupObject) }
                     .addOnFailureListener { backupInterface.onResponse(null) }
@@ -479,19 +479,19 @@ object BUUtils {
         doAsync {
             val appFolderTask = DRC!!.appFolder
             val driveContents = DRC!!.createContents()
-            Tasks.whenAll(appFolderTask, driveContents)
+            val result = Tasks.whenAll(appFolderTask, driveContents)
                     .continueWithTask {
                         val query = Query.Builder()
                                 .addFilter(Filters.contains(SearchableField.TITLE, "autobackup"))
                                 .build()
-                        DRC!!.queryChildren(appFolderTask.result, query)
+                        DRC!!.queryChildren(appFolderTask.result!!, query)
                     }.continueWithTask { task ->
                         val metadata = task.result
-                        if (metadata.count > 0)
-                            DRC!!.delete(metadata.get(0).driveId.asDriveResource())
-                        metadata.release()
+                        if (metadata?.count ?: 0 > 0)
+                            DRC!!.delete(metadata!!.get(0).driveId.asDriveResource())
+                        metadata?.release()
                         val contents = driveContents.result
-                        val outputStream = contents.outputStream
+                        val outputStream = contents?.outputStream
 
                         OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType("autobackup"))) }
                         val changeSet = MetadataChangeSet.Builder()
@@ -500,7 +500,7 @@ object BUUtils {
                                 .setStarred(true)
                                 .build()
 
-                        DRC!!.createFile(appFolderTask.result, changeSet, contents)
+                        DRC!!.createFile(appFolderTask.result!!, changeSet, contents)
                     }
                     .addOnSuccessListener(activity!!) { backupInterface.onResponse(backupObject) }
                     .addOnFailureListener(activity!!) { backupInterface.onResponse(null) }
@@ -592,34 +592,38 @@ object BUUtils {
         }
     }
 
-    private fun getList(id: String): MutableList<*> {
+    private fun getList(id: String): List<*> {
         return when (id) {
             "favs" -> CacheDB.INSTANCE.favsDAO().allRaw
             "history" -> CacheDB.INSTANCE.recordsDAO().allRaw
             "following" -> CacheDB.INSTANCE.seeingDAO().allRaw
             "seen" -> CacheDB.INSTANCE.chaptersDAO().all
+            "achievements" -> CacheDB.INSTANCE.achievementsDAO().all
             else -> mutableListOf<RecordObject>()
         }
     }
 
     private fun getType(id: String): Type {
-        when (id) {
-            "favs" -> return object : TypeToken<BackupObject<FavoriteObject>>() {
+        return when (id) {
+            "favs" -> object : TypeToken<BackupObject<FavoriteObject>>() {
 
             }.type
-            "history" -> return object : TypeToken<BackupObject<RecordObject>>() {
+            "history" -> object : TypeToken<BackupObject<RecordObject>>() {
 
             }.type
-            "following" -> return object : TypeToken<BackupObject<SeeingObject>>() {
+            "following" -> object : TypeToken<BackupObject<SeeingObject>>() {
 
             }.type
-            "seen" -> return object : TypeToken<BackupObject<AnimeObject.WebInfo.AnimeChapter>>() {
+            "seen" -> object : TypeToken<BackupObject<AnimeObject.WebInfo.AnimeChapter>>() {
 
             }.type
-            "autobackup" -> return object : TypeToken<AutoBackupObject>() {
+            "achievements" -> object : TypeToken<BackupObject<Achievement>>() {
 
             }.type
-            else -> return object : TypeToken<BackupObject<*>>() {
+            "autobackup" -> object : TypeToken<AutoBackupObject>() {
+
+            }.type
+            else -> object : TypeToken<BackupObject<*>>() {
 
             }.type
         }
@@ -628,6 +632,7 @@ object BUUtils {
     fun isAnimeflvInstalled(context: Context): Boolean {
         return try {
             context.packageManager.getPackageInfo("knf.animeflv", 0)
+            AchievementManager.unlock(7)
             true
         } catch (e: Exception) {
             false

@@ -12,8 +12,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crashlytics.android.Crashlytics
 import knf.kuma.download.FileAccessHelper
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import java.io.File
 import java.io.OutputStream
@@ -165,7 +163,7 @@ object FileUtil {
                     outputStream.write(buffer, 0, read)
                     current += read.toLong()
                     val prog = (current * 100 / total).toInt()
-                    launch(UI) { liveData.setValue(Pair(prog, false)) }
+                    doOnUI { liveData.setValue(Pair(prog, false)) }
                     read = inputStream.read(buffer)
                 }
                 inputStream.close()
@@ -178,11 +176,11 @@ object FileUtil {
                     e.printStackTrace()
                 }
 
-                launch(UI) { liveData.setValue(Pair(100, true)) }
+                doOnUI { liveData.setValue(Pair(100, true)) }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Crashlytics.logException(e)
-                launch(UI) { liveData.setValue(Pair(-1, true)) }
+                doOnUI { liveData.setValue(Pair(-1, true)) }
             }
         }
         return liveData
@@ -206,13 +204,13 @@ object FileUtil {
                         outputStream!!.write(buffer, 0, read)
                         current += read.toLong()
                         val prog = (current * 100 / total).toInt()
-                        launch(UI) { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), prog), false)) }
+                        doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), prog), false)) }
                         read = inputStream.read(buffer)
                     }
                     inputStream.close()
                     outputStream!!.flush()
                     outputStream.close()
-                    launch(UI) { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), 100), false)) }
+                    doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), 100), false)) }
                     try {
                         DocumentsContract.deleteDocument(resolver, pair.first)
                     } catch (e: Exception) {
@@ -227,7 +225,7 @@ object FileUtil {
 
             }
             val finalSuccess = success
-            launch(UI) { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, gTotal, gTotal), finalSuccess), true)) }
+            doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, gTotal, gTotal), finalSuccess), true)) }
         }
         return liveData
     }

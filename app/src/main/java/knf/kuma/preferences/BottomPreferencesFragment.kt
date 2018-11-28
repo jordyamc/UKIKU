@@ -6,9 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.EAHelper
 
 class BottomPreferencesFragment : BottomFragment() {
+
+    var count = 1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         EAHelper.enter1("C")
@@ -17,6 +20,8 @@ class BottomPreferencesFragment : BottomFragment() {
 
     override fun onReselect() {
         EAHelper.enter1("C")
+        count++
+        if (count == 20) AchievementManager.unlock(40)
     }
 
     companion object {

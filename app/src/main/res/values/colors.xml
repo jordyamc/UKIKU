@@ -5,8 +5,8 @@
     <!-- text color -->
     <color name="textWhitePrimary">#FFFFFFFF</color>
 
-    <color name="colorPrimary">#424242</color>
-    <color name="colorPrimaryDark">#1b1b1b</color>
+    <color name="colorPrimary">#fafafa</color>
+    <color name="colorPrimaryDark">#c7c7c7</color>
     <color name="colorAccent">#d32f2f</color>
 
     <color name="colorAccentPink">#C2185B</color>
@@ -58,4 +58,6 @@
     <color name="dropbox">#007EE5</color>
     <color name="drive">#ffbb00</color>
     <color name="text_disable">#42000000</color>
+
+    <color name="color_bottom_line_disabled">#AAAAAA</color>
 </resources>

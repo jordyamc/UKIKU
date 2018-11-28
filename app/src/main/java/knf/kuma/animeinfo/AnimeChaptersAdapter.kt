@@ -3,6 +3,7 @@ package knf.kuma.animeinfo
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -23,6 +25,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.squareup.picasso.Callback
 import knf.kuma.R
 import knf.kuma.animeinfo.fragments.ChaptersFragment
@@ -36,14 +39,13 @@ import knf.kuma.pojos.RecordObject
 import knf.kuma.pojos.SeeingObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
-class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerView: RecyclerView, private val chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>, private val touchListener: DragSelectTouchListener) : RecyclerView.Adapter<AnimeChaptersAdapter.ChapterImgHolder>() {
+class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerView: RecyclerView, private val chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>, private val touchListener: DragSelectTouchListener) : RecyclerView.Adapter<AnimeChaptersAdapter.ChapterImgHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     private val context: Context? = fragment.context
     private val chaptersDAO = CacheDB.INSTANCE.chaptersDAO()
@@ -59,12 +61,26 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
 
     init {
         chaptersDAO.init()
-        if (chapters.isNotEmpty())
+        if (chapters.isNotEmpty()) {
             seeingObject = seeingDAO.getByAid(chapters[0].aid)
+            doAsync {
+                if (CacheDB.INSTANCE.animeDAO().isCompleted(chapters[0].aid))
+                    DownloadedObserver.observe(chapters.size, chapters[0].fileName)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChapterImgHolder {
         return ChapterImgHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_chapter_preview, parent, false))
+    }
+
+    override fun onBindViewHolder(holder: ChapterImgHolder, position: Int, payloads: MutableList<Any>) {
+        if (selection.contains(position))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context!!, EAHelper.getThemeColorLight(context)))
+        else
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context!!, R.color.cardview_background))
+        if (payloads.isEmpty())
+            super.onBindViewHolder(holder, position, payloads)
     }
 
     override fun onBindViewHolder(holder: ChapterImgHolder, position: Int) {
@@ -157,12 +173,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 downloadObject.get()!!.state = -8
                             chapter.isDownloaded = false
                             holder.setDownloaded(false, false)
-                            FileAccessHelper.INSTANCE.delete(chapter.fileName) {
-                                launch(UI) {
-                                    notifyDataSetChanged()
-                                }
-                            }
-                            //CacheDB.INSTANCE.downloadsDAO().deleteByEid(chapter.eid);
+                            FileAccessHelper.INSTANCE.delete(chapter.fileName, false)
                             DownloadManager.cancel(chapter.eid)
                             QueueManager.remove(chapter.eid)
                         }
@@ -170,6 +181,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                     }
                     R.id.download -> {
                         setProcessingItem(holder, true)
+                        setOrientation(true)
                         ServersFactory.start(context, chapter.link, chapter, false, false, object : ServersFactory.ServersInterface {
                             override fun onFinish(started: Boolean, success: Boolean) {
                                 if (started) {
@@ -177,6 +189,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     chapter.isDownloaded = true
                                 }
                                 setProcessingItem(holder, false)
+                                setOrientation(false)
                             }
 
                             override fun onCast(url: String?) {
@@ -184,7 +197,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             }
 
                             override fun onProgressIndicator(boolean: Boolean) {
-                                launch(UI) {
+                                doOnUI {
                                     if (boolean) {
                                         holder.progressBar.isIndeterminate = true
                                         holder.progressBarRoot.visibility = View.VISIBLE
@@ -200,6 +213,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                     }
                     R.id.streaming -> {
                         setProcessingItem(holder, true)
+                        setOrientation(true)
                         ServersFactory.start(context, chapter.link, chapter, true, false, object : ServersFactory.ServersInterface {
                             override fun onFinish(started: Boolean, success: Boolean) {
                                 if (!started && success) {
@@ -209,6 +223,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     holder.setSeen(context, true)
                                 }
                                 setProcessingItem(holder, false)
+                                setOrientation(false)
                             }
 
                             override fun onCast(url: String?) {
@@ -233,18 +248,20 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         holder.setQueue(true, true)
                     } else {
                         setProcessingItem(holder, true)
+                        setOrientation(true)
                         ServersFactory.start(context, chapter.link, chapter, true, true, object : ServersFactory.ServersInterface {
                             override fun onFinish(started: Boolean, success: Boolean) {
                                 if (success) {
                                     holder.setQueue(true, false)
                                 }
                                 setProcessingItem(holder, false)
+                                setOrientation(false)
                             }
 
                             override fun onCast(url: String?) {}
 
                             override fun onProgressIndicator(boolean: Boolean) {
-                                launch(UI) {
+                                doOnUI {
                                     if (boolean) {
                                         holder.progressBar.isIndeterminate = true
                                         holder.progressBarRoot.visibility = View.VISIBLE
@@ -283,10 +300,25 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         }
     }
 
+    override fun getSectionName(position: Int): String {
+        return chapters[position].number.trim().substring(chapters[position].number.trim().lastIndexOf(" ") + 1)
+    }
+
     private fun updateSeeing(chapter: String) {
         if (seeingObject != null) {
             seeingObject!!.chapter = chapter
             seeingDAO.update(seeingObject!!)
+        }
+    }
+
+    private fun setOrientation(block: Boolean) {
+        noCrash {
+            if (block)
+                (fragment.activity as? AppCompatActivity)?.requestedOrientation = when {
+                    fragment.context!!.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         }
     }
 
@@ -318,7 +350,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         } else {
             selection.remove(pos)
         }
-        notifyItemChanged(pos)
+        notifyItemChanged(pos, 0)
     }
 
     fun selectRange(start: Int, end: Int, sel: Boolean) {
@@ -328,12 +360,12 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             else
                 selection.remove(i)
         }
-        notifyItemRangeChanged(start, end - start + 1)
+        notifyItemRangeChanged(start, end - start + 1, 0)
     }
 
     fun deselectAll() {
         selection.clear()
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0, itemCount, 0)
     }
 
     override fun onViewRecycled(holder: ChapterImgHolder) {
@@ -418,10 +450,15 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         DownloadObject.PAUSED, DownloadObject.DOWNLOADING -> {
                             progressBarRoot.visibility = View.VISIBLE
                             progressBar.isIndeterminate = false
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                                progressBar.setProgress(downloadObject.progress, true)
-                            else
-                                progressBar.progress = downloadObject.progress
+                            if (downloadObject.getEta() == -2L || PrefsUtil.downloaderType == 0)
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                                    progressBar.setProgress(downloadObject.progress, true)
+                                else
+                                    progressBar.progress = downloadObject.progress
+                            else {
+                                progressBar.progress = 0
+                                progressBar.secondaryProgress = downloadObject.progress
+                            }
                         }
                         else -> progressBarRoot.visibility = View.GONE
                     }

@@ -22,12 +22,11 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.FavSection
 import knf.kuma.pojos.FavoriteObject
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
@@ -57,7 +56,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         ViewModelProviders.of(activity!!).get(FavoriteViewModel::class.java).getData().observe(this, Observer { favoriteObjects ->
             if (favoriteObjects == null || favoriteObjects.isEmpty()) {
                 errorLayout.visibility = View.VISIBLE
-                adapter!!.updateList(ArrayList())
+                adapter?.updateList(ArrayList())
             } else if (PrefsUtil.showFavSections()) {
                 errorLayout.visibility = View.GONE
                 val container = FavSectionHelper.getInfoContainer(edited)
@@ -91,7 +90,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         manager = recyclerView.layoutManager
-        adapter = FavsSectionAdapter(this, recyclerView)
+        adapter = FavsSectionAdapter(this, recyclerView, PrefsUtil.showFavSections())
         if (PrefsUtil.layType == "1" && PrefsUtil.showFavSections()) {
             (manager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
@@ -174,7 +173,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             edited?.category = input
                             CacheDB.INSTANCE.favsDAO().addFav(edited!!)
                         }
-                        launch(UI) {
+                        doOnUI {
                             showAddToCategory(edited == null, input)
                         }
                     }
@@ -285,7 +284,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                         isNotDefault -> "cancelar"
                         !isEdit -> "atras"
                         else -> ""
-                    }) { _ ->
+                    }) {
                         if (isNotDefault)
                             MaterialDialog(context).safeShow {
                                 message(text = "¿Desea eliminar esta categoría?")

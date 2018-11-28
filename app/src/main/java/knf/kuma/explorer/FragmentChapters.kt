@@ -1,5 +1,6 @@
 package knf.kuma.explorer
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.LayoutInflater
@@ -10,17 +11,22 @@ import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import knf.kuma.queue.QueueManager
 import org.jetbrains.anko.find
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
 
 class FragmentChapters : Fragment() {
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressBar
+    lateinit var fab: FloatingActionButton
     internal var adapter: ExplorerChapsAdapter? = null
     private var clearInterface: ClearInterface? = null
     private var isFirst = true
@@ -37,18 +43,28 @@ class FragmentChapters : Fragment() {
         val view = inflater.inflate(layout, container, false)
         recyclerView = view.find(R.id.recycler)
         progressBar = view.find(R.id.progress)
+        fab = view.find(R.id.fab)
         return view
     }
 
+    private fun playAll(list: List<ExplorerObject.FileDownObj>) {
+        noCrash { QueueManager.startQueueDownloaded(context!!, list) }
+    }
+
+    @SuppressLint("RestrictedApi")
     fun setObject(explorerObject: ExplorerObject?) {
+        noCrash {
+            fab.internalSetVisibility(View.INVISIBLE, true)
+            fab.hide()
+        }
         clear()
-        explorerObject?.let {
+        explorerObject?.let { it ->
             it.getLiveData(context)
                     .observe(this@FragmentChapters, Observer { fileDownObjs ->
                         if (fileDownObjs.isEmpty()) {
                             Toaster.toast("Directorio vacio")
                             CacheDB.INSTANCE.explorerDAO().delete(explorerObject)
-                            clearInterface!!.onClear()
+                            clearInterface?.onClear()
                         } else {
                             explorerObject.chapters = fileDownObjs as MutableList<ExplorerObject.FileDownObj>
                             progressBar.visibility = View.GONE
@@ -58,20 +74,23 @@ class FragmentChapters : Fragment() {
                                 isFirst = false
                                 recyclerView.scheduleLayoutAnimation()
                             }
+                            if (!CastUtil.get().connected()) {
+                                fab.show()
+                                fab.onClick { playAll(fileDownObjs) }
+                            }
                         }
-                    }) //webInfo.clearLiveData(this);
+                    })
         }
     }
 
     internal fun deleteAll() {
-        if (adapter != null)
-            adapter!!.deleteAll()
+        adapter?.deleteAll()
     }
 
     private fun clear() {
         isFirst = true
         adapter = null
-        launch(UI) {
+        doOnUI {
             progressBar.visibility = View.VISIBLE
             recyclerView.adapter = null
         }
@@ -79,8 +98,7 @@ class FragmentChapters : Fragment() {
 
     fun setInterface(clearInterface: ClearInterface) {
         this.clearInterface = clearInterface
-        if (adapter != null)
-            adapter!!.setInterface(clearInterface)
+        adapter?.setInterface(clearInterface)
     }
 
     interface ClearInterface {

@@ -1,76 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Pink" parent="AppTheme">
+    <style name="AppTheme.Pink" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentPink</item>
+        <item name="colorAccentLight">@color/colorAccentPinkLight</item>
     </style>
 
-    <style name="AppTheme.Purple" parent="AppTheme">
+    <style name="AppTheme.Purple" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentPurple</item>
+        <item name="colorAccentLight">@color/colorAccentPurpleLight</item>
     </style>
 
-    <style name="AppTheme.DeepPurple" parent="AppTheme">
+    <style name="AppTheme.DeepPurple" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentDeepPurple</item>
+        <item name="colorAccentLight">@color/colorAccentDeepPurpleLight</item>
     </style>
 
-    <style name="AppTheme.Indigo" parent="AppTheme">
+    <style name="AppTheme.Indigo" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentIndigo</item>
+        <item name="colorAccentLight">@color/colorAccentIndigoLight</item>
     </style>
 
-    <style name="AppTheme.Blue" parent="AppTheme">
+    <style name="AppTheme.Blue" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentBlue</item>
+        <item name="colorAccentLight">@color/colorAccentBlueLight</item>
     </style>
 
-    <style name="AppTheme.LightBlue" parent="AppTheme">
+    <style name="AppTheme.LightBlue" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentLightBlue</item>
+        <item name="colorAccentLight">@color/colorAccentLightBlueLight</item>
     </style>
 
-    <style name="AppTheme.Cyan" parent="AppTheme">
+    <style name="AppTheme.Cyan" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentCyan</item>
+        <item name="colorAccentLight">@color/colorAccentCyanLight</item>
     </style>
 
-    <style name="AppTheme.Teal" parent="AppTheme">
+    <style name="AppTheme.Teal" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentTeal</item>
+        <item name="colorAccentLight">@color/colorAccentTealLight</item>
     </style>
 
-    <style name="AppTheme.Green" parent="AppTheme">
+    <style name="AppTheme.Green" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentGreen</item>
+        <item name="colorAccentLight">@color/colorAccentGreenLight</item>
     </style>
 
-    <style name="AppTheme.LightGreen" parent="AppTheme">
+    <style name="AppTheme.LightGreen" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentLightGreen</item>
+        <item name="colorAccentLight">@color/colorAccentLightGreenLight</item>
     </style>
 
-    <style name="AppTheme.Lime" parent="AppTheme">
+    <style name="AppTheme.Lime" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentLime</item>
+        <item name="colorAccentLight">@color/colorAccentLimeLight</item>
     </style>
 
-    <style name="AppTheme.Yellow" parent="AppTheme">
+    <style name="AppTheme.Yellow" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentYellow</item>
+        <item name="colorAccentLight">@color/colorAccentYellowLight</item>
     </style>
 
-    <style name="AppTheme.Amber" parent="AppTheme">
+    <style name="AppTheme.Amber" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentAmber</item>
+        <item name="colorAccentLight">@color/colorAccentAmberLight</item>
     </style>
 
-    <style name="AppTheme.Orange" parent="AppTheme">
+    <style name="AppTheme.Orange" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentOrange</item>
+        <item name="colorAccentLight">@color/colorAccentOrangeLight</item>
     </style>
 
-    <style name="AppTheme.DeepOrange" parent="AppTheme">
+    <style name="AppTheme.DeepOrange" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentDeepOrange</item>
+        <item name="colorAccentLight">@color/colorAccentDeepOrangeLight</item>
     </style>
 
-    <style name="AppTheme.Brown" parent="AppTheme">
+    <style name="AppTheme.Brown" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentBrown</item>
+        <item name="colorAccentLight">@color/colorAccentBrownLight</item>
     </style>
 
-    <style name="AppTheme.Gray" parent="AppTheme">
+    <style name="AppTheme.Gray" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentGray</item>
+        <item name="colorAccentLight">@color/colorAccentGrayLight</item>
     </style>
 
-    <style name="AppTheme.BlueGray" parent="AppTheme">
+    <style name="AppTheme.BlueGray" parent="AppTheme.DayNight">
         <item name="colorAccent">@color/colorAccentBlueGrey</item>
+        <item name="colorAccentLight">@color/colorAccentBlueGreyLight</item>
     </style>
 
     <!--No action bar-->
@@ -149,75 +167,75 @@
 
     <!--Dialog-->
 
-    <style name="AppTheme.Dialog.Pink" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Pink" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentPink</item>
     </style>
 
-    <style name="AppTheme.Dialog.Purple" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Purple" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentPurple</item>
     </style>
 
-    <style name="AppTheme.Dialog.DeepPurple" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.DeepPurple" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentDeepPurple</item>
     </style>
 
-    <style name="AppTheme.Dialog.Indigo" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Indigo" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentIndigo</item>
     </style>
 
-    <style name="AppTheme.Dialog.Blue" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Blue" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentBlue</item>
     </style>
 
-    <style name="AppTheme.Dialog.LightBlue" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.LightBlue" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentLightBlue</item>
     </style>
 
-    <style name="AppTheme.Dialog.Cyan" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Cyan" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentCyan</item>
     </style>
 
-    <style name="AppTheme.Dialog.Teal" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Teal" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentTeal</item>
     </style>
 
-    <style name="AppTheme.Dialog.Green" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Green" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentGreen</item>
     </style>
 
-    <style name="AppTheme.Dialog.LightGreen" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.LightGreen" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentLightGreen</item>
     </style>
 
-    <style name="AppTheme.Dialog.Lime" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Lime" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentLime</item>
     </style>
 
-    <style name="AppTheme.Dialog.Yellow" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Yellow" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentYellow</item>
     </style>
 
-    <style name="AppTheme.Dialog.Amber" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Amber" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentAmber</item>
     </style>
 
-    <style name="AppTheme.Dialog.Orange" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Orange" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentOrange</item>
     </style>
 
-    <style name="AppTheme.Dialog.DeepOrange" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.DeepOrange" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentDeepOrange</item>
     </style>
 
-    <style name="AppTheme.Dialog.Brown" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Brown" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentBrown</item>
     </style>
 
-    <style name="AppTheme.Dialog.Gray" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Gray" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentGray</item>
     </style>
 
-    <style name="AppTheme.Dialog.BlueGray" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.BlueGray" parent="AppTheme.Dialog.Base.DayNight">
         <item name="colorAccent">@color/colorAccentBlueGrey</item>
     </style>
 </resources>

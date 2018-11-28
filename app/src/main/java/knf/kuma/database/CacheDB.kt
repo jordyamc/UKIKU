@@ -9,8 +9,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import knf.kuma.database.dao.*
 import knf.kuma.pojos.*
 
-@Database(entities = [RecentObject::class, AnimeObject::class, FavoriteObject::class, AnimeObject.WebInfo.AnimeChapter::class, NotificationObj::class, DownloadObject::class, RecordObject::class, SeeingObject::class, ExplorerObject::class, GenreStatusObject::class, QueueObject::class],
-        version = 11)
+@Database(entities = [RecentObject::class, AnimeObject::class, FavoriteObject::class, AnimeObject.WebInfo.AnimeChapter::class, NotificationObj::class, DownloadObject::class, RecordObject::class, SeeingObject::class, ExplorerObject::class, GenreStatusObject::class, QueueObject::class, Achievement::class],
+        version = 13)
 abstract class CacheDB : RoomDatabase() {
 
     abstract fun recentsDAO(): RecentsDAO
@@ -34,6 +34,8 @@ abstract class CacheDB : RoomDatabase() {
     abstract fun queueDAO(): QueueDAO
 
     abstract fun genresDAO(): GenresDAO
+
+    abstract fun achievementsDAO(): AchievementsDAO
 
     companion object {
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
@@ -91,18 +93,57 @@ abstract class CacheDB : RoomDatabase() {
                 database.execSQL("ALTER TABLE `seeingobject`  ADD COLUMN `state` INTEGER NOT NULL DEFAULT 1")
             }
         }
+
+        val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE `achivement` (" +
+                        "`key` INTEGER NOT NULL, " +
+                        "`name` TEXT NOT NULL, " +
+                        "`description` TEXT NOT NULL, " +
+                        "`icon` INTEGER NOT NULL, " +
+                        "`points` INTEGER NOT NULL, " +
+                        "`isSecret` INTEGER NOT NULL, " +
+                        "`group` TEXT, " +
+                        "`time` INTEGER NOT NULL, " +
+                        "`count` INTEGER NOT NULL, " +
+                        "`goal` INTEGER NOT NULL, " +
+                        "`isUnlocked` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`key`))")
+            }
+        }
+
+        private val MIGRATION_12_13: Migration = object : Migration(12, 13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE `achivement_tmp` (" +
+                        "`key` INTEGER NOT NULL, " +
+                        "`name` TEXT NOT NULL, " +
+                        "`description` TEXT NOT NULL, " +
+                        "`points` INTEGER NOT NULL, " +
+                        "`isSecret` INTEGER NOT NULL, " +
+                        "`group` TEXT, " +
+                        "`time` INTEGER NOT NULL, " +
+                        "`count` INTEGER NOT NULL, " +
+                        "`goal` INTEGER NOT NULL, " +
+                        "`isUnlocked` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`key`))")
+                database.execSQL("INSERT INTO `achivement_tmp` (`key`,`name`,`description`,`points`,`isSecret`,`group`,`time`,`count`,`goal`,`isUnlocked`) SELECT `key`,`name`,`description`,`points`,`isSecret`,`group`,`time`,`count`,`goal`,`isUnlocked` FROM `achivement`")
+                database.execSQL("DROP TABLE `achivement`")
+                database.execSQL("ALTER TABLE `achivement_tmp` RENAME TO `achievement`")
+            }
+        }
+
         lateinit var INSTANCE: CacheDB
 
         fun init(context: Context) {
             INSTANCE = Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
                     .allowMainThreadQueries()
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13).build()
         }
 
         fun createAndGet(context: Context): CacheDB {
             return Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
                     .allowMainThreadQueries()
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13).build()
         }
     }
 

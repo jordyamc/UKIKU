@@ -2,11 +2,10 @@ package knf.kuma.explorer
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.ExplorerObject
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import java.io.FileFilter
 import java.util.*
@@ -69,7 +68,7 @@ object ExplorerCreator {
     }
 
     private fun postState(state: String?) {
-        launch(UI) { STATE_LISTENER.setValue(state) }
+        doOnUI { STATE_LISTENER.setValue(state) }
     }
 
     interface EmptyListener {

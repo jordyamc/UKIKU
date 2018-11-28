@@ -14,7 +14,7 @@ public class SeeingObject {
     @Ignore
     public static final int STATE_COMPLETED = 3;
     @Ignore
-    public static final int STATE_DROPED = 4;
+    public static final int STATE_DROPPED = 4;
 
     @PrimaryKey
     public int key;
@@ -34,7 +34,7 @@ public class SeeingObject {
         this.aid = aid;
         this.title = title;
         this.chapter = chapter;
-        this.lastChapter= CacheDB.INSTANCE.chaptersDAO().getLastByAid(aid);
+        this.lastChapter = CacheDB.INSTANCE.chaptersDAO().getLastByAid(aid);
         this.state = state;
     }
 
@@ -43,14 +43,14 @@ public class SeeingObject {
     }
 
     @Ignore
-    public static SeeingObject fromAnime(FavoriteObject favoriteObject){
-        SeeingObject item=new SeeingObject();
-        item.key=Integer.parseInt(favoriteObject.aid);
-        item.img=favoriteObject.img;
-        item.link=favoriteObject.link;
-        item.aid=favoriteObject.aid;
-        item.title=favoriteObject.name;
-        item.chapter="No empezado";
+    public static SeeingObject fromAnime(FavoriteObject favoriteObject) {
+        SeeingObject item = new SeeingObject();
+        item.key = Integer.parseInt(favoriteObject.aid);
+        item.img = favoriteObject.img;
+        item.link = favoriteObject.link;
+        item.aid = favoriteObject.aid;
+        item.title = favoriteObject.name;
+        item.chapter = "No empezado";
         return item;
     }
 

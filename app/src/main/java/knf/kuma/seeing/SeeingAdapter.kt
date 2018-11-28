@@ -10,20 +10,16 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.PicassoSingle
-import knf.kuma.commons.bind
-import knf.kuma.commons.notSameContent
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import java.util.*
 
-internal class SeeingAdapter(private val activity: Activity, private val isFullList: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+internal class SeeingAdapter(private val activity: Activity, private val isFullList: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     var list: List<SeeingObject> = ArrayList()
     private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
@@ -58,7 +54,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
                     SeeingObject.STATE_WATCHING -> popupMenu.menu.findItem(R.id.watching).isVisible = false
                     SeeingObject.STATE_CONSIDERING -> popupMenu.menu.findItem(R.id.considering).isVisible = false
                     SeeingObject.STATE_COMPLETED -> popupMenu.menu.findItem(R.id.completed).isVisible = false
-                    SeeingObject.STATE_DROPED -> popupMenu.menu.findItem(R.id.droped).isVisible = false
+                    SeeingObject.STATE_DROPPED -> popupMenu.menu.findItem(R.id.droped).isVisible = false
                 }
                 popupMenu.setOnMenuItemClickListener { menuItem ->
                     doAsync {
@@ -69,7 +65,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
                             R.id.droped -> seeingDAO.update(seeingObject.also { it.state = 4 })
                         }
                         if (isFullList)
-                            launch(UI) {
+                            doOnUI {
                                 (holder as SeeingItem).chapter.text = getCardText(seeingObject)
                             }
                     }
@@ -81,12 +77,22 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         }
     }
 
+    override fun getSectionName(position: Int): String {
+        return list[position].title.substring(0, 1)
+    }
+
     private fun getCardText(seeingObject: SeeingObject): String {
         return if (isFullList) {
             getStateText(seeingObject.state)
         } else {
             val lastChapter = seeingObject.lastChapter
-            lastChapter?.number ?: "No empezado"
+            val number = lastChapter?.number
+            if (number == null)
+                "No empezado"
+            else if (!lastChapter.number.startsWith("Episodio "))
+                "Episodio ${lastChapter.number}"
+            else
+                lastChapter.number
         }
     }
 
@@ -115,7 +121,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         if (this.list notSameContent list) {
             doAsync {
                 val result = DiffUtil.calculateDiff(SeeingDiff(this@SeeingAdapter.list, list))
-                launch(UI) {
+                doOnUI {
                     this@SeeingAdapter.list = list
                     try {
                         result.dispatchUpdatesTo(this@SeeingAdapter)

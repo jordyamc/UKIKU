@@ -21,11 +21,10 @@ import com.thin.downloadmanager.DownloadRequest
 import com.thin.downloadmanager.DownloadStatusListenerV1
 import com.thin.downloadmanager.ThinDownloadManager
 import knf.kuma.R
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.getUpdateDir
 import knf.kuma.download.DownloadManager
 import kotlinx.android.synthetic.main.activity_updater.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import xdroid.toaster.Toaster
 import java.io.File
 
@@ -130,7 +129,7 @@ class UpdateActivity : AppCompatActivity() {
     }
 
     private fun setDownProgress(p: Int) {
-        launch(UI) {
+        doOnUI {
             try {
                 with(progress) {
                     isIndeterminate = false

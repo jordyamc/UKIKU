@@ -13,10 +13,9 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
+import knf.kuma.commons.doOnUI
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 
 class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     private var viewModel: RecentsViewModel? = null
@@ -27,7 +26,7 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(RecentsViewModel::class.java)
         viewModel?.dbLiveData?.observe(this, Observer { objects ->
-            launch(UI) {
+            doOnUI {
                 if (objects != null) {
                     holder?.setError(objects.isEmpty())
                     holder?.setRefreshing(false)

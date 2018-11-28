@@ -98,9 +98,9 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_name" />
+                            <entry key="outputName" value="ic_achievement_evangelion" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\jordy\Desktop\Proyectos\java\UKIKU\name.psd" />
+                            <entry key="sourceFile" value="M:\Users\Jordy\Downloads\evangelion.svg" />
                           </map>
                         </option>
                       </PersistentState>

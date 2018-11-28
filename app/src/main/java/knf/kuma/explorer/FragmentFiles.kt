@@ -12,10 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.find
 
 class FragmentFiles : Fragment() {
@@ -70,7 +69,7 @@ class FragmentFiles : Fragment() {
     }
 
     fun onEmpty() {
-        launch(UI) {
+        doOnUI {
             progressBar.visibility = View.GONE
             error.visibility = View.VISIBLE
             state.visibility = View.GONE

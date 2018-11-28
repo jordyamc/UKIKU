@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.BUUtils
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.Network
@@ -67,7 +68,12 @@ class SyncItemView : RelativeLayout {
                         date.text = backupObject.date
                         restore?.isEnabled = true
                     }
-                    backup?.setOnClickListener { noCrash { onClick.onAction(this@SyncItemView, actionId, true) } }
+                    backup?.setOnClickListener {
+                        noCrash {
+                            onClick.onAction(this@SyncItemView, actionId, true)
+                            AchievementManager.onBackup()
+                        }
+                    }
                     restore?.setOnClickListener { noCrash { onClick.onAction(this@SyncItemView, actionId, false) } }
                 } else {
                     date.text = "Sin internet"

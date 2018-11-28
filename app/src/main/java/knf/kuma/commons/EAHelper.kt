@@ -1,16 +1,29 @@
 package knf.kuma.commons
 
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.LayoutInflater
+import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
+import androidx.appcompat.app.AppCompatActivity
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LevelEndEvent
 import com.crashlytics.android.answers.LevelStartEvent
+import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.database.EADB
+import knf.kuma.iap.IAPWrapper
 import knf.kuma.pojos.EAObject
+import kotlinx.android.synthetic.main.activity_ea.*
+import kotlinx.android.synthetic.main.item_ea_step.view.*
+import moe.feng.common.stepperview.IStepperAdapter
+import moe.feng.common.stepperview.VerticalStepperItemView
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
 import java.util.*
 
@@ -20,17 +33,17 @@ object EAHelper {
     private var CURRENT_1 = ""
     private var CURRENT_2 = ""
 
-    private val isPart0Unlocked: Boolean
-        get() = EADB.INSTANCE!!.eaDAO().isUnlocked(0)!!
+    val isPart0Unlocked: Boolean
+        get() = EADB.INSTANCE.eaDAO().isUnlocked(0)
 
-    private val isPart1Unlocked: Boolean
-        get() = EADB.INSTANCE!!.eaDAO().isUnlocked(1)!!
+    val isPart1Unlocked: Boolean
+        get() = EADB.INSTANCE.eaDAO().isUnlocked(1)
 
-    private val isPart2Unlocked: Boolean
-        get() = EADB.INSTANCE!!.eaDAO().isUnlocked(2)!!
+    val isPart2Unlocked: Boolean
+        get() = EADB.INSTANCE.eaDAO().isUnlocked(2)
 
-    private val isPart3Unlocked: Boolean
-        get() = EADB.INSTANCE!!.eaDAO().isUnlocked(3)!!
+    val isPart3Unlocked: Boolean
+        get() = EADB.INSTANCE.eaDAO().isUnlocked(3)
 
     val phase: Int
         get() = when {
@@ -50,6 +63,16 @@ object EAHelper {
             else -> "\u26B2 easteregg"
         }
 
+    fun getMessage(phase: Int): String {
+        return when (phase) {
+            4 -> "Disfruta de la recompensa"
+            3 -> "El tesoro esta en Akihabara"
+            2 -> "LMMJVSD \u2192 US \u2192 " + CODE2!!
+            1 -> CODE1!!
+            else -> "\u26B2 easteregg"
+        }
+    }
+
     fun init(context: Context) {
         val manager = PreferenceManager.getDefaultSharedPreferences(context)
         CODE1 = manager.getString("ea_code1", null)
@@ -61,7 +84,7 @@ object EAHelper {
     }
 
     fun checkStart(query: String) {
-        if (phase == 0 && query == "easteregg") {
+        if (phase == 0 && query == BuildConfig.EASTER_SEARCH) {
             Toaster.toastLong(CODE1)
             Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg"))
             Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg Phase 1"))
@@ -127,15 +150,16 @@ object EAHelper {
     }
 
     private fun setUnlocked(phase: Int) {
-        EADB.INSTANCE!!.eaDAO().unlock(EAObject(phase))
+        EADB.INSTANCE.eaDAO().unlock(EAObject(phase))
+        AchievementManager.onPhaseUnlocked(phase)
     }
 
     @StyleRes
     fun getTheme(context: Context?): Int {
         if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.style.AppTheme
+            return R.style.AppTheme_DayNight
         when (PrefsUtil.themeColor) {
-            "0" -> return R.style.AppTheme
+            "0" -> return R.style.AppTheme_DayNight
             "1" -> return R.style.AppTheme_Pink
             "2" -> return R.style.AppTheme_Purple
             "3" -> return R.style.AppTheme_DeepPurple
@@ -154,7 +178,7 @@ object EAHelper {
             "16" -> return R.style.AppTheme_Brown
             "17" -> return R.style.AppTheme_Gray
             "18" -> return R.style.AppTheme_BlueGray
-            else -> return R.style.AppTheme
+            else -> return R.style.AppTheme_DayNight
         }
     }
 
@@ -189,7 +213,7 @@ object EAHelper {
     @StyleRes
     fun getThemeDialog(context: Context?): Int {
         if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.style.AppTheme_NoActionBar
+            return R.style.AppTheme_Dialog_Base
         when (PrefsUtil.themeColor) {
             "0" -> return R.style.AppTheme_Dialog_Base
             "1" -> return R.style.AppTheme_Dialog_Pink
@@ -373,6 +397,71 @@ object EAHelper {
             "17" -> return R.color.colorAccentGrayLight
             "18" -> return R.color.colorAccentBlueGreyLight
             else -> return R.color.colorAccentLight
+        }
+    }
+}
+
+class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
+
+    private lateinit var iapWrapper: IAPWrapper
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(EAHelper.getTheme(this))
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_ea)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.title = "Easter egg"
+        toolbar.setNavigationOnClickListener { onBackPressed() }
+        iapWrapper = IAPWrapper(this)
+        vertical_stepper_view.stepperAdapter = this
+        vertical_stepper_view.currentStep = EAHelper.phase
+    }
+
+    override fun getTitle(index: Int): CharSequence {
+        return "Paso ${index + 1}"
+    }
+
+    override fun onCreateCustomView(index: Int, context: Context?, view: VerticalStepperItemView?): View {
+        val inflateView = LayoutInflater.from(context).inflate(R.layout.item_ea_step, view, false)
+        val hint = inflateView.hint
+        hint.text = EAHelper.getMessage(index)
+        val unlockButton = inflateView.unlock
+        if (index == 0 || index == 4)
+            unlockButton.visibility = View.GONE
+        else
+            unlockButton.onClick {
+                if (!iapWrapper.isEnabled)
+                    iapWrapper.showInstallDialog()
+            }
+        return inflateView
+    }
+
+    override fun getSummary(index: Int): CharSequence? {
+        return null
+    }
+
+    override fun size(): Int {
+        return 5
+    }
+
+    override fun onShow(index: Int) {
+
+    }
+
+    override fun onHide(index: Int) {
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+    }
+
+    companion object {
+        fun start(context: Context) {
+            context.startActivity(Intent(context, EAUnlockActivity::class.java))
         }
     }
 }

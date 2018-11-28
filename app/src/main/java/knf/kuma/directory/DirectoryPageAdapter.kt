@@ -12,14 +12,16 @@ import androidx.fragment.app.Fragment
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.pojos.AnimeObject
 
-class DirectoryPageAdapter internal constructor(private val fragment: Fragment) : PagedListAdapter<AnimeObject, DirectoryPageAdapter.ItemHolder>(DIFF_CALLBACK) {
+class DirectoryPageAdapter internal constructor(private val fragment: Fragment) : PagedListAdapter<AnimeObject, DirectoryPageAdapter.ItemHolder>(DIFF_CALLBACK), FastScrollRecyclerView.SectionedAdapter {
     private val layType: String = PreferenceManager.getDefaultSharedPreferences(fragment.context).getString("lay_type", "0")!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
@@ -41,6 +43,15 @@ class DirectoryPageAdapter internal constructor(private val fragment: Fragment) 
             PicassoSingle[fragment.context!!].load(PatternUtil.getCover(animeObject.aid)).into(holder.imageView)
             holder.textView.text = animeObject.name
             holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView, persist = false) }
+        }
+    }
+
+    override fun getSectionName(position: Int): String {
+        return when (PrefsUtil.dirOrder) {
+            1 -> getItem(position)?.rate_stars ?: ""
+            2 -> getItem(position)?.aid ?: ""
+            3 -> getItem(position)?.aid ?: ""
+            else -> getItem(position)?.name?.first()?.toUpperCase()?.toString() ?: ""
         }
     }
 

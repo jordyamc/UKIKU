@@ -16,6 +16,7 @@ import com.crashlytics.android.answers.CustomEvent
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.App
 import knf.kuma.BuildConfig
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
@@ -25,8 +26,6 @@ import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
 import knf.kuma.queue.QueueManager
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
@@ -64,7 +63,7 @@ class ServersFactory {
     }
 
     private fun showServerList() {
-        launch(UI) {
+        doOnUI {
             try {
                 if (servers.size == 0) {
                     Toaster.toast("Sin servidores disponibles")
@@ -132,7 +131,7 @@ class ServersFactory {
     }
 
     private fun showOptions(server: VideoServer, isCast: Boolean) {
-        launch(UI) {
+        doOnUI {
             try {
                 MaterialDialog(this@ServersFactory.context).safeShow {
                     title(text = server.name)
@@ -281,9 +280,9 @@ class ServersFactory {
                 addQueue: Boolean = false,
                 serversInterface: ServersInterface
         ) {
-            if (!isRunning()) {
+            if (!isRunning())
                 INSTANCE = ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
-            } else {
+            else {
                 serversInterface.onFinish(false, false)
                 Toaster.toast("Solo una petición a la vez")
             }
@@ -296,9 +295,9 @@ class ServersFactory {
                 isStream: Boolean = false,
                 serversInterface: ServersInterface
         ) {
-            if (!isRunning()) {
+            if (!isRunning())
                 INSTANCE = ServersFactory(context, url, downloadObject, isStream, serversInterface).also { doAsync { it.start() } }
-            } else {
+            else {
                 serversInterface.onFinish(false, false)
                 Toaster.toast("Solo una petición a la vez")
             }
@@ -309,6 +308,7 @@ class ServersFactory {
         }
 
         fun startPlay(context: Context, title: String, file_name: String) {
+            AchievementManager.onPlayChapter()
             val file = FileAccessHelper.INSTANCE.getFile(file_name)
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 context.startActivity(PrefsUtil.getPlayerIntent()

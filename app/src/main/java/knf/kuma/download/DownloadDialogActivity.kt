@@ -7,16 +7,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.safeDismiss
-import knf.kuma.commons.safeShow
+import knf.kuma.commons.*
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.NotificationObj
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import java.util.regex.Pattern
@@ -51,7 +46,7 @@ class DownloadDialogActivity : AppCompatActivity() {
                 }
                 val chapter = AnimeObject.WebInfo.AnimeChapter(Integer.parseInt(aid!!), "Episodio " + num!!, eid, intent.dataString!!, name, aid)
                 downloadObject = DownloadObject.fromChapter(chapter, false)
-                launch(UI) {
+                doOnUI {
                     dialog.safeDismiss()
                     try {
                         showSelectDialog()

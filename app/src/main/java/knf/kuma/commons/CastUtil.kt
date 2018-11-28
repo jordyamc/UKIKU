@@ -11,9 +11,8 @@ import com.google.android.material.snackbar.Snackbar
 import es.munix.multidisplaycast.CastManager
 import es.munix.multidisplaycast.interfaces.CastListener
 import es.munix.multidisplaycast.interfaces.PlayStatusListener
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.custom.ThemedControlsActivity
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.annotations.Contract
 import xdroid.toaster.Toaster
 
@@ -49,6 +48,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
                 if (isAid)
                     fPreview = "https://animeflv.net/uploads/animes/thumbs/$preview.jpg"
                 CastManager.getInstance().playMedia(fUrl, "video/mp4", title, chapter, fPreview)
+                AchievementManager.unlock(6)
             } else {
                 Toaster.toast("No hay dispositivo seleccionado")
             }
@@ -57,6 +57,10 @@ class CastUtil private constructor(private val context: Context) : CastListener,
             Toaster.toast("Error al reproducir")
         }
 
+    }
+
+    fun stop() {
+        CastManager.getInstance().stop()
     }
 
     fun onDestroy() {
@@ -71,6 +75,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
 
     override fun isDisconnected() {
         setEid(NO_PLAYING)
+        SelfServer.stop()
     }
 
     private fun getLoading(view: View): Snackbar {
@@ -78,26 +83,26 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     private fun startLoading(view: View) {
-        launch(UI) {
+        doOnUI {
             loading = getLoading(view)
         }
     }
 
     private fun stopLoading() {
-        launch(UI) {
+        doOnUI {
             loading?.safeDismiss()
             loading = null
         }
     }
 
     private fun setEid(eid: String) {
-        launch(UI) {
+        doOnUI {
             casting.setValue(eid)
         }
     }
 
     fun openControls() {
-        context.startActivity(Intent(context, ThemedControlsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        context.startActivity(Intent(context, ThemedControlsActivity::class.java))
     }
 
     override fun onPlayStatusChanged(playStatus: Int) {
@@ -124,7 +129,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     override fun onTotalDurationObtained(totalDuration: Long) {
-        Log.e("Duration", totalDuration.toString())
+
     }
 
     override fun onSuccessSeek() {

@@ -12,6 +12,9 @@ interface ChaptersDAO {
     @get:Query("SELECT * FROM animechapter")
     val all: MutableList<AnimeObject.WebInfo.AnimeChapter>
 
+    @get:Query("SELECT count(*) FROM animechapter")
+    val countLive: LiveData<Int>
+
     @Query("SELECT count(*) FROM animechapter")
     fun init(): Int
 
@@ -31,7 +34,7 @@ interface ChaptersDAO {
     fun addChapter(chapter: AnimeObject.WebInfo.AnimeChapter)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addAll(list: MutableList<AnimeObject.WebInfo.AnimeChapter>)
+    fun addAll(list: List<AnimeObject.WebInfo.AnimeChapter>)
 
     @Delete
     fun deleteChapter(chapter: AnimeObject.WebInfo.AnimeChapter)

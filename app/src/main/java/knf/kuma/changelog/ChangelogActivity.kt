@@ -11,11 +11,10 @@ import com.crashlytics.android.Crashlytics
 import knf.kuma.R
 import knf.kuma.changelog.objects.Changelog
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.jobscheduler.DirUpdateJob
 import kotlinx.android.synthetic.main.recycler_changelog.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
@@ -89,7 +88,7 @@ class ChangelogActivity : AppCompatActivity() {
                     val pCode = activity.packageManager.getPackageInfo(activity.packageName, 0).versionCode
                     if (pCode > cCode && cCode != 0) {
                         runWVersion(pCode)
-                        launch(UI) {
+                        doOnUI {
                             MaterialDialog(activity).safeShow {
                                 message(text = "Nueva versión, ¿Leer Changelog?")
                                 positiveButton(text = "Leer") {

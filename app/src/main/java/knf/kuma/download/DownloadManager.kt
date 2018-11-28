@@ -37,7 +37,7 @@ class DownloadManager : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null && intent.action != null && intent.action == "stop.foregrouns") {
+        if (intent != null && intent.action != null && intent.action == "stop.foreground") {
             stopForeground(true)
             stopSelf()
         }
@@ -47,6 +47,7 @@ class DownloadManager : Service() {
     override fun onCreate() {
         super.onCreate()
         startForeground(23498, foregroundNotification())
+        //notificationManager?.notify(22498, foregroundGroupNotification())
     }
 
     companion object {
@@ -63,7 +64,7 @@ class DownloadManager : Service() {
         private var notificationManager: NotificationManager? = null
 
         fun setParallelDownloads(newValue: String) {
-            if (fetch != null) fetch!!.setDownloadConcurrentLimit(Integer.parseInt(newValue))
+            if (fetch != null) fetch?.setDownloadConcurrentLimit(Integer.parseInt(newValue))
         }
 
         fun init(context: Context) {
@@ -101,6 +102,7 @@ class DownloadManager : Service() {
                     if (downloadObject != null) {
                         if (FileAccessHelper.INSTANCE.isTempFile(download.file)) {
                             downloadObject.setEta(-2)
+                            downloadObject.progress = 0
                             downloadDao.update(downloadObject)
                             FileUtil.moveFile(downloadObject.file!!, object : FileUtil.MoveCallback {
                                 override fun onProgress(pair: Pair<Int, Boolean>) {
@@ -115,7 +117,7 @@ class DownloadManager : Service() {
                                         downloadObject.progress = 100
                                         downloadObject.state = DownloadObject.COMPLETED
                                         downloadDao.update(downloadObject)
-                                        notificationManager!!.cancel(downloadObject.eid!!.toInt())
+                                        notificationManager?.cancel(downloadObject.eid!!.toInt())
                                         completedNotification(downloadObject)
                                     }
                                     stopIfNeeded()
@@ -135,9 +137,9 @@ class DownloadManager : Service() {
                     if (downloadObject != null) {
                         errorNotification(downloadObject)
                         downloadDao.delete(downloadObject)
-                        throwable!!.printStackTrace()
-                        fetch!!.delete(download.id)
-                        throwable.printStackTrace()
+                        throwable?.printStackTrace()
+                        fetch?.delete(download.id)
+                        throwable?.printStackTrace()
                         Crashlytics.logException(throwable)
                         stopIfNeeded()
                     }
@@ -195,21 +197,21 @@ class DownloadManager : Service() {
                 override fun onCancelled(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null)
-                        notificationManager!!.cancel(downloadObject.getDid())
+                        notificationManager?.cancel(downloadObject.getDid())
                     stopIfNeeded()
                 }
 
                 override fun onRemoved(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null)
-                        notificationManager!!.cancel(downloadObject.getDid())
+                        notificationManager?.cancel(downloadObject.getDid())
                     stopIfNeeded()
                 }
 
                 override fun onDeleted(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null)
-                        notificationManager!!.cancel(downloadObject.getDid())
+                        notificationManager?.cancel(downloadObject.getDid())
                     stopIfNeeded()
                 }
             })
@@ -242,9 +244,9 @@ class DownloadManager : Service() {
             val downloadObject = downloadDao.getByEid(eid)
             if (downloadObject != null) {
                 downloadDao.delete(downloadObject)
-                notificationManager!!.cancel(downloadObject.eid!!.toInt())
+                notificationManager?.cancel(downloadObject.eid!!.toInt())
                 if (downloadObject.did != null)
-                    fetch!!.delete(downloadObject.getDid())
+                    fetch?.delete(downloadObject.getDid())
             }
         }
 
@@ -263,7 +265,7 @@ class DownloadManager : Service() {
         }
 
         fun pause(did: Int) {
-            doAsync { fetch!!.pause(did) }
+            doAsync { fetch?.pause(did) }
         }
 
         fun resume(downloadObject: DownloadObject) {
@@ -271,7 +273,7 @@ class DownloadManager : Service() {
         }
 
         internal fun resume(did: Int) {
-            doAsync { fetch!!.resume(did) }
+            doAsync { fetch?.resume(did) }
         }
 
         private fun updateNotification(downloadObject: DownloadObject, isPaused: Boolean) {
@@ -309,7 +311,7 @@ class DownloadManager : Service() {
                     .setWhen(downloadObject.time)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()
-            notificationManager!!.notify(downloadObject.eid!!.toInt(), notification)
+            notificationManager?.notify(downloadObject.eid!!.toInt(), notification)
             updateMedia(downloadObject)
         }
 
@@ -323,25 +325,37 @@ class DownloadManager : Service() {
                     .setWhen(downloadObject.time)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()
-            notificationManager!!.notify(downloadObject.eid!!.toInt(), notification)
+            notificationManager?.notify(downloadObject.eid!!.toInt(), notification)
         }
 
         private fun foregroundNotification(): Notification {
-            val builder = NotificationCompat.Builder(context!!, CHANNEL_FOREGROUND)
-                    .setSmallIcon(R.drawable.ic_service)
-                    .setOngoing(true)
-                    .setPriority(NotificationCompat.PRIORITY_MIN)
-            if (PrefsUtil.collapseDirectoryNotification)
-                builder.setSubText("Descargas en progreso")
-            else
-                builder.setContentTitle("Descargas en progreso")
-            return builder.build()
+            return NotificationCompat.Builder(context!!, CHANNEL_FOREGROUND).apply {
+                setSmallIcon(R.drawable.ic_service)
+                setOngoing(true)
+                priority = NotificationCompat.PRIORITY_MIN
+                setGroup("manager")
+                if (PrefsUtil.collapseDirectoryNotification)
+                    setSubText("Descargas en progreso")
+                else
+                    setContentTitle("Descargas en progreso")
+            }.build()
+        }
+
+        private fun foregroundGroupNotification(): Notification {
+            return NotificationCompat.Builder(context!!, CHANNEL_FOREGROUND).apply {
+                setContentTitle("Descargas en progreso")
+                setSmallIcon(R.drawable.ic_service)
+                setOngoing(false)
+                priority = NotificationCompat.PRIORITY_MIN
+                setGroup("manager")
+                setGroupSummary(true)
+            }.build()
         }
 
         private fun updateMedia(downloadObject: DownloadObject) {
             try {
                 val file = downloadObject.file
-                context!!.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(FileAccessHelper.INSTANCE.getFile(file!!))))
+                context?.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(FileAccessHelper.INSTANCE.getFile(file!!))))
                 MediaScannerConnection.scanFile(context, arrayOf(FileAccessHelper.INSTANCE.getFile(file).absolutePath), arrayOf("video/mp4"), null)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -358,8 +372,10 @@ class DownloadManager : Service() {
         }
 
         private fun stopIfNeeded() {
-            if (downloadDao.countActive() == 0)
-                ContextCompat.startForegroundService(context!!, Intent(context, DownloadManager::class.java).setAction("stop.foregrouns"))
+            if (downloadDao.countActive() == 0) {
+                ContextCompat.startForegroundService(context!!, Intent(context, DownloadManager::class.java).setAction("stop.foreground"))
+                notificationManager?.cancel(22498)
+            }
         }
     }
 }

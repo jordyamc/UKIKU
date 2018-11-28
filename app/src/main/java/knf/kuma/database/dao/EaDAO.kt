@@ -8,8 +8,8 @@ import knf.kuma.pojos.EAObject
 @TypeConverters(BaseConverter::class)
 interface EaDAO {
     @Query("SELECT count(*) FROM eaobject WHERE code=:code")
-    fun isUnlocked(code: Int): Boolean?
+    fun isUnlocked(code: Int): Boolean
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun unlock(`object`: EAObject)
+    fun unlock(eaObject: EAObject)
 }

@@ -6,7 +6,7 @@
     android:background="@color/cardview_background"
     android:elevation="16dp"
     android:orientation="vertical"
-    android:theme="@style/AppTheme">
+    android:theme="@style/AppTheme.DayNight">
 
     <TextView
         android:layout_width="wrap_content"
@@ -22,12 +22,12 @@
         android:id="@+id/action_seen"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="?selectableItemBackground"
         android:clickable="true"
         android:drawableStart="@drawable/ic_option_seen"
         android:drawablePadding="32dp"
         android:drawableTint="?colorControlNormal"
         android:focusable="true"
+        android:foreground="?selectableItemBackground"
         android:gravity="start|center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"

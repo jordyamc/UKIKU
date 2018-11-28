@@ -16,15 +16,17 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeRelatedAdapter
 import knf.kuma.animeinfo.AnimeTagsAdapter
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.custom.ExpandableTV
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.SeeingObject
 import kotlinx.android.synthetic.main.fragment_anime_details.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.zhanghai.android.materialratingbar.MaterialRatingBar
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
@@ -54,7 +56,7 @@ class AnimeDetailsHolder(val view: View) {
     }
 
     fun populate(fragment: Fragment, animeObject: AnimeObject) {
-        launch(UI) {
+        doOnUI {
             title.text = animeObject.name
             noCrash {
                 cardViews[0].setOnLongClickListener {
@@ -75,7 +77,7 @@ class AnimeDetailsHolder(val view: View) {
                     desc.setTextAndIndicator(animeObject.description!!.trim { it <= ' ' }, expandIcon)
                     desc.setAnimationDuration(300)
                     val onClickListener = View.OnClickListener {
-                        launch(UI) {
+                        doOnUI {
                             expandIcon.setImageResource(if (desc.isExpanded) R.drawable.action_expand else R.drawable.action_shrink)
                             desc.toggle()
                         }
@@ -134,7 +136,7 @@ class AnimeDetailsHolder(val view: View) {
 
     private fun showCard(view: CardView) {
         retard += 100
-        launch(UI) {
+        GlobalScope.launch(Dispatchers.Main) {
             delay(retard.toLong())
             view.visibility = View.VISIBLE
             val animation = AnimationUtils.makeInChildBottomAnimation(view.context)

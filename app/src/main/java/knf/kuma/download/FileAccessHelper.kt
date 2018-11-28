@@ -172,32 +172,49 @@ class FileAccessHelper private constructor(private val context: Context) {
 
     }
 
-    @JvmOverloads
-    fun delete(file_name: String?, listener: DeleteListener? = null) {
+    fun getDownloadsDirectoryFromFile(file_name: String): File {
+        return try {
+            if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
+                File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/${PatternUtil.getNameFromFile(file_name)}")
+            } else {
+                File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads/${PatternUtil.getNameFromFile(file_name)}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Environment.getDataDirectory()
+        }
+
+    }
+
+    fun delete(file_name: String?, async: Boolean = true) {
+        if (async)
+            doAsync { delete(file_name) }
+        else
+            delete(file_name)
+    }
+
+    private fun delete(file_name: String?) {
         if (file_name.isNull())
             return
-        doAsync {
-            try {
-                if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
-                    val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
-                    file.delete()
-                    val dir = file.parentFile
-                    if (dir.listFiles() == null || dir.listFiles().isEmpty())
+        try {
+            if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
+                val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
+                file.delete()
+                val dir = file.parentFile
+                if (dir.listFiles() == null || dir.listFiles().isEmpty())
+                    dir.delete()
+            } else {
+                val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
+                if (documentFile != null && documentFile.exists()) {
+                    val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
+                    file?.delete()
+                    val dir = file?.parentFile
+                    if (dir != null && dir.listFiles().isEmpty())
                         dir.delete()
-                } else {
-                    val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
-                    if (documentFile != null && documentFile.exists()) {
-                        val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
-                        file!!.delete()
-                        val dir = file.parentFile
-                        if (dir != null && dir.listFiles().isEmpty())
-                            dir.delete()
-                    }
                 }
-                listener?.invoke()
-            } catch (e: Exception) {
-                listener?.invoke()
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -398,15 +415,6 @@ class FileAccessHelper private constructor(private val context: Context) {
         }
 
         fun openTreeChooser(fragment: Fragment) {
-            try {
-                fragment.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
-            } catch (e: Exception) {
-                Toaster.toast("Error al buscar SD")
-            }
-
-        }
-
-        fun openTreeChooser(fragment: android.app.Fragment) {
             try {
                 fragment.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
             } catch (e: Exception) {

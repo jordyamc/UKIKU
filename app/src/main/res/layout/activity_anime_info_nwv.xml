@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -22,6 +23,7 @@
             app:expandedTitleMarginBottom="?actionBarSize"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
+            app:expandedTitleTextAppearance="@style/ExpandedTextWhite"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -54,12 +56,16 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"
+                style="@style/Widget.MaterialComponents.TabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:background="@android:color/transparent"
                 app:layout_scrollFlags="scroll|enterAlways"
+                app:tabBackground="@android:color/transparent"
                 app:tabMode="scrollable"
-                app:tabTextColor="@android:color/white">
+                app:tabSelectedTextColor="?colorAccent"
+                app:tabTextColor="@android:color/secondary_text_dark">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
@@ -82,14 +88,14 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:tint="@android:color/white"
         android:visibility="visible"
         app:fabSize="normal"
         app:layout_anchor="@+id/appBar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/heart_empty"/>
+        tools:srcCompat="@drawable/heart_empty"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

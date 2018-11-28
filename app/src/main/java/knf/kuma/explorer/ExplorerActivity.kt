@@ -71,6 +71,11 @@ class ExplorerActivity : AppCompatActivity(), OnFileStateChange {
         invalidateOptionsMenu()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        ThumbServer.stop()
+    }
+
     override fun onBackPressed() {
         if (adapter == null || !(adapter!!.getItem(pager!!.currentItem) as FragmentBase).onBackPressed())
             super.onBackPressed()

@@ -25,6 +25,9 @@
                 <item
                     android:id="@+id/by_id_dir"
                     android:title="ID"/>
+                <item
+                    android:id="@+id/by_added_dir"
+                    android:title="Ú. añadidos"/>
             </group>
         </menu>
     </item>

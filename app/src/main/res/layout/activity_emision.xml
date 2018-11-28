@@ -21,12 +21,18 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabMode="scrollable"/>
+            style="@style/Widget.MaterialComponents.TabLayout"
+            android:background="?colorPrimary"
+            app:tabBackground="?colorPrimary"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="?colorAccent"
+            app:tabTextColor="@android:color/secondary_text_dark"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 </LinearLayout>

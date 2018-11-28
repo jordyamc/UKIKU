@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
@@ -33,6 +34,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import es.munix.multidisplaycast.CastManager
+import knf.kuma.achievements.AchievementActivity
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.BUUtils
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.MigrationActivity
@@ -66,8 +69,6 @@ import knf.kuma.seeing.SeeingActivity
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.nav_header_main.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.cryse.widget.persistentsearch.PersistentSearchView
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.hintTextColor
@@ -143,16 +144,26 @@ class Main : AppCompatActivity(),
 
     @SuppressLint("SetTextI18n")
     private fun setNavigationButtons() {
-        launch(UI) {
+        doOnUI {
             badgeEmission = navigationView.menu.findItem(R.id.drawer_emision).actionView as TextView
             badgeSeeing = navigationView.menu.findItem(R.id.drawer_seeing).actionView as TextView
             badgeQueue = navigationView.menu.findItem(R.id.drawer_queue).actionView as TextView
             navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg(this@Main))
+            val header = navigationView.getHeaderView(0).img
+            ViewCompat.setOnApplyWindowInsetsListener(header) { v, insets ->
+                v.apply {
+                    if (insets.systemWindowInsetTop > 0)
+                        setPadding(paddingLeft, insets.systemWindowInsetTop, paddingRight, paddingBottom)
+                }
+                insets
+            }
             val actionInfo = navigationView.getHeaderView(0).action_info
+            val actionTrophy = navigationView.getHeaderView(0).action_trophy
             val actionLogin = navigationView.getHeaderView(0).action_login
             val actionMigrate = navigationView.getHeaderView(0).action_migrate
             val actionMap = navigationView.getHeaderView(0).action_map
             actionInfo.setOnClickListener { AppInfo.open(this@Main) }
+            actionTrophy.setOnClickListener { AchievementActivity.open(this@Main) }
             actionLogin.setOnClickListener { BackUpActivity.start(this@Main) }
             actionMigrate.setOnClickListener { MigrationActivity.start(this@Main) }
             actionMap.setOnClickListener { EAMActivity.start(this@Main) }
@@ -180,18 +191,18 @@ class Main : AppCompatActivity(),
                         .setGravityOffset(5f, 5f, true)
                         .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight(this)))
                 CacheDB.INSTANCE.favsDAO().countLive.observe(this, Observer { integer ->
-                    if (badgeView != null)
+                    if (badgeView != null && integer != null)
                         if (PrefsUtil.showFavIndicator)
-                            badgeView!!.badgeNumber = integer!!
+                            badgeView?.badgeNumber = integer
                         else
-                            badgeView!!.hide(false)
+                            badgeView?.hide(false)
                 })
                 PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean!!)
-                            badgeView!!.badgeNumber = CacheDB.INSTANCE.favsDAO().count
+                            badgeView?.badgeNumber = CacheDB.INSTANCE.favsDAO().count
                         else
-                            badgeView!!.hide(false)
+                            badgeView?.hide(false)
                     }
                 })
                 PreferenceManager.getDefaultSharedPreferences(this).stringLiveData("theme_color", "0")
@@ -239,7 +250,6 @@ class Main : AppCompatActivity(),
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 55498)
     }
 
-
     override fun onNeedUpdate(o_code: String, n_code: String) {
         runOnUiThread {
             try {
@@ -269,6 +279,7 @@ class Main : AppCompatActivity(),
 
             override fun onSearchTermChanged(term: String) {
                 EAHelper.checkStart(term)
+                AchievementManager.onSearch(term)
                 if (selectedFragment is SearchFragment)
                     (selectedFragment as SearchFragment).setSearch(term)
             }
@@ -327,6 +338,7 @@ class Main : AppCompatActivity(),
                 0 -> menu.findItem(R.id.by_name_dir).isChecked = true
                 1 -> menu.findItem(R.id.by_votes).isChecked = true
                 2 -> menu.findItem(R.id.by_id_dir).isChecked = true
+                3 -> menu.findItem(R.id.by_added_dir).isChecked = true
             }
         } else {
             menuInflater.inflate(R.menu.main, menu)
@@ -365,6 +377,10 @@ class Main : AppCompatActivity(),
                 PrefsUtil.dirOrder = 2
                 changeOrder()
             }
+            R.id.by_added_dir -> {
+                PrefsUtil.dirOrder = 3
+                changeOrder()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -401,7 +417,7 @@ class Main : AppCompatActivity(),
     }
 
     private fun setFragment(fragment: BottomFragment) {
-        launch(UI) {
+        doOnUI {
             try {
                 selectedFragment = fragment
                 val transaction = supportFragmentManager.beginTransaction()
@@ -431,8 +447,10 @@ class Main : AppCompatActivity(),
         if (tmpfragment != null) {
             setFragment(tmpfragment!!)
             tmpfragment = null
-        } else
+        } else {
             bottomNavigationView.selectedItemId = R.id.action_bottom_recents
+            setFragment(RecentFragment.get())
+        }
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
@@ -498,7 +516,7 @@ class Main : AppCompatActivity(),
         Crashlytics.setString("screen", "Main")
         invalidateOptionsMenu()
         checkBypass()
-        launch(UI) {
+        doOnUI {
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             when (BUUtils.getType(this@Main)) {
                 BUUtils.BUType.LOCAL -> backupLocation.text = "Almacenamiento local"
@@ -508,9 +526,19 @@ class Main : AppCompatActivity(),
         }
         if (isFirst) {
             isFirst = false
-            UpdateChecker.check(this, this)
-            ChangelogActivity.check(this)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        AchievementManager.backup(this)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        ChangelogActivity.check(this)
+        UpdateChecker.check(this, this)
+        AchievementManager.restore(this)
     }
 
     override fun onNeedRecreate() {
@@ -536,7 +564,7 @@ class Main : AppCompatActivity(),
                     isLoading = true
                     Log.e("CloudflareBypass", "is needed")
                     clearCookies()
-                    launch(UI) {
+                    doOnUI {
                         webView?.settings?.javaScriptEnabled = true
                         webView?.webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {

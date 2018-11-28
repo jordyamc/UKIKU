@@ -24,11 +24,23 @@ interface SeeingDAO {
     @get:Query("SELECT count(*) FROM seeingobject WHERE state=1")
     val countWatchingLive: LiveData<Int>
 
+    @get:Query("SELECT count(*) FROM seeingobject WHERE state=3")
+    val countCompletedLive: LiveData<Int>
+
+    @get:Query("SELECT count(*) FROM seeingobject WHERE state=4")
+    val countDroppedLive: LiveData<Int>
+
     @Query("SELECT * FROM seeingobject WHERE aid LIKE :aid")
     fun getByAid(aid: String): SeeingObject?
 
-    @Query("SELECT count(*) FROM seeingobject WHERE aid = :aid")
+    @Query("SELECT count(*) FROM seeingobject WHERE aid = :aid AND state>0 AND state <3")
     fun isSeeing(aid: String): Boolean
+
+    @Query("SELECT count(*) FROM seeingobject WHERE aid = :aid")
+    fun isSeeingAll(aid: String): Boolean
+
+    @Query("SELECT count(*) FROM seeingobject WHERE aid IN (:list) AND state=3")
+    fun isAnimeCompleted(list: List<String>): LiveData<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun add(seeingObject: SeeingObject)

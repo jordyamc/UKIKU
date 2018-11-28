@@ -16,6 +16,7 @@ import com.evernote.android.job.JobManager
 import es.munix.multidisplaycast.CastManager
 import io.branch.referral.Branch
 import io.fabric.sdk.android.Fabric
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
@@ -31,17 +32,19 @@ import knf.kuma.jobscheduler.RecentsJob
 import knf.kuma.jobscheduler.UpdateJob
 
 class App : Application() {
+    //private lateinit var appCoinsAds: AppCoinsAds
 
     @TargetApi(Build.VERSION_CODES.O)
     private fun createChannels() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val dirChannel = NotificationChannel(DirectoryService.CHANNEL, getString(R.string.directory_channel_title), NotificationManager.IMPORTANCE_MIN)
         dirChannel.setSound(null, AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN).setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
+        dirChannel.setShowBadge(false)
         manager.createNotificationChannel(dirChannel)
         manager.createNotificationChannel(NotificationChannel(RecentsJob.CHANNEL_RECENTS, "Capitulos recientes", NotificationManager.IMPORTANCE_HIGH))
         manager.createNotificationChannel(NotificationChannel(DownloadService.CHANNEL, "Descargas", NotificationManager.IMPORTANCE_HIGH))
-        manager.createNotificationChannel(NotificationChannel(DownloadService.CHANNEL_ONGOING, "Descargas en progreso", NotificationManager.IMPORTANCE_LOW))
-        manager.createNotificationChannel(NotificationChannel(DownloadManager.CHANNEL_FOREGROUND, "Administrador de descargas", NotificationManager.IMPORTANCE_MIN))
+        manager.createNotificationChannel(NotificationChannel(DownloadService.CHANNEL_ONGOING, "Descargas en progreso", NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
+        manager.createNotificationChannel(NotificationChannel(DownloadManager.CHANNEL_FOREGROUND, "Administrador de descargas", NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
         manager.createNotificationChannel(NotificationChannel(UpdateJob.CHANNEL, "Actualización de la app", NotificationManager.IMPORTANCE_DEFAULT))
     }
 
@@ -64,8 +67,17 @@ class App : Application() {
         CastUtil.init(this)
         DownloadManager.init(this)
         FileAccessHelper.init(this)
+        AchievementManager.init(this)
+        initAppCoins()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels()
+    }
+
+    private fun initAppCoins() {
+        /*appCoinsAds= AppCoinsAdsBuilder()
+                .withDebug(BuildConfig.DEBUG)
+                .createAdvertisementSdk(this)
+                .also { it.init(this) }*/
     }
 
     companion object {

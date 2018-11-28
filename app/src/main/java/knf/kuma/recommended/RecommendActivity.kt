@@ -150,7 +150,7 @@ class RecommendActivity : AppCompatActivity() {
         for (list in lists) {
             val removeList = ArrayList<AnimeObject>()
             for (animeObject in list)
-                if (favsDAO.isFav(animeObject.key) || seeingDAO.isSeeing(animeObject.aid!!))
+                if (favsDAO.isFav(animeObject.key) || seeingDAO.isSeeingAll(animeObject.aid!!))
                     removeList.add(animeObject)
             list.removeAll(removeList)
         }

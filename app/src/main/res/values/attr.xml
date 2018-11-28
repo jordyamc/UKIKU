@@ -15,4 +15,5 @@
         <attr name="si_showDivider" format="boolean"/>
         <attr name="si_actionId" format="string"/>
     </declare-styleable>
+    <attr name="colorAccentLight" format="reference"/>
 </resources>

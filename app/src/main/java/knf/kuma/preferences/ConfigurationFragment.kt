@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -35,8 +34,6 @@ import knf.kuma.jobscheduler.DirUpdateJob
 import knf.kuma.jobscheduler.RecentsJob
 import knf.kuma.pojos.AutoBackupObject
 import knf.kuma.widgets.emision.WEmisionProvider
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.FileOutputStream
@@ -46,218 +43,232 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         if (activity != null && context != null)
-            launch(UI) {
-                noCrash {
-                    addPreferencesFromResource(R.xml.preferences)
-                    preferenceManager.sharedPreferences.edit().putBoolean("daynigth_permission", Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED).apply()
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                        preferenceScreen.findPreference("daynigth_permission").isEnabled = false
-                    preferenceScreen.findPreference("daynigth_permission").setOnPreferenceChangeListener { _, o ->
-                        val check = o as Boolean
-                        if (check && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                            if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 5587)
-                            } else if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                preferenceManager.sharedPreferences.edit().putBoolean("daynigth_permission", true).apply()
-                                preferenceScreen.findPreference("daynigth_permission").isEnabled = false
-                            }
-                        true
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                        preferenceScreen.findPreference("custom_tone").summary = "Abrir configuración"
-                    else if (FileAccessHelper.INSTANCE.toneFile.exists())
-                        preferenceScreen.findPreference("custom_tone").summary = "Personalizado"
-                    preferenceScreen.findPreference("custom_tone").setOnPreferenceClickListener {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            noCrash {
-                                startActivity(
-                                        Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-                                                .putExtra(Settings.EXTRA_CHANNEL_ID, RecentsJob.CHANNEL_RECENTS)
-                                                .putExtra(Settings.EXTRA_APP_PACKAGE, this@ConfigurationFragment.context?.packageName)
-                                )
-                            }
-                        else
-                            MaterialDialog(activity!!).safeShow {
-                                title(text = "Tono de notificación")
-                                listItems(items = listOf("Cambiar tono", "Tono de sistema")) { _, index, _ ->
-                                    when (index) {
-                                        0 -> startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT)
-                                                .addCategory(Intent.CATEGORY_OPENABLE)
-                                                .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                                .setType("audio/*"), 4784)
-                                        1 -> {
-                                            FileAccessHelper.INSTANCE.toneFile.safeDelete()
-                                            preferenceScreen.findPreference("custom_tone").summary = "Sistema"
-                                        }
+            doOnUI {
+                addPreferencesFromResource(R.xml.preferences)
+                preferenceManager.sharedPreferences.edit().putBoolean("daynigth_permission", Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED).apply()
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                    preferenceScreen.findPreference("daynigth_permission").isEnabled = false
+                preferenceScreen.findPreference("daynigth_permission").setOnPreferenceChangeListener { _, o ->
+                    val check = o as Boolean
+                    if (check && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                        if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 5587)
+                        } else if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            preferenceManager.sharedPreferences.edit().putBoolean("daynigth_permission", true).apply()
+                            preferenceScreen.findPreference("daynigth_permission").isEnabled = false
+                        }
+                    true
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    preferenceScreen.findPreference("custom_tone").summary = "Abrir configuración"
+                else if (FileAccessHelper.INSTANCE.toneFile.exists())
+                    preferenceScreen.findPreference("custom_tone").summary = "Personalizado"
+                preferenceScreen.findPreference("custom_tone").setOnPreferenceClickListener {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        noCrash {
+                            startActivity(
+                                    Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                                            .putExtra(Settings.EXTRA_CHANNEL_ID, RecentsJob.CHANNEL_RECENTS)
+                                            .putExtra(Settings.EXTRA_APP_PACKAGE, this@ConfigurationFragment.context?.packageName)
+                            )
+                        }
+                    else
+                        MaterialDialog(activity!!).safeShow {
+                            title(text = "Tono de notificación")
+                            listItems(items = listOf("Cambiar tono", "Tono de sistema")) { _, index, _ ->
+                                when (index) {
+                                    0 -> startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT)
+                                            .addCategory(Intent.CATEGORY_OPENABLE)
+                                            .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            .setType("audio/*"), 4784)
+                                    1 -> {
+                                        FileAccessHelper.INSTANCE.toneFile.safeDelete()
+                                        preferenceScreen.findPreference("custom_tone").summary = "Sistema"
                                     }
                                 }
                             }
-                        return@setOnPreferenceClickListener true
-                    }
-                    if (BUUtils.getType(activity) != BUUtils.BUType.LOCAL) {
-                        if (Network.isConnected) {
-                            BUUtils.init(activity!!, object : BUUtils.LoginInterface {
-                                override fun onLogin() {
-                                    preferenceScreen.findPreference("auto_backup").summary = "Cargando..."
-                                    BUUtils.search("autobackup", object : BUUtils.SearchInterface {
-                                        override fun onResponse(backupObject: BackupObject<*>?) {
-                                            launch(UI) {
-                                                try {
-                                                    if (backupObject != null) {
-                                                        val autoBackupObject = backupObject as AutoBackupObject?
-                                                        if (backupObject == AutoBackupObject(activity))
-                                                            preferenceScreen.findPreference("auto_backup").summary = "%s"
-                                                        else
-                                                            preferenceScreen.findPreference("auto_backup").summary = "Solo " + autoBackupObject!!.name
-                                                    } else {
-                                                        preferenceManager.sharedPreferences.edit().putString("auto_backup", "0").apply()
+                        }
+                    return@setOnPreferenceClickListener true
+                }
+                if (BUUtils.getType(activity) != BUUtils.BUType.LOCAL) {
+                    if (Network.isConnected) {
+                        BUUtils.init(activity!!, object : BUUtils.LoginInterface {
+                            override fun onLogin() {
+                                preferenceScreen.findPreference("auto_backup").summary = "Cargando..."
+                                BUUtils.search("autobackup", object : BUUtils.SearchInterface {
+                                    override fun onResponse(backupObject: BackupObject<*>?) {
+                                        doOnUI {
+                                            try {
+                                                if (backupObject != null) {
+                                                    val autoBackupObject = backupObject as AutoBackupObject?
+                                                    if (backupObject == AutoBackupObject(activity))
                                                         preferenceScreen.findPreference("auto_backup").summary = "%s"
-                                                    }
-                                                    preferenceScreen.findPreference("auto_backup").isEnabled = true
-                                                } catch (e: Exception) {
-                                                    preferenceScreen.findPreference("auto_backup").summary = "Error al buscar archivo"
+                                                    else
+                                                        preferenceScreen.findPreference("auto_backup").summary = "Solo " + autoBackupObject!!.name
+                                                } else {
+                                                    preferenceManager.sharedPreferences.edit().putString("auto_backup", "0").apply()
+                                                    preferenceScreen.findPreference("auto_backup").summary = "%s"
                                                 }
+                                                preferenceScreen.findPreference("auto_backup").isEnabled = true
+                                            } catch (e: Exception) {
+                                                preferenceScreen.findPreference("auto_backup").summary = "Error al buscar archivo"
                                             }
                                         }
-                                    })
-                                }
-                            }, true)
-                        } else {
-                            preferenceScreen.findPreference("auto_backup").summary = "Sin internet"
-                        }
-                    } else {
-                        preferenceScreen.findPreference("auto_backup").summary = "Sin cuenta para respaldos"
-                    }
-                    preferenceScreen.findPreference("auto_backup").setOnPreferenceChangeListener { _, o ->
-                        BackupJob.reSchedule(Integer.valueOf(o as String))
-                        BUUtils.backup(AutoBackupObject(activity), object : BUUtils.AutoBackupInterface {
-                            override fun onResponse(backupObject: AutoBackupObject?) {
-                                if (backupObject != null)
-                                    Log.e("Backup override", backupObject.name)
+                                    }
+                                })
                             }
-                        })
-                        true
+                        }, true)
+                    } else {
+                        preferenceScreen.findPreference("auto_backup").summary = "Sin internet"
                     }
-                    preferenceScreen.findPreference("download_type").setOnPreferenceChangeListener { _, o ->
-                        if (o == "1" && !FileAccessHelper.INSTANCE.canDownload(this@ConfigurationFragment, o as String))
-                            Toaster.toast("Por favor selecciona la raiz de tu SD")
-                        true
-                    }
-                    if (PrefsUtil.downloaderType == 0) {
+                } else {
+                    preferenceScreen.findPreference("auto_backup").summary = "Sin cuenta para respaldos"
+                }
+                preferenceScreen.findPreference("auto_backup").setOnPreferenceChangeListener { _, o ->
+                    BackupJob.reSchedule(Integer.valueOf(o as String))
+                    BUUtils.backup(AutoBackupObject(activity), object : BUUtils.AutoBackupInterface {
+                        override fun onResponse(backupObject: AutoBackupObject?) {
+                            if (backupObject != null)
+                                Log.e("Backup override", backupObject.name)
+                        }
+                    })
+                    true
+                }
+                preferenceScreen.findPreference("download_type").setOnPreferenceChangeListener { _, o ->
+                    if (o == "1" && !FileAccessHelper.INSTANCE.canDownload(this@ConfigurationFragment, o as String))
+                        Toaster.toast("Por favor selecciona la raiz de tu SD")
+                    true
+                }
+                if (PrefsUtil.downloaderType == 0) {
+                    preferenceScreen.findPreference("max_parallel_downloads").isEnabled = false
+                    preferenceScreen.findPreference("buffer_size").isEnabled = true
+                } else {
+                    preferenceScreen.findPreference("max_parallel_downloads").isEnabled = true
+                    preferenceScreen.findPreference("buffer_size").isEnabled = false
+                }
+                preferenceScreen.findPreference("downloader_type").setOnPreferenceChangeListener { _, o ->
+                    if (o == "0") {
                         preferenceScreen.findPreference("max_parallel_downloads").isEnabled = false
                         preferenceScreen.findPreference("buffer_size").isEnabled = true
                     } else {
                         preferenceScreen.findPreference("max_parallel_downloads").isEnabled = true
                         preferenceScreen.findPreference("buffer_size").isEnabled = false
                     }
-                    preferenceScreen.findPreference("downloader_type").setOnPreferenceChangeListener { _, o ->
-                        if (o == "0") {
-                            preferenceScreen.findPreference("max_parallel_downloads").isEnabled = false
-                            preferenceScreen.findPreference("buffer_size").isEnabled = true
-                        } else {
-                            preferenceScreen.findPreference("max_parallel_downloads").isEnabled = true
-                            preferenceScreen.findPreference("buffer_size").isEnabled = false
-                        }
-                        true
+                    true
+                }
+                preferenceScreen.findPreference("theme_option").setOnPreferenceChangeListener { _, o ->
+                    AppCompatDelegate.setDefaultNightMode((o as String).toInt())
+                    PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("theme_value", o).apply()
+                    WEmisionProvider.update(activity!!)
+                    activity?.recreate()
+                    //AestheticUtils.updateIsDarkMode(this@ConfigurationFragment.context!!, o == "2")
+                    true
+                }
+                preferenceScreen.findPreference("recents_time").setOnPreferenceChangeListener { _, o ->
+                    preferenceScreen.findPreference("notify_favs").isEnabled = "0" != o
+                    RecentsJob.reSchedule(Integer.valueOf(o as String) * 15)
+                    true
+                }
+                preferenceScreen.findPreference("dir_update_time").setOnPreferenceChangeListener { _, o ->
+                    DirUpdateJob.reSchedule(Integer.valueOf(o as String) * 15)
+                    true
+                }
+                preferenceScreen.findPreference("dir_update").setOnPreferenceClickListener {
+                    try {
+                        if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
+                            ContextCompat.startForegroundService(safeContext.applicationContext, Intent(safeContext.applicationContext, DirectoryUpdateService::class.java))
+                        else if (DirectoryUpdateService.isRunning)
+                            Toaster.toast("Ya se esta actualizando")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                    preferenceScreen.findPreference("theme_option").setOnPreferenceChangeListener { _, o ->
-                        AppCompatDelegate.setDefaultNightMode((o as String).toInt())
-                        PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("theme_value", o).apply()
-                        WEmisionProvider.update(activity!!)
-                        activity?.recreate()
-                        //AestheticUtils.updateIsDarkMode(this@ConfigurationFragment.context!!, o == "2")
-                        true
-                    }
-                    preferenceScreen.findPreference("recents_time").setOnPreferenceChangeListener { _, o ->
-                        preferenceScreen.findPreference("notify_favs").isEnabled = "0" != o
-                        RecentsJob.reSchedule(Integer.valueOf(o as String) * 15)
-                        true
-                    }
-                    preferenceScreen.findPreference("dir_update_time").setOnPreferenceChangeListener { _, o ->
-                        DirUpdateJob.reSchedule(Integer.valueOf(o as String) * 15)
-                        true
-                    }
-                    preferenceScreen.findPreference("dir_update").setOnPreferenceClickListener {
-                        try {
-                            if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
-                                ContextCompat.startForegroundService(safeContext.applicationContext, Intent(safeContext.applicationContext, DirectoryUpdateService::class.java))
-                            else if (DirectoryUpdateService.isRunning)
-                                Toaster.toast("Ya se esta actualizando")
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
 
-                        false
-                    }
-                    preferenceScreen.findPreference("dir_destroy").setOnPreferenceClickListener { _ ->
-                        try {
-                            if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
-                                MaterialDialog(activity!!).safeShow {
-                                    message(text = "¿Desea recrear el directorio?")
-                                    positiveButton(text = "continuar") {
-                                        doAsync {
-                                            CacheDB.INSTANCE.animeDAO().nuke()
-                                            PreferenceManager.getDefaultSharedPreferences(safeContext.applicationContext).edit().putBoolean("directory_finished", false).apply()
-                                            DirectoryService.run(safeContext.applicationContext)
-                                        }
+                    false
+                }
+                preferenceScreen.findPreference("dir_destroy").setOnPreferenceClickListener {
+                    try {
+                        if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
+                            MaterialDialog(activity!!).safeShow {
+                                message(text = "¿Desea recrear el directorio?")
+                                positiveButton(text = "continuar") {
+                                    doAsync {
+                                        CacheDB.INSTANCE.animeDAO().nuke()
+                                        PreferenceManager.getDefaultSharedPreferences(safeContext.applicationContext).edit().putBoolean("directory_finished", false).apply()
+                                        DirectoryService.run(safeContext.applicationContext)
                                     }
-                                    negativeButton(text = "cancelar")
                                 }
-                            else if (DirectoryService.isRunning)
-                                Toaster.toast("Ya se esta creando")
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                                negativeButton(text = "cancelar")
+                            }
+                        else if (DirectoryService.isRunning)
+                            Toaster.toast("Ya se esta creando")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
 
+                    false
+                }
+                when {
+                    EAHelper.phase == 4 ->
+                        preferenceScreen.findPreference("theme_color").setOnPreferenceChangeListener { _, value ->
+                            startActivity(Intent(activity, Main::class.java).putExtra("start_position", 3))
+                            activity?.finish()
+                            //AestheticUtils.updateAccentColor(this@ConfigurationFragment.context!!,value as String)
+                            true
+                        }
+                    EAHelper.phase == 0 -> {
+                        val category = preferenceScreen.findPreference("category_design") as PreferenceCategory
+                        category.removePreference(preferenceScreen.findPreference("theme_color"))
+                        val pref = Preference(activity)
+                        pref.title = "Color de tema"
+                        pref.summary = "Resuelve el secreto para desbloquear"
+                        pref.setIcon(R.drawable.ic_palette)
+                        pref.setOnPreferenceClickListener {
+                            Toaster.toast(EAHelper.eaMessage)
+                            true
+                        }
+                        category.addPreference(pref)
+                    }
+                    else -> {
+                        preferenceScreen.findPreference("theme_color").summary = "Resuelve el secreto para desbloquear"
+                        preferenceScreen.findPreference("theme_color").isEnabled = false
+                    }
+                }
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this@ConfigurationFragment.context))
+                    (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
+                        isChecked = true
+                        isEnabled = false
+                    }
+                else if (!Settings.canDrawOverlays(this@ConfigurationFragment.context)) {
+                    (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
+                        isChecked = false
+                        isEnabled = true
+                    }
+                }
+                preferenceScreen.findPreference("achievements_permissions").setOnPreferenceChangeListener { _, _ ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
+                    return@setOnPreferenceChangeListener true
+                }
+                preferenceScreen.findPreference("hide_chaps").setOnPreferenceChangeListener { _, o ->
+                    if (!FileAccessHelper.NOMEDIA_CREATING) {
+                        FileAccessHelper.INSTANCE.checkNoMedia(o as Boolean)
+                        true
+                    } else {
+                        (preferenceScreen.findPreference("hide_chaps") as SwitchPreference).isChecked = !(o as Boolean)
                         false
                     }
-                    when {
-                        EAHelper.phase == 4 ->
-                            preferenceScreen.findPreference("theme_color").setOnPreferenceChangeListener { _, value ->
-                                startActivity(Intent(activity, Main::class.java).putExtra("start_position", 3))
-                                activity?.finish()
-                                //AestheticUtils.updateAccentColor(this@ConfigurationFragment.context!!,value as String)
-                                true
-                            }
-                        EAHelper.phase == 0 -> {
-                            val category = preferenceScreen.findPreference("category_design") as PreferenceCategory
-                            category.removePreference(preferenceScreen.findPreference("theme_color"))
-                            val pref = Preference(activity)
-                            pref.title = "Color de tema"
-                            pref.summary = "Resuelve el secreto para desbloquear"
-                            pref.setIcon(R.drawable.ic_palette)
-                            pref.setOnPreferenceClickListener {
-                                Toaster.toast(EAHelper.eaMessage)
-                                true
-                            }
-                            category.addPreference(pref)
+                }
+                preferenceScreen.findPreference("max_parallel_downloads").setOnPreferenceChangeListener { _, o ->
+                    DownloadManager.setParallelDownloads(o as String)
+                    true
+                }
+                if (BuildConfig.DEBUG) {
+                    preferenceScreen.findPreference("reset_recents").setOnPreferenceClickListener {
+                        doAsync {
+                            CacheDB.INSTANCE.recentsDAO().clear()
+                            RecentsJob.run()
                         }
-                        else -> {
-                            preferenceScreen.findPreference("theme_color").summary = "Resuelve el secreto para desbloquear"
-                            preferenceScreen.findPreference("theme_color").isEnabled = false
-                        }
-                    }
-                    preferenceScreen.findPreference("hide_chaps").setOnPreferenceChangeListener { _, o ->
-                        if (!FileAccessHelper.NOMEDIA_CREATING) {
-                            FileAccessHelper.INSTANCE.checkNoMedia(o as Boolean)
-                            true
-                        } else {
-                            (preferenceScreen.findPreference("hide_chaps") as SwitchPreference).isChecked = !(o as Boolean)
-                            false
-                        }
-                    }
-                    preferenceScreen.findPreference("max_parallel_downloads").setOnPreferenceChangeListener { _, o ->
-                        DownloadManager.setParallelDownloads(o as String)
                         true
-                    }
-                    if (BuildConfig.DEBUG) {
-                        preferenceScreen.findPreference("reset_recents").setOnPreferenceClickListener {
-                            doAsync {
-                                CacheDB.INSTANCE.recentsDAO().clear()
-                                RecentsJob.run()
-                            }
-                            true
-                        }
                     }
                 }
             }
@@ -309,17 +320,17 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             Toaster.toast("Error al importar")
                         }
                     })
+        } else if (requestCode == 5879) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context))
+                (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
+                    isChecked = true
+                    isEnabled = false
+                }
+            else
+                (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
+                    isChecked = false
+                    isEnabled = true
+                }
         }
-    }
-
-    private fun queryName(uri: Uri?): String? {
-        return if (uri != null) {
-            val returnCursor = activity?.contentResolver?.query(uri, null, null, null, null)!!
-            val nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            returnCursor.moveToFirst()
-            val name = returnCursor.getString(nameIndex)
-            returnCursor.close()
-            name
-        } else null
     }
 }

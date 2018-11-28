@@ -12,16 +12,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.PicassoSingle
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.notSameContent
+import knf.kuma.commons.*
 import knf.kuma.custom.HiddenOverlay
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.item_emision.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import java.util.*
 
@@ -75,7 +70,7 @@ class EmisionAdapter internal constructor(private val fragment: Fragment) : Recy
                 this@EmisionAdapter.showHidden = PreferenceManager.getDefaultSharedPreferences(fragment.context).getBoolean("show_hidden", false)
                 val result = if (animate) DiffUtil.calculateDiff(EmissionDiff(this@EmisionAdapter.list, list), true) else null
                 this@EmisionAdapter.list = list
-                launch(UI) {
+                doOnUI {
                     try {
                         if (animate)
                             result?.dispatchUpdatesTo(this@EmisionAdapter)

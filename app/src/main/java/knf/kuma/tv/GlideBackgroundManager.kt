@@ -9,8 +9,7 @@ import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import knf.kuma.commons.doOnUI
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -88,7 +87,7 @@ class GlideBackgroundManager(activity: Activity) {
 
     private inner class UpdateBackgroundTask : TimerTask() {
         override fun run() {
-            launch(UI) {
+            doOnUI {
                 if (mBackgroundURI != null) {
                     updateBackground()
                 }

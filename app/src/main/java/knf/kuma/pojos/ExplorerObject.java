@@ -31,6 +31,7 @@ import androidx.room.TypeConverters;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.download.FileAccessHelper;
+import knf.kuma.explorer.ThumbServer;
 import xdroid.toaster.Toaster;
 
 @Entity
@@ -94,7 +95,7 @@ public class ExplorerObject {
                 chapters = new ArrayList<>();
                 File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
                 this.file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
-                for (File chap: file_list)
+                for (File chap : file_list)
                     try {
                         String file_name = chap.getName();
                         chapters.add(new FileDownObj(context, name, aid, PatternUtil.INSTANCE.getNumFromfile(file_name), file_name, chap));
@@ -139,6 +140,7 @@ public class ExplorerObject {
         public String time;
         public String fileName;
         public String link;
+        public File thumb;
 
         FileDownObj(Context context, String title, String aid, String chapter, String name, File file) {
             this.title = title;
@@ -153,8 +155,31 @@ public class ExplorerObject {
             this.link = "https://animeflv.net/ver/" + fileName.replace("$", "/").replace(".mp4", "");
         }
 
+        public static String[] getTitles(List<FileDownObj> list) {
+            List<String> names = new ArrayList<>();
+            for (FileDownObj file : list) {
+                names.add(file.getChapTitle());
+            }
+            return names.toArray(new String[]{});
+        }
+
+        public static Uri[] getUris(List<FileDownObj> list) {
+            List<Uri> uris = new ArrayList<>();
+            for (FileDownObj file : list) {
+                uris.add(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(file.fileName)));
+            }
+            return uris.toArray(new Uri[]{});
+        }
+
         public String getChapTitle() {
             return title + " " + chapter;
+        }
+
+        public String getChapPreviewLink() {
+            if (thumb == null)
+                return "https://animeflv.net/uploads/animes/screenshots/" + aid + "/" + chapter + "/th_2.jpg";
+            else
+                return ThumbServer.INSTANCE.loadFile(thumb);
         }
 
         private String getTime(Context context, File file) {

@@ -3,12 +3,14 @@ package knf.kuma.commons
 import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.drawable.AnimationDrawable
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ProgressBar
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
@@ -18,11 +20,13 @@ import androidx.preference.PreferenceFragmentCompat
 import com.afollestad.aesthetic.AestheticActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -51,7 +55,7 @@ val getUpdateDir: String
 fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
     try {
         this.func()
-        launch(UI) {
+        doOnUI {
             try {
                 this@safeShow.show()
             } catch (e: Exception) {
@@ -65,7 +69,7 @@ fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
 }
 
 fun MaterialDialog.safeShow() {
-    launch(UI) {
+    doOnUI {
         try {
             this@safeShow.show()
         } catch (e: Exception) {
@@ -91,22 +95,11 @@ fun Snackbar.safeDismiss() {
 }
 
 fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
-    return Snackbar.make(this, text, duration).also { launch(UI) { it.show() } }
+    return Snackbar.make(this, text, duration).also { doOnUI { it.show() } }
 }
 
 fun View.createSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
     return Snackbar.make(this, text, duration)
-}
-
-fun View.createIndeterminateSnackbar(text: String, show: Boolean = true): Snackbar {
-    val snackbar = Snackbar.make(this, text, Snackbar.LENGTH_INDEFINITE)
-    val progressBar = ProgressBar(context).also {
-        it.setPadding(10.asPx, 10.asPx, 10.asPx, 10.asPx)
-        it.isIndeterminate = true
-    }
-    (snackbar.view.findViewById<View>(com.google.android.material.R.id.snackbar_text).parent as ViewGroup).addView(progressBar, 0)
-    if (show) launch(UI) { snackbar.show() }
-    return snackbar
 }
 
 val Int.asPx: Int
@@ -149,8 +142,8 @@ val PreferenceFragmentCompat.safeContext: Context
     get() = context!!.applicationContext
 
 @ColorInt
-fun Int.resolveColor(context: Context): Int {
-    return ContextCompat.getColor(context, this)
+fun Int.toColor(): Int {
+    return ContextCompat.getColor(App.context, this)
 }
 
 fun noCrash(enableLog: Boolean = true, func: () -> Unit) {
@@ -159,6 +152,14 @@ fun noCrash(enableLog: Boolean = true, func: () -> Unit) {
     } catch (e: Exception) {
         if (enableLog)
             e.printStackTrace()
+    }
+}
+
+fun doOnUI(func: () -> Unit) {
+    GlobalScope.launch(Dispatchers.Main) {
+        noCrash(true) {
+            func()
+        }
     }
 }
 
@@ -198,4 +199,13 @@ fun Any?.isNull(): Boolean {
 
 fun Any?.notNull(): Boolean {
     return this != null
+}
+
+@UiThread
+fun ImageView.setAnimatedResource(@DrawableRes res: Int) {
+    setImageResource(res)
+    val animated = drawable as AnimationDrawable
+    animated.callback = this
+    animated.setVisible(true, true)
+    animated.start()
 }

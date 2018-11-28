@@ -11,7 +11,6 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackgroundBorderless"
-    android:orientation="vertical"
     android:theme="@style/AppTheme.Cardview"
     app:cardCornerRadius="2dp"
     app:cardElevation="2dp">
@@ -72,8 +71,7 @@
                             android:gravity="center_vertical"
                             android:lines="2"
                             android:text="Title"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                            android:textColor="?android:textColorPrimary"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                             android:textSize="18sp"/>
 
                         <TextView
@@ -84,8 +82,8 @@
                             android:layout_marginBottom="8dp"
                             android:lines="1"
                             android:text="Chapter"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            android:textSize="16sp"/>
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textColor="?android:attr/textColorSecondary"/>
 
                     </RelativeLayout>
 
@@ -138,7 +136,7 @@
 
                     <Button
                         android:id="@+id/streaming"
-                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -146,7 +144,7 @@
 
                     <Button
                         android:id="@+id/download"
-                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

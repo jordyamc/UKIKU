@@ -83,7 +83,7 @@ class RecentsJob : Job() {
     @Throws(Exception::class)
     private fun notifyFavChaps(local: MutableList<RecentObject>, objects: MutableList<RecentObject>) {
         for (recentObject in objects) {
-            if (!local.contains(recentObject) && (favsDAO.isFav(Integer.parseInt(recentObject.aid!!)) || seeingDAO.isSeeing(recentObject.aid!!)!!))
+            if (!local.contains(recentObject) && (favsDAO.isFav(Integer.parseInt(recentObject.aid!!)) || seeingDAO.isSeeing(recentObject.aid!!)))
                 notifyRecent(recentObject)
         }
     }

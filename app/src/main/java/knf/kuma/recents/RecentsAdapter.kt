@@ -36,8 +36,6 @@ import knf.kuma.pojos.RecordObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.android.synthetic.main.item_recents.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import xdroid.toaster.Toaster
 import java.util.*
 
@@ -61,6 +59,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
+        holder.unsetObservers()
         val recentObject = list[position]
         holder.setState(isNetworkAvailable, recentObject.isChapterDownloaded || recentObject.isDownloading)
         PicassoSingle[context].load(PatternUtil.getCover(recentObject.aid!!)).into(holder.imageView)
@@ -92,12 +91,12 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 holder.streaming.setOnClickListener { CastUtil.get().openControls() }
             } else {
                 holder.setCasting(false, recentObject.fileName)
-                holder.streaming.setOnClickListener { _ ->
+                holder.streaming.setOnClickListener {
                     if (recentObject.isChapterDownloaded || recentObject.isDownloading) {
                         MaterialDialog(context).safeShow {
                             message(text = "¿Eliminar el ${recentObject.chapter!!.toLowerCase()} de ${recentObject.name}?")
                             positiveButton(text = "CONFIRMAR") {
-                                FileAccessHelper.INSTANCE.delete(recentObject.fileName)
+                                FileAccessHelper.INSTANCE.delete(recentObject.fileName, true)
                                 DownloadManager.cancel(recentObject.eid!!)
                                 QueueManager.remove(recentObject.eid!!)
                                 recentObject.isChapterDownloaded = false
@@ -125,7 +124,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                             }
 
                             override fun onProgressIndicator(boolean: Boolean) {
-                                launch(UI) {
+                                doOnUI {
                                     if (boolean) {
                                         holder.progressBar.isIndeterminate = true
                                         holder.progressBarRoot.visibility = View.VISIBLE
@@ -188,7 +187,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                     }
 
                     override fun onProgressIndicator(boolean: Boolean) {
-                        launch(UI) {
+                        doOnUI {
                             if (boolean) {
                                 holder.progressBar.isIndeterminate = true
                                 holder.progressBarRoot.visibility = View.VISIBLE
@@ -222,18 +221,18 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     private fun setOrientation(block: Boolean) {
-        if (block)
-            (fragment.activity as? AppCompatActivity)?.requestedOrientation = when {
-                context.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
-        else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        noCrash {
+            if (block)
+                (fragment.activity as? AppCompatActivity)?.requestedOrientation = when {
+                    context.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        }
     }
 
     override fun onViewRecycled(holder: ItemHolder) {
-        holder.unsetChapterObserver()
-        holder.unsetDownloadObserver()
-        holder.unsetCastingObserver()
+        holder.unsetObservers()
         super.onViewRecycled(holder)
     }
 
@@ -315,6 +314,12 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             }
         }
 
+        fun unsetObservers() {
+            unsetChapterObserver()
+            unsetDownloadObserver()
+            unsetCastingObserver()
+        }
+
         fun setNew(isNew: Boolean) {
             newIcon.post { newIcon.visibility = if (isNew) View.VISIBLE else View.GONE }
         }
@@ -368,10 +373,17 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                         DownloadObject.DOWNLOADING -> {
                             progressBarRoot.visibility = View.VISIBLE
                             progressBar.isIndeterminate = false
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                                progressBar.setProgress(downloadObject.progress, true)
-                            else
-                                progressBar.progress = downloadObject.progress
+                            if (downloadObject.getEta() == -2L || PrefsUtil.downloaderType == 0) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                                    progressBar.setProgress(downloadObject.progress, true)
+                                else
+                                    progressBar.progress = downloadObject.progress
+                                if (downloadObject.getEta() == -2L && PrefsUtil.downloaderType != 0)
+                                    progressBar.secondaryProgress = 100
+                            } else {
+                                progressBar.progress = 0
+                                progressBar.secondaryProgress = downloadObject.progress
+                            }
                         }
                         DownloadObject.PAUSED -> {
                             progressBarRoot.visibility = View.VISIBLE

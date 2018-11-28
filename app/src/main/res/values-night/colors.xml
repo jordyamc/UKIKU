@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#424242</color>
+    <color name="colorPrimaryDark">#1b1b1b</color>
     <color name="divider">#fff</color>
     <color name="textPrimary">#fff</color>
     <color name="textSecondary">#bebebe</color>
 
     <color name="cardview_background">#FF424242</color>
     <color name="text_disable">#42ffffff</color>
+
+    <color name="color_bottom_line_disabled">#EEEEEE</color>
 </resources>

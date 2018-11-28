@@ -3,6 +3,8 @@ package knf.kuma.seeing
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.viewpager.widget.ViewPager
@@ -54,6 +56,18 @@ class SeeingActivity : AppCompatActivity() {
                 (pager.adapter as? SeeingPagerAdapter)!!.fragmentList[position].clickCount = 0
             }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_seeing_auto, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.auto -> FavToSeeing.onConfirmation(this)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {

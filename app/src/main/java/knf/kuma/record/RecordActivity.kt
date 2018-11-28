@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.bind
 import knf.kuma.commons.safeShow
@@ -101,6 +102,7 @@ class RecordActivity : AppCompatActivity() {
 
         fun open(context: Context) {
             context.startActivity(Intent(context, RecordActivity::class.java))
+            AchievementManager.onRecordsOpenned()
         }
     }
 }

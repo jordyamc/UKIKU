@@ -1,6 +1,17 @@
 package knf.kuma.commons
 
+import android.app.Notification
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Intent
+import android.os.Build
+import android.os.IBinder
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import fi.iki.elonen.NanoHTTPD
+import knf.kuma.App
+import knf.kuma.R
+import knf.kuma.download.DownloadManager
 import knf.kuma.download.FileAccessHelper
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -13,26 +24,69 @@ import java.io.PipedOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-object SelfServer {
-    var HTTP_PORT = 6991
-    private var INSTANCE: Server? = null
+class SelfServer : Service() {
 
-    fun start(data: String, isFile: Boolean): String? {
-        return try {
-            stop()
-            INSTANCE = Server(data, isFile)
-            "http://" + Network.ipAddress + ":" + HTTP_PORT
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toaster.toast("Error al iniciar server")
-            null
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent != null && intent.action != null && intent.action == "stop.foreground") {
+            CastUtil.get().stop()
+            stopForeground(true)
+            stopSelf()
         }
-
+        return START_STICKY
     }
 
-    fun stop() {
-        if (INSTANCE != null && INSTANCE!!.isAlive)
-            INSTANCE!!.stop()
+    override fun onCreate() {
+        super.onCreate()
+        startForeground(64587, foregroundNotification())
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    private fun foregroundNotification(): Notification {
+        return NotificationCompat.Builder(App.context, DownloadManager.CHANNEL_FOREGROUND).apply {
+            setSmallIcon(R.drawable.ic_server_running)
+            setOngoing(true)
+            priority = NotificationCompat.PRIORITY_MIN
+            setGroup("manager")
+            if (PrefsUtil.collapseDirectoryNotification)
+                setSubText("Servidor activo")
+            else
+                setContentTitle("Servidor activo")
+            addAction(R.drawable.ic_stop, "Detener",
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        PendingIntent.getForegroundService(App.context, 4689, Intent(App.context, SelfServer::class.java).setAction("stop.foreground"), PendingIntent.FLAG_UPDATE_CURRENT)
+                    else
+                        PendingIntent.getService(App.context, 4689, Intent(App.context, SelfServer::class.java).setAction("stop.foreground"), PendingIntent.FLAG_UPDATE_CURRENT)
+            )
+        }.build()
+    }
+
+    companion object {
+        var HTTP_PORT = 6991
+        private var INSTANCE: Server? = null
+
+        fun start(data: String, isFile: Boolean): String? {
+            return try {
+                stop(true)
+                ContextCompat.startForegroundService(App.context, Intent(App.context, SelfServer::class.java))
+                INSTANCE = Server(data, isFile)
+                "http://" + Network.ipAddress + ":" + HTTP_PORT
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toaster.toast("Error al iniciar server")
+                null
+            }
+
+        }
+
+        fun stop(isRestart: Boolean = false) {
+            if (INSTANCE?.isAlive == true)
+                INSTANCE?.stop()
+            if (!isRestart)
+                ContextCompat.startForegroundService(App.context, Intent(App.context, SelfServer::class.java).setAction("stop.foreground"))
+        }
     }
 
     private class Server @Throws(Exception::class)
@@ -86,65 +140,6 @@ object SelfServer {
                 Thread.sleep(400)
                 res = createResponse(NanoHTTPD.Response.Status.OK, "video/mp4", pipedIn, total)
             }
-            /*var res: NanoHTTPD.Response?
-            val mime = "video/mp4"
-            try {
-                val okHttpClient = OkHttpClient()
-                val request = Request.Builder()
-                        .url(url)
-                var startFrom: Long = 0
-                var endAt: Long = -1
-                var range = header["range"]
-                if (range != null) {
-                    if (range.startsWith("bytes=")) {
-                        range = range.substring("bytes=".length)
-                        val minus = range.indexOf('-')
-                        try {
-                            if (minus > 0) {
-                                startFrom = java.lang.Long.parseLong(range.substring(0, minus))
-                                endAt = java.lang.Long.parseLong(range.substring(minus + 1))
-                            }
-                        } catch (ignored: NumberFormatException) {
-                        }
-
-                    }
-                }
-                val fileLen = getSize(url)
-                if (range != null && startFrom >= 0) {
-                    if (startFrom >= fileLen) {
-                        res = createResponse(NanoHTTPD.Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
-                        res.addHeader("Content-Range", "bytes 0-0/$fileLen")
-                    } else {
-                        if (endAt < 0) {
-                            endAt = fileLen - 1
-                        }
-                        var newLen = endAt - startFrom + 1
-                        if (newLen < 0) {
-                            newLen = 0
-                        }
-
-                        val dataLen = newLen
-                        request.addHeader("Range", "bytes " + startFrom + "-" +
-                                endAt + "/" + fileLen)
-                        val response = okHttpClient.newCall(request.build()).execute()
-                        val fis = response.body()!!.byteStream()
-                        fis.skip(startFrom)
-
-                        res = createResponse(NanoHTTPD.Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
-                        res.addHeader("Content-Length", "" + dataLen)
-                        res.addHeader("Content-Range", "bytes " + startFrom + "-" +
-                                endAt + "/" + fileLen)
-                    }
-                } else {
-                    val response = okHttpClient.newCall(request.build()).execute()
-                    val fis = response.body()!!.byteStream()
-                    res = createResponse(NanoHTTPD.Response.Status.OK, mime, fis, fileLen)
-                    res.addHeader("Content-Length", "" + fileLen)
-                }
-            } catch (e: Exception) {
-                res = getResponse("Forbidden: Reading file failed")
-            }*/
-
             return res ?: getResponse("Error 404: File not found")
         }
 

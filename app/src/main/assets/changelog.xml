@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="70" version="3.0">
+        <change type="fix">Errores generales</change>
+        <change type="new">Logros</change>
+        <change type="changes">Mejoras generales</change>
+        <change type="change">Tema claro mejorado</change>
+        <change type="change">Cambios con Material Design 2</change>
+    </release>
     <release code="69" version="2.2">
         <change type="fix">Errores generales</change>
         <change type="new">Sección simple de noticias</change>

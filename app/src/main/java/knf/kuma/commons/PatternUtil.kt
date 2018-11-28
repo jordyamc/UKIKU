@@ -8,6 +8,7 @@ import java.util.*
 import java.util.regex.Pattern
 
 object PatternUtil {
+    @Suppress("DEPRECATION")
     fun fromHtml(html: String): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY).toString()

@@ -20,9 +20,9 @@ class MigrationTest {
     @Test
     @Throws(Exception::class)
     fun testMigration() {
-        val db = migrationTestHelper.createDatabase(TEST_DB_NAME, 2)
+        val db = migrationTestHelper.createDatabase(TEST_DB_NAME, 11)
         db.close()
-        migrationTestHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, CacheDB.MIGRATION_2_3)
+        migrationTestHelper.runMigrationsAndValidate(TEST_DB_NAME, 12, true, CacheDB.MIGRATION_11_12)
     }
 
     companion object {

@@ -44,13 +44,20 @@ class RecordsAdapter(private val activity: Activity) : RecyclerView.Adapter<Reco
         if (animeObject != null)
             PicassoSingle[activity].load(PatternUtil.getCover(animeObject.aid!!)).into(holder.imageView)
         holder.title.text = item.name
-        holder.chapter.text = item.chapter
+        holder.chapter.text = getCardText(item)
         holder.cardView.setOnClickListener {
             if (item.animeObject != null)
                 ActivityAnime.open(activity, item, holder.imageView)
             else
                 Toaster.toast("Error al abrir")
         }
+    }
+
+    private fun getCardText(recordObject: RecordObject): String {
+        return if (!recordObject.chapter.startsWith("Episodio "))
+            "Episodio ${recordObject.chapter}"
+        else
+            recordObject.chapter
     }
 
     override fun getItemCount(): Int {

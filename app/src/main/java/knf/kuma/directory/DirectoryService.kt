@@ -20,8 +20,6 @@ import knf.kuma.database.dao.AnimeDAO
 import knf.kuma.jobscheduler.DirUpdateJob
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DirectoryPage
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import pl.droidsonroids.jspoon.Jspoon
@@ -64,10 +62,10 @@ class DirectoryService : IntentService("Directory update") {
         SSLSkipper.skip()
         val jspoon = Jspoon.create()
         setStatus(STATE_PARTIAL)
-        doEmissionRefresh(jspoon, animeDAO)
         doPartialSearch(jspoon, animeDAO)
         setStatus(STATE_FULL)
         doFullSearch(jspoon, animeDAO)
+        doEmissionRefresh(jspoon, animeDAO)
         cancelForeground()
     }
 
@@ -200,7 +198,7 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     private fun setStatus(status: Int) {
-        launch(UI) { liveStatus.setValue(status) }
+        doOnUI { liveStatus.setValue(status) }
     }
 
     private fun notShow(code: Int, notification: Notification) {

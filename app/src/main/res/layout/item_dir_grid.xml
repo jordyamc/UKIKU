@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -37,9 +38,9 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:lines="2"
-            android:text="Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            tools:text="Title"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

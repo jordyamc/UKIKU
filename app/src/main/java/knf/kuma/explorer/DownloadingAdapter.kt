@@ -1,6 +1,7 @@
 package knf.kuma.explorer
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
@@ -94,7 +96,15 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
                             }
                         }
                         holder.progress.isIndeterminate = false
-                        holder.progress.progress = downloadObject1.progress
+                        if (downloadObject1.getEta() == -2L || PrefsUtil.downloaderType == 0)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                                holder.progress.setProgress(downloadObject1.progress, true)
+                            else
+                                holder.progress.progress = downloadObject1.progress
+                        else {
+                            holder.progress.progress = 0
+                            holder.progress.secondaryProgress = downloadObject1.progress
+                        }
                         holder.eta.text = downloadObject1.subtext
                     }
                 }

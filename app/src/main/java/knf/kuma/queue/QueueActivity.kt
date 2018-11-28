@@ -59,8 +59,8 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
         setContentView(layout)
         toolbar.title = "Pendientes"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         menuInflater.inflate(R.menu.menu_play_queue, listToolbar.menu)
         listToolbar.setOnMenuItemClickListener { item ->
@@ -167,8 +167,8 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
                     if (list!!.isEmpty())
                         bottomSheetBehavior!!.setState(BottomSheetBehavior.STATE_HIDDEN)
                     else {
-                        listAdapter!!.update(queueObject.chapter.aid, list)
-                        bottomSheetBehavior!!.setState(BottomSheetBehavior.STATE_EXPANDED)
+                        listAdapter?.update(queueObject.chapter.aid, list)
+                        bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
                     }
                     current = queueObject
                     liveData.removeObserver(this)
@@ -183,7 +183,7 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
     }
 
     override fun onStartDrag(holder: RecyclerView.ViewHolder) {
-        mItemTouchHelper!!.startDrag(holder)
+        mItemTouchHelper?.startDrag(holder)
     }
 
     override fun onListCleared() {
@@ -204,7 +204,7 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
         when (item.itemId) {
             R.id.info ->
                 MaterialDialog(this).safeShow {

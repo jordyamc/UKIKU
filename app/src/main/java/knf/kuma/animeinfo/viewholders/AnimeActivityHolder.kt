@@ -31,14 +31,13 @@ import knf.kuma.commons.BypassUtil.Companion.saveCookies
 import knf.kuma.commons.BypassUtil.Companion.userAgent
 import knf.kuma.commons.PicassoSingle
 import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.optionalBind
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
 
-@SuppressLint("RestrictedApi")
+
 class AnimeActivityHolder(activity: AppCompatActivity) {
     val appBarLayout: AppBarLayout by bind(activity, R.id.appBar)
     private val collapsingToolbarLayout: CollapsingToolbarLayout by bind(activity, R.id.collapsingToolbar)
@@ -46,7 +45,7 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     val toolbar: Toolbar by bind(activity, R.id.toolbar)
     private val tabLayout: TabLayout by bind(activity, R.id.tabs)
     val pager: ViewPager by bind(activity, R.id.pager)
-    val fab: FloatingActionButton by bind(activity, R.id.fab)
+    private val fab: FloatingActionButton by bind(activity, R.id.fab)
     private val webView: WebView? by optionalBind(activity, R.id.webview)
 
     private val intent: Intent = activity.intent
@@ -59,7 +58,8 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     private val drawableHalfStar: Drawable by lazy { activity.getDrawable(R.drawable.ic_seeing) }
 
     init {
-        fab.visibility = View.INVISIBLE
+        //fab.visibility = View.INVISIBLE
+        fab.isEnabled = false
         populate(activity)
         pager.offscreenPageLimit = 2
         pager.adapter = animePagerAdapter
@@ -103,44 +103,51 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     }
 
     fun setFABState(isFav: Boolean) {
-        launch(UI) { fab.setImageDrawable(if (isFav) drawableHeartFull else drawableHeartEmpty) }
+        doOnUI {
+            fab.setImageDrawable(if (isFav) drawableHeartFull else drawableHeartEmpty)
+            fab.invalidate()
+        }
     }
 
     fun setFABSeeing() {
-        launch(UI) { fab.setImageDrawable(drawableHalfStar) }
+        doOnUI {
+            fab.setImageDrawable(drawableHalfStar)
+            fab.invalidate()
+        }
     }
 
     fun setFABState(isFav: Boolean, isSeeing: Boolean = false) {
-        launch(UI) {
+        doOnUI {
             fab.setImageDrawable(when {
                 isFav && isSeeing -> drawableStarHeart
                 isSeeing -> drawableHalfStar
                 isFav -> drawableHeartFull
                 else -> drawableHeartEmpty
             })
+            fab.invalidate()
         }
     }
 
     fun showFAB() {
-        launch(UI) {
+        doOnUI {
             fab.isEnabled = true
-            fab.visibility = View.VISIBLE
-            fab.startAnimation(AnimationUtils.loadAnimation(fab.context, R.anim.scale_up))
+            //fab.show()
         }
     }
 
     fun hideFAB() {
-        launch(UI) {
+        doOnUI {
             fab.isEnabled = false
-            fab.visibility = View.INVISIBLE
+            //fab.visibility = View.INVISIBLE
             fab.startAnimation(AnimationUtils.loadAnimation(fab.context, R.anim.scale_down))
         }
     }
 
     fun hideFABForce() {
-        launch(UI) {
+        doOnUI {
             fab.isEnabled = false
-            fab.visibility = View.INVISIBLE
+            //fab.internalSetVisibility(View.INVISIBLE,true)
+            fab.hide()
         }
     }
 

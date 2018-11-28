@@ -23,6 +23,7 @@ class SeeingFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         liveData.observe(this, Observer {
+            progress.visibility = View.GONE
             error.visibility = if (it?.isEmpty() == true) View.VISIBLE else View.GONE
             adapter.update(it)
         })

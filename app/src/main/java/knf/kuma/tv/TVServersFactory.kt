@@ -7,6 +7,7 @@ import androidx.leanback.widget.Presenter
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
@@ -17,8 +18,6 @@ import knf.kuma.tv.streaming.TVServerSelectionFragment
 import knf.kuma.videoservers.Option
 import knf.kuma.videoservers.Server
 import knf.kuma.videoservers.VideoServer
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
@@ -31,7 +30,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
     private var current: VideoServer? = null
 
     fun showServerList() {
-        launch(UI) {
+        doOnUI {
             try {
                 if (servers.isEmpty()) {
                     Toaster.toast("Sin servidores disponibles")

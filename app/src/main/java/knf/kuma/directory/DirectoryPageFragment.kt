@@ -61,10 +61,10 @@ class DirectoryPageFragment : BottomFragment() {
 
     private fun getLiveData(model: DirectoryViewModel): LiveData<PagedList<AnimeObject>> {
         return when (arguments!!.getInt("type", 0)) {
-            0 -> model.getAnimes(context!!)
-            1 -> model.getOvas(context!!)
-            2 -> model.getMovies(context!!)
-            else -> model.getAnimes(context!!)
+            0 -> model.getAnimes()
+            1 -> model.getOvas()
+            2 -> model.getMovies()
+            else -> model.getAnimes()
         }
     }
 
@@ -73,7 +73,7 @@ class DirectoryPageFragment : BottomFragment() {
             getLiveData(ViewModelProviders.of(activity!!).get(DirectoryViewModel::class.java)).observe(this, Observer { animeObjects ->
                 hideProgress()
                 listUpdated = true
-                adapter!!.submitList(animeObjects)
+                adapter?.submitList(animeObjects)
                 makeAnimation()
                 scrollTop()
             })

@@ -9,9 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.doOnUI
 import kotlinx.android.synthetic.main.activity_news_details.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
@@ -42,7 +41,7 @@ class NewsDetailsActivity : AppCompatActivity(), Html.ImageGetter {
             levelListDrawable.addLevel(1, 1, drawable)
             levelListDrawable.setBounds(0, 0, bitmap.width, bitmap.height)
             levelListDrawable.level = 1
-            launch(UI) {
+            doOnUI {
                 content.refreshDrawableState()
             }
         }

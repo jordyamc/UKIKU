@@ -209,6 +209,11 @@
             android:key="daynigth_permission"
             android:title="Tema dia/noche preciso"/>
         <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_trophy_normal"
+            android:key="achievements_permissions"
+            android:title="Habilitar logros"/>
+        <SwitchPreference
             android:defaultValue="true"
             android:icon="@drawable/ic_changelog_get"
             android:key="changelog_load"

@@ -16,8 +16,6 @@ import com.squareup.picasso.Callback
 import knf.kuma.R
 import knf.kuma.commons.*
 import kotlinx.android.synthetic.main.layout_img_big.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
@@ -82,7 +80,7 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                             } catch (e: Exception) {
                                 //
                             }
-                            launch(UI) {
+                            doOnUI {
                                 PicassoSingle[this@ActivityImgFull].load(imgUrl).into(img, object : Callback {
                                     override fun onSuccess() {
                                         bitmap = (img.drawable as BitmapDrawable).bitmap

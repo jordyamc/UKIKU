@@ -44,13 +44,13 @@ public class RecordObject {
     }
 
     @Ignore
-    public static RecordObject fromDownloaded(ExplorerObject.FileDownObj recentObject) {
+    public static RecordObject fromDownloaded(ExplorerObject.FileDownObj downloadedObject) {
         RecordObject object = new RecordObject();
-        object.key = Integer.parseInt(recentObject.aid);
-        object.name = recentObject.title;
-        object.chapter = "Episodio " + recentObject.chapter;
-        object.aid = recentObject.aid;
-        object.eid = recentObject.eid;
+        object.key = Integer.parseInt(downloadedObject.aid);
+        object.name = downloadedObject.title;
+        object.chapter = "Episodio " + downloadedObject.chapter;
+        object.aid = downloadedObject.aid;
+        object.eid = downloadedObject.eid;
         object.date = System.currentTimeMillis();
         return object;
     }
