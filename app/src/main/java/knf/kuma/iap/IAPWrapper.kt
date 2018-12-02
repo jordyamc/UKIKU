@@ -1,46 +1,62 @@
 package knf.kuma.iap
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.app.Activity
+import android.app.PendingIntent
+import android.content.*
 import android.net.Uri
+import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.NonNull
 import com.afollestad.materialdialogs.MaterialDialog
+import knf.kuma.App
 import knf.kuma.BuildConfig
+import knf.kuma.commons.EAHelper
 import knf.kuma.commons.safeShow
+import xdroid.toaster.Toaster
 
 
 class IAPWrapper(private val context: Context) : ServiceConnection {
     val isEnabled: Boolean = IAPHelper.hasWalletInstalled(context)
     private var iapService: IAPService? = null
-    private var inventory: Inventory? = null
+    var inventory: Inventory? = null
     private var onConnectedListener: ((success: Boolean) -> Unit)? = null
+
+    val isAvailable get() = iapService != null && inventory != null
 
     fun setUp(onConnect: (success: Boolean) -> Unit) {
         onConnectedListener = onConnect
-        if (isEnabled)
+        if (isEnabled && EAHelper.phase < 4)
             context.bindService(Intent(BuildConfig.IAB_BIND_ACTION).setPackage(BuildConfig.IAB_BIND_PACKAGE), this, Context.BIND_AUTO_CREATE)
+        else onConnect.invoke(false)
+    }
+
+    fun onDestroy() {
+        if (isEnabled && isAvailable)
+            try {
+                context.unbindService(this)
+            } finally {
+                inventory = null
+            }
     }
 
     fun showInstallDialog() {
         MaterialDialog(context).safeShow {
             message(text = "Para hacer compras en UKIKU, se necesita la cartera AppCoin DBS")
             positiveButton(text = "Instalar") {
-                gotoStore(context)
+                goToStore(context)
             }
             negativeButton(text = "Cancelar")
         }
     }
 
     @NonNull
-    private fun gotoStore(activity: Context) {
+    private fun goToStore(activity: Context) {
         val appPackageName = "com.appcoins.wallet"
         try {
             activity.startActivity(
                     Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
-        } catch (anfe: android.content.ActivityNotFoundException) {
+        } catch (anfe: ActivityNotFoundException) {
             activity.startActivity(Intent(Intent.ACTION_VIEW,
                     Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")))
         }
@@ -58,6 +74,54 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
                 onConnectedListener?.invoke(true)
             else
                 onConnectedListener?.invoke(false)
+        }
+    }
+
+    fun launchPurchaseFlow(activity: Activity, sku: String, extraData: String): Boolean {
+        try {
+            val intentBundle = iapService?.getBuyIntent(3, App.context.packageName, sku, ITEM_TYPE_INAPP, extraData)
+            if (intentBundle?.responseCode == BILLING_RESPONSE_RESULT_OK) {
+                val pendingIntent = intentBundle.getParcelable<PendingIntent>(RESPONSE_BUY_INTENT)
+                        ?: return false
+                activity.startIntentSenderForResult(pendingIntent.intentSender, PURCHASE_CODE, Intent(), 0, 0, 0)
+                return true
+            } else
+                Toaster.toast("Error al iniciar compra")
+            return false
+        } catch (e: Exception) {
+            Toaster.toast("Error al iniciar compra")
+            return false
+        }
+    }
+
+    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?, callback: (success: Boolean, sku: String?) -> Unit) {
+        if (requestCode != PURCHASE_CODE) {
+            callback.invoke(false, null)
+            return
+        }
+        if (data == null) {
+            Log.e("Purchase", "Null data")
+            callback.invoke(false, null)
+            return
+        }
+        val purchaseData = data.getStringExtra(RESPONSE_INAPP_PURCHASE_DATA)
+        val dataSignature = data.getStringExtra(RESPONSE_INAPP_SIGNATURE)
+        val id = data.getStringExtra(RESPONSE_INAPP_PURCHASE_ID)
+        if (resultCode == Activity.RESULT_OK && data.extras?.responseCode == BILLING_RESPONSE_RESULT_OK) {
+            if (purchaseData == null || dataSignature == null) {
+                Log.e("Purchase", "Data or signature null")
+                callback.invoke(false, null)
+                return
+            }
+            val purchase = Inventory.Purchase(id, purchaseData, dataSignature)
+            if (!Security.verifyPurchase(purchaseData, dataSignature)) {
+                Toaster.toast("Verificacion de firma fallida")
+                Log.e("Purchase", "Signature verification failed")
+                callback.invoke(false, null)
+                return
+            }
+            inventory?.addPurchase(purchase)
+            callback.invoke(false, purchase.sku)
         }
     }
 
@@ -107,5 +171,10 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
         // some fields on the getSkuDetails response bundle
         const val GET_SKU_DETAILS_ITEM_LIST = "ITEM_ID_LIST"
         const val GET_SKU_DETAILS_ITEM_TYPE_LIST = "ITEM_TYPE_LIST"
+
+        const val PURCHASE_CODE = 6745
+
+        val Bundle.responseCode: Int
+            get() = get(RESPONSE_CODE)?.toString()?.toInt() ?: -1
     }
 }

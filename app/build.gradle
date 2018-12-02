@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 70
-        versionName "3.0"
+        versionCode 71
+        versionName "3.0.1"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -45,6 +45,10 @@ android {
                     "\"" + APPCOINS_DEV_IAB_BIND_ACTION + "\""
             buildConfigField "String", "IAB_BIND_PACKAGE",
                     "\"" + APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
+            buildConfigField "String", "APPCOINS_ADDRESS",
+                    "\"" + APPCOINS_ADDRESS + "\""
+            buildConfigField "String", "DROPBOX_TOKEN",
+                    "\"" + DROPBOX_TOKEN + "\""
             manifestPlaceholders = [iabPermission: "com.appcoins.dev.BILLING"]
             buildConfigField "String", "EASTER_SEARCH",
                     "\"" + EASTER_SEARCH + "\""
@@ -61,6 +65,10 @@ android {
                     "\"" + APPCOINS_IAB_BIND_ACTION + "\""
             buildConfigField "String", "IAB_BIND_PACKAGE",
                     "\"" + APPCOINS_IAB_BIND_PACKAGE + "\""
+            buildConfigField "String", "APPCOINS_ADDRESS",
+                    "\"" + APPCOINS_ADDRESS + "\""
+            buildConfigField "String", "DROPBOX_TOKEN",
+                    "\"" + DROPBOX_TOKEN + "\""
             manifestPlaceholders = [iabPermission: "com.appcoins.BILLING"]
             buildConfigField "String", "EASTER_SEARCH",
                     "\"" + EASTER_SEARCH + "\""

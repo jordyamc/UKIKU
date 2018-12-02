@@ -78,7 +78,11 @@ class AchievementActivity : AppCompatActivity() {
             MaterialDialog(this).safeShow {
                 message(text = "Para mostrar una mejor animacion al desbloquear logros, la app necesita un permiso especial, ¿Deseas activarlo?")
                 positiveButton(text = "Activar") {
-                    startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
+                    try {
+                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
+                    } catch (e: Exception) {
+                        Toaster.toast("No se pudo abrir la configuracion")
+                    }
                 }
                 negativeButton(text = "Omitir") {
                     PrefsUtil.isAchievementsOmited = true

@@ -11,6 +11,7 @@ import androidx.annotation.LayoutRes
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
@@ -21,10 +22,11 @@ import knf.kuma.favorite.objects.InfoContainer
 import knf.kuma.pojos.FavoriteObject
 import java.util.*
 
-class FavsSectionAdapter(private val fragment: Fragment, private val recyclerView: RecyclerView, private val showSections: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FavsSectionAdapter(private val fragment: Fragment, private val recyclerView: FastScrollRecyclerView, private val showSections: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     private val context: Context?
     private val listener: OnMoveListener
+    private val orderType = PrefsUtil.favsOrder
     private var list: MutableList<FavoriteObject> = ArrayList()
 
     private val layout: Int
@@ -38,6 +40,8 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     init {
         this.listener = fragment as OnMoveListener
         this.context = fragment.context
+        if (showSections)
+            recyclerView.setFastScrollEnabled(false)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -72,6 +76,13 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
 
     override fun getItemViewType(position: Int): Int {
         return if (list[position].isSection) TYPE_HEADER else TYPE_ITEM
+    }
+
+    override fun getSectionName(position: Int): String {
+        return when (orderType) {
+            0 -> list[position].name.substring(0, 1).toUpperCase()
+            else -> list[position].aid
+        }
     }
 
     fun updatePosition(container: InfoContainer) {

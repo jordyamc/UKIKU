@@ -1,6 +1,7 @@
 package knf.kuma.tv.ui
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Bundle
 import android.util.SparseArray
 import android.view.View
@@ -43,7 +44,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
         headersState = BrowseSupportFragment.HEADERS_ENABLED
         isHeadersTransitionOnBackEnabled = true
         title = "UKIKU"
-        brandColor = ContextCompat.getColor(context!!, R.color.colorPrimary)
+        brandColor = Color.parseColor("#424242")
         searchAffordanceColor = ContextCompat.getColor(context!!, R.color.colorAccent)
         setOnSearchClickedListener(this)
         createDataRows()

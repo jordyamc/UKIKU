@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.R
+import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
 import kotlinx.android.synthetic.main.fragment_seeing.*
@@ -55,6 +56,7 @@ class SeeingFragment : Fragment() {
             }
             else -> error_text.text = "No has marcado ningun anime"
         }
+        recycler.verifyManager()
         recycler.adapter = adapter
     }
 

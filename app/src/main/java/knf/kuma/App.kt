@@ -9,6 +9,8 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+/*import com.asf.appcoins.sdk.ads.AppCoinsAds
+import com.asf.appcoins.sdk.ads.AppCoinsAdsBuilder*/
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.core.CrashlyticsCore

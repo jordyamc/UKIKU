@@ -22,6 +22,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.bind
 import knf.kuma.commons.safeShow
+import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 
 class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
@@ -50,6 +51,7 @@ class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         toolbar.setNavigationOnClickListener { finish() }
         refreshLayout.setOnRefreshListener(this)
         adapter = RandomAdapter(this)
+        recyclerView.verifyManager()
         recyclerView.adapter = adapter
         refreshLayout.isRefreshing = true
         refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(this), EAHelper.getThemeColorLight(this), R.color.colorPrimary)

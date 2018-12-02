@@ -16,11 +16,44 @@
             android:layout_height="?actionBarSize"/>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <moe.feng.common.stepperview.VerticalStepperView
-        android:id="@+id/vertical_stepper_view"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:step_activated_color="?colorAccent"
-        app:step_enable_animation="true"/>
+        android:layout_height="match_parent">
+
+        <moe.feng.common.stepperview.VerticalStepperView
+            android:id="@+id/vertical_stepper_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:step_activated_color="?colorAccent"
+            app:step_enable_animation="true"/>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.Material.ProgressBar.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+        <RelativeLayout
+            android:id="@+id/block_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha=".20"
+                android:background="#000"/>
+
+            <ProgressBar
+                style="@android:style/Widget.Material.ProgressBar.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+    </RelativeLayout>
 
 </LinearLayout>

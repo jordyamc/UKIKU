@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import knf.kuma.R
+import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.widgets.emision.WEmisionProvider
@@ -35,6 +36,7 @@ class EmisionFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         adapter = EmisionAdapter(this)
+        recycler.verifyManager()
         recycler.adapter = adapter
         if (context != null)
             CacheDB.INSTANCE.animeDAO().getByDay(arguments!!.getInt("day", 1), blacklist!!).observe(this, Observer { animeObjects ->

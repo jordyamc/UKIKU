@@ -47,7 +47,7 @@ class EmisionActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_emision, menu)
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_hidden", false))
-            menu.findItem(R.id.action_hideshow).setIcon(R.drawable.ic_hide)
+            menu.findItem(R.id.action_hideshow).setIcon(R.drawable.ic_hide_pref)
         return super.onCreateOptionsMenu(menu)
     }
 

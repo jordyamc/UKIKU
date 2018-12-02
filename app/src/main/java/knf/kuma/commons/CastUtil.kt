@@ -102,7 +102,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     fun openControls() {
-        context.startActivity(Intent(context, ThemedControlsActivity::class.java))
+        context.startActivity(Intent(context, ThemedControlsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
     override fun onPlayStatusChanged(playStatus: Int) {

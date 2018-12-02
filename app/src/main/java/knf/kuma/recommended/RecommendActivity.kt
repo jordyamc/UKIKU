@@ -20,6 +20,7 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.bind
+import knf.kuma.commons.gridColumns
 import knf.kuma.commons.removeAll
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -42,6 +43,8 @@ class RecommendActivity : AppCompatActivity() {
     private val dao = CacheDB.INSTANCE.animeDAO()
     private val favsDAO = CacheDB.INSTANCE.favsDAO()
     private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
+
+    private val defaultGridColumns = gridColumns()
 
     private val layout: Int
         @LayoutRes
@@ -105,17 +108,17 @@ class RecommendActivity : AppCompatActivity() {
                         sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[2]), c, isGrid))
                     val layoutManager: RecyclerView.LayoutManager
                     if (isGrid) {
-                        val grid = GridLayoutManager(this@RecommendActivity, resources.getInteger(R.integer.span_count))
+                        val grid = GridLayoutManager(this@RecommendActivity, defaultGridColumns)
                         grid.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                             override fun getSpanSize(position: Int): Int {
                                 return try {
                                     when (sectionedAdapter.getSectionItemViewType(position)) {
-                                        SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER -> resources.getInteger(R.integer.span_count)
+                                        SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER -> defaultGridColumns
                                         else -> 1
                                     }
                                 } catch (e: Exception) {
                                     e.printStackTrace()
-                                    resources.getInteger(R.integer.span_count)
+                                    defaultGridColumns
                                 }
 
                             }

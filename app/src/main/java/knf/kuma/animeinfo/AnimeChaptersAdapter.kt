@@ -365,7 +365,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
 
     fun deselectAll() {
         selection.clear()
-        notifyItemRangeChanged(0, itemCount, 0)
+        notifyDataSetChanged()
     }
 
     override fun onViewRecycled(holder: ChapterImgHolder) {

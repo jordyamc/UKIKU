@@ -2,6 +2,7 @@ package knf.kuma.videoservers
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -201,18 +202,27 @@ class ServersFactory {
             QueueManager.add(Uri.parse(option.url), false, chapter!!)
         } else {
             Answers.getInstance().logCustom(CustomEvent("Streaming").putCustomAttribute("Server", option.server))
-            if (PreferenceManager.getDefaultSharedPreferences(App.context).getString("player_type", "0") == "0") {
+            AchievementManager.onPlayChapter()
+            try {
+                if (PreferenceManager.getDefaultSharedPreferences(App.context).getString("player_type", "0") == "0") {
+                    App.context.startActivity(
+                            PrefsUtil.getPlayerIntent()
+                                    .setData(Uri.parse(option.url))
+                                    .putExtra("title", downloadObject.title)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } else {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                            .setDataAndType(Uri.parse(option.url), "video/mp4")
+                            .putExtra("title", downloadObject.title)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    App.context.startActivity(intent)
+                }
+            } catch (e: ActivityNotFoundException) {
                 App.context.startActivity(
                         PrefsUtil.getPlayerIntent()
                                 .setData(Uri.parse(option.url))
                                 .putExtra("title", downloadObject.title)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            } else {
-                val intent = Intent(Intent.ACTION_VIEW)
-                        .setDataAndType(Uri.parse(option.url), "video/mp4")
-                        .putExtra("title", downloadObject.title)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                App.context.startActivity(intent)
             }
         }
         callOnFinish(false, true)

@@ -2,6 +2,7 @@ package knf.kuma.preferences
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -245,8 +246,12 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     }
                 }
                 preferenceScreen.findPreference("achievements_permissions").setOnPreferenceChangeListener { _, _ ->
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                            startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
+                    } catch (e: ActivityNotFoundException) {
+                        Toaster.toast("No se pudo abrir la configuracion")
+                    }
                     return@setOnPreferenceChangeListener true
                 }
                 preferenceScreen.findPreference("hide_chaps").setOnPreferenceChangeListener { _, o ->
@@ -292,45 +297,47 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
-            if (!FileAccessHelper.INSTANCE.isUriValid(data?.data)) {
-                Toaster.toast("Directorio invalido")
-                FileAccessHelper.openTreeChooser(this)
-            }
-        } else if (requestCode == 4784 && resultCode == Activity.RESULT_OK) {
-            if (!FileAccessHelper.INSTANCE.toneFile.exists())
-                FileAccessHelper.INSTANCE.toneFile.createNewFile()
-            FileUtil.moveFile(
-                    context?.contentResolver!!,
-                    data?.data!!,
-                    FileOutputStream(FileAccessHelper.INSTANCE.toneFile), false)
-                    .observe(this, Observer {
-                        try {
-                            if (it != null) {
-                                if (it.second) {
-                                    if (it.first == -1) {
-                                        FileAccessHelper.INSTANCE.toneFile.safeDelete()
-                                        Toaster.toast("Error al copiar")
-                                    } else {
-                                        Toaster.toast("Tono seleccionado!")
+        noCrash {
+            if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
+                if (!FileAccessHelper.INSTANCE.isUriValid(data?.data)) {
+                    Toaster.toast("Directorio invalido")
+                    FileAccessHelper.openTreeChooser(this)
+                }
+            } else if (requestCode == 4784 && resultCode == Activity.RESULT_OK) {
+                if (!FileAccessHelper.INSTANCE.toneFile.exists())
+                    FileAccessHelper.INSTANCE.toneFile.createNewFile()
+                FileUtil.moveFile(
+                        context?.contentResolver!!,
+                        data?.data!!,
+                        FileOutputStream(FileAccessHelper.INSTANCE.toneFile), false)
+                        .observe(this, Observer {
+                            try {
+                                if (it != null) {
+                                    if (it.second) {
+                                        if (it.first == -1) {
+                                            FileAccessHelper.INSTANCE.toneFile.safeDelete()
+                                            Toaster.toast("Error al copiar")
+                                        } else {
+                                            Toaster.toast("Tono seleccionado!")
+                                        }
                                     }
                                 }
+                            } catch (e: Exception) {
+                                Toaster.toast("Error al importar")
                             }
-                        } catch (e: Exception) {
-                            Toaster.toast("Error al importar")
-                        }
-                    })
-        } else if (requestCode == 5879) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context))
-                (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
-                    isChecked = true
-                    isEnabled = false
-                }
-            else
-                (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
-                    isChecked = false
-                    isEnabled = true
-                }
+                        })
+            } else if (requestCode == 5879) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context))
+                    (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
+                        isChecked = true
+                        isEnabled = false
+                    }
+                else
+                    (preferenceScreen.findPreference("achievements_permissions") as SwitchPreference).apply {
+                        isChecked = false
+                        isEnabled = true
+                    }
+            }
         }
     }
 }

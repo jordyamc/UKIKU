@@ -67,8 +67,8 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("last_start", value).apply()
 
     var firstStart: Long
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("first_start", 0)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("first_start", value).apply()
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("first_start_new", 0)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("first_start_new", value).apply()
 
     fun init(context: Context) {
         PrefsUtil.context = context

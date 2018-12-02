@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/lay_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,20 +18,24 @@
 
     <Button
         android:id="@+id/login_dropbox"
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_dropbox"
         android:padding="20dp"
         android:text="Dropbox"
-        android:theme="@style/AppTheme.Button.Dropbox"/>
+        android:theme="@style/AppTheme.Button.Dropbox"
+        app:icon="@drawable/ic_dropbox"/>
 
     <Button
         android:id="@+id/login_drive"
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_drive"
         android:padding="20dp"
         android:text="Google Drive"
-        android:theme="@style/AppTheme.Button.Drive"/>
+        android:theme="@style/AppTheme.Button.Drive"
+        app:icon="@drawable/ic_drive"/>
 
 </LinearLayout>

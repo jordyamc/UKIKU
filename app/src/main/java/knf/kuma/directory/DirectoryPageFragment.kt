@@ -15,6 +15,7 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.commons.verifyManager
 import knf.kuma.pojos.AnimeObject
 import org.jetbrains.anko.find
 
@@ -56,6 +57,7 @@ class DirectoryPageFragment : BottomFragment() {
             adapter!!.submitList(animeObjects)
             makeAnimation()
         })
+        recyclerView.verifyManager()
         recyclerView.adapter = adapter
     }
 

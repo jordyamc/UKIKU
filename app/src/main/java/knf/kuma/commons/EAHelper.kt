@@ -1,10 +1,13 @@
 package knf.kuma.commons
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -13,11 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LevelEndEvent
 import com.crashlytics.android.answers.LevelStartEvent
+import com.crashlytics.android.answers.PurchaseEvent
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.database.EADB
 import knf.kuma.iap.IAPWrapper
+import knf.kuma.iap.PayloadHelper
 import knf.kuma.pojos.EAObject
 import kotlinx.android.synthetic.main.activity_ea.*
 import kotlinx.android.synthetic.main.item_ea_step.view.*
@@ -25,6 +30,7 @@ import moe.feng.common.stepperview.IStepperAdapter
 import moe.feng.common.stepperview.VerticalStepperItemView
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
+import java.math.BigDecimal
 import java.util.*
 
 object EAHelper {
@@ -149,7 +155,7 @@ object EAHelper {
         }
     }
 
-    private fun setUnlocked(phase: Int) {
+    fun setUnlocked(phase: Int) {
         EADB.INSTANCE.eaDAO().unlock(EAObject(phase))
         AchievementManager.onPhaseUnlocked(phase)
     }
@@ -415,27 +421,56 @@ class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
         supportActionBar?.title = "Easter egg"
         toolbar.setNavigationOnClickListener { onBackPressed() }
         iapWrapper = IAPWrapper(this)
-        vertical_stepper_view.stepperAdapter = this
-        vertical_stepper_view.currentStep = EAHelper.phase
+        iapWrapper.setUp {
+            if (it)
+                invalidateOptionsMenu()
+            doOnUI {
+                progress.visibility = View.GONE
+                vertical_stepper_view.stepperAdapter = this@EAUnlockActivity
+                vertical_stepper_view.currentStep = EAHelper.phase
+            }
+        }
+
+    }
+
+    override fun onDestroy() {
+        iapWrapper.onDestroy()
+        super.onDestroy()
     }
 
     override fun getTitle(index: Int): CharSequence {
         return "Paso ${index + 1}"
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateCustomView(index: Int, context: Context?, view: VerticalStepperItemView?): View {
         val inflateView = LayoutInflater.from(context).inflate(R.layout.item_ea_step, view, false)
         val hint = inflateView.hint
         hint.text = EAHelper.getMessage(index)
         val unlockButton = inflateView.unlock
-        if (index == 0 || index == 4)
+        if (index == 0 || index == 4 || !iapWrapper.isEnabled || !iapWrapper.isAvailable)
             unlockButton.visibility = View.GONE
-        else
+        else {
+            unlockButton.text = "Desbloquear ${iapWrapper.inventory!!.skuList[getSkuCode(index)]?.price} ${iapWrapper.inventory!!.skuList[getSkuCode(index)]?.priceCurrencyCode}"
             unlockButton.onClick {
                 if (!iapWrapper.isEnabled)
                     iapWrapper.showInstallDialog()
+                else
+                    if (iapWrapper.launchPurchaseFlow(this@EAUnlockActivity,
+                                    getSkuCode(index), PayloadHelper.buildIntentPayload(BuildConfig.APPCOINS_ADDRESS, null)))
+                        block_view.visibility = View.VISIBLE
             }
+        }
         return inflateView
+    }
+
+    private fun getSkuCode(index: Int): String {
+        return when (index) {
+            1 -> "ee_2"
+            2 -> "ee_3"
+            3 -> "ee_4"
+            else -> "ee_all"
+        }
     }
 
     override fun getSummary(index: Int): CharSequence? {
@@ -454,9 +489,56 @@ class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (iapWrapper.isAvailable && EAHelper.phase != 4)
+            menuInflater.inflate(R.menu.menu_ea, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.unlock -> {
+                if (!iapWrapper.isEnabled)
+                    iapWrapper.showInstallDialog()
+                else
+                    if (iapWrapper.launchPurchaseFlow(this@EAUnlockActivity,
+                                    getSkuCode(0), PayloadHelper.buildIntentPayload(BuildConfig.APPCOINS_ADDRESS, null)))
+                        block_view.visibility = View.VISIBLE
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        block_view.visibility = View.GONE
+        iapWrapper.handleActivityResult(requestCode, resultCode, data) { success, sku ->
+            if (success)
+                when (sku) {
+                    "ee_2" -> {
+                        Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 2").putItemPrice(BigDecimal.valueOf(7L)))
+                        EAHelper.setUnlocked(1)
+                        vertical_stepper_view.nextStep()
+                    }
+                    "ee_3" -> {
+                        Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 3").putItemPrice(BigDecimal.valueOf(13L)))
+                        EAHelper.setUnlocked(2)
+                        vertical_stepper_view.nextStep()
+                    }
+                    "ee_4" -> {
+                        Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 4").putItemPrice(BigDecimal.valueOf(5L)))
+                        EAHelper.setUnlocked(3)
+                        vertical_stepper_view.nextStep()
+                    }
+                    "ee_all" -> {
+                        Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg complete").putItemPrice(BigDecimal.valueOf(20L)))
+                        EAHelper.setUnlocked(1)
+                        EAHelper.setUnlocked(2)
+                        EAHelper.setUnlocked(3)
+                        vertical_stepper_view.currentStep = 4
+                        invalidateOptionsMenu()
+                    }
+                }
+        }
     }
 
     companion object {

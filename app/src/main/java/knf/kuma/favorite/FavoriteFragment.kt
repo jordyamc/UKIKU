@@ -18,12 +18,10 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.BottomFragment
 import knf.kuma.R
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
-import knf.kuma.commons.safeShow
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.FavSection
 import knf.kuma.pojos.FavoriteObject
@@ -33,7 +31,7 @@ import xdroid.toaster.Toaster
 import java.util.*
 
 class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
-    lateinit var recyclerView: RecyclerView
+    lateinit var recyclerView: FastScrollRecyclerView
     private lateinit var errorLayout: LinearLayout
     private var edited: FavoriteObject? = null
     private var manager: RecyclerView.LayoutManager? = null
@@ -52,8 +50,8 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.favsDAO().all.observe(this, Observer { FavSectionHelper.reload() })
-        ViewModelProviders.of(activity!!).get(FavoriteViewModel::class.java).getData().observe(this, Observer { favoriteObjects ->
+        CacheDB.INSTANCE.favsDAO().all.observe(this@FavoriteFragment, Observer { FavSectionHelper.reload() })
+        ViewModelProviders.of(activity!!).get(FavoriteViewModel::class.java).getData().observe(this@FavoriteFragment, Observer { favoriteObjects ->
             if (favoriteObjects == null || favoriteObjects.isEmpty()) {
                 errorLayout.visibility = View.VISIBLE
                 adapter?.updateList(ArrayList())
@@ -83,6 +81,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
         recyclerView = view.find(R.id.recycler)
+        recyclerView.verifyManager()
         errorLayout = view.find(R.id.error)
         return view
     }

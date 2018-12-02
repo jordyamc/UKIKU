@@ -74,7 +74,11 @@ public class QueueObject implements Serializable {
     }
 
     public String getTitle() {
-        return chapter.name + chapter.number.substring(chapter.number.lastIndexOf(" "));
+        try {
+            return chapter.name + chapter.number.substring(chapter.number.lastIndexOf(" "));
+        } catch (Exception e) {
+            return chapter.name;
+        }
     }
 
     @Override

@@ -22,7 +22,7 @@ class BypassUtil {
         const val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
         var isLoading = false
 
-        fun saveCookies(context: Context) {
+        fun saveCookies(context: Context): Boolean {
             val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/").trim { it <= ' ' }
             if (cookies.contains("cf_clearance")) {
                 val parts = cookies.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -34,7 +34,9 @@ class BypassUtil {
                         preferences.putString("cf_clearance", cookie.trim { it <= ' ' }.substring(cookie.trim { it <= ' ' }.indexOf("=") + 1))
                 }
                 preferences.apply()
+                return true
             }
+            return false
         }
 
         fun clearCookies() {

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="71" version="3.0.1">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Errores con algunos logros</change>
+        <change type="change">Mejoras esteticas para modo claro en Android 8+</change>
+        <change type="changes">Mejora de modo cuadrícula para teléfonos anchos y tablets</change>
+    </release>
     <release code="70" version="3.0">
         <change type="fix">Errores generales</change>
         <change type="new">Logros</change>

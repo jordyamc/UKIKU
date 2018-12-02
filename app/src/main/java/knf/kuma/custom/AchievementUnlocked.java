@@ -820,8 +820,12 @@ public class AchievementUnlocked {
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                dismissWithoutAnimation();
+                try {
+                    super.onAnimationEnd(animation);
+                    dismissWithoutAnimation();
+                } catch (Exception e) {
+                    //
+                }
             }
         });
         return set;
@@ -867,12 +871,16 @@ public class AchievementUnlocked {
         sets.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                if (AchievementUnlocked.this.achievements != null && !hasBeenDismissed && AchievementUnlocked.this.achievements.length > 0 && index + 1 < AchievementUnlocked.this.achievements.length) {
-                    index++;
-                    morphData().start();
-                } else
-                    getExitAnimation().start();
+                try {
+                    super.onAnimationEnd(animation);
+                    if (AchievementUnlocked.this.achievements != null && !hasBeenDismissed && AchievementUnlocked.this.achievements.length > 0 && index + 1 < AchievementUnlocked.this.achievements.length) {
+                        index++;
+                        morphData().start();
+                    } else
+                        getExitAnimation().start();
+                } catch (Exception e) {
+                    //
+                }
             }
         });
         return sets;

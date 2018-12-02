@@ -17,6 +17,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceFragmentCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import xdroid.toaster.Toaster
 import java.io.File
 
 fun Toolbar.changeToolbarFont() {
@@ -94,6 +97,20 @@ fun Snackbar.safeDismiss() {
     }
 }
 
+fun RecyclerView.verifyManager(size: Int = 115) {
+    val manager = layoutManager
+    if (manager is GridLayoutManager) {
+        manager.spanCount = gridColumns(size)
+        layoutManager = manager
+    }
+}
+
+fun gridColumns(size: Int = 115): Int {
+    val metrics = App.context.resources.displayMetrics
+    val dpWidht = metrics.widthPixels / metrics.density
+    return (dpWidht / size).toInt()
+}
+
 fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
     return Snackbar.make(this, text, duration).also { doOnUI { it.show() } }
 }
@@ -146,13 +163,20 @@ fun Int.toColor(): Int {
     return ContextCompat.getColor(App.context, this)
 }
 
-fun noCrash(enableLog: Boolean = true, func: () -> Unit) {
-    try {
+fun noCrash(enableLog: Boolean = true, func: () -> Unit): String? {
+    return try {
         func()
+        null
     } catch (e: Exception) {
         if (enableLog)
             e.printStackTrace()
+        e.message
     }
+}
+
+fun String?.toast() {
+    if (!this.isNullOrEmpty())
+        Toaster.toast(this)
 }
 
 fun doOnUI(func: () -> Unit) {

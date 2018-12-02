@@ -10,13 +10,12 @@ import android.provider.Settings
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.R
 import knf.kuma.backup.BUUtils
 import knf.kuma.backup.objects.BackupObject
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
-import knf.kuma.commons.noCrash
+import knf.kuma.commons.*
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.database.CacheDB
 import knf.kuma.database.EADB
@@ -172,25 +171,27 @@ object AchievementManager {
 
     fun backup(ncontext: Context) {
         BUUtils.init(ncontext)
-        BUUtils.backupNUI(ncontext, "achievements", object : BUUtils.BackupInterface {
-            override fun onResponse(backupObject: BackupObject<*>?) {
+        if (BUUtils.isLogedIn)
+            BUUtils.backupNUI(ncontext, "achievements", object : BUUtils.BackupInterface {
+                override fun onResponse(backupObject: BackupObject<*>?) {
 
-            }
-        })
+                }
+            })
     }
 
     fun restore(ncontext: Context) {
         BUUtils.init(ncontext)
-        BUUtils.search(ncontext, "achievements", object : BUUtils.SearchInterface {
-            override fun onResponse(backupObject: BackupObject<*>?) {
-                if (backupObject != null) {
-                    doAsync {
-                        CacheDB.INSTANCE.achievementsDAO().update((backupObject.data?.filterIsInstance<Achievement>()
-                                ?: arrayListOf()).filter { it.isUnlocked })
+        if (BUUtils.isLogedIn)
+            BUUtils.search(ncontext, "achievements", object : BUUtils.SearchInterface {
+                override fun onResponse(backupObject: BackupObject<*>?) {
+                    if (backupObject != null) {
+                        doAsync {
+                            CacheDB.INSTANCE.achievementsDAO().update((backupObject.data?.filterIsInstance<Achievement>()
+                                    ?: arrayListOf()).filter { it.isUnlocked })
+                        }
                     }
                 }
-            }
-        })
+            })
     }
 
     private fun updateCount(count: Int, vararg keys: Int) {
@@ -224,11 +225,13 @@ object AchievementManager {
                 noCrash {
                     if (!achievementsDAO.isUnlocked(it)) {
                         val achievement = achievementsDAO.find(it)
-                        if (achievement != null)
+                        if (achievement != null) {
+                            Answers.getInstance().logCustom(CustomEvent("Achievement").putCustomAttribute("code", it))
                             list.add(achievement.apply {
                                 isUnlocked = true
                                 time = System.currentTimeMillis()
                             })
+                        }
                     }
                 }
             }
@@ -251,11 +254,11 @@ object AchievementManager {
             val list = mutableListOf<Int>()
             list.add(0)
             if (PrefsUtil.firstStart == 0L)
-                PrefsUtil.firstStart = System.currentTimeMillis()
-            val time = PrefsUtil.firstStart - System.currentTimeMillis()
-            if (time >= 7776000) list.add(8)
-            if (time >= 15552000) list.add(9)
-            if (time >= 31104000) list.add(10)
+                PrefsUtil.firstStart = Calendar.getInstance().timeInMillis
+            val time = (Calendar.getInstance().timeInMillis - PrefsUtil.firstStart)
+            if (time >= 7776000000) list.add(8)
+            if (time >= 15552000000) list.add(9)
+            if (time >= 31104000000) list.add(10)
             if (System.currentTimeMillis() - PrefsUtil.lastStart >= 604800000)
                 list.add(36)
             PrefsUtil.lastStart = System.currentTimeMillis()
@@ -298,7 +301,7 @@ object AchievementManager {
         }
     }
 
-    fun onRecordsOpenned() {
+    fun onRecordsOpened() {
         incrementCount(1, 44)
     }
 
@@ -327,7 +330,7 @@ object AchievementManager {
                 val batteryLevel = batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
                 val batteryScale = batteryStatus?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
                 val batteryPct = batteryLevel / batteryScale.toFloat()
-                val isLivingAtLimit = batteryPct <= .10f &&
+                val isLivingAtLimit = (batteryPct * 100).toInt() <= 10 &&
                         batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) != BatteryManager.BATTERY_STATUS_CHARGING &&
                         batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) != BatteryManager.BATTERY_STATUS_FULL
                 if (isLivingAtLimit)
@@ -336,7 +339,7 @@ object AchievementManager {
                 val current = timeFormat.format(Calendar.getInstance().time).toInt()
                 if (current in 0..3)
                     unlock(31)
-            }
+            }.toast()
         }
     }
 

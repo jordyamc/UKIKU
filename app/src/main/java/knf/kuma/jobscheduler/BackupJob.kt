@@ -21,7 +21,7 @@ class BackupJob : Job() {
             }
             Job.Result.SUCCESS
         } else
-            Job.Result.RESCHEDULE
+            Job.Result.FAILURE
     }
 
     companion object {

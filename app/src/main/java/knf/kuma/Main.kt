@@ -22,6 +22,7 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -33,6 +34,7 @@ import com.crashlytics.android.Crashlytics
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import es.munix.multidisplaycast.CastManager
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
@@ -87,6 +89,7 @@ class Main : AppCompatActivity(),
     private val searchView by bind<PersistentSearchView>(R.id.searchview)
     private val drawer by bind<DrawerLayout>(R.id.drawer_layout)
     private val navigationView by bind<NavigationView>(R.id.nav_view)
+    private val coordinator by bind<CoordinatorLayout>(R.id.coordinator)
     private val bottomNavigationView by bind<BottomNavigationView>(R.id.bottomNavigation)
     private val webView: WebView? by optionalBind(R.id.webview)
     internal var selectedFragment: BottomFragment? = null
@@ -411,7 +414,6 @@ class Main : AppCompatActivity(),
             R.id.drawer_random -> RandomActivity.open(this)
         }
         closeSearchBar()
-        invalidateOptionsMenu()
         closeDrawer()
         return true
     }
@@ -424,6 +426,7 @@ class Main : AppCompatActivity(),
                 transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout)
                 transaction.replace(R.id.root, selectedFragment!!)
                 transaction.commit()
+                invalidateOptionsMenu()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -561,6 +564,7 @@ class Main : AppCompatActivity(),
         if (webView != null)
             doAsync {
                 if (isNeeded(this@Main) && !isLoading) {
+                    val snack = coordinator.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
                     isLoading = true
                     Log.e("CloudflareBypass", "is needed")
                     clearCookies()
@@ -569,10 +573,11 @@ class Main : AppCompatActivity(),
                         webView?.webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                 Log.e("CloudflareBypass", "Override ${request?.url}")
+                                snack.safeDismiss()
                                 if (request?.url.toString() == "https://animeflv.net/") {
                                     Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
-                                    saveCookies(this@Main)
-                                    Toaster.toast("Bypass actualizado")
+                                    if (saveCookies(this@Main))
+                                        coordinator.showSnackbar("Bypass actualizado")
                                     PicassoSingle.clear()
                                     onNeedRecreate()
                                 }

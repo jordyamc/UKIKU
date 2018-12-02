@@ -16,6 +16,7 @@ import knf.kuma.R
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
+import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import knf.kuma.queue.QueueManager
@@ -42,6 +43,7 @@ class FragmentChapters : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
         recyclerView = view.find(R.id.recycler)
+        recyclerView.verifyManager(170)
         progressBar = view.find(R.id.progress)
         fab = view.find(R.id.fab)
         return view

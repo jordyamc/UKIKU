@@ -21,6 +21,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.bind
 import knf.kuma.commons.safeShow
+import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecordObject
 
@@ -51,6 +52,7 @@ class RecordActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         adapter = RecordsAdapter(this)
+        recyclerView.verifyManager()
         recyclerView.adapter = adapter
         val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
@@ -102,7 +104,7 @@ class RecordActivity : AppCompatActivity() {
 
         fun open(context: Context) {
             context.startActivity(Intent(context, RecordActivity::class.java))
-            AchievementManager.onRecordsOpenned()
+            AchievementManager.onRecordsOpened()
         }
     }
 }

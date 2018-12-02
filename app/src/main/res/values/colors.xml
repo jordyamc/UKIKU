@@ -5,7 +5,7 @@
     <!-- text color -->
     <color name="textWhitePrimary">#FFFFFFFF</color>
 
-    <color name="colorPrimary">#fafafa</color>
+    <color name="colorPrimary">#ffffff</color>
     <color name="colorPrimaryDark">#c7c7c7</color>
     <color name="colorAccent">#d32f2f</color>
 

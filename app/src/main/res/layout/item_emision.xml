@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:clickable="true"
@@ -20,20 +20,20 @@
         android:orientation="vertical">
 
         <RelativeLayout
-            android:layout_width="105dp"
-            android:layout_height="149dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/img"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="149dp"
                 android:scaleType="centerCrop"
                 android:transitionName="img"/>
 
             <knf.kuma.custom.HiddenOverlay
                 android:id="@+id/hidden"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="149dp"
                 android:visibility="gone"/>
         </RelativeLayout>
 

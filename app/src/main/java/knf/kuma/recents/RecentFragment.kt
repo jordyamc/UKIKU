@@ -13,7 +13,6 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
-import knf.kuma.commons.doOnUI
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.ServersFactory
 
@@ -25,14 +24,10 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(RecentsViewModel::class.java)
-        viewModel?.dbLiveData?.observe(this, Observer { objects ->
-            doOnUI {
-                if (objects != null) {
-                    holder?.setError(objects.isEmpty())
-                    holder?.setRefreshing(false)
-                    adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
-                }
-            }
+        viewModel?.dbLiveData?.observe(this@RecentFragment, Observer { objects ->
+            holder?.setError(objects.isEmpty())
+            holder?.setRefreshing(false)
+            adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
         })
         updateList()
     }

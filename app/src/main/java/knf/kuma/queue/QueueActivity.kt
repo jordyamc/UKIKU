@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.bind
+import knf.kuma.commons.gridColumns
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
@@ -151,7 +152,7 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
             recyclerView.layoutManager = LinearLayoutManager(this)
             recyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
         } else {
-            recyclerView.layoutManager = GridLayoutManager(this, resources.getInteger(R.integer.span_count))
+            recyclerView.layoutManager = GridLayoutManager(this, gridColumns())
             recyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.grid_fall_down)
         }
     }

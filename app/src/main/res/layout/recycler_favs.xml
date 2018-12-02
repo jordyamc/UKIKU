@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,8 +17,11 @@
         android:paddingEnd="10dp"
         app:layoutManager="LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:fastScrollPopupBgColor="?colorAccent"
+        app:fastScrollPopupTextColor="@android:color/white"
+        app:fastScrollThumbColor="?colorAccentLight"
         tools:listitem="@layout/item_fav">
-    </androidx.recyclerview.widget.RecyclerView>
+    </com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView>
 
     <LinearLayout
         android:id="@+id/error"

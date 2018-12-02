@@ -5,7 +5,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorAccentLight">@color/colorAccentLight</item>
-        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 
@@ -21,11 +21,11 @@
     <style name="AppTheme.DayNight" parent="AppTheme.Light"/>
 
     <style name="AppTheme.TV.Browser" parent="Theme.Leanback.Browse">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorPrimary">#424242</item>
+        <item name="android:colorPrimaryDark">#1b1b1b</item>
         <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="defaultBrandColor">@color/colorPrimary</item>
-        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+        <item name="defaultBrandColor">#424242</item>
+        <item name="defaultBrandColorDark">#1b1b1b</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
@@ -33,11 +33,11 @@
     </style>
 
     <style name="AppTheme.TV.Guided" parent="Theme.Leanback.GuidedStep">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorPrimary">#424242</item>
+        <item name="android:colorPrimaryDark">#1b1b1b</item>
         <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="defaultBrandColor">@color/colorPrimary</item>
-        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+        <item name="defaultBrandColor">#424242</item>
+        <item name="defaultBrandColorDark">#1b1b1b</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
@@ -45,11 +45,11 @@
     </style>
 
     <style name="AppTheme.TV.Base" parent="Theme.Leanback">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorPrimary">#424242</item>
+        <item name="android:colorPrimaryDark">#1b1b1b</item>
         <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="defaultBrandColor">@color/colorPrimary</item>
-        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+        <item name="defaultBrandColor">#424242</item>
+        <item name="defaultBrandColorDark">#1b1b1b</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
@@ -57,11 +57,11 @@
     </style>
 
     <style name="AppTheme.TV.Details" parent="Theme.Leanback.Details">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorPrimary">#424242</item>
+        <item name="android:colorPrimaryDark">#1b1b1b</item>
         <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="defaultBrandColor">@color/colorPrimary</item>
-        <item name="defaultBrandColorDark">@color/colorPrimaryDark</item>
+        <item name="defaultBrandColor">#424242</item>
+        <item name="defaultBrandColorDark">#1b1b1b</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme.DayNight">
@@ -123,7 +123,7 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>
 
     <style name="AppTheme.Cardview" parent="CardView.Light"/>
 

@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.commons.doOnUI
+import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.find
@@ -56,6 +57,7 @@ class FragmentFiles : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
         recyclerView = view.find(R.id.recycler)
+        recyclerView.verifyManager()
         error = view.find(R.id.error)
         progressBar = view.find(R.id.progress)
         state = view.find(R.id.state)
