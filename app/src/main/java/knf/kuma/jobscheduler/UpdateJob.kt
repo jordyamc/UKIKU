@@ -10,28 +10,31 @@ import androidx.core.content.ContextCompat
 import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
 import com.evernote.android.job.JobRequest
+import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.R
+import knf.kuma.commons.Network
 import org.jsoup.Jsoup
 import java.util.concurrent.TimeUnit
 
 class UpdateJob : Job() {
 
     override fun onRunJob(params: Job.Params): Job.Result {
-        try {
-            val document = Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num").get()
-            val nCode = Integer.parseInt(document.select("body").first().ownText().trim { it <= ' ' })
-            val sCode = PreferenceManager.getDefaultSharedPreferences(context).getInt("last_notified_update", 0)
-            if (nCode <= sCode)
-                return Job.Result.SUCCESS
-            val oCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
-            if (nCode > oCode) {
-                showNotification()
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("last_notified_update", nCode).apply()
+        if (Network.isConnected && BuildConfig.BUILD_TYPE != "playstore")
+            try {
+                val document = Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num").get()
+                val nCode = Integer.parseInt(document.select("body").first().ownText().trim { it <= ' ' })
+                val sCode = PreferenceManager.getDefaultSharedPreferences(context).getInt("last_notified_update", 0)
+                if (nCode <= sCode)
+                    return Job.Result.SUCCESS
+                val oCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+                if (nCode > oCode) {
+                    showNotification()
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("last_notified_update", nCode).apply()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
 
         return Job.Result.SUCCESS
     }

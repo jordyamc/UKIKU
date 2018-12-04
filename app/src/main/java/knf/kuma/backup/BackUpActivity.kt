@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Rect
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -45,6 +46,7 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContentView(R.layout.activity_login)
         BUUtils.init(this, savedInstanceState == null)
         login_dropbox.setOnClickListener { onDropBoxLogin() }

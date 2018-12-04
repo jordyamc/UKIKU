@@ -223,7 +223,7 @@ object AchievementManager {
             val list = mutableListOf<Achievement>()
             keys.forEach {
                 noCrash {
-                    if (!achievementsDAO.isUnlocked(it)) {
+                    if (!achievementsDAO.isUnlocked(it) && !isTV) {
                         val achievement = achievementsDAO.find(it)
                         if (achievement != null) {
                             Answers.getInstance().logCustom(CustomEvent("Achievement").putCustomAttribute("code", it))
@@ -259,9 +259,9 @@ object AchievementManager {
             if (time >= 7776000000) list.add(8)
             if (time >= 15552000000) list.add(9)
             if (time >= 31104000000) list.add(10)
-            if (System.currentTimeMillis() - PrefsUtil.lastStart >= 604800000)
+            if (Calendar.getInstance().timeInMillis - PrefsUtil.lastStart >= 604800000)
                 list.add(36)
-            PrefsUtil.lastStart = System.currentTimeMillis()
+            PrefsUtil.lastStart = Calendar.getInstance().timeInMillis
             if (EADB.INSTANCE.eaDAO().isUnlocked(0)) list.add(12)
             if (EADB.INSTANCE.eaDAO().isUnlocked(1)) list.add(13)
             if (EADB.INSTANCE.eaDAO().isUnlocked(2)) list.add(14)

@@ -17,7 +17,7 @@ import xdroid.toaster.Toaster
 
 
 class IAPWrapper(private val context: Context) : ServiceConnection {
-    val isEnabled: Boolean = IAPHelper.hasWalletInstalled(context)
+    val isEnabled: Boolean = IAPHelper.hasWalletInstalled(context) && BuildConfig.BUILD_TYPE != "playstore"
     private var iapService: IAPService? = null
     var inventory: Inventory? = null
     private var onConnectedListener: ((success: Boolean) -> Unit)? = null

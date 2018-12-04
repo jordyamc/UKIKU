@@ -224,7 +224,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         noCrash {
             if (block)
                 (fragment.activity as? AppCompatActivity)?.requestedOrientation = when {
-                    context.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    context.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                     else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
             else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR

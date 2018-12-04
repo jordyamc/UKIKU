@@ -41,7 +41,7 @@ class AnimeDetailsHolder(val view: View) {
     internal val id: TextView = view.aid
     private val layScore: LinearLayout = view.lay_score
     private val ratingCount: TextView = view.rating_count
-    internal val ratingBar: MaterialRatingBar = view.ratingBar
+    private val ratingBar: MaterialRatingBar = view.ratingBar
     private val recyclerViewGenres: RecyclerView = view.recycler_genres
     private val spinnerList: Spinner = view.spinner_list
     private val recyclerViewRelated: RecyclerView = view.recycler_related

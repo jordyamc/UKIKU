@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="knf.kuma">
 
     <uses-feature
@@ -10,6 +11,30 @@
         android:required="false"/>
     <uses-feature
         android:name="android.hardware.microphone"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.faketouch"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.location"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.sensor"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.wifi"
         android:required="false"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -39,6 +64,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter android:label="@string/app_name">
@@ -70,7 +96,6 @@
                     android:scheme="ukiku"/>
 
                 <action android:name="android.intent.action.VIEW"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
@@ -85,11 +110,11 @@
         <activity
             android:name=".tv.ui.TVMain"
             android:banner="@drawable/tv_banner"
-            android:screenOrientation="landscape"
             android:theme="@style/AppTheme.TV.Browser">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -115,7 +140,6 @@
             android:immersive="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
-            android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"/>
         <activity
             android:name=".animeinfo.ActivityImgFull"
@@ -132,7 +156,6 @@
         <activity android:name=".changelog.ChangelogActivity"/>
         <activity
             android:name=".backup.BackUpActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Translucent"/>
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
@@ -165,6 +188,7 @@
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
         <service android:name=".download.DownloadManager"/>
         <service android:name=".commons.SelfServer"/>
+
         <receiver
             android:name=".widgets.emision.WEmisionProvider"
             android:label="Emisión">
@@ -240,13 +264,18 @@
             android:immersive="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
-            android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"/>
         <activity android:name=".custom.ThemedControlsActivity"/>
         <activity android:name=".news.NewsActivity"/>
         <activity android:name=".news.NewsDetailsActivity"/>
         <activity android:name=".achievements.AchievementActivity"/>
         <activity android:name=".commons.EAUnlockActivity"/>
+
+        <activity
+            android:name="es.munix.multidisplaycast.CastControlsActivity"
+            android:screenOrientation="sensor"
+            tools:node="merge"
+            tools:replace="android:screenOrientation"/>
 
         <provider
             android:name=".slices.AnimeSlice"

@@ -2,4 +2,5 @@
 <resources>
     <bool name="isLandscape">false</bool>
     <bool name="isDark">false</bool>
+    <bool name="isTv">false</bool>
 </resources>

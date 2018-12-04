@@ -1,13 +1,11 @@
 package knf.kuma.commons
 
-import android.annotation.SuppressLint
 import java.security.GeneralSecurityException
 import java.security.SecureRandom
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 
-@SuppressLint("TrustAllX509TrustManager")
 object SSLSkipper {
     fun skip() {
         val trustAllCertificates = arrayOf<TrustManager>(object : X509TrustManager {
@@ -16,15 +14,23 @@ object SSLSkipper {
             }
 
             override fun checkClientTrusted(certs: Array<X509Certificate>, authType: String) {
-                // Do nothing. Just allow them all.
+                noCrash {
+                    certs.forEach {
+                        it.checkValidity()
+                    }
+                }
             }
 
             override fun checkServerTrusted(certs: Array<X509Certificate>, authType: String) {
-                // Do nothing. Just allow them all.
+                noCrash {
+                    certs.forEach {
+                        it.checkValidity()
+                    }
+                }
             }
         })
 
-        val trustAllHostnames = HostnameVerifier { _, _ -> true }
+        val trustAllHostnames = HostnameVerifier { hostName, _ -> isHostValid(hostName) }
 
         try {
             System.setProperty("jsse.enableSNIExtension", "false")
@@ -41,10 +47,20 @@ object SSLSkipper {
             context.init(null, arrayOf<X509TrustManager>(object : X509TrustManager {
                 @Throws(CertificateException::class)
                 override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
+                    noCrash {
+                        chain.forEach {
+                            it.checkValidity()
+                        }
+                    }
                 }
 
                 @Throws(CertificateException::class)
                 override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
+                    noCrash {
+                        chain.forEach {
+                            it.checkValidity()
+                        }
+                    }
                 }
 
                 override fun getAcceptedIssuers(): Array<X509Certificate?> {

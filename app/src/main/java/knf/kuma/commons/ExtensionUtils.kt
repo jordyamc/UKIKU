@@ -46,7 +46,7 @@ fun Toolbar.changeToolbarFont() {
 }
 
 fun getPackage(): String {
-    return if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "release") "knf.kuma" else "knf.kuma.${BuildConfig.BUILD_TYPE}"
+    return if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "release" || BuildConfig.BUILD_TYPE == "playstore") "knf.kuma" else "knf.kuma.${BuildConfig.BUILD_TYPE}"
 }
 
 val getUpdateDir: String
@@ -158,6 +158,8 @@ fun Request.execute(): Response {
 val PreferenceFragmentCompat.safeContext: Context
     get() = context!!.applicationContext
 
+val isTV: Boolean get() = App.context.resources.getBoolean(R.bool.isTv)
+
 @ColorInt
 fun Int.toColor(): Int {
     return ContextCompat.getColor(App.context, this)
@@ -232,4 +234,37 @@ fun ImageView.setAnimatedResource(@DrawableRes res: Int) {
     animated.callback = this
     animated.setVisible(true, true)
     animated.start()
+}
+
+fun isHostValid(hostName: String): Boolean {
+    //Log.e("Hostname", hostName)
+    return when (hostName) {
+        "fex.net",
+        "api.crashlytics.com",
+        "settings.crashlytics.com",
+        "somoskudasai.com",
+        "animeflv.net",
+        "raw.githubusercontent.com",
+        "m.animeflv.net",
+        "s1.animeflv.net",
+        "streamango.com",
+        "ok.ru",
+        "www.rapidvideo.com",
+        "www.yourupload.com" -> true
+        else -> isVideoHostName(hostName)
+    }
+}
+
+private fun isVideoHostName(hostName: String): Boolean {
+    return when {
+        hostName.contains("fex.net") ||
+                hostName.contains("content-na.drive.amazonaws.com") ||
+                hostName.contains("mediafire") ||
+                hostName.contains("black-raspberry.fruithosted.net") ||
+                hostName.contains("mp4upload.com") ||
+                hostName.contains("storage.googleapis.com") ||
+                hostName.contains("safety.playercdn.net") ||
+                hostName.contains("vidcache.net") -> true
+        else -> false
+    }
 }

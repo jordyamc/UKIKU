@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 71
-        versionName "3.0.1"
+        versionCode 76
+        versionName "3.0.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -79,7 +79,7 @@ android {
         }
         playstore {
             initWith release
-            applicationIdSuffix ".play"
+            manifestPlaceholders = [iabPermission: "com.android.vending.BILLING"]
         }
     }
     sourceSets {
@@ -159,9 +159,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.7.0'
     implementation "com.google.android.exoplayer:extension-mediasession:2.7.0"
     //MaterialDialogs
-    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc2'
-    implementation 'com.afollestad.material-dialogs:input:2.0.0-rc2'
-    implementation 'com.afollestad.material-dialogs:color:2.0.0-rc2'
+    implementation 'com.afollestad.material-dialogs:core:2.0.0-rc3'
+    implementation 'com.afollestad.material-dialogs:input:2.0.0-rc3'
+    implementation 'com.afollestad.material-dialogs:color:2.0.0-rc3'
     //Aesthetic
     implementation 'com.afollestad:aesthetic:1.0.0-beta04'
     //---------

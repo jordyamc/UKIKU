@@ -1,6 +1,7 @@
 package knf.kuma.player
 
 import android.app.PictureInPictureParams
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.AudioManager
 import android.os.Build
@@ -37,6 +38,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         setContentView(R.layout.player_view)
         volumeControlStream = AudioManager.STREAM_MUSIC
         if (savedInstanceState != null) {

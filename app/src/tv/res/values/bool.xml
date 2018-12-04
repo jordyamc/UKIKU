@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="isLandscape">false</bool>
+    <bool name="isDark">false</bool>
+    <bool name="isTv">true</bool>
+</resources>
