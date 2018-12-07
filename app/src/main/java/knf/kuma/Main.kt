@@ -169,7 +169,7 @@ class Main : AppCompatActivity(),
             actionTrophy.setOnClickListener { AchievementActivity.open(this@Main) }
             actionLogin.setOnClickListener { BackUpActivity.start(this@Main) }
             actionMigrate.setOnClickListener { MigrationActivity.start(this@Main) }
-            actionMap.setOnClickListener { EAMActivity.start(this@Main) }
+            actionMap.setOnClickListener { EAMapActivity.start(this@Main) }
             actionMigrate.visibility = if (BUUtils.isAnimeflvInstalled(this@Main) && DirectoryService.isDirectoryFinished(this@Main)) View.VISIBLE else View.GONE
             actionMap.visibility = if (EAHelper.phase == 3) View.VISIBLE else View.GONE
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)

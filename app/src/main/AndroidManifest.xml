@@ -3,6 +3,13 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="knf.kuma">
 
+    <!--
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the 'MyLocation' functionality.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
     <uses-feature
         android:name="android.software.leanback"
         android:required="false"/>
@@ -56,7 +63,16 @@
         android:label="@string/app_name"
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:theme="@style/AppTheme.DayNight">
+        android:theme="@style/AppTheme.DayNight"
+        tools:replace="android:banner">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
+
+        <activity
+            android:name=".commons.EAMapActivity"
+            android:label="@string/title_activity_eamap">
+        </activity>
         <activity
             android:name=".SplashActivity"
             android:label="@string/title_activity_main"
@@ -96,6 +112,7 @@
                     android:scheme="ukiku"/>
 
                 <action android:name="android.intent.action.VIEW"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
@@ -217,14 +234,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"/>
-
-        <activity
-            android:name=".commons.EAMActivity"
-            android:label="@string/title_activity_eam">
-        </activity>
         <activity android:name=".queue.QueueActivity"/>
         <activity
             android:name=".tv.streaming.TVServerSelection"
@@ -270,7 +279,6 @@
         <activity android:name=".news.NewsDetailsActivity"/>
         <activity android:name=".achievements.AchievementActivity"/>
         <activity android:name=".commons.EAUnlockActivity"/>
-
         <activity
             android:name="es.munix.multidisplaycast.CastControlsActivity"
             android:screenOrientation="sensor"

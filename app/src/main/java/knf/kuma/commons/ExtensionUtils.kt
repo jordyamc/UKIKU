@@ -241,6 +241,8 @@ fun isHostValid(hostName: String): Boolean {
     return when (hostName) {
         "fex.net",
         "api.crashlytics.com",
+        "e.crashlytics.com",
+        "cdn.myanimelist.net",
         "settings.crashlytics.com",
         "somoskudasai.com",
         "animeflv.net",
@@ -257,6 +259,7 @@ fun isHostValid(hostName: String): Boolean {
 
 private fun isVideoHostName(hostName: String): Boolean {
     return when {
+        hostName.contains("google.com") -> true
         hostName.contains("fex.net") ||
                 hostName.contains("content-na.drive.amazonaws.com") ||
                 hostName.contains("mediafire") ||

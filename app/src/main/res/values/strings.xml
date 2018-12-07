@@ -194,4 +194,5 @@
         <item>18</item>
     </string-array>
     <string name="title_activity_eam">Mapa</string>
+    <string name="title_activity_eamap">Map</string>
 </resources>
