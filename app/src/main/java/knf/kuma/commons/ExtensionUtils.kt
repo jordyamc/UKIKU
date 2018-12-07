@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.AnimationDrawable
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -237,7 +238,8 @@ fun ImageView.setAnimatedResource(@DrawableRes res: Int) {
 }
 
 fun isHostValid(hostName: String): Boolean {
-    //Log.e("Hostname", hostName)
+    if (BuildConfig.DEBUG)
+        Log.e("Hostname", hostName)
     return when (hostName) {
         "fex.net",
         "api.crashlytics.com",
@@ -246,6 +248,7 @@ fun isHostValid(hostName: String): Boolean {
         "settings.crashlytics.com",
         "somoskudasai.com",
         "animeflv.net",
+        "github.com",
         "raw.githubusercontent.com",
         "m.animeflv.net",
         "s1.animeflv.net",
