@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="79" version="3.0.5">
+        <change type="fix">Errores generales</change>
+        <change type="change">Mejora en imagen de Splash</change>
+    </release>
     <release code="78" version="3.0.4">
         <change type="fix">Errores generales</change>
     </release>

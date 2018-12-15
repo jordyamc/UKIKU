@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 78
-        versionName "3.0.4"
+        versionCode 79
+        versionName "3.0.5"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -72,7 +72,6 @@ android {
                     "\"" + APPCOINS_ADDRESS + "\""
             buildConfigField "String", "DROPBOX_TOKEN",
                     "\"" + DROPBOX_TOKEN + "\""
-            manifestPlaceholders = [iabPermission: "com.appcoins.BILLING"]
             buildConfigField "String", "EASTER_SEARCH",
                     "\"" + EASTER_SEARCH + "\""
         }
@@ -82,7 +81,6 @@ android {
         }
         playstore {
             initWith release
-            manifestPlaceholders = [iabPermission: "com.android.vending.BILLING"]
         }
     }
     sourceSets {
