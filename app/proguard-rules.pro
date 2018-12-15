@@ -22,6 +22,7 @@
 
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
+-keep,allowobfuscation @interface kotlin.coroutines.jvm.internal.DebugMetadata
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
 

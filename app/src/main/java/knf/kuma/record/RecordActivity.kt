@@ -3,7 +3,6 @@ package knf.kuma.record
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,10 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.bind
-import knf.kuma.commons.safeShow
-import knf.kuma.commons.verifyManager
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecordObject
 
@@ -36,7 +32,7 @@ class RecordActivity : AppCompatActivity() {
 
     private val layout: Int
         @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(this).getString("lay_type", "0") == "0") {
+        get() = if (PrefsUtil.layType == "0") {
             R.layout.recycler_records
         } else {
             R.layout.recycler_records_grid

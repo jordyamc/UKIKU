@@ -32,6 +32,7 @@ import knf.kuma.download.FileAccessHelper
 import knf.kuma.jobscheduler.JobsCreator
 import knf.kuma.jobscheduler.RecentsJob
 import knf.kuma.jobscheduler.UpdateJob
+import knf.kuma.widgets.emision.WEmissionService
 
 class App : Application() {
     //private lateinit var appCoinsAds: AppCoinsAds
@@ -48,6 +49,7 @@ class App : Application() {
         manager.createNotificationChannel(NotificationChannel(DownloadService.CHANNEL_ONGOING, "Descargas en progreso", NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
         manager.createNotificationChannel(NotificationChannel(DownloadManager.CHANNEL_FOREGROUND, "Administrador de descargas", NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
         manager.createNotificationChannel(NotificationChannel(UpdateJob.CHANNEL, "Actualización de la app", NotificationManager.IMPORTANCE_DEFAULT))
+        manager.createNotificationChannel(NotificationChannel(WEmissionService.CHANNEL, "Actualizador de widget", NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
     }
 
     override fun onCreate() {

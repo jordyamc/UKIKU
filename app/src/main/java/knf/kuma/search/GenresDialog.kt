@@ -44,7 +44,7 @@ class GenresDialog : DialogFragment() {
                 .create()
     }
 
-    override fun show(manager: FragmentManager, tag: String) {
+    override fun show(manager: FragmentManager, tag: String?) {
         try {
             super.show(manager, tag)
         } catch (e: Exception) {

@@ -10,13 +10,16 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
 import androidx.preference.*
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import knf.kuma.BuildConfig
@@ -279,11 +282,15 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
             }
     }
 
+    override fun onCreateRecyclerView(inflater: LayoutInflater?, parent: ViewGroup?, savedInstanceState: Bundle?): RecyclerView {
+        return super.onCreateRecyclerView(inflater, parent, savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        view.findViewById<ListView>(android.R.id.list)?.let {
+            ViewCompat.setNestedScrollingEnabled(it, true)
+        }
         super.onViewCreated(view, savedInstanceState)
-        val lv = view.findViewById<ListView>(android.R.id.list)
-        if (lv != null)
-            ViewCompat.setNestedScrollingEnabled(lv, true)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

@@ -34,16 +34,16 @@ class DownloadService : IntentService("Download service") {
     private val bufferSize = PrefsUtil.bufferSize()
 
     private val startNotification: Notification
-        get() = NotificationCompat.Builder(this, CHANNEL_ONGOING)
-                .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setContentTitle(current!!.name)
-                .setContentText(current!!.chapter)
-                .setProgress(100, current!!.progress, true)
-                .setOngoing(true)
-                .setSound(null)
-                .setWhen(current!!.time)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build()
+        get() = NotificationCompat.Builder(this, CHANNEL_ONGOING).apply {
+            setSmallIcon(android.R.drawable.stat_sys_download)
+            setContentTitle(current!!.name)
+            setContentText(current!!.chapter)
+            setProgress(100, current!!.progress, true)
+            setOngoing(true)
+            setSound(null)
+            setWhen(current!!.time)
+            priority = NotificationCompat.PRIORITY_LOW
+        }.build()
 
     override fun onHandleIntent(intent: Intent?) {
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -1,6 +1,5 @@
 package knf.kuma.explorer
 
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.notSameContent
 import knf.kuma.pojos.ExplorerObject
@@ -24,7 +24,7 @@ class ExplorerFilesAdapter internal constructor(private val fragment: Fragment, 
 
     private val layout: Int
         @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(fragment.context).getString("lay_type", "0") == "0") {
+        get() = if (PrefsUtil.layType == "0") {
             R.layout.item_explorer
         } else {
             R.layout.item_explorer_grid

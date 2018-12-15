@@ -3,7 +3,6 @@ package knf.kuma.recommended
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,10 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.crashlytics.android.Crashlytics
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import knf.kuma.R
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.bind
-import knf.kuma.commons.gridColumns
-import knf.kuma.commons.removeAll
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.GenreStatusObject
@@ -55,7 +51,7 @@ class RecommendActivity : AppCompatActivity() {
         }
 
     private val isGrid: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(this).getString("lay_type", "0") != "0"
+        get() = PrefsUtil.layType != "0"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))

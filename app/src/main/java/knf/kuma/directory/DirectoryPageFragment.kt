@@ -1,7 +1,6 @@
 package knf.kuma.directory
 
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.verifyManager
 import knf.kuma.pojos.AnimeObject
 import org.jetbrains.anko.find
@@ -29,7 +29,7 @@ class DirectoryPageFragment : BottomFragment() {
 
     private val layout: Int
         @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0") == "0") {
+        get() = if (PrefsUtil.layType == "0") {
             R.layout.recycler_dir
         } else {
             R.layout.recycler_dir_grid

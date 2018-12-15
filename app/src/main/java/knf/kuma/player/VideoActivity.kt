@@ -54,9 +54,9 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
             player.useController = false
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState!!.putInt("window", playerState.window)
+        outState.putInt("window", playerState.window)
         outState.putLong("position", playerState.position)
     }
 

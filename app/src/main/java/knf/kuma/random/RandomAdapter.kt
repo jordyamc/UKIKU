@@ -1,7 +1,6 @@
 package knf.kuma.random
 
 import android.app.Activity
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +11,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.PicassoSingle
-import knf.kuma.commons.bind
-import knf.kuma.commons.notSameContent
+import knf.kuma.commons.*
 import knf.kuma.pojos.AnimeObject
 import java.util.*
 
@@ -24,7 +20,7 @@ internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adap
 
     private val layout: Int
         @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(activity).getString("lay_type", "0") == "0") {
+        get() = if (PrefsUtil.layType == "0") {
             R.layout.item_fav
         } else {
             R.layout.item_fav_grid

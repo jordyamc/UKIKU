@@ -46,7 +46,8 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        if (!resources.getBoolean(R.bool.isTablet))
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContentView(R.layout.activity_login)
         BUUtils.init(this, savedInstanceState == null)
         login_dropbox.setOnClickListener { onDropBoxLogin() }

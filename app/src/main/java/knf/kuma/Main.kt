@@ -17,7 +17,6 @@ import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -72,6 +71,7 @@ import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import org.cryse.widget.persistentsearch.PersistentSearchView
+import org.cryse.widget.persistentsearch.SearchItem
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.textColor
@@ -93,7 +93,7 @@ class Main : AppCompatActivity(),
     private val bottomNavigationView by bind<BottomNavigationView>(R.id.bottomNavigation)
     private val webView: WebView? by optionalBind(R.id.webview)
     internal var selectedFragment: BottomFragment? = null
-    private var tmpfragment: BottomFragment? = null
+    private var searchFragment: SearchFragment? = null
     private lateinit var badgeEmission: TextView
     private lateinit var badgeSeeing: TextView
     private lateinit var badgeQueue: TextView
@@ -269,22 +269,21 @@ class Main : AppCompatActivity(),
     }
 
     private fun setSearch() {
-        val searchEdit = searchView.findViewById(R.id.edittext_search) as EditText
-        searchEdit.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-        searchEdit.textColor = ContextCompat.getColor(this, android.R.color.black)
-        searchEdit.hintTextColor = ContextCompat.getColor(this, android.R.color.darker_gray)
+        searchView.searchEditText.apply {
+            inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            textColor = ContextCompat.getColor(this@Main, android.R.color.black)
+            hintTextColor = ContextCompat.getColor(this@Main, android.R.color.darker_gray)
+        }
         searchView.setSuggestionBuilder(FiltersSuggestion(this))
         searchView.setSearchListener(object : PersistentSearchView.SearchListener {
             override fun onSearchCleared() {
-                if (selectedFragment is SearchFragment)
-                    (selectedFragment as SearchFragment).setSearch("")
+                searchFragment?.setSearch("")
             }
 
             override fun onSearchTermChanged(term: String) {
                 EAHelper.checkStart(term)
                 AchievementManager.onSearch(term)
-                if (selectedFragment is SearchFragment)
-                    (selectedFragment as SearchFragment).setSearch(term)
+                searchFragment?.setSearch(term)
             }
 
             override fun onSearch(query: String) {}
@@ -305,6 +304,8 @@ class Main : AppCompatActivity(),
             override fun onSearchExit() {
                 closeSearch()
             }
+
+            override fun onSuggestion(searchItem: SearchItem?): Boolean = false
         })
     }
 
@@ -355,8 +356,8 @@ class Main : AppCompatActivity(),
         when (item.itemId) {
             R.id.action_search -> {
                 searchView.openSearch()
-                tmpfragment = selectedFragment
-                setFragment(SearchFragment.get())
+                searchFragment = SearchFragment.get()
+                setFragment(searchFragment as BottomFragment)
             }
             R.id.action_new_category -> if (selectedFragment is FavoriteFragment)
                 (selectedFragment as FavoriteFragment).showNewCategory(null)
@@ -398,7 +399,6 @@ class Main : AppCompatActivity(),
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        tmpfragment = null
         when (item.itemId) {
             R.id.action_bottom_recents -> setFragment(RecentFragment.get())
             R.id.action_bottom_favorites -> setFragment(FavoriteFragment.get())
@@ -421,10 +421,11 @@ class Main : AppCompatActivity(),
     private fun setFragment(fragment: BottomFragment) {
         doOnUI {
             try {
-                selectedFragment = fragment
+                if (fragment !is SearchFragment)
+                    selectedFragment = fragment
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout)
-                transaction.replace(R.id.root, selectedFragment!!)
+                transaction.replace(R.id.root, fragment)
                 transaction.commit()
                 invalidateOptionsMenu()
             } catch (e: Exception) {
@@ -447,9 +448,8 @@ class Main : AppCompatActivity(),
     }
 
     private fun returnFragment() {
-        if (tmpfragment != null) {
-            setFragment(tmpfragment!!)
-            tmpfragment = null
+        if (selectedFragment != null) {
+            setFragment(selectedFragment!!)
         } else {
             bottomNavigationView.selectedItemId = R.id.action_bottom_recents
             setFragment(RecentFragment.get())
@@ -458,15 +458,14 @@ class Main : AppCompatActivity(),
     }
 
     private fun returnSelectFragment() {
-        if (tmpfragment != null) {
-            when (tmpfragment) {
+        if (selectedFragment != null) {
+            when (selectedFragment) {
                 is FavoriteFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_favorites
                 is DirectoryFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_directory
                 is BottomPreferencesFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_settings
                 else -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents
             }
         }
-        tmpfragment = null
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
@@ -479,7 +478,6 @@ class Main : AppCompatActivity(),
             4 -> {
                 selectedFragment = RecentFragment.get()
                 searchView.openSearch()
-                tmpfragment = selectedFragment
                 setFragment(SearchFragment[intent.getStringExtra("search_query") ?: ""])
                 searchView.setSearchString(intent.getStringExtra("search_query") ?: "", false)
             }
@@ -500,10 +498,10 @@ class Main : AppCompatActivity(),
     }
 
     override fun onNavigationItemReselected(item: MenuItem) {
-        if (tmpfragment != null) {
+        if (selectedFragment != null && searchView.isSearching) {
             closeSearch()
         } else if (selectedFragment != null) {
-            selectedFragment!!.onReselect()
+            selectedFragment?.onReselect()
         }
     }
 
@@ -572,16 +570,21 @@ class Main : AppCompatActivity(),
                         webView?.settings?.javaScriptEnabled = true
                         webView?.webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                                Log.e("CloudflareBypass", "Override ${request?.url}")
+                                shouldOverrideUrlLoading(view, request?.url?.toString())
+                                return false
+                            }
+
+                            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                                Log.e("CloudflareBypass", "Override $url")
                                 snack.safeDismiss()
-                                if (request?.url.toString() == "https://animeflv.net/") {
+                                if (url == "https://animeflv.net/") {
                                     Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
                                     if (saveCookies(this@Main))
                                         coordinator.showSnackbar("Bypass actualizado")
                                     PicassoSingle.clear()
                                     onNeedRecreate()
+                                    isLoading = false
                                 }
-                                isLoading = false
                                 return false
                             }
                         }

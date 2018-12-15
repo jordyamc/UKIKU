@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.preference.PreferenceManager
 import androidx.lifecycle.LiveData
+import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
 import java.util.*
@@ -14,7 +15,8 @@ object PrefsUtil {
     private var context: Context? = null
 
     val layType: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0")!!
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", context?.getString(R.string.layType)
+                ?: "0")!!
 
     val themeOption: String
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")!!

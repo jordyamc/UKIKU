@@ -16,6 +16,8 @@
         android:paddingTop="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="140dp"
+        android:layoutAnimation="@anim/layout_fall_down"
+        app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/item_dir"/>
 
     <ProgressBar

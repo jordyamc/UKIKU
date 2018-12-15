@@ -2,7 +2,6 @@ package knf.kuma.explorer
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
-import knf.kuma.commons.CastUtil
-import knf.kuma.commons.doOnUI
-import knf.kuma.commons.noCrash
-import knf.kuma.commons.verifyManager
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import knf.kuma.queue.QueueManager
@@ -34,7 +30,7 @@ class FragmentChapters : Fragment() {
 
     private val layout: Int
         @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0") == "0") {
+        get() = if (PrefsUtil.layType == "0") {
             R.layout.recycler_explorer_chaps
         } else {
             R.layout.recycler_explorer_chaps_grid

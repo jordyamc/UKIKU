@@ -1,6 +1,5 @@
 package knf.kuma.directory
 
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ import knf.kuma.commons.bind
 import knf.kuma.pojos.AnimeObject
 
 class DirectoryPageAdapter internal constructor(private val fragment: Fragment) : PagedListAdapter<AnimeObject, DirectoryPageAdapter.ItemHolder>(DIFF_CALLBACK), FastScrollRecyclerView.SectionedAdapter {
-    private val layType: String = PreferenceManager.getDefaultSharedPreferences(fragment.context).getString("lay_type", "0")!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
         return ItemHolder(LayoutInflater.from(parent.context).inflate(getLayType(), parent, false))
@@ -30,7 +28,7 @@ class DirectoryPageAdapter internal constructor(private val fragment: Fragment) 
 
     @LayoutRes
     private fun getLayType(): Int {
-        return if (layType == "0") {
+        return if (PrefsUtil.layType == "0") {
             R.layout.item_dir
         } else {
             R.layout.item_dir_grid

@@ -3,7 +3,6 @@ package knf.kuma.explorer
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils
-import android.preference.PreferenceManager
 import android.provider.MediaStore.Video.Thumbnails.MINI_KIND
 import android.view.LayoutInflater
 import android.view.View
@@ -41,7 +40,7 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
 
     private val layout: Int
         @LayoutRes
-        get() = if (PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", "0") == "0") {
+        get() = if (PrefsUtil.layType == "0") {
             R.layout.item_chap
         } else {
             R.layout.item_chap_grid

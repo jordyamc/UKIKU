@@ -61,8 +61,7 @@ class WEmisionProvider : AppWidgetProvider() {
         val svcIntent = Intent(context, WEmissionService::class.java)
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         svcIntent.data = Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME))
-        remoteViews.setRemoteAdapter(R.id.words,
-                svcIntent)
+        remoteViews.setRemoteAdapter(R.id.words, svcIntent)
         val clickIntent = Intent(context, EmisionActivity::class.java)
         remoteViews.setTextViewText(R.id.title_day, actualDay)
         remoteViews.setTextViewText(R.id.title_count, CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)!!).size.toString())

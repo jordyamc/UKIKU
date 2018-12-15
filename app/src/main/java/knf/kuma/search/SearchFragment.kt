@@ -4,18 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.SearchEvent
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.verifyManager
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
 import org.jetbrains.anko.find
@@ -29,7 +29,7 @@ class SearchFragment : BottomFragment() {
 
     private var model: SearchViewModel? = null
     private var adapter: SearchAdapter? = null
-    private var manager: LinearLayoutManager? = null
+    private var manager: RecyclerView.LayoutManager? = null
 
     private var isFirst = true
 
@@ -118,7 +118,7 @@ class SearchFragment : BottomFragment() {
         super.onActivityCreated(savedInstanceState)
         model = ViewModelProviders.of(activity!!).get(SearchViewModel::class.java)
         model?.setSearch(query, "", this, Observer { animeObjects ->
-            adapter!!.submitList(animeObjects)
+            adapter?.submitList(animeObjects)
             errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
             if (isFirst) {
                 progressBar.visibility = View.GONE
@@ -129,7 +129,11 @@ class SearchFragment : BottomFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_search, container, false)
+        val view = inflater.inflate(
+                if (PrefsUtil.layType == "0")
+                    R.layout.fragment_search
+                else
+                    R.layout.fragment_search_grid, container, false)
         recyclerView = view.find(R.id.recycler)
         fab = view.find(R.id.fab)
         progressBar = view.find(R.id.progress)
@@ -139,21 +143,20 @@ class SearchFragment : BottomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        manager = LinearLayoutManager(context)
-        recyclerView.layoutManager = manager
-        recyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(context, R.anim.layout_fall_down)
+        recyclerView.verifyManager()
+        manager = recyclerView.layoutManager
         adapter = SearchAdapter(this)
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                 super.onItemRangeMoved(fromPosition, toPosition, itemCount)
                 if (toPosition == 0)
-                    manager!!.smoothScrollToPosition(recyclerView, null, 0)
+                    manager?.smoothScrollToPosition(recyclerView, null, 0)
             }
 
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 if (positionStart == 0)
-                    manager!!.smoothScrollToPosition(recyclerView, null, 0)
+                    manager?.smoothScrollToPosition(recyclerView, null, 0)
             }
         })
         recyclerView.adapter = adapter
@@ -171,10 +174,10 @@ class SearchFragment : BottomFragment() {
     }
 
     fun setSearch(q: String) {
-        this.query = q.trim { it <= ' ' }
-        model?.setSearch(q.trim { it <= ' ' }, genresString, this, Observer { animeObjects ->
+        this.query = q.trim()
+        model?.setSearch(q.trim(), genresString, this, Observer { animeObjects ->
             if (animeObjects != null) {
-                adapter!!.submitList(animeObjects)
+                adapter?.submitList(animeObjects)
                 errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
                 Answers.getInstance().logSearch(SearchEvent().putQuery(query))
                 if (genresString != "")
