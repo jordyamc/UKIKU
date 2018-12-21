@@ -219,7 +219,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         public String name;
         @Selector(value = "div.Image img[src]", attr = "src")
         public String img;
-        @Selector(value = "div.Description p", defValue = "Sin descripcion")
+        @Selector(value = "div.Description", defValue = "Sin descripcion")
         public String description;
         @Selector(value = "span[class^=Type]", attr = "class", defValue = "Desconocido")
         @ColumnInfo(name = "web_type")
@@ -306,7 +306,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.number = "Episodio " + num;
                 this.link = "https://animeflv.net/ver/" + sid + "/" + info.getSid() + "-" + num;
                 this.eid = sid;
-                this.img = "https://animeflv.net/uploads/animes/screenshots/" + info.getAid() + "/" + num + "/3.jpg";
+                this.img = "https://cdn.animeflv.net/screenshots/" + info.getAid() + "/" + num + "/th_3.jpg";
                 this.key = Integer.parseInt(eid);
                 this.aid = info.getAid();
             }

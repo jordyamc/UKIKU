@@ -250,6 +250,7 @@ fun isHostValid(hostName: String): Boolean {
         "animeflv.net",
         "github.com",
         "raw.githubusercontent.com",
+        "cdn.animeflv.net",
         "m.animeflv.net",
         "s1.animeflv.net",
         "streamango.com",
