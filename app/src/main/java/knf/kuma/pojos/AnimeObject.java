@@ -34,6 +34,7 @@ import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 import knf.kuma.animeinfo.AnimeInfo;
 import knf.kuma.commons.PatternUtil;
+import knf.kuma.commons.PrefsUtil;
 import pl.droidsonroids.jspoon.ElementConverter;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
@@ -351,7 +352,10 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             }
 
             public String getFileName() {
-                return eid + "$" + PatternUtil.INSTANCE.getFileName(link);
+                if (PrefsUtil.INSTANCE.getSaveWithName())
+                    return eid + "$" + PatternUtil.INSTANCE.getFileName(link);
+                else
+                    return eid + "$" + aid + "-" + number.substring(number.lastIndexOf(" ") + 1) + ".mp4";
             }
 
             public String getEpTitle() {

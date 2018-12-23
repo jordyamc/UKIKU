@@ -93,13 +93,13 @@ object PatternUtil {
         return matcher.group(1) + "/"
     }
 
-    fun getNumFromfile(file: String): String {
+    fun getNumFromFile(file: String): String {
         val matcher = Pattern.compile("^.*\\$[a-z-0-9]*-(\\d+)\\.mp4$").matcher(file)
         matcher.find()
         return matcher.group(1)
     }
 
-    fun getEidFromfile(file: String): String {
+    fun getEidFromFile(file: String): String {
         val matcher = Pattern.compile("^(\\d+)\\$.*$").matcher(file)
         matcher.find()
         return matcher.group(1)

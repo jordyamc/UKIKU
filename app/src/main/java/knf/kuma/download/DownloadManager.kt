@@ -227,7 +227,7 @@ class DownloadManager : Service() {
                 downloadObject.setDid(request.id)
                 downloadObject.canResume = true
                 downloadDao.insert(downloadObject)
-                fetch!!.enqueue(request, Func { Log.e("Download", "Queued " + it.id) }, Func {
+                fetch?.enqueue(request, Func { Log.e("Download", "Queued " + it.id) }, Func {
                     if (it.throwable != null) it.throwable!!.printStackTrace()
                     downloadDao.delete(downloadObject)
                 })
@@ -255,10 +255,10 @@ class DownloadManager : Service() {
         }
 
         fun pauseAll() {
-            fetch?.getDownloadsWithStatus(Status.DOWNLOADING, Func { it ->
+            fetch?.getDownloadsWithStatus(Status.DOWNLOADING, Func {
                 val list = mutableListOf<Int>()
-                it.forEach {
-                    list.add(it.id)
+                it.forEach { download ->
+                    list.add(download.id)
                 }
                 fetch?.pause(list)
             })
@@ -278,16 +278,16 @@ class DownloadManager : Service() {
 
         private fun updateNotification(downloadObject: DownloadObject, isPaused: Boolean) {
             val notification = NotificationCompat.Builder(context!!, CHANNEL_ONGOING)
-                    .setSmallIcon(if (isPaused) R.drawable.ic_pause_not else if (downloadObject.eta!!.toInt() == -2) R.drawable.ic_move else android.R.drawable.stat_sys_download)
+                    .setSmallIcon(if (isPaused) R.drawable.ic_pause_not else if (downloadObject.eta.toInt() == -2) R.drawable.ic_move else android.R.drawable.stat_sys_download)
                     .setContentTitle(downloadObject.name)
                     .setContentText(downloadObject.chapter)
-                    .setOnlyAlertOnce(!isPaused || downloadObject.eta!!.toInt() == -2)
+                    .setOnlyAlertOnce(!isPaused || downloadObject.eta.toInt() == -2)
                     .setProgress(100, downloadObject.progress, downloadObject.state == DownloadObject.PENDING)
                     .setOngoing(!isPaused)
                     .setSound(null)
                     .setWhen(downloadObject.time)
                     .setPriority(NotificationCompat.PRIORITY_LOW)
-            if (downloadObject.eta!!.toInt() != -2) {
+            if (downloadObject.eta.toInt() != -2) {
                 if (isPaused)
                     notification.addAction(R.drawable.ic_play_not, "Reanudar", getPending(downloadObject, ACTION_RESUME))
                 else

@@ -72,6 +72,9 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("first_start_new", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("first_start_new", value).apply()
 
+    val saveWithName: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("save_type", "0") == "0"
+
     fun init(context: Context) {
         PrefsUtil.context = context
     }

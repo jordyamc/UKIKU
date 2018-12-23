@@ -19,7 +19,7 @@ class MangoServer(context: Context, baseLink: String) : Server(context, baseLink
         get() {
             try {
                 val frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"))
-                val downLink = Jsoup.parse(frame).select("iframe").first().attr("src")
+                val downLink = Jsoup.parse(frame).select("iframe").attr("src")
                 val mangoLink = PatternUtil.extractMangoLink(Jsoup.connect(downLink).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("script").last().html())
                 val html = Jsoup.connect(mangoLink).get().html()
                 val matcher = Pattern.compile("type:\"video/mp4\",src:d\\('([^']+)',(\\d+)\\)").matcher(html)

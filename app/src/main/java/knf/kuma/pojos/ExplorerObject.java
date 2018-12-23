@@ -98,7 +98,7 @@ public class ExplorerObject {
                 for (File chap : file_list)
                     try {
                         String file_name = chap.getName();
-                        chapters.add(new FileDownObj(context, name, aid, PatternUtil.INSTANCE.getNumFromfile(file_name), file_name, chap));
+                        chapters.add(new FileDownObj(context, name, aid, PatternUtil.INSTANCE.getNumFromFile(file_name), file_name, chap));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -146,7 +146,7 @@ public class ExplorerObject {
             this.title = title;
             this.chapter = chapter;
             this.aid = aid;
-            this.eid = PatternUtil.INSTANCE.getEidFromfile(name);
+            this.eid = PatternUtil.INSTANCE.getEidFromFile(name);
             this.fileName = name;
             this.path = file.getAbsolutePath();
             this.time = getTime(context, file);

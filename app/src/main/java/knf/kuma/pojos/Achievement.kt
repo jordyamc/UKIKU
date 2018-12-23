@@ -66,7 +66,7 @@ data class Achievement(
 
     private fun tintedIcon(context: Context): Drawable? {
         return try {
-            val drawable = DrawableCompat.wrap(context.getDrawable(AchievementManager.getIcon(key))!!)
+            val drawable = DrawableCompat.wrap(ContextCompat.getDrawable(context, AchievementManager.getIcon(key))!!)
             DrawableCompat.setTint(drawable, Color.WHITE)
             drawable
         } catch (e: Exception) {

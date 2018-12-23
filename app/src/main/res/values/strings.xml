@@ -134,6 +134,14 @@
         <item>5</item>
         <item>7</item>
     </string-array>
+    <string-array name="savetype_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="savetype">
+        <item>Nombre</item>
+        <item>ID</item>
+    </string-array>
     <string-array name="list_states">
         <item>Ninguno</item>
         <item>Viendo</item>

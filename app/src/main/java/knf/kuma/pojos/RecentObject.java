@@ -9,6 +9,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import knf.kuma.commons.PatternUtil;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.download.FileAccessHelper;
@@ -69,7 +70,10 @@ public class RecentObject {
     }
 
     public String getFileName() {
-        return eid + "$" + PatternUtil.INSTANCE.getFileName(url);
+        if (PrefsUtil.INSTANCE.getSaveWithName())
+            return eid + "$" + PatternUtil.INSTANCE.getFileName(url);
+        else
+            return eid + "$" + aid + "-" + chapter.substring(chapter.lastIndexOf(" ") + 1) + ".mp4";
     }
 
     public String getEpTitle() {
