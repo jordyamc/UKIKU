@@ -18,8 +18,7 @@ class OkruServer(context: Context, baseLink: String) : Server(context, baseLink)
     override val videoServer: VideoServer?
         get() {
             try {
-                val frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"))
-                val downLink = Jsoup.parse(frame).select("iframe").first().attr("src")
+                val downLink = PatternUtil.extractLink(baseLink)
                 val trueLink = PatternUtil.extractOkruLink(Jsoup.connect(downLink).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("script").last().html())
                 val eJson = Jsoup.connect(trueLink).get().select("div[data-module='OKVideo']").first().attr("data-options")
                 val cutJson = "{" + eJson.substring(eJson.lastIndexOf("\\\"videos"), eJson.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "").replace("%3B", ";") + "}"

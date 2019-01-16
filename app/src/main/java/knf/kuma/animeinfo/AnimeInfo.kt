@@ -41,7 +41,7 @@ class AnimeInfo(code: String) {
         while (matcher.find()) {
             when (i) {
                 0 -> this.aid = matcher.group(1)
-                1 -> this.title = matcher.group(1)
+                1 -> this.title = PatternUtil.fromHtml(matcher.group(1))
                 2 -> this.sid = matcher.group(1)
                 3 -> this.date = matcher.group(1)
             }

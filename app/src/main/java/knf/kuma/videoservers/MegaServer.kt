@@ -1,8 +1,8 @@
 package knf.kuma.videoservers
 
 import android.content.Context
+import knf.kuma.commons.PatternUtil
 import knf.kuma.videoservers.VideoServer.Names.MEGA
-import org.jsoup.Jsoup
 import java.net.URLDecoder
 
 class MegaServer(context: Context, baseLink: String) : Server(context, baseLink) {
@@ -25,8 +25,7 @@ class MegaServer(context: Context, baseLink: String) : Server(context, baseLink)
         get() {
             return try {
                 if (type == STREAM) {
-                    val frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"))
-                    val downLink = Jsoup.parse(frame).select("iframe").first().attr("src")
+                    val downLink = PatternUtil.extractLink(baseLink)
                     val link = "https://mega.nz/#" + downLink.substring(downLink.lastIndexOf("!"))
                     VideoServer(name, Option(name, null, link))
                 } else

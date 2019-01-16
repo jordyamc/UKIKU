@@ -44,7 +44,6 @@ object ExplorerCreator {
                         } catch (e: IllegalStateException) {
                             e.printStackTrace()
                         }
-
                     postState("Creando lista")
                     explorerDAO.insert(list)
                 }

@@ -2,6 +2,7 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import android.util.Log
+import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PatternUtil
 import knf.kuma.videoservers.VideoServer.Names.YOURUPLOAD
 import okhttp3.OkHttpClient
@@ -18,11 +19,10 @@ class YUServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
     override val videoServer: VideoServer?
         get() {
-            val frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"))
-            val redirLink = Jsoup.parse(frame).select("iframe").first().attr("src")
+            val redirLink = PatternUtil.extractLink(baseLink)
             Log.e("Redir", redirLink)
             try {
-                val yuLink = PatternUtil.getYULink(Jsoup.connect(redirLink).get().html())
+                val yuLink = PatternUtil.getYULink(Jsoup.connect(redirLink).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().html())
                 val videoLink = PatternUtil.getYUvideoLink(Jsoup.connect(yuLink).get().html())
                 val client = OkHttpClient().newBuilder().followRedirects(false).build()
                 val request = Request.Builder()

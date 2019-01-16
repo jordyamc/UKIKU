@@ -65,7 +65,6 @@ class EmisionFragment : Fragment() {
                         val animeObject1 = AnimeObject(animeObject.link!!, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(document.outerHtml()))
                         if (animeObject1.state != "En emisión") {
                             dao.updateAnime(animeObject1)
-                            adapter?.remove(adapter!!.list.indexOf(animeObject))
                             WEmisionProvider.update(context!!)
                         }
                     } catch (e: Exception) {

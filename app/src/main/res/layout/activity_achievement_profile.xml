@@ -171,14 +171,16 @@
                 android:id="@+id/progress_indicator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center|center_horizontal"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <ProgressBar
                     android:id="@+id/progress_bar"
                     style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_weight="1"/>
 
                 <TextView

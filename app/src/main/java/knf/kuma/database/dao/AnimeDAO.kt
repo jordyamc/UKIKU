@@ -124,7 +124,7 @@ interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE fileName LIKE :file")
     fun getByFile(file: String): AnimeObject?
 
-    @Query("SELECT * FROM AnimeObject WHERE fileName IN (:names)")
+    @Query("SELECT * FROM AnimeObject WHERE fileName IN (:names) OR aid IN (:names)")
     fun getAllByFile(names: MutableList<String>): MutableList<AnimeObject>
 
     @Query("SELECT * FROM AnimeObject WHERE name LIKE :name ORDER BY name COLLATE NOCASE LIMIT 5")

@@ -28,6 +28,7 @@ import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
 import knf.kuma.queue.QueueManager
 import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
 import java.util.*
@@ -176,14 +177,16 @@ class ServersFactory {
             var j = ""
             for (element in sScript) {
                 val sEl = element.outerHtml()
-                if (sEl.contains("var video = [];")) {
+                if (sEl.contains("var videos = {\"SUB\":")) {
                     j = sEl
                     break
                 }
             }
-            val parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            for (baseLink in parts) {
-                val server = Server.check(context, baseLink)
+            val jsonArray = JSONObject("\\{\"SUB\":\\[.*\\]\\}".toRegex().find(j)?.value).getJSONArray("SUB")
+            /*Log.e("JSON","$json")
+            val parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()*/
+            for (baseLink in jsonArray) {
+                val server = Server.check(context, baseLink.optString("code"))
                 if (server != null)
                     servers.add(server)
             }

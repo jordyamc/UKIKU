@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.doOnUI
 import kotlinx.android.synthetic.main.exo_playback_control_view.*
 import kotlinx.android.synthetic.main.player_view.*
 
@@ -85,6 +86,11 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         Log.i("Player", "OnStart")
         startPlayer()
         activateMediaSession()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        doOnUI { hideUI() }
     }
 
     /*override fun onResume() {

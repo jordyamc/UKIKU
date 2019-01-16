@@ -8,6 +8,7 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.doOnUI
+import knf.kuma.commons.iterator
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
@@ -19,6 +20,7 @@ import knf.kuma.videoservers.Option
 import knf.kuma.videoservers.Server
 import knf.kuma.videoservers.VideoServer
 import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
 
@@ -119,14 +121,16 @@ class TVServersFactory private constructor(private val activity: Activity, priva
             var j = ""
             for (element in sScript) {
                 val sEl = element.outerHtml()
-                if (sEl.contains("var video = [];")) {
+                if (sEl.contains("var videos = {\"SUB\":")) {
                     j = sEl
                     break
                 }
             }
-            val parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            for (baseLink in parts) {
-                val server = Server.check(activity, baseLink)
+            val jsonArray = JSONObject("\\{\"SUB\":\\[.*\\]\\}".toRegex().find(j)?.value).getJSONArray("SUB")
+            /*Log.e("JSON","$json")
+            val parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()*/
+            for (baseLink in jsonArray) {
+                val server = Server.check(activity, baseLink.optString("code"))
                 if (server != null)
                     servers.add(server)
             }

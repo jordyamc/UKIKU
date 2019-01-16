@@ -160,6 +160,13 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         }
     }
 
+    public String getFileName() {
+        if (PrefsUtil.INSTANCE.getSaveWithName())
+            return fileName;
+        else
+            return aid;
+    }
+
     public String getGenresString() {
         if (genres.size() == 0)
             return "Sin generos";

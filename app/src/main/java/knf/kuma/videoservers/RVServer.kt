@@ -16,8 +16,7 @@ class RVServer(context: Context, baseLink: String) : Server(context, baseLink) {
     override val videoServer: VideoServer?
         get() {
             try {
-                val frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"))
-                var downLink = Jsoup.parse(frame).select("iframe").first().attr("src").replace("&q=720p|&q=480p|&q=360p".toRegex(), "")
+                var downLink = PatternUtil.extractLink(baseLink).replace("&q=720p|&q=480p|&q=360p".toRegex(), "")
                 if (downLink.contains("&server=rv"))
                     downLink = PatternUtil.getRapidLink(downLink)
                 val needPost = Jsoup.connect(downLink).get().html().contains("Please click on this button to open this video")

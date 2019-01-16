@@ -28,6 +28,7 @@ import com.google.android.exoplayer2.upstream.FileDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
@@ -207,6 +208,7 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
     }
 
     override fun onResume() {
+        doOnUI { hideUI() }
         initPlayer(intent)
         super.onResume()
     }

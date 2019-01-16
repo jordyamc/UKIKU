@@ -11,9 +11,9 @@ object PatternUtil {
     @Suppress("DEPRECATION")
     fun fromHtml(html: String): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY).toString()
+            Html.fromHtml(html.replace("\\\\u", "\\u"), Html.FROM_HTML_MODE_LEGACY).toString()
         else
-            Html.fromHtml(html).toString()
+            Html.fromHtml(html.replace("\\\\u", "\\u")).toString()
     }
 
     fun getLinkNumber(link: String): String {
@@ -106,7 +106,7 @@ object PatternUtil {
     }
 
     fun extractLink(html: String): String {
-        val matcher = Pattern.compile("https?://[a-zA-Z0-a.=?/&]+").matcher(html)
+        val matcher = Pattern.compile("https?://[a-zA-Z0-a.=?/&\\-]+").matcher(html)
         matcher.find()
         return matcher.group(0)
     }
