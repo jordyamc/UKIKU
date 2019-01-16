@@ -77,13 +77,13 @@ public class ExplorerObject {
         this.key = object.key;
         this.img = PatternUtil.INSTANCE.getCover(object.aid);
         this.link = object.link;
-        this.fileName = object.fileName;
+        this.fileName = object.getFileName();
         this.name = object.name;
         this.aid = object.aid;
-        File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.fileName);
+        File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.getFileName());
         file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
         if (file_list == null || file_list.length == 0)
-            throw new IllegalStateException("Directory empty: " + object.fileName);
+            throw new IllegalStateException("Directory empty: " + object.getFileName());
         this.count = file_list.length;
         this.path = file.getAbsolutePath();
     }
