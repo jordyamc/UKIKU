@@ -90,7 +90,7 @@ class UpdateActivity : AppCompatActivity() {
         val file = update
         if (file.exists())
             file.delete()
-        ThinDownloadManager().add(DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/$getUpdateDir/app-release.apk"))
+        ThinDownloadManager().add(DownloadRequest(Uri.parse("https://github.com/jordyamc/UKIKU/raw/master/app/$getUpdateDir/app-$getUpdateDir.apk"))
                 .setDestinationURI(Uri.fromFile(file))
                 .setDownloadResumable(false)
                 .setStatusListener(object : DownloadStatusListenerV1 {

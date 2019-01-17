@@ -13,7 +13,7 @@ object UpdateChecker {
             doAsync {
                 try {
                     val document = Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num").get()
-                    val nCode = Integer.parseInt(document.select("body").first().ownText().trim { it <= ' ' })
+                    val nCode = Integer.parseInt(document.select("body").first().ownText().trim())
                     val oCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
                     if (nCode > oCode) {
                         listener.onNeedUpdate(oCode.toString(), nCode.toString())

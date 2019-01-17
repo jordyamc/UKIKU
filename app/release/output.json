@@ -6,8 +6,8 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 82,
-      "versionName": "3.0.8",
+      "versionCode": 83,
+      "versionName": "3.0.9",
       "enabled": true,
       "outputFile": "app-release.apk",
       "fullName": "release",
