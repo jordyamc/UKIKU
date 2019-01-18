@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="85" version="3.0.11">
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="84" version="3.0.10">
         <change type="fix">Errores generales</change>
         <change type="new">Soporte para multiples idiomas en algunos animes</change>

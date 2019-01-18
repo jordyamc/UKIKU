@@ -271,10 +271,10 @@ private fun isVideoHostName(hostName: String): Boolean {
         hostName.contains("fex.net") ||
                 hostName.contains("content-na.drive.amazonaws.com") ||
                 hostName.contains("mediafire") ||
-                hostName.contains("black-raspberry.fruithosted.net") ||
+                hostName.contains("fruithosted.net") ||
                 hostName.contains("mp4upload.com") ||
                 hostName.contains("storage.googleapis.com") ||
-                hostName.contains("safety.playercdn.net") ||
+                hostName.contains("playercdn.net") ||
                 hostName.contains("vidcache.net") -> true
         else -> false
     }
