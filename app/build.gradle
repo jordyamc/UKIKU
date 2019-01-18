@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 83
-        versionName "3.0.9"
+        versionCode 84
+        versionName "3.0.10"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -156,7 +156,7 @@ dependencies {
     implementation 'com.evernote:android-job:1.3.0-alpha09'
     implementation 'com.pavelsikun:material-seekbar-preference:2.3.0'
     //implementation 'org.cryse.widget:persistentsearchview:1.0.4@aar'
-    implementation 'com.github.jordyamc:PersistentSearchView:1.0.6'
+    implementation 'com.github.jordyamc:PersistentSearchView:1.0.7'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.7.0'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.7.0'
     implementation "com.google.android.exoplayer:extension-mediasession:2.7.0"

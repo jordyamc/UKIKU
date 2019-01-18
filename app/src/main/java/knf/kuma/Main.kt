@@ -111,7 +111,7 @@ class Main : AppCompatActivity(),
         }
         try {
             setContentView(R.layout.activity_main_drawer)
-        } catch (e: InflateException) {
+        } catch (e: Exception) {
             setContentView(R.layout.activity_main_drawer_nwv)
         }
         //setDefaults()

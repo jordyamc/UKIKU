@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
@@ -177,22 +178,48 @@ class ServersFactory {
             var j = ""
             for (element in sScript) {
                 val sEl = element.outerHtml()
-                if (sEl.contains("var videos = {\"SUB\":")) {
+                if ("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().containsMatchIn(sEl)) {
                     j = sEl
                     break
                 }
             }
-            val jsonArray = JSONObject("\\{\"SUB\":\\[.*\\]\\}".toRegex().find(j)?.value).getJSONArray("SUB")
-            /*Log.e("JSON","$json")
-            val parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()*/
-            for (baseLink in jsonArray) {
-                val server = Server.check(context, baseLink.optString("code"))
-                if (server != null)
-                    servers.add(server)
+            val jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value)
+            if (jsonObject.length() > 1) {
+                doOnUI {
+                    MaterialDialog(context).safeShow {
+                        listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
+                            doAsync {
+                                val jsonArray =
+                                        when (index) {
+                                            1 -> jsonObject.getJSONArray("LAT")
+                                            else -> jsonObject.getJSONArray("SUB")
+                                        }
+                                for (baseLink in jsonArray) {
+                                    val server = Server.check(context, baseLink.optString("code"))
+                                    if (server != null)
+                                        servers.add(server)
+                                }
+                                servers.sort()
+                                this@ServersFactory.servers = servers
+                                showServerList()
+                            }
+                        }
+                        setOnCancelListener { callOnFinish(false, false) }
+                    }
+                }
+            } else {
+                val jsonArray = jsonObject.getJSONArray(if (jsonObject.has("SUB")) "SUB" else "LAT")
+                /*Log.e("JSON","$json")
+                val parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()*/
+                for (baseLink in jsonArray) {
+                    val server = Server.check(context, baseLink.optString("code"))
+                    if (server != null)
+                        servers.add(server)
+                }
+                servers.sort()
+                this@ServersFactory.servers = servers
+                showServerList()
             }
-            servers.sort()
-            this@ServersFactory.servers = servers
-            showServerList()
         } catch (e: Exception) {
             e.printStackTrace()
             this@ServersFactory.servers = ArrayList()

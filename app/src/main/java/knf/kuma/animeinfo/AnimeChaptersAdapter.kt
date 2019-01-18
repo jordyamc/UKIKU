@@ -318,7 +318,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                     fragment.context!!.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                     else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
-            else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
 

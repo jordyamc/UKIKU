@@ -101,7 +101,7 @@ object EAHelper {
     private fun generate(context: Context, key: String, array: Array<String>): String {
         val builder = StringBuilder()
         for (i in 0..9) {
-            builder.append(array[Random().nextInt(array.size - 1)])
+            builder.append(array[Random().nextInt(array.size)])
         }
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(key, builder.toString()).apply()
         return builder.toString()

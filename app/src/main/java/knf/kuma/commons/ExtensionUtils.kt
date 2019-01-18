@@ -60,9 +60,9 @@ val getUpdateDir: String
 
 fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
     try {
-        this.func()
         doOnUI {
             try {
+                this.func()
                 this@safeShow.show()
             } catch (e: Exception) {
                 //
