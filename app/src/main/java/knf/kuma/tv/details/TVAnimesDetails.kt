@@ -39,11 +39,15 @@ class TVAnimesDetails : TVBaseActivity(), TVServersFactory.ServersInterface {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            val bundle = data!!.extras
-            if (bundle!!.getBoolean("is_video_server", false))
-                serversFactory?.analyzeOption(bundle.getInt("position", 0))
-            else
-                serversFactory?.analyzeServer(bundle.getInt("position", 0))
+            val bundle = data?.extras
+            if (requestCode == TVServersFactory.REQUEST_CODE_MULTI)
+                serversFactory?.analyzeMulti(bundle?.getInt("position", 0) ?: 0)
+            else {
+                if (bundle?.getBoolean("is_video_server", false) == true)
+                    serversFactory?.analyzeOption(bundle.getInt("position", 0))
+                else
+                    serversFactory?.analyzeServer(bundle?.getInt("position", 0) ?: 0)
+            }
         } else if (resultCode == Activity.RESULT_CANCELED && data!!.extras!!.getBoolean("is_video_server", false))
             serversFactory?.showServerList()
     }

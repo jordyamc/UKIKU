@@ -51,23 +51,23 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 addPreferencesFromResource(R.xml.preferences)
                 preferenceManager.sharedPreferences.edit().putBoolean("daynigth_permission", Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED).apply()
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                    preferenceScreen.findPreference("daynigth_permission").isEnabled = false
-                preferenceScreen.findPreference("daynigth_permission").setOnPreferenceChangeListener { _, o ->
+                    preferenceScreen.findPreference<Preference>("daynigth_permission").isEnabled = false
+                preferenceScreen.findPreference<Preference>("daynigth_permission").setOnPreferenceChangeListener { _, o ->
                     val check = o as Boolean
                     if (check && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                         if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 5587)
                         } else if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             preferenceManager.sharedPreferences.edit().putBoolean("daynigth_permission", true).apply()
-                            preferenceScreen.findPreference("daynigth_permission").isEnabled = false
+                            preferenceScreen.findPreference<Preference>("daynigth_permission").isEnabled = false
                         }
                     true
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    preferenceScreen.findPreference("custom_tone").summary = "Abrir configuración"
+                    preferenceScreen.findPreference<Preference>("custom_tone").summary = "Abrir configuración"
                 else if (FileAccessHelper.INSTANCE.toneFile.exists())
-                    preferenceScreen.findPreference("custom_tone").summary = "Personalizado"
-                preferenceScreen.findPreference("custom_tone").setOnPreferenceClickListener {
+                    preferenceScreen.findPreference<Preference>("custom_tone").summary = "Personalizado"
+                preferenceScreen.findPreference<Preference>("custom_tone").setOnPreferenceClickListener {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         noCrash {
                             startActivity(
@@ -87,7 +87,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                             .setType("audio/*"), 4784)
                                     1 -> {
                                         FileAccessHelper.INSTANCE.toneFile.safeDelete()
-                                        preferenceScreen.findPreference("custom_tone").summary = "Sistema"
+                                        preferenceScreen.findPreference<Preference>("custom_tone").summary = "Sistema"
                                     }
                                 }
                             }
@@ -98,7 +98,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     if (Network.isConnected) {
                         BUUtils.init(activity!!, object : BUUtils.LoginInterface {
                             override fun onLogin() {
-                                preferenceScreen.findPreference("auto_backup").summary = "Cargando..."
+                                preferenceScreen.findPreference<Preference>("auto_backup").summary = "Cargando..."
                                 BUUtils.search("autobackup", object : BUUtils.SearchInterface {
                                     override fun onResponse(backupObject: BackupObject<*>?) {
                                         doOnUI {
@@ -106,16 +106,16 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                 if (backupObject != null) {
                                                     val autoBackupObject = backupObject as AutoBackupObject?
                                                     if (backupObject == AutoBackupObject(activity))
-                                                        preferenceScreen.findPreference("auto_backup").summary = "%s"
+                                                        preferenceScreen.findPreference<Preference>("auto_backup").summary = "%s"
                                                     else
-                                                        preferenceScreen.findPreference("auto_backup").summary = "Solo " + autoBackupObject!!.name
+                                                        preferenceScreen.findPreference<Preference>("auto_backup").summary = "Solo " + autoBackupObject!!.name
                                                 } else {
                                                     preferenceManager.sharedPreferences.edit().putString("auto_backup", "0").apply()
-                                                    preferenceScreen.findPreference("auto_backup").summary = "%s"
+                                                    preferenceScreen.findPreference<Preference>("auto_backup").summary = "%s"
                                                 }
-                                                preferenceScreen.findPreference("auto_backup").isEnabled = true
+                                                preferenceScreen.findPreference<Preference>("auto_backup").isEnabled = true
                                             } catch (e: Exception) {
-                                                preferenceScreen.findPreference("auto_backup").summary = "Error al buscar archivo"
+                                                preferenceScreen.findPreference<Preference>("auto_backup").summary = "Error al buscar archivo"
                                             }
                                         }
                                     }
@@ -123,12 +123,12 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             }
                         }, true)
                     } else {
-                        preferenceScreen.findPreference("auto_backup").summary = "Sin internet"
+                        preferenceScreen.findPreference<Preference>("auto_backup").summary = "Sin internet"
                     }
                 } else {
-                    preferenceScreen.findPreference("auto_backup").summary = "Sin cuenta para respaldos"
+                    preferenceScreen.findPreference<Preference>("auto_backup").summary = "Sin cuenta para respaldos"
                 }
-                preferenceScreen.findPreference("auto_backup").setOnPreferenceChangeListener { _, o ->
+                preferenceScreen.findPreference<Preference>("auto_backup").setOnPreferenceChangeListener { _, o ->
                     BackupJob.reSchedule(Integer.valueOf(o as String))
                     BUUtils.backup(AutoBackupObject(activity), object : BUUtils.AutoBackupInterface {
                         override fun onResponse(backupObject: AutoBackupObject?) {
@@ -138,29 +138,29 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     })
                     true
                 }
-                preferenceScreen.findPreference("download_type").setOnPreferenceChangeListener { _, o ->
+                preferenceScreen.findPreference<Preference>("download_type").setOnPreferenceChangeListener { _, o ->
                     if (o == "1" && !FileAccessHelper.INSTANCE.canDownload(this@ConfigurationFragment, o as String))
                         Toaster.toast("Por favor selecciona la raiz de tu SD")
                     true
                 }
                 if (PrefsUtil.downloaderType == 0) {
-                    preferenceScreen.findPreference("max_parallel_downloads").isEnabled = false
-                    preferenceScreen.findPreference("buffer_size").isEnabled = true
+                    preferenceScreen.findPreference<Preference>("max_parallel_downloads").isEnabled = false
+                    preferenceScreen.findPreference<Preference>("buffer_size").isEnabled = true
                 } else {
-                    preferenceScreen.findPreference("max_parallel_downloads").isEnabled = true
-                    preferenceScreen.findPreference("buffer_size").isEnabled = false
+                    preferenceScreen.findPreference<Preference>("max_parallel_downloads").isEnabled = true
+                    preferenceScreen.findPreference<Preference>("buffer_size").isEnabled = false
                 }
-                preferenceScreen.findPreference("downloader_type").setOnPreferenceChangeListener { _, o ->
+                preferenceScreen.findPreference<Preference>("downloader_type").setOnPreferenceChangeListener { _, o ->
                     if (o == "0") {
-                        preferenceScreen.findPreference("max_parallel_downloads").isEnabled = false
-                        preferenceScreen.findPreference("buffer_size").isEnabled = true
+                        preferenceScreen.findPreference<Preference>("max_parallel_downloads").isEnabled = false
+                        preferenceScreen.findPreference<Preference>("buffer_size").isEnabled = true
                     } else {
-                        preferenceScreen.findPreference("max_parallel_downloads").isEnabled = true
-                        preferenceScreen.findPreference("buffer_size").isEnabled = false
+                        preferenceScreen.findPreference<Preference>("max_parallel_downloads").isEnabled = true
+                        preferenceScreen.findPreference<Preference>("buffer_size").isEnabled = false
                     }
                     true
                 }
-                preferenceScreen.findPreference("theme_option").setOnPreferenceChangeListener { _, o ->
+                preferenceScreen.findPreference<Preference>("theme_option").setOnPreferenceChangeListener { _, o ->
                     AppCompatDelegate.setDefaultNightMode((o as String).toInt())
                     PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("theme_value", o).apply()
                     WEmisionProvider.update(activity!!)
@@ -168,16 +168,16 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     //AestheticUtils.updateIsDarkMode(this@ConfigurationFragment.context!!, o == "2")
                     true
                 }
-                preferenceScreen.findPreference("recents_time").setOnPreferenceChangeListener { _, o ->
-                    preferenceScreen.findPreference("notify_favs").isEnabled = "0" != o
+                preferenceScreen.findPreference<Preference>("recents_time").setOnPreferenceChangeListener { _, o ->
+                    preferenceScreen.findPreference<Preference>("notify_favs").isEnabled = "0" != o
                     RecentsJob.reSchedule(Integer.valueOf(o as String) * 15)
                     true
                 }
-                preferenceScreen.findPreference("dir_update_time").setOnPreferenceChangeListener { _, o ->
+                preferenceScreen.findPreference<Preference>("dir_update_time").setOnPreferenceChangeListener { _, o ->
                     DirUpdateJob.reSchedule(Integer.valueOf(o as String) * 15)
                     true
                 }
-                preferenceScreen.findPreference("dir_update").setOnPreferenceClickListener {
+                preferenceScreen.findPreference<Preference>("dir_update").setOnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
                             ContextCompat.startForegroundService(safeContext.applicationContext, Intent(safeContext.applicationContext, DirectoryUpdateService::class.java))
@@ -189,7 +189,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
 
                     false
                 }
-                preferenceScreen.findPreference("dir_destroy").setOnPreferenceClickListener {
+                preferenceScreen.findPreference<Preference>("dir_destroy").setOnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
                             MaterialDialog(activity!!).safeShow {
@@ -213,7 +213,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 when {
                     EAHelper.phase == 4 ->
-                        preferenceScreen.findPreference("theme_color").setOnPreferenceChangeListener { _, value ->
+                        preferenceScreen.findPreference<Preference>("theme_color").setOnPreferenceChangeListener { _, value ->
                             startActivity(Intent(activity, Main::class.java).putExtra("start_position", 3))
                             activity?.finish()
                             //AestheticUtils.updateAccentColor(this@ConfigurationFragment.context!!,value as String)
@@ -233,8 +233,8 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         category.addPreference(pref)
                     }
                     else -> {
-                        preferenceScreen.findPreference("theme_color").summary = "Resuelve el secreto para desbloquear"
-                        preferenceScreen.findPreference("theme_color").isEnabled = false
+                        preferenceScreen.findPreference<Preference>("theme_color").summary = "Resuelve el secreto para desbloquear"
+                        preferenceScreen.findPreference<Preference>("theme_color").isEnabled = false
                     }
                 }
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this@ConfigurationFragment.context))
@@ -248,7 +248,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         isEnabled = true
                     }
                 }
-                preferenceScreen.findPreference("achievements_permissions").setOnPreferenceChangeListener { _, _ ->
+                preferenceScreen.findPreference<Preference>("achievements_permissions").setOnPreferenceChangeListener { _, _ ->
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
@@ -257,7 +257,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     }
                     return@setOnPreferenceChangeListener true
                 }
-                preferenceScreen.findPreference("hide_chaps").setOnPreferenceChangeListener { _, o ->
+                preferenceScreen.findPreference<Preference>("hide_chaps").setOnPreferenceChangeListener { _, o ->
                     if (!FileAccessHelper.NOMEDIA_CREATING) {
                         FileAccessHelper.INSTANCE.checkNoMedia(o as Boolean)
                         true
@@ -266,12 +266,12 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         false
                     }
                 }
-                preferenceScreen.findPreference("max_parallel_downloads").setOnPreferenceChangeListener { _, o ->
+                preferenceScreen.findPreference<Preference>("max_parallel_downloads").setOnPreferenceChangeListener { _, o ->
                     DownloadManager.setParallelDownloads(o as String)
                     true
                 }
                 if (BuildConfig.DEBUG) {
-                    preferenceScreen.findPreference("reset_recents").setOnPreferenceClickListener {
+                    preferenceScreen.findPreference<Preference>("reset_recents").setOnPreferenceClickListener {
                         doAsync {
                             CacheDB.INSTANCE.recentsDAO().clear()
                             RecentsJob.run()
@@ -296,7 +296,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            preferenceScreen.findPreference("daynigth_permission").isEnabled = false
+            preferenceScreen.findPreference<Preference>("daynigth_permission").isEnabled = false
         } else {
             preferenceManager.sharedPreferences.edit().putBoolean("daynigth_permission", false).apply()
             (preferenceScreen.findPreference("daynigth_permission") as SwitchPreference).isChecked = false

@@ -61,7 +61,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
         if (intent.getBooleanExtra("aid_only", false))
             viewModel?.init(intent.getStringExtra("aid"))
         else
-            viewModel?.init(this@ActivityAnime, intent.dataString!!, intent.getBooleanExtra("persist", true))
+            viewModel?.init(this@ActivityAnime, intent.dataString, intent.getBooleanExtra("persist", true))
         holder = AnimeActivityHolder(this@ActivityAnime)
         doOnUI {
             if (intent.getBooleanExtra("notification", false))

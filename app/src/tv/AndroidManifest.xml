@@ -186,6 +186,11 @@
             tools:replace="android:screenOrientation"
             android:theme="@style/AppTheme.TV.Guided"/>
         <activity
+            android:name=".tv.streaming.TVMultiSelection"
+            android:screenOrientation="sensorLandscape"
+            tools:replace="android:screenOrientation"
+            android:theme="@style/AppTheme.TV.Guided"/>
+        <activity
             android:name=".tv.exoplayer.TVPlayer"
             android:screenOrientation="sensorLandscape"
             tools:replace="android:screenOrientation"

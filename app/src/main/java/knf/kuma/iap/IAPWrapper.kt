@@ -26,9 +26,10 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
 
     fun setUp(onConnect: (success: Boolean) -> Unit) {
         onConnectedListener = onConnect
-        if (isEnabled && EAHelper.phase < 4)
+        if (isEnabled && EAHelper.phase < 4) {
             context.bindService(Intent(BuildConfig.IAB_BIND_ACTION).setPackage(BuildConfig.IAB_BIND_PACKAGE), this, Context.BIND_AUTO_CREATE)
-        else onConnect.invoke(false)
+            onConnect.invoke(true)
+        }else onConnect.invoke(false)
     }
 
     fun onDestroy() {

@@ -234,6 +234,7 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
+
         <activity android:name=".queue.QueueActivity"/>
         <activity
             android:name=".tv.streaming.TVServerSelection"
@@ -284,26 +285,29 @@
             android:screenOrientation="sensor"
             tools:node="merge"
             tools:replace="android:screenOrientation"/>
+        <activity
+            android:name=".tv.streaming.TVMultiSelection"
+            android:theme="@style/AppTheme.TV.Guided"/>
 
         <provider
             android:name=".slices.AnimeSlice"
-            android:authorities="${applicationId}.slices"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+        android:authorities="${applicationId}.slices"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.app.slice.category.SLICE"/>
+            <category android:name="android.app.slice.category.SLICE"/>
 
-                <data
-                    android:host="knf"
-                    android:pathPrefix="/"
-                    android:scheme="http"/>
-            </intent-filter>
-        </provider>
+            <data
+                android:host="knf"
+                android:pathPrefix="/"
+                android:scheme="http"/>
+        </intent-filter>
+    </provider>
 
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false"/>
-    </application>
+    <uses-library
+        android:name="org.apache.http.legacy"
+        android:required="false"/>
+</application>
 
-</manifest>
+    </manifest>

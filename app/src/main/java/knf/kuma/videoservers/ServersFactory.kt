@@ -165,15 +165,7 @@ class ServersFactory {
             serversInterface.onProgressIndicator(true)
             showSnack("Obteniendo servidores...")
             val main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get()
-            val downloads = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download")
             val servers = ArrayList<Server>()
-            for (e in downloads) {
-                var z = e.attr("href")
-                z = z.substring(z.lastIndexOf("http"))
-                val server = Server.check(context, z)
-                if (server != null)
-                    servers.add(server)
-            }
             val sScript = main.select("script")
             var j = ""
             for (element in sScript) {
@@ -189,6 +181,14 @@ class ServersFactory {
                     MaterialDialog(context).safeShow {
                         listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
                             doAsync {
+                                val downloads = main.select("table.RTbl.Dwnl tr:contains(${if (index == 0) "SUB" else "LAT"}) a.Button.Sm.fa-download")
+                                for (e in downloads) {
+                                    var z = e.attr("href")
+                                    z = z.substring(z.lastIndexOf("http"))
+                                    val server = Server.check(context, z)
+                                    if (server != null)
+                                        servers.add(server)
+                                }
                                 val jsonArray =
                                         when (index) {
                                             1 -> jsonObject.getJSONArray("LAT")
@@ -208,9 +208,15 @@ class ServersFactory {
                     }
                 }
             } else {
+                val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
+                for (e in downloads) {
+                    var z = e.attr("href")
+                    z = z.substring(z.lastIndexOf("http"))
+                    val server = Server.check(context, z)
+                    if (server != null)
+                        servers.add(server)
+                }
                 val jsonArray = jsonObject.getJSONArray(if (jsonObject.has("SUB")) "SUB" else "LAT")
-                /*Log.e("JSON","$json")
-                val parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()*/
                 for (baseLink in jsonArray) {
                     val server = Server.check(context, baseLink.optString("code"))
                     if (server != null)

@@ -12,8 +12,8 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activity!!.setResult(Activity.RESULT_CANCELED, Intent()
-                .putExtra("is_video_server", arguments!!.getBoolean(IS_SERVER_DATA, false)))
+        activity?.setResult(Activity.RESULT_CANCELED, Intent()
+                .putExtra("is_video_server", arguments?.getBoolean(IS_SERVER_DATA, false)))
     }
 
     override fun onCreateGuidance(savedInstanceState: Bundle?): GuidanceStylist.Guidance {
@@ -36,10 +36,10 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
 
     override fun onGuidedActionClicked(action: GuidedAction?) {
         super.onGuidedActionClicked(action)
-        activity!!.setResult(Activity.RESULT_OK, Intent()
-                .putExtra("is_video_server", arguments!!.getBoolean(IS_SERVER_DATA, false))
+        activity?.setResult(Activity.RESULT_OK, Intent()
+                .putExtra("is_video_server", arguments?.getBoolean(IS_SERVER_DATA, false))
                 .putExtra("position", action!!.id.toInt()))
-        activity!!.finish()
+        activity?.finish()
     }
 
     companion object {

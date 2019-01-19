@@ -13,14 +13,14 @@ class AnimeViewModel : ViewModel() {
     var liveData: LiveData<AnimeObject>? = null
         private set
 
-    fun init(context: Context, link: String, persist: Boolean) {
-        if (liveData != null)
+    fun init(context: Context, link: String?, persist: Boolean) {
+        if (liveData != null || link == null)
             return
         liveData = repository.getAnime(context, link, persist)
     }
 
-    fun init(aid: String) {
-        if (liveData != null)
+    fun init(aid: String?) {
+        if (liveData != null || aid == null)
             return
         liveData = CacheDB.INSTANCE.animeDAO().getAnimeByAid(aid)
     }
