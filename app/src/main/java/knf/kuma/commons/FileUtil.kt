@@ -66,7 +66,7 @@ object FileUtil {
         }
         var volumePath: String? = FileUtil.getVolumePath(FileUtil.getVolumeIdFromTreeUri(treeUri), con)
                 ?: return File.separator
-        if (volumePath!!.endsWith(File.separator)) {
+        if (volumePath?.endsWith(File.separator) == true) {
             volumePath = volumePath.substring(0, volumePath.length - 1)
         }
 
@@ -150,23 +150,27 @@ object FileUtil {
         }
     }
 
-    fun moveFile(resolver: ContentResolver, uri: Uri, outputStream: OutputStream, delete: Boolean = true): LiveData<Pair<Int, Boolean>> {
+    fun moveFile(resolver: ContentResolver, uri: Uri?, outputStream: OutputStream?, delete: Boolean = true): LiveData<Pair<Int, Boolean>> {
         val liveData = MutableLiveData<Pair<Int, Boolean>>()
+        if (uri == null || outputStream == null) {
+            doOnUI { liveData.setValue(Pair(-1, true)) }
+            return liveData
+        }
         doAsync {
             try {
                 val inputStream = resolver.openInputStream(uri)
-                val total = inputStream!!.available().toLong()
+                val total = inputStream?.available()?.toLong() ?: 0
                 val buffer = ByteArray(128 * 1024)
-                var read: Int = inputStream.read(buffer)
+                var read: Int = inputStream?.read(buffer) ?: 0
                 var current: Long = 0
                 while (read != -1) {
                     outputStream.write(buffer, 0, read)
                     current += read.toLong()
                     val prog = (current * 100 / total).toInt()
                     doOnUI { liveData.setValue(Pair(prog, false)) }
-                    read = inputStream.read(buffer)
+                    read = inputStream?.read(buffer) ?: 0
                 }
-                inputStream.close()
+                inputStream?.close()
                 outputStream.flush()
                 outputStream.close()
                 try {
@@ -196,20 +200,20 @@ object FileUtil {
                 try {
                     val inputStream = resolver.openInputStream(pair.first)
                     val outputStream = FileAccessHelper.INSTANCE.getOutputStream(pair.second)
-                    val total = inputStream!!.available().toLong()
+                    val total = inputStream?.available()?.toLong() ?: 0
                     val buffer = ByteArray(128 * 1024)
-                    var read: Int = inputStream.read(buffer)
+                    var read: Int = inputStream?.read(buffer) ?: 0
                     var current: Long = 0
                     while (read != -1) {
-                        outputStream!!.write(buffer, 0, read)
+                        outputStream?.write(buffer, 0, read)
                         current += read.toLong()
                         val prog = (current * 100 / total).toInt()
                         doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), prog), false)) }
-                        read = inputStream.read(buffer)
+                        read = inputStream?.read(buffer) ?: 0
                     }
-                    inputStream.close()
-                    outputStream!!.flush()
-                    outputStream.close()
+                    inputStream?.close()
+                    outputStream?.flush()
+                    outputStream?.close()
                     doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), 100), false)) }
                     try {
                         DocumentsContract.deleteDocument(resolver, pair.first)
@@ -235,20 +239,20 @@ object FileUtil {
             try {
                 val inputStream = FileAccessHelper.INSTANCE.getTmpInputStream(file_name)
                 val outputStream = FileAccessHelper.INSTANCE.getOutputStream(file_name)
-                val total = inputStream!!.available().toLong()
+                val total = inputStream?.available()?.toLong() ?: 0
                 val buffer = ByteArray(128 * 1024)
-                var read: Int = inputStream.read(buffer)
+                var read: Int = inputStream?.read(buffer) ?: 0
                 var current: Long = 0
                 while (read != -1) {
-                    outputStream!!.write(buffer, 0, read)
+                    outputStream?.write(buffer, 0, read)
                     current += read.toLong()
                     val prog = (current * 100 / total).toInt()
                     callback.onProgress(Pair(prog, false))
-                    read = inputStream.read(buffer)
+                    read = inputStream?.read(buffer) ?: 0
                 }
-                inputStream.close()
-                outputStream!!.flush()
-                outputStream.close()
+                inputStream?.close()
+                outputStream?.flush()
+                outputStream?.close()
                 try {
                     val file = FileAccessHelper.INSTANCE.getTmpFile(file_name)
                     file.delete()

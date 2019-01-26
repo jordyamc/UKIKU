@@ -58,7 +58,7 @@ class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     private fun refreshList() {
         counter++
         if (counter >= 15)
-            AchievementManager.unlock(32)
+            AchievementManager.unlock(listOf(32))
         Handler().postDelayed({
             CacheDB.INSTANCE.animeDAO().getRandom(PreferenceManager.getDefaultSharedPreferences(this@RandomActivity).getInt("random_limit", 25))
                     .observe(this@RandomActivity, Observer { animeObjects ->

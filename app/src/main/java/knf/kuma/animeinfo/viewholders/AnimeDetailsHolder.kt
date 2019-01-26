@@ -73,8 +73,8 @@ class AnimeDetailsHolder(val view: View) {
                 showCard(cardViews[0])
             }
             noCrash {
-                if (animeObject.description != null && animeObject.description!!.trim { it <= ' ' } != "") {
-                    desc.setTextAndIndicator(animeObject.description!!.trim { it <= ' ' }, expandIcon)
+                if (animeObject.description != null && animeObject.description?.trim() != "") {
+                    desc.setTextAndIndicator(animeObject.description?.trim() ?: "", expandIcon)
                     desc.setAnimationDuration(300)
                     val onClickListener = View.OnClickListener {
                         doOnUI {
@@ -89,20 +89,22 @@ class AnimeDetailsHolder(val view: View) {
             }
             noCrash {
                 type.text = animeObject.type
-                state.text = getStateString(animeObject.state!!, animeObject.day!!)
+                state.text = getStateString(animeObject.state, animeObject.day)
                 id.text = animeObject.aid
                 if (animeObject.rate_stars == null || animeObject.rate_stars == "0.0")
                     layScore.visibility = View.GONE
                 else {
                     ratingCount.text = animeObject.rate_count
-                    ratingBar.rating = animeObject.rate_stars!!.toFloat()
+                    ratingBar.rating = animeObject.rate_stars?.toFloat() ?: 0f
                 }
                 showCard(cardViews[2])
             }
             noCrash {
-                if (animeObject.genres?.isNotEmpty() == true) {
-                    recyclerViewGenres.adapter = AnimeTagsAdapter(fragment.context!!, animeObject.genres)
-                    showCard(cardViews[3])
+                fragment.context?.let {
+                    if (animeObject.genres?.isNotEmpty() == true) {
+                        recyclerViewGenres.adapter = AnimeTagsAdapter(it, animeObject.genres)
+                        showCard(cardViews[3])
+                    }
                 }
             }
             noCrash {
@@ -155,7 +157,7 @@ class AnimeDetailsHolder(val view: View) {
         }, retard.toLong())*/
     }
 
-    private fun getStateString(state: String, day: AnimeObject.Day): String {
+    private fun getStateString(state: String?, day: AnimeObject.Day): String {
         return when (day) {
             AnimeObject.Day.MONDAY -> "$state - Lunes"
             AnimeObject.Day.TUESDAY -> "$state - Martes"
@@ -164,7 +166,7 @@ class AnimeDetailsHolder(val view: View) {
             AnimeObject.Day.FRIDAY -> "$state - Viernes"
             AnimeObject.Day.SATURDAY -> "$state - Sábado"
             AnimeObject.Day.SUNDAY -> "$state - Domingo"
-            else -> state
+            else -> state ?: ""
         }
     }
 }

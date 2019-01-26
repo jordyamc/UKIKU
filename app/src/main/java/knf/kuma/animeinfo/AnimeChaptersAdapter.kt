@@ -1,6 +1,5 @@
 package knf.kuma.animeinfo
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -27,8 +26,10 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.squareup.picasso.Callback
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.animeinfo.fragments.ChaptersFragment
+import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
@@ -76,21 +77,22 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
 
     override fun onBindViewHolder(holder: ChapterImgHolder, position: Int, payloads: MutableList<Any>) {
         if (selection.contains(position))
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context!!, EAHelper.getThemeColorLight(context)))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, EAHelper.getThemeColorLight(context)))
         else
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context!!, R.color.cardview_background))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
         if (payloads.isEmpty())
             super.onBindViewHolder(holder, position, payloads)
     }
 
     override fun onBindViewHolder(holder: ChapterImgHolder, position: Int) {
+        if (context == null) return
         val chapter = chapters[position]
         val downloadObject = AtomicReference(downloadsDAO.getByEid(chapter.eid))
         val dFile = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
         if (selection.contains(position))
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context!!, EAHelper.getThemeColorLight(context)))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, EAHelper.getThemeColorLight(context)))
         else
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context!!, R.color.cardview_background))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
         holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(dFile, downloadObject.get()))
         chapter.isDownloaded = canPlay(dFile)
         if (processingPosition == holder.adapterPosition) {
@@ -111,7 +113,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         if (!Network.isConnected || chapter.img == null)
             holder.imageView.visibility = View.GONE
         if (chapter.img != null)
-            PicassoSingle[context].load(chapter.img).into(holder.imageView, object : Callback {
+            PicassoSingle.get().load(chapter.img).into(holder.imageView, object : Callback {
                 override fun onSuccess() {
                     holder.imageView.visibility = View.VISIBLE
                 }
@@ -126,7 +128,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             else
                 holder.setDownloaded(isPlayAvailable(dFile, downloadObject.get()), chapter.eid == s)
         })
-        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.eid)) EAHelper.getThemeColor(context) else R.color.textPrimary))
+        holder.chapter.setTextColor(ContextCompat.getColor(App.context, if (chaptersDAO.chapterIsSeen(chapter.eid)) EAHelper.getThemeColor(context) else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
         holder.chapter.text = chapter.number
         holder.actions.setOnClickListener { view ->
@@ -154,12 +156,13 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         recordsDAO.add(RecordObject.fromChapter(chapter))
                         updateSeeing(chapter.number)
                         holder.setSeen(context, true)
-                        ServersFactory.startPlay(context, chapter.epTitle, chapter.fileName)
+                        ServersFactory.startPlay(App.context, chapter.epTitle, chapter.fileName)
                     } else {
                         Toaster.toast("Aun no se está descargando")
                     }
                     R.id.cast -> if (canPlay(dFile)) {
-                        CastUtil.get().play(fragment.activity as Activity, recyclerView, chapter.eid, SelfServer.start(chapter.fileName, true), chapter.name, chapter.number, if (chapter.img == null) chapter.aid else chapter.img!!, chapter.img == null)
+                        //CastUtil.get().play(fragment.activity as Activity, recyclerView, chapter.eid, SelfServer.start(chapter.fileName, true), chapter.name, chapter.number, if (chapter.img == null) chapter.aid else chapter.img, chapter.img == null)
+                        CastUtil.get().play(recyclerView, CastMedia.create(chapter))
                         chaptersDAO.addChapter(chapter)
                         recordsDAO.add(RecordObject.fromChapter(chapter))
                         updateSeeing(chapter.number)
@@ -169,8 +172,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                     R.id.delete -> MaterialDialog(context).safeShow {
                         message(text = "¿Eliminar el ${chapter.number.toLowerCase()}?")
                         positiveButton(text = "CONFIRMAR") {
-                            if (downloadObject.get() != null)
-                                downloadObject.get()!!.state = -8
+                            downloadObject.get()?.state = -8
                             chapter.isDownloaded = false
                             holder.setDownloaded(false, false)
                             FileAccessHelper.INSTANCE.delete(chapter.fileName, false)
@@ -227,7 +229,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             }
 
                             override fun onCast(url: String?) {
-                                CastUtil.get().play(fragment.activity as Activity, recyclerView, chapter.eid, url, chapter.name, chapter.number, if (chapter.img == null) chapter.aid else chapter.img!!, chapter.img == null)
+                                CastUtil.get().play(recyclerView, CastMedia.create(chapter, url))
                                 chaptersDAO.addChapter(chapter)
                                 recordsDAO.add(RecordObject.fromChapter(chapter))
                                 updateSeeing(chapter.number)
@@ -275,7 +277,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             }
                         })
                     }
-                    R.id.share -> fragment.activity!!.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
+                    R.id.share -> fragment.activity?.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
                             .setType("text/plain")
                             .putExtra(Intent.EXTRA_TEXT, chapter.epTitle + "\n" + chapter.link), "Compartir"))
                     R.id.import_file -> (fragment as ChaptersFragment).onMove(chapter.fileName)
@@ -305,9 +307,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     }
 
     private fun updateSeeing(chapter: String) {
-        if (seeingObject != null) {
-            seeingObject!!.chapter = chapter
-            seeingDAO.update(seeingObject!!)
+        seeingObject?.let {
+            it.chapter = chapter
+            seeingDAO.update(it)
         }
     }
 
@@ -315,7 +317,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         noCrash {
             if (block)
                 (fragment.activity as? AppCompatActivity)?.requestedOrientation = when {
-                    fragment.context!!.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    fragment.context?.resources?.getBoolean(R.bool.isLandscape) == true -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                     else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
             else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -337,7 +339,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     }
 
     override fun getItemViewType(position: Int): Int {
-        return chapters[position].chapterType!!.value
+        return chapters[position].chapterType?.value ?: 0
     }
 
     override fun getItemCount(): Int {
@@ -390,26 +392,28 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         private var castingObserver: Observer<String>? = null
 
         fun setDownloadObserver(downloadLiveData: LiveData<DownloadObject>, owner: LifecycleOwner?, observer: Observer<DownloadObject>) {
+            if (owner == null) return
             this.downloadLiveData = downloadLiveData
             this.downloadObserver = observer
-            this.downloadLiveData.observe(owner!!, downloadObserver!!)
+            this.downloadLiveData.observe(owner, observer)
         }
 
         fun unsetDownloadObserver() {
-            if (downloadObserver != null) {
-                downloadLiveData.removeObserver(downloadObserver!!)
+            downloadObserver?.let {
+                downloadLiveData.removeObserver(it)
                 downloadObserver = null
             }
         }
 
         fun setCastingObserver(owner: LifecycleOwner?, observer: Observer<String>) {
+            if (owner == null) return
             this.castingObserver = observer
-            CastUtil.get().casting.observe(owner!!, castingObserver!!)
+            CastUtil.get().casting.observe(owner, observer)
         }
 
         fun unsetCastingObserver() {
-            if (castingObserver != null) {
-                CastUtil.get().casting.removeObserver(castingObserver!!)
+            castingObserver?.let {
+                CastUtil.get().casting.removeObserver(it)
                 castingObserver = null
             }
         }
@@ -436,7 +440,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         }
 
         fun setSeen(context: Context?, seen: Boolean) {
-            chapter.post { chapter.setTextColor(ContextCompat.getColor(context!!, if (seen) EAHelper.getThemeColor(context) else R.color.textPrimary)) }
+            chapter.post { chapter.setTextColor(ContextCompat.getColor(App.context, if (seen) EAHelper.getThemeColor(context) else R.color.textPrimary)) }
         }
 
         fun setDownloadState(downloadObject: DownloadObject?) {

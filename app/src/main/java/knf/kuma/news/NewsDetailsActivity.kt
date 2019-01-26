@@ -32,17 +32,18 @@ class NewsDetailsActivity : AppCompatActivity(), Html.ImageGetter {
 
     override fun getDrawable(source: String?): Drawable {
         val levelListDrawable = LevelListDrawable()
-        val empty = getDrawable(R.mipmap.ic_launcher)
-        levelListDrawable.addLevel(0, 0, empty)
-        levelListDrawable.setBounds(0, 0, empty.intrinsicWidth, empty.intrinsicHeight)
-        doAsync {
-            val bitmap = PicassoSingle[this@NewsDetailsActivity].load(source).get()
-            val drawable = BitmapDrawable(resources, bitmap)
-            levelListDrawable.addLevel(1, 1, drawable)
-            levelListDrawable.setBounds(0, 0, bitmap.width, bitmap.height)
-            levelListDrawable.level = 1
-            doOnUI {
-                content.refreshDrawableState()
+        getDrawable(R.mipmap.ic_launcher)?.let {
+            levelListDrawable.addLevel(0, 0, it)
+            levelListDrawable.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+            doAsync {
+                val bitmap = PicassoSingle.get().load(source).get()
+                val drawable = BitmapDrawable(resources, bitmap)
+                levelListDrawable.addLevel(1, 1, drawable)
+                levelListDrawable.setBounds(0, 0, bitmap.width, bitmap.height)
+                levelListDrawable.level = 1
+                doOnUI {
+                    content.refreshDrawableState()
+                }
             }
         }
         return levelListDrawable

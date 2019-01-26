@@ -83,7 +83,7 @@ class DirectoryService : IntentService("Directory update") {
         val strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet("failed_pages", LinkedHashSet())
         val newStrings = LinkedHashSet<String>()
         var partialCount = 0
-        if (strings!!.size == 0)
+        if (strings?.size == 0)
             Log.e("Directory Getter", "No pending pages")
         for (s in LinkedHashSet(strings)) {
             partialCount++
@@ -142,7 +142,7 @@ class DirectoryService : IntentService("Directory update") {
 
                         override fun onError() {
                             Log.e("Directory Getter", "At page: $page")
-                            if (!strings!!.contains(page.toString()))
+                            if (strings?.contains(page.toString()) == false)
                                 strings.add(page.toString())
                         }
                     })
@@ -166,7 +166,7 @@ class DirectoryService : IntentService("Directory update") {
                 setStatus(STATE_INTERRUPTED)
             } catch (e: Exception) {
                 Log.e("Directory Getter", "Page error: $page")
-                if (!strings!!.contains(page.toString()))
+                if (strings?.contains(page.toString()) == false)
                     strings.add(page.toString())
             }
 
@@ -202,13 +202,11 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     private fun notShow(code: Int, notification: Notification) {
-        if (manager != null)
-            manager!!.notify(code, notification)
+        manager?.notify(code, notification)
     }
 
     private fun notCancel(code: Int) {
-        if (manager != null)
-            manager!!.cancel(code)
+        manager?.cancel(code)
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
@@ -237,10 +235,6 @@ class DirectoryService : IntentService("Directory update") {
         fun run(context: Context) {
             if (!isRunning)
                 ContextCompat.startForegroundService(context, Intent(context, DirectoryService::class.java))
-        }
-
-        fun isDirectoryFinished(context: Context): Boolean {
-            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false)
         }
 
         fun getLiveStatus(): LiveData<Int> {

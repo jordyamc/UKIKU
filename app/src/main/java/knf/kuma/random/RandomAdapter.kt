@@ -32,7 +32,7 @@ internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adap
 
     override fun onBindViewHolder(holder: RandomItem, position: Int) {
         val animeObject = list[position]
-        PicassoSingle[activity].load(PatternUtil.getCover(animeObject.aid!!)).into(holder.imageView)
+        holder.imageView.load(PatternUtil.getCover(animeObject.aid))
         holder.title.text = animeObject.name
         holder.type.text = animeObject.type
         holder.cardView.setOnClickListener { ActivityAnime.open(activity, animeObject, holder.imageView, false, true) }

@@ -20,12 +20,12 @@ class InfoContainer {
         when {
             favoriteObject == null -> needReload = true
             favoriteObject is FavSection -> needReload = true
-            !updated!!.contains(favoriteObject) -> needReload = true
-            current!!.size != updated!!.size -> needReload = true
+            updated?.contains(favoriteObject) == false -> needReload = true
+            current?.size != updated?.size -> needReload = true
             else -> {
                 needReload = false
-                from = current!!.indexOf(favoriteObject)
-                to = updated!!.indexOf(favoriteObject)
+                from = current?.indexOf(favoriteObject) ?: -1
+                to = updated?.indexOf(favoriteObject) ?: -1
             }
         }
     }

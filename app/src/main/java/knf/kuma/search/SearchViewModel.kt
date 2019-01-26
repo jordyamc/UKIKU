@@ -12,8 +12,7 @@ class SearchViewModel : ViewModel() {
     private var observer: Observer<PagedList<AnimeObject>>? = null
 
     fun setSearch(query: String, genres: String, owner: LifecycleOwner, observer: Observer<PagedList<AnimeObject>>) {
-        if (this.observer != null)
-            liveData.removeObserver(this.observer!!)
+        this.observer?.let { liveData.removeObserver(it) }
         this.observer = observer
         liveData = if (query == "" && genres == "")
             repository.search
@@ -21,6 +20,6 @@ class SearchViewModel : ViewModel() {
             repository.getSearch(query)
         else
             repository.getSearch(query, genres)
-        liveData.observe(owner, this.observer!!)
+        liveData.observe(owner, observer)
     }
 }

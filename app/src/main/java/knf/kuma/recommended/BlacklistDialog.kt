@@ -28,18 +28,20 @@ class BlacklistDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return AlertDialog.Builder(activity!!)
-                .setTitle("Lista negra")
-                .setMultiChoiceItems(genres.toTypedArray(), states) { _, index, isSelected ->
-                    if (isSelected) {
-                        selected.add(genres[index])
-                    } else {
-                        selected.remove(genres[index])
-                    }
-                }.setPositiveButton("SELECCIONAR") { _, _ ->
-                    selected.sort()
-                    listener?.onOkay(selected)
-                }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }.create()
+        return activity?.let {
+            AlertDialog.Builder(it)
+                    .setTitle("Lista negra")
+                    .setMultiChoiceItems(genres.toTypedArray(), states) { _, index, isSelected ->
+                        if (isSelected) {
+                            selected.add(genres[index])
+                        } else {
+                            selected.remove(genres[index])
+                        }
+                    }.setPositiveButton("SELECCIONAR") { _, _ ->
+                        selected.sort()
+                        listener?.onOkay(selected)
+                    }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }.create()
+        } ?: super.onCreateDialog(savedInstanceState)
     }
 
     interface MultiChoiceListener {

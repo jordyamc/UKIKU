@@ -32,14 +32,17 @@ interface AchievementsDAO {
     @Query("SELECT * FROM achievement WHERE `key` IN (:keys)")
     fun find(vararg keys: Int): List<Achievement>
 
+    @Query("SELECT * FROM achievement WHERE `key` IN (:keys)")
+    fun find(keys: List<Int>): List<Achievement>
+
     @Query("SELECT isUnlocked FROM achievement WHERE `key`=:key LIMIT 1")
     fun isUnlocked(key: Int): Boolean
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(vararg achievements: Achievement)
 
-    @Update
-    fun update(achievements: Collection<Achievement>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun update(achievements: List<Achievement>)
 
     @Update
     fun update(achievements: Achievement)

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.pm.PackageInfoCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.Crashlytics
 import knf.kuma.R
@@ -59,8 +60,8 @@ class ChangelogActivity : AppCompatActivity() {
         setContentView(R.layout.recycler_changelog)
         toolbar.title = "Changelog"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         doAsync {
             try {
@@ -85,7 +86,7 @@ class ChangelogActivity : AppCompatActivity() {
             doAsync {
                 try {
                     val cCode = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0)
-                    val pCode = activity.packageManager.getPackageInfo(activity.packageName, 0).versionCode
+                    val pCode = PackageInfoCompat.getLongVersionCode(activity.packageManager.getPackageInfo(activity.packageName, 0)).toInt()
                     if (pCode > cCode && cCode != 0) {
                         runWVersion(pCode)
                         doOnUI {

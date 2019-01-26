@@ -17,7 +17,8 @@ class DirUpdateJob : Job() {
     override fun onRunJob(params: Job.Params): Job.Result {
         if (DirectoryUpdateService.isRunning)
             ContextCompat.startForegroundService(context, Intent(context, DirectoryUpdateService::class.java))
-        reSchedule(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString("dir_update_time", "7")!!))
+        reSchedule(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString("dir_update_time", "7")
+                ?: "7"))
         return Job.Result.SUCCESS
     }
 
@@ -26,7 +27,7 @@ class DirUpdateJob : Job() {
 
         fun schedule(context: Context) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val time = Integer.valueOf(preferences.getString("dir_update_time", "7")!!)
+            val time = Integer.valueOf(preferences.getString("dir_update_time", "7") ?: "7")
             if (JobManager.instance().getAllJobRequestsForTag(TAG).size == 0 &&
                     preferences.getBoolean("directory_finished", false) &&
                     time > 0)

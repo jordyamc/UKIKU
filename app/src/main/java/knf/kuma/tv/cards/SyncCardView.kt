@@ -17,7 +17,7 @@ class SyncCardView(context: Context) : BindableCardView<SyncObject>(context) {
         get() = img
 
     override fun bind(data: SyncObject) {
-        PicassoSingle[context].load(data.image).into(img)
+        PicassoSingle.get().load(data.image).into(img)
         title.text = data.title
     }
 }

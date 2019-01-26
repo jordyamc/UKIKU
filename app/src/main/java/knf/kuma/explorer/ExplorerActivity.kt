@@ -61,7 +61,7 @@ class ExplorerActivity : AppCompatActivity(), OnFileStateChange {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.delete_all -> adapter!!.onRemoveAllClicked()
+            R.id.delete_all -> adapter?.onRemoveAllClicked()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -77,8 +77,10 @@ class ExplorerActivity : AppCompatActivity(), OnFileStateChange {
     }
 
     override fun onBackPressed() {
-        if (adapter == null || !(adapter!!.getItem(pager!!.currentItem) as FragmentBase).onBackPressed())
-            super.onBackPressed()
+        adapter?.let {
+            if ((it.getItem(pager.currentItem) as? FragmentBase)?.onBackPressed() == false)
+                super.onBackPressed()
+        } ?: super.onBackPressed()
     }
 
     companion object {

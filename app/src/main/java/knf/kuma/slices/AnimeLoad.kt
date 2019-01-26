@@ -24,15 +24,12 @@ class AnimeLoad : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         doAsync {
             try {
-                if (searchIcon == null)
-                    searchIcon = IconCompat.createWithBitmap(getBitmap(Objects.requireNonNull<Drawable>(ContextCompat.getDrawable(context, R.drawable.ic_search_black_24dp)) as VectorDrawable))
-                if (openIcon == null)
-                    openIcon = IconCompat.createWithBitmap(getBitmap(Objects.requireNonNull<Drawable>(ContextCompat.getDrawable(context, R.drawable.ic_open)) as VectorDrawable))
+                initIcons(context)
                 if (QUERY != "/anime/") {
                     LIST = CacheDB.createAndGet(context).animeDAO().getByName("%" + QUERY.replace("/anime/", "").trim { it <= ' ' } + "%")
                     for (animeObject in LIST) {
                         try {
-                            animeObject.icon = IconCompat.createWithBitmap(PicassoSingle[context].load(PatternUtil.getCover(animeObject.aid!!)).get())
+                            animeObject.icon = IconCompat.createWithBitmap(PicassoSingle.get().load(PatternUtil.getCover(animeObject.aid)).get())
                         } catch (e: IOException) {
                             animeObject.icon = IconCompat.createWithResource(context, R.mipmap.ic_launcher)
                         }
@@ -49,10 +46,18 @@ class AnimeLoad : BroadcastReceiver() {
     companion object {
         var QUERY = "/anime/"
         var LIST: MutableList<AnimeObject> = ArrayList()
-        var openIcon: IconCompat? = null
-        var searchIcon: IconCompat? = null
+        lateinit var openIcon: IconCompat
+        lateinit var searchIcon: IconCompat
 
-        private fun getBitmap(vectorDrawable: VectorDrawable): Bitmap {
+        private fun initIcons(context: Context) {
+            if (!::searchIcon.isInitialized)
+                searchIcon = IconCompat.createWithBitmap(getBitmap(ContextCompat.getDrawable(context, R.drawable.ic_search_black_24dp)))
+            if (!::openIcon.isInitialized)
+                openIcon = IconCompat.createWithBitmap(getBitmap(ContextCompat.getDrawable(context, R.drawable.ic_open)))
+        }
+
+        private fun getBitmap(vectorDrawable: Drawable?): Bitmap? {
+            if (vectorDrawable !is VectorDrawable) return null
             val bitmap = Bitmap.createBitmap(vectorDrawable.intrinsicWidth,
                     vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)

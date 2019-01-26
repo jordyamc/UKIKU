@@ -12,6 +12,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.BUUtils
 import knf.kuma.backup.objects.BackupObject
@@ -44,31 +45,31 @@ object AchievementManager {
             setDismissible(true)
         }
         preloadAchievements()
-        achievementsDAO.completionListener.also { completionLiveData = it }.observeForever(Observer { it ->
+        achievementsDAO.completionListener.also { completionLiveData = it }.observeForever(Observer {
             if (it.isEmpty()) return@Observer
-            val list: List<Int> = it.map { it.key.toInt() }
+            val list: List<Int> = it.map { achievement -> achievement.key.toInt() }
             unlock(list)
         })
         CacheDB.INSTANCE.chaptersDAO().countLive.also { liveList.add(it) }.observeForever {
-            updateCount(it, 33, 39)
+            updateCount(it, listOf(33, 39))
         }
         CacheDB.INSTANCE.favsDAO().countLive.also { liveList.add(it) }.observeForever {
-            updateCount(it, 11, 1, 2, 3, 4, 5)
+            updateCount(it, listOf(11, 1, 2, 3, 4, 5))
         }
         CacheDB.INSTANCE.seeingDAO().countLive.also { liveList.add(it) }.observeForever {
-            updateCount(it, 16, 17, 18, 19)
+            updateCount(it, listOf(16, 17, 18, 19))
         }
         CacheDB.INSTANCE.seeingDAO().countCompletedLive.also { liveList.add(it) }.observeForever {
-            updateCount(it, 20, 21, 22, 23)
+            updateCount(it, listOf(20, 21, 22, 23))
         }
         CacheDB.INSTANCE.seeingDAO().countDroppedLive.also { liveList.add(it) }.observeForever {
-            updateCount(it, 24, 25, 26, 27)
+            updateCount(it, listOf(24, 25, 26, 27))
         }
         CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("363", "1706", "2950", "1182", "2479", "2478")).also { liveList.add(it) }.observeForever {
-            if (it == 6) unlock(38)
+            if (it == 6) unlock(listOf(38))
         }
         CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("1487", "1488", "1019", "460", "1493", "1494")).also { liveList.add(it) }.observeForever {
-            if (it == 6) unlock(45)
+            if (it == 6) unlock(listOf(45))
         }
     }
 
@@ -169,42 +170,42 @@ object AchievementManager {
         }
     }
 
-    fun backup(ncontext: Context) {
-        BUUtils.init(ncontext)
+    fun backup(callback: () -> Unit = {}) {
+        BUUtils.init(App.context)
         if (BUUtils.isLogedIn)
-            BUUtils.backupNUI(ncontext, "achievements", object : BUUtils.BackupInterface {
+            BUUtils.backupNUI(App.context, "achievements", object : BUUtils.BackupInterface {
                 override fun onResponse(backupObject: BackupObject<*>?) {
-
+                    callback.invoke()
                 }
             })
     }
 
-    fun restore(ncontext: Context) {
-        BUUtils.init(ncontext)
+    fun restore(callback: () -> Unit = {}) {
+        BUUtils.init(App.context)
         if (BUUtils.isLogedIn)
-            BUUtils.search(ncontext, "achievements", object : BUUtils.SearchInterface {
+            BUUtils.search(App.context, "achievements", object : BUUtils.SearchInterface {
                 override fun onResponse(backupObject: BackupObject<*>?) {
-                    if (backupObject != null) {
+                    if (backupObject != null)
                         doAsync {
                             CacheDB.INSTANCE.achievementsDAO().update((backupObject.data?.filterIsInstance<Achievement>()
                                     ?: arrayListOf()).filter { it.isUnlocked })
+                            callback.invoke()
                         }
-                    }
                 }
             })
     }
 
-    private fun updateCount(count: Int, vararg keys: Int) {
+    private fun updateCount(count: Int, keys: List<Int>) {
         doAsync {
-            val list = achievementsDAO.find(*keys)
+            val list = achievementsDAO.find(keys)
             list.forEach { it.count = count }
             achievementsDAO.update(list)
         }
     }
 
-    private fun incrementCount(by: Int, vararg keys: Int) {
+    private fun incrementCount(by: Int, keys: List<Int>) {
         doAsync {
-            val list = achievementsDAO.find(*keys)
+            val list = achievementsDAO.find(keys)
             list.forEach { it.count += by }
             achievementsDAO.update(list)
         }
@@ -214,11 +215,7 @@ object AchievementManager {
         return achievementsDAO.isUnlocked(key)
     }
 
-    private fun unlock(keys: Collection<Int>) {
-        unlock(*keys.toIntArray())
-    }
-
-    fun unlock(vararg keys: Int) {
+    fun unlock(keys: Collection<Int>) {
         doAsync {
             val list = mutableListOf<Achievement>()
             keys.forEach {
@@ -241,7 +238,7 @@ object AchievementManager {
                 list.forEach { achievementList.add(it.achievementData(context)) }
                 resetIndicator()
                 doOnUI {
-                    achievementUnlocked.show(*achievementList.toTypedArray())
+                    achievementUnlocked.show(achievementList)
                 }
             } else
                 for (achievement in list)
@@ -274,43 +271,43 @@ object AchievementManager {
 
     fun onPhaseUnlocked(phase: Int) {
         when (phase) {
-            0 -> unlock(12)
-            1 -> unlock(13)
-            2 -> unlock(14)
-            3 -> unlock(15)
+            0 -> unlock(listOf(12))
+            1 -> unlock(listOf(13))
+            2 -> unlock(listOf(14))
+            3 -> unlock(listOf(15))
         }
-        if (EAHelper.isPart0Unlocked && EAHelper.isPart1Unlocked && EAHelper.isPart2Unlocked && EAHelper.isPart3Unlocked)
-            unlock(28)
+        if (EAHelper.isAllUnlocked)
+            unlock(listOf(28))
     }
 
     fun onNewsOpened() {
-        incrementCount(1, 30)
+        incrementCount(1, listOf(30))
     }
 
     fun onBackup() {
-        unlock(41)
+        unlock(listOf(41))
     }
 
     fun onShare() {
-        incrementCount(1, 42)
+        incrementCount(1, listOf(42))
     }
 
     fun onSearch(query: String) {
         when (query.toLowerCase()) {
-            "boku no hero" -> unlock(43)
+            "boku no hero" -> unlock(listOf(43))
         }
     }
 
     fun onRecordsOpened() {
-        incrementCount(1, 44)
+        incrementCount(1, listOf(44))
     }
 
     fun onFavAdded(fav: FavoriteObject) {
         doAsync {
             if (CacheDB.INSTANCE.animeDAO().hasGenre(fav.aid, "Ecchi".like))
-                incrementCount(1, 34)
+                incrementCount(1, listOf(34))
             if (CacheDB.INSTANCE.animeDAO().hasGenre(fav.aid, "Shounen".like))
-                unlock(37)
+                unlock(listOf(37))
         }
     }
 
@@ -319,7 +316,7 @@ object AchievementManager {
     fun onPlayQueue(count: Int) {
         if (count == 0)
             return
-        incrementCount(count - 1, 33)
+        incrementCount(count - 1, listOf(33))
         onPlayChapter()
     }
 
@@ -334,11 +331,11 @@ object AchievementManager {
                         batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) != BatteryManager.BATTERY_STATUS_CHARGING &&
                         batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) != BatteryManager.BATTERY_STATUS_FULL
                 if (isLivingAtLimit)
-                    unlock(29)
+                    unlock(listOf(29))
                 val timeFormat = SimpleDateFormat("HH", Locale.getDefault())
                 val current = timeFormat.format(Calendar.getInstance().time).toInt()
                 if (current in 0..3)
-                    unlock(31)
+                    unlock(listOf(31))
             }.toast()
         }
     }

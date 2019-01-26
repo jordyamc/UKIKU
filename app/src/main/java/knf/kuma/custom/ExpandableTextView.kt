@@ -42,8 +42,8 @@ class ExpandableTextView(context: Context, attrs: AttributeSet) : LinearLayout(c
         override fun handleMessage(msg: Message) {
             when {
                 WHAT == msg.what -> {
-                    textView!!.maxLines = msg.arg1
-                    textView!!.invalidate()
+                    textView?.maxLines = msg.arg1
+                    textView?.invalidate()
                 }
                 WHAT_ANIMATION_END == msg.what -> setExpandState(msg.arg1)
                 WHAT_EXPAND_ONLY == msg.what -> changeExpandState(msg.arg1)
@@ -81,44 +81,44 @@ class ExpandableTextView(context: Context, attrs: AttributeSet) : LinearLayout(c
     private fun initView(context: Context) {
 
         val inflater = context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        inflater.inflate(R.layout.layout_expandable_textview, this)
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as? LayoutInflater
+        inflater?.inflate(R.layout.layout_expandable_textview, this)
 
         textView = findViewById(R.id.tv_expand_text_view_animation)
         //textView.setTextColor(textContentColor);
         //textView.getPaint().setTextSize(textContentSize);
 
-        textView!!.maxLines = expandLines
+        textView?.maxLines = expandLines
 
     }
 
     fun setExpandIndicatorButton(button: ImageButton) {
         ivExpandOrShrink = button
-        ivExpandOrShrink!!.setOnClickListener(this)
+        ivExpandOrShrink?.setOnClickListener(this)
     }
 
     private fun initClick() {
-        textView!!.setOnClickListener(this)
+        textView?.setOnClickListener(this)
     }
 
     fun setTextColor(@ColorInt color: Int) {
-        textView!!.setTextColor(color)
+        textView?.setTextColor(color)
     }
 
     fun setStateColorFilter(@ColorInt color: Int) {
         if (ivExpandOrShrink != null)
-            ivExpandOrShrink!!.setColorFilter(color)
+            ivExpandOrShrink?.setColorFilter(color)
     }
 
     fun setText(charSequence: CharSequence) {
         textContent = charSequence
-        textView!!.text = charSequence.toString()
-        val viewTreeObserver = textView!!.viewTreeObserver
-        viewTreeObserver.addOnPreDrawListener {
+        textView?.text = charSequence.toString()
+        val viewTreeObserver = textView?.viewTreeObserver
+        viewTreeObserver?.addOnPreDrawListener {
             if (!isInitTextView) {
                 return@addOnPreDrawListener true
             }
-            textLines = textView!!.lineCount
+            textLines = textView?.lineCount ?: 0
             Log.e("Expandable", "Lines: $textLines")
             isExpandNeeded = textLines > expandLines
             isInitTextView = false
@@ -176,17 +176,17 @@ class ExpandableTextView(context: Context, attrs: AttributeSet) : LinearLayout(c
 
         }
 
-        thread!!.start()
+        thread?.start()
 
     }
 
     private fun changeExpandState(endIndex: Int) {
         if (endIndex < textLines) {
             if (ivExpandOrShrink != null)
-                ivExpandOrShrink!!.setImageDrawable(drawableExpand)
+                ivExpandOrShrink?.setImageDrawable(drawableExpand)
         } else {
             if (ivExpandOrShrink != null)
-                ivExpandOrShrink!!.setImageDrawable(drawableShrink)
+                ivExpandOrShrink?.setImageDrawable(drawableShrink)
         }
 
     }
@@ -196,23 +196,23 @@ class ExpandableTextView(context: Context, attrs: AttributeSet) : LinearLayout(c
         if (endIndex < textLines) {
             isShrink = true
             if (ivExpandOrShrink != null)
-                ivExpandOrShrink!!.setImageDrawable(drawableExpand)
-            textView!!.setOnClickListener(this)
+                ivExpandOrShrink?.setImageDrawable(drawableExpand)
+            textView?.setOnClickListener(this)
         } else {
             isShrink = false
             if (ivExpandOrShrink != null)
-                ivExpandOrShrink!!.setImageDrawable(drawableShrink)
-            textView!!.setOnClickListener(null)
+                ivExpandOrShrink?.setImageDrawable(drawableShrink)
+            textView?.setOnClickListener(null)
         }
 
     }
 
     private fun doNotExpand() {
-        textView!!.maxLines = expandLines
-        textView!!.setOnClickListener(null)
+        textView?.maxLines = expandLines
+        textView?.setOnClickListener(null)
         if (ivExpandOrShrink != null) {
-            ivExpandOrShrink!!.setOnClickListener(null)
-            ivExpandOrShrink!!.visibility = View.GONE
+            ivExpandOrShrink?.setOnClickListener(null)
+            ivExpandOrShrink?.visibility = View.GONE
         }
     }
 

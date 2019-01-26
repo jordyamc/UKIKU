@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.commons.safeShow
 import knf.kuma.pojos.ExplorerObject
 import xdroid.toaster.Toaster
+
 
 class FragmentFilesRoot : FragmentBase(), FragmentFiles.SelectedListener, FragmentChapters.ClearInterface, ExplorerCreator.EmptyListener {
 
@@ -74,16 +74,18 @@ class FragmentFilesRoot : FragmentBase(), FragmentFiles.SelectedListener, Fragme
         outState.putString("name", name)
     }
 
-    internal fun setStateChange(stateChange: OnFileStateChange) {
+    internal fun setStateChange(stateChange: OnFileStateChange?) {
         this.stateChange = stateChange
     }
 
     internal fun onRemoveAll() {
-        if (name != null && activity != null)
-            MaterialDialog(activity!!).safeShow {
-                message(text = "¿Eliminar todos los capitulos de $name?")
-                positiveButton(text = "Eliminar") { chapters.deleteAll() }
-                negativeButton(text = "Cancelar")
+        if (name != null)
+            activity?.let {
+                MaterialDialog(it).safeShow {
+                    message(text = "¿Eliminar todos los capitulos de $name?")
+                    positiveButton(text = "Eliminar") { chapters.deleteAll() }
+                    negativeButton(text = "Cancelar")
+                }
             }
         else
             Toaster.toast("Error al borrar episodios")

@@ -58,19 +58,21 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
                 DownloadManager.resume(downloadObject)
             }
         }
-        holder.cancel.setOnClickListener { _ ->
-            MaterialDialog(fragment.context!!).safeShow {
-                message(text = "¿Cancelar descarga del ${downloadObject.chapter!!.toLowerCase()} de ${downloadObject.name}?")
-                positiveButton(text = "CONFIRMAR") {
-                    try {
-                        downloadObjects.removeAt(holder.adapterPosition)
-                        notifyItemRemoved(holder.adapterPosition)
-                        DownloadManager.cancel(downloadObject.eid!!)
-                    } catch (e: Exception) {
-                        //
+        holder.cancel.setOnClickListener {
+            fragment.context?.let {
+                MaterialDialog(it).safeShow {
+                    message(text = "¿Cancelar descarga del ${downloadObject.chapter?.toLowerCase()} de ${downloadObject.name}?")
+                    positiveButton(text = "CONFIRMAR") {
+                        try {
+                            downloadObjects.removeAt(holder.adapterPosition)
+                            notifyItemRemoved(holder.adapterPosition)
+                            DownloadManager.cancel(downloadObject.eid)
+                        } catch (e: Exception) {
+                            //
+                        }
                     }
+                    negativeButton(text = "CANCELAR")
                 }
-                negativeButton(text = "CANCELAR")
             }
         }
         downloadsDAO.getLiveByKey(downloadObject.key).observe(fragment, Observer { downloadObject1 ->

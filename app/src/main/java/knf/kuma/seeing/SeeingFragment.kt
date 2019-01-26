@@ -19,14 +19,14 @@ class SeeingFragment : Fragment() {
 
     var clickCount = 0
 
-    private val adapter: SeeingAdapter by lazy { SeeingAdapter(activity!!, arguments?.getInt("state", 0) == 0) }
+    private val adapter: SeeingAdapter? by lazy { activity?.let { SeeingAdapter(it, arguments?.getInt("state", 0) == 0) } }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         liveData.observe(this, Observer {
             progress.visibility = View.GONE
             error.visibility = if (it?.isEmpty() == true) View.VISIBLE else View.GONE
-            adapter.update(it)
+            adapter?.update(it)
         })
     }
 
@@ -39,22 +39,22 @@ class SeeingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         when (arguments?.getInt("state", 0)) {
             1 -> {
-                error_text.text = "No estas viendo ningun anime"
+                error_text.text = "No estas viendo ningún anime"
                 error_img.setImageResource(R.drawable.ic_watching)
             }
             2 -> {
-                error_text.text = "No consideras ningun anime"
+                error_text.text = "No consideras ningún anime"
                 error_img.setImageResource(R.drawable.ic_considering)
             }
             3 -> {
-                error_text.text = "No has terminado ningun anime"
+                error_text.text = "No has terminado ningún anime"
                 error_img.setImageResource(R.drawable.ic_completed)
             }
             4 -> {
-                error_text.text = "No has dropeado ningun anime"
+                error_text.text = "No has dropeado ningún anime"
                 error_img.setImageResource(R.drawable.ic_droped)
             }
-            else -> error_text.text = "No has marcado ningun anime"
+            else -> error_text.text = "No has marcado ningún anime"
         }
         recycler.verifyManager()
         recycler.adapter = adapter
@@ -81,8 +81,8 @@ class SeeingFragment : Fragment() {
 
     fun onSelected() {
         clickCount++
-        if (clickCount == 3 && adapter.list.isNotEmpty()) {
-            Toaster.toast("${adapter.list.size} anime" + if (adapter.list.size > 1) "s" else "")
+        if (clickCount == 3 && adapter?.list?.isNotEmpty() == true) {
+            Toaster.toast("${adapter?.list?.size} anime" + adapter?.let { if (it.list.size > 1) "s" else "" })
             clickCount = 0
         }
     }

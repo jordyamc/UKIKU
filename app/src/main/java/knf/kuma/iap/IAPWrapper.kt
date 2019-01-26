@@ -69,12 +69,14 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        iapService = IAPService(service!!).also {
-            inventory = Inventory(it)
-            if (it.isBillingSupported(3, context.packageName, ITEM_TYPE_INAPP) == BILLING_RESPONSE_RESULT_OK)
-                onConnectedListener?.invoke(true)
-            else
-                onConnectedListener?.invoke(false)
+        service?.let {
+            iapService = IAPService(service).also {
+                inventory = Inventory(it)
+                if (it.isBillingSupported(3, context.packageName, ITEM_TYPE_INAPP) == BILLING_RESPONSE_RESULT_OK)
+                    onConnectedListener?.invoke(true)
+                else
+                    onConnectedListener?.invoke(false)
+            }
         }
     }
 
@@ -101,7 +103,7 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
             return
         }
         if (data == null) {
-            Log.e("Purchase", "Null data")
+            Log.e(NAME, "Null data")
             callback.invoke(false, null)
             return
         }
@@ -110,14 +112,14 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
         val id = data.getStringExtra(RESPONSE_INAPP_PURCHASE_ID)
         if (resultCode == Activity.RESULT_OK && data.extras?.responseCode == BILLING_RESPONSE_RESULT_OK) {
             if (purchaseData == null || dataSignature == null) {
-                Log.e("Purchase", "Data or signature null")
+                Log.e(NAME, "Data or signature null")
                 callback.invoke(false, null)
                 return
             }
             val purchase = Inventory.Purchase(id, purchaseData, dataSignature)
             if (!Security.verifyPurchase(purchaseData, dataSignature)) {
                 Toaster.toast("Verificacion de firma fallida")
-                Log.e("Purchase", "Signature verification failed")
+                Log.e(NAME, "Signature verification failed")
                 callback.invoke(false, null)
                 return
             }
@@ -127,6 +129,7 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
     }
 
     companion object {
+        const val NAME = "Purchase"
         const val BILLING_RESPONSE_RESULT_OK = 0
         const val BILLING_RESPONSE_RESULT_USER_CANCELED = 1
         const val BILLING_RESPONSE_RESULT_SERVICE_UNAVAILABLE = 2

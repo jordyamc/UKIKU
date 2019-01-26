@@ -3,6 +3,7 @@ package knf.kuma.backup
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
@@ -74,19 +75,19 @@ object BUUtils {
     }
 
     fun setDriveClient() {
-        val account = GoogleSignIn.getLastSignedInAccount(activity!!)
-        if (account != null)
-            DRC = Drive.getDriveResourceClient(activity!!, account)
-        if (loginInterface != null)
-            loginInterface!!.onLogin()
+        activity?.let {
+            val account = GoogleSignIn.getLastSignedInAccount(it)
+            if (account != null)
+                DRC = Drive.getDriveResourceClient(it, account)
+            loginInterface?.onLogin()
+        }
     }
 
     private fun setDriveClient(context: Context) {
         val account = GoogleSignIn.getLastSignedInAccount(context)
         if (account != null)
             DRC = Drive.getDriveResourceClient(context, account)
-        if (loginInterface != null)
-            loginInterface!!.onLogin()
+        loginInterface?.onLogin()
     }
 
     fun setDropBoxClient(token: String?) {
@@ -97,8 +98,7 @@ object BUUtils {
                     .build()
             DBC = DbxClientV2(requestConfig, token)
         }
-        if (loginInterface != null)
-            loginInterface!!.onLogin()
+        loginInterface?.onLogin()
     }
 
     private fun setDropBoxClient(context: Context, token: String?) {
@@ -109,8 +109,7 @@ object BUUtils {
                     .build()
             DBC = DbxClientV2(requestConfig, token)
         }
-        if (loginInterface != null)
-            loginInterface!!.onLogin()
+        loginInterface?.onLogin()
     }
 
     private fun getDBToken(context: Context): String? {
@@ -125,8 +124,8 @@ object BUUtils {
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestScopes(Drive.SCOPE_APPFOLDER)
                 .build()
-        val client = GoogleSignIn.getClient(activity!!, signInOptions)
-        client.signOut()
+        val client = activity?.let { GoogleSignIn.getClient(it, signInOptions) }
+        client?.signOut()
     }
 
     fun startClient(type: BUType, fromInit: Boolean) {
@@ -135,14 +134,15 @@ object BUUtils {
                 val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestScopes(Drive.SCOPE_APPFOLDER)
                         .build()
-                activity!!.startActivityForResult(GoogleSignIn.getClient(activity!!, signInOptions).signInIntent, LOGIN_CODE)
+                activity?.startActivityForResult(activity?.let { GoogleSignIn.getClient(it, signInOptions).signInIntent }
+                        ?: Intent(), LOGIN_CODE)
             } else {
                 setDriveClient()
             }
             BUUtils.BUType.DROPBOX -> if (fromInit && dbToken != null) {
                 setDropBoxClient(dbToken)
             } else {
-                Auth.startOAuth2Authentication(activity!!, "qtjow4hsk06vt19")
+                activity?.let { Auth.startOAuth2Authentication(it, "qtjow4hsk06vt19") }
             }
             else -> {
             }
@@ -265,11 +265,11 @@ object BUUtils {
     private fun searchDropbox(id: String, searchInterface: SearchInterface) {
         doAsync {
             try {
-                val list = DBC!!.files().search("", id).matches
+                val list = DBC?.files()?.search("", id)?.matches ?: arrayListOf()
                 if (list.size > 0) {
-                    val downloader = DBC!!.files().download("/$id")
-                    searchInterface.onResponse(Gson().fromJson<Any>(InputStreamReader(downloader.inputStream), getType(id)) as BackupObject<*>)
-                    downloader.close()
+                    val downloader = DBC?.files()?.download("/$id")
+                    searchInterface.onResponse(Gson().fromJson<Any>(InputStreamReader(downloader?.inputStream), getType(id)) as? BackupObject<*>)
+                    downloader?.close()
                 } else {
                     searchInterface.onResponse(null)
                 }
@@ -283,33 +283,38 @@ object BUUtils {
     private fun searchDrive(id: String, searchInterface: SearchInterface) {
         doAsync {
             try {
-                val appFolderTask = DRC!!.appFolder
-                appFolderTask.continueWithTask {
+                val appFolderTask = DRC?.appFolder
+                appFolderTask?.continueWithTask {
                     val appfolder = appFolderTask.result
                     val query = Query.Builder()
                             .addFilter(Filters.contains(SearchableField.TITLE, id))
                             .build()
-                    DRC!!.queryChildren(appfolder!!, query)
-                }.continueWithTask<DriveContents> { task ->
+                    appfolder?.let { DRC?.queryChildren(it, query) }
+                }?.continueWithTask<DriveContents> { task ->
                     val metadata = task.result
                     if (metadata?.count ?: 0 > 0) {
-                        val driveFile = metadata!!.get(0).driveId.asDriveFile()
-                        metadata.release()
-                        DRC!!.openFile(driveFile, DriveFile.MODE_READ_ONLY)
+                        val driveFile = metadata?.get(0)?.driveId?.asDriveFile()
+                        metadata?.release()
+                        driveFile?.let { DRC?.openFile(it, DriveFile.MODE_READ_ONLY) }
                     } else {
                         metadata?.release()
                         null
                     }
-                }.addOnSuccessListener(activity!!) { driveContents ->
-                    try {
-                        searchInterface.onResponse(Gson().fromJson<BackupObject<*>>(InputStreamReader(driveContents.inputStream), getType(id)))
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        searchInterface.onResponse(null)
+                }?.apply {
+                    activity?.let {
+                        addOnSuccessListener(it) { driveContents ->
+                            try {
+                                searchInterface.onResponse(Gson().fromJson<BackupObject<*>>(InputStreamReader(driveContents.inputStream), getType(id)))
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                searchInterface.onResponse(null)
+                            }
+                        }
+                        addOnFailureListener(it) { e ->
+                            e.printStackTrace()
+                            searchInterface.onResponse(null)
+                        }
                     }
-                }.addOnFailureListener(activity!!) { e ->
-                    e.printStackTrace()
-                    searchInterface.onResponse(null)
                 }
             } catch (e: Exception) {
                 Crashlytics.logException(e)
@@ -321,33 +326,36 @@ object BUUtils {
     private fun searchDriveNC(id: String, searchInterface: SearchInterface) {
         doAsync {
             try {
-                val appFolderTask = DRC!!.appFolder
-                appFolderTask.continueWithTask {
+                val appFolderTask = DRC?.appFolder
+                appFolderTask?.continueWithTask {
                     val appfolder = appFolderTask.result
                     val query = Query.Builder()
                             .addFilter(Filters.contains(SearchableField.TITLE, id))
                             .build()
-                    DRC!!.queryChildren(appfolder!!, query)
-                }.continueWithTask<DriveContents> { task ->
+                    appfolder?.let { DRC?.queryChildren(it, query) }
+                }?.continueWithTask<DriveContents> { task ->
                     val metadata = task.result
                     if (metadata?.count ?: 0 > 0) {
-                        val driveFile = metadata!!.get(0).driveId.asDriveFile()
-                        metadata.release()
-                        DRC!!.openFile(driveFile, DriveFile.MODE_READ_ONLY)
+                        val driveFile = metadata?.get(0)?.driveId?.asDriveFile()
+                        metadata?.release()
+                        driveFile?.let { DRC?.openFile(it, DriveFile.MODE_READ_ONLY) }
                     } else {
                         metadata?.release()
                         null
                     }
-                }.addOnSuccessListener { driveContents ->
-                    try {
-                        searchInterface.onResponse(Gson().fromJson<BackupObject<*>>(InputStreamReader(driveContents.inputStream), getType(id)))
-                    } catch (e: Exception) {
+                }?.apply {
+                    addOnSuccessListener { driveContents ->
+                        try {
+                            searchInterface.onResponse(Gson().fromJson<BackupObject<*>>(InputStreamReader(driveContents.inputStream), getType(id)))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            searchInterface.onResponse(null)
+                        }
+                    }
+                    addOnFailureListener { e ->
                         e.printStackTrace()
                         searchInterface.onResponse(null)
                     }
-                }.addOnFailureListener { e ->
-                    e.printStackTrace()
-                    searchInterface.onResponse(null)
                 }
             } catch (e: Exception) {
                 Crashlytics.logException(e)
@@ -361,10 +369,10 @@ object BUUtils {
         doAsync {
             try {
                 val backupObject = BackupObject(getList(id))
-                DBC!!.files().uploadBuilder("/$id")
-                        .withMute(true)
-                        .withMode(WriteMode.OVERWRITE)
-                        .uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(id)).toByteArray(StandardCharsets.UTF_8)))
+                DBC?.files()?.uploadBuilder("/$id")
+                        ?.withMute(true)
+                        ?.withMode(WriteMode.OVERWRITE)
+                        ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(id)).toByteArray(StandardCharsets.UTF_8)))
                 backupInterface.onResponse(backupObject)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -378,10 +386,10 @@ object BUUtils {
         doAsync {
             try {
                 val backupObject = BackupObject(getList(id))
-                DBC!!.files().uploadBuilder("/$id")
-                        .withMute(true)
-                        .withMode(WriteMode.OVERWRITE)
-                        .uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(id)).toByteArray(StandardCharsets.UTF_8)))
+                DBC?.files()?.uploadBuilder("/$id")
+                        ?.withMute(true)
+                        ?.withMode(WriteMode.OVERWRITE)
+                        ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(id)).toByteArray(StandardCharsets.UTF_8)))
                 backupInterface.onResponse(backupObject)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -393,10 +401,10 @@ object BUUtils {
     private fun backupDropbox(backupObject: AutoBackupObject, backupInterface: AutoBackupInterface) {
         doAsync {
             try {
-                DBC!!.files().uploadBuilder("/autobackup")
-                        .withMute(true)
-                        .withMode(WriteMode.OVERWRITE)
-                        .uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType("autobackup")).toByteArray(StandardCharsets.UTF_8)))
+                DBC?.files()?.uploadBuilder("/autobackup")
+                        ?.withMute(true)
+                        ?.withMode(WriteMode.OVERWRITE)
+                        ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType("autobackup")).toByteArray(StandardCharsets.UTF_8)))
                 backupInterface.onResponse(backupObject)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -408,21 +416,21 @@ object BUUtils {
     private fun backupDrive(view: View, id: String, backupInterface: BackupInterface) {
         val snackbar = view.showSnackbar("Respaldando...", Snackbar.LENGTH_INDEFINITE)
         doAsync {
-            val appFolderTask = DRC!!.appFolder
-            val driveContents = DRC!!.createContents()
+            val appFolderTask = DRC?.appFolder
+            val driveContents = DRC?.createContents()
             val backupObject = BackupObject(getList(id))
             val result = Tasks.whenAll(appFolderTask, driveContents)
                     .continueWithTask {
                         val query = Query.Builder()
                                 .addFilter(Filters.contains(SearchableField.TITLE, id))
                                 .build()
-                        DRC!!.queryChildren(appFolderTask.result!!, query)
+                        appFolderTask?.result?.let { DRC?.queryChildren(it, query) }
                     }.continueWithTask { task ->
                         val metadata = task.result
-                        if (metadata?.count ?: 0 > 0)
-                            DRC!!.delete(metadata!!.get(0).driveId.asDriveResource())
+                        if (metadata != null && metadata.count > 0)
+                            metadata.get(0)?.driveId?.asDriveResource()?.let { DRC?.delete(it) }
                         metadata?.release()
-                        val contents = driveContents.result
+                        val contents = driveContents?.result
                         val outputStream = contents?.outputStream
                         OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType(id))) }
                         val changeSet = MetadataChangeSet.Builder()
@@ -431,36 +439,40 @@ object BUUtils {
                                 .setStarred(true)
                                 .build()
 
-                        DRC!!.createFile(appFolderTask.result!!, changeSet, contents)
-                    }.addOnSuccessListener(activity!!) {
-                        snackbar.safeDismiss()
-                        backupInterface.onResponse(backupObject)
-                    }.addOnFailureListener(activity!!) {
-                        snackbar.safeDismiss()
-                        backupInterface.onResponse(null)
+                        appFolderTask?.result?.let { DRC?.createFile(it, changeSet, contents) }
+                    }.apply {
+                        activity?.let {
+                            addOnSuccessListener(it) {
+                                snackbar.safeDismiss()
+                                backupInterface.onResponse(backupObject)
+                            }
+                            addOnFailureListener(it) {
+                                snackbar.safeDismiss()
+                                backupInterface.onResponse(null)
+                            }
+                        }
                     }
         }
     }
 
     private fun backupDriveNUI(id: String, backupInterface: BackupInterface) {
         doAsync {
-            val appFolderTask = DRC!!.appFolder
-            val driveContents = DRC!!.createContents()
+            val appFolderTask = DRC?.appFolder
+            val driveContents = DRC?.createContents()
             val backupObject = BackupObject(getList(id))
             val result = Tasks.whenAll(appFolderTask, driveContents)
                     .continueWithTask {
                         val query = Query.Builder()
                                 .addFilter(Filters.contains(SearchableField.TITLE, id))
                                 .build()
-                        DRC!!.queryChildren(appFolderTask.result!!, query)
+                        appFolderTask?.result?.let { DRC?.queryChildren(it, query) }
                     }.continueWithTask { task ->
                         val metadata = task.result
-                        if (metadata?.count ?: 0 > 0)
-                            DRC!!.delete(metadata!!.get(0).driveId.asDriveResource())
+                        if (metadata != null && metadata.count > 0)
+                            DRC?.delete(metadata.get(0).driveId.asDriveResource())
                         metadata?.release()
-                        val contents = driveContents.result
+                        val contents = driveContents?.result
                         val outputStream = contents?.outputStream
-
                         OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType(id))) }
                         val changeSet = MetadataChangeSet.Builder()
                                 .setTitle(id)
@@ -468,7 +480,7 @@ object BUUtils {
                                 .setStarred(true)
                                 .build()
 
-                        DRC!!.createFile(appFolderTask.result!!, changeSet, contents)
+                        appFolderTask?.result?.let { DRC?.createFile(it, changeSet, contents) }
                     }
                     .addOnSuccessListener { backupInterface.onResponse(backupObject) }
                     .addOnFailureListener { backupInterface.onResponse(null) }
@@ -477,20 +489,20 @@ object BUUtils {
 
     private fun backupDrive(backupObject: AutoBackupObject, backupInterface: AutoBackupInterface) {
         doAsync {
-            val appFolderTask = DRC!!.appFolder
-            val driveContents = DRC!!.createContents()
+            val appFolderTask = DRC?.appFolder
+            val driveContents = DRC?.createContents()
             val result = Tasks.whenAll(appFolderTask, driveContents)
                     .continueWithTask {
                         val query = Query.Builder()
                                 .addFilter(Filters.contains(SearchableField.TITLE, "autobackup"))
                                 .build()
-                        DRC!!.queryChildren(appFolderTask.result!!, query)
+                        appFolderTask?.result?.let { DRC?.queryChildren(it, query) }
                     }.continueWithTask { task ->
                         val metadata = task.result
-                        if (metadata?.count ?: 0 > 0)
-                            DRC!!.delete(metadata!!.get(0).driveId.asDriveResource())
+                        if (metadata != null && metadata.count > 0)
+                            DRC?.delete(metadata.get(0).driveId.asDriveResource())
                         metadata?.release()
-                        val contents = driveContents.result
+                        val contents = driveContents?.result
                         val outputStream = contents?.outputStream
 
                         OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType("autobackup"))) }
@@ -500,19 +512,25 @@ object BUUtils {
                                 .setStarred(true)
                                 .build()
 
-                        DRC!!.createFile(appFolderTask.result!!, changeSet, contents)
+                        appFolderTask?.result?.let { DRC?.createFile(it, changeSet, contents) }
+                    }.apply {
+                        activity?.let {
+                            addOnSuccessListener(it) { backupInterface.onResponse(backupObject) }
+                            addOnFailureListener(it) { backupInterface.onResponse(null) }
+                        }
                     }
-                    .addOnSuccessListener(activity!!) { backupInterface.onResponse(backupObject) }
-                    .addOnFailureListener(activity!!) { backupInterface.onResponse(null) }
         }
     }
 
-    fun restoreDialog(view: View, id: String, backupObject: BackupObject<*>) {
-        MaterialDialog(activity!!).safeShow {
-            message(text = "¿Como desea restaurar?")
-            positiveButton(text = "mezclar") { restore(view, false, id, backupObject) }
-            negativeButton(text = "reemplazar") { restore(view, true, id, backupObject) }
-        }
+    fun restoreDialog(view: View, id: String, backupObject: BackupObject<*>?) {
+        if (backupObject != null)
+            activity?.let {
+                MaterialDialog(it).safeShow {
+                    message(text = "¿Como desea restaurar?")
+                    positiveButton(text = "mezclar") { restore(view, false, id, backupObject) }
+                    negativeButton(text = "reemplazar") { restore(view, true, id, backupObject) }
+                }
+            }
     }
 
     private fun restore(view: View, replace: Boolean, id: String, backupObject: BackupObject<*>) {
@@ -523,22 +541,22 @@ object BUUtils {
                     "favs" -> {
                         if (replace)
                             CacheDB.INSTANCE.favsDAO().clear()
-                        CacheDB.INSTANCE.favsDAO().addAll(backupObject.data!!.filterIsInstance<FavoriteObject>() as MutableList<FavoriteObject>)
+                        (backupObject.data?.filterIsInstance<FavoriteObject>() as? MutableList<FavoriteObject>)?.let { CacheDB.INSTANCE.favsDAO().addAll(it) }
                     }
                     "history" -> {
                         if (replace)
                             CacheDB.INSTANCE.recordsDAO().clear()
-                        CacheDB.INSTANCE.recordsDAO().addAll(backupObject.data!!.filterIsInstance<RecordObject>() as MutableList<RecordObject>)
+                        (backupObject.data?.filterIsInstance<RecordObject>() as? MutableList<RecordObject>)?.let { CacheDB.INSTANCE.recordsDAO().addAll(it) }
                     }
                     "following" -> {
                         if (replace)
                             CacheDB.INSTANCE.seeingDAO().clear()
-                        CacheDB.INSTANCE.seeingDAO().addAll(backupObject.data!!.filterIsInstance<SeeingObject>() as MutableList<SeeingObject>)
+                        (backupObject.data?.filterIsInstance<SeeingObject>() as? MutableList<SeeingObject>)?.let { CacheDB.INSTANCE.seeingDAO().addAll(it) }
                     }
                     "seen" -> {
                         if (replace)
                             CacheDB.INSTANCE.chaptersDAO().clear()
-                        CacheDB.INSTANCE.chaptersDAO().addAll(backupObject.data!!.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>() as MutableList<AnimeObject.WebInfo.AnimeChapter>)
+                        (backupObject.data?.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>() as? MutableList<AnimeObject.WebInfo.AnimeChapter>)?.let { CacheDB.INSTANCE.chaptersDAO().addAll(it) }
                     }
                 }
                 Toaster.toast("Restauración completada")
@@ -557,7 +575,7 @@ object BUUtils {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
-                            CacheDB.INSTANCE.favsDAO().addAll(backupObject.data!!.filterIsInstance<FavoriteObject>() as MutableList<FavoriteObject>)
+                            backupObject.data?.filterIsInstance<FavoriteObject>()?.let { CacheDB.INSTANCE.favsDAO().addAll(it) }
                             Log.e("Sync", "Favs sync")
                         }
                 }
@@ -566,7 +584,7 @@ object BUUtils {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
-                            CacheDB.INSTANCE.chaptersDAO().addAll(backupObject.data!!.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>() as MutableList<AnimeObject.WebInfo.AnimeChapter>)
+                            backupObject.data?.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>()?.let { CacheDB.INSTANCE.chaptersDAO().addAll(it) }
                             Log.e("Sync", "Seen sync")
                         }
                 }
@@ -575,7 +593,7 @@ object BUUtils {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
-                            CacheDB.INSTANCE.seeingDAO().addAll(backupObject.data!!.filterIsInstance<SeeingObject>() as MutableList<SeeingObject>)
+                            backupObject.data?.filterIsInstance<SeeingObject>()?.let { CacheDB.INSTANCE.seeingDAO().addAll(it) }
                             Log.e("Sync", "Seen sync")
                         }
                 }
@@ -584,7 +602,7 @@ object BUUtils {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
-                            CacheDB.INSTANCE.recordsDAO().addAll(backupObject.data!!.filterIsInstance<RecordObject>() as MutableList<RecordObject>)
+                            backupObject.data?.filterIsInstance<RecordObject>()?.let { CacheDB.INSTANCE.recordsDAO().addAll(it) }
                             Log.e("Sync", "History sync")
                         }
                 }
@@ -632,7 +650,7 @@ object BUUtils {
     fun isAnimeflvInstalled(context: Context): Boolean {
         return try {
             context.packageManager.getPackageInfo("knf.animeflv", 0)
-            AchievementManager.unlock(7)
+            AchievementManager.unlock(listOf(7))
             true
         } catch (e: Exception) {
             false

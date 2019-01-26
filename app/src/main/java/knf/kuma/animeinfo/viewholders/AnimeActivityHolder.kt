@@ -81,12 +81,11 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
             pager.setCurrentItem(1, true)
         tabLayout.addOnTabSelectedListener(object : TabLayout.ViewPagerOnTabSelectedListener(pager) {
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                if (tab!!.position == 1)
+                if (tab?.position == 1)
                     animePagerAdapter.onChaptersReselect()
             }
         })
         fab.onClick { innerInterface.onFabClicked(fab) }
-        //fab.onLongClick { innerInterface.onFabLongClicked(fab) }
         imageView.onClick { innerInterface.onImgClicked(imageView) }
         checkBypass(activity)
     }
@@ -97,7 +96,7 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
 
     fun loadImg(link: String, listener: View.OnClickListener) {
         imageView.post {
-            PicassoSingle[imageView.context].load(link).noPlaceholder().into(imageView)
+            PicassoSingle.get().load(link).noPlaceholder().into(imageView)
             imageView.setOnClickListener(listener)
         }
     }
@@ -157,7 +156,7 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
             collapsingToolbarLayout.title = title
         val img = intent.getStringExtra("img")
         if (img != null) {
-            PicassoSingle[activity].load(img).into(imageView)
+            PicassoSingle.get().load(img).into(imageView)
             imageView.setOnClickListener { activity.startActivity(Intent(activity, ActivityImgFull::class.java).setData(Uri.parse(img)).putExtra("title", title), ActivityOptionsCompat.makeSceneTransitionAnimation(activity, imageView, "img").toBundle()) }
         }
     }
@@ -170,11 +169,11 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
                     isLoading = true
                     Log.e("CloudflareBypass", "is needed")
                     clearCookies()
-                    webView!!.settings.javaScriptEnabled = true
-                    webView!!.webViewClient = object : WebViewClient() {
+                    webView?.settings?.javaScriptEnabled = true
+                    webView?.webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                            Log.e("CloudflareBypass", "Override ${request!!.url}")
-                            if (request.url.toString() == "https://animeflv.net/") {
+                            Log.e("CloudflareBypass", "Override ${request?.url}")
+                            if (request?.url.toString() == "https://animeflv.net/") {
                                 Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
                                 saveCookies(context)
                                 Toaster.toast("Bypass actualizado")
@@ -185,8 +184,8 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
                             return false
                         }
                     }
-                    webView!!.settings.userAgentString = userAgent
-                    webView!!.loadUrl("https://animeflv.net/")
+                    webView?.settings?.userAgentString = userAgent
+                    webView?.loadUrl("https://animeflv.net/")
                 } else {
                     Log.e("CloudflareBypass", "Not needed")
                 }
@@ -195,8 +194,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
 
     interface Interface {
         fun onFabClicked(actionButton: FloatingActionButton)
-
-        fun onFabLongClicked(actionButton: FloatingActionButton)
 
         fun onImgClicked(imageView: ImageView)
 

@@ -35,8 +35,8 @@ open class VideoServer : Parcelable {
     }
 
     protected constructor(parcel: Parcel) {
-        name = parcel.readString()!!
-        options = parcel.createTypedArrayList(Option.CREATOR)!!
+        name = parcel.readString() ?: ""
+        options = parcel.createTypedArrayList(Option.CREATOR) ?: arrayListOf()
     }
 
     override fun describeContents(): Int {

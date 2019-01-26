@@ -35,9 +35,9 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
         for (option in ArrayList(videoServer.options))
             try {
                 val request = Request.Builder()
-                        .url(option.url!!)
+                        .url(option.url ?: "")
                 if (option.headers != null)
-                    for (pair in option.headers!!.headers)
+                    for (pair in option.headers?.headers ?: arrayListOf())
                         request.addHeader(pair.first, pair.second)
                 val response = client.newCall(request.build()).execute()
                 if (!response.isSuccessful) {

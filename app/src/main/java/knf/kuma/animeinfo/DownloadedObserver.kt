@@ -26,6 +26,6 @@ object DownloadedObserver {
     }
 
     private fun unlock() {
-        AchievementManager.unlock(35)
+        AchievementManager.unlock(listOf(35))
     }
 }

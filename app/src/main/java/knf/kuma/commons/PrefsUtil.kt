@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
-import java.util.*
 
 @SuppressLint("StaticFieldLeak")
 object PrefsUtil {
@@ -16,13 +15,15 @@ object PrefsUtil {
 
     val layType: String
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", context?.getString(R.string.layType)
-                ?: "0")!!
+                ?: "0") ?: "0"
 
     val themeOption: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")!!
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")
+                ?: "0"
 
     val themeColor: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")!!
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")
+                ?: "0"
 
     var favsOrder: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("favs_order", 0)
@@ -39,11 +40,13 @@ object PrefsUtil {
     val isChapsAsc: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("asc_chapters", false)
 
-    val isDirectoryFinished: Boolean
+    var isDirectoryFinished: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val downloaderType: Int
-        get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")!!)
+        get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
+                ?: "1")
 
     val showFavIndicator: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_fav_count", true)
@@ -60,7 +63,16 @@ object PrefsUtil {
     val useSmoothAnimations: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("smooth_animations", true)
 
-    var isAchievementsOmited: Boolean
+    var emissionBlacklist: MutableSet<String>
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getStringSet("emision_blacklist", LinkedHashSet())
+                ?: LinkedHashSet()
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putStringSet("emision_blacklist", value).apply()
+
+    var emissionShowHidden: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_hidden", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("show_hidden", value).apply()
+
+    var isAchievementsOmitted: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("achievements_omited", false)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("achievements_omited", value).apply()
 
@@ -92,7 +104,8 @@ object PrefsUtil {
     }
 
     fun bufferSize(): Int {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("buffer_size", "32")!!)
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("buffer_size", "32")
+                ?: "32")
     }
 
     fun getLiveEmissionBlackList(): LiveData<Set<String>> {

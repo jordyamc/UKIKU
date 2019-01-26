@@ -30,18 +30,20 @@ class GenresDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return AlertDialog.Builder(activity!!)
-                .setTitle("Generos")
-                .setMultiChoiceItems(genres.toTypedArray(), states) { _, index, isSelected ->
-                    if (isSelected)
-                        selected.add(genres[index])
-                    else
-                        selected.remove(genres[index])
-                }.setPositiveButton("BUSCAR") { _, _ ->
-                    selected.sort()
-                    listener?.onOkay(selected)
-                }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }
-                .create()
+        return activity?.let {
+            AlertDialog.Builder(it)
+                    .setTitle("Generos")
+                    .setMultiChoiceItems(genres.toTypedArray(), states) { _, index, isSelected ->
+                        if (isSelected)
+                            selected.add(genres[index])
+                        else
+                            selected.remove(genres[index])
+                    }.setPositiveButton("BUSCAR") { _, _ ->
+                        selected.sort()
+                        listener?.onOkay(selected)
+                    }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }
+                    .create()
+        } ?: super.onCreateDialog(savedInstanceState)
     }
 
     override fun show(manager: FragmentManager, tag: String?) {

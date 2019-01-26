@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import knf.kuma.App
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
@@ -34,26 +35,29 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        ViewModelProviders.of(activity!!).get(AnimeViewModel::class.java).liveData!!.observe(this, Observer { animeObject ->
-            if (animeObject != null) {
-                val chapters = animeObject.chapters
-                if (PrefsUtil.isChapsAsc)
-                    chapters!!.reverse()
-                holder?.setAdapter(this@ChaptersFragment, chapters!!)
-                holder?.goToChapter()
-            }
-        })
+        activity?.let {
+            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData?.observe(this, Observer { animeObject ->
+                if (animeObject != null) {
+                    val chapters = animeObject.chapters
+                    if (PrefsUtil.isChapsAsc)
+                        chapters?.reverse()
+                    holder?.setAdapter(this@ChaptersFragment, chapters)
+                    holder?.goToChapter()
+                }
+            })
+        }
     }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         retainInstance = true
         val view = inflater.inflate(R.layout.recycler_chapters, container, false)
-        holder = AnimeChaptersHolder(view, childFragmentManager, this)
-        snackManager = SnackProgressBarManager(holder?.recyclerView!!)
-                .setProgressBarColor(EAHelper.getThemeColor(context))
-                .setOverlayLayoutAlpha(0.4f)
-                .setOverlayLayoutColor(android.R.color.background_dark)
+        holder = AnimeChaptersHolder(view, childFragmentManager, this).also {
+            snackManager = SnackProgressBarManager(it.recyclerView)
+                    .setProgressBarColor(EAHelper.getThemeColor(context))
+                    .setOverlayLayoutAlpha(0.4f)
+                    .setOverlayLayoutColor(android.R.color.background_dark)
+        }
         return view
     }
 
@@ -92,25 +96,25 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
         if (resultCode == Activity.RESULT_OK)
             try {
                 holder?.adapter?.isImporting = true
-                if (data!!.clipData == null || data.clipData?.itemCount ?: 0 == 0) {
+                if (data?.clipData == null || data.clipData?.itemCount ?: 0 == 0) {
                     if (moveFile == null && chapters.size > 0) {
-                        val uri = data.data
-                        val file = DocumentFile.fromSingleUri(context!!, uri!!)
-                        val last = getLastNumber(file!!.name!!)
-                        moveFile = findChapter(last)!!.fileName
+                        val uri = data?.data
+                        val file = DocumentFile.fromSingleUri(App.context, uri ?: Uri.EMPTY)
+                        val last = getLastNumber(file?.name)
+                        moveFile = findChapter(last)?.fileName
                     }
                     val snackbar = SnackProgressBar(SnackProgressBar.TYPE_HORIZONTAL, "Importando...")
                             .setIsIndeterminate(false)
                             .setProgressMax(100)
                             .setShowProgressPercentage(true)
                     snackManager.show(snackbar, SnackProgressBarManager.LENGTH_INDEFINITE)
-                    FileUtil.moveFile(context!!.contentResolver, data.data!!, FileAccessHelper.INSTANCE.getOutputStream(moveFile!!)!!).observe(this, Observer { pair ->
+                    FileUtil.moveFile(App.context.contentResolver, data?.data, FileAccessHelper.INSTANCE.getOutputStream(moveFile)).observe(this, Observer { pair ->
                         try {
                             if (pair != null) {
                                 if (pair.second) {
                                     if (pair.first == -1) {
                                         Toaster.toast("Error al importar")
-                                        FileAccessHelper.INSTANCE.delete(moveFile!!)
+                                        FileAccessHelper.INSTANCE.delete(moveFile)
                                     } else
                                         Toaster.toast("Importado exitosamente")
                                     holder?.adapter?.notifyDataSetChanged()
@@ -131,12 +135,13 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                             .setShowProgressPercentage(true)
                     snackManager.show(snackbar, SnackProgressBarManager.LENGTH_INDEFINITE)
                     val moveRequests = ArrayList<Pair<Uri, String>>()
-                    for (i in 0 until data.clipData!!.itemCount) {
+                    val count = data.clipData?.itemCount ?: 0
+                    for (i in 0 until count) {
                         try {
-                            val uri = data.clipData!!.getItemAt(i).uri
-                            val file = DocumentFile.fromSingleUri(context!!, uri)
-                            val last = getLastNumber(file!!.name!!)
-                            moveRequests.add(Pair(uri, findChapter(last)!!.fileName))
+                            val uri = data.clipData?.getItemAt(i)?.uri ?: Uri.EMPTY
+                            val file = DocumentFile.fromSingleUri(App.context, uri)
+                            val last = getLastNumber(file?.name)
+                            moveRequests.add(Pair(uri, findChapter(last)?.fileName ?: ""))
                         } catch (e: Exception) {
                             //
                         }
@@ -145,7 +150,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                         Toaster.toast("No se pudo inferir el numero de los episodios")
                         snackManager.dismiss()
                     } else {
-                        FileUtil.moveFiles(context!!.contentResolver, moveRequests).observe(this@ChaptersFragment, Observer { pairBooleanPair ->
+                        FileUtil.moveFiles(App.context.contentResolver, moveRequests).observe(this@ChaptersFragment, Observer { pairBooleanPair ->
                             try {
                                 if (pairBooleanPair != null) {
                                     if (pairBooleanPair.second) {
@@ -175,7 +180,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
 
     private fun findChapter(num: String?): AnimeObject.WebInfo.AnimeChapter? {
         for (c in ArrayList<AnimeObject.WebInfo.AnimeChapter>(chapters)) {
-            if (c.number == "Episodio " + num!!) {
+            if (c.number == "Episodio $num") {
                 chapters.remove(c)
                 return c
             }
@@ -183,7 +188,8 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
         return null
     }
 
-    private fun getLastNumber(name: String): String? {
+    private fun getLastNumber(name: String?): String? {
+        if (name.isNullOrEmpty()) return null
         val matcher = Pattern.compile(".*[_ ]0?(\\d+)[_ ].*$|0?(\\d+)$").matcher(name.replace(".mp4", ""))
         var last: String? = null
         while (matcher.find()) {

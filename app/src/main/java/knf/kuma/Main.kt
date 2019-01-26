@@ -3,16 +3,22 @@ package knf.kuma
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.provider.Settings
 import android.text.InputType
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -22,6 +28,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -170,7 +177,7 @@ class Main : AppCompatActivity(),
             actionLogin.setOnClickListener { BackUpActivity.start(this@Main) }
             actionMigrate.setOnClickListener { MigrationActivity.start(this@Main) }
             actionMap.setOnClickListener { EAMapActivity.start(this@Main) }
-            actionMigrate.visibility = if (BUUtils.isAnimeflvInstalled(this@Main) && DirectoryService.isDirectoryFinished(this@Main)) View.VISIBLE else View.GONE
+            actionMigrate.visibility = if (BUUtils.isAnimeflvInstalled(this@Main)) View.VISIBLE else View.GONE
             actionMap.visibility = if (EAHelper.phase == 3) View.VISIBLE else View.GONE
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             when (BUUtils.getType(this@Main)) {
@@ -202,7 +209,7 @@ class Main : AppCompatActivity(),
                 })
                 PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
                     if (badgeView != null) {
-                        if (aBoolean!!)
+                        if (aBoolean)
                             badgeView?.badgeNumber = CacheDB.INSTANCE.favsDAO().count
                         else
                             badgeView?.hide(false)
@@ -251,6 +258,29 @@ class Main : AppCompatActivity(),
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 55498)
+    }
+
+    private fun showRationalPermission(denied: Boolean = false) {
+        MaterialDialog(this).safeShow {
+            title(text = "Permiso de escritura")
+            message(text = "Esta aplicación necesita el permiso obligatoriamente para guardar cache y descargar los episodios")
+            positiveButton(text = "Aceptar") {
+                if (denied) {
+                    try {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        finish()
+                        startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        "Error al mostrar configuración".toast()
+                    }
+                } else
+                    checkPermissions()
+            }
+            negativeButton(text = "Salir") { finish() }
+            setCancelable(false)
+        }
     }
 
     override fun onNeedUpdate(o_code: String, n_code: String) {
@@ -448,9 +478,9 @@ class Main : AppCompatActivity(),
     }
 
     private fun returnFragment() {
-        if (selectedFragment != null) {
-            setFragment(selectedFragment!!)
-        } else {
+        selectedFragment?.let {
+            setFragment(it)
+        } ?: let {
             bottomNavigationView.selectedItemId = R.id.action_bottom_recents
             setFragment(RecentFragment.get())
         }
@@ -508,7 +538,10 @@ class Main : AppCompatActivity(),
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED)
-            checkPermissions()
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                showRationalPermission()
+            else
+                showRationalPermission(true)
     }
 
     @SuppressLint("SetTextI18n")
@@ -530,16 +563,10 @@ class Main : AppCompatActivity(),
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        AchievementManager.backup(this)
-    }
-
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         ChangelogActivity.check(this)
         UpdateChecker.check(this, this)
-        AchievementManager.restore(this)
     }
 
     override fun onNeedRecreate() {

@@ -3,7 +3,6 @@ package knf.kuma.commons
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +11,7 @@ import es.munix.multidisplaycast.CastManager
 import es.munix.multidisplaycast.interfaces.CastListener
 import es.munix.multidisplaycast.interfaces.PlayStatusListener
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.cast.CastMedia
 import knf.kuma.custom.ThemedControlsActivity
 import org.jetbrains.annotations.Contract
 import xdroid.toaster.Toaster
@@ -29,26 +29,21 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     fun connected(): Boolean {
-        return CastManager.getInstance().isConnected!!
+        return CastManager.getInstance().isConnected
         //return isConnected;
     }
 
-    fun play(context: Context?, view: View, eid: String, url: String?, title: String, chapter: String, preview: String, isAid: Boolean) {
-        var fUrl = url
-        var fPreview = preview
+    fun play(view: View, castMedia: CastMedia?) {
         try {
+            if (castMedia == null) throw IllegalStateException("CastMedia must not be null")
             if (connected()) {
-                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("force_local_cast", false) && !url!!.endsWith(":" + SelfServer.HTTP_PORT))
-                    fUrl = SelfServer.start(url, false)
-                if (!url!!.endsWith(":" + SelfServer.HTTP_PORT))
+                if (!castMedia.url.endsWith(":" + SelfServer.HTTP_PORT))
                     SelfServer.stop()
-                Log.e("Cast", fUrl)
+                Log.e("Cast", castMedia.url)
                 startLoading(view)
-                setEid(eid)
-                if (isAid)
-                    fPreview = "https://animeflv.net/uploads/animes/thumbs/$preview.jpg"
-                CastManager.getInstance().playMedia(fUrl, "video/mp4", title, chapter, fPreview)
-                AchievementManager.unlock(6)
+                setEid(castMedia.eid)
+                CastManager.getInstance().playMedia(castMedia.url, "video/mp4", castMedia.title, castMedia.subTitle, castMedia.image)
+                AchievementManager.unlock(listOf(6))
             } else {
                 Toaster.toast("No hay dispositivo seleccionado")
             }
@@ -56,7 +51,6 @@ class CastUtil private constructor(private val context: Context) : CastListener,
             stopLoading()
             Toaster.toast("Error al reproducir")
         }
-
     }
 
     fun stop() {
@@ -74,6 +68,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     override fun isDisconnected() {
+        stopLoading()
         setEid(NO_PLAYING)
         SelfServer.stop()
     }
@@ -108,7 +103,6 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     override fun onPlayStatusChanged(playStatus: Int) {
         when (playStatus) {
             PlayStatusListener.STATUS_START_PLAYING -> {
-                Log.e("Status", "On start playing")
                 stopLoading()
                 openControls()
             }

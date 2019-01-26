@@ -42,6 +42,8 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Collection;
+
 import androidx.annotation.Nullable;
 import knf.kuma.BuildConfig;
 
@@ -590,6 +592,10 @@ public class AchievementUnlocked {
         return this;
     }
 
+    public void show(Collection<AchievementData> data) {
+        show(data.toArray(new AchievementData[0]));
+    }
+
     /**
      * Pop the popup with the supplied data
      *
@@ -597,7 +603,6 @@ public class AchievementUnlocked {
      */
     public void show(AchievementData... data) {
         if (data == null || data.length == 0) {
-            Log.e(TAG, "Nothing to show");
             return;
         }
         //Check permission first

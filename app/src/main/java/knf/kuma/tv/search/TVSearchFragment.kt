@@ -35,8 +35,10 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
     }
 
     private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 55498)
+        context?.let {
+            if (ContextCompat.checkSelfPermission(it, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+                requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 55498)
+        }
     }
 
     override fun getResultsAdapter(): ObjectAdapter? {
@@ -69,21 +71,21 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
 
     private fun setResult(query: String) {
         val liveData = CacheDB.INSTANCE.animeDAO().getSearchList("%$query%")
-        if (activity != null) {
-            liveData.observe(activity!!, Observer { animeObjects ->
-                liveData.removeObservers(activity!!)
-                arrayObjectAdapter!!.clear()
+        activity?.let {
+            liveData.observe(it, Observer { animeObjects ->
+                liveData.removeObservers(it)
+                arrayObjectAdapter?.clear()
                 val objectAdapter = ArrayObjectAdapter(AnimePresenter())
                 for (animeObject in animeObjects)
                     objectAdapter.add(animeObject)
                 val headerItem = HeaderItem(if (animeObjects.isNotEmpty()) "Resultados para '$query'" else "Sin resultados")
-                arrayObjectAdapter!!.add(ListRow(headerItem, objectAdapter))
+                arrayObjectAdapter?.add(ListRow(headerItem, objectAdapter))
             })
         }
     }
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
         val animeObject = item as AnimeObject
-        TVAnimesDetails.start(context!!, animeObject.link!!)
+        context?.let { TVAnimesDetails.start(it, animeObject.link) }
     }
 }

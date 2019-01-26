@@ -34,6 +34,7 @@ import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
 import java.util.*
 
+
 class ServersFactory {
     private var context: Context
     private var url: String
@@ -235,7 +236,7 @@ class ServersFactory {
 
     private fun startStreaming(option: Option) {
         if (chapter != null && downloadObject.addQueue) {
-            QueueManager.add(Uri.parse(option.url), false, chapter!!)
+            QueueManager.add(Uri.parse(option.url), false, chapter)
         } else {
             Answers.getInstance().logCustom(CustomEvent("Streaming").putCustomAttribute("Server", option.server))
             AchievementManager.onPlayChapter()
@@ -266,8 +267,9 @@ class ServersFactory {
 
     private fun startDownload(option: Option) {
         if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url)
-        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter!!.eid))
-            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(chapter!!.fileName)), true, chapter!!))
+        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0"))
+            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(chapter?.fileName
+                    ?: "null")), true, chapter))
         Answers.getInstance().logCustom(CustomEvent("Download").putCustomAttribute("Server", option.server))
         downloadObject.link = option.url
         downloadObject.headers = option.headers
@@ -312,6 +314,7 @@ class ServersFactory {
         fun getView(): View?
     }
 
+
     companion object {
         @SuppressLint("StaticFieldLeak")
         private var INSTANCE: ServersFactory? = null
@@ -353,7 +356,8 @@ class ServersFactory {
             INSTANCE = null
         }
 
-        fun startPlay(context: Context, title: String, file_name: String) {
+        fun startPlay(context: Context?, title: String, file_name: String) {
+            if (context == null) return
             AchievementManager.onPlayChapter()
             val file = FileAccessHelper.INSTANCE.getFile(file_name)
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {

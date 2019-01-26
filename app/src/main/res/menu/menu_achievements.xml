@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/sync"
+        android:icon="@drawable/ic_sync_menu"
+        android:title="Sincronizar"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/backup"
+                android:icon="@drawable/ic_backup"
+                android:title="Respaldar"
+                app:showAsAction="always|withText"/>
+            <item
+                android:id="@+id/restore"
+                android:icon="@drawable/ic_restore"
+                android:title="Restaurar"
+                app:showAsAction="always|withText"/>
+        </menu>
+    </item>
+</menu>

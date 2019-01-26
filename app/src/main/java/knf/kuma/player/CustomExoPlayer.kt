@@ -113,23 +113,21 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
             }
             exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
             player.player = exoPlayer
-            exoPlayer!!.addListener(this)
+            exoPlayer?.addListener(this)
 
             val canResume = currentPosition != C.TIME_UNSET
             if (canResume)
-                exoPlayer!!.seekTo(currentPosition)
-            exoPlayer!!.prepare(source, !canResume, false)
-            exoPlayer!!.playWhenReady = true
+                exoPlayer?.seekTo(currentPosition)
+            exoPlayer?.prepare(source, !canResume, false)
+            exoPlayer?.playWhenReady = true
 
         }
     }
 
     private fun releasePlayer() {
-        if (exoPlayer != null) {
-            exoPlayer!!.stop()
-            exoPlayer!!.release()
-            exoPlayer = null
-        }
+        exoPlayer?.stop()
+        exoPlayer?.release()
+        exoPlayer = null
     }
 
     @TargetApi(Build.VERSION_CODES.N)
@@ -151,8 +149,8 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
     }
 
     private fun onSkip() {
-        if (exoPlayer != null)
-            exoPlayer!!.seekTo(exoPlayer!!.currentWindowIndex, exoPlayer!!.currentPosition + 85000)
+        exoPlayer?.seekTo(exoPlayer?.currentWindowIndex ?: 0, (exoPlayer?.currentPosition
+                ?: 0) + 85000)
     }
 
     private fun onExitPip() {
@@ -217,9 +215,9 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
         super.onPause()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
             return
-        if (exoPlayer != null) {
-            resumeWindow = exoPlayer!!.currentWindowIndex
-            currentPosition = exoPlayer!!.currentPosition
+        exoPlayer?.let {
+            resumeWindow = it.currentWindowIndex
+            currentPosition = it.currentPosition
             releasePlayer()
         }
     }

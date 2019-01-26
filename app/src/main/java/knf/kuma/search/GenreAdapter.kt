@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.load
 import knf.kuma.pojos.AnimeObject
 import kotlinx.android.synthetic.main.item_dir.view.*
 
@@ -25,8 +25,8 @@ internal class GenreAdapter(private val activity: Activity) : PagedListAdapter<A
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
         val animeObject = getItem(position)
-        if (animeObject != null) {
-            PicassoSingle[activity].load(PatternUtil.getCover(animeObject.aid!!)).into(holder.imageView)
+        animeObject?.let {
+            holder.imageView.load(PatternUtil.getCover(animeObject.aid))
             holder.textView.text = animeObject.name
             holder.cardView.setOnClickListener { ActivityAnime.open(activity, animeObject, holder.imageView, false, true) }
         }

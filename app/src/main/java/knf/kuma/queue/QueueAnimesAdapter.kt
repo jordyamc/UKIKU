@@ -38,11 +38,11 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
     override fun onBindViewHolder(holder: AnimeHolder, position: Int) {
         val queueObject = list[position]
         val img = PatternUtil.getCover(queueObject.chapter.aid)
-        PicassoSingle[activity].load(img).into(holder.imageView)
+        PicassoSingle.get().load(img).into(holder.imageView)
         holder.title.text = queueObject.chapter.name
         val count = CacheDB.INSTANCE.queueDAO().countAlone(queueObject.chapter.aid)
         holder.type.text = String.format(Locale.getDefault(), if (count == 1) "%d episodio" else "%d episodios", count)
-        holder.cardView.setOnClickListener { if (listener != null) listener!!.onSelect(queueObject) }
+        holder.cardView.setOnClickListener { listener?.onSelect(queueObject) }
         holder.cardView.setOnLongClickListener {
             ActivityAnime.open(activity, queueObject, holder.imageView)
             true

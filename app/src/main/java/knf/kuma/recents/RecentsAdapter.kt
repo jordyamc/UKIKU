@@ -1,6 +1,5 @@
 package knf.kuma.recents
 
-import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.os.Build
@@ -23,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
+import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
@@ -41,7 +41,7 @@ import java.util.*
 
 class RecentsAdapter internal constructor(private val fragment: Fragment, private val view: View) : RecyclerView.Adapter<RecentsAdapter.ItemHolder>() {
 
-    private val context: Context = fragment.context!!
+    private val context: Context? = fragment.context
     private var list: MutableList<RecentObject> = ArrayList()
     private val dao = CacheDB.INSTANCE.favsDAO()
     private val animeDAO = CacheDB.INSTANCE.animeDAO()
@@ -59,16 +59,17 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
+        if (context == null) return
         holder.unsetObservers()
         val recentObject = list[position]
         holder.setState(isNetworkAvailable, recentObject.isChapterDownloaded || recentObject.isDownloading)
-        PicassoSingle[context].load(PatternUtil.getCover(recentObject.aid!!)).into(holder.imageView)
+        PicassoSingle.get().load(PatternUtil.getCover(recentObject.aid)).into(holder.imageView)
         holder.setNew(recentObject.isNew)
-        holder.setFav(dao.isFav(Integer.parseInt(recentObject.aid!!)))
-        holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.eid!!))
-        dao.favObserver(Integer.parseInt(recentObject.aid!!)).observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
-        holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.eid!!), fragment, Observer { chapter -> holder.setSeen(chapter != null) })
-        holder.setDownloadObserver(downloadsDAO.getLiveByEid(recentObject.eid!!), fragment, Observer { downloadObject ->
+        holder.setFav(dao.isFav(Integer.parseInt(recentObject.aid)))
+        holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.eid))
+        dao.favObserver(Integer.parseInt(recentObject.aid)).observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
+        holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.eid), fragment, Observer { chapter -> holder.setSeen(chapter != null) })
+        holder.setDownloadObserver(downloadsDAO.getLiveByEid(recentObject.eid), fragment, Observer { downloadObject ->
             holder.setDownloadState(downloadObject)
             if (downloadObject == null) {
                 recentObject.downloadState = -8
@@ -94,11 +95,11 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 holder.streaming.setOnClickListener {
                     if (recentObject.isChapterDownloaded || recentObject.isDownloading) {
                         MaterialDialog(context).safeShow {
-                            message(text = "¿Eliminar el ${recentObject.chapter!!.toLowerCase()} de ${recentObject.name}?")
+                            message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase()} de ${recentObject.name}?")
                             positiveButton(text = "CONFIRMAR") {
                                 FileAccessHelper.INSTANCE.delete(recentObject.fileName, true)
-                                DownloadManager.cancel(recentObject.eid!!)
-                                QueueManager.remove(recentObject.eid!!)
+                                DownloadManager.cancel(recentObject.eid)
+                                QueueManager.remove(recentObject.eid)
                                 recentObject.isChapterDownloaded = false
                                 holder.setState(isNetworkAvailable, false)
                             }
@@ -106,7 +107,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                         }
                     } else {
                         holder.setLocked(true)
-                        ServersFactory.start(context, recentObject.url!!, DownloadObject.fromRecent(recentObject), true, object : ServersFactory.ServersInterface {
+                        ServersFactory.start(context, recentObject.url, DownloadObject.fromRecent(recentObject), true, object : ServersFactory.ServersInterface {
                             override fun onFinish(started: Boolean, success: Boolean) {
                                 if (!started && success) {
                                     chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
@@ -116,7 +117,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                             }
 
                             override fun onCast(url: String?) {
-                                CastUtil.get().play(fragment.activity as? Activity, view, recentObject.eid!!, url, recentObject.name!!, recentObject.chapter!!, recentObject.aid!!, true)
+                                CastUtil.get().play(view, CastMedia.create(recentObject, url))
                                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
                                 recordsDAO.add(RecordObject.fromRecent(recentObject))
                                 holder.setSeen(true)
@@ -145,9 +146,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         holder.chapter.text = recentObject.chapter
         holder.cardView.setOnClickListener {
             if (recentObject.animeObject != null) {
-                ActivityAnime.open(fragment, recentObject.animeObject!!, holder.imageView)
+                ActivityAnime.open(fragment, recentObject.animeObject, holder.imageView)
             } else {
-                val animeObject = animeDAO.getByAid(recentObject.aid!!)
+                val animeObject = animeDAO.getByAid(recentObject.aid)
                 if (animeObject != null) {
                     ActivityAnime.open(fragment, animeObject, holder.imageView)
                 } else {
@@ -157,7 +158,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             }
         }
         holder.cardView.setOnLongClickListener {
-            if (!chaptersDAO.chapterIsSeen(recentObject.eid!!)) {
+            if (!chaptersDAO.chapterIsSeen(recentObject.eid)) {
                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
                 holder.animeOverlay.setSeen(true, true)
             } else {
@@ -167,13 +168,13 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             true
         }
         holder.download.setOnClickListener {
-            val obj = downloadsDAO.getByEid(recentObject.eid!!)
+            val obj = downloadsDAO.getByEid(recentObject.eid)
             if (FileAccessHelper.INSTANCE.canDownload(fragment) &&
                     !recentObject.isChapterDownloaded &&
                     !recentObject.isDownloading &&
                     recentObject.downloadState != DownloadObject.PENDING) {
                 holder.setLocked(true)
-                ServersFactory.start(context, recentObject.url!!, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), false, false, object : ServersFactory.ServersInterface {
+                ServersFactory.start(context, recentObject.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), false, false, object : ServersFactory.ServersInterface {
                     override fun onFinish(started: Boolean, success: Boolean) {
                         if (started) {
                             recentObject.isChapterDownloaded = true
@@ -210,11 +211,11 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             }
         }
         holder.download.setOnLongClickListener {
-            val obj = downloadsDAO.getByEid(recentObject.eid!!)
+            val obj = downloadsDAO.getByEid(recentObject.eid)
             if (CastUtil.get().connected() &&
                     recentObject.isChapterDownloaded && (obj == null || obj.state == DownloadObject.COMPLETED)) {
                 chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
-                CastUtil.get().play(fragment.activity as? Activity, view, recentObject.eid!!, SelfServer.start(recentObject.fileName, true), recentObject.name!!, recentObject.chapter!!, recentObject.aid!!, true)
+                CastUtil.get().play(view, CastMedia.create(recentObject))
             }
             true
         }
@@ -224,7 +225,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         noCrash {
             if (block)
                 (fragment.activity as? AppCompatActivity)?.requestedOrientation = when {
-                    context.resources.getBoolean(R.bool.isLandscape) -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    context?.resources?.getBoolean(R.bool.isLandscape) == true -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                     else -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
             else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -279,12 +280,12 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         fun setChapterObserver(chapterLiveData: LiveData<AnimeObject.WebInfo.AnimeChapter>, owner: LifecycleOwner, observer: Observer<AnimeObject.WebInfo.AnimeChapter>) {
             this.chapterLiveData = chapterLiveData
             this.chapterObserver = observer
-            this.chapterLiveData.observe(owner, chapterObserver!!)
+            this.chapterLiveData.observe(owner, observer)
         }
 
         fun unsetChapterObserver() {
-            if (chapterObserver != null) {
-                chapterLiveData.removeObserver(chapterObserver!!)
+            chapterObserver?.let {
+                chapterLiveData.removeObserver(it)
                 chapterObserver = null
             }
         }
@@ -292,24 +293,24 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         fun setDownloadObserver(downloadLiveData: LiveData<DownloadObject>, owner: LifecycleOwner, observer: Observer<DownloadObject>) {
             this.downloadLiveData = downloadLiveData
             this.downloadObserver = observer
-            this.downloadLiveData.observe(owner, downloadObserver!!)
+            this.downloadLiveData.observe(owner, observer)
         }
 
         fun unsetDownloadObserver() {
-            if (downloadObserver != null) {
-                downloadLiveData.removeObserver(downloadObserver!!)
+            downloadObserver?.let {
+                downloadLiveData.removeObserver(it)
                 downloadObserver = null
             }
         }
 
         fun setCastingObserver(owner: LifecycleOwner, observer: Observer<String>) {
             this.castingObserver = observer
-            CastUtil.get().casting.observe(owner, castingObserver!!)
+            CastUtil.get().casting.observe(owner, observer)
         }
 
         fun unsetCastingObserver() {
-            if (castingObserver != null) {
-                CastUtil.get().casting.removeObserver(castingObserver!!)
+            castingObserver?.let {
+                CastUtil.get().casting.removeObserver(it)
                 castingObserver = null
             }
         }

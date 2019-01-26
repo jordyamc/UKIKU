@@ -26,21 +26,22 @@ internal class ChangeAdapter(release: Release) : RecyclerView.Adapter<ChangeAdap
 
     @SuppressLint("SetTextI18n")
     private fun setType(textView: TextView?, type: String) {
+        if (textView == null) return
         when (type) {
             "new" -> {
-                textView!!.text = "Nuevo"
+                textView.text = "Nuevo"
                 textView.setBackgroundResource(R.drawable.chip_new)
             }
             "change" -> {
-                textView!!.text = "Cambio"
+                textView.text = "Cambio"
                 textView.setBackgroundResource(R.drawable.chip_change)
             }
             "fix" -> {
-                textView!!.text = "Arreglo"
+                textView.text = "Arreglo"
                 textView.setBackgroundResource(R.drawable.chip_error)
             }
             else -> {
-                textView!!.text = "Cambio"
+                textView.text = "Cambio"
                 textView.setBackgroundResource(R.drawable.chip_change)
             }
         }

@@ -37,32 +37,34 @@ class DirectoryPageFragment : BottomFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val model = ViewModelProviders.of(activity!!).get(DirectoryViewModel::class.java)
-        adapter = DirectoryPageAdapter(this)
-        adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                if (positionStart == 0)
-                    scrollTop()
-            }
+        activity?.let {
+            val model = ViewModelProviders.of(it).get(DirectoryViewModel::class.java)
+            adapter = DirectoryPageAdapter(this)
+            adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    if (positionStart == 0)
+                        scrollTop()
+                }
 
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                if (toPosition == 0)
-                    scrollTop()
-            }
-        })
-        getLiveData(model).observe(this, Observer { animeObjects ->
-            hideProgress()
-            adapter!!.submitList(animeObjects)
-            makeAnimation()
-        })
-        recyclerView.verifyManager()
-        recyclerView.adapter = adapter
+                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                    if (toPosition == 0)
+                        scrollTop()
+                }
+            })
+            getLiveData(model).observe(this, Observer { animeObjects ->
+                hideProgress()
+                adapter?.submitList(animeObjects)
+                makeAnimation()
+            })
+            recyclerView.verifyManager()
+            recyclerView.adapter = adapter
+        }
     }
 
     private fun getLiveData(model: DirectoryViewModel): LiveData<PagedList<AnimeObject>> {
-        return when (arguments!!.getInt("type", 0)) {
+        return when (arguments?.getInt("type", 0) ?: 0) {
             0 -> model.getAnimes()
             1 -> model.getOvas()
             2 -> model.getMovies()
@@ -71,8 +73,8 @@ class DirectoryPageFragment : BottomFragment() {
     }
 
     fun onChangeOrder() {
-        if (activity != null && adapter != null) {
-            getLiveData(ViewModelProviders.of(activity!!).get(DirectoryViewModel::class.java)).observe(this, Observer { animeObjects ->
+        activity?.let {
+            getLiveData(ViewModelProviders.of(it).get(DirectoryViewModel::class.java)).observe(this, Observer { animeObjects ->
                 hideProgress()
                 listUpdated = true
                 adapter?.submitList(animeObjects)

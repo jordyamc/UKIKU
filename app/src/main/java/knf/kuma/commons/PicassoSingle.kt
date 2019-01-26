@@ -1,21 +1,23 @@
 package knf.kuma.commons
 
 import android.annotation.SuppressLint
-import android.content.Context
 
 import com.squareup.picasso.Picasso
+import knf.kuma.App
 
 object PicassoSingle {
     @SuppressLint("StaticFieldLeak")
-    private var picasso: Picasso? = null
+    private lateinit var picasso: Picasso
 
-    operator fun get(context: Context): Picasso {
-        if (picasso == null)
-            PicassoSingle.picasso = Picasso.Builder(context).downloader(CookieImageDownloader(context)).build()
-        return picasso!!
+    fun get(): Picasso {
+        if (!::picasso.isInitialized)
+            PicassoSingle.picasso = create()
+        return picasso
     }
 
+    private fun create(): Picasso = Picasso.Builder(App.context).downloader(CookieImageDownloader(App.context)).build()
+
     fun clear() {
-        picasso = null
+        picasso = create()
     }
 }

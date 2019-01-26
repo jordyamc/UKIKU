@@ -2,6 +2,7 @@ package knf.kuma.player
 
 import android.app.PictureInPictureParams
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.AudioManager
 import android.os.Build
@@ -185,7 +186,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
 
     // Picture in Picture related functions.
     override fun onUserLeaveHint() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerHolder.audioFocusPlayer.playWhenReady) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerHolder.audioFocusPlayer.playWhenReady && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             enterPictureInPictureMode(
                     with(PictureInPictureParams.Builder()) {
                         setAspectRatio(Rational(16, 9))

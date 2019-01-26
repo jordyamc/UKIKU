@@ -41,7 +41,7 @@ class PlayerHolder(private val context: Context,
                 .build()
         playerCallback = context as PlayerCallback
         mediaCatalog = MediaCatalog(mutableListOf(), intent)
-        playerCallback.onChangeTitle(mediaCatalog[listPosition].title!!.toString())
+        playerCallback.onChangeTitle((mediaCatalog[listPosition].title ?: "").toString())
         if (mediaCatalog.size == 1) playerCallback.onChangeTitle(mediaCatalog[0].title.toString())
         audioFocusPlayer = AudioFocusWrapper(
                 audioAttributes,
@@ -54,7 +54,7 @@ class PlayerHolder(private val context: Context,
     private fun buildMediaSource(): MediaSource {
         val uriList = mutableListOf<MediaSource>()
         mediaCatalog.forEach {
-            uriList.add(createExtractorMediaSource(it.mediaUri!!))
+            uriList.add(createExtractorMediaSource(it.mediaUri ?: Uri.EMPTY))
         }
         return ConcatenatingMediaSource(*uriList.toTypedArray())
     }
@@ -129,7 +129,7 @@ class PlayerHolder(private val context: Context,
 
             override fun onPlayerError(error: ExoPlaybackException?) {
                 var exception: Exception? = null
-                when (error!!.type) {
+                when (error?.type) {
                     ExoPlaybackException.TYPE_RENDERER -> exception = error.rendererException
                     ExoPlaybackException.TYPE_UNEXPECTED -> exception = error.unexpectedException
                     ExoPlaybackException.TYPE_SOURCE -> exception = error.sourceException
@@ -152,7 +152,8 @@ class PlayerHolder(private val context: Context,
                     val latestPosition = playerView.player.currentWindowIndex
                     if (latestPosition != listPosition) {
                         listPosition = latestPosition
-                        playerCallback.onChangeTitle(mediaCatalog[listPosition].title!!.toString())
+                        playerCallback.onChangeTitle((mediaCatalog[listPosition].title
+                                ?: "").toString())
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

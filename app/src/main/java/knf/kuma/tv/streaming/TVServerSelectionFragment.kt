@@ -13,19 +13,20 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.setResult(Activity.RESULT_CANCELED, Intent()
-                .putExtra("is_video_server", arguments?.getBoolean(IS_SERVER_DATA, false)))
+                .putExtra(keyIsVideoServer, arguments?.getBoolean(IS_SERVER_DATA, false)))
     }
 
     override fun onCreateGuidance(savedInstanceState: Bundle?): GuidanceStylist.Guidance {
-        return if (arguments!!.getBoolean(IS_SERVER_DATA, false))
-            GuidanceStylist.Guidance(arguments!!.getString("server_name"), "Selecciona calidad", "", null)
+        return if (arguments?.getBoolean(IS_SERVER_DATA, false) == true)
+            GuidanceStylist.Guidance(arguments?.getString(keyServerName)
+                    ?: "", "Selecciona calidad", "", null)
         else
             GuidanceStylist.Guidance("Selecciona servidor", "", "", null)
     }
 
     override fun onCreateActions(actions: MutableList<GuidedAction>, savedInstanceState: Bundle?) {
-        val list = arguments!!.getStringArrayList(SERVERS_DATA)
-        for ((id, name) in list!!.withIndex()) {
+        val list = arguments?.getStringArrayList(SERVERS_DATA) ?: arrayListOf()
+        for ((id, name) in list.withIndex()) {
             if (name != "Mega")
                 actions.add(GuidedAction.Builder(context)
                         .id(id.toLong())
@@ -37,12 +38,15 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
     override fun onGuidedActionClicked(action: GuidedAction?) {
         super.onGuidedActionClicked(action)
         activity?.setResult(Activity.RESULT_OK, Intent()
-                .putExtra("is_video_server", arguments?.getBoolean(IS_SERVER_DATA, false))
-                .putExtra("position", action!!.id.toInt()))
+                .putExtra(keyIsVideoServer, arguments?.getBoolean(IS_SERVER_DATA, false))
+                .putExtra(keyPosition, action?.id?.toInt()))
         activity?.finish()
     }
 
     companion object {
+        const val keyIsVideoServer = "is_video_server"
+        const val keyPosition = "position"
+        const val keyServerName = "server_name"
 
         const val VIDEO_DATA = "option_data"
         const val SERVERS_DATA = "list_data"
@@ -54,7 +58,7 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
             bundle.putStringArrayList(SERVERS_DATA, servers)
             bundle.putBoolean(IS_SERVER_DATA, isServerData)
             if (name != null)
-                bundle.putString("server_name", name)
+                bundle.putString(keyServerName, name)
             fragment.arguments = bundle
             return fragment
         }

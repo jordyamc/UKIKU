@@ -26,7 +26,7 @@ class MangoServer(context: Context, baseLink: String) : Server(context, baseLink
                 val hash = matcher.group(1)
                 val key = Integer.parseInt(matcher.group(2))
                 var file = KDecoder.decodeMango(hash, key)
-                if (file!!.isEmpty())
+                if (file.isNullOrBlank())
                     return null
                 if (file.startsWith("//"))
                     file = file.replaceFirst("//".toRegex(), "https://")

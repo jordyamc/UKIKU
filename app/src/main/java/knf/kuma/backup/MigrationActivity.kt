@@ -21,7 +21,7 @@ class MigrationActivity : AppCompatActivity(), DirectoryService.OnDirStatus {
 
     override fun onResume() {
         super.onResume()
-        if (MigrateVersionFragment.getInstalledCode(this) < 252)
+        if (MigrateVersionFragment.installedCode < 252)
             setFragment(MigrateVersionFragment())
         else if (!PrefsUtil.isDirectoryFinished) {
             DirectoryService.run(this)

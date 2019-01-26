@@ -17,9 +17,8 @@ class RecentsPresenter : Presenter() {
     override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
         (viewHolder.view as RecentsCardView).bind(item as RecentObject)
         viewHolder.view.setOnLongClickListener { v ->
-            val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(item.aid!!)
-            if (animeObject != null)
-                TVAnimesDetails.start(v.context, animeObject.link!!)
+            val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(item.aid)
+            animeObject?.let { TVAnimesDetails.start(v.context, it.link) }
             true
         }
     }

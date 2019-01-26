@@ -1,11 +1,12 @@
 package knf.kuma.backup.screens
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.Fragment
+import knf.kuma.App
 import knf.kuma.R
 import kotlinx.android.synthetic.main.lay_migrate_version.*
 
@@ -17,19 +18,19 @@ class MigrateVersionFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        tv_version_bad.text = getInstalledCode(context).toString()
+        tv_version_bad.text = installedCode.toString()
     }
 
     companion object {
 
-        fun getInstalledCode(context: Context?): Int {
+        val installedCode: Long
+            get() {
             return try {
-                val info = context!!.packageManager.getPackageInfo("knf.animeflv", 0)
-                info.versionCode
+                val info = App.context.packageManager.getPackageInfo("knf.animeflv", 0)
+                PackageInfoCompat.getLongVersionCode(info)
             } catch (e: Exception) {
                 -1
             }
-
         }
     }
 }

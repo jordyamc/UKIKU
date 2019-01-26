@@ -59,8 +59,8 @@ class RecommendActivity : AppCompatActivity() {
         setContentView(layout)
         toolbar.title = "Sugeridos"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         setAdapter()
     }
@@ -149,7 +149,7 @@ class RecommendActivity : AppCompatActivity() {
         for (list in lists) {
             val removeList = ArrayList<AnimeObject>()
             for (animeObject in list)
-                if (favsDAO.isFav(animeObject.key) || seeingDAO.isSeeingAll(animeObject.aid!!))
+                if (favsDAO.isFav(animeObject.key) || seeingDAO.isSeeingAll(animeObject.aid))
                     removeList.add(animeObject)
             list.removeAll(removeList)
         }

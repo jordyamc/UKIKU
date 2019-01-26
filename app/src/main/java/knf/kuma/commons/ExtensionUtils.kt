@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.AnimationDrawable
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Callback
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -110,6 +112,10 @@ fun RecyclerView.verifyManager(size: Int = 115) {
     }
 }
 
+fun <T> MutableList<T>.toArray(): Array<T> {
+    return this.toArray()
+}
+
 fun gridColumns(size: Int = 115): Int {
     val metrics = App.context.resources.displayMetrics
     val dpWidht = metrics.widthPixels / metrics.density
@@ -161,13 +167,21 @@ fun Request.execute(): Response {
 }
 
 val PreferenceFragmentCompat.safeContext: Context
-    get() = context!!.applicationContext
+    get() = App.context
 
 val isTV: Boolean get() = App.context.resources.getBoolean(R.bool.isTv)
 
 @ColorInt
 fun Int.toColor(): Int {
     return ContextCompat.getColor(App.context, this)
+}
+
+fun ImageView.load(link: String?, callback: Callback? = null) {
+    PicassoSingle.get().load(link).into(this, callback)
+}
+
+fun ImageView.load(uri: Uri?, callback: Callback? = null) {
+    PicassoSingle.get().load(uri).into(this, callback)
 }
 
 fun noCrash(enableLog: Boolean = true, func: () -> Unit): String? {

@@ -316,7 +316,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
         maxLines = 4
         mMaxLines = 4
         if (!needIndicator)
-            indicator!!.post { indicator!!.visibility = View.GONE }
+            indicator?.post { indicator?.visibility = View.GONE }
     }
 
     /**

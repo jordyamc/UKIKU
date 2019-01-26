@@ -45,7 +45,7 @@ interface FavsDAO {
     fun addFav(favoriteObject: FavoriteObject)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addAll(list: MutableList<FavoriteObject>)
+    fun addAll(list: List<FavoriteObject>)
 
     @Delete
     fun deleteFav(favoriteObject: FavoriteObject)

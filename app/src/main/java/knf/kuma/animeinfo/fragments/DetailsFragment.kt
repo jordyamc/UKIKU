@@ -17,14 +17,16 @@ class DetailsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        ViewModelProviders.of(activity!!).get(AnimeViewModel::class.java).liveData!!.observe(this, Observer { animeObject ->
-            if (animeObject != null)
-                holder!!.populate(this@DetailsFragment, animeObject)
-            else {
-                Toaster.toast("No se pudo obtener la informacion")
-                activity!!.finish()
-            }
-        })
+        activity?.let {
+            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData?.observe(this, Observer { animeObject ->
+                if (animeObject != null)
+                    holder?.populate(this@DetailsFragment, animeObject)
+                else {
+                    Toaster.toast("No se pudo obtener la informacion")
+                    it.finish()
+                }
+            })
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -34,7 +34,7 @@ class MultipleSection(private val activity: Activity, private val name: String, 
     override fun onBindItemViewHolder(h: RecyclerView.ViewHolder, position: Int) {
         val holder = h as RIHolder
         val animeObject = animeObjects[position]
-        PicassoSingle[activity].load(PatternUtil.getCover(animeObject.aid!!)).into(holder.img)
+        PicassoSingle.get().load(PatternUtil.getCover(animeObject.aid)).into(holder.img)
         holder.title.text = animeObject.name
         holder.type.text = animeObject.type
         holder.cardView.setOnClickListener { ActivityAnime.open(activity, animeObject, holder.img, true, true) }
@@ -46,6 +46,6 @@ class MultipleSection(private val activity: Activity, private val name: String, 
 
     override fun onBindHeaderViewHolder(h: RecyclerView.ViewHolder?) {
         val holder = h as RHHolder?
-        holder!!.title.text = name
+        holder?.title?.text = name
     }
 }

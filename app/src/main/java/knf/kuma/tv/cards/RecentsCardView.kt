@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.ImageView
 import knf.kuma.R
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.load
 import knf.kuma.pojos.RecentObject
 import knf.kuma.tv.BindableCardView
 import kotlinx.android.synthetic.main.item_tv_card_chapter.view.*
@@ -17,8 +17,8 @@ class RecentsCardView(context: Context) : BindableCardView<RecentObject>(context
         get() = R.layout.item_tv_card_chapter
 
     override fun bind(data: RecentObject) {
-        PicassoSingle[context].load(PatternUtil.getCover(data.aid!!)).into(imageView)
-        title!!.text = data.name
-        chapter!!.text = data.chapter
+        imageView.load(PatternUtil.getCover(data.aid))
+        title?.text = data.name
+        chapter?.text = data.chapter
     }
 }

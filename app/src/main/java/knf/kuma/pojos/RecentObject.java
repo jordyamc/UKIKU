@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -20,19 +21,26 @@ public class RecentObject {
     @PrimaryKey
     public int key;
     @Ignore
-    public String aid;
+    @NonNull
+    public String aid = "";
     @Ignore
-    public String eid;
+    @NonNull
+    public String eid = "";
     @Ignore
-    public String name;
+    @NonNull
+    public String name = "";
     @Ignore
-    public String chapter;
+    @NonNull
+    public String chapter = "";
     @Ignore
-    public String url;
+    @NonNull
+    public String url = "";
     @Ignore
-    public String anime;
+    @NonNull
+    public String anime = "";
     @Ignore
-    public String img;
+    @NonNull
+    public String img = "";
     @Ignore
     public boolean isNew;
     @Ignore

@@ -34,11 +34,12 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.recycler_refresh_fragment, container, false)
-        holder = RecyclerRefreshHolder(view)
-        holder?.refreshLayout?.setOnRefreshListener(this@RecentFragment)
-        adapter = RecentsAdapter(this@RecentFragment, holder!!.recyclerView)
-        holder?.recyclerView?.adapter = adapter
-        holder?.setRefreshing(true)
+        holder = RecyclerRefreshHolder(view).also {
+            it.refreshLayout.setOnRefreshListener(this@RecentFragment)
+            adapter = RecentsAdapter(this@RecentFragment, it.recyclerView)
+            it.recyclerView.adapter = adapter
+            it.setRefreshing(true)
+        }
         EAHelper.enter1("R")
         return view
     }
@@ -51,19 +52,19 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
         if (!Network.isConnected) {
             holder?.setRefreshing(false)
         } else {
-            viewModel?.reload(context!!)
+            viewModel?.reload()
         }
     }
 
     override fun onReselect() {
         EAHelper.enter1("R")
-        if (holder != null) holder!!.scrollToTop()
+        holder?.scrollToTop()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         ServersFactory.clear()
-        (activity as AppCompatActivity?)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        (activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
     }
 
     companion object {

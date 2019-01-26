@@ -40,10 +40,10 @@ class ExplorerFilesAdapter internal constructor(private val fragment: Fragment, 
 
     override fun onBindViewHolder(holder: FileItem, position: Int) {
         val explorerObject = list[position]
-        PicassoSingle[fragment.context!!].load(explorerObject.img).into(holder.imageView)
+        PicassoSingle.get().load(explorerObject.img).into(holder.imageView)
         holder.title.text = explorerObject.name
         holder.chapter.text = String.format(Locale.getDefault(), if (explorerObject.count == 1) "%d archivo" else "%d archivos", explorerObject.count)
-        holder.cardView.setOnClickListener { listener!!.onSelected(explorerObject) }
+        holder.cardView.setOnClickListener { listener?.onSelected(explorerObject) }
         holder.cardView.setOnLongClickListener {
             ActivityAnime.open(fragment, explorerObject, holder.imageView)
             true

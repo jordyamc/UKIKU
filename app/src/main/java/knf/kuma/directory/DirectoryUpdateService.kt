@@ -90,8 +90,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     private fun cancelForeground() {
         isRunning = false
         stopForeground(true)
-        if (manager != null)
-            manager!!.cancel(NOT_CODE)
+        manager?.cancel(NOT_CODE)
     }
 
     private fun updateNotification() {
@@ -107,7 +106,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
             notification
                     .setContentTitle("Actualizando directorio")
                     .setContentText("Actualizados: $count")
-        manager!!.notify(NOT_CODE, notification.build())
+        manager?.notify(NOT_CODE, notification.build())
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {

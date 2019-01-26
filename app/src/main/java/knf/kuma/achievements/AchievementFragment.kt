@@ -28,7 +28,7 @@ class AchievementFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.achievementsDAO().achievementList(arguments?.getInt("isUnlocked", 0) ?: 0)
+        CacheDB.INSTANCE.achievementsDAO().achievementList(arguments?.getInt(isUnlockedKey, 0) ?: 0)
                 .observe(this, Observer {
                     adapter.setAchievements(it)
                     error.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
@@ -43,7 +43,7 @@ class AchievementFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_achievements, container, false).also {
             error = it.find(R.id.error)
             errorText = it.find(R.id.error_text)
-            errorText.text = if (arguments?.getInt("isUnlocked", 0) == 0) "Has completado todos los logros" else "No has completado ningun logro"
+            errorText.text = if (arguments?.getInt(isUnlockedKey, 0) == 0) "Has completado todos los logros" else "No has completado ningun logro"
             recyclerView = it.find(R.id.recycler)
             recyclerView.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
             recyclerView.adapter = adapter
@@ -55,10 +55,12 @@ class AchievementFragment : Fragment() {
     }
 
     companion object {
+        private const val isUnlockedKey = "isUnlocked"
+
         fun get(isUnlocked: Int, onClick: OnClick): AchievementFragment {
             val achievementFragment = AchievementFragment()
             val bundle = Bundle().apply {
-                this.putInt("isUnlocked", isUnlocked)
+                this.putInt(isUnlockedKey, isUnlocked)
             }
             achievementFragment.arguments = bundle
             achievementFragment.setCallback(onClick)

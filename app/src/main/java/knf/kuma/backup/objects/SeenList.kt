@@ -25,14 +25,14 @@ class SeenList {
     private fun deserialize() {
         list = ArrayList()
         Log.e("Seen", vistos)
-        val els = vistos!!.replace("E", "").split(":::".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        for (el in els) {
+        val els = vistos?.replace("E", "")?.split(":::".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
+        for (el in els ?: emptyArray()) {
             if (el != "") {
                 val spl = el.split("_".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                list!!.add(SeenObj(spl[0], spl[1]))
+                list?.add(SeenObj(spl[0], spl[1]))
             }
         }
-        list!!.sort()
+        list?.sort()
     }
 
     internal inner class SeenObj(var aid: String, var num: String) : Comparable<SeenObj> {
@@ -49,22 +49,23 @@ class SeenList {
 
     companion object {
 
-        fun decode(inputStream: InputStream): MutableList<AnimeObject.WebInfo.AnimeChapter> {
+        fun decode(inputStream: InputStream?): MutableList<AnimeObject.WebInfo.AnimeChapter>? {
+            if (inputStream == null) return null
             var errorCount = 0
             val dao = CacheDB.INSTANCE.animeDAO()
             val seenList = Gson().fromJson<SeenList>(InputStreamReader(inputStream), object : TypeToken<SeenList>() {
 
             }.type)
             seenList.deserialize()
-            val totalCount = seenList.list!!.size
+            val totalCount = seenList.list?.size ?: 0
             val chapters = ArrayList<AnimeObject.WebInfo.AnimeChapter>()
             var animeObject: AnimeObject? = null
-            for (obj in seenList.list!!) {
+            for (obj in seenList.list ?: listOf<SeenObj>()) {
                 if (animeObject == null || animeObject.aid != obj.aid)
                     animeObject = dao.getByAid(obj.aid)
-                val chapterList = animeObject!!.chapters
+                val chapterList = animeObject?.chapters ?: listOf()
                 var found = false
-                for (chapter in chapterList!!) {
+                for (chapter in chapterList) {
                     if (chapter.number.endsWith(" " + obj.num)) {
                         chapters.add(chapter)
                         found = true

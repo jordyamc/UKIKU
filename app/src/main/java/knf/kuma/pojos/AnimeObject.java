@@ -50,7 +50,8 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     @Embedded
     public WebInfo webInfo;
     @Ignore
-    public String aid;
+    @NonNull
+    public String aid = "";
     @Ignore
     public String img;
     @Ignore

@@ -32,7 +32,7 @@ class SeeingActivity : AppCompatActivity() {
         tabs.setupWithViewPager(pager)
         tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                (pager.adapter as? SeeingPagerAdapter)!!.fragmentList[pager.currentItem].onSelected()
+                ((pager.adapter as? SeeingPagerAdapter)?.fragmentList)?.let { it[pager.currentItem].onSelected() }
             }
 
             override fun onTabUnselected(p0: TabLayout.Tab?) {
@@ -53,7 +53,7 @@ class SeeingActivity : AppCompatActivity() {
             }
 
             override fun onPageSelected(position: Int) {
-                (pager.adapter as? SeeingPagerAdapter)!!.fragmentList[position].clickCount = 0
+                ((pager.adapter as? SeeingPagerAdapter)?.fragmentList)?.let { it[position].clickCount = 0 }
             }
         })
     }

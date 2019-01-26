@@ -16,7 +16,7 @@ class TVAnimesDetails : TVBaseActivity(), TVServersFactory.ServersInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragment = TVAnimesDetailsFragment[intent.getStringExtra("url")]
+        fragment = TVAnimesDetailsFragment[intent.getStringExtra(keyUrl)]
         addFragment(fragment as TVAnimesDetailsFragment)
     }
 
@@ -41,21 +41,25 @@ class TVAnimesDetails : TVBaseActivity(), TVServersFactory.ServersInterface {
         if (resultCode == Activity.RESULT_OK) {
             val bundle = data?.extras
             if (requestCode == TVServersFactory.REQUEST_CODE_MULTI)
-                serversFactory?.analyzeMulti(bundle?.getInt("position", 0) ?: 0)
+                serversFactory?.analyzeMulti(bundle?.getInt(keyPosition, 0) ?: 0)
             else {
-                if (bundle?.getBoolean("is_video_server", false) == true)
-                    serversFactory?.analyzeOption(bundle.getInt("position", 0))
+                if (bundle?.getBoolean(keyIsVideoServer, false) == true)
+                    serversFactory?.analyzeOption(bundle.getInt(keyPosition, 0))
                 else
-                    serversFactory?.analyzeServer(bundle?.getInt("position", 0) ?: 0)
+                    serversFactory?.analyzeServer(bundle?.getInt(keyPosition, 0) ?: 0)
             }
-        } else if (resultCode == Activity.RESULT_CANCELED && data!!.extras!!.getBoolean("is_video_server", false))
+        } else if (resultCode == Activity.RESULT_CANCELED && data?.extras?.getBoolean(keyIsVideoServer, false) == true)
             serversFactory?.showServerList()
     }
 
     companion object {
 
+        private const val keyPosition = "position"
+        private const val keyUrl = "url"
+        private const val keyIsVideoServer = "is_video_server"
+
         fun start(context: Context, url: String) {
-            context.startActivity(Intent(context, TVAnimesDetails::class.java).putExtra("url", url))
+            context.startActivity(Intent(context, TVAnimesDetails::class.java).putExtra(keyUrl, url))
         }
     }
 }

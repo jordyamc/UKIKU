@@ -9,6 +9,7 @@ import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.database.CacheDB
 import java.util.*
+import kotlin.collections.LinkedHashSet
 
 class WEListProvider internal constructor(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val items = ArrayList<WEListItem>()
@@ -33,9 +34,9 @@ class WEListProvider internal constructor(private val context: Context) : Remote
 
     private fun populateListItem() {
         items.clear()
-        val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)!!)
+        val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context))
         for (obj in list) {
-            items.add(WEListItem(obj.key, obj.link!!, obj.name!!, obj.aid!!, obj.img!!))
+            items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, obj.img))
         }
     }
 
@@ -111,8 +112,9 @@ class WEListProvider internal constructor(private val context: Context) : Remote
         return true
     }
 
-    private fun getBlacklist(context: Context): Set<String>? {
+    private fun getBlacklist(context: Context): Set<String> {
         return PreferenceManager.getDefaultSharedPreferences(context).getStringSet("emision_blacklist", LinkedHashSet())
+                ?: setOf()
     }
 
 }

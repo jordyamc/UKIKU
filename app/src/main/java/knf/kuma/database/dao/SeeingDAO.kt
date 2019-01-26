@@ -46,7 +46,7 @@ interface SeeingDAO {
     fun add(seeingObject: SeeingObject)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addAll(list: MutableList<SeeingObject>)
+    fun addAll(list: List<SeeingObject>)
 
     @Update
     fun update(seeingObject: SeeingObject)

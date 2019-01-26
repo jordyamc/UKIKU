@@ -30,7 +30,7 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_img_big)
-        PicassoSingle[this].load(intent.data).into(img, object : Callback {
+        img.load(intent.data, object : Callback {
             override fun onSuccess() {
                 bitmap = (img.drawable as BitmapDrawable).bitmap
             }
@@ -42,7 +42,7 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         })
         img.setOnLongClickListener {
             if (bitmap != null) {
-                val popupMenu = PopupMenu(this@ActivityImgFull, anchor!!)
+                val popupMenu = PopupMenu(this@ActivityImgFull, anchor)
                 popupMenu.inflate(R.menu.menu_img)
                 popupMenu.setOnMenuItemClickListener(this@ActivityImgFull)
                 popupMenu.show()
@@ -63,7 +63,8 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                             .build().execute()
                     if (response.code() != 200)
                         throw IllegalStateException("Response code: ${response.code()}")
-                    val results = JSONObject(response.body()!!.string()).getJSONArray("results")
+                    val results = JSONObject(response.body()?.string()
+                            ?: "{}").getJSONArray("results")
                     response.close()
                     for (i in 0..(results.length() - 1)) {
                         val json = results.getJSONObject(i)
@@ -74,14 +75,15 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                                 val picturesResponse = Request.Builder().url("https://api.jikan.moe/v3/anime/${json.getString("mal_id")}/pictures").build().execute()
                                 if (picturesResponse.code() != 200)
                                     throw IllegalStateException("Response code: ${picturesResponse.code()}")
-                                val picturesArray = JSONObject(picturesResponse.body()!!.string()).getJSONArray("pictures")
+                                val picturesArray = JSONObject(picturesResponse.body()?.string()
+                                        ?: "{}").getJSONArray("pictures")
                                 picturesResponse.close()
                                 imgUrl = picturesArray.getJSONObject(picturesArray.length() - 1).getString("large")
                             } catch (e: Exception) {
                                 //
                             }
                             doOnUI {
-                                PicassoSingle[this@ActivityImgFull].load(imgUrl).into(img, object : Callback {
+                                PicassoSingle.get().load(imgUrl).into(img, object : Callback {
                                     override fun onSuccess() {
                                         bitmap = (img.drawable as BitmapDrawable).bitmap
                                     }
@@ -134,13 +136,15 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         snackbar.show()
         doAsync {
             try {
-                val pfd = contentResolver.openFileDescriptor(data!!.data!!, "w")
-                val fileOutputStream = FileOutputStream(pfd!!.fileDescriptor)
-                bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
-                fileOutputStream.close()
-                pfd.close()
-                snackbar.safeDismiss()
-                img.showSnackbar("Image guardada!")
+                val pfd = contentResolver.openFileDescriptor(data?.data ?: Uri.EMPTY, "w")
+                pfd?.let {
+                    val fileOutputStream = FileOutputStream(it.fileDescriptor)
+                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+                    fileOutputStream.close()
+                    it.close()
+                    snackbar.safeDismiss()
+                    img.showSnackbar("Image guardada!")
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 snackbar.safeDismiss()

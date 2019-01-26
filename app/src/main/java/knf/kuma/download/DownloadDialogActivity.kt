@@ -18,7 +18,7 @@ import java.util.regex.Pattern
 
 class DownloadDialogActivity : AppCompatActivity() {
 
-    private var downloadObject: DownloadObject? = null
+    private lateinit var downloadObject: DownloadObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeDialog(this))
@@ -34,9 +34,9 @@ class DownloadDialogActivity : AppCompatActivity() {
             try {
                 val document = Jsoup.connect(intent.dataString).get()
                 val name = PatternUtil.fromHtml(document.select("nav.Brdcrmb.fa-home a[href^=/anime/]").first().text())
-                var aid: String? = null
+                lateinit var aid: String
                 val eid = extract(intent.dataString, "^.*/(\\d+)/.*$")
-                var num: String? = null
+                lateinit var num: String
                 val matcher = Pattern.compile("var (.*) = (\\d+);").matcher(document.html())
                 while (matcher.find()) {
                     when (matcher.group(1)) {
@@ -44,7 +44,8 @@ class DownloadDialogActivity : AppCompatActivity() {
                         "episode_number" -> num = matcher.group(2)
                     }
                 }
-                val chapter = AnimeObject.WebInfo.AnimeChapter(Integer.parseInt(aid!!), "Episodio " + num!!, eid, intent.dataString!!, name, aid)
+                val chapter = AnimeObject.WebInfo.AnimeChapter(Integer.parseInt(aid), "Episodio $num", eid, intent.dataString
+                        ?: "", name, aid)
                 downloadObject = DownloadObject.fromChapter(chapter, false)
                 doOnUI {
                     dialog.safeDismiss()
@@ -66,7 +67,8 @@ class DownloadDialogActivity : AppCompatActivity() {
     private fun showSelectDialog() {
         MaterialDialog(this).safeShow {
             listItems(items = listOf("Descarga", "Streaming")) { _, index, _ ->
-                ServersFactory.start(this@DownloadDialogActivity, intent.dataString!!, downloadObject!!, index == 1, object : ServersFactory.ServersInterface {
+                ServersFactory.start(this@DownloadDialogActivity, intent.dataString
+                        ?: "", downloadObject, index == 1, object : ServersFactory.ServersInterface {
                     override fun onFinish(started: Boolean, success: Boolean) {
                         if (success)
                             removeNotification()

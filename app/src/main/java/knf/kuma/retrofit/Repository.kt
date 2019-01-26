@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.crashlytics.android.Crashlytics
+import knf.kuma.App
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -27,13 +28,13 @@ class Repository {
     val search: LiveData<PagedList<AnimeObject>>
         get() = getSearch("")
 
-    fun reloadRecents(context: Context) {
+    fun reloadRecents() {
         if (Network.isConnected) {
-            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net").enqueue(object : Callback<Recents> {
+            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(object : Callback<Recents> {
                 override fun onResponse(call: Call<Recents>, response: Response<Recents>) {
                     try {
                         if (response.isSuccessful) {
-                            val objects = RecentObject.create(response.body()!!.list!!)
+                            val objects = RecentObject.create(response.body()?.list ?: listOf())
                             for ((i, recentObject) in objects.withIndex())
                                 recentObject.key = i
                             val dao = CacheDB.INSTANCE.recentsDAO()
@@ -71,7 +72,7 @@ class Repository {
                             data.value = CacheDB.INSTANCE.animeDAO().getAnimeRaw(link)
                             return
                         }
-                        val animeObject = AnimeObject(link, response.body() as AnimeObject.WebInfo)
+                        val animeObject = AnimeObject(link, response.body())
                         if (persist)
                             dao.insert(animeObject)
                         data.value = animeObject

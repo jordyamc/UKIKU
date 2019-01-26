@@ -69,6 +69,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
 
+        <meta-data
+            android:name=
+                "com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="knf.kuma.cast.CastOptionsProvider"/>
+
         <activity
             android:name=".commons.EAMapActivity"
             android:label="@string/title_activity_eamap">
@@ -96,14 +101,6 @@
                 <data
                     android:host="ukiku.ga"
                     android:pathPrefix="/*"
-                    android:scheme="https"/>
-                <data
-                    android:host="ukiku.ga"
-                    android:pathPrefix="/get.php"
-                    android:scheme="http"/>
-                <data
-                    android:host="ukiku.ga"
-                    android:pathPrefix="/get.php"
                     android:scheme="https"/>
             </intent-filter>
             <intent-filter>

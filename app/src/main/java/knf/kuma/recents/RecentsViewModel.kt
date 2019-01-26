@@ -1,7 +1,5 @@
 package knf.kuma.recents
 
-import android.content.Context
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import knf.kuma.database.CacheDB
@@ -14,7 +12,7 @@ class RecentsViewModel : ViewModel() {
     val dbLiveData: LiveData<MutableList<RecentObject>>
         get() = CacheDB.INSTANCE.recentsDAO().objects
 
-    fun reload(context: Context) {
-        repository.reloadRecents(context)
+    fun reload() {
+        repository.reloadRecents()
     }
 }

@@ -189,7 +189,7 @@ class SelfServer : Service() {
 
                         val dataLen = newLen
                         val fis = FileAccessHelper.INSTANCE.getInputStream(file_name)
-                        fis!!.skip(startFrom)
+                        fis?.skip(startFrom)
 
                         res = createResponse(NanoHTTPD.Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
                         res.addHeader("Content-Length", "" + dataLen)

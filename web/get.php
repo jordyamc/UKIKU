@@ -5,11 +5,25 @@
  * Date: 31/01/2018
  * Time: 05:39 PM
  */
-if (is_old_android() && !isset($_GET['force'])) {
-    echo "<h1>Lo sentimos, esta app solo esta disponible para Android 5 o superior :(</h1>";
+
+
+/**if (is_old_android() && !isset($_GET['force'])) {
+    
+	echo "<h1>Lo sentimos, esta app solo esta disponible para Android 5 o superior :(</h1>";
+
+} else*/
+
+ if(isset($_GET['tv'])){
+    
+	header("Location: https://github.com/jordyamc/UKIKU/raw/master/app/tv/app-tv.apk");
+
 } else {
-    header("Location: https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk");
+	header("Location: https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk");
+
+
 }
+
+
 
 function is_old_android($version = '5.0')
 {

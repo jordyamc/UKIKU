@@ -30,8 +30,8 @@ class EAMapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_eamap)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+                .findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
         Log.e("Google Maps Android API", getString(R.string.google_maps_key))
     }
 
@@ -57,7 +57,7 @@ class EAMapActivity : AppCompatActivity(), OnMapReadyCallback {
             icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVD(this@EAMapActivity, R.drawable.ic_treasure)))
 
         })
-        googleMap.setOnCameraMoveListener { marker!!.isVisible = mMap.cameraPosition.zoom >= 13 }
+        googleMap.setOnCameraMoveListener { marker?.isVisible = mMap.cameraPosition.zoom >= 13 }
         googleMap.setOnMarkerClickListener { m ->
             if (m == marker) {
                 EAHelper.enter3()
@@ -78,11 +78,11 @@ class EAMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getBitmapFromVD(context: Context, drawableId: Int): Bitmap {
         val drawable = ContextCompat.getDrawable(context, drawableId)
-        val bitmap = Bitmap.createBitmap(drawable!!.intrinsicWidth,
-                drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(drawable?.intrinsicWidth ?: 0,
+                drawable?.intrinsicHeight ?: 0, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
+        drawable?.setBounds(0, 0, canvas.width, canvas.height)
+        drawable?.draw(canvas)
         return bitmap
     }
 

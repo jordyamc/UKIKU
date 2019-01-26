@@ -16,7 +16,7 @@ interface RecordsDAO {
     fun add(recordObject: RecordObject)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addAll(list: MutableList<RecordObject>)
+    fun addAll(list: List<RecordObject>)
 
     @Delete
     fun delete(recordObject: RecordObject)

@@ -29,7 +29,7 @@ class AnimeSlice : SliceProvider() {
      * false otherwise.
      */
 
-    private var launcherIcon: IconCompat? = null
+    private lateinit var launcherIcon: IconCompat
 
     private fun getBitmap(drawable: Drawable): Bitmap {
         val bmp = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
@@ -41,7 +41,7 @@ class AnimeSlice : SliceProvider() {
 
     override fun onCreateSliceProvider(): Boolean {
         return try {
-            launcherIcon = IconCompat.createWithBitmap(getBitmap(Objects.requireNonNull<Drawable>(ContextCompat.getDrawable(context!!, R.mipmap.ic_launcher))))
+            context?.let { launcherIcon = IconCompat.createWithBitmap(getBitmap(Objects.requireNonNull<Drawable>(ContextCompat.getDrawable(it, R.mipmap.ic_launcher)))) }
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -60,7 +60,7 @@ class AnimeSlice : SliceProvider() {
         if (intent == null) return uriBuilder.build()
         val data = intent.data
         if (data != null && data.path != null) {
-            val path = data.path!!.replace("/", "")
+            val path = data.path?.replace("/", "")
             uriBuilder = uriBuilder.path(path)
         }
         val context = context
@@ -81,21 +81,21 @@ class AnimeSlice : SliceProvider() {
                 AnimeLoad.QUERY != path -> {
                     AnimeLoad.QUERY = path
                     context.sendBroadcast(Intent(context, AnimeLoad::class.java))
-                    return ListBuilder(getContext()!!, sliceUri, ListBuilder.INFINITY)
+                    return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
                             .addRow(
                                     RowBuilder()
                                             .setTitle("Buscando animes...", true)
                                             .setPrimaryAction(createActivityAction(null, null))
                             ).build()
                 }
-                AnimeLoad.LIST.isEmpty() -> return ListBuilder(getContext()!!, sliceUri, ListBuilder.INFINITY)
+                AnimeLoad.LIST.isEmpty() -> return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
                         .addRow(
                                 RowBuilder()
                                         .setTitle("No se encontraron animes")
                                         .setPrimaryAction(createActivityAction(null, path.replace("/anime/", "").trim { it <= ' ' }))
                         ).build()
                 else -> {
-                    val listBuilder = ListBuilder(getContext()!!, sliceUri, ListBuilder.INFINITY)
+                    val listBuilder = ListBuilder(context, sliceUri, ListBuilder.INFINITY)
                     listBuilder.setAccentColor(ContextCompat.getColor(context, EAHelper.getThemeColor(context)))
                     val animeObjects = AnimeLoad.LIST
                     if (animeObjects.isNotEmpty()) {
@@ -108,14 +108,14 @@ class AnimeSlice : SliceProvider() {
                         for (animeObject in animeObjects)
                             listBuilder.addRow(
                                     RowBuilder()
-                                            .setTitle(animeObject.name!!)
+                                            .setTitle(animeObject.name)
                                             .setSubtitle(animeObject.genresString)
                                             .setPrimaryAction(createOpenAnimeAction(animeObject))
-                                            .setTitleItem(animeObject.icon!!, ListBuilder.SMALL_IMAGE)
+                                            .setTitleItem(animeObject.icon, ListBuilder.SMALL_IMAGE)
                             )
                         listBuilder.addAction(createActivityAction(null, path.replace("/anime/", "").trim { it <= ' ' }))
                     } else
-                        return ListBuilder(getContext()!!, sliceUri, ListBuilder.INFINITY)
+                        return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
                                 .addRow(
                                         RowBuilder()
                                                 .setTitle("No se encontraron animes")
@@ -138,7 +138,7 @@ class AnimeSlice : SliceProvider() {
                                         .putExtra("start_position", 4)
                                         .putExtra("search_query", query), PendingIntent.FLAG_CANCEL_CURRENT
                         ),
-                        AnimeLoad.searchIcon!!,
+                        AnimeLoad.searchIcon,
                         ListBuilder.ICON_IMAGE,
                         "Abrir busqueda"
                 )
@@ -147,7 +147,7 @@ class AnimeSlice : SliceProvider() {
                         PendingIntent.getActivity(
                                 context, 0, Intent(context, Main::class.java), 0
                         ),
-                        launcherIcon!!,
+                        launcherIcon,
                         ListBuilder.SMALL_IMAGE,
                         "Abrir App"
                 )
@@ -159,9 +159,9 @@ class AnimeSlice : SliceProvider() {
                             .setData(Uri.parse(animeObject.link))
                             .putExtra("title", animeObject.name)
                             .putExtra("aid", animeObject.aid)
-                            .putExtra("img", PatternUtil.getCover(animeObject.aid!!)), PendingIntent.FLAG_CANCEL_CURRENT
+                            .putExtra("img", PatternUtil.getCover(animeObject.aid)), PendingIntent.FLAG_CANCEL_CURRENT
                     ),
-                    IconCompat.createWithResource(context!!, R.drawable.ic_open),
+                    IconCompat.createWithResource(context, R.drawable.ic_open),
                     ListBuilder.ICON_IMAGE,
                     "Abrir anime"
             )
@@ -170,13 +170,14 @@ class AnimeSlice : SliceProvider() {
     private fun createOpenAnimeAction(animeObject: AnimeObject?): SliceAction {
         return SliceAction.create(
                 PendingIntent.getActivity(
-                        context, animeObject!!.key, Intent(context, ActivityAnime::class.java)
-                        .setData(Uri.parse(animeObject.link))
-                        .putExtra("title", animeObject.name)
-                        .putExtra("aid", animeObject.aid)
-                        .putExtra("img", PatternUtil.getCover(animeObject.aid!!)), PendingIntent.FLAG_CANCEL_CURRENT
+                        context, animeObject?.key ?: 0, Intent(context, ActivityAnime::class.java)
+                        .setData(Uri.parse(animeObject?.link ?: ""))
+                        .putExtra("title", animeObject?.name ?: "")
+                        .putExtra("aid", animeObject?.aid ?: "")
+                        .putExtra("img", PatternUtil.getCover(animeObject?.aid
+                                ?: "")), PendingIntent.FLAG_CANCEL_CURRENT
                 ),
-                AnimeLoad.openIcon!!,
+                AnimeLoad.openIcon,
                 ListBuilder.ICON_IMAGE,
                 "Abrir anime"
         )

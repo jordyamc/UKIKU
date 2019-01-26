@@ -8,6 +8,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
@@ -23,6 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import knf.kuma.R
+import knf.kuma.backup.BUUtils
 import knf.kuma.commons.*
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.database.CacheDB
@@ -52,6 +55,8 @@ class AchievementActivity : AppCompatActivity() {
     private val description: TextView by bind(R.id.achievement_description)
     private lateinit var bottomSheet: BottomSheetBehavior<CardView>
 
+    private var syncButton: MenuItem? = null
+
     private val levelCalculator = LevelCalculator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +79,7 @@ class AchievementActivity : AppCompatActivity() {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (!PrefsUtil.isAchievementsOmited && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))
+        if (!PrefsUtil.isAchievementsOmitted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))
             MaterialDialog(this).safeShow {
                 message(text = "Para mostrar una mejor animacion al desbloquear logros, la app necesita un permiso especial, ¿Deseas activarlo?")
                 positiveButton(text = "Activar") {
@@ -85,7 +90,7 @@ class AchievementActivity : AppCompatActivity() {
                     }
                 }
                 negativeButton(text = "Omitir") {
-                    PrefsUtil.isAchievementsOmited = true
+                    PrefsUtil.isAchievementsOmitted = true
                 }
             }
     }
@@ -142,6 +147,34 @@ class AchievementActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (BUUtils.getType(this) != BUUtils.BUType.LOCAL) {
+            menuInflater.inflate(R.menu.menu_achievements, menu)
+            syncButton = menu?.findItem(R.id.sync)
+        }
+        return super.onCreateOptionsMenu(menu)
+
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.backup -> {
+                syncButton?.isEnabled = false
+                AchievementManager.backup {
+                    invalidateOptionsMenu()
+                }
+            }
+            R.id.restore -> {
+                syncButton?.isEnabled = false
+                AchievementManager.restore {
+                    invalidateOptionsMenu()
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onBackPressed() {
         if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED)
             bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
@@ -164,7 +197,7 @@ class AchievementActivity : AppCompatActivity() {
                     val achievementList = mutableListOf<AchievementUnlocked.AchievementData>()
                     list.forEach { achievementList.add(it.achievementData(this@AchievementActivity)) }
                     doOnUI {
-                        achievementUnlocked.show(*achievementList.toTypedArray())
+                        achievementUnlocked.show(achievementList)
                     }
                 }
             } else

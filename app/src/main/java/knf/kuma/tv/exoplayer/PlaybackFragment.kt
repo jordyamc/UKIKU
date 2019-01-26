@@ -27,7 +27,7 @@ class PlaybackFragment : VideoSupportFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mVideo = Video(activity!!.intent.extras!!)
+        mVideo = Video(activity?.intent?.extras)
     }
 
     override fun onStart() {
@@ -52,9 +52,8 @@ class PlaybackFragment : VideoSupportFragment() {
     override fun onPause() {
         super.onPause()
 
-        if (mPlayerGlue != null && mPlayerGlue!!.isPlaying) {
-            mPlayerGlue!!.pause()
-        }
+        if (mPlayerGlue?.isPlaying == true)
+            mPlayerGlue?.pause()
         if (Util.SDK_INT <= 23) {
             releasePlayer()
         }
@@ -75,60 +74,60 @@ class PlaybackFragment : VideoSupportFragment() {
         mPlayer = ExoPlayerFactory.newSimpleInstance(activity, mTrackSelector)
         mPlayerAdapter = LeanbackPlayerAdapter(activity as Context, mPlayer as SimpleExoPlayer, UPDATE_DELAY)
         mPlayerGlue = VideoPlayerGlue(activity as Context, mPlayerAdapter as LeanbackPlayerAdapter)
-        mPlayerGlue!!.host = VideoSupportFragmentGlueHost(this)
-        mPlayerGlue!!.playWhenPrepared()
+        mPlayerGlue?.host = VideoSupportFragmentGlueHost(this)
+        mPlayerGlue?.playWhenPrepared()
 
-        play(mVideo!!)
+        play(mVideo)
     }
 
     private fun releasePlayer() {
-        if (mPlayer != null) {
-            mPlayer!!.release()
-            mPlayer = null
-            mTrackSelector = null
-            mPlayerGlue = null
-            mPlayerAdapter = null
-        }
+        mPlayer?.release()
+        mPlayer = null
+        mTrackSelector = null
+        mPlayerGlue = null
+        mPlayerAdapter = null
     }
 
-    private fun play(video: Video) {
-        mPlayerGlue!!.title = video.title
-        mPlayerGlue!!.subtitle = video.chapter
-        prepareMediaForPlaying(video.uri)
-        mPlayerGlue!!.play()
+    private fun play(video: Video?) {
+        mPlayerGlue?.title = video?.title
+        mPlayerGlue?.subtitle = video?.chapter
+        prepareMediaForPlaying(video?.uri ?: Uri.EMPTY)
+        mPlayerGlue?.play()
     }
 
     private fun prepareMediaForPlaying(mediaSourceUri: Uri) {
-        val userAgent = Util.getUserAgent(activity, "VideoPlayerGlue")
-        val mediaSource = ExtractorMediaSource(
-                mediaSourceUri,
-                DefaultDataSourceFactory(activity!!, userAgent),
-                DefaultExtractorsFactory(), null, null)
+        activity?.let {
+            val userAgent = Util.getUserAgent(it, "VideoPlayerGlue")
+            val mediaSource = ExtractorMediaSource(
+                    mediaSourceUri,
+                    DefaultDataSourceFactory(it, userAgent),
+                    DefaultExtractorsFactory(), null, null)
 
-        mPlayer!!.prepare(mediaSource)
+            mPlayer?.prepare(mediaSource)
+        }
     }
 
     fun skipToNext() {
-        mPlayerGlue!!.next()
+        mPlayerGlue?.next()
     }
 
     fun skipToPrevious() {
-        mPlayerGlue!!.previous()
+        mPlayerGlue?.previous()
     }
 
     fun rewind() {
-        mPlayerGlue!!.rewind()
+        mPlayerGlue?.rewind()
     }
 
     fun fastForward() {
-        mPlayerGlue!!.fastForward()
+        mPlayerGlue?.fastForward()
     }
 
     companion object {
 
         private const val UPDATE_DELAY = 16
 
-        operator fun get(bundle: Bundle): PlaybackFragment {
+        operator fun get(bundle: Bundle?): PlaybackFragment {
             val fragment = PlaybackFragment()
             fragment.arguments = bundle
             return fragment

@@ -36,7 +36,8 @@ class FavList {
 
     companion object {
 
-        fun decode(inputStream: InputStream): MutableList<FavoriteObject> {
+        fun decode(inputStream: InputStream?): MutableList<FavoriteObject>? {
+            if (inputStream == null) return null
             var totalCount = 0
             var errorCount = 0
             val dao = CacheDB.INSTANCE.animeDAO()
@@ -44,10 +45,10 @@ class FavList {
 
             }.type)
             val favs = ArrayList<FavoriteObject>()
-            for (section in favList.favs!!) {
-                totalCount += section.list!!.size
-                for (favEntry in section.list!!) {
-                    val animeObject = dao.getByAid(favEntry.aid!!)
+            for (section in favList.favs ?: listOf<FavSection>()) {
+                totalCount += section.list?.size ?: 0
+                for (favEntry in section.list ?: listOf<FavEntry>()) {
+                    val animeObject = dao.getByAid(favEntry.aid ?: "")
                     if (animeObject != null) {
                         val fav = FavoriteObject(animeObject)
                         fav.category = favEntry.section

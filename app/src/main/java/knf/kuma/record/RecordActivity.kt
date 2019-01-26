@@ -44,8 +44,8 @@ class RecordActivity : AppCompatActivity() {
         setContentView(layout)
         toolbar.title = "Historial"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         adapter = RecordsAdapter(this)
         recyclerView.verifyManager()
@@ -57,7 +57,7 @@ class RecordActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 animate = false
-                adapter!!.remove(viewHolder.adapterPosition)
+                adapter?.remove(viewHolder.adapterPosition)
                 Snackbar.make(recyclerView, "Elemento eliminado", Snackbar.LENGTH_SHORT).show()
             }
         })
@@ -66,7 +66,7 @@ class RecordActivity : AppCompatActivity() {
             if (recordObjects != null && recordObjects.isNotEmpty()) {
                 if (animate) {
                     runOnUiThread {
-                        adapter!!.update(recordObjects as MutableList<RecordObject>)
+                        adapter?.update(recordObjects as MutableList<RecordObject>)
                         if (isFirst) {
                             isFirst = false
                             recyclerView.scheduleLayoutAnimation()

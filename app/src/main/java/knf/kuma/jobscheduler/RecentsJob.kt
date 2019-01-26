@@ -51,7 +51,7 @@ class RecentsJob : Job() {
         try {
             manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val recents = Jspoon.create().adapter(Recents::class.java).fromHtml(Jsoup.connect("https://animeflv.net/").cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().outerHtml())
-            val objects = RecentObject.create(recents.list!!)
+            val objects = RecentObject.create(recents.list ?: listOf())
             for ((i, recentObject) in objects.withIndex())
                 recentObject.key = i
             val local = recentsDAO.all
@@ -83,7 +83,7 @@ class RecentsJob : Job() {
     @Throws(Exception::class)
     private fun notifyFavChaps(local: MutableList<RecentObject>, objects: MutableList<RecentObject>) {
         for (recentObject in objects) {
-            if (!local.contains(recentObject) && (favsDAO.isFav(Integer.parseInt(recentObject.aid!!)) || seeingDAO.isSeeing(recentObject.aid!!)))
+            if (!local.contains(recentObject) && (favsDAO.isFav(Integer.parseInt(recentObject.aid)) || seeingDAO.isSeeing(recentObject.aid)))
                 notifyRecent(recentObject)
         }
     }
@@ -91,7 +91,7 @@ class RecentsJob : Job() {
     @Throws(Exception::class)
     private fun notifyRecent(recentObject: RecentObject) {
         val animeObject = getAnime(recentObject)
-        val obj = NotificationObj(Integer.parseInt(recentObject.eid!!), NotificationObj.RECENT)
+        val obj = NotificationObj(Integer.parseInt(recentObject.eid), NotificationObj.RECENT)
         val notification = NotificationCompat.Builder(context, CHANNEL_RECENTS).create {
             setSmallIcon(R.drawable.ic_new_recent)
             color = ContextCompat.getColor(context, R.color.colorAccent)
@@ -123,7 +123,7 @@ class RecentsJob : Job() {
 
     private fun getBitmap(recentObject: RecentObject): Bitmap? {
         return try {
-            if (PrefsUtil.showRecentImage) PicassoSingle[context].load(recentObject.img).get() else null
+            if (PrefsUtil.showRecentImage) PicassoSingle.get().load(recentObject.img).get() else null
         } catch (e: Exception) {
             null
         }
@@ -132,9 +132,9 @@ class RecentsJob : Job() {
 
     @Throws(Exception::class)
     private fun getAnime(recentObject: RecentObject): AnimeObject {
-        var animeObject: AnimeObject? = animeDAO.getByAid(recentObject.aid!!)
+        var animeObject: AnimeObject? = animeDAO.getByAid(recentObject.aid)
         if (animeObject == null) {
-            animeObject = AnimeObject(recentObject.anime!!, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(Jsoup.connect(recentObject.anime).get().outerHtml()))
+            animeObject = AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(Jsoup.connect(recentObject.anime).get().outerHtml()))
             animeDAO.insert(animeObject)
         }
         return animeObject
@@ -182,7 +182,7 @@ class RecentsJob : Job() {
 
         fun schedule(context: Context) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val time = preferences.getString("recents_time", "1")!!.toInt() * 15
+            val time = (preferences.getString("recents_time", "1") ?: "1").toInt() * 15
             if (time > 0 && JobManager.instance().getAllJobRequestsForTag(TAG).size == 0)
                 JobRequest.Builder(TAG)
                         .setPeriodic(TimeUnit.MINUTES.toMillis(time.toLong()))

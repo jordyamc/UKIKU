@@ -27,7 +27,7 @@ class TVMultiSelectionFragment : GuidedStepSupportFragment(){
     override fun onGuidedActionClicked(action: GuidedAction?) {
         super.onGuidedActionClicked(action)
         activity?.setResult(Activity.RESULT_OK, Intent()
-                .putExtra("position", action!!.id.toInt()))
+                .putExtra("position", action?.id?.toInt() ?: 0))
         activity?.finish()
     }
 }

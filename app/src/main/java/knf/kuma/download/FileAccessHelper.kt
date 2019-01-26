@@ -23,6 +23,7 @@ import java.io.*
 
 typealias DeleteListener = () -> Unit
 
+
 class FileAccessHelper private constructor(private val context: Context) {
 
     val downloadsDirectory: File
@@ -50,8 +51,9 @@ class FileAccessHelper private constructor(private val context: Context) {
 
         }
 
-    fun getFile(file_name: String): File {
+    fun getFile(file_name: String?): File {
         return try {
+            if (file_name.isNullOrEmpty()) throw IllegalStateException("Name can't be null!")
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
                 File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
             } else {
@@ -131,15 +133,15 @@ class FileAccessHelper private constructor(private val context: Context) {
                         else if (!noMediaNeeded && inside.exists())
                             inside.delete()
                     }
-                if (treeUri != null) {
-                    val documentRoot = find(DocumentFile.fromTreeUri(context, treeUri!!), "UKIKU/downloads")
-                    val nomediaRoot = documentRoot!!.findFile(".nomedia")
+                treeUri?.let {
+                    val documentRoot = find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads")
+                    val nomediaRoot = documentRoot?.findFile(".nomedia")
                     if (noMediaNeeded && (nomediaRoot == null || !nomediaRoot.exists()))
-                        documentRoot.createFile("application/nomedia", ".nomedia")
+                        documentRoot?.createFile("application/nomedia", ".nomedia")
                     else if (!noMediaNeeded && nomediaRoot != null && nomediaRoot.exists())
                         nomediaRoot.delete()
-                    val documentList = documentRoot.listFiles()
-                    if (documentList.isNotEmpty())
+                    val documentList = documentRoot?.listFiles()
+                    if (!documentList.isNullOrEmpty())
                         for (dFile in documentList) {
                             if (dFile.isDirectory) {
                                 val inside = dFile.findFile(".nomedia")
@@ -198,19 +200,21 @@ class FileAccessHelper private constructor(private val context: Context) {
             return
         try {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
-                val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
+                val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
                 file.delete()
                 val dir = file.parentFile
                 if (dir.listFiles() == null || dir.listFiles().isEmpty())
                     dir.delete()
             } else {
-                val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
-                if (documentFile != null && documentFile.exists()) {
-                    val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name!!) + file_name)
-                    file?.delete()
-                    val dir = file?.parentFile
-                    if (dir != null && dir.listFiles().isEmpty())
-                        dir.delete()
+                treeUri?.let {
+                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    if (documentFile != null && documentFile.exists()) {
+                        val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        file?.delete()
+                        val dir = file?.parentFile
+                        if (dir != null && dir.listFiles().isEmpty())
+                            dir.delete()
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -220,15 +224,18 @@ class FileAccessHelper private constructor(private val context: Context) {
 
     private fun createTmpIfNotExist() {
         if (!File(FileUtil.getFullPathFromTreeUri(treeUri, context), "Android/data/${getPackage()}").exists()) {
-            val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
-            if (documentFile != null && documentFile.exists()) {
-                val file = find(documentFile, "Android/data/${getPackage()}/files/downloads/tmp.file")
-                file?.delete()
+            treeUri?.let {
+                val documentFile = DocumentFile.fromTreeUri(context, it)
+                if (documentFile != null && documentFile.exists()) {
+                    val file = find(documentFile, "Android/data/${getPackage()}/files/downloads/tmp.file")
+                    file?.delete()
+                }
             }
         }
     }
 
-    fun getOutputStream(file_name: String): OutputStream? {
+    fun getOutputStream(file_name: String?): OutputStream? {
+        if (file_name == null) return null
         try {
             return if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
                 var file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name))
@@ -239,7 +246,10 @@ class FileAccessHelper private constructor(private val context: Context) {
                     file.createNewFile()
                 FileOutputStream(File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
-                context.contentResolver.openOutputStream(find(DocumentFile.fromTreeUri(context, treeUri!!), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)!!.uri, "rw")
+                treeUri?.let {
+                    context.contentResolver.openOutputStream(find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
+                            ?: Uri.EMPTY, "rw")
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -259,7 +269,10 @@ class FileAccessHelper private constructor(private val context: Context) {
                     file.createNewFile()
                 FileOutputStream(File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
-                FileOutputStream(context.contentResolver.openFileDescriptor(find(DocumentFile.fromTreeUri(context, treeUri!!), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)!!.uri, "rw")!!.fileDescriptor)
+                treeUri?.let {
+                    FileOutputStream(context.contentResolver.openFileDescriptor(find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
+                            ?: Uri.EMPTY, "rw")?.fileDescriptor)
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -279,7 +292,10 @@ class FileAccessHelper private constructor(private val context: Context) {
                     file.createNewFile()
                 FileInputStream(File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
-                context.contentResolver.openInputStream(find(DocumentFile.fromTreeUri(context, treeUri!!), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)!!.uri)
+                treeUri?.let {
+                    context.contentResolver.openInputStream(find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
+                            ?: Uri.EMPTY)
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -303,11 +319,13 @@ class FileAccessHelper private constructor(private val context: Context) {
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
                 File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists()
             } else {
-                val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
-                if (documentFile != null && documentFile.exists()) {
-                    find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
-                }
-                File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists()
+                treeUri?.let {
+                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    if (documentFile != null && documentFile.exists()) {
+                        find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                    }
+                    File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists()
+                } ?: false
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -321,13 +339,15 @@ class FileAccessHelper private constructor(private val context: Context) {
             true
         } else {
             try {
-                val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
-                if (documentFile != null && documentFile.exists()) {
-                    true
-                } else {
-                    openTreeChooser(fragment)
-                    false
-                }
+                treeUri?.let {
+                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    if (documentFile != null && documentFile.exists()) {
+                        true
+                    } else {
+                        openTreeChooser(fragment)
+                        false
+                    }
+                } ?: false
             } catch (e: IllegalArgumentException) {
                 openTreeChooser(fragment)
                 false
@@ -336,18 +356,20 @@ class FileAccessHelper private constructor(private val context: Context) {
         }
     }
 
-    fun canDownload(fragment: Fragment, value: String): Boolean {
+    fun canDownload(fragment: Fragment, value: String?): Boolean {
         return if (value == "0") {
             true
         } else {
             try {
-                val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
-                if (documentFile != null && documentFile.exists()) {
-                    true
-                } else {
-                    openTreeChooser(fragment)
-                    false
-                }
+                treeUri?.let {
+                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    if (documentFile != null && documentFile.exists()) {
+                        true
+                    } else {
+                        openTreeChooser(fragment)
+                        false
+                    }
+                } ?: false
             } catch (e: IllegalArgumentException) {
                 openTreeChooser(fragment)
                 false
@@ -358,15 +380,17 @@ class FileAccessHelper private constructor(private val context: Context) {
 
     fun getDataUri(file_name: String): Uri? {
         try {
-            if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
-                return FileProvider.getUriForFile(context, "${getPackage()}.fileprovider", File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
+            return if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
+                FileProvider.getUriForFile(context, "${getPackage()}.fileprovider", File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
-                val documentFile = DocumentFile.fromTreeUri(context, treeUri!!)
-                if (documentFile != null && documentFile.exists()) {
-                    val root = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
-                    return root!!.uri
+                treeUri?.let {
+                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    if (documentFile != null && documentFile.exists()) {
+                        val root = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        root?.uri
+                    }
+                    null
                 }
-                return null
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -379,15 +403,15 @@ class FileAccessHelper private constructor(private val context: Context) {
     private fun find(root: DocumentFile?, path: String, create: Boolean = true): DocumentFile? {
         var fRoot = root
         for (name in path.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
-            val file = fRoot!!.findFile(name)
+            val file = fRoot?.findFile(name)
             fRoot = if (file == null || !file.exists()) {
                 if (create)
                     when {
-                        name.endsWith(".mp4") -> fRoot.createFile("video/mp4", name)
-                        name.endsWith(".nomedia") -> fRoot.createFile("application/nomedia", name)
-                        else -> fRoot.createDirectory(name)
+                        name.endsWith(".mp4") -> fRoot?.createFile("video/mp4", name)
+                        name.endsWith(".nomedia") -> fRoot?.createFile("application/nomedia", name)
+                        else -> fRoot?.createDirectory(name)
                     }
-                fRoot.findFile(name)
+                fRoot?.findFile(name)
             } else
                 file
         }

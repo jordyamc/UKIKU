@@ -1,16 +1,17 @@
 package knf.kuma.news
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import knf.kuma.commons.doOnUI
+import knf.kuma.commons.toast
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -66,17 +67,17 @@ object NewsCreator {
         }
     }
 
-    fun openNews(activity: AppCompatActivity, newsObject: NewsObject, background: View, title: View, content: View) {
-        /*this.currentNews = newsObject
-        val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
-                Pair(background, "background"),
-                Pair(title, "title"),
-                Pair(content, "content")).toBundle()
-        activity.startActivity(Intent(activity, NewsDetailsActivity::class.java), bundle)*/
+    fun openNews(activity: AppCompatActivity, newsObject: NewsObject) {
         try {
             CustomTabsIntent.Builder().build().launchUrl(activity, Uri.parse(newsObject.link))
-        } catch (e: Exception) {
-            activity.startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(newsObject.link)))
+        } catch (e: ActivityNotFoundException) {
+            try {
+                activity.startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(newsObject.link)))
+            } catch (anfe: ActivityNotFoundException) {
+                "No se encontró ningun navegador para abrir noticia".toast()
+            }
+        } catch (ex: Exception) {
+            "Error al abrir noticia".toast()
         }
     }
 

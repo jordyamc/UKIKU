@@ -80,8 +80,7 @@ class FragmentFiles : Fragment() {
 
     fun setListener(listener: SelectedListener) {
         this.listener = listener
-        if (adapter != null)
-            adapter!!.setListener(listener)
+        adapter?.setListener(listener)
     }
 
     interface SelectedListener {

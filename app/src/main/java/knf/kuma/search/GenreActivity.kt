@@ -25,15 +25,15 @@ class GenreActivity : AppCompatActivity() {
         setContentView(R.layout.recycler_genre)
         toolbar.title = intent.getStringExtra("name")
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
         toolbar.setNavigationOnClickListener { finish() }
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
         adapter = GenreAdapter(this)
         recycler.adapter = adapter
         LivePagedListBuilder<Int, AnimeObject>(CacheDB.INSTANCE.animeDAO().getAllGenre("%" + intent.getStringExtra("name") + "%"), 25).build().observe(this, Observer { animeObjects ->
-            adapter!!.submitList(animeObjects)
+            adapter?.submitList(animeObjects)
             if (isFirst) {
                 progress.visibility = View.GONE
                 isFirst = false

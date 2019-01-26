@@ -49,32 +49,12 @@ class LeanbackPlayerAdapter
         }
     }
 
-    /**
-     * Sets the [ControlDispatcher].
-     *
-     * @param controlDispatcher The [ControlDispatcher], or null to use
-     * [DefaultControlDispatcher].
-     */
-    fun setControlDispatcher(controlDispatcher: ControlDispatcher?) {
-        this.controlDispatcher = controlDispatcher ?: DefaultControlDispatcher()
-    }
-
-    /**
-     * Sets the optional [ErrorMessageProvider].
-     *
-     * @param errorMessageProvider The [ErrorMessageProvider].
-     */
-    fun setErrorMessageProvider(
-            errorMessageProvider: ErrorMessageProvider<in ExoPlaybackException>) {
-        this.errorMessageProvider = errorMessageProvider
-    }
-
     // PlayerAdapter implementation.
 
     override fun onAttachedToHost(host: PlaybackGlueHost?) {
         if (host is SurfaceHolderGlueHost) {
             surfaceHolderGlueHost = host
-            surfaceHolderGlueHost!!.setSurfaceHolderCallback(componentListener)
+            surfaceHolderGlueHost?.setSurfaceHolderCallback(componentListener)
         }
         notifyStateChanged()
         player.addListener(componentListener)
@@ -84,10 +64,8 @@ class LeanbackPlayerAdapter
     override fun onDetachedFromHost() {
         player.removeListener(componentListener)
         player.removeVideoListener(componentListener)
-        if (surfaceHolderGlueHost != null) {
-            surfaceHolderGlueHost!!.setSurfaceHolderCallback(null)
-            surfaceHolderGlueHost = null
-        }
+        surfaceHolderGlueHost?.setSurfaceHolderCallback(null)
+        surfaceHolderGlueHost = null
         hasSurface = false
         val callback = callback
         callback.onBufferingStateChanged(this, false)
@@ -119,21 +97,21 @@ class LeanbackPlayerAdapter
 
     override fun play() {
         if (player.playbackState == Player.STATE_ENDED) {
-            controlDispatcher!!.dispatchSeekTo(player, player.currentWindowIndex, C.TIME_UNSET)
+            controlDispatcher?.dispatchSeekTo(player, player.currentWindowIndex, C.TIME_UNSET)
         }
-        if (controlDispatcher!!.dispatchSetPlayWhenReady(player, true)) {
+        if (controlDispatcher?.dispatchSetPlayWhenReady(player, true) == true) {
             callback.onPlayStateChanged(this)
         }
     }
 
     override fun pause() {
-        if (controlDispatcher!!.dispatchSetPlayWhenReady(player, false)) {
+        if (controlDispatcher?.dispatchSetPlayWhenReady(player, false) == true) {
             callback.onPlayStateChanged(this)
         }
     }
 
     override fun seekTo(positionMs: Long) {
-        controlDispatcher!!.dispatchSeekTo(player, player.currentWindowIndex, positionMs)
+        controlDispatcher?.dispatchSeekTo(player, player.currentWindowIndex, positionMs)
     }
 
     override fun getBufferedPosition(): Long {
@@ -195,11 +173,11 @@ class LeanbackPlayerAdapter
 
         override fun onPlayerError(exception: ExoPlaybackException?) {
             val callback = callback
-            if (errorMessageProvider != null) {
-                val errorMessage = errorMessageProvider!!.getErrorMessage(exception)
+            errorMessageProvider?.let {
+                val errorMessage = it.getErrorMessage(exception)
                 callback.onError(this@LeanbackPlayerAdapter, errorMessage.first, errorMessage.second)
-            } else {
-                callback.onError(this@LeanbackPlayerAdapter, exception!!.type, context.getString(
+            } ?: exception?.let {
+                callback.onError(this@LeanbackPlayerAdapter, exception.type, context.getString(
                         R.string.lb_media_player_error, exception.type, exception.rendererIndex))
             }
         }

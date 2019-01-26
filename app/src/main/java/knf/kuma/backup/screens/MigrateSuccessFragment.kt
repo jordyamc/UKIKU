@@ -1,5 +1,6 @@
 package knf.kuma.backup.screens
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,11 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.crashlytics.android.Crashlytics
 import com.google.android.material.snackbar.Snackbar
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.objects.FavList
 import knf.kuma.backup.objects.SeenList
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
+import knf.kuma.commons.toast
 import knf.kuma.database.CacheDB
 import kotlinx.android.synthetic.main.lay_migrate_success.view.*
 import org.jetbrains.anko.doAsync
@@ -33,11 +36,19 @@ class MigrateSuccessFragment : Fragment() {
     }
 
     private fun onMigrateFavs() {
-        startActivityForResult(Intent().setAction("knf.kuma.MIGRATE").putExtra("type", 0), REQUEST_FAVS)
+        try {
+            startActivityForResult(Intent().setAction("knf.kuma.MIGRATE").putExtra("type", 0), REQUEST_FAVS)
+        } catch (e: ActivityNotFoundException) {
+            "No se encontró Animeflv App o la version es incorrecta!".toast()
+        }
     }
 
     private fun onMigrateSeen() {
-        startActivityForResult(Intent().setAction("knf.kuma.MIGRATE").putExtra("type", 1), REQUEST_SEEN)
+        try {
+            startActivityForResult(Intent().setAction("knf.kuma.MIGRATE").putExtra("type", 1), REQUEST_SEEN)
+        } catch (e: ActivityNotFoundException) {
+            "No se encontró Animeflv App o la version es incorrecta!".toast()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -45,16 +56,21 @@ class MigrateSuccessFragment : Fragment() {
         val snackbar = root.showSnackbar("Migrando...", Snackbar.LENGTH_INDEFINITE)
         doAsync {
             try {
-                when (requestCode) {
-                    REQUEST_FAVS -> {
-                        val list = FavList.decode(context!!.contentResolver.openInputStream(data!!.data!!)!!)
-                        CacheDB.INSTANCE.favsDAO().addAll(list)
+                data?.data?.let {
+                    when (requestCode) {
+                        REQUEST_FAVS -> {
+                            val list = FavList.decode(App.context.contentResolver.openInputStream(it))
+                                    ?: return@let null
+                            CacheDB.INSTANCE.favsDAO().addAll(list)
+                        }
+                        REQUEST_SEEN -> {
+                            val chapters = SeenList.decode(App.context.contentResolver.openInputStream(it))
+                                    ?: return@let null
+                            CacheDB.INSTANCE.chaptersDAO().addAll(chapters)
+                        }
+                        else -> null
                     }
-                    REQUEST_SEEN -> {
-                        val chapters = SeenList.decode(context!!.contentResolver.openInputStream(data!!.data!!)!!)
-                        CacheDB.INSTANCE.chaptersDAO().addAll(chapters)
-                    }
-                }
+                } ?: throw IllegalStateException("Data or IS is null!")
             } catch (e: Exception) {
                 e.printStackTrace()
                 Crashlytics.logException(e)

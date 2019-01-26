@@ -20,6 +20,7 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
 
+
 class FragmentChapters : Fragment() {
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressBar
@@ -46,7 +47,7 @@ class FragmentChapters : Fragment() {
     }
 
     private fun playAll(list: List<ExplorerObject.FileDownObj>) {
-        noCrash { QueueManager.startQueueDownloaded(context!!, list) }
+        noCrash { QueueManager.startQueueDownloaded(context, list) }
     }
 
     @SuppressLint("RestrictedApi")
@@ -56,7 +57,7 @@ class FragmentChapters : Fragment() {
             fab.hide()
         }
         clear()
-        explorerObject?.let { it ->
+        explorerObject?.let {
             it.getLiveData(context)
                     .observe(this@FragmentChapters, Observer { fileDownObjs ->
                         if (fileDownObjs.isEmpty()) {

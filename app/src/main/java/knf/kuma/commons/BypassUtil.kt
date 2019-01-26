@@ -67,8 +67,8 @@ class BypassUtil {
         fun getMapCookie(context: Context): Map<String, String> {
             val map = LinkedHashMap<String, String>()
             map["device"] = "computer"
-            map["cf_clearance"] = getClearance(context)!!
-            map["__cfduid"] = getCFDuid(context)!!
+            map["cf_clearance"] = getClearance(context)
+            map["__cfduid"] = getCFDuid(context)
             return map
         }
 
@@ -78,12 +78,14 @@ class BypassUtil {
                     "__cfduid=" + getCFDuid(context)
         }
 
-        private fun getClearance(context: Context): String? {
+        private fun getClearance(context: Context): String {
             return PreferenceManager.getDefaultSharedPreferences(context).getString("cf_clearance", "00000000")
+                    ?: "00000000"
         }
 
-        private fun getCFDuid(context: Context): String? {
+        private fun getCFDuid(context: Context): String {
             return PreferenceManager.getDefaultSharedPreferences(context).getString("__cfduid", "00000000")
+                    ?: "00000000"
         }
     }
 }

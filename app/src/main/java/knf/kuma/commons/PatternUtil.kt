@@ -7,6 +7,7 @@ import knf.kuma.pojos.AnimeObject
 import java.util.*
 import java.util.regex.Pattern
 
+
 object PatternUtil {
     @Suppress("DEPRECATION")
     fun fromHtml(html: String): String {
@@ -87,7 +88,8 @@ object PatternUtil {
 
     }
 
-    fun getNameFromFile(file: String): String {
+    fun getNameFromFile(file: String?): String {
+        if (file.isNull()) return ""
         val matcher = Pattern.compile("^.*\\$(.*)-\\d+\\.?\\d*\\.mp4$").matcher(file)
         matcher.find()
         return matcher.group(1) + "/"
@@ -133,7 +135,7 @@ object PatternUtil {
         return "https://animeflv.net/anime/" + aid + chapter.substring(chapter.lastIndexOf("/"), chapter.lastIndexOf("-"))
     }
 
-    fun getCover(aid: String): String {
+    fun getCover(aid: String?): String {
         return "https://m.animeflv.net/uploads/animes/covers/$aid.jpg"
     }
 

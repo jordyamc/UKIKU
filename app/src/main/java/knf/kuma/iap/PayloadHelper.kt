@@ -36,10 +36,10 @@ object PayloadHelper {
      *
      * @return The developers ethereum address
      */
-    fun getAddress(uriString: String): String {
+    fun getAddress(uriString: String): String? {
         val uri = Uri.parse(uriString)
         return if (uri.scheme.equals(SCHEME, true)) {
-            uri.getQueryParameter(ADDRESS_PARAMETER)!!
+            uri.getQueryParameter(ADDRESS_PARAMETER)
         } else {
             throw IllegalArgumentException()
         }
@@ -56,7 +56,7 @@ object PayloadHelper {
     fun getPayload(uriString: String): String {
         val uri = Uri.parse(uriString)
         return if (uri.scheme.equals(SCHEME, true)) {
-            uri.getQueryParameter(PAYLOAD_PARAMETER)!!
+            uri.getQueryParameter(PAYLOAD_PARAMETER) ?: ""
         } else {
             throw IllegalArgumentException()
         }

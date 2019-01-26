@@ -8,6 +8,6 @@ class TVPlayer : TVBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        addFragment(PlaybackFragment[intent.extras!!])
+        addFragment(PlaybackFragment[intent.extras])
     }
 }

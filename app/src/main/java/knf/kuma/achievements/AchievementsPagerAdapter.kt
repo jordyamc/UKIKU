@@ -10,31 +10,36 @@ class AchievementsPagerAdapter(private val fragmentManager: FragmentManager, pri
 
     private val fragments = arrayOfNulls<Fragment>(2)
 
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+    override fun destroyItem(container: ViewGroup, position: Int, any: Any) {
         assert(0 <= position && position < fragments.size)
-        val transaction = fragmentManager.beginTransaction()
-        transaction.remove(fragments[position]!!)
-        transaction.commit()
-        fragments[position] = null
+        val fragment = fragments[position]
+        fragment?.let {
+            val transaction = fragmentManager.beginTransaction()
+            transaction.remove(it)
+            transaction.commit()
+            fragments[position] = null
+        }
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val fragment = getItem(position)
-        val transaction = fragmentManager.beginTransaction()
-        transaction.add(container.id, fragment, "fragment:$position")
-        transaction.commit()
-        return fragment
+        fragment?.let {
+            val transaction = fragmentManager.beginTransaction()
+            transaction.add(container.id, fragment, "fragment:$position")
+            transaction.commit()
+        }
+        return fragment ?: Any()
     }
 
     override fun isViewFromObject(view: View, any: Any): Boolean {
-        return (any as Fragment).view == view
+        return (any as? Fragment)?.view == view
     }
 
-    private fun getItem(position: Int): Fragment {
+    private fun getItem(position: Int): Fragment? {
         assert(0 <= position && position < fragments.size)
         if (fragments[position] == null)
             fragments[position] = AchievementFragment.get(if (position == 0) 1 else 0, onClick)
-        return fragments[position]!!
+        return fragments[position]
     }
 
     override fun getCount(): Int {

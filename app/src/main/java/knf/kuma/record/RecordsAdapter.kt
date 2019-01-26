@@ -37,8 +37,7 @@ class RecordsAdapter(private val activity: Activity) : RecyclerView.Adapter<Reco
     override fun onBindViewHolder(holder: RecordItem, position: Int) {
         val item = items[position]
         val animeObject = item.animeObject
-        if (animeObject != null)
-            PicassoSingle[activity].load(PatternUtil.getCover(animeObject.aid!!)).into(holder.imageView)
+        animeObject?.let { holder.imageView.load(PatternUtil.getCover(animeObject.aid)) }
         holder.title.text = item.name
         holder.chapter.text = getCardText(item)
         holder.cardView.setOnClickListener {

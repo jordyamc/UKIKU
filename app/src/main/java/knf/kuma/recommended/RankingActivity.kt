@@ -21,7 +21,7 @@ class RankingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.recycler_ranking)
         setSupportActionBar(toolbar)
-        with(supportActionBar!!) {
+        supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(false)
         }

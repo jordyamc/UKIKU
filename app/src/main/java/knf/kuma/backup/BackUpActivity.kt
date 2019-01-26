@@ -97,7 +97,7 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
                     }
                 })
             else
-                BUUtils.restoreDialog(colorChanger, id, syncItemView.bakup!!)
+                BUUtils.restoreDialog(colorChanger, id, syncItemView.bakup)
         }
     }
 
@@ -167,7 +167,7 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
-                    colorChanger!!.visibility = View.INVISIBLE
+                    colorChanger?.visibility = View.INVISIBLE
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
@@ -184,8 +184,8 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
 
     private fun setState(isLogedIn: Boolean) {
         runOnUiThread {
-            lay_main!!.visibility = if (isLogedIn) View.GONE else View.VISIBLE
-            lay_buttons!!.visibility = if (isLogedIn) View.VISIBLE else View.GONE
+            lay_main?.visibility = if (isLogedIn) View.GONE else View.VISIBLE
+            lay_buttons?.visibility = if (isLogedIn) View.VISIBLE else View.GONE
         }
     }
 

@@ -26,12 +26,12 @@ internal class AnimeRelatedAdapter(private val fragment: Fragment, private val l
 
     override fun onBindViewHolder(holder: RelatedHolder, position: Int) {
         val related = list[position]
-        val animeObject = dao.getBySid(related.aid!!)
+        val animeObject = dao.getBySid(related.aid ?: "0")
         holder.textView.text = related.name
         holder.relation.text = related.relation
         if (animeObject != null) {
             holder.imageView.visibility = View.VISIBLE
-            PicassoSingle[context!!].load(PatternUtil.getCover(animeObject.aid!!)).into(holder.imageView)
+            PicassoSingle.get().load(PatternUtil.getCover(animeObject.aid)).into(holder.imageView)
             holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView) }
         } else {
             holder.imageView.visibility = View.GONE

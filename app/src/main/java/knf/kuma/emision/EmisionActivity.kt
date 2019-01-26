@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_emision.*
 import java.util.*
 
 class EmisionActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
-    private var pagerAdapter: EmisionPagerAdapter? = null
+    private var pagerAdapter: EmissionPagerAdapter? = null
 
     private val currentDay: Int
         get() {
@@ -32,11 +32,11 @@ class EmisionActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
         setContentView(R.layout.activity_emision)
         toolbar.title = "Emisión"
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowHomeEnabled(false)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         pager.offscreenPageLimit = 7
-        pagerAdapter = EmisionPagerAdapter(supportFragmentManager)
+        pagerAdapter = EmissionPagerAdapter(supportFragmentManager)
         pager.adapter = pagerAdapter
         tabs.setupWithViewPager(pager)
         tabs.addOnTabSelectedListener(this)

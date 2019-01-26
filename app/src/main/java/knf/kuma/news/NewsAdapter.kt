@@ -32,7 +32,7 @@ class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<NewsAd
         holder.description.text = newsObject.description
         holder.card.onClick {
             AchievementManager.onNewsOpened()
-            NewsCreator.openNews(activity, newsObject, holder.card, holder.title, holder.description)
+            NewsCreator.openNews(activity, newsObject)
         }
     }
 

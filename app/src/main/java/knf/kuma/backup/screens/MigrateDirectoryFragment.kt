@@ -42,7 +42,7 @@ class MigrateDirectoryFragment : Fragment() {
                     }
                     STATE_FINISHED -> {
                         Log.e("Dir", "Finished")
-                        onDirStatus!!.onFinished()
+                        onDirStatus?.onFinished()
                     }
                 }
         })

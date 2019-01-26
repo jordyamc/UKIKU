@@ -54,7 +54,7 @@ class SyncItemView : RelativeLayout {
         super.onFinishInflate()
         title.text = cardTitle
         if (!showDivider)
-            separator!!.visibility = View.GONE
+            separator?.visibility = View.GONE
     }
 
     fun enableBackup(backupObject: BackupObject<*>?, onClick: OnClick) {

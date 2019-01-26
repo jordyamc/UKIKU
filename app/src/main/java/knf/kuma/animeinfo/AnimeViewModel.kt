@@ -28,8 +28,4 @@ class AnimeViewModel : ViewModel() {
     fun reload(context: Context, link: String, persist: Boolean) {
         liveData = repository.getAnime(context, link, persist)
     }
-
-    enum class ModeState {
-        NORMAL
-    }
 }

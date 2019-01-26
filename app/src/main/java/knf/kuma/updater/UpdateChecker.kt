@@ -2,6 +2,7 @@ package knf.kuma.updater
 
 import android.content.Context
 import android.util.Log
+import androidx.core.content.pm.PackageInfoCompat
 import knf.kuma.BuildConfig
 import knf.kuma.commons.Network
 import org.jetbrains.anko.doAsync
@@ -14,7 +15,7 @@ object UpdateChecker {
                 try {
                     val document = Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num").get()
                     val nCode = Integer.parseInt(document.select("body").first().ownText().trim())
-                    val oCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+                    val oCode = PackageInfoCompat.getLongVersionCode(context.packageManager.getPackageInfo(context.packageName, 0)).toInt()
                     if (nCode > oCode) {
                         listener.onNeedUpdate(oCode.toString(), nCode.toString())
                     } else {

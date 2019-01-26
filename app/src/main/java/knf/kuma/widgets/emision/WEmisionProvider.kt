@@ -64,20 +64,22 @@ class WEmisionProvider : AppWidgetProvider() {
         remoteViews.setRemoteAdapter(R.id.words, svcIntent)
         val clickIntent = Intent(context, EmisionActivity::class.java)
         remoteViews.setTextViewText(R.id.title_day, actualDay)
-        remoteViews.setTextViewText(R.id.title_count, CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)!!).size.toString())
+        remoteViews.setTextViewText(R.id.title_count, CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)).size.toString())
         remoteViews.setOnClickPendingIntent(R.id.back_layout, PendingIntent.getActivity(context, 555, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT))
         remoteViews.setPendingIntentTemplate(R.id.words, PendingIntent.getActivity(context, appWidgetId, Intent(context, ActivityAnime::class.java), PendingIntent.FLAG_UPDATE_CURRENT))
         remoteViews.setEmptyView(R.id.words, R.id.empty)
         return remoteViews
     }
 
-    private fun getBlacklist(context: Context): Set<String>? {
+    private fun getBlacklist(context: Context): Set<String> {
         return PreferenceManager.getDefaultSharedPreferences(context).getStringSet("emision_blacklist", LinkedHashSet())
+                ?: setOf()
     }
 
     companion object {
 
-        fun update(context: Context) {
+        fun update(context: Context?) {
+            if (context == null) return
             val intent = Intent(context, WEmisionProvider::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             val ids = AppWidgetManager.getInstance(context)

@@ -64,15 +64,15 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
         listToolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.play -> {
-                    bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-                    QueueManager.startQueue(applicationContext, listAdapter!!.list)
+                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+                    QueueManager.startQueue(applicationContext, listAdapter?.list ?: listOf())
                 }
                 R.id.clear ->
                     MaterialDialog(this@QueueActivity).safeShow {
                         message(text = "¿Remover los episodios pendientes?")
                         positiveButton(text = "remover") {
-                            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-                            QueueManager.remove(listAdapter!!.list)
+                            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+                            QueueManager.remove(listAdapter?.list ?: mutableListOf())
                         }
                         negativeButton(text = "cancelar")
                     }
@@ -113,7 +113,7 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
                 recyclerView.adapter = animesAdapter
                 dettachHelper()
                 mItemTouchHelper = ItemTouchHelper(NoTouchHelperCallback())
-                mItemTouchHelper!!.attachToRecyclerView(recyclerView)
+                mItemTouchHelper?.attachToRecyclerView(recyclerView)
                 animesAdapter.update(QueueObject.getOne(list))
             })
         } else {
@@ -121,13 +121,13 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
             currentData.observe(this, object : Observer<MutableList<QueueObject>> {
                 override fun onChanged(list: MutableList<QueueObject>?) {
                     clearInterfaces()
-                    errorView.visibility = if (list!!.isEmpty()) View.VISIBLE else View.GONE
+                    errorView.visibility = if (list?.isEmpty() == true) View.VISIBLE else View.GONE
                     val allAdapter = QueueAllAdapter(this@QueueActivity)
                     recyclerView.adapter = allAdapter
                     dettachHelper()
                     mItemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(allAdapter))
                     mItemTouchHelper?.attachToRecyclerView(recyclerView)
-                    allAdapter.update(list)
+                    allAdapter.update(list ?: mutableListOf())
                     currentData.removeObserver(this)
                 }
             })
@@ -162,10 +162,10 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
             val liveData = CacheDB.INSTANCE.queueDAO().getByAid(queueObject.chapter.aid)
             liveData.observe(this, object : Observer<MutableList<QueueObject>> {
                 override fun onChanged(list: MutableList<QueueObject>?) {
-                    if (list!!.isEmpty())
-                        bottomSheetBehavior!!.setState(BottomSheetBehavior.STATE_HIDDEN)
+                    if (list?.isEmpty() == true)
+                        bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
                     else {
-                        listAdapter?.update(queueObject.chapter.aid, list)
+                        listAdapter?.update(queueObject.chapter.aid, list ?: mutableListOf())
                         bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
                     }
                     current = queueObject
@@ -222,8 +222,8 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
                 invalidateOptionsMenu()
             }
             R.id.play -> {
-                bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-                val list = (recyclerView.adapter as QueueAllAdapter).list
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+                val list = (recyclerView.adapter as? QueueAllAdapter)?.list ?: mutableListOf()
                 if (list.size > 0)
                     QueueManager.startQueue(applicationContext, list)
                 else
@@ -243,8 +243,8 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
     }
 
     override fun onBackPressed() {
-        if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_EXPANDED)
-            bottomSheetBehavior!!.setState(BottomSheetBehavior.STATE_HIDDEN)
+        if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED)
+            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
         else
             super.onBackPressed()
     }

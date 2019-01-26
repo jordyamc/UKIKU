@@ -16,9 +16,9 @@ class FragmentDownloads : FragmentBase() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         CacheDB.INSTANCE.downloadsDAO().active.observe(this, Observer { downloadObjects ->
-            progress!!.visibility = View.GONE
-            error!!.visibility = if (downloadObjects.isEmpty()) View.VISIBLE else View.GONE
-            if (isFirst || downloadObjects.isEmpty() || recycler.adapter != null && downloadObjects.size > recycler.adapter!!.itemCount) {
+            progress?.visibility = View.GONE
+            error?.visibility = if (downloadObjects.isEmpty()) View.VISIBLE else View.GONE
+            if (isFirst || downloadObjects.isEmpty() || recycler.adapter != null && downloadObjects.size > recycler.adapter?.itemCount ?: 0) {
                 isFirst = false
                 recycler.adapter = DownloadingAdapter(this@FragmentDownloads, downloadObjects as MutableList<DownloadObject>)
             }

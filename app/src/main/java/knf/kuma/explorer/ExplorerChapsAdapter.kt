@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
+import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
@@ -29,6 +30,7 @@ import org.jetbrains.anko.doAsync
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+
 
 class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, private val recyclerView: RecyclerView, private val explorerObject: ExplorerObject, private var clearInterface: FragmentChapters.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem>() {
     private val context: Context? = fragment.context
@@ -61,9 +63,9 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
             recordsDAO.add(RecordObject.fromDownloaded(chapObject))
             holder.seenOverlay.setSeen(true, true)
             if (CastUtil.get().connected()) {
-                CastUtil.get().play(fragment.activity!!, recyclerView, chapObject.eid, SelfServer.start(chapObject.fileName, true), chapObject.title, "Episodio " + chapObject.chapter, chapObject.chapPreviewLink, chapObject.thumb.isNull())
+                CastUtil.get().play(recyclerView, CastMedia.create(chapObject))
             } else {
-                ServersFactory.startPlay(context!!, chapObject.chapTitle, chapObject.fileName)
+                ServersFactory.startPlay(context, chapObject.chapTitle, chapObject.fileName)
             }
         }
         holder.cardView.setOnLongClickListener {
@@ -77,12 +79,14 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
             true
         }
         holder.action.setOnClickListener {
-            MaterialDialog(context!!).safeShow {
-                message(text = "¿Eliminar el episodio ${chapObject.chapter} de ${chapObject.title}?")
-                positiveButton(text = "CONFIRMAR") {
-                    delete(chapObject, holder.adapterPosition)
+            context?.let {
+                MaterialDialog(context).safeShow {
+                    message(text = "¿Eliminar el episodio ${chapObject.chapter} de ${chapObject.title}?")
+                    positiveButton(text = "CONFIRMAR") {
+                        delete(chapObject, holder.adapterPosition)
+                    }
+                    negativeButton(text = "CANCELAR")
                 }
-                negativeButton(text = "CANCELAR")
             }
         }
     }
@@ -118,15 +122,15 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
                 }
             }
             explorerDAO.delete(explorerObject)
-            clearInterface!!.onClear()
+            clearInterface?.onClear()
         }
     }
 
     private fun loadThumb(fileDownObj: ExplorerObject.FileDownObj, imageView: ImageView?) {
-        val file = File(context!!.cacheDir, explorerObject.fileName + "_" + fileDownObj.chapter.toLowerCase() + ".png")
+        val file = File(context?.cacheDir, explorerObject.fileName + "_" + fileDownObj.chapter.toLowerCase() + ".png")
         if (file.exists()) {
             fileDownObj.thumb = file
-            PicassoSingle[context].load(file).into(imageView)
+            PicassoSingle.get().load(file).into(imageView)
         } else {
             doAsync {
                 try {
@@ -137,10 +141,10 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
                         file.createNewFile()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(file))
                         fileDownObj.thumb = file
-                        doOnUI { PicassoSingle[this@ExplorerChapsAdapter.context].load(file).into(imageView) }
+                        doOnUI { PicassoSingle.get().load(file).into(imageView) }
                     }
                 } catch (e: Exception) {
-                    doOnUI { PicassoSingle[this@ExplorerChapsAdapter.context].load(R.drawable.ic_no_thumb).fit().into(imageView) }
+                    doOnUI { PicassoSingle.get().load(R.drawable.ic_no_thumb).fit().into(imageView) }
                 }
             }
         }

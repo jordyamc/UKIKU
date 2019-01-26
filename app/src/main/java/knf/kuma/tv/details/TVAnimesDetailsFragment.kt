@@ -1,6 +1,5 @@
 package knf.kuma.tv.details
 
-import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
@@ -12,6 +11,7 @@ import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
@@ -51,13 +51,15 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     }
 
     private fun buildDetails() {
-        Repository().getAnime(context!!, arguments!!.getString("url")!!, true).observe(activity!!, Observer { animeObject ->
-            Glide.with(activity!!).asBitmap().load(PatternUtil.getCover(animeObject.aid!!)).into(object : SimpleTarget<Bitmap>() {
+        val activity = activity ?: return
+        Repository().getAnime(App.context, arguments?.getString("url")
+                ?: "", true).observe(activity, Observer { animeObject ->
+            Glide.with(App.context).asBitmap().load(PatternUtil.getCover(animeObject.aid)).into(object : SimpleTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     Palette.from(resource).generate { palette ->
-                        val swatch = palette!!.darkMutedSwatch
+                        val swatch = palette?.darkMutedSwatch
                         favoriteObject = FavoriteObject(animeObject)
-                        chapters = animeObject.chapters!!
+                        chapters = animeObject.chapters
                         chapters.reversed()
                         val selector = ClassPresenterSelector()
                         val rowPresenter = CustomFullWidthDetailsOverviewRowPresenter(
@@ -80,39 +82,40 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                         val detailsOverview = DetailsOverviewRow(animeObject)
 
                         // Add images and action buttons to the details view
-                        detailsOverview.setImageBitmap(context!!, resource)
+                        detailsOverview.setImageBitmap(activity, resource)
                         detailsOverview.isImageScaleUpAllowed = true
                         actionAdapter = SparseArrayObjectAdapter()
                         if (CacheDB.INSTANCE.favsDAO().isFav(animeObject.key)) {
-                            actionAdapter!!.set(1, Action(1, "Quitar favorito", null, ContextCompat.getDrawable(context!!, R.drawable.heart_full)))
+                            actionAdapter?.set(1, Action(1, "Quitar favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_full)))
                         } else {
-                            actionAdapter!!.set(1, Action(1, "Añadir favorito", null, ContextCompat.getDrawable(context!!, R.drawable.heart_empty)))
+                            actionAdapter?.set(1, Action(1, "Añadir favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_empty)))
                         }
                         detailsOverview.actionsAdapter = actionAdapter
                         rowPresenter.onActionClickedListener = this@TVAnimesDetailsFragment
-                        mRowsAdapter!!.add(detailsOverview)
+                        mRowsAdapter?.add(detailsOverview)
 
                         // Add a Chapters items row
                         if (chapters.isNotEmpty()) {
                             listRowAdapter = ArrayObjectAdapter(
                                     ChapterPresenter())
                             for (chapter in chapters)
-                                listRowAdapter!!.add(chapter)
+                                listRowAdapter?.add(chapter)
                             val header = HeaderItem(0, "Episodios")
-                            mRowsAdapter!!.add(ChaptersListRow(header, listRowAdapter as ArrayObjectAdapter))
+                            mRowsAdapter?.add(ChaptersListRow(header, listRowAdapter
+                                    ?: ArrayObjectAdapter()))
                         }
 
                         // Add a Related items row
-                        if (animeObject.related!!.isNotEmpty()) {
+                        if (animeObject.related?.isNotEmpty() == true) {
                             val listRowAdapter = ArrayObjectAdapter(
                                     RelatedPresenter())
-                            for (related in animeObject.related!!)
+                            for (related in animeObject.related ?: listOf())
                                 listRowAdapter.add(related)
                             val header = HeaderItem(0, "Relacionados")
-                            mRowsAdapter!!.add(ListRow(header, listRowAdapter))
+                            mRowsAdapter?.add(ListRow(header, listRowAdapter))
                         }
 
-                        adapter = mRowsAdapter!!
+                        adapter = mRowsAdapter
                     }
                 }
             })
@@ -120,31 +123,33 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     }
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
+        val activity = activity ?: return
         if (item is AnimeObject.WebInfo.AnimeRelated) {
-            TVAnimesDetails.start(context!!, "https://animeflv.net" + item.link!!)
+            TVAnimesDetails.start(activity, "https://animeflv.net" + item.link)
         } else if (item is AnimeObject.WebInfo.AnimeChapter) {
             currentChapter = item
-            TVServersFactory.start(activity as Activity, item.link, item, itemViewHolder, activity as TVServersFactory.ServersInterface)
+            TVServersFactory.start(activity, item.link, item, itemViewHolder, activity as? TVServersFactory.ServersInterface)
         }
     }
 
     fun onStartStreaming() {
-        if (currentChapter != null)
-            listRowAdapter!!.notifyArrayItemRangeChanged(chapters.indexOf(currentChapter as AnimeObject.WebInfo.AnimeChapter), 1)
+        currentChapter?.let { listRowAdapter?.notifyArrayItemRangeChanged(chapters.indexOf(it), 1) }
     }
 
     override fun onActionClicked(action: Action) {
-        actionAdapter!!.clear()
-        if (CacheDB.INSTANCE.favsDAO().isFav(favoriteObject!!.key)) {
-            CacheDB.INSTANCE.favsDAO().deleteFav(favoriteObject as FavoriteObject)
-            action.label1 = "Añadir favorito"
-            action.icon = ContextCompat.getDrawable(context!!, R.drawable.heart_empty)
-        } else {
-            CacheDB.INSTANCE.favsDAO().addFav(favoriteObject as FavoriteObject)
-            action.label1 = "Quitar favorito"
-            action.icon = ContextCompat.getDrawable(context!!, R.drawable.heart_full)
+        actionAdapter?.clear()
+        favoriteObject?.let {
+            if (CacheDB.INSTANCE.favsDAO().isFav(it.key)) {
+                CacheDB.INSTANCE.favsDAO().deleteFav(it)
+                action.label1 = "Añadir favorito"
+                action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_empty)
+            } else {
+                CacheDB.INSTANCE.favsDAO().addFav(it)
+                action.label1 = "Quitar favorito"
+                action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
+            }
         }
-        actionAdapter!!.set(1, action)
+        actionAdapter?.set(1, action)
     }
 
     companion object {

@@ -34,8 +34,8 @@ import java.math.BigDecimal
 import java.util.*
 
 object EAHelper {
-    private var CODE1: String? = null
-    private var CODE2: String? = null
+    private var CODE1: String = ""
+    private var CODE2: String = ""
     private var CURRENT_1 = ""
     private var CURRENT_2 = ""
 
@@ -50,6 +50,8 @@ object EAHelper {
 
     val isPart3Unlocked: Boolean
         get() = EADB.INSTANCE.eaDAO().isUnlocked(3)
+    val isAllUnlocked: Boolean
+        get() = isPart0Unlocked && isPart1Unlocked && isPart2Unlocked && isPart3Unlocked
 
     val phase: Int
         get() = when {
@@ -64,7 +66,7 @@ object EAHelper {
         get() = when {
             isPart3Unlocked -> "Disfruta de la recompensa"
             isPart2Unlocked -> "El tesoro esta en Akihabara"
-            isPart1Unlocked -> "LMMJVSD \u2192 US \u2192 " + CODE2!!
+            isPart1Unlocked -> "LMMJVSD \u2192 US \u2192 " + CODE2
             isPart0Unlocked -> CODE1
             else -> "\u26B2 easteregg"
         }
@@ -73,8 +75,8 @@ object EAHelper {
         return when (phase) {
             4 -> "Disfruta de la recompensa"
             3 -> "El tesoro esta en Akihabara"
-            2 -> "LMMJVSD \u2192 US \u2192 " + CODE2!!
-            1 -> CODE1!!
+            2 -> "LMMJVSD \u2192 US \u2192 " + CODE2
+            1 -> CODE1
             else -> "\u26B2 easteregg"
         }
     }
@@ -82,11 +84,9 @@ object EAHelper {
     fun init(context: Context) {
         val manager = PreferenceManager.getDefaultSharedPreferences(context)
         CODE1 = manager.getString("ea_code1", null)
+                ?: generate(context, "ea_code1", arrayOf("R", "F", "D", "C"))
         CODE2 = manager.getString("ea_code2", null)
-        if (CODE1 == null)
-            CODE1 = generate(context, "ea_code1", arrayOf("R", "F", "D", "C"))
-        if (CODE2 == null)
-            CODE2 = generate(context, "ea_code2", arrayOf("1", "2", "3", "4", "5", "6", "7"))
+                ?: generate(context, "ea_code2", arrayOf("1", "2", "3", "4", "5", "6", "7"))
     }
 
     fun checkStart(query: String) {
@@ -112,11 +112,11 @@ object EAHelper {
             CURRENT_1 += part
             if (CURRENT_1 == CODE1) {
                 setUnlocked(1)
-                Toaster.toastLong("LMMJVSD \u2192 US \u2192 " + CODE2!!)
+                Toaster.toastLong("LMMJVSD \u2192 US \u2192 " + CODE2)
                 clear1()
                 Answers.getInstance().logLevelEnd(LevelEndEvent().putLevelName("Easter Egg Phase 1").putScore(0))
                 Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg Phase 2"))
-            } else if (!CODE1!!.startsWith(CURRENT_1)) {
+            } else if (!CODE1.startsWith(CURRENT_1)) {
                 clear1()
                 CURRENT_1 += part
             }
@@ -136,7 +136,7 @@ object EAHelper {
                 clear2()
                 Answers.getInstance().logLevelEnd(LevelEndEvent().putLevelName("Easter Egg Phase 2").putScore(0))
                 Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg Phase 3"))
-            } else if (!CODE2!!.startsWith(CURRENT_2)) {
+            } else if (!CODE2.startsWith(CURRENT_2)) {
                 clear2()
                 CURRENT_2 += part
             }
@@ -451,7 +451,8 @@ class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
         if (index == 0 || index == 4 || !iapWrapper.isEnabled || !iapWrapper.isAvailable)
             unlockButton.visibility = View.GONE
         else {
-            unlockButton.text = "Desbloquear ${iapWrapper.inventory!!.skuList[getSkuCode(index)]?.price} ${iapWrapper.inventory!!.skuList[getSkuCode(index)]?.priceCurrencyCode}"
+            val details = iapWrapper.inventory?.skuList?.let { it[getSkuCode(index)] }
+            unlockButton.text = "Desbloquear ${details?.price} ${details?.priceCurrencyCode}"
             unlockButton.onClick {
                 if (!iapWrapper.isEnabled)
                     iapWrapper.showInstallDialog()

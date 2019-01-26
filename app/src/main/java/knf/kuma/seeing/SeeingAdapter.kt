@@ -43,12 +43,12 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         val seeingObject = list[position]
         if (holder is SeeingItem)
             holder.chapter.text = getCardText(seeingObject)
-        (holder as SeeingItemNormal).apply {
-            PicassoSingle[activity].load(PatternUtil.getCover(seeingObject.aid!!)).into(imageView)
+        (holder as? SeeingItemNormal)?.apply {
+            PicassoSingle.get().load(PatternUtil.getCover(seeingObject.aid)).into(imageView)
             title.text = seeingObject.title
             cardView.setOnClickListener { ActivityAnime.open(activity, seeingObject, imageView) }
-            cardView.setOnLongClickListener { it ->
-                val popupMenu = PopupMenu(activity, it)
+            cardView.setOnLongClickListener { view ->
+                val popupMenu = PopupMenu(activity, view)
                 popupMenu.inflate(R.menu.menu_seeing)
                 when (seeingObject.state) {
                     SeeingObject.STATE_WATCHING -> popupMenu.menu.findItem(R.id.watching).isVisible = false
@@ -66,7 +66,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
                         }
                         if (isFullList)
                             doOnUI {
-                                (holder as SeeingItem).chapter.text = getCardText(seeingObject)
+                                (holder as? SeeingItem)?.chapter?.text = getCardText(seeingObject)
                             }
                     }
                     true
@@ -117,12 +117,12 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         return list.size
     }
 
-    fun update(list: List<SeeingObject>) {
-        if (this.list notSameContent list) {
+    fun update(newList: List<SeeingObject>) {
+        if (this.list notSameContent newList) {
             doAsync {
-                val result = DiffUtil.calculateDiff(SeeingDiff(this@SeeingAdapter.list, list))
+                val result = DiffUtil.calculateDiff(SeeingDiff(list, newList))
                 doOnUI {
-                    this@SeeingAdapter.list = list
+                    list = newList
                     try {
                         result.dispatchUpdatesTo(this@SeeingAdapter)
                     } catch (e: Exception) {

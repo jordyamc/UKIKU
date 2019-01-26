@@ -116,16 +116,17 @@ class SearchFragment : BottomFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        model = ViewModelProviders.of(activity!!).get(SearchViewModel::class.java)
-        model?.setSearch(query, "", this, Observer { animeObjects ->
-            adapter?.submitList(animeObjects)
-            errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
-            if (isFirst) {
-                progressBar.visibility = View.GONE
-                isFirst = false
-                recyclerView.scheduleLayoutAnimation()
-            }
-        })
+        model = activity?.let { ViewModelProviders.of(it).get(SearchViewModel::class.java) }?.also {
+            it.setSearch(query, "", this, Observer { animeObjects ->
+                adapter?.submitList(animeObjects)
+                errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
+                if (isFirst) {
+                    progressBar.visibility = View.GONE
+                    isFirst = false
+                    recyclerView.scheduleLayoutAnimation()
+                }
+            })
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

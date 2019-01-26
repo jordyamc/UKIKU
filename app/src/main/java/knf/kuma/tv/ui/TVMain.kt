@@ -26,8 +26,9 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragment = TVMainFragment.get()
-        addFragment(fragment!!)
+        fragment = TVMainFragment.get().also {
+            addFragment(it)
+        }
         DirectoryService.run(this)
         RecentsJob.schedule(this)
         DirUpdateJob.schedule(this)
@@ -79,7 +80,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                         else
                             serversFactory?.analyzeServer(bundle?.getInt("position", 0) ?: 0)
                     }
-                } else if (resultCode == Activity.RESULT_CANCELED && data.extras!!.getBoolean("is_video_server", false))
+                } else if (resultCode == Activity.RESULT_CANCELED && data.extras?.getBoolean("is_video_server", false) == true)
                     serversFactory?.showServerList()
         } catch (e: Exception) {
             e.printStackTrace()

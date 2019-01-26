@@ -7,7 +7,6 @@ import android.net.Uri
 import android.preference.PreferenceManager
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.notNull
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
@@ -17,12 +16,14 @@ import knf.kuma.pojos.RecordObject
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
+
 object QueueManager {
     fun isInQueue(eid: String): Boolean {
         return CacheDB.INSTANCE.queueDAO().isInQueue(eid)
     }
 
-    fun add(uri: Uri, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter) {
+    fun add(uri: Uri, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter?) {
+        if (chapter == null) return
         CacheDB.INSTANCE.queueDAO().add(QueueObject(uri, isFile, chapter))
         Toaster.toast("Episodio añadido a cola")
     }
@@ -40,8 +41,8 @@ object QueueManager {
     }
 
     fun remove(eid: String?) {
-        if (eid.notNull())
-            CacheDB.INSTANCE.queueDAO().removeByEID(eid!!)
+        if (eid == null) return
+        CacheDB.INSTANCE.queueDAO().removeByEID(eid)
     }
 
     fun removeAll(aid: String) {
@@ -60,7 +61,8 @@ object QueueManager {
             Toaster.toast("La lista esta vacía")
     }
 
-    internal fun startQueueDownloaded(context: Context, list: List<ExplorerObject.FileDownObj>) {
+    internal fun startQueueDownloaded(context: Context?, list: List<ExplorerObject.FileDownObj>) {
+        if (context == null) return
         if (list.isNotEmpty()) {
             markAllSeenDownloaded(list)
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0" || isMxInstalled(context) == null)
@@ -99,7 +101,7 @@ object QueueManager {
         val startUri = if (list[0].isFile) FileAccessHelper.INSTANCE.getDataUri(list[0].chapter.fileName) else list[0].getUri()
         val titles = QueueObject.getTitles(list)
         val uris = QueueObject.getUris(list)
-        uris[0] = startUri!!
+        uris[0] = startUri ?: Uri.EMPTY
         val intent = Intent(Intent.ACTION_VIEW)
                 .setPackage(isMxInstalled(context))
                 .setDataAndType(startUri, "video/mp4")
@@ -117,7 +119,7 @@ object QueueManager {
         val startUri = FileAccessHelper.INSTANCE.getDataUri(list[0].fileName)
         val titles = ExplorerObject.FileDownObj.getTitles(list)
         val uris = ExplorerObject.FileDownObj.getUris(list)
-        uris[0] = startUri!!
+        uris[0] = startUri ?: Uri.EMPTY
         val intent = Intent(Intent.ACTION_VIEW)
                 .setPackage(isMxInstalled(context))
                 .setDataAndType(startUri, "video/mp4")

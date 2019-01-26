@@ -34,15 +34,15 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
         touchListener = DragSelectTouchListener()
                 .withSelectListener(DragSelectionProcessor(object : DragSelectionProcessor.ISelectionHandler {
                     override fun getSelection(): Set<Int> {
-                        return adapter!!.selection
+                        return adapter?.selection ?: setOf()
                     }
 
                     override fun isSelected(i: Int): Boolean {
-                        return adapter!!.selection.contains(i)
+                        return adapter?.selection?.contains(i) ?: false
                     }
 
                     override fun updateSelection(i: Int, i1: Int, b: Boolean, b1: Boolean) {
-                        adapter!!.selectRange(i, i1, b)
+                        adapter?.selectRange(i, i1, b)
                     }
                 }).withStartFinishedListener(object : DragSelectionProcessor.ISelectionStartFinishedListener {
                     override fun onSelectionStarted(i: Int, b: Boolean) {
@@ -57,7 +57,8 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                     when (state) {
                                         BottomActionsDialog.STATE_SEEN -> doAsync {
                                             val dao = CacheDB.INSTANCE.chaptersDAO()
-                                            for (i13 in ArrayList(adapter!!.selection)) {
+                                            for (i13 in ArrayList(adapter?.selection
+                                                    ?: arrayListOf())) {
                                                 dao.addChapter(chapters[i13])
                                             }
                                             val seeingDAO = CacheDB.INSTANCE.seeingDAO()
@@ -66,13 +67,14 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 seeingObject.chapter = chapters[0].number
                                                 seeingDAO.update(seeingObject)
                                             }
-                                            recyclerView.post { adapter!!.deselectAll() }
+                                            recyclerView.post { adapter?.deselectAll() }
                                             snackbar.safeDismiss()
                                         }
                                         BottomActionsDialog.STATE_UNSEEN -> doAsync {
                                             try {
                                                 val dao = CacheDB.INSTANCE.chaptersDAO()
-                                                for (i12 in ArrayList(adapter!!.selection)) {
+                                                for (i12 in ArrayList(adapter?.selection
+                                                        ?: arrayListOf())) {
                                                     dao.deleteChapter(chapters[i12])
                                                 }
                                                 val seeingDAO = CacheDB.INSTANCE.seeingDAO()
@@ -81,7 +83,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                     seeingObject.chapter = chapters[0].number
                                                     seeingDAO.update(seeingObject)
                                                 }
-                                                recyclerView.post { adapter!!.deselectAll() }
+                                                recyclerView.post { adapter?.deselectAll() }
                                                 snackbar.safeDismiss()
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
@@ -92,7 +94,8 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                             try {
                                                 val cChapters = ArrayList<AnimeObject.WebInfo.AnimeChapter>()
                                                 val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
-                                                for (i13 in ArrayList(adapter!!.selection)) {
+                                                for (i13 in ArrayList(adapter?.selection
+                                                        ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
                                                     val file = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
@@ -100,7 +103,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                         cChapters.add(chapter)
                                                 }
                                                 callback.onImportMultiple(cChapters)
-                                                recyclerView.post { adapter!!.deselectAll() }
+                                                recyclerView.post { adapter?.deselectAll() }
                                                 snackbar.safeDismiss()
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
@@ -115,7 +118,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                             }
 
                             override fun onDismiss() {
-                                adapter!!.deselectAll()
+                                adapter?.deselectAll()
                             }
                         }).safeShow(fragmentManager, "actions_dialog")
                     }
@@ -134,7 +137,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
 
     fun refresh() {
         if (adapter != null)
-            recyclerView.post { adapter!!.notifyDataSetChanged() }
+            recyclerView.post { adapter?.notifyDataSetChanged() }
     }
 
     fun goToChapter() {

@@ -20,7 +20,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.favorite.objects.InfoContainer
 import knf.kuma.pojos.FavoriteObject
-import java.util.*
+
 
 class FavsSectionAdapter(private val fragment: Fragment, private val recyclerView: FastScrollRecyclerView, private val showSections: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
@@ -56,9 +56,10 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
         val favoriteObject = list[position]
         if (holder is HeaderHolder) {
             holder.header.text = favoriteObject.name
-            holder.action.setOnClickListener { listener.onEdit(favoriteObject.name!!) }
+            holder.action.setOnClickListener { listener.onEdit(favoriteObject.name ?: "") }
         } else if (holder is ItemHolder) {
-            PicassoSingle[context!!].load(PatternUtil.getCover(favoriteObject.aid!!)).into(holder.imageView)
+            PicassoSingle.get().load(PatternUtil.getCover(favoriteObject.aid
+                    ?: "")).into(holder.imageView)
             holder.title.text = favoriteObject.name
             holder.type.text = favoriteObject.type
             holder.cardView.setOnClickListener { ActivityAnime.open(fragment, favoriteObject, holder.imageView) }
@@ -79,14 +80,24 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     }
 
     override fun getSectionName(position: Int): String {
-        return when (orderType) {
-            0 -> list[position].name.substring(0, 1).toUpperCase()
-            else -> list[position].aid
+        return try {
+            when (orderType) {
+                0 -> {
+                    val name = list[position].name
+                    if (name.isNotEmpty())
+                        name.substring(0, 1).toUpperCase()
+                    else
+                        name
+                }
+                else -> list[position].aid
+            }
+        } catch (e: IllegalStateException) {
+            ""
         }
     }
 
     fun updatePosition(container: InfoContainer) {
-        list = container.updated!!
+        list = container.updated ?: arrayListOf()
         recyclerView.post { notifyItemMoved(container.from, container.to) }
     }
 

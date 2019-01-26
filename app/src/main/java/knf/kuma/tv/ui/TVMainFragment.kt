@@ -10,6 +10,7 @@ import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.*
 import androidx.lifecycle.Observer
 import com.dropbox.core.android.Auth
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.BUUtils
 import knf.kuma.database.CacheDB
@@ -45,7 +46,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
         isHeadersTransitionOnBackEnabled = true
         title = "UKIKU"
         brandColor = Color.parseColor("#424242")
-        searchAffordanceColor = ContextCompat.getColor(context!!, R.color.colorAccent)
+        searchAffordanceColor = ContextCompat.getColor(App.context, R.color.colorAccent)
         setOnSearchClickedListener(this)
         createDataRows()
         createRows()
@@ -58,17 +59,17 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
 
     private fun createDataRows() {
         mRows = SparseArray()
-        mRows!!.put(RECENTS, AnimeRow()
+        mRows?.put(RECENTS, AnimeRow()
                 .setId(RECENTS)
                 .setAdapter(ArrayObjectAdapter(RecentsPresenter()))
                 .setTitle("Recientes")
                 .setPage(1))
-        mRows!!.put(LAST_SEEN, AnimeRow()
+        mRows?.put(LAST_SEEN, AnimeRow()
                 .setId(LAST_SEEN)
                 .setAdapter(ArrayObjectAdapter(RecordPresenter()))
                 .setTitle("Ultimos vistos")
                 .setPage(1))
-        mRows!!.put(FAVORITES, AnimeRow()
+        mRows?.put(FAVORITES, AnimeRow()
                 .setId(FAVORITES)
                 .setAdapter(ArrayObjectAdapter(FavPresenter()))
                 .setTitle("Favoritos")
@@ -77,10 +78,10 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
 
     private fun createRows() {
         val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-        for (i in 0 until mRows!!.size()) {
-            val row = mRows!!.get(i)
-            val headerItem = HeaderItem(row.id.toLong(), row.title)
-            val listRow = ListRow(headerItem, row.adapter)
+        for (i in 0 until (mRows?.size() ?: 0)) {
+            val row = mRows?.get(i)
+            val headerItem = HeaderItem(row?.id?.toLong() ?: 0, row?.title)
+            val listRow = ListRow(headerItem, row?.adapter)
             rowsAdapter.add(listRow)
         }
         adapter = rowsAdapter
@@ -89,50 +90,52 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
     }
 
     private fun fetchData() {
-        Repository().reloadRecents(context!!)
-        CacheDB.INSTANCE.recentsDAO().objects.observe(activity!!, Observer { recentObjects ->
-            val row = mRows!!.get(RECENTS)
-            row.page = row.page + 1
-            row.adapter!!.clear()
-            for (recentObject in recentObjects) {
-                row.adapter!!.add(recentObject)
-            }
-            startEntranceTransition()
-        })
-        CacheDB.INSTANCE.recordsDAO().all.observe(activity!!, Observer { recordObjects ->
-            val row = mRows!!.get(LAST_SEEN)
-            row.page = row!!.page + 1
-            row.adapter!!.clear()
-            for (recordObject in recordObjects) {
-                row.adapter!!.add(recordObject)
-            }
-            startEntranceTransition()
-        })
-        CacheDB.INSTANCE.favsDAO().all.observe(activity!!, Observer { favoriteObjects ->
-            val row = mRows!!.get(FAVORITES)
-            row.page = row.page + 1
-            row.adapter!!.clear()
-            for (favoriteObject in favoriteObjects) {
-                row.adapter!!.add(favoriteObject)
-            }
-            startEntranceTransition()
-        })
+        Repository().reloadRecents()
+        activity?.let {
+            CacheDB.INSTANCE.recentsDAO().objects.observe(it, Observer { recentObjects ->
+                val row = mRows?.get(RECENTS)
+                row?.page = row?.page?.plus(1) ?: 0
+                row?.adapter?.clear()
+                for (recentObject in recentObjects) {
+                    row?.adapter?.add(recentObject)
+                }
+                startEntranceTransition()
+            })
+            CacheDB.INSTANCE.recordsDAO().all.observe(it, Observer { recordObjects ->
+                val row = mRows?.get(LAST_SEEN)
+                row?.page = row?.page?.plus(1) ?: 0
+                row?.adapter?.clear()
+                for (recordObject in recordObjects) {
+                    row?.adapter?.add(recordObject)
+                }
+                startEntranceTransition()
+            })
+            CacheDB.INSTANCE.favsDAO().all.observe(it, Observer { favoriteObjects ->
+                val row = mRows?.get(FAVORITES)
+                row?.page = row?.page?.plus(1) ?: 0
+                row?.adapter?.clear()
+                for (favoriteObject in favoriteObjects) {
+                    row?.adapter?.add(favoriteObject)
+                }
+                startEntranceTransition()
+            })
+        }
     }
 
     override fun onClick(v: View) {
-        TVSearch.start(context!!)
+        context?.let { TVSearch.start(it) }
     }
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder?, item: Any?, rowViewHolder: RowPresenter.ViewHolder?, row: Row?) {
         if (item is RecentObject) {
-            TVServersFactory.start(activity as Activity, item.url!!, AnimeObject.WebInfo.AnimeChapter.fromRecent(item), activity as TVServersFactory.ServersInterface)
+            TVServersFactory.start(activity as Activity, item.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(item), activity as TVServersFactory.ServersInterface)
         } else if (item is RecordObject) {
             if (item.animeObject != null)
-                TVAnimesDetails.start(context!!, item.animeObject!!.link!!)
+                context?.let { TVAnimesDetails.start(it, item.animeObject.link) }
             else
                 Toaster.toast("Anime no encontrado")
         } else if (item is FavoriteObject) {
-            TVAnimesDetails.start(context!!, item.link!!)
+            context?.let { TVAnimesDetails.start(it, item.link) }
         } else if (item is SyncObject) {
             if (item is LogOutObject) {
                 BUUtils.logOut()

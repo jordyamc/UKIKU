@@ -68,14 +68,14 @@ open class Option : Parcelable {
         fun getNames(options: MutableList<Option>): MutableList<String> {
             val names = ArrayList<String>()
             for (option in options)
-                names.add(option.name!!)
+                names.add(option.name ?: "")
             return names
         }
 
         fun getLinks(options: MutableList<Option>): MutableList<String> {
             val links = ArrayList<String>()
             for (option in options)
-                links.add(option.name!!)
+                links.add(option.name ?: "")
             return links
         }
     }

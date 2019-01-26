@@ -24,7 +24,7 @@ class FSGridRecyclerView : FastScrollRecyclerView {
             var animationParams: GridLayoutAnimationController.AnimationParameters? = null
 
             if (params.layoutAnimationParameters != null)
-                animationParams = params.layoutAnimationParameters as GridLayoutAnimationController.AnimationParameters
+                animationParams = params.layoutAnimationParameters as? GridLayoutAnimationController.AnimationParameters
 
             if (animationParams == null) {
                 // If there are no animation parameters, create new once and attach them to

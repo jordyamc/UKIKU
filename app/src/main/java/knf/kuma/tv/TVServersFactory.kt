@@ -21,6 +21,7 @@ import knf.kuma.videoservers.Option
 import knf.kuma.videoservers.Server
 import knf.kuma.videoservers.VideoServer
 import org.jetbrains.anko.doAsync
+import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
@@ -62,7 +63,8 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                 if (server != null)
                     servers.add(server)
             }
-            val jsonArray = jsonObject!!.getJSONArray(if (position == 0) "SUB" else "LAT")
+            val jsonArray = jsonObject?.getJSONArray(if (position == 0) "SUB" else "LAT")
+                    ?: JSONArray()
             for (baseLink in jsonArray) {
                 val server = Server.check(activity, baseLink.optString("code"))
                 if (server != null)
@@ -105,15 +107,15 @@ class TVServersFactory private constructor(private val activity: Activity, priva
     }
 
     fun analyzeOption(position: Int) {
-        if (current != null)
-            startStreaming(current!!.options[position])
+        current?.let { startStreaming(it.options[position]) }
     }
 
     private fun showOptions(server: VideoServer) {
         this.current = server
         activity.startActivityForResult(Intent(activity, TVServerSelection::class.java)
                 .putExtra("name", server.name)
-                .putExtra(TVServerSelectionFragment.VIDEO_DATA, Option.getNames(server.options) as ArrayList),
+                .putExtra(TVServerSelectionFragment.VIDEO_DATA, (Option.getNames(server.options) as? ArrayList)
+                        ?: arrayListOf<String>()),
                 REQUEST_CODE_OPTION)
     }
 
@@ -143,7 +145,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                 }
             }
             jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value)
-            if (jsonObject!!.length() > 1) {
+            if (jsonObject?.length() ?: 0 > 1) {
                 this.servers = servers
                 activity.startActivityForResult(Intent(activity, TVMultiSelection::class.java),
                         REQUEST_CODE_MULTI)
@@ -156,7 +158,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                     if (server != null)
                         servers.add(server)
                 }
-                val jsonArray = jsonObject!!.getJSONArray("SUB")
+                val jsonArray = jsonObject?.getJSONArray("SUB") ?: JSONArray()
                 for (baseLink in jsonArray) {
                     val server = Server.check(activity, baseLink.optString("code"))
                     if (server != null)
@@ -189,11 +191,13 @@ class TVServersFactory private constructor(private val activity: Activity, priva
             start(activity, url, chapter, null, serversInterface)
         }
 
-        fun start(activity: Activity, url: String, chapter: AnimeObject.WebInfo.AnimeChapter, viewHolder: Presenter.ViewHolder?, serversInterface: ServersInterface) {
+        fun start(activity: Activity, url: String, chapter: AnimeObject.WebInfo.AnimeChapter, viewHolder: Presenter.ViewHolder?, serversInterface: ServersInterface?) {
             doAsync {
-                val factory = TVServersFactory(activity, url, chapter, viewHolder, serversInterface)
-                serversInterface.onReady(factory)
-                factory.get()
+                serversInterface?.let {
+                    val factory = TVServersFactory(activity, url, chapter, viewHolder, it)
+                    serversInterface.onReady(factory)
+                    factory.get()
+                }
             }
         }
     }

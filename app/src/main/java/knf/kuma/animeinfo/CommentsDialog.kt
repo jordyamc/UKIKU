@@ -11,6 +11,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import knf.kuma.R
+import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
 import knf.kuma.pojos.AnimeObject
 import java.net.URLEncoder
@@ -33,40 +34,44 @@ class CommentsDialog(private val chapters: MutableList<AnimeObject.WebInfo.Anime
 
     @SuppressLint("SetJavaScriptEnabled")
     fun show(activity: Activity) {
-        val dialog = MaterialDialog(activity)
-                .customView(R.layout.layout_comments_dialog, noVerticalPadding = true)
-        with(dialog.getCustomView()!!) {
-            spinner = findViewById(R.id.spinner)
-            progressBar = findViewById(R.id.progress)
-            scrollView = findViewById(R.id.scroll)
-            webView = findViewById(R.id.webview)
-        }
-        webView.settings.javaScriptEnabled = true
-        val newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0"
-        webView.settings.userAgentString = newUA
-        webView.webViewClient = object : WebViewClient() {
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                super.onPageStarted(view, url, favicon)
-                onHide()
+        noCrash {
+            val dialog = MaterialDialog(activity)
+                    .customView(R.layout.layout_comments_dialog, noVerticalPadding = true)
+            dialog.getCustomView()?.let {
+                with(it) {
+                    spinner = findViewById(R.id.spinner)
+                    progressBar = findViewById(R.id.progress)
+                    scrollView = findViewById(R.id.scroll)
+                    webView = findViewById(R.id.webview)
+                }
             }
+            webView.settings.javaScriptEnabled = true
+            val newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0"
+            webView.settings.userAgentString = newUA
+            webView.webViewClient = object : WebViewClient() {
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    onHide()
+                }
 
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                onShow()
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    onShow()
+                }
             }
-        }
-        spinner.adapter = ArrayAdapter(activity, R.layout.item_simple_spinner, eps)
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                webView.loadUrl(getLink(chapters[position].link))
-            }
+            spinner.adapter = ArrayAdapter(activity, R.layout.item_simple_spinner, eps)
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    webView.loadUrl(getLink(chapters[position].link))
+                }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
 
+                }
             }
+            webView.loadUrl(getLink(chapters[0].link))
+            dialog.safeShow()
         }
-        webView.loadUrl(getLink(chapters[0].link))
-        dialog.safeShow()
     }
 
     private fun getLink(link: String): String {

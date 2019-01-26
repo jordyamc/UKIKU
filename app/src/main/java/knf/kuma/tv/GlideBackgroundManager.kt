@@ -9,6 +9,7 @@ import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import knf.kuma.App
 import knf.kuma.commons.doOnUI
 import java.lang.ref.WeakReference
 import java.util.*
@@ -29,7 +30,7 @@ class GlideBackgroundManager(activity: Activity) {
     }
 
     init {
-        if (!mBackgroundManager!!.isAttached)
+        if (mBackgroundManager?.isAttached == false)
             mBackgroundManager.attach(activity.window)
     }
 
@@ -59,9 +60,7 @@ class GlideBackgroundManager(activity: Activity) {
      * Stops the timer
      */
     private fun cancelTimer() {
-        if (mBackgroundTimer != null) {
-            mBackgroundTimer!!.cancel()
-        }
+        mBackgroundTimer?.cancel()
     }
 
     /**
@@ -71,18 +70,16 @@ class GlideBackgroundManager(activity: Activity) {
         cancelTimer()
         mBackgroundTimer = Timer()
         /* set delay time to reduce too much background image loading process */
-        mBackgroundTimer!!.schedule(UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY.toLong())
+        mBackgroundTimer?.schedule(UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY.toLong())
     }
 
     /**
      * Updates the background with the last known URI
      */
     fun updateBackground() {
-        if (mActivityWeakReference.get() != null) {
-            Glide.with(mActivityWeakReference.get()!!)
-                    .load(mBackgroundURI)
-                    .into<SimpleTarget<Drawable>>(mGlideDrawableSimpleTarget)
-        }
+        Glide.with(App.context)
+                .load(mBackgroundURI)
+                .into<SimpleTarget<Drawable>>(mGlideDrawableSimpleTarget)
     }
 
     private inner class UpdateBackgroundTask : TimerTask() {

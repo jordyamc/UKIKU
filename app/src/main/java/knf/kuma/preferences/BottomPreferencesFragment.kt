@@ -21,7 +21,7 @@ class BottomPreferencesFragment : BottomFragment() {
     override fun onReselect() {
         EAHelper.enter1("C")
         count++
-        if (count == 20) AchievementManager.unlock(40)
+        if (count == 20) AchievementManager.unlock(listOf(40))
     }
 
     companion object {

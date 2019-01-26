@@ -37,9 +37,10 @@ class BottomActionsDialog : BottomSheetDialogFragment() {
         val dialog = super.onCreateDialog(savedInstanceState)
         dialog.setOnShowListener { dialogInterface ->
             try {
-                val d = dialogInterface as BottomSheetDialog
-                val bottomSheetInternal = d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                BottomSheetBehavior.from(bottomSheetInternal!!).setState(BottomSheetBehavior.STATE_EXPANDED)
+                val d = dialogInterface as? BottomSheetDialog
+                d?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.also {
+                    BottomSheetBehavior.from(it).setState(BottomSheetBehavior.STATE_EXPANDED)
+                }
             } catch (e: Exception) {
                 //
             }
@@ -65,9 +66,14 @@ class BottomActionsDialog : BottomSheetDialogFragment() {
 
     }
 
+
     override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        callback?.onDismiss()
+        try {
+            super.onDismiss(dialog)
+            callback?.onDismiss()
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
     }
 
     interface ActionsCallback {

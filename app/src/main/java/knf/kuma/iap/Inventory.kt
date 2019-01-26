@@ -28,17 +28,19 @@ class Inventory(service: BillingService) {
         var continuationToken: String? = ""
         do {
             noCrash {
-                val bundle = service.getPurchases(3, App.context.packageName, IAPWrapper.ITEM_TYPE_INAPP, continuationToken!!)
+                val bundle = service.getPurchases(3, App.context.packageName, IAPWrapper.ITEM_TYPE_INAPP, continuationToken
+                        ?: "")
                 if (bundle.responseCode != IAPWrapper.BILLING_RESPONSE_RESULT_OK)
                     return@noCrash
                 val ownedSkus = bundle.getStringArrayList(IAPWrapper.RESPONSE_INAPP_ITEM_LIST)
                 val purchaseDatas = bundle.getStringArrayList(IAPWrapper.RESPONSE_INAPP_PURCHASE_DATA_LIST)
                 val signatureList = bundle.getStringArrayList(IAPWrapper.RESPONSE_INAPP_SIGNATURE_LIST)
                 val idsList = bundle.getStringArrayList(IAPWrapper.RESPONSE_INAPP_PURCHASE_ID_LIST)
-                ownedSkus?.forEachIndexed { index, _ ->
-                    val purchase = Purchase(idsList!![index], purchaseDatas!![index], signatureList!![index])
-                    purchaseList[purchase.sku] = purchase
-                }
+                if (purchaseDatas != null && signatureList != null && idsList != null)
+                    ownedSkus?.forEachIndexed { index, _ ->
+                        val purchase = Purchase(idsList[index], purchaseDatas[index], signatureList[index])
+                        purchaseList[purchase.sku] = purchase
+                    }
                 continuationToken = bundle.getString(IAPWrapper.INAPP_CONTINUATION_TOKEN)
             }
         } while (!continuationToken.isNullOrEmpty())

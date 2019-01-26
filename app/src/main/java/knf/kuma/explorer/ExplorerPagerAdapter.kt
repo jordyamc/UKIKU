@@ -9,25 +9,30 @@ import androidx.viewpager.widget.PagerAdapter
 
 class ExplorerPagerAdapter(context: Context, private val fragmentManager: FragmentManager) : PagerAdapter() {
     private val fragments: Array<Fragment?> = arrayOfNulls(2)
-    private val stateChange: OnFileStateChange = context as OnFileStateChange
+    private val stateChange: OnFileStateChange? = context as? OnFileStateChange
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val fragment = getItem(position)
         try {
-            val trans = fragmentManager.beginTransaction()
-            trans.add(container.id, fragment, "fragment:$position")
-            trans.commit()
+            fragment?.let {
+                val trans = fragmentManager.beginTransaction()
+                trans.add(container.id, fragment, "fragment:$position")
+                trans.commit()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        return fragment
+        return fragment ?: Any()
     }
 
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        val trans = fragmentManager.beginTransaction()
-        trans.remove(fragments[position]!!)
-        trans.commit()
+    override fun destroyItem(container: ViewGroup, position: Int, any: Any) {
+        val fragment = fragments[position]
+        fragment?.let {
+            val trans = fragmentManager.beginTransaction()
+            trans.remove(fragment)
+            trans.commit()
+        }
         fragments[position] = null
     }
 
@@ -36,7 +41,7 @@ class ExplorerPagerAdapter(context: Context, private val fragmentManager: Fragme
     }
 
     override fun isViewFromObject(view: View, any: Any): Boolean {
-        return (any as Fragment).view === view
+        return (any as? Fragment)?.view === view
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
@@ -47,13 +52,13 @@ class ExplorerPagerAdapter(context: Context, private val fragmentManager: Fragme
         }
     }
 
-    fun getItem(position: Int): Fragment {
+    fun getItem(position: Int): Fragment? {
         if (fragments[position] == null) {
             fragments[position] = createFragment(position)
             if (position == 0)
-                (fragments[position] as FragmentFilesRoot).setStateChange(stateChange)
+                (fragments[position] as? FragmentFilesRoot)?.setStateChange(stateChange)
         }
-        return fragments[position]!!
+        return fragments[position]
     }
 
     private fun createFragment(position: Int): Fragment {
@@ -66,7 +71,7 @@ class ExplorerPagerAdapter(context: Context, private val fragmentManager: Fragme
 
     internal fun onRemoveAllClicked() {
         try {
-            (fragments[0] as FragmentFilesRoot).onRemoveAll()
+            (fragments[0] as? FragmentFilesRoot)?.onRemoveAll()
         } catch (e: Exception) {
             e.printStackTrace()
         }

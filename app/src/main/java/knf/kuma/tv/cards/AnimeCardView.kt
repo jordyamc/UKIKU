@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.ImageView
 import knf.kuma.R
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.load
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.tv.BindableCardView
 import kotlinx.android.synthetic.main.item_tv_card.view.*
@@ -17,7 +17,7 @@ class AnimeCardView(context: Context) : BindableCardView<AnimeObject>(context) {
         get() = R.layout.item_tv_card
 
     override fun bind(data: AnimeObject) {
-        PicassoSingle[context].load(PatternUtil.getCover(data.aid!!)).into(imageView)
-        title!!.text = data.name
+        imageView.load(PatternUtil.getCover(data.aid))
+        title?.text = data.name
     }
 }
