@@ -358,6 +358,7 @@ class ServersFactory {
 
         fun startPlay(context: Context?, title: String, file_name: String) {
             if (context == null) return
+            Log.e("Video", "On play")
             AchievementManager.onPlayChapter()
             val file = FileAccessHelper.INSTANCE.getFile(file_name)
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {

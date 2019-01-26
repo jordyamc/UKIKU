@@ -49,7 +49,7 @@
     <color name="colorAccentGrayLight">#8e8e8e</color>
     <color name="colorAccentBlueGreyLight">#718792</color>
 
-    <color name="cardview_background">#FFFFFFFF</color>
+    <color name="cardview_background">#FFFFFF</color>
 
     <color name="divider">#000</color>
     <color name="textPrimary">#000</color>

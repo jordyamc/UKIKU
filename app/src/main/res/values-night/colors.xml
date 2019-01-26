@@ -6,7 +6,7 @@
     <color name="textPrimary">#fff</color>
     <color name="textSecondary">#bebebe</color>
 
-    <color name="cardview_background">#FF424242</color>
+    <color name="cardview_background">#424242</color>
     <color name="text_disable">#42ffffff</color>
 
     <color name="color_bottom_line_disabled">#EEEEEE</color>

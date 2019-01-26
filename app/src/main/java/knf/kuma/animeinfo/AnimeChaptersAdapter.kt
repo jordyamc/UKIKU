@@ -156,7 +156,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         recordsDAO.add(RecordObject.fromChapter(chapter))
                         updateSeeing(chapter.number)
                         holder.setSeen(context, true)
-                        ServersFactory.startPlay(App.context, chapter.epTitle, chapter.fileName)
+                        ServersFactory.startPlay(context, chapter.epTitle, chapter.fileName)
                     } else {
                         Toaster.toast("Aun no se está descargando")
                     }

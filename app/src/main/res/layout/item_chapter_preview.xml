@@ -2,12 +2,14 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:clickable="true"
     android:foreground="?android:selectableItemBackgroundBorderless"
     android:theme="@style/AppTheme.Cardview"
+    app:cardBackgroundColor="@color/cardview_background"
     app:cardCornerRadius="0dp"
     app:cardElevation="2dp">
 
@@ -48,9 +50,10 @@
                     android:gravity="center_vertical"
                     android:paddingStart="8dp"
                     android:paddingEnd="0dp"
-                    android:text="Episodio #"
                     android:textAppearance="@android:style/TextAppearance.Material.Title"
-                    android:textSize="18sp"/>
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="18sp"
+                    tools:text="Episodio #"/>
 
                 <ImageView
                     android:id="@+id/in_down"

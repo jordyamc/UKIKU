@@ -387,7 +387,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                     val documentFile = DocumentFile.fromTreeUri(context, it)
                     if (documentFile != null && documentFile.exists()) {
                         val root = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
-                        root?.uri
+                        return@let root?.uri
                     }
                     null
                 }
