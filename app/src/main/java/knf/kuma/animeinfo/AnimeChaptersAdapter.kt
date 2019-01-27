@@ -76,10 +76,11 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     }
 
     override fun onBindViewHolder(holder: ChapterImgHolder, position: Int, payloads: MutableList<Any>) {
-        if (selection.contains(position))
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, EAHelper.getThemeColorLight(context)))
-        else
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
+        if (context != null)
+            if (selection.contains(position))
+                holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight(context)))
+            else
+                holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardview_background))
         if (payloads.isEmpty())
             super.onBindViewHolder(holder, position, payloads)
     }
@@ -90,9 +91,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         val downloadObject = AtomicReference(downloadsDAO.getByEid(chapter.eid))
         val dFile = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
         if (selection.contains(position))
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, EAHelper.getThemeColorLight(context)))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight(context)))
         else
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardview_background))
         holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(dFile, downloadObject.get()))
         chapter.isDownloaded = canPlay(dFile)
         if (processingPosition == holder.adapterPosition) {
@@ -128,7 +129,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             else
                 holder.setDownloaded(isPlayAvailable(dFile, downloadObject.get()), chapter.eid == s)
         })
-        holder.chapter.setTextColor(ContextCompat.getColor(App.context, if (chaptersDAO.chapterIsSeen(chapter.eid)) EAHelper.getThemeColor(context) else R.color.textPrimary))
+        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.eid)) EAHelper.getThemeColor(context) else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
         holder.chapter.text = chapter.number
         holder.actions.setOnClickListener { view ->

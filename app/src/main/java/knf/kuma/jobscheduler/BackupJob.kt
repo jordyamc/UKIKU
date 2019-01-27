@@ -1,10 +1,14 @@
 package knf.kuma.jobscheduler
 
+import androidx.preference.PreferenceManager
 import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
 import com.evernote.android.job.JobRequest
+import knf.kuma.App
 import knf.kuma.backup.BUUtils
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.pojos.AutoBackupObject
+import org.jetbrains.anko.doAsync
 import java.util.concurrent.TimeUnit
 
 class BackupJob : Job() {
@@ -26,6 +30,28 @@ class BackupJob : Job() {
 
     companion object {
         internal const val TAG = "backup-job"
+
+        fun checkInit() {
+            doAsync {
+                BUUtils.init(App.context)
+                if (BUUtils.isLogedIn) {
+                    val backupObject = BUUtils.waitAutoBackup(App.context)
+                    if (backupObject != null && backupObject == AutoBackupObject(App.context)) {
+                        val days = backupObject.value
+                        if (days == null) {
+                            BUUtils.backup(AutoBackupObject(App.context, PrefsUtil.autoBackupTime), object : BUUtils.AutoBackupInterface {
+                                override fun onResponse(backupObject: AutoBackupObject?) {
+
+                                }
+                            })
+                        } else if (days != PrefsUtil.autoBackupTime) {
+                            PreferenceManager.getDefaultSharedPreferences(App.context).edit().putString("auto_backup", days).apply()
+                            reSchedule(days.toInt())
+                        }
+                    }
+                }
+            }
+        }
 
         fun reSchedule(days: Int) {
             JobManager.instance().cancelAllForTag(TAG)

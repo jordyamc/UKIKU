@@ -28,6 +28,7 @@ import knf.kuma.directory.DirectoryService
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.DownloadService
 import knf.kuma.download.FileAccessHelper
+import knf.kuma.jobscheduler.BackupJob
 import knf.kuma.jobscheduler.JobsCreator
 import knf.kuma.jobscheduler.RecentsJob
 import knf.kuma.jobscheduler.UpdateJob
@@ -62,6 +63,7 @@ class App : Application() {
         )
         Branch.getAutoInstance(this)
         AppCompatDelegate.setDefaultNightMode(Integer.parseInt(PrefsUtil.themeOption))
+        BackupJob.checkInit()
         CastManager.register(this)
         CacheDB.init(this)
         EADB.init(this)

@@ -113,9 +113,9 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         override fun onResponse(backupObject: BackupObject<*>?) {
                                             doOnUI {
                                                 try {
-                                                    if (backupObject != null) {
-                                                        val autoBackupObject = backupObject as? AutoBackupObject
-                                                        if (backupObject == AutoBackupObject(activity))
+                                                    val autoBackupObject = backupObject as? AutoBackupObject
+                                                    if (backupObject != null && autoBackupObject?.value != "0") {
+                                                        if (backupObject != AutoBackupObject(activity))
                                                             preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "%s"
                                                         else
                                                             preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "Solo " + autoBackupObject?.name
@@ -141,7 +141,8 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 preferenceScreen.findPreference<Preference>(keyAutoBackup).setOnPreferenceChangeListener { _, o ->
                     BackupJob.reSchedule(Integer.valueOf((o as? String) ?: "0"))
-                    BUUtils.backup(AutoBackupObject(activity), object : BUUtils.AutoBackupInterface {
+                    BUUtils.backup(AutoBackupObject(activity, (o as? String)
+                            ?: "0"), object : BUUtils.AutoBackupInterface {
                         override fun onResponse(backupObject: AutoBackupObject?) {
                             if (backupObject != null)
                                 Log.e("Backup override", backupObject.name)

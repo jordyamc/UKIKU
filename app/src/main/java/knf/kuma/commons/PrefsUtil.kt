@@ -48,6 +48,11 @@ object PrefsUtil {
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
                 ?: "1")
 
+    var autoBackupTime: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("auto_backup", "0")
+                ?: "0"
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("auto_backup", value).apply()
+
     val showFavIndicator: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_fav_count", true)
 
