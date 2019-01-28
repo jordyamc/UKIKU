@@ -1,5 +1,6 @@
 ![](https://github.com/jordyamc/UKIKU/blob/master/web/img/UKIKU%20Facebook.png)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4f8228880e0a4d3da8ee1c861801e5bf)](https://app.codacy.com/app/jordyamc/UKIKU?utm_source=github.com&utm_medium=referral&utm_content=jordyamc/UKIKU&utm_campaign=Badge_Grade_Dashboard)
 [![GitHub last commit](https://img.shields.io/github/last-commit/google/skia.svg)](https://github.com/jordyamc/UKIKU/commits/master)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/jordyamc/UKIKU/blob/master/LICENSE)
 [![GitHub forks](https://img.shields.io/github/forks/jordyamc/UKIKU.svg)](https://github.com/jordyamc/UKIKU/network/members)
