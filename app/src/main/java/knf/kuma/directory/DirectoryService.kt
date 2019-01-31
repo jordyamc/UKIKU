@@ -50,8 +50,12 @@ class DirectoryService : IntentService("Directory update") {
             return notification.build()
         }
 
-    override fun onHandleIntent(intent: Intent?) {
+    override fun onCreate() {
+        super.onCreate()
         startForeground(NOT_CODE, startNotification)
+    }
+
+    override fun onHandleIntent(intent: Intent?) {
         isRunning = true
         if (!Network.isConnected) {
             stopSelf()
