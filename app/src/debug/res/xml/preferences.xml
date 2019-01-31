@@ -188,6 +188,12 @@
             android:icon="@drawable/ic_animations"
             android:key="smooth_animations"
             android:title="Mejorar animaciones"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_heart_full_menu"
+            android:key="show_favs"
+            android:summary="Marcar favoritos en emisión"
+            android:title="Indicador de favoritos"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="category_design"

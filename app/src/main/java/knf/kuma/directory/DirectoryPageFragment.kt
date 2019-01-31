@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.annotation.UiThread
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -26,6 +27,10 @@ class DirectoryPageFragment : BottomFragment() {
     private var adapter: DirectoryPageAdapter? = null
     private var isFirst = true
     private var listUpdated = false
+    private lateinit var model: DirectoryViewModel
+
+    private lateinit var liveData: LiveData<PagedList<AnimeObject>>
+    private lateinit var observer: Observer<PagedList<AnimeObject>>
 
     private val layout: Int
         @LayoutRes
@@ -35,10 +40,15 @@ class DirectoryPageFragment : BottomFragment() {
             R.layout.recycler_dir_grid
         }
 
+    private fun createModel(activity: FragmentActivity): DirectoryViewModel {
+        if (!::model.isInitialized)
+            model = ViewModelProviders.of(activity).get(DirectoryViewModel::class.java)
+        return model
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            val model = ViewModelProviders.of(it).get(DirectoryViewModel::class.java)
             adapter = DirectoryPageAdapter(this)
             adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -53,7 +63,7 @@ class DirectoryPageFragment : BottomFragment() {
                         scrollTop()
                 }
             })
-            getLiveData(model).observe(this, Observer { animeObjects ->
+            observeLiveData(createModel(it), Observer { animeObjects ->
                 hideProgress()
                 adapter?.submitList(animeObjects)
                 makeAnimation()
@@ -63,18 +73,23 @@ class DirectoryPageFragment : BottomFragment() {
         }
     }
 
-    private fun getLiveData(model: DirectoryViewModel): LiveData<PagedList<AnimeObject>> {
-        return when (arguments?.getInt("type", 0) ?: 0) {
+    private fun observeLiveData(model: DirectoryViewModel, newObserver: Observer<PagedList<AnimeObject>>) {
+        if (::liveData.isInitialized && ::observer.isInitialized)
+            liveData.removeObserver(observer)
+        liveData = when (arguments?.getInt("type", 0) ?: 0) {
             0 -> model.getAnimes()
             1 -> model.getOvas()
             2 -> model.getMovies()
             else -> model.getAnimes()
         }
+        liveData.observe(this, newObserver.also { observer = newObserver })
     }
 
     fun onChangeOrder() {
         activity?.let {
-            getLiveData(ViewModelProviders.of(it).get(DirectoryViewModel::class.java)).observe(this, Observer { animeObjects ->
+            adapter?.submitList(null)
+            showProgress()
+            observeLiveData(createModel(it), Observer { animeObjects ->
                 hideProgress()
                 listUpdated = true
                 adapter?.submitList(animeObjects)
@@ -86,6 +101,11 @@ class DirectoryPageFragment : BottomFragment() {
 
     private fun hideProgress() {
         progress.post { progress.visibility = View.GONE }
+    }
+
+    private fun showProgress() {
+        isFirst = true
+        progress.post { progress.visibility = View.VISIBLE }
     }
 
     private fun makeAnimation() {

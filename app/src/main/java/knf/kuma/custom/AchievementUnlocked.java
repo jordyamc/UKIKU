@@ -379,7 +379,7 @@ public class AchievementUnlocked {
                         PixelFormat.TRANSLUCENT);
             }
 
-            if (titleTextView == null) {
+            if (titleTextView != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && isLarge) {
                     titleTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
                 }
@@ -399,7 +399,7 @@ public class AchievementUnlocked {
                     }
                 });
             }
-            if (subtitleTextView == null) {
+            if (subtitleTextView != null) {
                 subtitleTextView.setSingleLine(true);
                 subtitleTextView.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -751,7 +751,7 @@ public class AchievementUnlocked {
             return (GradientDrawableWithColors) (container.getBackground());
         GradientDrawableWithColors iconBackground = new GradientDrawableWithColors();
         if (isRounded)
-            iconBackground.setCornerRadius(initialSize / 2);
+            iconBackground.setCornerRadius(initialSize / 2f);
         else iconBackground.setCornerRadius(convertDpToPixel(2));
         return iconBackground;
     }

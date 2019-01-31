@@ -64,6 +64,14 @@
         <item name="defaultBrandColorDark">#1b1b1b</item>
     </style>
 
+    <style name="AppTheme.TV.Grid" parent="Theme.Leanback.VerticalGrid">
+        <item name="android:colorPrimary">#424242</item>
+        <item name="android:colorPrimaryDark">#1b1b1b</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="defaultBrandColor">#424242</item>
+        <item name="defaultBrandColorDark">#1b1b1b</item>
+    </style>
+
     <style name="AppTheme.NoActionBar" parent="AppTheme.DayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

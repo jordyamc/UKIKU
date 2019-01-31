@@ -82,6 +82,9 @@ interface AnimeDAO {
     @Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day AND aid NOT IN (:list) ORDER BY name")
     fun getByDay(day: Int, list: Set<String>): LiveData<MutableList<AnimeObject>>
 
+    @Query("SELECT * FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day AND aid NOT IN (:list) ORDER BY name")
+    fun getByDayInline(day: Int, list: Set<String>): MutableList<AnimeObject>
+
     @Query("SELECT count(*) FROM AnimeObject WHERE state = 'En emisión' AND NOT day = 0 AND aid NOT IN (:list)")
     fun getInEmission(list: Set<String>): LiveData<Int>
 
@@ -102,6 +105,9 @@ interface AnimeDAO {
 
     @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genre ORDER BY name")
     fun getAllGenre(genre: String): DataSource.Factory<Int, AnimeObject>
+
+    @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genre ORDER BY name")
+    fun getAllGenreLive(genre: String): LiveData<List<AnimeObject>>
 
     @Query("SELECT * FROM AnimeObject WHERE genres LIKE :genres ORDER BY name")
     fun getByGenres(genres: String): MutableList<AnimeObject>
@@ -156,6 +162,9 @@ interface AnimeDAO {
 
     @Update
     fun updateAnime(animeObject: AnimeObject)
+
+    @Update
+    fun updateAnimes(animeObjects: List<AnimeObject>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(animeObject: AnimeObject)

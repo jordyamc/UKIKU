@@ -3,9 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--<item
+        android:id="@+id/action_favs"
+        android:icon="@drawable/ic_heart_off"
+        android:title="Cambiar favoritos"
+        app:showAsAction="always"/>-->
     <item
         android:id="@+id/action_hideshow"
         android:icon="@drawable/ic_show"
-        android:title="Mostrar ocultos"
+        android:title="Cambiar ocultos"
         app:showAsAction="always|always"/>
 </menu>

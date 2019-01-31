@@ -30,6 +30,9 @@ class DirectoryService : IntentService("Directory update") {
     private var manager: NotificationManager? = null
     private var count = 0
     private var page = 0
+    private val TAG = "Directory Getter"
+
+    private val keyFailedPages = "failed_pages"
 
     private val startNotification: Notification
         get() {
@@ -80,15 +83,15 @@ class DirectoryService : IntentService("Directory update") {
 
     @SuppressLint("ApplySharedPref")
     private fun doPartialSearch(jspoon: Jspoon, animeDAO: AnimeDAO) {
-        val strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet("failed_pages", LinkedHashSet())
+        val strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet(keyFailedPages, LinkedHashSet())
         val newStrings = LinkedHashSet<String>()
         var partialCount = 0
         if (strings?.size == 0)
-            Log.e("Directory Getter", "No pending pages")
+            Log.e(TAG, "No pending pages")
         for (s in LinkedHashSet(strings)) {
             partialCount++
             if (!Network.isConnected) {
-                Log.e("Directory Getter", "Processed $partialCount pages before disconnection")
+                Log.e(TAG, "Processed $partialCount pages before disconnection")
                 stopSelf()
                 return
             }
@@ -102,7 +105,7 @@ class DirectoryService : IntentService("Directory update") {
                         }
 
                         override fun onError() {
-                            Log.e("Directory Getter", "At page: $s")
+                            Log.e(TAG, "At page: $s")
                             if (!newStrings.contains(s))
                                 newStrings.add(s.toString())
                         }
@@ -111,22 +114,22 @@ class DirectoryService : IntentService("Directory update") {
                         animeDAO.insertAll(animeObjects)
                 }
             } catch (e: Exception) {
-                Log.e("Directory Getter", "Page error: $s")
+                Log.e(TAG, "Page error: $s")
                 if (!newStrings.contains(s.toString()))
                     newStrings.add(s.toString())
             }
 
         }
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet("failed_pages", newStrings).commit()
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet(keyFailedPages, newStrings).commit()
     }
 
     private fun doFullSearch(jspoon: Jspoon, animeDAO: AnimeDAO) {
         page = 0
         var finished = false
-        val strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet("failed_pages", LinkedHashSet())
+        val strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet(keyFailedPages, LinkedHashSet())
         while (!finished) {
             if (!Network.isConnected) {
-                Log.e("Directory Getter", "Processed $page pages before disconnection")
+                Log.e(TAG, "Processed $page pages before disconnection")
                 stopSelf()
                 return
             }
@@ -141,7 +144,7 @@ class DirectoryService : IntentService("Directory update") {
                         }
 
                         override fun onError() {
-                            Log.e("Directory Getter", "At page: $page")
+                            Log.e(TAG, "At page: $page")
                             if (strings?.contains(page.toString()) == false)
                                 strings.add(page.toString())
                         }
@@ -149,15 +152,15 @@ class DirectoryService : IntentService("Directory update") {
                     if (animeObjects.isNotEmpty()) {
                         animeDAO.insertAll(animeObjects)
                     } else if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("directory_finished", false)) {
-                        Log.e("Directory Getter", "Stop searching at page $page")
+                        Log.e(TAG, "Stop searching at page $page")
                         cancelForeground()
                         break
                     }
                 } else {
                     finished = true
-                    Log.e("Directory Getter", "Processed $page pages")
+                    Log.e(TAG, "Processed $page pages")
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("directory_finished", true).apply()
-                    PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet("failed_pages", strings).apply()
+                    PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet(keyFailedPages, strings).apply()
                     DirUpdateJob.schedule(this)
                     setStatus(STATE_FINISHED)
                 }
@@ -165,7 +168,7 @@ class DirectoryService : IntentService("Directory update") {
                 finished = true
                 setStatus(STATE_INTERRUPTED)
             } catch (e: Exception) {
-                Log.e("Directory Getter", "Page error: $page")
+                Log.e(TAG, "Page error: $page")
                 if (strings?.contains(page.toString()) == false)
                     strings.add(page.toString())
             }

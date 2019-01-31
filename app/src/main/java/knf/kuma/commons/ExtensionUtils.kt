@@ -18,7 +18,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.preference.PreferenceFragmentCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
@@ -166,7 +166,7 @@ fun Request.execute(): Response {
     return OkHttpClient().newBuilder().build().newCall(this).execute()
 }
 
-val PreferenceFragmentCompat.safeContext: Context
+val Fragment.safeContext: Context
     get() = App.context
 
 val isTV: Boolean get() = App.context.resources.getBoolean(R.bool.isTv)

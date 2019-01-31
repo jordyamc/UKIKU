@@ -5,10 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -167,14 +165,11 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
             doAsync {
                 if (isNeeded(context) && !isLoading) {
                     isLoading = true
-                    Log.e("CloudflareBypass", "is needed")
                     clearCookies()
                     webView?.settings?.javaScriptEnabled = true
                     webView?.webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                            Log.e("CloudflareBypass", "Override ${request?.url}")
                             if (request?.url.toString() == "https://animeflv.net/") {
-                                Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
                                 saveCookies(context)
                                 Toaster.toast("Bypass actualizado")
                                 PicassoSingle.clear()
@@ -186,8 +181,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
                     }
                     webView?.settings?.userAgentString = userAgent
                     webView?.loadUrl("https://animeflv.net/")
-                } else {
-                    Log.e("CloudflareBypass", "Not needed")
                 }
             }
     }

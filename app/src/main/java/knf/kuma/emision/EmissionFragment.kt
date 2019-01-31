@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -22,6 +24,9 @@ class EmissionFragment : Fragment() {
     private val dao = CacheDB.INSTANCE.animeDAO()
     private var adapter: EmissionAdapter? = null
     private var isFirst = true
+
+    private lateinit var liveData: LiveData<MutableList<AnimeObject>>
+    private lateinit var observer: Observer<MutableList<AnimeObject>>
 
     private val blacklist: Set<String>
         get() = if (PrefsUtil.emissionShowHidden)
@@ -39,10 +44,9 @@ class EmissionFragment : Fragment() {
         recycler.verifyManager()
         recycler.adapter = adapter
         if (context != null)
-            CacheDB.INSTANCE.animeDAO().getByDay(arguments?.getInt("day", 1)
-                    ?: 1, blacklist).observe(this, Observer { animeObjects ->
+            observeList(Observer { animeObjects ->
                 progress.visibility = View.GONE
-                    adapter?.update(animeObjects as MutableList<AnimeObject>, false) { smoothScroll() }
+                adapter?.update(animeObjects as MutableList<AnimeObject>, false) { smoothScroll() }
                 if (isFirst) {
                     isFirst = false
                     recycler.scheduleLayoutAnimation()
@@ -52,6 +56,15 @@ class EmissionFragment : Fragment() {
             })
     }
 
+    private fun observeList(obs: Observer<MutableList<AnimeObject>>) {
+        if (::liveData.isInitialized && ::observer.isInitialized)
+            liveData.removeObserver(observer)
+        liveData = CacheDB.INSTANCE.animeDAO().getByDay(arguments?.getInt("day", 1)
+                ?: 1, blacklist)
+        observer = obs
+        liveData.observe(this, observer)
+    }
+
     private fun smoothScroll() {
         //recycler.layoutManager?.smoothScrollToPosition(recycler,null,0)
     }
@@ -59,18 +72,20 @@ class EmissionFragment : Fragment() {
     private fun checkStates(animeObjects: MutableList<AnimeObject>) {
         doAsync {
             try {
+                val updateList = mutableListOf<AnimeObject>()
                 for (animeObject in animeObjects) {
                     try {
                         val document = Jsoup.connect(animeObject.link).cookie("device", "computer").get()
-                        val animeObject1 = AnimeObject(animeObject.link, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(document.outerHtml()))
-                        if (animeObject1.state != "En emisión") {
-                            dao.updateAnime(animeObject1)
-                            WEmisionProvider.update(context)
-                        }
+                        val updated = AnimeObject(animeObject.link, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(document.outerHtml()))
+                        if (updated.state == "Finalizado")
+                            updateList.add(updated)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-
+                }
+                if (!updateList.isEmpty()) {
+                    dao.updateAnimes(updateList)
+                    WEmisionProvider.update(context)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -78,10 +93,13 @@ class EmissionFragment : Fragment() {
         }
     }
 
+    fun updateChanges() {
+        doOnUI { adapter?.notifyDataSetChanged() }
+    }
+
     internal fun reloadList() {
         if (context != null)
-            CacheDB.INSTANCE.animeDAO().getByDay(arguments?.getInt("day", 1)
-                    ?: 1, blacklist).observe(this, Observer { animeObjects ->
+            observeList(Observer { animeObjects ->
                 error?.visibility = View.GONE
                 if (animeObjects != null && animeObjects.isNotEmpty())
                     adapter?.update(animeObjects) { smoothScroll() }

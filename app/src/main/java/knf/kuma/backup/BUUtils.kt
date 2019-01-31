@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.safeDismiss
@@ -49,11 +50,20 @@ object BUUtils {
     private var DRC: DriveResourceClient? = null
     private var DBC: DbxClientV2? = null
 
+    private const val TAG = "Sync"
+    private const val keyFavs = "favs"
+    private const val keyHistory = "history"
+    private const val keyFollowing = "following"
+    private const val keySeen = "seen"
+    private const val keyAchievements = "achievements"
+    private const val keyAutoBackup = "autobackup"
+
     val isLogedIn: Boolean
         get() = DRC != null || DBC != null
 
-    private val dbToken: String?
+    private var dbToken: String?
         get() = PreferenceManager.getDefaultSharedPreferences(activity).getString("db_token", null)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("db_token", value).apply()
 
     var type: BUType
         get() = getType(activity)
@@ -142,7 +152,7 @@ object BUUtils {
             BUUtils.BUType.DROPBOX -> if (fromInit && dbToken != null) {
                 setDropBoxClient(dbToken)
             } else {
-                activity?.let { Auth.startOAuth2Authentication(it, "qtjow4hsk06vt19") }
+                activity?.let { Auth.startOAuth2Authentication(it, BuildConfig.DROPBOX_TOKEN) }
             }
             else -> {
             }
@@ -227,10 +237,10 @@ object BUUtils {
                 i.getAndIncrement()
             }
         }
-        backupNUI(context, "favs", backupInterface)
-        backupNUI(context, "history", backupInterface)
-        backupNUI(context, "following", backupInterface)
-        backupNUI(context, "seen", backupInterface)
+        backupNUI(context, keyFavs, backupInterface)
+        backupNUI(context, keyHistory, backupInterface)
+        backupNUI(context, keyFollowing, backupInterface)
+        backupNUI(context, keySeen, backupInterface)
         while (i.get() != 4) {
             //
         }
@@ -238,7 +248,7 @@ object BUUtils {
 
     fun waitAutoBackup(context: Context): AutoBackupObject? {
         val tBackupObject = AtomicReference<AutoBackupObject>(FakeAutoBackup())
-        search(context, "autobackup", object : SearchInterface {
+        search(context, keyAutoBackup, object : SearchInterface {
             override fun onResponse(backupObject: BackupObject<*>?) {
                 try {
                     tBackupObject.set(backupObject as AutoBackupObject)
@@ -404,7 +414,7 @@ object BUUtils {
                 DBC?.files()?.uploadBuilder("/autobackup")
                         ?.withMute(true)
                         ?.withMode(WriteMode.OVERWRITE)
-                        ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType("autobackup")).toByteArray(StandardCharsets.UTF_8)))
+                        ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(keyAutoBackup)).toByteArray(StandardCharsets.UTF_8)))
                 backupInterface.onResponse(backupObject)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -494,7 +504,7 @@ object BUUtils {
             val result = Tasks.whenAll(appFolderTask, driveContents)
                     .continueWithTask {
                         val query = Query.Builder()
-                                .addFilter(Filters.contains(SearchableField.TITLE, "autobackup"))
+                                .addFilter(Filters.contains(SearchableField.TITLE, keyAutoBackup))
                                 .build()
                         appFolderTask?.result?.let { DRC?.queryChildren(it, query) }
                     }.continueWithTask { task ->
@@ -505,9 +515,9 @@ object BUUtils {
                         val contents = driveContents?.result
                         val outputStream = contents?.outputStream
 
-                        OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType("autobackup"))) }
+                        OutputStreamWriter(outputStream).use { writer -> writer.write(Gson().toJson(backupObject, getType(keyAutoBackup))) }
                         val changeSet = MetadataChangeSet.Builder()
-                                .setTitle("autobackup")
+                                .setTitle(keyAutoBackup)
                                 .setMimeType("application/json")
                                 .setStarred(true)
                                 .build()
@@ -538,22 +548,22 @@ object BUUtils {
         doAsync {
             try {
                 when (id) {
-                    "favs" -> {
+                    keyFavs -> {
                         if (replace)
                             CacheDB.INSTANCE.favsDAO().clear()
                         (backupObject.data?.filterIsInstance<FavoriteObject>() as? MutableList<FavoriteObject>)?.let { CacheDB.INSTANCE.favsDAO().addAll(it) }
                     }
-                    "history" -> {
+                    keyHistory -> {
                         if (replace)
                             CacheDB.INSTANCE.recordsDAO().clear()
                         (backupObject.data?.filterIsInstance<RecordObject>() as? MutableList<RecordObject>)?.let { CacheDB.INSTANCE.recordsDAO().addAll(it) }
                     }
-                    "following" -> {
+                    keyFollowing -> {
                         if (replace)
                             CacheDB.INSTANCE.seeingDAO().clear()
                         (backupObject.data?.filterIsInstance<SeeingObject>() as? MutableList<SeeingObject>)?.let { CacheDB.INSTANCE.seeingDAO().addAll(it) }
                     }
-                    "seen" -> {
+                    keySeen -> {
                         if (replace)
                             CacheDB.INSTANCE.chaptersDAO().clear()
                         (backupObject.data?.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>() as? MutableList<AnimeObject.WebInfo.AnimeChapter>)?.let { CacheDB.INSTANCE.chaptersDAO().addAll(it) }
@@ -571,39 +581,39 @@ object BUUtils {
 
     fun silentRestoreAll() {
         if (isLogedIn) {
-            search("favs", object : SearchInterface {
+            search(keyFavs, object : SearchInterface {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
                             backupObject.data?.filterIsInstance<FavoriteObject>()?.let { CacheDB.INSTANCE.favsDAO().addAll(it) }
-                            Log.e("Sync", "Favs sync")
+                            Log.e(TAG, "Favs sync")
                         }
                 }
             })
-            search("seen", object : SearchInterface {
+            search(keySeen, object : SearchInterface {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
                             backupObject.data?.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>()?.let { CacheDB.INSTANCE.chaptersDAO().addAll(it) }
-                            Log.e("Sync", "Seen sync")
+                            Log.e(TAG, "Seen sync")
                         }
                 }
             })
-            search("following", object : SearchInterface {
+            search(keyFollowing, object : SearchInterface {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
                             backupObject.data?.filterIsInstance<SeeingObject>()?.let { CacheDB.INSTANCE.seeingDAO().addAll(it) }
-                            Log.e("Sync", "Seen sync")
+                            Log.e(TAG, "Seen sync")
                         }
                 }
             })
-            search("history", object : SearchInterface {
+            search(keyHistory, object : SearchInterface {
                 override fun onResponse(backupObject: BackupObject<*>?) {
                     if (backupObject != null)
                         doAsync {
                             backupObject.data?.filterIsInstance<RecordObject>()?.let { CacheDB.INSTANCE.recordsDAO().addAll(it) }
-                            Log.e("Sync", "History sync")
+                            Log.e(TAG, "History sync")
                         }
                 }
             })
@@ -612,33 +622,33 @@ object BUUtils {
 
     private fun getList(id: String): List<*> {
         return when (id) {
-            "favs" -> CacheDB.INSTANCE.favsDAO().allRaw
-            "history" -> CacheDB.INSTANCE.recordsDAO().allRaw
-            "following" -> CacheDB.INSTANCE.seeingDAO().allRaw
-            "seen" -> CacheDB.INSTANCE.chaptersDAO().all
-            "achievements" -> CacheDB.INSTANCE.achievementsDAO().all
+            keyFavs -> CacheDB.INSTANCE.favsDAO().allRaw
+            keyHistory -> CacheDB.INSTANCE.recordsDAO().allRaw
+            keyFollowing -> CacheDB.INSTANCE.seeingDAO().allRaw
+            keySeen -> CacheDB.INSTANCE.chaptersDAO().all
+            keyAchievements -> CacheDB.INSTANCE.achievementsDAO().all
             else -> mutableListOf<RecordObject>()
         }
     }
 
     private fun getType(id: String): Type {
         return when (id) {
-            "favs" -> object : TypeToken<BackupObject<FavoriteObject>>() {
+            keyFavs -> object : TypeToken<BackupObject<FavoriteObject>>() {
 
             }.type
-            "history" -> object : TypeToken<BackupObject<RecordObject>>() {
+            keyHistory -> object : TypeToken<BackupObject<RecordObject>>() {
 
             }.type
-            "following" -> object : TypeToken<BackupObject<SeeingObject>>() {
+            keyFollowing -> object : TypeToken<BackupObject<SeeingObject>>() {
 
             }.type
-            "seen" -> object : TypeToken<BackupObject<AnimeObject.WebInfo.AnimeChapter>>() {
+            keySeen -> object : TypeToken<BackupObject<AnimeObject.WebInfo.AnimeChapter>>() {
 
             }.type
-            "achievements" -> object : TypeToken<BackupObject<Achievement>>() {
+            keyAchievements -> object : TypeToken<BackupObject<Achievement>>() {
 
             }.type
-            "autobackup" -> object : TypeToken<AutoBackupObject>() {
+            keyAutoBackup -> object : TypeToken<AutoBackupObject>() {
 
             }.type
             else -> object : TypeToken<BackupObject<*>>() {

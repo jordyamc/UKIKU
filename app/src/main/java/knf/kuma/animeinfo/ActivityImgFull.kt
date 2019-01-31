@@ -26,6 +26,7 @@ import java.net.URLEncoder
 class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     private var bitmap: Bitmap? = null
+    private val keyTitle = "title"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +58,7 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             doAsync {
                 val snackbar = img.showSnackbar("Buscando mejor resolucion...", Snackbar.LENGTH_INDEFINITE)
                 try {
-                    val title = intent.getStringExtra("title")
+                    val title = intent.getStringExtra(keyTitle)
                     val response = Request.Builder()
                             .url("https://api.jikan.moe/v3/search/anime?q=${URLEncoder.encode(title, "utf-8")}&page=1")
                             .build().execute()
@@ -68,7 +69,7 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                     response.close()
                     for (i in 0..(results.length() - 1)) {
                         val json = results.getJSONObject(i)
-                        val name = json.getString("title").toLowerCase()
+                        val name = json.getString(keyTitle).toLowerCase()
                         if (title.toLowerCase() == name) {
                             var imgUrl: String = json.getString("image_url")
                             try {
@@ -110,13 +111,13 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                 val i = Intent(Intent.ACTION_CREATE_DOCUMENT)
                         .addCategory(Intent.CATEGORY_OPENABLE)
                         .setType("image/jpg")
-                        .putExtra(Intent.EXTRA_TITLE, intent.getStringExtra("title") + ".jpg")
+                        .putExtra(Intent.EXTRA_TITLE, intent.getStringExtra(keyTitle) + ".jpg")
                 startActivityForResult(i, 556)
             }
             R.id.share -> try {
                 val intent = Intent(Intent.ACTION_SEND)
                         .setType("image/*")
-                        .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra("title"))
+                        .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(keyTitle))
                         .putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Images.Media.insertImage(contentResolver, bitmap, "", "")))
                 startActivity(Intent.createChooser(intent, "Compartir..."))
             } catch (e: Exception) {
@@ -143,7 +144,7 @@ class ActivityImgFull : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                     fileOutputStream.close()
                     it.close()
                     snackbar.safeDismiss()
-                    img.showSnackbar("Image guardada!")
+                    img.showSnackbar("Imagen guardada!")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -16,7 +16,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceManager
+import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import knf.kuma.BuildConfig
@@ -25,6 +28,7 @@ import knf.kuma.R
 import knf.kuma.backup.BUUtils
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.*
+import knf.kuma.custom.PreferenceFragmentCompat
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
@@ -226,7 +230,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 when {
                     EAHelper.phase == 4 ->
-                        preferenceScreen.findPreference<Preference>(keyThemeColor).setOnPreferenceChangeListener { _, value ->
+                        preferenceScreen.findPreference<Preference>(keyThemeColor).setOnPreferenceChangeListener { _, _ ->
                             startActivity(Intent(activity, Main::class.java).putExtra("start_position", 3))
                             activity?.finish()
                             true

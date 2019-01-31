@@ -45,6 +45,16 @@ class EmissionPagerAdapter internal constructor(fm: FragmentManager) : FragmentP
         }
     }
 
+    fun updateChanges() {
+        monday.updateChanges()
+        tuesday.updateChanges()
+        wednesday.updateChanges()
+        thursday.updateChanges()
+        friday.updateChanges()
+        saturday.updateChanges()
+        sunday.updateChanges()
+    }
+
     fun reloadPages() {
         monday.reloadList()
         tuesday.reloadList()

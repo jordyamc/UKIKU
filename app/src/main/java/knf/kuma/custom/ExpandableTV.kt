@@ -22,27 +22,8 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var mMaxLines = 4
     private var indicator: ImageButton? = null
     private var needIndicator = true
-    /**
-     * Returns the current [TimeInterpolator] for expanding.
-     *
-     * @return the current interpolator, null by default.
-     */
-    /**
-     * Sets a [TimeInterpolator] for expanding.
-     *
-     * @param expandInterpolator the interpolator
-     */
+
     private var expandInterpolator: TimeInterpolator? = null
-    /**
-     * Returns the current [TimeInterpolator] for collapsing.
-     *
-     * @return the current interpolator, null by default.
-     */
-    /**
-     * Sets a [TimeInterpolator] for collpasing.
-     *
-     * @param collapseInterpolator the interpolator
-     */
     private var collapseInterpolator: TimeInterpolator? = null
     private var animationDuration: Long = 0
     private var animating: Boolean = false

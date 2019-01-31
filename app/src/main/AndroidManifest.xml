@@ -246,6 +246,9 @@
             android:name=".tv.search.TVSearch"
             android:theme="@style/AppTheme.TV.Base"/>
         <activity
+            android:name=".tv.search.TVTag"
+            android:theme="@style/AppTheme.TV.Grid"/>
+        <activity
             android:name=".download.DownloadDialogActivity"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.AppCompat.DayNight.Dialog">

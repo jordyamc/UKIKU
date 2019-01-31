@@ -35,6 +35,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="149dp"
                 android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/heart"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:tint="?colorAccent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/heart_full"/>
         </RelativeLayout>
 
         <TextView

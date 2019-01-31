@@ -66,7 +66,7 @@ object EAHelper {
         get() = when {
             isPart3Unlocked -> "Disfruta de la recompensa"
             isPart2Unlocked -> "El tesoro esta en Akihabara"
-            isPart1Unlocked -> "LMMJVSD \u2192 US \u2192 " + CODE2
+            isPart1Unlocked -> "LMMJVSD \u2192 US \u2192 $CODE2"
             isPart0Unlocked -> CODE1
             else -> "\u26B2 easteregg"
         }
@@ -75,7 +75,7 @@ object EAHelper {
         return when (phase) {
             4 -> "Disfruta de la recompensa"
             3 -> "El tesoro esta en Akihabara"
-            2 -> "LMMJVSD \u2192 US \u2192 " + CODE2
+            2 -> "LMMJVSD \u2192 US \u2192 $CODE2"
             1 -> CODE1
             else -> "\u26B2 easteregg"
         }
@@ -112,7 +112,7 @@ object EAHelper {
             CURRENT_1 += part
             if (CURRENT_1 == CODE1) {
                 setUnlocked(1)
-                Toaster.toastLong("LMMJVSD \u2192 US \u2192 " + CODE2)
+                Toaster.toastLong("LMMJVSD \u2192 US \u2192 $CODE2")
                 clear1()
                 Answers.getInstance().logLevelEnd(LevelEndEvent().putLevelName("Easter Egg Phase 1").putScore(0))
                 Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg Phase 2"))

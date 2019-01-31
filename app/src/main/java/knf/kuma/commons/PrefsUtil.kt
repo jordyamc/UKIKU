@@ -92,6 +92,10 @@ object PrefsUtil {
     val saveWithName: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("save_type", "0") == "0"
 
+    var emissionShowFavs: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_favs", true)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("show_favs", value).apply()
+
     fun init(context: Context) {
         PrefsUtil.context = context
     }

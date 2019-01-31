@@ -64,7 +64,7 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onDestroyView() {
         super.onDestroyView()
         ServersFactory.clear()
-        (activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        (activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     companion object {

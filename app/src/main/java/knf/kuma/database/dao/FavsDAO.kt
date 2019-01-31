@@ -35,11 +35,14 @@ interface FavsDAO {
     @Query("SELECT * FROM favoriteobject WHERE category LIKE :category ORDER BY name")
     fun getAllInCategory(category: String): MutableList<FavoriteObject>
 
-    @Query("SELECT count(*) FROM favoriteobject WHERE `key` LIKE :key")
+    @Query("SELECT count(*) FROM favoriteobject WHERE `key` = :key")
     fun isFav(key: Int): Boolean
 
-    @Query("SELECT * FROM favoriteobject WHERE `key` LIKE :key LIMIT 1")
-    fun favObserver(key: Int): LiveData<FavoriteObject>
+    @Query("SELECT count(*) FROM favoriteobject WHERE `key` = :key")
+    fun isFavLive(key: Int): LiveData<Boolean>
+
+    @Query("SELECT * FROM favoriteobject WHERE `key` = :key")
+    fun favObserver(key: Int): LiveData<FavoriteObject?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addFav(favoriteObject: FavoriteObject)

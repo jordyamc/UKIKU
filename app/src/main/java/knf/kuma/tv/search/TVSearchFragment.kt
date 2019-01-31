@@ -8,15 +8,19 @@ import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.SearchSupportFragment
 import androidx.leanback.widget.*
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
+import knf.kuma.search.SearchFragment
 import knf.kuma.tv.anime.AnimePresenter
 import knf.kuma.tv.details.TVAnimesDetails
 
 class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, SpeechRecognitionCallback, OnItemViewClickedListener {
     private var arrayObjectAdapter: ArrayObjectAdapter? = null
+    private lateinit var liveData: LiveData<MutableList<AnimeObject>>
+    private lateinit var observer: Observer<MutableList<AnimeObject>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +30,12 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
         setOnItemViewClickedListener(this)
         if (context?.packageManager?.hasSystemFeature("amazon.hardware.fire_tv") == true)
             setSpeechRecognitionCallback(this)
+        val headerItem = HeaderItem("Géneros")
+        val objectAdapter = ArrayObjectAdapter(TagPresenter()).also {
+            it.addAll(0, SearchFragment.genres)
+        }
+        arrayObjectAdapter?.clear()
+        arrayObjectAdapter?.add(ListRow(headerItem, objectAdapter))
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -70,22 +80,28 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
     }
 
     private fun setResult(query: String) {
-        val liveData = CacheDB.INSTANCE.animeDAO().getSearchList("%$query%")
+        if (::liveData.isInitialized && ::observer.isInitialized)
+            liveData.removeObserver(observer)
         activity?.let {
-            liveData.observe(it, Observer { animeObjects ->
+            liveData = CacheDB.INSTANCE.animeDAO().getSearchList("%$query%")
+            observer = Observer { animeObjects ->
                 liveData.removeObservers(it)
-                arrayObjectAdapter?.clear()
+                if (arrayObjectAdapter?.size() ?: 0 > 1)
+                    arrayObjectAdapter?.removeItems(1, 1)
                 val objectAdapter = ArrayObjectAdapter(AnimePresenter())
                 for (animeObject in animeObjects)
                     objectAdapter.add(animeObject)
                 val headerItem = HeaderItem(if (animeObjects.isNotEmpty()) "Resultados para '$query'" else "Sin resultados")
                 arrayObjectAdapter?.add(ListRow(headerItem, objectAdapter))
-            })
+            }
+            liveData.observe(it, observer)
         }
     }
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
-        val animeObject = item as AnimeObject
-        context?.let { TVAnimesDetails.start(it, animeObject.link) }
+        when (item) {
+            is AnimeObject -> context?.let { TVAnimesDetails.start(it, item.link) }
+            is String -> context?.let { TVTag.start(it, item) }
+        }
     }
 }

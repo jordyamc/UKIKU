@@ -14,6 +14,7 @@ import com.bumptech.glide.request.transition.Transition
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.FavoriteObject
@@ -115,7 +116,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                             mRowsAdapter?.add(ListRow(header, listRowAdapter))
                         }
 
-                        adapter = mRowsAdapter
+                        noCrash { adapter = mRowsAdapter }
                     }
                 }
             })

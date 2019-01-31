@@ -7,17 +7,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
 import knf.kuma.custom.HiddenOverlay
+import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.item_emision.view.*
 import org.jetbrains.anko.doAsync
-import java.util.*
 
 
 class EmissionAdapter internal constructor(private val fragment: Fragment) : RecyclerView.Adapter<EmissionAdapter.EmissionItem>() {
@@ -26,6 +28,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
 
     private var blacklist: MutableSet<String> = PrefsUtil.emissionBlacklist
     private var showHidden: Boolean = PrefsUtil.emissionShowHidden
+    private val showHeart = PrefsUtil.emissionShowFavs
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmissionItem {
         return EmissionItem(LayoutInflater.from(parent.context).inflate(R.layout.item_emision, parent, false))
@@ -36,6 +39,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
         holder.imageView.load(PatternUtil.getCover(animeObject.aid))
         holder.title.text = animeObject.name
         holder.hiddenOverlay.setHidden(blacklist.contains(animeObject.aid), false)
+        holder.observeFav(fragment, animeObject.aid, showHeart)
         holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView, false, animate = true) }
         holder.cardView.setOnLongClickListener {
             val removed: Boolean = if (blacklist.contains(animeObject.aid)) {
@@ -59,31 +63,32 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
     }
 
     fun update(newList: MutableList<AnimeObject>, animate: Boolean = true, callback: () -> Unit) {
-        if (PrefsUtil.useSmoothAnimations)
-            doAsync {
+        if (list notSameContent newList)
+            if (PrefsUtil.useSmoothAnimations)
+                doAsync {
+                    blacklist = PrefsUtil.emissionBlacklist
+                    showHidden = PrefsUtil.emissionShowHidden
+                    val result = if (animate) DiffUtil.calculateDiff(EmissionDiff(list, newList), true) else null
+                    list = newList
+                    doOnUI {
+                        try {
+                            if (animate)
+                                result?.dispatchUpdatesTo(this@EmissionAdapter)
+                            else
+                                notifyDataSetChanged()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            notifyDataSetChanged()
+                        }
+                        callback.invoke()
+                    }
+                }
+            else {
                 blacklist = PrefsUtil.emissionBlacklist
                 showHidden = PrefsUtil.emissionShowHidden
-                val result = if (animate) DiffUtil.calculateDiff(EmissionDiff(list, newList), true) else null
                 list = newList
-                doOnUI {
-                    try {
-                        if (animate)
-                            result?.dispatchUpdatesTo(this@EmissionAdapter)
-                        else
-                            notifyDataSetChanged()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        notifyDataSetChanged()
-                    }
-                    callback.invoke()
-                }
+                notifyDataSetChanged()
             }
-        else if (list notSameContent newList) {
-            blacklist = PrefsUtil.emissionBlacklist
-            showHidden = PrefsUtil.emissionShowHidden
-            list = newList
-            notifyDataSetChanged()
-        }
     }
 
     private fun updateList(remove: Boolean, aid: String) {
@@ -107,7 +112,28 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
         val cardView: CardView = itemView.card
         val imageView: ImageView = itemView.img
         val hiddenOverlay: HiddenOverlay = itemView.hidden
+        val heart: ImageView = itemView.heart
         val title: TextView = itemView.title
+
+        private lateinit var liveData: LiveData<Boolean>
+        private lateinit var observer: Observer<Boolean>
+
+        fun observeFav(fragment: Fragment, aid: String, show: Boolean) {
+            if (::liveData.isInitialized && ::observer.isInitialized)
+                liveData.removeObserver(observer)
+            if (!show) {
+                heart.visibility = View.GONE
+                return
+            }
+            liveData = CacheDB.INSTANCE.favsDAO().isFavLive(aid.toInt())
+            observer = Observer {
+                if (!show)
+                    heart.visibility = View.GONE
+                else
+                    heart.visibility = if (it) View.VISIBLE else View.GONE
+            }
+            liveData.observe(fragment, observer)
+        }
     }
 }
 

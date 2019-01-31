@@ -70,50 +70,6 @@ class SearchFragment : BottomFragment() {
             }
         }
 
-    private val genres: MutableList<String>
-        get() = Arrays.asList(
-                "Acción",
-                "Artes Marciales",
-                "Aventuras",
-                "Carreras",
-                "Comedia",
-                "Demencia",
-                "Demonios",
-                "Deportes",
-                "Drama",
-                "Ecchi",
-                "Escolares",
-                "Espacial",
-                "Fantasía",
-                "Ciencia Ficción",
-                "Harem",
-                "Historico",
-                "Infantil",
-                "Josei",
-                "Juegos",
-                "Magia",
-                "Mecha",
-                "Militar",
-                "Misterio",
-                "Musica",
-                "Parodia",
-                "Policía",
-                "Psicológico",
-                "Recuentos de la vida",
-                "Romance",
-                "Samurai",
-                "Seinen",
-                "Shoujo",
-                "Shounen",
-                "Sin Generos",
-                "Sobrenatural",
-                "Superpoderes",
-                "Suspenso",
-                "Terror",
-                "Vampiros",
-                "Yaoi",
-                "Yuri")
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         model = activity?.let { ViewModelProviders.of(it).get(SearchViewModel::class.java) }?.also {
@@ -208,5 +164,49 @@ class SearchFragment : BottomFragment() {
             fragment.query = query
             return fragment
         }
+
+        val genres: MutableList<String>
+            get() = Arrays.asList(
+                    "Acción",
+                    "Artes Marciales",
+                    "Aventuras",
+                    "Carreras",
+                    "Comedia",
+                    "Demencia",
+                    "Demonios",
+                    "Deportes",
+                    "Drama",
+                    "Ecchi",
+                    "Escolares",
+                    "Espacial",
+                    "Fantasía",
+                    "Ciencia Ficción",
+                    "Harem",
+                    "Historico",
+                    "Infantil",
+                    "Josei",
+                    "Juegos",
+                    "Magia",
+                    "Mecha",
+                    "Militar",
+                    "Misterio",
+                    "Musica",
+                    "Parodia",
+                    "Policía",
+                    "Psicológico",
+                    "Recuentos de la vida",
+                    "Romance",
+                    "Samurai",
+                    "Seinen",
+                    "Shoujo",
+                    "Shounen",
+                    "Sin Generos",
+                    "Sobrenatural",
+                    "Superpoderes",
+                    "Suspenso",
+                    "Terror",
+                    "Vampiros",
+                    "Yaoi",
+                    "Yuri")
     }
 }

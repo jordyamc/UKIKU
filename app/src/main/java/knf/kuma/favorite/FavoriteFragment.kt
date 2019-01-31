@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -38,6 +40,10 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     private var adapter: FavsSectionAdapter? = null
     private var isFirst = true
 
+    private lateinit var model: FavoriteViewModel
+    private lateinit var liveData: LiveData<MutableList<FavoriteObject>>
+    private lateinit var observer: Observer<MutableList<FavoriteObject>>
+
     private var count = 0
 
     private val layout: Int
@@ -52,7 +58,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         super.onActivityCreated(savedInstanceState)
         CacheDB.INSTANCE.favsDAO().all.observe(this@FavoriteFragment, Observer { FavSectionHelper.reload() })
         activity?.let {
-            ViewModelProviders.of(it).get(FavoriteViewModel::class.java).getData().observe(this@FavoriteFragment, Observer { favoriteObjects ->
+            observeList(it, Observer { favoriteObjects ->
                 if (favoriteObjects == null || favoriteObjects.isEmpty()) {
                     errorLayout.visibility = View.VISIBLE
                     adapter?.updateList(ArrayList())
@@ -110,9 +116,20 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         EAHelper.enter1("F")
     }
 
+    private fun observeList(activity: FragmentActivity, obs: Observer<MutableList<FavoriteObject>>) {
+        adapter?.updateList(mutableListOf())
+        isFirst = true
+        if (::liveData.isInitialized && ::observer.isInitialized)
+            liveData.removeObserver(observer)
+        if (!::model.isInitialized) model = ViewModelProviders.of(activity).get(FavoriteViewModel::class.java)
+        liveData = model.getData()
+        observer = obs
+        liveData.observe(this, observer)
+    }
+
     fun onChangeOrder() {
         activity?.let {
-            ViewModelProviders.of(it).get(FavoriteViewModel::class.java).getData().observe(this, Observer { favoriteObjects ->
+            observeList(it, Observer { favoriteObjects ->
                 if (favoriteObjects == null || favoriteObjects.isEmpty()) {
                     adapter?.updateList(ArrayList())
                     errorLayout.post { errorLayout.visibility = View.VISIBLE }

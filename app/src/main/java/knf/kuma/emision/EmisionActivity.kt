@@ -3,13 +3,14 @@ package knf.kuma.emision
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
 import kotlinx.android.synthetic.main.activity_emision.*
 import java.util.*
 
@@ -46,16 +47,28 @@ class EmisionActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_emision, menu)
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_hidden", false))
+        if (PrefsUtil.emissionShowHidden)
             menu.findItem(R.id.action_hideshow).setIcon(R.drawable.ic_hide_pref)
+        /*if (!PrefsUtil.emissionShowFavs)
+            menu.findItem(R.id.action_favs).setIcon(R.drawable.ic_heart_full_menu)*/
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val show = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_hidden", false)
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("show_hidden", !show).apply()
+        when (item.itemId) {
+            R.id.action_hideshow -> {
+                Log.e("Emission", "On menu click")
+                val show = PrefsUtil.emissionShowHidden
+                PrefsUtil.emissionShowHidden = !show
+                pagerAdapter?.reloadPages()
+            }
+            /*R.id.action_favs -> {
+                val show = PrefsUtil.emissionShowFavs
+                PrefsUtil.emissionShowFavs = !show
+                pagerAdapter?.updateChanges()
+            }*/
+        }
         invalidateOptionsMenu()
-        pagerAdapter?.reloadPages()
         return super.onOptionsItemSelected(item)
     }
 

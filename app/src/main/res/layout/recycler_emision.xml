@@ -13,7 +13,7 @@
         android:clipToPadding="false"
         android:layoutAnimation="@anim/grid_fall_down"
         android:padding="5dp"
-        app:layoutManager="GridLayoutManager"
+        app:layoutManager="knf.kuma.custom.FixedGridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:spanCount="@integer/span_count"
         tools:listitem="@layout/item_emision">

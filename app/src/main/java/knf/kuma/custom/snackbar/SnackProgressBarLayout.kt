@@ -288,9 +288,6 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
         }
     }
 
-    /**
-     * Configures swipe to dismiss behaviour.
-     */
     private fun configureSwipeToDismiss() {
         if (swipeToDismiss) {
             // attach touch listener if it is not a CoordinatorLayout to allow extra features
