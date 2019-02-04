@@ -49,7 +49,8 @@ class Repository {
                 }
 
                 override fun onFailure(call: Call<Recents>, t: Throwable) {
-                    Toaster.toast("Error al obtener - " + t.message)
+                    if (t.message?.contains("503") == false)
+                        Toaster.toast("Error al obtener - " + t.message)
                     t.printStackTrace()
                     Crashlytics.logException(t)
                 }

@@ -24,7 +24,6 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.safeDismiss
@@ -152,7 +151,7 @@ object BUUtils {
             BUUtils.BUType.DROPBOX -> if (fromInit && dbToken != null) {
                 setDropBoxClient(dbToken)
             } else {
-                activity?.let { Auth.startOAuth2Authentication(it, BuildConfig.DROPBOX_TOKEN) }
+                activity?.let { Auth.startOAuth2Authentication(it, "qtjow4hsk06vt19") }
             }
             else -> {
             }

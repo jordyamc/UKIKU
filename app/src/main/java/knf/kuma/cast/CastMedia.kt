@@ -52,7 +52,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
         fun create(fileDownObj: ExplorerObject.FileDownObj?): CastMedia? {
             if (fileDownObj == null) return null
             val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
-                putString(MediaMetadata.KEY_TITLE, fileDownObj.time)
+                putString(MediaMetadata.KEY_TITLE, fileDownObj.title)
                 putString(MediaMetadata.KEY_SUBTITLE, "Episodio ${fileDownObj.chapter}")
                 addImage(WebImage(Uri.parse(fileDownObj.chapPreviewLink)))
             }

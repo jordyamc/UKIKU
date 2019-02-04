@@ -1,23 +1,30 @@
 package knf.kuma.tv.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-
+import android.util.Log
+import android.webkit.CookieManager
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import knf.kuma.backup.BUUtils
-import knf.kuma.commons.safeShow
+import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
 import knf.kuma.jobscheduler.DirUpdateJob
 import knf.kuma.jobscheduler.RecentsJob
 import knf.kuma.recents.RecentsNotReceiver
+import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVBaseActivity
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
+import org.jetbrains.anko.doAsync
 
 class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecker.CheckListener {
 
@@ -34,6 +41,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
         DirUpdateJob.schedule(this)
         RecentsNotReceiver.removeAll(this)
         UpdateChecker.check(this, this)
+        checkBypass()
         Answers.getInstance().logCustom(CustomEvent("TV UI"))
     }
 
@@ -86,6 +94,47 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             e.printStackTrace()
         }
 
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun checkBypass() {
+        noCrash {
+            val webView = WebView(this)
+            doAsync {
+                if (BypassUtil.isNeeded(this@TVMain) && !BypassUtil.isLoading) {
+                    "Creando bypass...".toast()
+                    BypassUtil.isLoading = true
+                    Log.e("CloudflareBypass", "is needed")
+                    BypassUtil.clearCookies()
+                    doOnUI {
+                        webView.settings?.javaScriptEnabled = true
+                        webView.webViewClient = object : WebViewClient() {
+                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                                shouldOverrideUrlLoading(view, request?.url?.toString())
+                                return false
+                            }
+
+                            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                                Log.e("CloudflareBypass", "Override $url")
+                                if (url == "https://animeflv.net/") {
+                                    Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
+                                    if (BypassUtil.saveCookies(this@TVMain))
+                                        "Bypass actualizado".toast()
+                                    PicassoSingle.clear()
+                                    Repository().reloadRecents()
+                                    BypassUtil.isLoading = false
+                                }
+                                return false
+                            }
+                        }
+                        webView.settings?.userAgentString = BypassUtil.userAgent
+                        webView.loadUrl("https://animeflv.net/")
+                    }
+                } else {
+                    Log.e("CloudflareBypass", "Not needed")
+                }
+            }
+        }
     }
 
 }
