@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="93" version="3.1.3">
+        <change type="fix">Errores de bypass en TV</change>
+        <change type="new">Mensajes de servicio</change>
+    </release>
     <release code="92" version="3.1.2">
         <change type="fix">Errores de bypass en TV</change>
     </release>

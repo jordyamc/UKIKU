@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.R
@@ -113,23 +114,33 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             BUUtils.init(it, object : BUUtils.LoginInterface {
                                 override fun onLogin() {
                                     preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "Cargando..."
-                                    BUUtils.search("autobackup", object : BUUtils.SearchInterface {
+                                    BUUtils.search(BUUtils.keyAutoBackup, object : BUUtils.SearchInterface {
                                         override fun onResponse(backupObject: BackupObject<*>?) {
                                             doOnUI {
                                                 try {
                                                     val autoBackupObject = backupObject as? AutoBackupObject
-                                                    if (backupObject != null && autoBackupObject?.value != "0") {
-                                                        if (backupObject != AutoBackupObject(activity))
+                                                    if (autoBackupObject != null) {
+                                                        if (autoBackupObject == AutoBackupObject(activity))
                                                             preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "%s"
                                                         else
-                                                            preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "Solo " + autoBackupObject?.name
+                                                            preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "Solo " + autoBackupObject.name
+                                                        if (autoBackupObject.value == null)
+                                                            BUUtils.backup(AutoBackupObject(App.context, PrefsUtil.autoBackupTime), object : BUUtils.AutoBackupInterface {
+                                                                override fun onResponse(backupObject: AutoBackupObject?) {
+                                                                    /*when (backupObject) {
+                                                                        null -> "Error al actualizar"
+                                                                        else -> "Actualizado correctamente"
+                                                                    }.toast()*/
+                                                                }
+                                                            })
+                                                        else
+                                                            preferenceManager.sharedPreferences.edit().putString(keyAutoBackup, autoBackupObject.value).apply()
                                                     } else {
-                                                        preferenceManager.sharedPreferences.edit().putString(keyAutoBackup, "0").apply()
-                                                        preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "%s"
+                                                        preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "%s (NE)"
                                                     }
                                                     preferenceScreen.findPreference<Preference>(keyAutoBackup).isEnabled = true
                                                 } catch (e: Exception) {
-                                                    preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "Error al buscar archivo"
+                                                    preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "Error al buscar archivo: ${e.message}"
                                                 }
                                             }
                                         }
@@ -148,8 +159,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     BUUtils.backup(AutoBackupObject(activity, (o as? String)
                             ?: "0"), object : BUUtils.AutoBackupInterface {
                         override fun onResponse(backupObject: AutoBackupObject?) {
-                            if (backupObject != null)
-                                Log.e("Backup override", backupObject.name)
+                            Log.e("Backup override", backupObject?.name.toString())
                         }
                     })
                     true

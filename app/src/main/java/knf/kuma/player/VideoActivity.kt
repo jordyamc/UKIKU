@@ -14,6 +14,7 @@ import android.util.Log
 import android.util.Rational
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
@@ -209,6 +210,11 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
             progress.post { progress.visibility = View.GONE }
         progress.post { progress.visibility = if (loading) View.VISIBLE else View.GONE }
+    }
+
+    override fun onPlayerStateChanged(state: Int) {
+        if (state == Player.STATE_READY)
+            doOnUI { hideUI() }
     }
 
     override fun onFinish() {

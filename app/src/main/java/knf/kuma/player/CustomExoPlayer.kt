@@ -242,6 +242,8 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+        if (playbackState == Player.STATE_READY)
+            doOnUI { hideUI() }
         if (playbackState == Player.STATE_ENDED)
             finish()
     }

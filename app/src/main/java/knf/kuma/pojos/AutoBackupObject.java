@@ -6,6 +6,7 @@ import android.provider.Settings;
 
 import com.jaredrummler.android.device.DeviceName;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 import knf.kuma.backup.objects.BackupObject;
@@ -35,6 +36,12 @@ public class AutoBackupObject extends BackupObject {
             this.device_id = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
             this.value = newValue;
         }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name + " ID: " + device_id;
     }
 
     @Override

@@ -2,22 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90684a6d-0c49-4c34-9f86-a427c19eef30" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../app/playstore/app-playstore.apk" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/playstore/res/drawable/ic_launcher_foregound.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/playstore/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/playstore/res/mipmap-anydpi-v26/ic_launcher_round.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/playstore/res/values/ic_launcher_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/assetWizardSettings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/assetWizardSettings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/google-services.json" beforeDir="false" afterPath="$PROJECT_DIR$/../app/google-services.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/app-release.apk" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/app-release.apk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/output.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/BVListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/BVListener.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/tv/ui/TVMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/tv/ui/TVMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/updater/Updatechecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/updater/UpdateChecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/tv/app-tv.apk" beforeDir="false" afterPath="$PROJECT_DIR$/../app/tv/app-tv.apk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/get.php" beforeDir="false" afterPath="$PROJECT_DIR$/get.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/Player.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/Player.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,34 +17,22 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="-2026697486">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="1" />
-          <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="1" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="php" value="33" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="PLAIN_TEXT" value="33" />
-        </counts>
-      </usages-collector>
-    </session>
-  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/get.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="119">
-              <caret line="7" column="25" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+              <caret line="7" selection-start-line="7" selection-end-line="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/public/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="33" selection-start-line="7" selection-start-column="33" selection-end-line="7" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -60,11 +40,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="728">
+            <state relative-caret-position="6885">
               <caret line="405" column="3" selection-start-line="405" selection-start-column="3" selection-end-line="405" selection-end-column="3" />
-              <folding>
-                <element signature="n#style#0;n#input#0;n#li#0;n#!!top" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -98,14 +75,9 @@
         <option value="$PROJECT_DIR$/eacounter.php" />
         <option value="$PROJECT_DIR$/test.js" />
         <option value="$PROJECT_DIR$/get.php" />
+        <option value="$PROJECT_DIR$/public/index.html" />
       </list>
     </option>
-  </component>
-  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsGulpfileManager">
-    <detection-done>true</detection-done>
-    <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="PhpServers">
     <servers />
@@ -124,7 +96,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -132,10 +103,16 @@
               <item name="web" type="b2602c69:ProjectViewProjectNode" />
               <item name="web" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="web" type="b2602c69:ProjectViewProjectNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -179,11 +156,13 @@
       <workItem from="1529632941094" duration="3080000" />
       <workItem from="1530280798549" duration="1199000" />
       <workItem from="1536187562468" duration="224000" />
+      <workItem from="1549488022844" duration="1362000" />
+      <workItem from="1549490760052" duration="1488000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15952000" />
+    <option name="totallyTimeSpent" value="18802000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
@@ -212,9 +191,6 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
-  </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/updater/upload_apk.php" />
@@ -246,20 +222,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="728">
-          <caret line="405" column="3" selection-start-line="405" selection-start-column="3" selection-end-line="405" selection-end-column="3" />
-          <folding>
-            <element signature="n#style#0;n#input#0;n#li#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/get.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
-          <caret line="7" column="25" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6885">
+          <caret line="405" column="3" selection-start-line="405" selection-start-column="3" selection-end-line="405" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="33" selection-start-line="7" selection-start-column="33" selection-end-line="7" selection-end-column="33" />
         </state>
       </provider>
     </entry>

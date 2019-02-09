@@ -166,6 +166,7 @@ class PlayerHolder(private val context: Context,
         exoPlayer.addListener(object : Player.DefaultEventListener() {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 Log.i("Player", "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady")
+                playerCallback.onPlayerStateChanged(playbackState)
             }
 
             override fun onPlayerError(error: ExoPlaybackException?) {
@@ -188,6 +189,7 @@ class PlayerHolder(private val context: Context,
     interface PlayerCallback {
         fun onChangeTitle(title: String)
         fun onLoadingChange(loading: Boolean)
+        fun onPlayerStateChanged(state: Int)
         fun onFinish()
     }
 

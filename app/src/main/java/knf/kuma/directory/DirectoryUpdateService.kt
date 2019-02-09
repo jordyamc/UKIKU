@@ -38,11 +38,15 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
             return notification.build()
         }
 
+    override fun onCreate() {
+        super.onCreate()
+        startForeground(NOT_CODE, startNotification)
+    }
+
     override fun onHandleIntent(intent: Intent?) {
         if (!Network.isConnected)
             stopSelf()
         isRunning = true
-        startForeground(NOT_CODE, startNotification)
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
         val jspoon = Jspoon.create()

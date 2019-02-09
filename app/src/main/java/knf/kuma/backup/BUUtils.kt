@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import knf.kuma.App
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.safeDismiss
@@ -55,7 +56,7 @@ object BUUtils {
     private const val keyFollowing = "following"
     private const val keySeen = "seen"
     private const val keyAchievements = "achievements"
-    private const val keyAutoBackup = "autobackup"
+    const val keyAutoBackup = "autobackup"
 
     val isLogedIn: Boolean
         get() = DRC != null || DBC != null
@@ -263,6 +264,8 @@ object BUUtils {
     }
 
     fun backup(backupObject: AutoBackupObject, backupInterface: AutoBackupInterface) {
+        loginInterface = null
+        BUUtils.init(App.context)
         when (type) {
             BUUtils.BUType.DRIVE -> backupDrive(backupObject, backupInterface)
             BUUtils.BUType.DROPBOX -> backupDropbox(backupObject, backupInterface)
@@ -277,7 +280,7 @@ object BUUtils {
                 val list = DBC?.files()?.search("", id)?.matches ?: arrayListOf()
                 if (list.size > 0) {
                     val downloader = DBC?.files()?.download("/$id")
-                    searchInterface.onResponse(Gson().fromJson<Any>(InputStreamReader(downloader?.inputStream), getType(id)) as? BackupObject<*>)
+                    searchInterface.onResponse(Gson().fromJson<Any>(InputStreamReader(downloader?.inputStream), getType(id)) as BackupObject<*>)
                     downloader?.close()
                 } else {
                     searchInterface.onResponse(null)
@@ -324,7 +327,7 @@ object BUUtils {
                             searchInterface.onResponse(null)
                         }
                     }
-                }
+                } ?: searchInterface.onResponse(null)
             } catch (e: Exception) {
                 Crashlytics.logException(e)
                 searchInterface.onResponse(null)
@@ -410,7 +413,7 @@ object BUUtils {
     private fun backupDropbox(backupObject: AutoBackupObject, backupInterface: AutoBackupInterface) {
         doAsync {
             try {
-                DBC?.files()?.uploadBuilder("/autobackup")
+                DBC?.files()?.uploadBuilder("/$keyAutoBackup")
                         ?.withMute(true)
                         ?.withMode(WriteMode.OVERWRITE)
                         ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(keyAutoBackup)).toByteArray(StandardCharsets.UTF_8)))
@@ -447,7 +450,6 @@ object BUUtils {
                                 .setMimeType("application/json")
                                 .setStarred(true)
                                 .build()
-
                         appFolderTask?.result?.let { DRC?.createFile(it, changeSet, contents) }
                     }.apply {
                         activity?.let {

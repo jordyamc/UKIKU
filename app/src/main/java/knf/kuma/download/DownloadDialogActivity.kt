@@ -32,7 +32,7 @@ class DownloadDialogActivity : AppCompatActivity() {
         }
         doAsync {
             try {
-                val document = Jsoup.connect(intent.dataString).get()
+                val document = Jsoup.connect(intent.dataString).cookies(BypassUtil.getMapCookie(this@DownloadDialogActivity)).userAgent(BypassUtil.userAgent).get()
                 val name = PatternUtil.fromHtml(document.select("nav.Brdcrmb.fa-home a[href^=/anime/]").first().text())
                 lateinit var aid: String
                 val eid = extract(intent.dataString, "^.*/(\\d+)/.*$")

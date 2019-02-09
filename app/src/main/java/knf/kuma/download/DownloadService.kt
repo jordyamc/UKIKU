@@ -46,6 +46,11 @@ class DownloadService : IntentService("Download service") {
             priority = NotificationCompat.PRIORITY_LOW
         }.build()
 
+    override fun onCreate() {
+        super.onCreate()
+        startForeground(DOWNLOADING_ID, startNotification)
+    }
+
     override fun onHandleIntent(intent: Intent?) {
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (intent == null)
@@ -54,7 +59,6 @@ class DownloadService : IntentService("Download service") {
         if (current == null)
             return
         file = current?.file
-        startForeground(DOWNLOADING_ID, startNotification)
         try {
             val request = Request.Builder()
                     .url(intent.dataString ?: "")
