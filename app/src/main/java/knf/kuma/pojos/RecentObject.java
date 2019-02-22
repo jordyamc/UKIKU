@@ -54,6 +54,11 @@ public class RecentObject {
     @Embedded
     public WebInfo webInfo;
 
+    @Ignore
+    public RecentObject() {
+
+    }
+
     public RecentObject(int key, WebInfo webInfo) {
         this.key = key;
         populate(webInfo);

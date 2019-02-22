@@ -17,19 +17,24 @@ import xdroid.toaster.Toaster
 
 
 class IAPWrapper(private val context: Context) : ServiceConnection {
-    val isEnabled: Boolean = IAPHelper.hasWalletInstalled(context) && BuildConfig.BUILD_TYPE != "playstore"
+    val isEnabled: Boolean get() = IAPHelper.hasWalletInstalled(context) && BuildConfig.BUILD_TYPE != "playstore"
     private var iapService: IAPService? = null
     var inventory: Inventory? = null
     private var onConnectedListener: ((success: Boolean) -> Unit)? = null
 
     val isAvailable get() = iapService != null && inventory != null
+    private var isConnected = false
 
     fun setUp(onConnect: (success: Boolean) -> Unit) {
         onConnectedListener = onConnect
+        if (isConnected) {
+            onConnect.invoke(true)
+            return
+        }
         if (isEnabled && EAHelper.phase < 4) {
             context.bindService(Intent(BuildConfig.IAB_BIND_ACTION).setPackage(BuildConfig.IAB_BIND_PACKAGE), this, Context.BIND_AUTO_CREATE)
             onConnect.invoke(true)
-        }else onConnect.invoke(false)
+        } else onConnect.invoke(false)
     }
 
     fun onDestroy() {
@@ -66,10 +71,12 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
 
     override fun onServiceDisconnected(name: ComponentName?) {
         iapService = null
+        isConnected = false
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         service?.let {
+            isConnected = true
             iapService = IAPService(service).also {
                 inventory = Inventory(it)
                 if (it.isBillingSupported(3, context.packageName, ITEM_TYPE_INAPP) == BILLING_RESPONSE_RESULT_OK)

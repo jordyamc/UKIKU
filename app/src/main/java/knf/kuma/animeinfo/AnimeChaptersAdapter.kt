@@ -57,7 +57,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     val selection = HashSet<Int>()
     private var seeingObject: SeeingObject? = null
     var isImporting = false
-    private var isProcessing = false
     private var processingPosition = -1
 
     init {
@@ -142,7 +141,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                 menu.inflate(R.menu.chapter_downloaded_menu)
                 if (!CastUtil.get().connected())
                     menu.menu.findItem(R.id.cast).isVisible = false
-            } else if (isNetworkAvailable && !isProcessing)
+            } else if (isNetworkAvailable)
                 menu.inflate(R.menu.chapter_menu)
             else
                 menu.inflate(R.menu.chapter_menu_offline)
@@ -183,7 +182,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         negativeButton(text = "CANCELAR")
                     }
                     R.id.download -> {
-                        setProcessingItem(holder, true)
                         setOrientation(true)
                         ServersFactory.start(context, chapter.link, chapter, false, false, object : ServersFactory.ServersInterface {
                             override fun onFinish(started: Boolean, success: Boolean) {
@@ -191,7 +189,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     holder.setQueue(CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid), true)
                                     chapter.isDownloaded = true
                                 }
-                                setProcessingItem(holder, false)
                                 setOrientation(false)
                             }
 
@@ -215,7 +212,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         })
                     }
                     R.id.streaming -> {
-                        setProcessingItem(holder, true)
                         setOrientation(true)
                         ServersFactory.start(context, chapter.link, chapter, true, false, object : ServersFactory.ServersInterface {
                             override fun onFinish(started: Boolean, success: Boolean) {
@@ -225,7 +221,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     updateSeeing(chapter.number)
                                     holder.setSeen(context, true)
                                 }
-                                setProcessingItem(holder, false)
                                 setOrientation(false)
                             }
 
@@ -250,14 +245,12 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         QueueManager.add(Uri.fromFile(dFile), true, chapter)
                         holder.setQueue(true, true)
                     } else {
-                        setProcessingItem(holder, true)
                         setOrientation(true)
                         ServersFactory.start(context, chapter.link, chapter, true, true, object : ServersFactory.ServersInterface {
                             override fun onFinish(started: Boolean, success: Boolean) {
                                 if (success) {
                                     holder.setQueue(true, false)
                                 }
-                                setProcessingItem(holder, false)
                                 setOrientation(false)
                             }
 
@@ -323,12 +316,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                 }
             else (fragment.activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
-    }
-
-    private fun setProcessingItem(holder: ChapterImgHolder, processing: Boolean) {
-        isProcessing = processing
-        processingPosition = if (processing) holder.adapterPosition else -1
-        holder.setIsRecyclable(!processing)
     }
 
     private fun isPlayAvailable(file: File?, downloadObject: DownloadObject?): Boolean {

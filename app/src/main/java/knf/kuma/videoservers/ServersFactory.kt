@@ -20,6 +20,7 @@ import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.*
+import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.DownloadService
@@ -44,6 +45,8 @@ class ServersFactory {
     private var isCasting: Boolean = false
     private var serversInterface: ServersInterface
     private var snackbar: Snackbar? = null
+    private var snackBarManager: SnackProgressBarManager? = null
+    private var isSnackShowing = false
     private var servers: MutableList<Server> = ArrayList()
     private var selected = 0
 
@@ -295,13 +298,23 @@ class ServersFactory {
         INSTANCE = null
     }
 
+    private fun getSnackManager(): SnackProgressBarManager? {
+        val view = serversInterface.getView() ?: return null
+        return snackBarManager ?: SnackProgressBarManager(view)
+                .setProgressBarColor(EAHelper.getThemeColor(context))
+                .setOverlayLayoutAlpha(0.4f)
+                .setOverlayLayoutColor(android.R.color.background_dark).also { snackBarManager = it }
+    }
+
     private fun showSnack(text: String) {
         dismissSnack()
-        snackbar = serversInterface.getView()?.showSnackbar(text, duration = Snackbar.LENGTH_INDEFINITE)
+        //snackbar = serversInterface.getView()?.showSnackbar(text, duration = Snackbar.LENGTH_INDEFINITE)
+        getSnackManager()?.showProgressSnackbar(text, SnackProgressBarManager.LENGTH_INDEFINITE)
     }
 
     private fun dismissSnack() {
-        snackbar?.dismiss()
+        //snackbar?.dismiss()
+        getSnackManager()?.dismiss()
     }
 
     interface ServersInterface {

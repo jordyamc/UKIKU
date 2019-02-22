@@ -194,6 +194,12 @@
             android:key="show_favs"
             android:summary="Marcar favoritos en emisión"
             android:title="Indicador de favoritos"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_cash"
+            android:key="ads_enabled"
+            android:summary="Mostrar anuncios para ayudar al programador"
+            android:title="Mostrar anuncios"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="category_design"

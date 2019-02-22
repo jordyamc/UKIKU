@@ -606,9 +606,10 @@ class Main : AppCompatActivity(),
                                 snack.safeDismiss()
                                 if (url == "https://animeflv.net/") {
                                     Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
-                                    if (saveCookies(this@Main))
+                                    if (saveCookies(this@Main)) {
                                         coordinator.showSnackbar("Bypass actualizado")
-                                    PicassoSingle.clear()
+                                        PicassoSingle.clear()
+                                    }
                                     onNeedRecreate()
                                     isLoading = false
                                 }

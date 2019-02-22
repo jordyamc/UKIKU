@@ -409,7 +409,7 @@ object EAHelper {
 
 class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
 
-    private lateinit var iapWrapper: IAPWrapper
+    private val iapWrapper: IAPWrapper by lazy { IAPWrapper(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))
@@ -420,7 +420,10 @@ class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.title = "Easter egg"
         toolbar.setNavigationOnClickListener { onBackPressed() }
-        iapWrapper = IAPWrapper(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
         iapWrapper.setUp {
             if (it)
                 invalidateOptionsMenu()
@@ -430,7 +433,6 @@ class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
                 vertical_stepper_view.currentStep = EAHelper.phase
             }
         }
-
     }
 
     override fun onDestroy() {
@@ -448,11 +450,17 @@ class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
         val hint = inflateView.hint
         hint.text = EAHelper.getMessage(index)
         val unlockButton = inflateView.unlock
-        if (index == 0 || index == 4 || !iapWrapper.isEnabled || !iapWrapper.isAvailable)
+        if (index == 0 || index == 4)
             unlockButton.visibility = View.GONE
         else {
-            val details = iapWrapper.inventory?.skuList?.let { it[getSkuCode(index)] }
-            unlockButton.text = "Desbloquear ${details?.price} ${details?.priceCurrencyCode}"
+            if (iapWrapper.isEnabled) {
+                val details = iapWrapper.inventory?.skuList?.let { it[getSkuCode(index)] }
+                unlockButton.text = "Desbloquear ${details?.let { "${details.price} ${details.priceCurrencyCode}" }
+                        ?: getPurchaseInfo(index)}"
+                if (!iapWrapper.isAvailable)
+                    unlockButton.isEnabled = false
+            } else
+                unlockButton.text = "Desbloquear ${getPurchaseInfo(index)}"
             unlockButton.onClick {
                 if (!iapWrapper.isEnabled)
                     iapWrapper.showInstallDialog()
@@ -471,6 +479,15 @@ class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
             2 -> "ee_3"
             3 -> "ee_4"
             else -> "ee_all"
+        }
+    }
+
+    private fun getPurchaseInfo(index: Int): String {
+        return when (index) {
+            1 -> "$ 7 usd"
+            2 -> "$ 13 usd"
+            3 -> "$ 5 usd"
+            else -> "..."
         }
     }
 

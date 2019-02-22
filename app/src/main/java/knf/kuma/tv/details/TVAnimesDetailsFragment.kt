@@ -91,6 +91,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                         } else {
                             actionAdapter?.set(1, Action(1, "Añadir favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_empty)))
                         }
+                        actionAdapter?.set(2, Action(2, "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})", null, ContextCompat.getDrawable(App.context, R.drawable.ic_seeing)))
                         detailsOverview.actionsAdapter = actionAdapter
                         rowPresenter.onActionClickedListener = this@TVAnimesDetailsFragment
                         mRowsAdapter?.add(detailsOverview)
@@ -138,19 +139,21 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     }
 
     override fun onActionClicked(action: Action) {
-        actionAdapter?.clear()
-        favoriteObject?.let {
-            if (CacheDB.INSTANCE.favsDAO().isFav(it.key)) {
-                CacheDB.INSTANCE.favsDAO().deleteFav(it)
-                action.label1 = "Añadir favorito"
-                action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_empty)
-            } else {
-                CacheDB.INSTANCE.favsDAO().addFav(it)
-                action.label1 = "Quitar favorito"
-                action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
+        if (action.id == 1L) {
+            actionAdapter?.clear()
+            favoriteObject?.let {
+                if (CacheDB.INSTANCE.favsDAO().isFav(it.key)) {
+                    CacheDB.INSTANCE.favsDAO().deleteFav(it)
+                    action.label1 = "Añadir favorito"
+                    action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_empty)
+                } else {
+                    CacheDB.INSTANCE.favsDAO().addFav(it)
+                    action.label1 = "Quitar favorito"
+                    action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
+                }
             }
+            actionAdapter?.set(1, action)
         }
-        actionAdapter?.set(1, action)
     }
 
     companion object {

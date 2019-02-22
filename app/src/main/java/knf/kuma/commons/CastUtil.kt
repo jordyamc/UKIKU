@@ -3,7 +3,6 @@ package knf.kuma.commons
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
@@ -39,7 +38,6 @@ class CastUtil private constructor(private val context: Context) : CastListener,
             if (connected()) {
                 if (!castMedia.url.endsWith(":" + SelfServer.HTTP_PORT))
                     SelfServer.stop()
-                Log.e("Cast", castMedia.url)
                 startLoading(view)
                 setEid(castMedia.eid)
                 CastManager.getInstance().playMedia(castMedia.url, "video/mp4", castMedia.title, castMedia.subTitle, castMedia.image)

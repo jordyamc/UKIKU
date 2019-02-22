@@ -23,6 +23,11 @@ public class FavoriteObject implements Comparable<FavoriteObject> {
     @Ignore
     public boolean isSection = false;
 
+    @Ignore
+    public FavoriteObject() {
+
+    }
+
     public FavoriteObject(int key, String aid, String name, String img, String type, String link, String category) {
         this.key = key;
         this.aid = aid;

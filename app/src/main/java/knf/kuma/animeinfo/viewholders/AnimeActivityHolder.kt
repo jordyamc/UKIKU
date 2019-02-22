@@ -20,8 +20,8 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
-import knf.kuma.animeinfo.ActivityImgFull
 import knf.kuma.animeinfo.AnimePagerAdapter
+import knf.kuma.animeinfo.img.ActivityImgFull
 import knf.kuma.commons.BypassUtil.Companion.clearCookies
 import knf.kuma.commons.BypassUtil.Companion.isLoading
 import knf.kuma.commons.BypassUtil.Companion.isNeeded
@@ -170,9 +170,10 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
                     webView?.webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                             if (request?.url.toString() == "https://animeflv.net/") {
-                                saveCookies(context)
-                                Toaster.toast("Bypass actualizado")
-                                PicassoSingle.clear()
+                                if (saveCookies(context)) {
+                                    Toaster.toast("Bypass actualizado")
+                                    PicassoSingle.clear()
+                                }
                                 innerInterface.onNeedRecreate()
                             }
                             isLoading = false

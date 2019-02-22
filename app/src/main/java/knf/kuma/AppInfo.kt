@@ -51,7 +51,7 @@ class AppInfo : MaterialAboutActivity() {
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_facebook_group), "Grupo de Facebook", true, Uri.parse("https://www.facebook.com/groups/ukikugroup/")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_discord), "Discord", false, Uri.parse("https://discord.gg/6hzpua6")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_beta), "Grupo Beta", false, Uri.parse("https://t.me/ukiku_beta")))
-        extraCard.addItem(MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction { /*Toaster.toastLong(EAHelper.eaMessage)*/ EAUnlockActivity.start(this) }.build())
+        extraCard.addItem(MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction { EAUnlockActivity.start(this) }.build())
         return MaterialAboutList.Builder()
                 .addCard(infoCard.build())
                 .addCard(authorCard.build())

@@ -161,7 +161,7 @@
             android:resizeableActivity="true"
             android:supportsPictureInPicture="true"/>
         <activity
-            android:name=".animeinfo.ActivityImgFull"
+            android:name=".animeinfo.img.ActivityImgFull"
             android:theme="@style/AppTheme.FullScreen"/>
         <activity android:name=".record.RecordActivity"/>
         <activity android:name=".seeing.SeeingActivity"/>

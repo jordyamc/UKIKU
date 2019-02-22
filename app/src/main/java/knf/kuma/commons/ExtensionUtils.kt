@@ -29,6 +29,8 @@ import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
+import knf.kuma.custom.snackbar.SnackProgressBar
+import knf.kuma.custom.snackbar.SnackProgressBarManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -110,6 +112,7 @@ fun RecyclerView.verifyManager(size: Int = 115) {
         manager.spanCount = gridColumns(size)
         layoutManager = manager
     }
+    setHasFixedSize(true)
 }
 
 fun <T> MutableList<T>.toArray(): Array<T> {
@@ -124,6 +127,14 @@ fun gridColumns(size: Int = 115): Int {
 
 fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
     return Snackbar.make(this, text, duration).also { doOnUI { it.show() } }
+}
+
+fun SnackProgressBarManager.showProgressSnackbar(text: String, duration: Int = SnackProgressBarManager.LENGTH_SHORT) {
+    val snackbar = SnackProgressBar(SnackProgressBar.TYPE_HORIZONTAL, text)
+            .setIsIndeterminate(true)
+            .setProgressMax(100)
+            .setShowProgressPercentage(false)
+    doOnUI { show(snackbar, duration) }
 }
 
 fun View.createSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
@@ -263,6 +274,7 @@ fun isHostValid(hostName: String): Boolean {
         "api.crashlytics.com",
         "e.crashlytics.com",
         "cdn.myanimelist.net",
+        "myanimelist.cdn-dena.com",
         "settings.crashlytics.com",
         "somoskudasai.com",
         "animeflv.net",

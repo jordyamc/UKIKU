@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90684a6d-0c49-4c34-9f86-a427c19eef30" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/Player.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/Player.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/tv/details/TVAnimesDetailsFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/tv/details/TVAnimesDetailsFragment.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,8 +25,17 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/public/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="33" selection-start-line="7" selection-start-column="33" selection-end-line="7" selection-end-column="33" />
+            <state relative-caret-position="455">
+              <caret line="1510" column="46" selection-start-line="1510" selection-start-column="46" selection-end-line="1510" selection-end-column="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/public/about.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="339">
+              <caret line="1463" column="46" selection-start-line="1463" selection-start-column="46" selection-end-line="1463" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -59,7 +62,20 @@
     <findStrings>
       <find>anime_id</find>
       <find>anime_info</find>
+      <find>Mobirise</find>
+      <find>amp-img</find>
+      <find>&lt;amp-img</find>
+      <find>ampstart-btn</find>
+      <find>end</find>
+      <find>right</find>
+      <find>.hamburger</find>
+      <find>.ham</find>
+      <find>.bra</find>
+      <find>.brand</find>
     </findStrings>
+    <replaceStrings>
+      <replace>Preview</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -75,6 +91,10 @@
         <option value="$PROJECT_DIR$/eacounter.php" />
         <option value="$PROJECT_DIR$/test.js" />
         <option value="$PROJECT_DIR$/get.php" />
+        <option value="$PROJECT_DIR$/public/404.html" />
+        <option value="$PROJECT_DIR$/public/amp/index.html" />
+        <option value="$PROJECT_DIR$/public/amp/about.html" />
+        <option value="$PROJECT_DIR$/public/about.html" />
         <option value="$PROJECT_DIR$/public/index.html" />
       </list>
     </option>
@@ -96,6 +116,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -108,17 +129,36 @@
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="public" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="web" type="b2602c69:ProjectViewProjectNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="web" type="b2602c69:ProjectViewProjectNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="fonts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="web" type="b2602c69:ProjectViewProjectNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="images" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Animeflv2/docs" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -158,17 +198,24 @@
       <workItem from="1536187562468" duration="224000" />
       <workItem from="1549488022844" duration="1362000" />
       <workItem from="1549490760052" duration="1488000" />
+      <workItem from="1549760025342" duration="666000" />
+      <workItem from="1549909349860" duration="326000" />
+      <workItem from="1549988092683" duration="597000" />
+      <workItem from="1549990199379" duration="324000" />
+      <workItem from="1549996818401" duration="1899000" />
+      <workItem from="1549998777759" duration="71000" />
+      <workItem from="1549999362038" duration="2592000" />
+      <workItem from="1550013532510" duration="10171000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="18802000" />
+    <option name="totallyTimeSpent" value="35448000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22617611" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22617611" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -179,7 +226,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32922733" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" weight="0.32995495" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="11" />
@@ -222,13 +269,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/get.php">
+    <entry file="file://$PROJECT_DIR$/public/404.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
-          <caret line="7" selection-start-line="7" selection-end-line="7" />
+          <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/public/amp/index.html" />
+    <entry file="file://$PROJECT_DIR$/public/amp/about.html" />
     <entry file="file://$PROJECT_DIR$/test.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6885">
@@ -236,10 +285,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/public/index.html">
+    <entry file="file://$PROJECT_DIR$/get.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
-          <caret line="7" column="33" selection-start-line="7" selection-start-column="33" selection-end-line="7" selection-end-column="33" />
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/about.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="339">
+          <caret line="1463" column="46" selection-start-line="1463" selection-start-column="46" selection-end-line="1463" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="455">
+          <caret line="1510" column="46" selection-start-line="1510" selection-start-column="46" selection-end-line="1510" selection-end-column="46" />
         </state>
       </provider>
     </entry>

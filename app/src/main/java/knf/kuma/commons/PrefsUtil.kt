@@ -44,6 +44,9 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
+    val isAdsEnabled: Boolean
+        get() = /*PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", false)*/ false
+
     val downloaderType: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
                 ?: "1")

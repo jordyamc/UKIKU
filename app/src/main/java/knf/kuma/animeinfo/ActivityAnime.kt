@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import es.munix.multidisplaycast.CastManager
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.animeinfo.img.ActivityImgFull
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PatternUtil

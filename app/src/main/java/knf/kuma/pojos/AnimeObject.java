@@ -71,6 +71,11 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     @Ignore
     public IconCompat icon;
 
+    @Ignore
+    public AnimeObject() {
+
+    }
+
     public AnimeObject(int key, String link, String sid, String name, String fileName, WebInfo webInfo, String type, String state, Day day) {
         this.key = key;
         this.link = link;
@@ -419,10 +424,14 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
         @TypeConverter
         public List<WebInfo.AnimeRelated> stringToRelated(String json) {
-            Gson gson = new Gson();
-            Type type = new TypeToken<List<WebInfo.AnimeRelated>>() {
-            }.getType();
-            return gson.fromJson(json, type);
+            try {
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<WebInfo.AnimeRelated>>() {
+                }.getType();
+                return gson.fromJson(json, type);
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
         }
 
         @TypeConverter

@@ -13,6 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
+import knf.kuma.ads.AdCallback
+import knf.kuma.ads.AdCardItemHolder
+import knf.kuma.ads.AdFavoriteObject
+import knf.kuma.ads.implAdsFavorite
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
@@ -48,26 +52,31 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
         return when (viewType) {
             TYPE_HEADER -> HeaderHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_fav_header, parent, false))
             TYPE_ITEM -> ItemHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false))
+            TYPE_AD -> AdCardItemHolder(parent, AdCardItemHolder.TYPE_FAV)
             else -> HeaderHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_fav_header, parent, false))
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val favoriteObject = list[position]
-        if (holder is HeaderHolder) {
-            holder.header.text = favoriteObject.name
-            holder.action.setOnClickListener { listener.onEdit(favoriteObject.name ?: "") }
-        } else if (holder is ItemHolder) {
-            PicassoSingle.get().load(PatternUtil.getCover(favoriteObject.aid
-                    ?: "")).into(holder.imageView)
-            holder.title.text = favoriteObject.name
-            holder.type.text = favoriteObject.type
-            holder.cardView.setOnClickListener { ActivityAnime.open(fragment, favoriteObject, holder.imageView) }
-            if (showSections)
-                holder.cardView.setOnLongClickListener {
-                    listener.onSelect(favoriteObject)
-                    true
-                }
+        if (holder is AdCardItemHolder) {
+            holder.loadAd(list[position] as? AdCallback)
+        } else {
+            val favoriteObject = list[position]
+            if (holder is HeaderHolder) {
+                holder.header.text = favoriteObject.name
+                holder.action.setOnClickListener { listener.onEdit(favoriteObject.name ?: "") }
+            } else if (holder is ItemHolder) {
+                PicassoSingle.get().load(PatternUtil.getCover(favoriteObject.aid
+                        ?: "")).into(holder.imageView)
+                holder.title.text = favoriteObject.name
+                holder.type.text = favoriteObject.type
+                holder.cardView.setOnClickListener { ActivityAnime.open(fragment, favoriteObject, holder.imageView) }
+                if (showSections)
+                    holder.cardView.setOnLongClickListener {
+                        listener.onSelect(favoriteObject)
+                        true
+                    }
+            }
         }
     }
 
@@ -76,7 +85,7 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (list[position].isSection) TYPE_HEADER else TYPE_ITEM
+        return if (list[position] is AdFavoriteObject) TYPE_AD else if (list[position].isSection) TYPE_HEADER else TYPE_ITEM
     }
 
     override fun getSectionName(position: Int): String {
@@ -103,6 +112,8 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
 
     fun updateList(list: MutableList<FavoriteObject>) {
         this.list = list
+        if (PrefsUtil.layType == "0")
+            this.list.implAdsFavorite()
         recyclerView.post { this.notifyDataSetChanged() }
     }
 
@@ -127,5 +138,6 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     companion object {
         internal const val TYPE_HEADER = 0
         internal const val TYPE_ITEM = 1
+        internal const val TYPE_AD = 2
     }
 }

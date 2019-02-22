@@ -118,9 +118,10 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                                 Log.e("CloudflareBypass", "Override $url")
                                 if (url == "https://animeflv.net/") {
                                     Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
-                                    if (BypassUtil.saveCookies(this@TVMain))
+                                    if (BypassUtil.saveCookies(this@TVMain)) {
                                         "Bypass actualizado".toast()
-                                    PicassoSingle.clear()
+                                        PicassoSingle.clear()
+                                    }
                                     Repository().reloadRecents()
                                     BypassUtil.isLoading = false
                                 }
