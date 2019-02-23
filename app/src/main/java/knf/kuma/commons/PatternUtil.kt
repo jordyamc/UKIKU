@@ -3,6 +3,9 @@ package knf.kuma.commons
 import android.os.Build
 import android.text.Html
 import android.util.Log
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
+import knf.kuma.App
 import knf.kuma.pojos.AnimeObject
 import java.util.*
 import java.util.regex.Pattern
@@ -137,6 +140,13 @@ object PatternUtil {
 
     fun getCover(aid: String?): String {
         return "https://m.animeflv.net/uploads/animes/covers/$aid.jpg"
+    }
+
+    fun getCoverGlide(aid: String?): GlideUrl {
+        return GlideUrl("https://m.animeflv.net/uploads/animes/covers/$aid.jpg", LazyHeaders.Builder().apply {
+            addHeader("Cookie", BypassUtil.getStringCookie(App.context))
+            addHeader("User-Agent", BypassUtil.userAgent)
+        }.build())
     }
 
     fun getBanner(aid: String): String {

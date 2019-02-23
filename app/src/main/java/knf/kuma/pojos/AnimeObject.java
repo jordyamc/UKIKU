@@ -122,7 +122,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             this.day = animeInfo.getDay();
             this.chapters = WebInfo.AnimeChapter.create(animeInfo);
         } catch (Exception e) {
-            //
+            e.printStackTrace();
         }
     }
 
@@ -252,7 +252,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         @Selector("ul.ListAnmRel li:has(a[href~=^\\/[a-z]+\\/\\d+\\/.+$])")
         public List<AnimeRelated> related = new ArrayList<>();
         @Ignore
-        @Selector("script[type=text/javascript]:not([src])")
+        @Selector("script:not([src])")
         List<Element> scripts;
         /*@Selector("ul.ListCaps li,ul.ListEpisodes li,ul#episodeList li")
         public List<Element> chapters = new ArrayList<>();*/

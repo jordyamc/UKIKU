@@ -78,6 +78,7 @@ class Repository {
                             dao.insert(animeObject)
                         data.value = animeObject
                     } catch (e: Exception) {
+                        e.printStackTrace()
                         data.value = null
                     }
 

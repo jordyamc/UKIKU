@@ -98,7 +98,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                     onBackPressed()
                 }
             }
-        })
+        }) ?: Toaster.toast("Error al cargar información del anime")
     }
 
     private fun setResult() {
