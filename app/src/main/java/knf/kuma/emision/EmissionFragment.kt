@@ -10,13 +10,13 @@ import androidx.lifecycle.Observer
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.recycler_emision.*
 import org.jetbrains.anko.doAsync
-import org.jsoup.Jsoup
 import pl.droidsonroids.jspoon.Jspoon
 import java.util.*
 
@@ -75,7 +75,7 @@ class EmissionFragment : Fragment() {
                 val updateList = mutableListOf<AnimeObject>()
                 for (animeObject in animeObjects) {
                     try {
-                        val document = Jsoup.connect(animeObject.link).cookie("device", "computer").get()
+                        val document = jsoupCookies(animeObject.link).get()
                         val updated = AnimeObject(animeObject.link, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(document.outerHtml()))
                         if (updated.state == "Finalizado")
                             updateList.add(updated)

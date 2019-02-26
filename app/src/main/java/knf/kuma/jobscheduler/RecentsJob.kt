@@ -19,10 +19,10 @@ import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PicassoSingle
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.create
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadDialogActivity
 import knf.kuma.download.FileAccessHelper
@@ -31,7 +31,6 @@ import knf.kuma.pojos.NotificationObj
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.Recents
 import knf.kuma.recents.RecentsNotReceiver
-import org.jsoup.Jsoup
 import pl.droidsonroids.jspoon.Jspoon
 import java.util.concurrent.TimeUnit
 
@@ -50,7 +49,7 @@ class RecentsJob : Job() {
     override fun onRunJob(params: Job.Params): Job.Result {
         try {
             manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val recents = Jspoon.create().adapter(Recents::class.java).fromHtml(Jsoup.connect("https://animeflv.net/").cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().outerHtml())
+            val recents = Jspoon.create().adapter(Recents::class.java).fromHtml(jsoupCookies("https://animeflv.net/").get().outerHtml())
             val objects = RecentObject.create(recents.list ?: listOf())
             for ((i, recentObject) in objects.withIndex())
                 recentObject.key = i
@@ -134,7 +133,7 @@ class RecentsJob : Job() {
     private fun getAnime(recentObject: RecentObject): AnimeObject {
         var animeObject: AnimeObject? = animeDAO.getByAid(recentObject.aid)
         if (animeObject == null) {
-            animeObject = AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(Jsoup.connect(recentObject.anime).get().outerHtml()))
+            animeObject = AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(recentObject.anime).get().outerHtml()))
             animeDAO.insert(animeObject)
         }
         return animeObject

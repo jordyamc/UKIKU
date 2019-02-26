@@ -1,8 +1,8 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.videoservers.VideoServer.Names.FIRE
 import org.jsoup.Jsoup
 
@@ -18,7 +18,7 @@ class FireServer internal constructor(context: Context, baseLink: String) : Serv
         get() {
             return try {
                 val frame = PatternUtil.extractLink(baseLink)
-                val mediaFunc = Jsoup.connect(frame).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("script").last().outerHtml()
+                val mediaFunc = jsoupCookies(frame).get().select("script").last().outerHtml()
                 val download = Jsoup.connect(PatternUtil.extractMediaLink(mediaFunc)).get().select("a[href~=http://download.*]").first().attr("href")
                 VideoServer(FIRE, Option(name, null, download))
             } catch (e: Exception) {

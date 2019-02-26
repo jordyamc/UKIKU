@@ -99,6 +99,10 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_favs", true)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("show_favs", value).apply()
 
+    val timeoutTime: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("timeout_time", "10")?.toLong()
+                ?: 10
+
     fun init(context: Context) {
         PrefsUtil.context = context
     }

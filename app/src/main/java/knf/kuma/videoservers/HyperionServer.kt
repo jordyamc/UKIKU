@@ -1,11 +1,10 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.videoservers.VideoServer.Names.HYPERION
 import org.json.JSONObject
-import org.jsoup.Jsoup
 
 class HyperionServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -19,7 +18,7 @@ class HyperionServer(context: Context, baseLink: String) : Server(context, baseL
         get() {
             val downLink = PatternUtil.extractLink(baseLink)
             try {
-                val options = JSONObject(Jsoup.connect(downLink.replace("embed_hyperion", "check")).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().body().text())
+                val options = JSONObject(jsoupCookies(downLink.replace("embed_hyperion", "check")).get().body().text())
                 val array = options.getJSONArray("streams")
                 val videoServer = VideoServer(HYPERION)
                 for (i in 0 until array.length()) {

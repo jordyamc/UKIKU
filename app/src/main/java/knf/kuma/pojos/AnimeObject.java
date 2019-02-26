@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,10 +116,13 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
     private void completeInfo(List<Element> scripts) {
         try {
-            AnimeInfo animeInfo = new AnimeInfo(Objects.requireNonNull(findDataScript(scripts)).html());
-            //this.name = PatternUtil.fromHtml(animeInfo.title);
-            this.day = animeInfo.getDay();
-            this.chapters = WebInfo.AnimeChapter.create(animeInfo);
+            Element element = findDataScript(scripts);
+            if (element != null) {
+                AnimeInfo animeInfo = new AnimeInfo(element.html());
+                //this.name = PatternUtil.fromHtml(animeInfo.title);
+                this.day = animeInfo.getDay();
+                this.chapters = WebInfo.AnimeChapter.create(animeInfo);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

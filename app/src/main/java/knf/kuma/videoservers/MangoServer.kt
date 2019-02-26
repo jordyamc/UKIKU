@@ -1,8 +1,8 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.videoservers.VideoServer.Names.MANGO
 import org.jsoup.Jsoup
 import java.util.regex.Pattern
@@ -19,7 +19,7 @@ class MangoServer(context: Context, baseLink: String) : Server(context, baseLink
         get() {
             try {
                 val downLink = PatternUtil.extractLink(baseLink)
-                val mangoLink = PatternUtil.extractMangoLink(Jsoup.connect(downLink).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get().select("script").last().html())
+                val mangoLink = PatternUtil.extractMangoLink(jsoupCookies(downLink).get().select("script").last().html())
                 val html = Jsoup.connect(mangoLink).get().html()
                 val matcher = Pattern.compile("type:\"video/mp4\",src:d\\('([^']+)',(\\d+)\\)").matcher(html)
                 matcher.find()

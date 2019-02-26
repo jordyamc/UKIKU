@@ -13,7 +13,6 @@ import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.NotificationObj
 import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
-import org.jsoup.Jsoup
 import java.util.regex.Pattern
 
 class DownloadDialogActivity : AppCompatActivity() {
@@ -32,7 +31,7 @@ class DownloadDialogActivity : AppCompatActivity() {
         }
         doAsync {
             try {
-                val document = Jsoup.connect(intent.dataString).cookies(BypassUtil.getMapCookie(this@DownloadDialogActivity)).userAgent(BypassUtil.userAgent).get()
+                val document = jsoupCookies(intent.dataString).get()
                 val name = PatternUtil.fromHtml(document.select("nav.Brdcrmb.fa-home a[href^=/anime/]").first().text())
                 lateinit var aid: String
                 val eid = extract(intent.dataString, "^.*/(\\d+)/.*$")

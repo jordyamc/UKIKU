@@ -31,7 +31,6 @@ import knf.kuma.pojos.QueueObject
 import knf.kuma.queue.QueueManager
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
-import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
 import java.util.*
 
@@ -168,7 +167,7 @@ class ServersFactory {
         try {
             serversInterface.onProgressIndicator(true)
             showSnack("Obteniendo servidores...")
-            val main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(context)).userAgent(BypassUtil.userAgent).get()
+            val main = jsoupCookies(url).get()
             val servers = ArrayList<Server>()
             val sScript = main.select("script")
             var j = ""

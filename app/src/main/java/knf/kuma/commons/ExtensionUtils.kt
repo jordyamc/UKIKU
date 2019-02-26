@@ -39,6 +39,8 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import org.jsoup.Connection
+import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
 import java.io.File
 
@@ -265,6 +267,8 @@ fun ImageView.setAnimatedResource(@DrawableRes res: Int) {
     animated.setVisible(true, true)
     animated.start()
 }
+
+fun jsoupCookies(url: String?): Connection = Jsoup.connect(url).cookies(BypassUtil.getMapCookie(App.context)).userAgent(BypassUtil.userAgent).timeout(PrefsUtil.timeoutTime.toInt() * 1000)
 
 fun isHostValid(hostName: String): Boolean {
     if (BuildConfig.DEBUG)

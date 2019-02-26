@@ -2,6 +2,7 @@ package knf.kuma.commons
 
 import okhttp3.OkHttpClient
 import java.security.cert.CertificateException
+import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
@@ -36,9 +37,12 @@ object NoSSLOkHttpClient {
             val sslContext = SSLContext.getInstance("SSL")
             sslContext.init(null, trustAllCerts, java.security.SecureRandom())
             val sslSocketFactory = sslContext.socketFactory
-            val builder = OkHttpClient.Builder()
-            builder.sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-            builder.hostnameVerifier { hostName, _ -> isHostValid(hostName) }
+            val builder = OkHttpClient.Builder().apply {
+                connectTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
+                readTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
+                sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+                hostnameVerifier { hostName, _ -> isHostValid(hostName) }
+            }
             return builder.build()
         } catch (e: Exception) {
             throw RuntimeException(e)

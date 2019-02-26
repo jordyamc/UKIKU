@@ -588,7 +588,7 @@ class Main : AppCompatActivity(),
     private fun checkBypass() {
         if (webView != null)
             doAsync {
-                if (isNeeded(this@Main) && !isLoading) {
+                if (isNeeded() && !isLoading) {
                     val snack = coordinator.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
                     isLoading = true
                     Log.e("CloudflareBypass", "is needed")

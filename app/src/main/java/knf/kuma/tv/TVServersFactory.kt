@@ -6,9 +6,9 @@ import android.util.Log
 import androidx.leanback.widget.Presenter
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
-import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.iterator
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
@@ -23,7 +23,6 @@ import knf.kuma.videoservers.VideoServer
 import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
-import org.jsoup.Jsoup
 import xdroid.toaster.Toaster
 
 class TVServersFactory private constructor(private val activity: Activity, private val url: String, private val chapter: AnimeObject.WebInfo.AnimeChapter, val viewHolder: Presenter.ViewHolder?, private val serversInterface: ServersInterface) {
@@ -54,7 +53,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
 
     fun analyzeMulti(position: Int) {
         doAsync {
-            val main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(activity)).userAgent(BypassUtil.userAgent).get()
+            val main = jsoupCookies(url).get()
             val downloads = main.select("table.RTbl.Dwnl tr:contains(${if (position == 0) "SUB" else "LAT"}) a.Button.Sm.fa-download")
             for (e in downloads) {
                 var z = e.attr("href")
@@ -133,7 +132,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
     fun get() {
         try {
             Log.e("Url", url)
-            val main = Jsoup.connect(url).timeout(5000).cookies(BypassUtil.getMapCookie(activity)).userAgent(BypassUtil.userAgent).get()
+            val main = jsoupCookies(url).get()
             val servers = ArrayList<Server>()
             val sScript = main.select("script")
             var j = ""

@@ -10,6 +10,7 @@ import java.util.List;
 
 import knf.kuma.commons.BypassUtil;
 import knf.kuma.commons.Network;
+import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.dao.AnimeDAO;
 import pl.droidsonroids.jspoon.Jspoon;
 import pl.droidsonroids.jspoon.annotation.Selector;
@@ -24,7 +25,7 @@ public class DirectoryPage {
             if (Network.INSTANCE.isConnected()) {
                 if (!animeDAO.existLink("https://animeflv.net" + link))
                     try {
-                        AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.Companion.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).validateTLSCertificates(true).get().outerHtml());
+                        AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.Companion.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(((int) PrefsUtil.INSTANCE.getTimeoutTime()) * 1000).validateTLSCertificates(true).get().outerHtml());
                         animeObjects.add(new AnimeObject("https://animeflv.net" + link, webInfo));
                         Log.e("Directory Getter", "Added: https://animeflv.net" + link);
                         updateInterface.onAdd();
@@ -45,7 +46,7 @@ public class DirectoryPage {
         for (String link : links) {
             if (Network.INSTANCE.isConnected()) {
                 try {
-                    AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.Companion.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(3000).get().outerHtml());
+                    AnimeObject.WebInfo webInfo = jspoon.adapter(AnimeObject.WebInfo.class).fromHtml(Jsoup.connect("https://animeflv.net" + link).cookies(BypassUtil.Companion.getMapCookie(context)).userAgent(BypassUtil.userAgent).timeout(((int) PrefsUtil.INSTANCE.getTimeoutTime()) * 1000).get().outerHtml());
                     animeObjects.add(new AnimeObject("https://animeflv.net" + link, webInfo));
                     Log.e("Directory Getter", "Replaced: https://animeflv.net" + link);
                     updateInterface.onAdd();

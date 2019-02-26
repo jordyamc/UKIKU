@@ -39,6 +39,18 @@
         <item>3</item>
         <item>4</item>
     </string-array>
+    <string-array name="timeout_options">
+        <item>10 segundos</item>
+        <item>20 segundos</item>
+        <item>30 segundos</item>
+        <item>Ilimitado</item>
+    </string-array>
+    <string-array name="timeout_values">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>0</item>
+    </string-array>
     <string-array name="dir_options">
         <item>Nunca</item>
         <item>Diario</item>

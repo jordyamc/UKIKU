@@ -6,9 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.GridLayoutAnimationController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
-class FSGridRecyclerView : FastScrollRecyclerView {
+class FSGridRecyclerView : FSRecyclerView {
 
     constructor(context: Context) : super(context)
 

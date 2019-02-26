@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="96" version="3.1.6">
+        <change type="fix">Errores generales</change>
+        <change type="new">Opción para subir tiempo de espera de conexión (timeout)</change>
+    </release>
     <release code="95" version="3.1.5">
         <change type="fix">Errores generales</change>
     </release>

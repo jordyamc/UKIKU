@@ -39,10 +39,12 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
             ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData?.observe(this, Observer { animeObject ->
                 if (animeObject != null) {
                     val chapters = animeObject.chapters
-                    if (PrefsUtil.isChapsAsc)
-                        chapters?.reverse()
-                    holder?.setAdapter(this@ChaptersFragment, chapters)
-                    holder?.goToChapter()
+                    chapters?.let {
+                        if (PrefsUtil.isChapsAsc)
+                            chapters.reverse()
+                        holder?.setAdapter(this@ChaptersFragment, chapters)
+                        holder?.goToChapter()
+                    }
                 }
             })
         }

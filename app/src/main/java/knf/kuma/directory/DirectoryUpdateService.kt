@@ -9,14 +9,13 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import knf.kuma.R
-import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import knf.kuma.pojos.DirectoryPage
-import org.jsoup.Jsoup
 import pl.droidsonroids.jspoon.Jspoon
 
 class DirectoryUpdateService : IntentService("Directory re-update") {
@@ -64,7 +63,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                 return
             }
             try {
-                val document = Jsoup.connect("https://animeflv.net/browse?order=added&page=$page").cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get()
+                val document = jsoupCookies("https://animeflv.net/browse?order=added&page=$page").get()
                 if (document.select("article").size != 0) {
                     page++
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimesRecreate(this, jspoon, object : DirectoryPage.UpdateInterface {

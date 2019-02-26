@@ -224,6 +224,14 @@
     <PreferenceCategory
         android:title="Extras">
 
+        <androidx.preference.ListPreference
+            android:defaultValue="10"
+            android:entries="@array/timeout_options"
+            android:entryValues="@array/timeout_values"
+            android:icon="@drawable/ic_timeout"
+            android:key="timeout_time"
+            android:summary="%s"
+            android:title="Espera de conexión"/>
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_setting_gps"

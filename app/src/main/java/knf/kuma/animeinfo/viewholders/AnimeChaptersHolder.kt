@@ -126,7 +126,8 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                 .withMaxScrollDistance(32)
     }
 
-    fun setAdapter(fragment: Fragment, chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>) {
+    fun setAdapter(fragment: Fragment, chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?) {
+        if (chapters == null) return
         this.chapters = chapters
         this.adapter = AnimeChaptersAdapter(fragment, recyclerView, chapters, touchListener)
         recyclerView.post {

@@ -12,9 +12,10 @@ class CookieImageDownloader(private val context: Context) : UrlConnectionDownloa
 
     @Throws(IOException::class)
     override fun openConnection(path: Uri): HttpURLConnection {
-        val conn = super.openConnection(path)
-        conn.setRequestProperty("Cookie", BypassUtil.getStringCookie(context))
-        conn.setRequestProperty("User-Agent", BypassUtil.userAgent)
-        return conn
+        return super.openConnection(path).apply {
+            connectTimeout = PrefsUtil.timeoutTime.toInt() * 1000
+            setRequestProperty("Cookie", BypassUtil.getStringCookie(context))
+            setRequestProperty("User-Agent", BypassUtil.userAgent)
+        }
     }
 }

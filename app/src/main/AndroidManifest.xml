@@ -294,6 +294,7 @@
         <activity
             android:name=".tv.streaming.TVMultiSelection"
             android:theme="@style/AppTheme.TV.Guided"/>
+        <activity android:name=".Diagnostic"/>
 
         <provider
             android:name=".slices.AnimeSlice"

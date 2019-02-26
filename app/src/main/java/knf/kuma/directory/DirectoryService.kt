@@ -21,7 +21,6 @@ import knf.kuma.jobscheduler.DirUpdateJob
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DirectoryPage
 import org.jsoup.HttpStatusException
-import org.jsoup.Jsoup
 import pl.droidsonroids.jspoon.Jspoon
 import java.util.*
 
@@ -79,7 +78,7 @@ class DirectoryService : IntentService("Directory update") {
     private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
         animeDAO.allInEmission.forEach {
             noCrash {
-                val animeObject = AnimeObject(it.link, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(Jsoup.connect(it.link).cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get().outerHtml()))
+                val animeObject = AnimeObject(it.link, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(it.link).get().outerHtml()))
                 animeDAO.updateAnime(animeObject)
             }
         }
@@ -100,7 +99,7 @@ class DirectoryService : IntentService("Directory update") {
                 return
             }
             try {
-                val document = Jsoup.connect("https://animeflv.net/browse?order=added&page=$s").cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get()
+                val document = jsoupCookies("https://animeflv.net/browse?order=added&page=$s").get()
                 if (document.select("article").size != 0) {
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(this, animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
@@ -138,7 +137,7 @@ class DirectoryService : IntentService("Directory update") {
                 return
             }
             try {
-                val document = Jsoup.connect("https://animeflv.net/browse?order=added&page=$page").cookies(BypassUtil.getMapCookie(this)).userAgent(BypassUtil.userAgent).get()
+                val document = jsoupCookies("https://animeflv.net/browse?order=added&page=$page").get()
                 if (document.select("article").size != 0) {
                     page++
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(this, animeDAO, jspoon, object : DirectoryPage.UpdateInterface {

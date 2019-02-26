@@ -163,7 +163,7 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     fun checkBypass(context: Context) {
         if (webView != null)
             doAsync {
-                if (isNeeded(context) && !isLoading) {
+                if (isNeeded() && !isLoading) {
                     isLoading = true
                     clearCookies()
                     webView?.settings?.javaScriptEnabled = true

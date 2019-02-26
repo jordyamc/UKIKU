@@ -101,7 +101,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
         noCrash {
             val webView = WebView(this)
             doAsync {
-                if (BypassUtil.isNeeded(this@TVMain) && !BypassUtil.isLoading) {
+                if (BypassUtil.isNeeded() && !BypassUtil.isLoading) {
                     "Creando bypass...".toast()
                     BypassUtil.isLoading = true
                     Log.e("CloudflareBypass", "is needed")

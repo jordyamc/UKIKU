@@ -4,7 +4,6 @@ import android.content.Context
 import android.preference.PreferenceManager
 import android.webkit.CookieManager
 import org.jsoup.HttpStatusException
-import org.jsoup.Jsoup
 import java.io.IOException
 import java.util.*
 
@@ -55,9 +54,9 @@ class BypassUtil {
             }
         }
 
-        fun isNeeded(context: Context): Boolean {
+        fun isNeeded(): Boolean {
             return try {
-                val response = Jsoup.connect("https://animeflv.net/").cookies(getMapCookie(context)).userAgent(BypassUtil.userAgent).execute()
+                val response = jsoupCookies("https://animeflv.net/").execute()
                 response.statusCode() == 503
             } catch (e: HttpStatusException) {
                 e.statusCode == 503

@@ -15,5 +15,8 @@
         <attr name="si_showDivider" format="boolean"/>
         <attr name="si_actionId" format="string"/>
     </declare-styleable>
+    <declare-styleable name="StateView">
+        <attr name="sv_title" format="string"/>
+    </declare-styleable>
     <attr name="colorAccentLight" format="reference"/>
 </resources>
