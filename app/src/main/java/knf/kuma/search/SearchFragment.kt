@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.SearchEvent
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
@@ -23,7 +23,7 @@ import java.util.*
 
 class SearchFragment : BottomFragment() {
     lateinit var recyclerView: RecyclerView
-    lateinit var fab: FloatingActionButton
+    lateinit var fab: ExtendedFloatingActionButton
     lateinit var progressBar: ProgressBar
     private lateinit var errorView: View
 
@@ -101,19 +101,31 @@ class SearchFragment : BottomFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.verifyManager()
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0)
+                    fab.shrink()
+                else if (dy < 0)
+                    fab.extend()
+            }
+        })
         manager = recyclerView.layoutManager
         adapter = SearchAdapter(this)
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                 super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                if (toPosition == 0)
+                if (toPosition == 0) {
                     manager?.smoothScrollToPosition(recyclerView, null, 0)
+                    fab.extend()
+                }
             }
 
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                if (positionStart == 0)
+                if (positionStart == 0) {
                     manager?.smoothScrollToPosition(recyclerView, null, 0)
+                    fab.extend()
+                }
             }
         })
         recyclerView.adapter = adapter
@@ -149,7 +161,7 @@ class SearchFragment : BottomFragment() {
     }
 
     private fun setFabIcon() {
-        fab.post { fab.setImageResource(fabIcon) }
+        fab.post { fab.setIconResource(fabIcon) }
     }
 
     override fun onReselect() {

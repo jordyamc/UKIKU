@@ -1,13 +1,17 @@
 package knf.kuma.database.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.*
 import knf.kuma.pojos.RecordObject
 
 @Dao
 interface RecordsDAO {
     @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
-    val all: LiveData<List<RecordObject>>
+    val all: DataSource.Factory<Int, RecordObject>
+
+    @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
+    val allLive: LiveData<List<RecordObject>>
 
     @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
     val allRaw: MutableList<RecordObject>

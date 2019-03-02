@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.isSameContent
@@ -44,7 +44,7 @@ class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<NewsAd
     }
 
     class NewsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val card: CardView = itemView.card
+        val card: MaterialCardView = itemView.card
         val metadata: TextView = itemView.metadata
         val title: TextView = itemView.title
         val description: TextView = itemView.description

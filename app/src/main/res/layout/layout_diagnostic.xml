@@ -22,7 +22,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -38,19 +39,210 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
                         android:layout_marginBottom="8dp"
-                        android:text="Animeflv.net"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:textColor="?colorAccent"/>
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Animeflv.net"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:textColor="?colorAccent"/>
+
+                        <ImageButton
+                            android:id="@+id/info"
+                            style="@style/Base.Widget.AppCompat.Button.Borderless"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:background="@drawable/background_ripple"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_info"
+                            android:visibility="gone"/>
+                    </LinearLayout>
 
                     <knf.kuma.custom.StateView
                         android:id="@+id/generalState"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:sv_title="Estado general"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/codeState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Código http"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/timeoutState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Tiempo de respuesta"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Bypass"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:textColor="?colorAccent"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/bypassState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Estado general"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/clearanceState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:sv_title="cf_clearance"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/cfduidState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:sv_title="__cfduid"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/userAgentState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:sv_title="User agent"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Directorio"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:textColor="?colorAccent"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/dirState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Estado general"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/dirTotalState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Animes en directorio"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Memoria libre"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:textColor="?colorAccent"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/internalState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Interna"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/externalState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:sv_title="Tarjeta SD"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Respaldos"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:textColor="?colorAccent"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/backupState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Configurado"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/lastBackupState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:sv_title="Último respaldo"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

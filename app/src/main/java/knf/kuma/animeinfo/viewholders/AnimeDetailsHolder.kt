@@ -6,13 +6,13 @@ import android.content.Context
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeRelatedAdapter
 import knf.kuma.animeinfo.AnimeTagsAdapter
@@ -32,7 +32,7 @@ import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
 class AnimeDetailsHolder(val view: View) {
-    private var cardViews: MutableList<CardView> = arrayListOf(view.card_title, view.card_desc, view.card_details, view.card_genres, view.card_list, view.card_related)
+    private var cardViews: MutableList<MaterialCardView> = arrayListOf(view.card_title, view.card_desc, view.card_details, view.card_genres, view.card_list, view.card_related)
     internal val title: TextView = view.title
     private val expandIcon: ImageButton = view.expand_icon
     private val desc: ExpandableTV = view.expandable_desc
@@ -136,7 +136,7 @@ class AnimeDetailsHolder(val view: View) {
         }
     }
 
-    private fun showCard(view: CardView) {
+    private fun showCard(view: MaterialCardView) {
         retard += 100
         GlobalScope.launch(Dispatchers.Main) {
             delay(retard.toLong())

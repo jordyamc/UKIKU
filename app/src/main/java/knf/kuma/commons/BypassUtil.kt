@@ -23,7 +23,7 @@ class BypassUtil {
 
         private const val keyCfClearance = "cf_clearance"
         private const val keyCfDuid = "__cfduid"
-        private const val defaultValue = "00000000"
+        private const val defaultValue = ""
 
         fun saveCookies(context: Context): Boolean {
             val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/").trim { it <= ' ' }
@@ -79,12 +79,12 @@ class BypassUtil {
             return "device=computer; cf_clearance=${getClearance(context)}; __cfduid=${getCFDuid(context)}"
         }
 
-        private fun getClearance(context: Context): String {
+        fun getClearance(context: Context): String {
             return PreferenceManager.getDefaultSharedPreferences(context).getString(keyCfClearance, defaultValue)
                     ?: defaultValue
         }
 
-        private fun getCFDuid(context: Context): String {
+        fun getCFDuid(context: Context): String {
             return PreferenceManager.getDefaultSharedPreferences(context).getString(keyCfDuid, defaultValue)
                     ?: defaultValue
         }

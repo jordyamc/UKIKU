@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PicassoSingle
@@ -62,7 +62,7 @@ class ExplorerFilesAdapter internal constructor(private val fragment: Fragment, 
     }
 
     inner class FileItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView by itemView.bind(R.id.card)
+        val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)
         val chapter: TextView by itemView.bind(R.id.chapter)

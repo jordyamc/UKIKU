@@ -62,7 +62,7 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottom_card"
         android:layout_width="match_parent"
         android:layout_height="350dp"
@@ -96,6 +96,6 @@
                 app:layoutManager="LinearLayoutManager"
                 tools:listitem="@layout/item_queue"/>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

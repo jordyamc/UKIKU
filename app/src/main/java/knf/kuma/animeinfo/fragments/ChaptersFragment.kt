@@ -52,7 +52,6 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        retainInstance = true
         val view = inflater.inflate(R.layout.recycler_chapters, container, false)
         holder = AnimeChaptersHolder(view, childFragmentManager, this).also {
             snackManager = SnackProgressBarManager(it.recyclerView)

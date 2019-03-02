@@ -13,7 +13,11 @@ class IAPService(binder: IBinder) : BillingService {
     }
 
     override fun getSkuDetails(apiVersion: Int, packageName: String, type: String, skusBundle: Bundle): Bundle {
-        return service.getSkuDetails(apiVersion, packageName, type, skusBundle)
+        return try {
+            service.getSkuDetails(apiVersion, packageName, type, skusBundle)
+        } catch (e: Exception) {
+            Bundle()
+        }
     }
 
     override fun getBuyIntent(apiVersion: Int, packageName: String, sku: String, type: String, developerPayload: String): Bundle {

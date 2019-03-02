@@ -6,8 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,14 +25,15 @@
                 android:text="Sync title"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/backup"
-                style="@style/Widget.AppCompat.Button.Colored"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?colorSecondary"
                 android:enabled="false"
                 android:text="Respaldar"
-                android:textColor="@drawable/sync_button_color"/>
+                android:textColor="@android:color/primary_text_dark"/>
         </LinearLayout>
 
         <LinearLayout
@@ -53,14 +53,15 @@
                 android:text="Cargando..."
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/restore"
-                style="@style/Widget.AppCompat.Button.Colored"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?colorSecondary"
                 android:enabled="false"
                 android:text="Restaurar"
-                android:textColor="@drawable/sync_button_color"/>
+                android:textColor="@android:color/primary_text_dark"/>
         </LinearLayout>
 
         <View

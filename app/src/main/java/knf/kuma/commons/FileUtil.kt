@@ -61,28 +61,32 @@ object FileUtil {
         }
 
     fun getFullPathFromTreeUri(treeUri: Uri?, con: Context): String? {
-        if (treeUri == null) {
-            return null
-        }
-        var volumePath: String? = FileUtil.getVolumePath(FileUtil.getVolumeIdFromTreeUri(treeUri), con)
-                ?: return File.separator
-        if (volumePath?.endsWith(File.separator) == true) {
-            volumePath = volumePath.substring(0, volumePath.length - 1)
-        }
-
-        var documentPath = FileUtil.getDocumentPathFromTreeUri(treeUri)
-        if (documentPath.endsWith(File.separator)) {
-            documentPath = documentPath.substring(0, documentPath.length - 1)
-        }
-
-        return if (documentPath.isNotEmpty()) {
-            if (documentPath.startsWith(File.separator)) {
-                volumePath + documentPath
-            } else {
-                volumePath + File.separator + documentPath
+        try {
+            if (treeUri == null) {
+                return null
             }
-        } else {
-            volumePath
+            var volumePath: String? = FileUtil.getVolumePath(FileUtil.getVolumeIdFromTreeUri(treeUri), con)
+                    ?: return File.separator
+            if (volumePath?.endsWith(File.separator) == true) {
+                volumePath = volumePath.substring(0, volumePath.length - 1)
+            }
+
+            var documentPath = FileUtil.getDocumentPathFromTreeUri(treeUri)
+            if (documentPath.endsWith(File.separator)) {
+                documentPath = documentPath.substring(0, documentPath.length - 1)
+            }
+
+            return if (documentPath.isNotEmpty()) {
+                if (documentPath.startsWith(File.separator)) {
+                    volumePath + documentPath
+                } else {
+                    volumePath + File.separator + documentPath
+                }
+            } else {
+                volumePath
+            }
+        } catch (e: Exception) {
+            return null
         }
     }
 

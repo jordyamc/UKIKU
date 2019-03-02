@@ -2,6 +2,12 @@
 <changelog>
     <release code="96" version="3.1.6">
         <change type="fix">Errores generales</change>
+        <change type="change">Material Design 2</change>
+        <change type="change">Mejora de carga en historial</change>
+        <change type="new">Pantalla de diagnóstico en informacion de la app</change>
+    </release>
+    <release code="96" version="3.1.6">
+        <change type="fix">Errores generales</change>
         <change type="new">Opción para subir tiempo de espera de conexión (timeout)</change>
     </release>
     <release code="95" version="3.1.5">

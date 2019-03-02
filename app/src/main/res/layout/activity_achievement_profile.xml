@@ -99,6 +99,7 @@
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:tabBackground="?colorPrimary"
                 app:tabSelectedTextColor="?colorAccent"
+                app:tabIndicatorColor="?colorAccent"
                 app:tabTextColor="@android:color/secondary_text_dark">
 
                 <com.google.android.material.tabs.TabItem
@@ -120,7 +121,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -213,6 +214,6 @@
                 android:textColor="?android:attr/textColorSecondary"
                 tools:text="Usa mas la app para desbloquear"/>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

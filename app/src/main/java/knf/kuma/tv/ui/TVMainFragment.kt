@@ -101,7 +101,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
                 }
                 startEntranceTransition()
             })
-            CacheDB.INSTANCE.recordsDAO().all.observe(it, Observer { recordObjects ->
+            CacheDB.INSTANCE.recordsDAO().allLive.observe(it, Observer { recordObjects ->
                 val row = mRows?.get(LAST_SEEN)
                 row?.page = row?.page?.plus(1) ?: 0
                 row?.adapter?.clear()

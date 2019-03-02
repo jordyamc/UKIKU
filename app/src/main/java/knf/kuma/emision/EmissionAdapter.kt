@@ -5,12 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
@@ -109,7 +109,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
     }
 
     inner class EmissionItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView = itemView.card
+        val cardView: MaterialCardView = itemView.card
         val imageView: ImageView = itemView.img
         val hiddenOverlay: HiddenOverlay = itemView.hidden
         val heart: ImageView = itemView.heart

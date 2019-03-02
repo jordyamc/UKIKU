@@ -3,15 +3,13 @@
 
     <style name="AppTheme.DayNight" parent="AppTheme"/>
 
-    <style name="AppTheme.Dialog.Base.DayNight" parent="AppTheme.Dialog.Base">
+    <style name="AppTheme.Dialog.Base.DayNight" parent="Theme.MaterialComponents.Dialog">
         <item name="android:windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark"/>
-
-    <style name="AppTheme.Cardview" parent="CardView.Dark"/>
 
     <style name="AppTheme.AppInfo" parent="Theme.Mal.Dark">
         <item name="colorPrimary">@color/colorPrimary</item>

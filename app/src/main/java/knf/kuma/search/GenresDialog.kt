@@ -2,9 +2,10 @@ package knf.kuma.search
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import java.util.*
 
 class GenresDialog : DialogFragment() {
@@ -23,6 +24,14 @@ class GenresDialog : DialogFragment() {
             return states
         }
 
+    private val selectedStates: IntArray
+        get() {
+            val states = IntArray(selected.size)
+            for ((index, item) in selected.withIndex())
+                states[index] = genres.indexOf(item)
+            return states
+        }
+
     fun init(genres: MutableList<String>, selected: MutableList<String>, listener: MultiChoiceListener) {
         this.genres = genres
         this.selected = selected
@@ -31,7 +40,20 @@ class GenresDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            AlertDialog.Builder(it)
+            MaterialDialog(it).apply {
+                title(text = "Géneros")
+                listItemsMultiChoice(items = genres, initialSelection = selectedStates, allowEmptySelection = true) { _: MaterialDialog, _: IntArray, items: List<String> ->
+                    selected.apply {
+                        clear()
+                        addAll(items)
+                        sort()
+                    }
+                    listener?.onOkay(selected)
+                }
+                positiveButton(text = "BUSCAR")
+                negativeButton(text = "CERRAR")
+            }
+            /*AlertDialog.Builder(it)
                     .setTitle("Generos")
                     .setMultiChoiceItems(genres.toTypedArray(), states) { _, index, isSelected ->
                         if (isSelected)
@@ -42,7 +64,7 @@ class GenresDialog : DialogFragment() {
                         selected.sort()
                         listener?.onOkay(selected)
                     }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }
-                    .create()
+                    .create()*/
         } ?: super.onCreateDialog(savedInstanceState)
     }
 

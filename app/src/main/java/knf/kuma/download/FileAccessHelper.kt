@@ -41,10 +41,14 @@ class FileAccessHelper private constructor(private val context: Context) {
 
         }
 
+    val internalRoot: File get() = Environment.getExternalStorageDirectory()
+
+    val externalRoot: File? get() = FileUtil.getFullPathFromTreeUri(treeUri, context)?.let { File(it) }
+
     private val treeUri: Uri?
         get() {
             return try {
-                Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString("tree_uri", ""))
+                Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString("tree_uri", null))
             } catch (e: Exception) {
                 null
             }

@@ -16,7 +16,7 @@
         android:paddingTop="25dp"
         android:paddingBottom="10dp">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,9 +53,9 @@
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textSize="16sp"/>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -116,9 +116,9 @@
                     app:tvea_expandLines="4"
                     app:tvea_shrinkBitmap="@drawable/action_shrink"/>-->
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -255,9 +255,9 @@
                         android:padding="8dp"/>
                 </LinearLayout>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_genres"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -290,9 +290,9 @@
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/item_chip"/>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -325,9 +325,9 @@
                     android:entries="@array/list_states"/>
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_related"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -360,6 +360,6 @@
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/item_related"/>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

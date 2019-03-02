@@ -27,7 +27,6 @@ import androidx.preference.DialogPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.EditTextPreferenceDialogFragmentCompat;
 import androidx.preference.ListPreference;
-import androidx.preference.ListPreferenceDialogFragmentCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceGroupAdapter;
@@ -557,7 +556,7 @@ public abstract class PreferenceFragmentCompat extends Fragment implements
         if (preference instanceof EditTextPreference) {
             f = EditTextPreferenceDialogFragmentCompat.newInstance(preference.getKey());
         } else if (preference instanceof ListPreference) {
-            f = ListPreferenceDialogFragmentCompat.newInstance(preference.getKey());
+            f = ListPreferenceDialogFragmentCompat.Companion.newInstance(preference.getKey());
         } else {
             throw new IllegalArgumentException("Tried to display dialog for unknown " +
                     "preference type. Did you forget to override onDisplayPreferenceDialog()?");

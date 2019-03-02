@@ -100,8 +100,13 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("show_favs", value).apply()
 
     val timeoutTime: Long
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("timeout_time", "10")?.toLong()
-                ?: 10
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("timeout_time", if (context?.resources?.getBoolean(R.bool.isTv) == true) "0" else "10")?.toLong()
+                ?: 0
+
+    var lastBackup: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("last_backup", "Desconocido")
+                ?: "Desconocido"
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("last_backup", value).apply()
 
     fun init(context: Context) {
         PrefsUtil.context = context

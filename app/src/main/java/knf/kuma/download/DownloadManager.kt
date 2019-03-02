@@ -370,11 +370,15 @@ class DownloadManager : Service() {
         }
 
         private fun getPending(downloadObject: DownloadObject, action: Int): PendingIntent {
-            val intent = Intent(context, DownloadReceiver::class.java)
-                    .putExtra("did", downloadObject.getDid())
-                    .putExtra("eid", downloadObject.eid)
-                    .putExtra("action", action)
-            return PendingIntent.getBroadcast(context, downloadObject.key + action, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            return try {
+                val intent = Intent(context, DownloadReceiver::class.java)
+                        .putExtra("did", downloadObject.getDid())
+                        .putExtra("eid", downloadObject.eid)
+                        .putExtra("action", action)
+                PendingIntent.getBroadcast(context, downloadObject.key + action, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            } catch (e: IllegalStateException) {
+                PendingIntent.getBroadcast(context, 0, Intent(), PendingIntent.FLAG_CANCEL_CURRENT)
+            }
         }
 
         private fun stopIfNeeded() {

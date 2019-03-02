@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,7 +9,6 @@
     android:clickable="true"
     android:foreground="?android:selectableItemBackgroundBorderless"
     android:theme="@style/AppTheme.Cardview"
-    app:cardBackgroundColor="@color/cardview_background"
     app:cardCornerRadius="0dp"
     app:cardElevation="2dp">
 
@@ -90,4 +89,4 @@
         </FrameLayout>
     </RelativeLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

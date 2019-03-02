@@ -27,6 +27,7 @@ import com.google.gson.reflect.TypeToken
 import knf.kuma.App
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.objects.BackupObject
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showSnackbar
@@ -39,6 +40,8 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
@@ -386,6 +389,7 @@ object BUUtils {
                         ?.withMode(WriteMode.OVERWRITE)
                         ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(id)).toByteArray(StandardCharsets.UTF_8)))
                 backupInterface.onResponse(backupObject)
+                saveLastBackup()
             } catch (e: Exception) {
                 e.printStackTrace()
                 backupInterface.onResponse(null)
@@ -403,6 +407,7 @@ object BUUtils {
                         ?.withMode(WriteMode.OVERWRITE)
                         ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(id)).toByteArray(StandardCharsets.UTF_8)))
                 backupInterface.onResponse(backupObject)
+                saveLastBackup()
             } catch (e: Exception) {
                 e.printStackTrace()
                 backupInterface.onResponse(null)
@@ -418,6 +423,7 @@ object BUUtils {
                         ?.withMode(WriteMode.OVERWRITE)
                         ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, getType(keyAutoBackup)).toByteArray(StandardCharsets.UTF_8)))
                 backupInterface.onResponse(backupObject)
+                saveLastBackup()
             } catch (e: Exception) {
                 e.printStackTrace()
                 backupInterface.onResponse(null)
@@ -456,6 +462,7 @@ object BUUtils {
                             addOnSuccessListener(it) {
                                 snackbar.safeDismiss()
                                 backupInterface.onResponse(backupObject)
+                                saveLastBackup()
                             }
                             addOnFailureListener(it) {
                                 snackbar.safeDismiss()
@@ -493,7 +500,10 @@ object BUUtils {
 
                         appFolderTask?.result?.let { DRC?.createFile(it, changeSet, contents) }
                     }
-                    .addOnSuccessListener { backupInterface.onResponse(backupObject) }
+                    .addOnSuccessListener {
+                        backupInterface.onResponse(backupObject)
+                        saveLastBackup()
+                    }
                     .addOnFailureListener { backupInterface.onResponse(null) }
         }
     }
@@ -526,7 +536,10 @@ object BUUtils {
                         appFolderTask?.result?.let { DRC?.createFile(it, changeSet, contents) }
                     }.apply {
                         activity?.let {
-                            addOnSuccessListener(it) { backupInterface.onResponse(backupObject) }
+                            addOnSuccessListener(it) {
+                                backupInterface.onResponse(backupObject)
+                                saveLastBackup()
+                            }
                             addOnFailureListener(it) { backupInterface.onResponse(null) }
                         }
                     }
@@ -667,6 +680,10 @@ object BUUtils {
             false
         }
 
+    }
+
+    private fun saveLastBackup() {
+        PrefsUtil.lastBackup = SimpleDateFormat("dd/MM/yyyy kk:mm", Locale.getDefault()).format(Calendar.getInstance().time)
     }
 
     enum class BUType(var value: Int) {

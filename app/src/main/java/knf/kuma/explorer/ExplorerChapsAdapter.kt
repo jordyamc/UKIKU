@@ -11,10 +11,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
@@ -160,7 +160,7 @@ class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, 
     }
 
     inner class ChapItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView by itemView.bind(R.id.card)
+        val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val seenOverlay: SeenAnimeOverlay by itemView.bind(R.id.seen)
         val chapter: TextView by itemView.bind(R.id.chapter)

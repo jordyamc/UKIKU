@@ -19,11 +19,12 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"
-                android:layout_width="match_parent"
                 style="@style/Widget.MaterialComponents.TabLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?colorPrimary"
                 app:tabBackground="?colorPrimary"
+                app:tabIndicatorColor="?colorAccent"
                 app:tabSelectedTextColor="?colorAccent"
                 app:tabTextColor="@android:color/secondary_text_dark">
 

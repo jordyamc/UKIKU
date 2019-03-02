@@ -13,13 +13,13 @@ import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
@@ -31,9 +31,9 @@ class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedLis
     val recyclerView: RecyclerView by bind(R.id.recycler)
     private val listToolbar: Toolbar by bind(R.id.list_toolbar)
     private val listRecyclerView: RecyclerView by bind(R.id.list_recycler)
-    val cardView: CardView by bind(R.id.bottom_card)
+    val cardView: MaterialCardView by bind(R.id.bottom_card)
     val errorView: View by bind(R.id.error)
-    internal var bottomSheetBehavior: BottomSheetBehavior<CardView>? = null
+    internal var bottomSheetBehavior: BottomSheetBehavior<MaterialCardView>? = null
     private var listAdapter: QueueListAdapter? = null
 
     private var mItemTouchHelper: ItemTouchHelper? = null

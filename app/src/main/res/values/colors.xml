@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- snackbar -->
-    <color name="background">#FF323232</color>
+    <color name="background">#424242</color>
     <!-- text color -->
-    <color name="textWhitePrimary">#FFFFFFFF</color>
+    <color name="textWhitePrimary">#fff</color>
+
+    <color name="screenBackground">#fff3f3f3</color>
 
     <color name="colorPrimary">#ffffff</color>
     <color name="colorPrimaryDark">#c7c7c7</color>
     <color name="colorAccent">#d32f2f</color>
+
+    <color name="stateOk">#43a047</color>
+    <color name="stateWarning">#fdd835</color>
+    <color name="stateError">#e53935</color>
 
     <color name="colorAccentPink">#C2185B</color>
     <color name="colorAccentPurple">#7B1FA2</color>

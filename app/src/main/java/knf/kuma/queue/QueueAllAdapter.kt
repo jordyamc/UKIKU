@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.commons.notSameContent
 import knf.kuma.pojos.QueueObject
@@ -86,7 +86,7 @@ internal class QueueAllAdapter internal constructor(activity: Activity) : Recycl
     }
 
     internal inner class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView = itemView.card
+        val cardView: MaterialCardView = itemView.card
         val dragView: ImageView = itemView.drag
         val title: TextView = itemView.title
         val chapter: TextView = itemView.chapter

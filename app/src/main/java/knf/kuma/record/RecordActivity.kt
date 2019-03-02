@@ -11,6 +11,7 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
+import androidx.paging.LivePagedListBuilder
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -27,7 +28,6 @@ class RecordActivity : AppCompatActivity() {
     val progressBar: ProgressBar by bind(R.id.progress)
     val error: View by bind(R.id.error)
     private var adapter: RecordsAdapter? = null
-    private var animate = true
     private var isFirst = true
 
     private val layout: Int
@@ -56,25 +56,21 @@ class RecordActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                animate = false
                 adapter?.remove(viewHolder.adapterPosition)
                 Snackbar.make(recyclerView, "Elemento eliminado", Snackbar.LENGTH_SHORT).show()
             }
         })
         touchHelper.attachToRecyclerView(recyclerView)
-        CacheDB.INSTANCE.recordsDAO().all.observe(this, Observer { recordObjects ->
-            if (recordObjects != null && recordObjects.isNotEmpty()) {
-                if (animate) {
-                    runOnUiThread {
-                        adapter?.update(recordObjects as MutableList<RecordObject>)
-                        if (isFirst) {
-                            isFirst = false
-                            recyclerView.scheduleLayoutAnimation()
-                        }
-                    }
-                } else
-                    animate = true
-            } else error.post { error.visibility = View.VISIBLE }
+        LivePagedListBuilder<Int, RecordObject>(CacheDB.INSTANCE.recordsDAO().all, 15).build().observe(this, Observer { recordObjects ->
+            adapter?.submitList(recordObjects)
+            if (isFirst) {
+                isFirst = false
+                recyclerView.scheduleLayoutAnimation()
+            }
+            if (recordObjects.isEmpty())
+                error.visibility = View.VISIBLE
+            else
+                error.visibility = View.GONE
             progressBar.visibility = View.GONE
         })
     }

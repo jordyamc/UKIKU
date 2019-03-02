@@ -14,7 +14,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -23,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.card.MaterialCardView
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.squareup.picasso.Callback
@@ -60,6 +60,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     private var processingPosition = -1
 
     init {
+        setHasStableIds(true)
         chaptersDAO.init()
         if (chapters.isNotEmpty()) {
             seeingObject = seeingDAO.getByAid(chapters[0].aid)
@@ -334,6 +335,10 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         return chapters.size
     }
 
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
     fun select(pos: Int, sel: Boolean) {
         if (sel) {
             selection.add(pos)
@@ -365,7 +370,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     }
 
     inner class ChapterImgHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView by itemView.bind(R.id.card)
+        val cardView: MaterialCardView by itemView.bind(R.id.card)
         val separator: View by itemView.bind(R.id.separator)
         val imageView: ImageView by itemView.bind(R.id.img)
         val chapter: TextView by itemView.bind(R.id.chapter)

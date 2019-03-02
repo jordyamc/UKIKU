@@ -12,7 +12,7 @@ class WEmissionService : RemoteViewsService() {
         const val CHANNEL = "widget-service"
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onCreate() {
         startForeground(5987, NotificationCompat.Builder(this, CHANNEL).apply {
             setSmallIcon(R.drawable.ic_service)
             priority = NotificationCompat.PRIORITY_MIN
@@ -21,7 +21,7 @@ class WEmissionService : RemoteViewsService() {
             else
                 setContentTitle("Actualizando widget")
         }.build())
-        return super.onStartCommand(intent, flags, startId)
+        super.onCreate()
     }
 
     override fun onDestroy() {

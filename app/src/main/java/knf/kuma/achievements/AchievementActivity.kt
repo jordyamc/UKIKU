@@ -17,11 +17,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import knf.kuma.R
@@ -43,7 +43,7 @@ class AchievementActivity : AppCompatActivity() {
     private val progress: CircularProgressBar by bind(R.id.progress)
     private val level: TextView by bind(R.id.level)
     private val countDown: TextView by bind(R.id.countdown)
-    private val cardView: CardView by bind(R.id.sheet)
+    private val cardView: MaterialCardView by bind(R.id.sheet)
     private val icon: ImageView by bind(R.id.achievement_icon)
     private val xpIndicator: TextView by bind(R.id.achievement_xp)
     private val state: TextView by bind(R.id.achievement_state)
@@ -53,7 +53,7 @@ class AchievementActivity : AppCompatActivity() {
     private val progressIndText: TextView by bind(R.id.progress_ind_text)
     private val name: TextView by bind(R.id.achievement_name)
     private val description: TextView by bind(R.id.achievement_description)
-    private lateinit var bottomSheet: BottomSheetBehavior<CardView>
+    private lateinit var bottomSheet: BottomSheetBehavior<MaterialCardView>
 
     private var syncButton: MenuItem? = null
 

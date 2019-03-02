@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/holo_orange_dark">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -36,22 +36,24 @@
                 android:text="Se intentará migrar la mayor cantidad de datos desde Animeflv App, puede haber perdidas en el proceso."
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/migrate_favs"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?colorSecondary"
                 android:text="favoritos"
-                android:textColor="@drawable/sync_button_color"/>
+                android:textColor="@android:color/primary_text_dark"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/migrate_seen"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?colorSecondary"
                 android:text="capitulos vistos"
-                android:textColor="@drawable/sync_button_color"/>
+                android:textColor="@android:color/primary_text_dark"/>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>

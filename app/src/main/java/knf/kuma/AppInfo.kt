@@ -36,6 +36,7 @@ class AppInfo : MaterialAboutActivity() {
         infoCard.addItem(ConvenienceBuilder.createAppTitleItem(this))
         infoCard.addItem(ConvenienceBuilder.createVersionActionItem(this, getDrawable(R.drawable.ic_version), "Versión", true))
         infoCard.addItem(MaterialAboutActionItem.Builder().text("Changelog").icon(R.drawable.ic_changelog_get).setOnClickAction { ChangelogActivity.open(this@AppInfo) }.build())
+        infoCard.addItem(MaterialAboutActionItem.Builder().text("Diagnóstico").icon(R.drawable.ic_diagnostic).setOnClickAction { Diagnostic.open(this@AppInfo) }.build())
         val authorCard = MaterialAboutCard.Builder()
         authorCard.title("Autor")
         authorCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_author), "Jordy Mendoza", true, Uri.parse("https://t.me/UnbarredStream")))

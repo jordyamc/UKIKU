@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
@@ -45,7 +45,7 @@ internal class AnimeRelatedAdapter(private val fragment: Fragment, private val l
     }
 
     internal inner class RelatedHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView = itemView.card
+        val cardView: MaterialCardView = itemView.card
         val imageView: ImageView = itemView.img
         val textView: TextView = itemView.title
         val relation: TextView = itemView.relation

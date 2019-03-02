@@ -26,6 +26,7 @@
             app:tabBackground="?colorPrimary"
             app:tabMode="scrollable"
             app:tabSelectedTextColor="?colorAccent"
+            app:tabIndicatorColor="?colorAccent"
             app:tabTextColor="@android:color/secondary_text_dark"/>
     </com.google.android.material.appbar.AppBarLayout>
 

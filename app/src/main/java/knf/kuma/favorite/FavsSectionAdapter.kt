@@ -8,9 +8,9 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
 import knf.kuma.ads.AdCallback
@@ -124,7 +124,7 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     }
 
     internal inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: CardView by itemView.bind(R.id.card)
+        val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)
         val type: TextView by itemView.bind(R.id.type)

@@ -8,7 +8,7 @@
     android:background="@drawable/updater_background"
     android:fitsSystemWindows="true">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/card"
         style="@style/AppTheme.Cardview"
         android:layout_width="match_parent"
@@ -57,15 +57,17 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textSize="20sp"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/download"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="?colorSecondary"
+                    android:textColor="@android:color/primary_text_dark"
                     android:text="INSTALAR"
                     android:visibility="invisible"/>
             </RelativeLayout>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>
