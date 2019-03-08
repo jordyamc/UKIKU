@@ -7,6 +7,7 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
+import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
 import java.util.*
 import kotlin.collections.LinkedHashSet
@@ -36,7 +37,7 @@ class WEListProvider internal constructor(private val context: Context) : Remote
         items.clear()
         val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context))
         for (obj in list) {
-            items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, obj.img))
+            items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, PatternUtil.getCover(obj.aid)))
         }
     }
 

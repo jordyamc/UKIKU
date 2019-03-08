@@ -9,7 +9,7 @@ class SeeingPagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapte
     val fragmentList: MutableList<SeeingFragment> = mutableListOf()
 
     init {
-        for (i in 0..4) {
+        for (i in 0..5) {
             fragmentList.add(SeeingFragment[i])
         }
     }

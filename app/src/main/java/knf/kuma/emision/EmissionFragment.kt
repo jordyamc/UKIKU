@@ -14,6 +14,7 @@ import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
+import knf.kuma.search.SearchObject
 import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.recycler_emision.*
 import org.jetbrains.anko.doAsync
@@ -25,8 +26,8 @@ class EmissionFragment : Fragment() {
     private var adapter: EmissionAdapter? = null
     private var isFirst = true
 
-    private lateinit var liveData: LiveData<MutableList<AnimeObject>>
-    private lateinit var observer: Observer<MutableList<AnimeObject>>
+    private lateinit var liveData: LiveData<MutableList<SearchObject>>
+    private lateinit var observer: Observer<MutableList<SearchObject>>
 
     private val blacklist: Set<String>
         get() = if (PrefsUtil.emissionShowHidden)
@@ -46,7 +47,7 @@ class EmissionFragment : Fragment() {
         if (context != null)
             observeList(Observer { animeObjects ->
                 progress.visibility = View.GONE
-                adapter?.update(animeObjects as MutableList<AnimeObject>, false) { smoothScroll() }
+                adapter?.update(animeObjects, false) { smoothScroll() }
                 if (isFirst) {
                     isFirst = false
                     recycler.scheduleLayoutAnimation()
@@ -56,7 +57,7 @@ class EmissionFragment : Fragment() {
             })
     }
 
-    private fun observeList(obs: Observer<MutableList<AnimeObject>>) {
+    private fun observeList(obs: Observer<MutableList<SearchObject>>) {
         if (::liveData.isInitialized && ::observer.isInitialized)
             liveData.removeObserver(observer)
         liveData = CacheDB.INSTANCE.animeDAO().getByDay(arguments?.getInt("day", 1)
@@ -69,7 +70,7 @@ class EmissionFragment : Fragment() {
         //recycler.layoutManager?.smoothScrollToPosition(recycler,null,0)
     }
 
-    private fun checkStates(animeObjects: MutableList<AnimeObject>) {
+    private fun checkStates(animeObjects: MutableList<SearchObject>) {
         doAsync {
             try {
                 val updateList = mutableListOf<AnimeObject>()
@@ -83,7 +84,7 @@ class EmissionFragment : Fragment() {
                         e.printStackTrace()
                     }
                 }
-                if (!updateList.isEmpty()) {
+                if (updateList.isNotEmpty()) {
                     dao.updateAnimes(updateList)
                     WEmisionProvider.update(context)
                 }

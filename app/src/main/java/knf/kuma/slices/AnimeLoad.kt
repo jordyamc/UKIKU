@@ -14,7 +14,6 @@ import knf.kuma.R
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
 import org.jetbrains.anko.doAsync
 import java.io.IOException
 import java.util.*
@@ -26,7 +25,7 @@ class AnimeLoad : BroadcastReceiver() {
             try {
                 initIcons(context)
                 if (QUERY != "/anime/") {
-                    LIST = CacheDB.createAndGet(context).animeDAO().getByName("%" + QUERY.replace("/anime/", "").trim { it <= ' ' } + "%")
+                    LIST = CacheDB.createAndGet(context).animeDAO().getByName("%" + QUERY.replace("/anime/", "").trim() + "%")
                     for (animeObject in LIST) {
                         try {
                             animeObject.icon = IconCompat.createWithBitmap(PicassoSingle.get().load(PatternUtil.getCover(animeObject.aid)).get())
@@ -45,7 +44,7 @@ class AnimeLoad : BroadcastReceiver() {
 
     companion object {
         var QUERY = "/anime/"
-        var LIST: MutableList<AnimeObject> = ArrayList()
+        var LIST: MutableList<AnimeSliceObject> = ArrayList()
         lateinit var openIcon: IconCompat
         lateinit var searchIcon: IconCompat
 

@@ -16,7 +16,7 @@ import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
 import knf.kuma.custom.HiddenOverlay
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
+import knf.kuma.search.SearchObject
 import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.item_emision.view.*
 import org.jetbrains.anko.doAsync
@@ -24,7 +24,7 @@ import org.jetbrains.anko.doAsync
 
 class EmissionAdapter internal constructor(private val fragment: Fragment) : RecyclerView.Adapter<EmissionAdapter.EmissionItem>() {
 
-    var list: MutableList<AnimeObject> = ArrayList()
+    var list: MutableList<SearchObject> = ArrayList()
 
     private var blacklist: MutableSet<String> = PrefsUtil.emissionBlacklist
     private var showHidden: Boolean = PrefsUtil.emissionShowHidden
@@ -62,9 +62,9 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
         return list.size
     }
 
-    fun update(newList: MutableList<AnimeObject>, animate: Boolean = true, callback: () -> Unit) {
+    fun update(newList: MutableList<SearchObject>, animate: Boolean = true, callback: () -> Unit) {
         if (list notSameContent newList)
-            if (PrefsUtil.useSmoothAnimations)
+            if (list.isNotEmpty() && PrefsUtil.useSmoothAnimations)
                 doAsync {
                     blacklist = PrefsUtil.emissionBlacklist
                     showHidden = PrefsUtil.emissionShowHidden
@@ -138,8 +138,8 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
 }
 
 internal class EmissionDiff(
-        private val oldList: MutableList<AnimeObject>,
-        private val newList: MutableList<AnimeObject>) : DiffUtil.Callback() {
+        private val oldList: MutableList<SearchObject>,
+        private val newList: MutableList<SearchObject>) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return oldList[oldItemPosition] == newList[newItemPosition]

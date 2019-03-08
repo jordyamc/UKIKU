@@ -1,5 +1,6 @@
 package knf.kuma.animeinfo.viewholders
 
+import android.net.Uri
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -16,6 +17,7 @@ import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
+import knf.kuma.queue.QueueManager
 import kotlinx.android.synthetic.main.recycler_chapters.view.*
 import org.jetbrains.anko.doAsync
 import java.util.*
@@ -110,6 +112,48 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 snackbar.safeDismiss()
                                             }
                                         }
+                                        BottomActionsDialog.STATE_DOWNLOAD_MULTIPLE -> doAsync {
+                                            try {
+                                                val cChapters = mutableListOf<AnimeObject.WebInfo.AnimeChapter>()
+                                                val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
+                                                for (i13 in ArrayList(adapter?.selection
+                                                        ?: arrayListOf())) {
+                                                    val chapter = chapters[i13]
+                                                    val file = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
+                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid)
+                                                    if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
+                                                        cChapters.add(chapter)
+                                                }
+                                                recyclerView.post { adapter?.deselectAll() }
+                                                snackbar.safeDismiss()
+                                                callback.onDownloadMultiple(false, cChapters)
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
+                                                snackbar.safeDismiss()
+                                            }
+                                        }
+                                        BottomActionsDialog.STATE_QUEUE_MULTIPLE -> doAsync {
+                                            try {
+                                                val cChapters = mutableListOf<AnimeObject.WebInfo.AnimeChapter>()
+                                                val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
+                                                for (i13 in ArrayList(adapter?.selection
+                                                        ?: arrayListOf())) {
+                                                    val chapter = chapters[i13]
+                                                    val file = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
+                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid)
+                                                    if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
+                                                        cChapters.add(chapter)
+                                                    else if (file.exists() || downloadObject?.isDownloading == true)
+                                                        QueueManager.add(Uri.fromFile(file), true, chapter)
+                                                }
+                                                recyclerView.post { adapter?.deselectAll() }
+                                                snackbar.safeDismiss()
+                                                callback.onDownloadMultiple(true, cChapters)
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
+                                                snackbar.safeDismiss()
+                                            }
+                                        }
                                     }
                                 } catch (e: Exception) {
                                     //
@@ -165,5 +209,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
 
     interface ChapHolderCallback {
         fun onImportMultiple(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>)
+
+        fun onDownloadMultiple(addQueue: Boolean, chapters: List<AnimeObject.WebInfo.AnimeChapter>)
     }
 }

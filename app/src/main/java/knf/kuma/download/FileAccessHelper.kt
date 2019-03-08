@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Environment
 import android.preference.PreferenceManager
 import android.provider.DocumentsContract
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
@@ -69,6 +70,21 @@ class FileAccessHelper private constructor(private val context: Context) {
         }
 
     }
+
+    val rootFile: File
+        get() {
+            return try {
+                if (PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0") == "0") {
+                    Environment.getExternalStorageDirectory()
+                } else {
+                    File(FileUtil.getFullPathFromTreeUri(treeUri, context))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Environment.getExternalStorageDirectory()
+            }
+
+        }
 
     fun getTmpFile(file_name: String): File {
         return File(FileUtil.getFullPathFromTreeUri(treeUri, context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
@@ -343,15 +359,19 @@ class FileAccessHelper private constructor(private val context: Context) {
             true
         } else {
             try {
-                treeUri?.let {
-                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                val uri = treeUri
+                if (uri != null) {
+                    val documentFile = DocumentFile.fromTreeUri(context, uri)
                     if (documentFile != null && documentFile.exists()) {
                         true
                     } else {
                         openTreeChooser(fragment)
                         false
                     }
-                } ?: false
+                } else {
+                    openTreeChooser(fragment)
+                    false
+                }
             } catch (e: IllegalArgumentException) {
                 openTreeChooser(fragment)
                 false
@@ -365,15 +385,19 @@ class FileAccessHelper private constructor(private val context: Context) {
             true
         } else {
             try {
-                treeUri?.let {
-                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                val uri = treeUri
+                if (uri != null) {
+                    val documentFile = DocumentFile.fromTreeUri(context, uri)
                     if (documentFile != null && documentFile.exists()) {
                         true
                     } else {
                         openTreeChooser(fragment)
                         false
                     }
-                } ?: false
+                } else {
+                    openTreeChooser(fragment)
+                    false
+                }
             } catch (e: IllegalArgumentException) {
                 openTreeChooser(fragment)
                 false
@@ -445,6 +469,7 @@ class FileAccessHelper private constructor(private val context: Context) {
         fun openTreeChooser(fragment: Fragment) {
             try {
                 fragment.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
+                Log.e("FileAccess", "On open drocument tree")
             } catch (e: Exception) {
                 Toaster.toast("Error al buscar SD")
             }

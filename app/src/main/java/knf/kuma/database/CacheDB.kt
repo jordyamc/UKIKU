@@ -10,7 +10,7 @@ import knf.kuma.database.dao.*
 import knf.kuma.pojos.*
 
 @Database(entities = [RecentObject::class, AnimeObject::class, FavoriteObject::class, AnimeObject.WebInfo.AnimeChapter::class, NotificationObj::class, DownloadObject::class, RecordObject::class, SeeingObject::class, ExplorerObject::class, GenreStatusObject::class, QueueObject::class, Achievement::class],
-        version = 13)
+        version = 14)
 abstract class CacheDB : RoomDatabase() {
 
     abstract fun recentsDAO(): RecentsDAO
@@ -94,7 +94,7 @@ abstract class CacheDB : RoomDatabase() {
             }
         }
 
-        val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+        private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE `achivement` (" +
                         "`key` INTEGER NOT NULL, " +
@@ -132,18 +132,24 @@ abstract class CacheDB : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_13_14: Migration = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `animeobject`  ADD COLUMN `followers` TEXT")
+            }
+        }
+
         lateinit var INSTANCE: CacheDB
 
         fun init(context: Context) {
             INSTANCE = Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
                     .allowMainThreadQueries()
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14).build()
         }
 
         fun createAndGet(context: Context): CacheDB {
             return Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
                     .allowMainThreadQueries()
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14).build()
         }
     }
 

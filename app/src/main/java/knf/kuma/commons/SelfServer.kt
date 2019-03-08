@@ -4,8 +4,10 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import fi.iki.elonen.NanoHTTPD
@@ -17,10 +19,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.io.IOException
-import java.io.InputStream
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -67,7 +66,7 @@ class SelfServer : Service() {
         var HTTP_PORT = 6991
         private var INSTANCE: Server? = null
 
-        fun start(data: String, isFile: Boolean): String? {
+        fun start(data: String, isFile: Boolean = true): String? {
             return try {
                 stop(true)
                 ContextCompat.startForegroundService(App.context, Intent(App.context, SelfServer::class.java))
@@ -98,7 +97,10 @@ class SelfServer : Service() {
 
         override fun serve(session: NanoHTTPD.IHTTPSession): NanoHTTPD.Response? {
             return if (isFile)
-                serveFile(session.headers, data)
+                if (URLUtil.isFileUrl(data))
+                    serveFile(session.headers, File(Uri.parse(data).path))
+                else
+                    serveFile(session.headers, data)
             else
                 serveWeb(session.headers, data)
         }
@@ -202,6 +204,75 @@ class SelfServer : Service() {
                         res = createResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "")
                     else {
                         res = createResponse(NanoHTTPD.Response.Status.OK, mime, FileAccessHelper.INSTANCE.getInputStream(file_name), fileLen)
+                        res.addHeader("Content-Length", "" + fileLen)
+                        res.addHeader("ETag", etag)
+                    }
+                }
+            } catch (ioe: IOException) {
+                res = getResponse("Forbidden: Reading file failed")
+            }
+
+            return res ?: getResponse("Error 404: File not found")
+        }
+
+        private fun serveFile(header: Map<String, String>, file: File): NanoHTTPD.Response? {
+            var res: NanoHTTPD.Response?
+            val mime = "video/mp4"
+            try {
+                // Calculate etag
+                val etag = Integer.toHexString((file.absolutePath +
+                        file.lastModified() + "" + file.length()).hashCode())
+
+                // Support (simple) skipping:
+                var startFrom: Long = 0
+                var endAt: Long = -1
+                var range = header["range"]
+                if (range != null) {
+                    if (range.startsWith("bytes=")) {
+                        range = range.substring("bytes=".length)
+                        val minus = range.indexOf('-')
+                        try {
+                            if (minus > 0) {
+                                startFrom = java.lang.Long.parseLong(range.substring(0, minus))
+                                endAt = java.lang.Long.parseLong(range.substring(minus + 1))
+                            }
+                        } catch (ignored: NumberFormatException) {
+                        }
+
+                    }
+                }
+
+                // Change return code and add Content-Range header when skipping is requested
+                val fileLen = file.length()
+                if (range != null && startFrom >= 0) {
+                    if (startFrom >= fileLen) {
+                        res = createResponse(NanoHTTPD.Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
+                        res.addHeader("Content-Range", "bytes 0-0/$fileLen")
+                        res.addHeader("ETag", etag)
+                    } else {
+                        if (endAt < 0) {
+                            endAt = fileLen - 1
+                        }
+                        var newLen = endAt - startFrom + 1
+                        if (newLen < 0) {
+                            newLen = 0
+                        }
+
+                        val dataLen = newLen
+                        val fis = FileInputStream(file)
+                        fis.skip(startFrom)
+
+                        res = createResponse(NanoHTTPD.Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
+                        res.addHeader("Content-Length", "" + dataLen)
+                        res.addHeader("Content-Range", "bytes " + startFrom + "-" +
+                                endAt + "/" + fileLen)
+                        res.addHeader("ETag", etag)
+                    }
+                } else {
+                    if (etag == header["if-none-match"])
+                        res = createResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "")
+                    else {
+                        res = createResponse(NanoHTTPD.Response.Status.OK, mime, FileInputStream(file), fileLen)
                         res.addHeader("Content-Length", "" + fileLen)
                         res.addHeader("ETag", etag)
                     }

@@ -11,7 +11,7 @@
         <item name="colorAccentLight">@color/colorAccentLight</item>
         <item name="colorOnSurface">@color/textPrimary</item>
         <item name="android:colorBackground">@color/screenBackground</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 
@@ -120,10 +120,17 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="AppTheme.AppInfo" parent="Theme.Mal.Light">
+    <style name="AppTheme.AppInfo" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/screenBackground</item>
+        <item name="mal_toolbarTheme">@style/Theme.Mal.Toolbar.Light</item>
+        <item name="mal_toolbarPopupTheme">@style/Theme.Mal.Toolbar.Light</item>
+        <item name="mal_color_primary">@color/mal_text_primary</item>
+        <item name="mal_color_secondary">@color/mal_text_secondary</item>
+        <item name="mal_card_background">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>

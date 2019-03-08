@@ -8,6 +8,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.google.gson.annotations.SerializedName
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.EAHelper
@@ -19,16 +20,26 @@ import java.util.*
 @Entity
 @TypeConverters(BaseConverter::class)
 data class Achievement(
+        @SerializedName("key")
         @PrimaryKey
         var key: Long,
+        @SerializedName("name")
         var name: String,
+        @SerializedName("description")
         var description: String,
+        @SerializedName("points")
         var points: Int,
+        @SerializedName("isSecret")
         var isSecret: Boolean = false,
+        @SerializedName("group")
         var group: String? = null,
+        @SerializedName("time")
         var time: Long = 0,
+        @SerializedName("count")
         var count: Int = 0,
+        @SerializedName("goal")
         var goal: Int = 0,
+        @SerializedName("isUnlocked")
         var isUnlocked: Boolean = false
 ) {
 

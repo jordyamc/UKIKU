@@ -103,10 +103,21 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("timeout_time", if (context?.resources?.getBoolean(R.bool.isTv) == true) "0" else "10")?.toLong()
                 ?: 0
 
+    var rememberServer: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("remember_server", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("remember_server", value).apply()
+
+    var lastServer: String?
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("last_server", null)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("last_server", value).apply()
+
     var lastBackup: String
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("last_backup", "Desconocido")
                 ?: "Desconocido"
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("last_backup", value).apply()
+
+    val isProxyCastEnabled: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("force_local_cast", false)
 
     fun init(context: Context) {
         PrefsUtil.context = context

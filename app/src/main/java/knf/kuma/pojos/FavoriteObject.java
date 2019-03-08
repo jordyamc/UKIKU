@@ -1,5 +1,7 @@
 package knf.kuma.pojos;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,19 +9,29 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import knf.kuma.search.SearchAdvObject;
 
 @Entity
 public class FavoriteObject implements Comparable<FavoriteObject> {
-    @PrimaryKey
-    public int key;
-    public String aid;
-    public String name;
-    public String img;
-    public String type;
-    public String link;
-    public String category;
+    @SerializedName("CATEGORY_NONE")
     @Ignore
     public static final String CATEGORY_NONE = "_NONE_";
+    @SerializedName("key")
+    @PrimaryKey
+    public int key;
+    @SerializedName("aid")
+    public String aid;
+    @SerializedName("name")
+    public String name;
+    @SerializedName("img")
+    public String img;
+    @SerializedName("type")
+    public String type;
+    @SerializedName("link")
+    public String link;
+    @SerializedName("category")
+    public String category;
+    @SerializedName("isSection")
     @Ignore
     public boolean isSection = false;
 
@@ -47,6 +59,19 @@ public class FavoriteObject implements Comparable<FavoriteObject> {
             this.img = object.img;
             this.type = object.type;
             this.link = object.link;
+            this.category = CATEGORY_NONE;
+        }
+    }
+
+    @Ignore
+    public FavoriteObject(SearchAdvObject object) {
+        if (object != null) {
+            this.key = object.getKey();
+            this.aid = object.getAid();
+            this.name = object.getName();
+            this.img = object.getImg();
+            this.type = object.getType();
+            this.link = object.getLink();
             this.category = CATEGORY_NONE;
         }
     }

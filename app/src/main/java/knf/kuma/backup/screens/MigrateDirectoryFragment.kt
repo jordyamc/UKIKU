@@ -28,7 +28,7 @@ class MigrateDirectoryFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.animeDAO().allList.observe(this, Observer { animeObjects -> tv_directory_count.text = animeObjects.size.toString() })
+        CacheDB.INSTANCE.animeDAO().countLive.observe(this, Observer { count -> tv_directory_count.text = count.toString() })
         DirectoryService.getLiveStatus().observe(this, Observer { integer ->
             if (integer != null)
                 when (integer) {

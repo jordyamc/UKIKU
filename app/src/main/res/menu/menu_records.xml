@@ -7,4 +7,10 @@
         android:icon="@drawable/ic_clear"
         android:title="Item"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_status"
+        android:icon="@drawable/ic_info"
+        android:title="Estado"
+        app:showAsAction="always"/>
 </menu>

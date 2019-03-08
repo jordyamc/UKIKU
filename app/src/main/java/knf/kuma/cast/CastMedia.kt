@@ -4,6 +4,7 @@ import android.net.Uri
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.common.images.WebImage
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.SelfServer
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.ExplorerObject
@@ -24,7 +25,11 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 putString(MediaMetadata.KEY_SUBTITLE, chapter.number)
                 addImage(WebImage(Uri.parse(if (chapter.img.isNullOrBlank()) "https://animeflv.net/uploads/animes/thumbs/${chapter.aid}.jpg" else chapter.img)))
             }
-            val fUrl = if (url.isNullOrBlank()) SelfServer.start(chapter.fileName, true) else url
+            val fUrl = when {
+                url.isNullOrBlank() -> SelfServer.start(chapter.fileName, true)
+                PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
+                else -> url
+            }
             val mediaInfo = MediaInfo.Builder(fUrl).apply {
                 setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 setContentType("video/mp4")
@@ -40,7 +45,11 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 putString(MediaMetadata.KEY_SUBTITLE, recent.chapter)
                 addImage(WebImage(Uri.parse("https://animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
             }
-            val fUrl = if (url.isNullOrBlank()) SelfServer.start(recent.fileName, true) else url
+            val fUrl = when {
+                url.isNullOrBlank() -> SelfServer.start(recent.fileName, true)
+                PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
+                else -> url
+            }
             val mediaInfo = MediaInfo.Builder(fUrl).apply {
                 setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 setContentType("video/mp4")

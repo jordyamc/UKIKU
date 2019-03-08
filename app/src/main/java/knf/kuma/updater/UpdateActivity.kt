@@ -114,7 +114,7 @@ class UpdateActivity : AppCompatActivity() {
     private fun install() {
         DownloadManager.pauseAll()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "knf.kuma.fileprovider", update))
+            val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "${applicationContext.packageName}.fileprovider", update))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
                     .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, packageName)

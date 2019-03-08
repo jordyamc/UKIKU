@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings;
 
+import com.google.gson.annotations.SerializedName;
 import com.jaredrummler.android.device.DeviceName;
 
 import androidx.annotation.NonNull;
@@ -12,8 +13,11 @@ import androidx.preference.PreferenceManager;
 import knf.kuma.backup.objects.BackupObject;
 
 public class AutoBackupObject extends BackupObject {
+    @SerializedName("name")
     public String name;
+    @SerializedName("device_id")
     public String device_id;
+    @SerializedName("value")
     @Nullable
     public String value;
 

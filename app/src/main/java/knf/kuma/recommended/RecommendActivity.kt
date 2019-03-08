@@ -19,12 +19,10 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.GenreStatusObject
 import knf.kuma.recommended.sections.MultipleSection
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.util.*
 
 /**
  * Created by jordy on 26/03/2018.
@@ -37,8 +35,6 @@ class RecommendActivity : AppCompatActivity() {
     val loading: LinearLayout by bind(R.id.loading)
     val state: TextView by bind(R.id.state)
     private val dao = CacheDB.INSTANCE.animeDAO()
-    private val favsDAO = CacheDB.INSTANCE.favsDAO()
-    private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
 
     private val defaultGridColumns = gridColumns()
 
@@ -68,6 +64,10 @@ class RecommendActivity : AppCompatActivity() {
     private fun setAdapter() {
         doAsync {
             try {
+                val excludeList = LinkedHashSet<String>().apply {
+                    addAll(CacheDB.INSTANCE.favsDAO().allAids)
+                    addAll(CacheDB.INSTANCE.seeingDAO().allAids)
+                }.toList()
                 val status = CacheDB.INSTANCE.genresDAO().top
                 setState("Revisando generos")
                 if (status.size == 3) {
@@ -87,21 +87,21 @@ class RecommendActivity : AppCompatActivity() {
                     val c = getList(status[2])
                     c.removeAll(abc, ab, ac, bc, a, b)
                     setState("Filtrando lista")
-                    removeFavs(abc, ab, ac, bc, a, b, c)
+                    removeFavs(excludeList, abc, ab, ac, bc, a, b, c)
                     if (abc.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[1], status[2]), abc, isGrid))
+                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[1], status[2]), getAnimeList(abc), isGrid))
                     if (ab.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[1]), ab, isGrid))
+                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[1]), getAnimeList(ab), isGrid))
                     if (ac.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[2]), ac, isGrid))
+                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[2]), getAnimeList(ac), isGrid))
                     if (bc.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[1], status[2]), bc, isGrid))
+                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[1], status[2]), getAnimeList(bc), isGrid))
                     if (a.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0]), a, isGrid))
+                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0]), getAnimeList(a), isGrid))
                     if (b.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[1]), b, isGrid))
+                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[1]), getAnimeList(b), isGrid))
                     if (c.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[2]), c, isGrid))
+                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[2]), getAnimeList(c), isGrid))
                     val layoutManager: RecyclerView.LayoutManager
                     if (isGrid) {
                         val grid = GridLayoutManager(this@RecommendActivity, defaultGridColumns)
@@ -145,20 +145,23 @@ class RecommendActivity : AppCompatActivity() {
     }
 
     @SafeVarargs
-    private fun removeFavs(vararg lists: MutableList<AnimeObject>) {
-        for (list in lists) {
-            val removeList = ArrayList<AnimeObject>()
-            for (animeObject in list)
-                if (favsDAO.isFav(animeObject.key) || seeingDAO.isSeeingAll(animeObject.aid))
-                    removeList.add(animeObject)
-            list.removeAll(removeList)
+    private fun removeFavs(excludeList: List<String>, vararg lists: MutableList<String>) {
+        lists.forEach { list ->
+            list.removeAll(list.filter { excludeList.contains(it) })
         }
     }
 
-    private fun getList(vararg status: GenreStatusObject): MutableList<AnimeObject> {
-        val objects = dao.getByGenres(getString(*status))
-        objects.sorted()
-        return objects
+    private fun getList(vararg status: GenreStatusObject): MutableList<String> {
+        return dao.getAidsByGenres(getString(*status))
+    }
+
+    private fun getAnimeList(list: List<String>): MutableList<AnimeShortObject> {
+        val chunk = list.chunked(900)
+        val animes = mutableListOf<AnimeShortObject>()
+        chunk.forEach {
+            animes.addAll(CacheDB.INSTANCE.animeDAO().getAnimesByAids(it))
+        }
+        return animes
     }
 
     private fun getString(vararg status: GenreStatusObject): String {

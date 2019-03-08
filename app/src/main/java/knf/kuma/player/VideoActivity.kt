@@ -4,7 +4,9 @@ import android.app.PictureInPictureParams
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Color
 import android.media.AudioManager
+import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -13,6 +15,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.github.rubensousa.previewseekbar.PreviewLoader
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
@@ -22,6 +25,8 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import kotlinx.android.synthetic.main.exo_playback_control_view.*
 import kotlinx.android.synthetic.main.player_view.*
+import org.jetbrains.anko.doAsync
+import java.util.concurrent.Future
 
 /**
  * Allows playback of videos that are in a playlist, using [PlayerHolder] to load the and render
@@ -29,19 +34,22 @@ import kotlinx.android.synthetic.main.player_view.*
  * [MediaSessionCompat] and picture in picture as well.
  */
 
-class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
+class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback, PreviewLoader {
     private val mediaSession: MediaSessionCompat by lazy { createMediaSession() }
     private val mediaSessionConnector: MediaSessionConnector by lazy {
         createMediaSessionConnector()
     }
     private val playerState by lazy { PlayerState() }
     private lateinit var playerHolder: PlayerHolder
+    private var previewFuture: Future<Unit>? = null
+    private var requestedFrame = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         setContentView(R.layout.player_view)
+        window.decorView.setBackgroundColor(Color.BLACK)
         volumeControlStream = AudioManager.STREAM_MUSIC
         if (savedInstanceState != null) {
             playerState.position = savedInstanceState.getLong("position", 0)
@@ -52,6 +60,8 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         createMediaSession()
         createPlayer()
         skip.setOnClickListener { playerHolder.skip() }
+        exo_progress.attachPreviewFrameLayout(previewFrameLayout)
+        exo_progress.setPreviewLoader(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isInPictureInPictureMode)
             player.useController = false
     }
@@ -181,6 +191,16 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         player.useController = !isInPictureInPictureMode
     }
 
+    override fun loadPreview(currentPosition: Long, max: Long) {
+        previewFuture?.cancel(true)
+        previewFuture = doAsync {
+            requestedFrame = currentPosition
+            val bitmap = playerHolder.retriever.getFrameAtTime(currentPosition * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+            if (requestedFrame == currentPosition || previewFuture?.isCancelled == false)
+                doOnUI(false) { preview.setImageBitmap(bitmap) }
+        }
+    }
+
     override fun onChangeTitle(title: String) {
         video_title.text = title
     }
@@ -191,12 +211,16 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         progress.post { progress.visibility = if (loading) View.VISIBLE else View.GONE }
     }
 
-    override fun onPlayerStateChanged(state: Int) {
+    override fun onPlayerStateChanged(state: Int, playWhenReady: Boolean) {
         if (state == Player.STATE_READY)
             doOnUI { hideUI() }
+        if (state == Player.STATE_READY && playWhenReady)
+            exo_progress.hidePreview()
     }
 
     override fun onFinish() {
         finish()
     }
+
+
 }

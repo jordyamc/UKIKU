@@ -18,6 +18,7 @@ import knf.kuma.animeinfo.AnimeRelatedAdapter
 import knf.kuma.animeinfo.AnimeTagsAdapter
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
+import knf.kuma.commons.removeAllDecorations
 import knf.kuma.custom.ExpandableTV
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -39,6 +40,7 @@ class AnimeDetailsHolder(val view: View) {
     internal val type: TextView = view.type
     internal val state: TextView = view.state
     internal val id: TextView = view.aid
+    internal val followers: TextView = view.followers
     private val layScore: LinearLayout = view.lay_score
     private val ratingCount: TextView = view.rating_count
     private val ratingBar: MaterialRatingBar = view.ratingBar
@@ -47,12 +49,12 @@ class AnimeDetailsHolder(val view: View) {
     private val recyclerViewRelated: RecyclerView = view.recycler_related
     private val clipboardManager = view.context.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     private var retard = 0
+    private var needAnimation = true
 
     init {
         recyclerViewGenres.layoutManager = ChipsLayoutManager.newBuilder(view.context).build()
         recyclerViewGenres.addItemDecoration(SpacingItemDecoration(5, 5))
         recyclerViewRelated.layoutManager = LinearLayoutManager(view.context)
-        recyclerViewRelated.addItemDecoration(DividerItemDecoration(view.context, LinearLayout.VERTICAL))
     }
 
     fun populate(fragment: Fragment, animeObject: AnimeObject) {
@@ -91,6 +93,7 @@ class AnimeDetailsHolder(val view: View) {
                 type.text = animeObject.type
                 state.text = getStateString(animeObject.state, animeObject.day)
                 id.text = animeObject.aid
+                followers.text = animeObject.followers
                 if (animeObject.rate_stars == null || animeObject.rate_stars == "0.0")
                     layScore.visibility = View.GONE
                 else {
@@ -129,14 +132,21 @@ class AnimeDetailsHolder(val view: View) {
             }
             noCrash {
                 if (animeObject.related?.isNotEmpty() == true) {
+                    recyclerViewRelated.removeAllDecorations()
+                    if (animeObject.related.size > 1)
+                        recyclerViewRelated.addItemDecoration(DividerItemDecoration(view.context, LinearLayout.VERTICAL))
                     recyclerViewRelated.adapter = AnimeRelatedAdapter(fragment, animeObject.related)
                     showCard(cardViews[5])
+                } else {
+                    doOnUI { cardViews[5].visibility = View.GONE }
                 }
             }
+            needAnimation = false
         }
     }
 
     private fun showCard(view: MaterialCardView) {
+        if (view.visibility == View.VISIBLE || !needAnimation) return
         retard += 100
         GlobalScope.launch(Dispatchers.Main) {
             delay(retard.toLong())
@@ -147,14 +157,6 @@ class AnimeDetailsHolder(val view: View) {
             if (cardViews.indexOf(view) == 1)
                 desc.checkIndicator()
         }
-        /*Handler(Looper.getMainLooper()).postDelayed({
-            view.visibility = View.VISIBLE
-            val animation = AnimationUtils.makeInChildBottomAnimation(view.context)
-            animation.duration = 250
-            view.startAnimation(animation)
-            if (cardViews.indexOf(view) == 1)
-                desc.checkIndicator()
-        }, retard.toLong())*/
     }
 
     private fun getStateString(state: String?, day: AnimeObject.Day): String {

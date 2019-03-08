@@ -63,6 +63,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
                             R.id.considering -> seeingDAO.update(seeingObject.also { it.state = 2 })
                             R.id.completed -> seeingDAO.update(seeingObject.also { it.state = 3 })
                             R.id.droped -> seeingDAO.update(seeingObject.also { it.state = 4 })
+                            R.id.paused -> seeingDAO.update(seeingObject.also { it.state = 5 })
                         }
                         if (isFullList)
                             doOnUI {
@@ -101,7 +102,8 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
             1 -> "Viendo"
             2 -> "Considerando"
             3 -> "Completado"
-            else -> "Dropeado"
+            4 -> "Dropeado"
+            else -> "Pausado"
         }
     }
 

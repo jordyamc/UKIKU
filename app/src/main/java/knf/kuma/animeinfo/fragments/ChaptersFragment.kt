@@ -22,6 +22,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.download.FileAccessHelper
+import knf.kuma.download.MultipleDownloadManager
 import knf.kuma.pojos.AnimeObject
 import xdroid.toaster.Toaster
 import java.util.*
@@ -88,6 +89,14 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                         .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                         .setType("video/mp4"), 55698)
+            }
+        }
+    }
+
+    override fun onDownloadMultiple(addQueue: Boolean, chapters: List<AnimeObject.WebInfo.AnimeChapter>) {
+        activity?.let {
+            holder?.let { holder ->
+                MultipleDownloadManager.startDownload(it, holder.recyclerView, chapters, addQueue)
             }
         }
     }

@@ -80,7 +80,6 @@ class SyncItemView : RelativeLayout {
                 }
             }
         }
-
     }
 
     fun clear() {

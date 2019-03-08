@@ -31,6 +31,7 @@ import androidx.room.TypeConverters;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.download.FileAccessHelper;
+import knf.kuma.emision.AnimeSubObject;
 import knf.kuma.explorer.ThumbServer;
 import xdroid.toaster.Toaster;
 
@@ -71,19 +72,19 @@ public class ExplorerObject {
     }
 
     @Ignore
-    public ExplorerObject(@Nullable AnimeObject object) throws IllegalStateException {
+    public ExplorerObject(@Nullable AnimeSubObject object) throws IllegalStateException {
         if (object == null)
             throw new IllegalStateException("Anime not found!!!");
-        this.key = object.key;
-        this.img = PatternUtil.INSTANCE.getCover(object.aid);
-        this.link = object.link;
-        this.fileName = object.getFileName();
-        this.name = object.name;
-        this.aid = object.aid;
-        File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.getFileName());
+        this.key = object.getKey();
+        this.img = PatternUtil.INSTANCE.getCover(object.getAid());
+        this.link = object.getLink();
+        this.fileName = object.getFinalName();
+        this.name = object.getName();
+        this.aid = object.getAid();
+        File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.getFinalName());
         file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
         if (file_list == null || file_list.length == 0)
-            throw new IllegalStateException("Directory empty: " + object.getFileName());
+            throw new IllegalStateException("Directory empty: " + object.getFinalName());
         this.count = file_list.length;
         this.path = file.getAbsolutePath();
     }

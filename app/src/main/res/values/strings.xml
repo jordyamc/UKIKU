@@ -160,6 +160,7 @@
         <item>Considerando</item>
         <item>Completado</item>
         <item>Dropeado</item>
+        <item>Pausado</item>
     </string-array>
     <string name="shortcut_fav_short">Favoritos</string>
     <string name="shortcut_fav_long">Animes favoritos</string>

@@ -62,7 +62,7 @@ class SeenList {
             var animeObject: AnimeObject? = null
             for (obj in seenList.list ?: listOf<SeenObj>()) {
                 if (animeObject == null || animeObject.aid != obj.aid)
-                    animeObject = dao.getByAid(obj.aid)
+                    animeObject = dao.getFullByAid(obj.aid)
                 val chapterList = animeObject?.chapters ?: listOf()
                 var found = false
                 for (chapter in chapterList) {

@@ -64,5 +64,5 @@ object FavToSeeing {
     private val FavoriteObject.isCompleted: Boolean get() = CacheDB.INSTANCE.animeDAO().isCompleted(aid)
     private val FavoriteObject.isSeeing: Boolean get() = CacheDB.INSTANCE.seeingDAO().isSeeingAll(aid)
     private val FavoriteObject.chapters: List<AnimeObject.WebInfo.AnimeChapter>
-        get() = CacheDB.INSTANCE.animeDAO().getByAid(aid)?.chapters ?: listOf()
+        get() = CacheDB.INSTANCE.animeDAO().getFullByAid(aid)?.chapters ?: listOf()
 }

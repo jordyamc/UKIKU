@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -59,10 +60,10 @@ class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         setContentView(R.layout.exo_player)
+        window.decorView.setBackgroundColor(Color.BLACK)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
             pip.visibility = View.VISIBLE
         pip.setOnClickListener { onPip() }
-        pip_exit.setOnClickListener { onExitPip() }
         skip.setOnClickListener { onSkip() }
         hideUI()
         player.setResizeMode(resizeMode)

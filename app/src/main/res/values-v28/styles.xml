@@ -16,4 +16,19 @@
         <item name="android:windowLightNavigationBar">@bool/isNotDark</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
+
+    <style name="AppTheme.AppInfo" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/screenBackground</item>
+        <item name="mal_toolbarTheme">@style/Theme.Mal.Toolbar.Light</item>
+        <item name="mal_toolbarPopupTheme">@style/Theme.Mal.Toolbar.Light</item>
+        <item name="mal_color_primary">@color/mal_text_primary</item>
+        <item name="mal_color_secondary">@color/mal_text_secondary</item>
+        <item name="mal_card_background">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:windowLightNavigationBar">@bool/isNotDark</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
 </resources>

@@ -54,6 +54,10 @@ class SeeingFragment : Fragment() {
                 error_text.text = "No has dropeado ningún anime"
                 error_img.setImageResource(R.drawable.ic_droped)
             }
+            5 -> {
+                error_text.text = "No tienes pausado ningún anime"
+                error_img.setImageResource(R.drawable.ic_paused)
+            }
             else -> error_text.text = "No has marcado ningún anime"
         }
         recycler.verifyManager()
@@ -75,6 +79,7 @@ class SeeingFragment : Fragment() {
                 2 -> "Considerando"
                 3 -> "Completado"
                 4 -> "Dropeado"
+                5 -> "Pausado"
                 else -> "Todos"
             }
         }

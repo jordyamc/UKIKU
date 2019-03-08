@@ -6,7 +6,6 @@ import androidx.leanback.widget.*
 import androidx.lifecycle.Observer
 import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.tv.anime.AnimePresenter
 import knf.kuma.tv.details.TVAnimesDetails
 import org.jetbrains.anko.doAsync
@@ -33,7 +32,7 @@ class TVTagFragment : VerticalGridSupportFragment(), OnItemViewClickedListener {
     }
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder?, item: Any?, rowViewHolder: RowPresenter.ViewHolder?, row: Row?) {
-        val anime = item as? AnimeObject
+        val anime = item as? BasicAnimeObject
         if (anime != null)
             context?.let { TVAnimesDetails.start(it, anime.link) }
     }

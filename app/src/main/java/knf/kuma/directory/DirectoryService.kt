@@ -76,9 +76,9 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
-        animeDAO.allInEmission.forEach {
+        animeDAO.allLinksInEmission.forEach {
             noCrash {
-                val animeObject = AnimeObject(it.link, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(it.link).get().outerHtml()))
+                val animeObject = AnimeObject(it, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(it).get().outerHtml()))
                 animeDAO.updateAnime(animeObject)
             }
         }

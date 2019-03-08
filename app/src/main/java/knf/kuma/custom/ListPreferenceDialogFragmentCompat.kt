@@ -66,19 +66,23 @@ class ListPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            val entryList = mutableListOf<String>()
-            mEntries?.forEach { entry ->
-                entryList.add(entry.toString())
-            }
-            MaterialDialog(it).apply {
-                title(text = preference.dialogTitle.toString())
-                listItemsSingleChoice(items = entryList, initialSelection = mClickedDialogEntryIndex, waitForPositiveButton = false) { dialog, index, _ ->
-                    mClickedDialogEntryIndex = index
-                    this@ListPreferenceDialogFragmentCompat.onClick(dialog,
-                            DialogInterface.BUTTON_POSITIVE)
-                    dialog.dismiss()
+            try {
+                val entryList = mutableListOf<String>()
+                mEntries?.forEach { entry ->
+                    entryList.add(entry.toString())
                 }
-                positiveButton(android.R.string.ok)
+                MaterialDialog(it).apply {
+                    title(text = preference.dialogTitle.toString())
+                    listItemsSingleChoice(items = entryList, initialSelection = mClickedDialogEntryIndex, waitForPositiveButton = false) { dialog, index, _ ->
+                        mClickedDialogEntryIndex = index
+                        this@ListPreferenceDialogFragmentCompat.onClick(dialog,
+                                DialogInterface.BUTTON_POSITIVE)
+                        dialog.dismiss()
+                    }
+                    positiveButton(android.R.string.ok)
+                }
+            } catch (e: Exception) {
+                super.onCreateDialog(savedInstanceState)
             }
         } ?: super.onCreateDialog(savedInstanceState)
     }

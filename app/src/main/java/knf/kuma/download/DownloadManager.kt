@@ -47,7 +47,7 @@ class DownloadManager : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        startForeground(23498, foregroundNotification())
+        startForeground(23498, foregroundGroupNotification())
         //notificationManager?.notify(22498, foregroundGroupNotification())
     }
 
@@ -283,25 +283,27 @@ class DownloadManager : Service() {
 
         private fun updateNotification(downloadObject: DownloadObject?, isPaused: Boolean) {
             if (downloadObject == null) return
-            val notification = NotificationCompat.Builder(context, CHANNEL_ONGOING)
-                    .setSmallIcon(if (isPaused) R.drawable.ic_pause_not else if (downloadObject.eta.toLong() == -2L) R.drawable.ic_move else android.R.drawable.stat_sys_download)
-                    .setContentTitle(downloadObject.name)
-                    .setContentText(downloadObject.chapter)
-                    .setOnlyAlertOnce(!isPaused || downloadObject.eta.toLong() == -2L)
-                    .setProgress(100, downloadObject.progress, downloadObject.state == DownloadObject.PENDING)
-                    .setOngoing(!isPaused)
-                    .setSound(null)
-                    .setWhen(downloadObject.time)
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
-            if (downloadObject.eta.toLong() != -2L) {
-                if (isPaused)
-                    notification.addAction(R.drawable.ic_play_not, "Reanudar", getPending(downloadObject, ACTION_RESUME))
-                else
-                    notification.addAction(R.drawable.ic_pause_not, "Pausar", getPending(downloadObject, ACTION_PAUSE))
-                notification.addAction(R.drawable.ic_delete, "Cancelar", getPending(downloadObject, ACTION_CANCEL))
+            val notification = NotificationCompat.Builder(context, CHANNEL_ONGOING).apply {
+                setSmallIcon(if (isPaused) R.drawable.ic_pause_not else if (downloadObject.eta.toLong() == -2L) R.drawable.ic_move else android.R.drawable.stat_sys_download)
+                setContentTitle(downloadObject.name)
+                setContentText(downloadObject.chapter)
+                setOnlyAlertOnce(!isPaused || downloadObject.eta.toLong() == -2L)
+                setProgress(100, downloadObject.progress, downloadObject.state == DownloadObject.PENDING)
+                setGroup("manager")
+                setOngoing(!isPaused)
+                setSound(null)
+                setWhen(downloadObject.time)
+                priority = NotificationCompat.PRIORITY_LOW
+                if (downloadObject.eta.toLong() != -2L) {
+                    if (isPaused)
+                        addAction(R.drawable.ic_play_not, "Reanudar", getPending(downloadObject, ACTION_RESUME))
+                    else
+                        addAction(R.drawable.ic_pause_not, "Pausar", getPending(downloadObject, ACTION_PAUSE))
+                    addAction(R.drawable.ic_delete, "Cancelar", getPending(downloadObject, ACTION_CANCEL))
+                }
+                if (!isPaused)
+                    setSubText(downloadObject.subtext)
             }
-            if (!isPaused)
-                notification.setSubText(downloadObject.subtext)
             notificationManager?.notify(downloadObject.eid?.toInt() ?: 0, notification.build())
         }
 
@@ -349,12 +351,15 @@ class DownloadManager : Service() {
 
         private fun foregroundGroupNotification(): Notification {
             return NotificationCompat.Builder(context, CHANNEL_FOREGROUND).apply {
-                setContentTitle("Descargas en progreso")
                 setSmallIcon(R.drawable.ic_service)
-                setOngoing(false)
+                setOngoing(true)
                 priority = NotificationCompat.PRIORITY_MIN
                 setGroup("manager")
                 setGroupSummary(true)
+                if (PrefsUtil.collapseDirectoryNotification)
+                    setSubText("Descargas en progreso")
+                else
+                    setContentTitle("Descargas en progreso")
             }.build()
         }
 

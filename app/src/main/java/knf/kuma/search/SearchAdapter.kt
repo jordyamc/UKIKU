@@ -16,9 +16,8 @@ import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.load
-import knf.kuma.pojos.AnimeObject
 
-class SearchAdapter internal constructor(private val fragment: Fragment) : PagedListAdapter<AnimeObject, SearchAdapter.ItemHolder>(DIFF_CALLBACK) {
+class SearchAdapter internal constructor(private val fragment: Fragment) : PagedListAdapter<SearchObject, SearchAdapter.ItemHolder>(DIFF_CALLBACK) {
 
     private val layType = PrefsUtil.layType
 
@@ -48,12 +47,12 @@ class SearchAdapter internal constructor(private val fragment: Fragment) : Paged
 
     companion object {
 
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AnimeObject>() {
-            override fun areItemsTheSame(oldItem: AnimeObject, newItem: AnimeObject): Boolean {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<SearchObject>() {
+            override fun areItemsTheSame(oldItem: SearchObject, newItem: SearchObject): Boolean {
                 return oldItem.key == newItem.key
             }
 
-            override fun areContentsTheSame(oldItem: AnimeObject, newItem: AnimeObject): Boolean {
+            override fun areContentsTheSame(oldItem: SearchObject, newItem: SearchObject): Boolean {
                 return oldItem.name == newItem.name && oldItem.aid == newItem.aid
             }
         }

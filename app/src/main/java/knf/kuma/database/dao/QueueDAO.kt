@@ -24,6 +24,9 @@ interface QueueDAO {
     @Query("SELECT count(*) FROM queueobject WHERE eid = :eid")
     fun isInQueue(eid: String): Boolean
 
+    @Query("SELECT count(*) FROM queueobject WHERE eid = :eid")
+    fun isInQueueLive(eid: String): LiveData<Boolean>
+
     @Query("SELECT count(*) FROM queueobject WHERE aid LIKE :aid")
     fun countAlone(aid: String): Int
 

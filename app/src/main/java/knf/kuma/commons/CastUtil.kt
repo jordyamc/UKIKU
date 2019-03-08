@@ -10,6 +10,7 @@ import es.munix.multidisplaycast.CastManager
 import es.munix.multidisplaycast.interfaces.CastListener
 import es.munix.multidisplaycast.interfaces.PlayStatusListener
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.cast.CastCustom
 import knf.kuma.cast.CastMedia
 import knf.kuma.custom.ThemedControlsActivity
 import org.jetbrains.annotations.Contract
@@ -21,6 +22,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     private var loading: Snackbar? = null
 
     init {
+        CastManager.setInstance(CastCustom())
         CastManager.getInstance().setDiscoveryManager()
         CastManager.getInstance().setPlayStatusListener(javaClass.simpleName, this)
         CastManager.getInstance().setCastListener(javaClass.simpleName, this)

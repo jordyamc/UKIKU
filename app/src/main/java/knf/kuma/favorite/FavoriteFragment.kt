@@ -157,8 +157,8 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                 input(hint = "Nombre", prefill = name, waitForPositiveButton = false) { dialog, charSequence ->
                     dialog.setActionButtonEnabled(WhichButton.POSITIVE, charSequence.isNotEmpty())
                 }
-                positiveButton(text = if (name == null) "Crear" else "Renombrar") {
-                    val input = it.getInputField()?.text.toString()
+                positiveButton(text = if (name == null) "Crear" else "Renombrar") { dialog ->
+                    val input = dialog.getInputField().text.toString()
                     if (categories.contains(input)) {
                         Toaster.toast("Esta categoría ya existe")
                         showNewCategoryDialog(isEmpty, name)
@@ -187,7 +187,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                     dialog.setActionButtonEnabled(WhichButton.POSITIVE, charSequence.isNotEmpty())
                 }
                 positiveButton(text = "Crear") { dialog ->
-                    val input = dialog.getInputField()?.text.toString()
+                    val input = dialog.getInputField().text.toString()
                     if (categories.contains(input)) {
                         Toaster.toast("Esta categoría ya existe")
                         showNewCategory(input)
@@ -216,7 +216,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                     dialog.setActionButtonEnabled(WhichButton.POSITIVE, charSequence.isNotEmpty())
                 }
                 positiveButton(text = "Renombrar") { dialog ->
-                    val input = dialog.getInputField()?.text.toString()
+                    val input = dialog.getInputField().text.toString()
                     if (categories.contains(input)) {
                         Toaster.toast("Esta categoría ya existe")
                         showCategoryRename(name)

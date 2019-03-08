@@ -1,10 +1,13 @@
 package knf.kuma.backup.objects
 
+import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
 
 open class BackupObject<T> {
+    @SerializedName("date")
     var date: String? = null
+    @SerializedName("data")
     var data: List<T>? = null
 
     constructor()

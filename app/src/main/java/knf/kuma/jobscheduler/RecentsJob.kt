@@ -31,6 +31,7 @@ import knf.kuma.pojos.NotificationObj
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.Recents
 import knf.kuma.recents.RecentsNotReceiver
+import knf.kuma.search.SearchAdvObject
 import pl.droidsonroids.jspoon.Jspoon
 import java.util.concurrent.TimeUnit
 
@@ -130,16 +131,24 @@ class RecentsJob : Job() {
     }
 
     @Throws(Exception::class)
-    private fun getAnime(recentObject: RecentObject): AnimeObject {
-        var animeObject: AnimeObject? = animeDAO.getByAid(recentObject.aid)
+    private fun getAnime(recentObject: RecentObject): SearchAdvObject {
+        var animeObject: SearchAdvObject? = animeDAO.getByAid(recentObject.aid)
         if (animeObject == null) {
-            animeObject = AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(recentObject.anime).get().outerHtml()))
-            animeDAO.insert(animeObject)
+            val tmp = AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(recentObject.anime).get().outerHtml()))
+            animeObject = SearchAdvObject().apply {
+                key = tmp.key
+                name = tmp.name
+                link = tmp.link
+                aid = tmp.aid
+                type = tmp.type
+                img = tmp.img
+            }
+            animeDAO.insert(tmp)
         }
         return animeObject
     }
 
-    private fun getAnimeIntent(animeObject: AnimeObject, notificationObj: NotificationObj): Intent {
+    private fun getAnimeIntent(animeObject: SearchAdvObject, notificationObj: NotificationObj): Intent {
         return Intent(context, ActivityAnime::class.java)
                 .setData(Uri.parse(animeObject.link))
                 .putExtras(notificationObj.getBroadcast(context))

@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="97" version="4.0">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Errores en TV</change>
+        <change type="fix">Errores en respaldos</change>
+        <change type="fix">Errores en autobackup</change>
+        <change type="change">Cambios al diseño para MD2</change>
+        <change type="change">Nuevo dato en informacion: "Seguidores"</change>
+        <change type="change">Optimizacion general (sobre todo en sugeridos)</change>
+        <change type="change">Google Drive deshabilitado</change>
+        <change type="new">Categoría pausado en seguidos</change>
+        <change type="new">Recordar último servidor</change>
+        <change type="new">Descarga por lotes</change>
+        <change type="new">Añadir a cola por lotes</change>
+        <change type="new">Preview al avanzar en reproductor experimental</change>
+        <change type="new">Opcion para usar proxy en CAST</change>
+    </release>
     <release code="96" version="3.1.6">
         <change type="fix">Errores generales</change>
         <change type="change">Material Design 2</change>

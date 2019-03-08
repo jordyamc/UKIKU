@@ -17,7 +17,6 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.verifyManager
-import knf.kuma.pojos.AnimeObject
 import org.jetbrains.anko.find
 
 class DirectoryPageFragment : BottomFragment() {
@@ -29,8 +28,8 @@ class DirectoryPageFragment : BottomFragment() {
     private var listUpdated = false
     private lateinit var model: DirectoryViewModel
 
-    private lateinit var liveData: LiveData<PagedList<AnimeObject>>
-    private lateinit var observer: Observer<PagedList<AnimeObject>>
+    private lateinit var liveData: LiveData<PagedList<DirObject>>
+    private lateinit var observer: Observer<PagedList<DirObject>>
 
     private val layout: Int
         @LayoutRes
@@ -73,11 +72,10 @@ class DirectoryPageFragment : BottomFragment() {
         }
     }
 
-    private fun observeLiveData(model: DirectoryViewModel, newObserver: Observer<PagedList<AnimeObject>>) {
+    private fun observeLiveData(model: DirectoryViewModel, newObserver: Observer<PagedList<DirObject>>) {
         if (::liveData.isInitialized && ::observer.isInitialized)
             liveData.removeObserver(observer)
         liveData = when (arguments?.getInt("type", 0) ?: 0) {
-            0 -> model.getAnimes()
             1 -> model.getOvas()
             2 -> model.getMovies()
             else -> model.getAnimes()

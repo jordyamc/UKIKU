@@ -29,17 +29,4 @@
         app:icon="@drawable/ic_dropbox"
         app:iconTint="#fff"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/login_drive"
-        style="@style/Widget.MaterialComponents.Button.Icon"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/drive"
-        android:padding="20dp"
-        android:text="Google Drive"
-        android:textColor="#fff"
-        android:theme="@style/AppTheme.Button.Drive"
-        app:icon="@drawable/ic_drive"
-        app:iconTint="#fff"/>
-
 </LinearLayout>

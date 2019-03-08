@@ -12,11 +12,10 @@ import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
-import knf.kuma.pojos.AnimeObject
 import java.util.*
 
 internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adapter<RandomAdapter.RandomItem>() {
-    private var list: MutableList<AnimeObject> = ArrayList()
+    private var list: MutableList<RandomObject> = ArrayList()
 
     private val layout: Int
         @LayoutRes
@@ -42,7 +41,7 @@ internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adap
         return list.size
     }
 
-    fun update(list: MutableList<AnimeObject>) {
+    fun update(list: MutableList<RandomObject>) {
         if (this.list notSameContent list) {
             this.list = list
             notifyDataSetChanged()

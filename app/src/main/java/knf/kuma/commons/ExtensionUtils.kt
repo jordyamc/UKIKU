@@ -213,9 +213,9 @@ fun String?.toast() {
         Toaster.toast(this)
 }
 
-fun doOnUI(func: () -> Unit) {
+fun doOnUI(enableLog: Boolean = true, func: () -> Unit) {
     GlobalScope.launch(Dispatchers.Main) {
-        noCrash(true) {
+        noCrash(enableLog) {
             func()
         }
     }
@@ -249,6 +249,11 @@ fun File.safeDelete(log: Boolean = false) {
         if (log)
             e.printStackTrace()
     }
+}
+
+fun RecyclerView.removeAllDecorations() {
+    while (itemDecorationCount > 0)
+        removeItemDecorationAt(0)
 }
 
 fun Any?.isNull(): Boolean {

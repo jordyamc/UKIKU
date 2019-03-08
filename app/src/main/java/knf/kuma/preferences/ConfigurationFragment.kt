@@ -160,6 +160,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             ?: "0"), object : BUUtils.AutoBackupInterface {
                         override fun onResponse(backupObject: AutoBackupObject?) {
                             Log.e("Backup override", backupObject?.name.toString())
+                            preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "%s"
                         }
                     })
                     true
@@ -288,13 +289,29 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         FileAccessHelper.INSTANCE.checkNoMedia(o as? Boolean == true)
                         true
                     } else {
-                        (preferenceScreen.findPreference("hide_chaps") as? SwitchPreference)?.isChecked = !(o as? Boolean == true)
+                        (preferenceScreen.findPreference("hide_chaps") as? SwitchPreference)?.isChecked = o as? Boolean != true
                         false
                     }
                 }
                 preferenceScreen.findPreference<Preference>("max_parallel_downloads").setOnPreferenceChangeListener { _, o ->
                     DownloadManager.setParallelDownloads(o as? String)
                     true
+                }
+                preferenceScreen.findPreference<SwitchPreference>("remember_server").apply {
+                    val lastServer = PrefsUtil.lastServer
+                    if (lastServer.isNull())
+                        isEnabled = false
+                    else {
+                        summary = lastServer
+                        setOnPreferenceChangeListener { preference, newValue ->
+                            if (newValue as? Boolean == false) {
+                                PrefsUtil.lastServer = null
+                                preference.summary = null
+                                preference.isEnabled = false
+                            }
+                            true
+                        }
+                    }
                 }
                 if (BuildConfig.DEBUG) {
                     preferenceScreen.findPreference<Preference>("reset_recents").setOnPreferenceClickListener {

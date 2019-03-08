@@ -14,10 +14,9 @@ import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.load
-import knf.kuma.pojos.AnimeObject
 import kotlinx.android.synthetic.main.item_dir.view.*
 
-internal class GenreAdapter(private val activity: Activity) : PagedListAdapter<AnimeObject, GenreAdapter.ItemHolder>(DIFF_CALLBACK) {
+internal class GenreAdapter(private val activity: Activity) : PagedListAdapter<SearchObject, GenreAdapter.ItemHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_dir, parent, false))
@@ -40,12 +39,12 @@ internal class GenreAdapter(private val activity: Activity) : PagedListAdapter<A
 
     companion object {
 
-        val DIFF_CALLBACK: DiffUtil.ItemCallback<AnimeObject> = object : DiffUtil.ItemCallback<AnimeObject>() {
-            override fun areItemsTheSame(oldItem: AnimeObject, newItem: AnimeObject): Boolean {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<SearchObject>() {
+            override fun areItemsTheSame(oldItem: SearchObject, newItem: SearchObject): Boolean {
                 return oldItem.key == newItem.key
             }
 
-            override fun areContentsTheSame(oldItem: AnimeObject, newItem: AnimeObject): Boolean {
+            override fun areContentsTheSame(oldItem: SearchObject, newItem: SearchObject): Boolean {
                 return oldItem.name == newItem.name
             }
         }

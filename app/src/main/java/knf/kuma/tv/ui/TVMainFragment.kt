@@ -144,8 +144,6 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
                 waitingLogin = true
                 if (item.isDropbox)
                     BUUtils.startClient(BUUtils.BUType.DROPBOX, false)
-                else
-                    BUUtils.startClient(BUUtils.BUType.DRIVE, false)
             }
         }
     }
@@ -171,7 +169,6 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
                 BUUtils.silentRestoreAll()
             } else {
                 adapter.add(SyncObject(true))
-                adapter.add(SyncObject(false))
             }
             if (getAdapter().size() == 3)
                 (getAdapter() as ArrayObjectAdapter).add(SYNC, ListRow(headerItem, adapter))

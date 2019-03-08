@@ -23,13 +23,10 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:theme="@style/AppTheme.Cardview"
-            android:visibility="gone"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
+            android:theme="@style/AppTheme.Cardview"
+            android:visibility="gone"
             app:contentPadding="8dp">
 
             <LinearLayout
@@ -41,7 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Título"
-                    android:textAppearance="@android:style/TextAppearance.Material.Title"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?colorAccent"/>
 
                 <TextView
@@ -50,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="TITULO COMPLETO"
-                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                     android:textSize="16sp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -66,7 +63,8 @@
             android:visibility="gone"
             app:cardCornerRadius="2dp"
             app:cardElevation="2dp"
-            app:contentPadding="8dp">
+            app:contentPadding="8dp"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -83,7 +81,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Descripción"
-                        android:textAppearance="@android:style/TextAppearance.Material.Title"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                         android:textColor="?colorAccent"/>
 
                     <ImageButton
@@ -104,17 +102,8 @@
                     android:clickable="true"
                     android:ellipsize="end"
                     android:text="TEST"
-                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                     android:textSize="16sp"/>
-
-                <!--<knf.kuma.Custom.ExpandableTextView
-                    android:id="@+id/expandable_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    app:tvea_expandBitmap="@drawable/action_expand"
-                    app:tvea_expandLines="4"
-                    app:tvea_shrinkBitmap="@drawable/action_shrink"/>-->
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -126,9 +115,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
-            android:visibility="gone"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -140,86 +127,86 @@
                     android:layout_height="wrap_content"
                     android:padding="8dp"
                     android:text="Detalles"
-                    android:textAppearance="@android:style/TextAppearance.Material.Title"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?colorAccent"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:alpha="0.12"
-                    android:background="@color/divider"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:paddingTop="8dp"
                     android:paddingEnd="8dp"
                     android:text="Tipo"
-                    android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
 
                 <TextView
                     android:id="@+id/type"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="TIPO"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:alpha="0.12"
-                    android:background="@color/divider"/>
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="TIPO"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:paddingTop="8dp"
                     android:paddingEnd="8dp"
                     android:text="Estado"
-                    android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
 
                 <TextView
                     android:id="@+id/state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="ESTADO"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:alpha="0.12"
-                    android:background="@color/divider"/>
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="ESTADO"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="8dp"
-                    android:paddingTop="8dp"
                     android:paddingEnd="8dp"
                     android:text="ID"
-                    android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
 
                 <TextView
                     android:id="@+id/aid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:text="####"/>
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="####"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="Seguidores"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
+
+                <TextView
+                    android:id="@+id/followers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="0"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
 
                 <LinearLayout
                     android:id="@+id/lay_score"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:alpha="0.12"
-                        android:background="@color/divider"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -228,21 +215,22 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="8dp"
-                        android:paddingTop="8dp"
                         android:paddingEnd="8dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Votos"
-                            android:textAppearance="@android:style/TextAppearance.Material.Subhead"/>
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
 
                         <TextView
                             android:id="@+id/rating_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:layout_marginTop="1dp"/>
+                            android:layout_marginTop="1dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                            tools:text="-0000"/>
                     </LinearLayout>
 
                     <me.zhanghai.android.materialratingbar.MaterialRatingBar
@@ -266,8 +254,6 @@
             android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
             android:visibility="gone"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp"
             app:contentPadding="8dp">
 
             <LinearLayout
@@ -279,7 +265,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Géneros"
-                    android:textAppearance="@android:style/TextAppearance.Material.Title"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?colorAccent"/>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -300,9 +286,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
-            android:visibility="gone"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -314,7 +298,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:text="Seguir"
-                    android:textAppearance="@android:style/TextAppearance.Material.Title"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?colorAccent"/>
 
                 <Spinner
@@ -335,9 +319,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:theme="@style/AppTheme.Cardview"
-            android:visibility="gone"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -349,14 +331,13 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:text="Relacionados"
-                    android:textAppearance="@android:style/TextAppearance.Material.Title"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?colorAccent"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_related"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/item_related"/>
             </LinearLayout>

@@ -30,9 +30,12 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
+import knf.kuma.directory.DirObject
 import knf.kuma.pojos.*
+import knf.kuma.recommended.AnimeShortObject
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
+import knf.kuma.search.SearchObject
 import knf.kuma.widgets.emision.WEListItem
 import xdroid.toaster.Toaster
 import java.util.*
@@ -227,7 +230,53 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
             fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
+        fun open(fragment: Fragment, animeObject: SearchObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, ActivityAnime::class.java)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
+        fun open(fragment: Fragment, animeObject: DirObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, ActivityAnime::class.java)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
         fun open(activity: Activity, animeObject: AnimeObject, view: ImageView, persist: Boolean, animate: Boolean) {
+            val intent = Intent(activity, ActivityAnime::class.java)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
+        fun open(activity: Activity, animeObject: SearchObject, view: ImageView, persist: Boolean, animate: Boolean) {
+            val intent = Intent(activity, ActivityAnime::class.java)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
+        fun open(activity: Activity, animeObject: AnimeShortObject, view: ImageView, persist: Boolean, animate: Boolean) {
             val intent = Intent(activity, ActivityAnime::class.java)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
@@ -271,7 +320,7 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
             activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
-        fun open(context: Context, animeObject: AnimeObject) {
+        fun open(context: Context, animeObject: SearchObject) {
             val intent = Intent(context, ActivityAnime::class.java)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)

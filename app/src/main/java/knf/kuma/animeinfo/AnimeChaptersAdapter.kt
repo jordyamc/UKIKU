@@ -61,7 +61,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
 
     init {
         setHasStableIds(true)
-        chaptersDAO.init()
         if (chapters.isNotEmpty()) {
             seeingObject = seeingDAO.getByAid(chapters[0].aid)
             doAsync {
@@ -94,7 +93,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight(context)))
         else
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardview_background))
-        holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(dFile, downloadObject.get()))
+        holder.setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.eid), fragment, Observer {
+            holder.setQueue(it, isPlayAvailable(dFile, downloadObject.get()))
+        })
         chapter.isDownloaded = canPlay(dFile)
         if (processingPosition == holder.adapterPosition) {
             holder.progressBar.isIndeterminate = true
@@ -366,6 +367,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     override fun onViewRecycled(holder: ChapterImgHolder) {
         holder.unsetCastingObserver()
         holder.unsetDownloadObserver()
+        holder.unsetQueueObserver()
         super.onViewRecycled(holder)
     }
 
@@ -380,9 +382,11 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         val progressBarRoot: View by itemView.bind(R.id.progress_root)
 
         private var downloadLiveData: LiveData<DownloadObject> = MutableLiveData()
+        private var queueLiveData: LiveData<Boolean> = MutableLiveData()
 
         private var downloadObserver: Observer<DownloadObject>? = null
         private var castingObserver: Observer<String>? = null
+        private var queueObserver: Observer<Boolean>? = null
 
         fun setDownloadObserver(downloadLiveData: LiveData<DownloadObject>, owner: LifecycleOwner?, observer: Observer<DownloadObject>) {
             if (owner == null) return
@@ -408,6 +412,20 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             castingObserver?.let {
                 CastUtil.get().casting.removeObserver(it)
                 castingObserver = null
+            }
+        }
+
+        fun setQueueObserver(queueLivedata: LiveData<Boolean>, owner: LifecycleOwner?, observer: Observer<Boolean>) {
+            if (owner == null) return
+            this.queueLiveData = queueLivedata
+            this.queueObserver = observer
+            this.queueLiveData.observe(owner, observer)
+        }
+
+        fun unsetQueueObserver() {
+            queueObserver?.let {
+                queueLiveData.removeObserver(it)
+                queueObserver = null
             }
         }
 

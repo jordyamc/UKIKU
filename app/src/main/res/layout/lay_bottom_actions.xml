@@ -4,24 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/cardview_background"
-    android:elevation="16dp"
     android:orientation="vertical"
     android:theme="@style/AppTheme.DayNight">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="56dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:gravity="center"
-        android:text="Episodios"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="16sp"/>
-
-    <TextView
         android:id="@+id/action_seen"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
         android:clickable="true"
         android:drawableStart="@drawable/ic_option_seen"
         android:drawablePadding="32dp"
@@ -38,7 +27,7 @@
     <TextView
         android:id="@+id/action_unseen"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
         android:background="?selectableItemBackground"
         android:clickable="true"
         android:drawableStart="@drawable/ic_option_not_seen"
@@ -55,7 +44,7 @@
     <TextView
         android:id="@+id/action_import_all"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
         android:background="?selectableItemBackground"
         android:clickable="true"
         android:drawableStart="@drawable/ic_import"
@@ -66,6 +55,40 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="Importar archivos"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/action_download_all"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_download_multiple"
+        android:drawablePadding="32dp"
+        android:drawableTint="?colorControlNormal"
+        android:focusable="true"
+        android:gravity="start|center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Descargar todos"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/action_queue_all"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_add_list"
+        android:drawablePadding="32dp"
+        android:drawableTint="?colorControlNormal"
+        android:focusable="true"
+        android:gravity="start|center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Añadir a cola"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="16sp"/>
 

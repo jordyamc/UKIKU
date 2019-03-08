@@ -16,7 +16,7 @@ open class Option : Parcelable {
      * @param server  Nombre del servidor de donde viene la opcion [VideoServer.Names]
      * @param name    Nombre de la opcion, null si es una opcion unica
      * @param url     Url de la opcion
-     * @param headers Header requerido por la opcion
+     * @param headers Headers requeridos por la opcion
      */
     constructor(server: String, name: String?, url: String?, headers: Headers?) {
         if (url == null || url.trim { it <= ' ' }.isEmpty())

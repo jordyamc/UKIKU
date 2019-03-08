@@ -92,6 +92,14 @@
           }
         },
         {
+          "client_id": "928658019079-597ceth59vfrn68t3a8evfq5ech7hotb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.tv",
+            "certificate_hash": "e53f97d45da9e4f3443817b5ba19419ddce84e50"
+          }
+        },
+        {
           "client_id": "928658019079-qf4eeqn4vnbsj6et3lk9fogscbe68hjb.apps.googleusercontent.com",
           "client_type": 3
         }

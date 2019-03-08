@@ -11,9 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.slice.Slice
 import androidx.slice.SliceProvider
-import androidx.slice.builders.ListBuilder
-import androidx.slice.builders.ListBuilder.RowBuilder
-import androidx.slice.builders.SliceAction
+import androidx.slice.builders.*
 import knf.kuma.Main
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
@@ -81,47 +79,44 @@ class AnimeSlice : SliceProvider() {
                 AnimeLoad.QUERY != path -> {
                     AnimeLoad.QUERY = path
                     context.sendBroadcast(Intent(context, AnimeLoad::class.java))
-                    return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
-                            .addRow(
-                                    RowBuilder()
-                                            .setTitle("Buscando animes...", true)
-                                            .setPrimaryAction(createActivityAction(null, null))
-                            ).build()
+                    return list(context, sliceUri, ListBuilder.INFINITY) {
+                        row {
+                            title = "Buscando animes..."
+                            primaryAction = createActivityAction(null, null)
+                        }
+                    }
                 }
-                AnimeLoad.LIST.isEmpty() -> return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
-                        .addRow(
-                                RowBuilder()
-                                        .setTitle("No se encontraron animes")
-                                        .setPrimaryAction(createActivityAction(null, path.replace("/anime/", "").trim { it <= ' ' }))
-                        ).build()
+                AnimeLoad.LIST.isEmpty() -> return list(context, sliceUri, ListBuilder.INFINITY) {
+                    row {
+                        title = "No se encontraron animes"
+                        primaryAction = createActivityAction(null, path.replace("/anime/", "").trim())
+                    }
+                }
                 else -> {
-                    val listBuilder = ListBuilder(context, sliceUri, ListBuilder.INFINITY)
-                    listBuilder.setAccentColor(ContextCompat.getColor(context, EAHelper.getThemeColor(context)))
-                    val animeObjects = AnimeLoad.LIST
-                    if (animeObjects.isNotEmpty()) {
-                        listBuilder.setHeader(
-                                ListBuilder.HeaderBuilder()
-                                        .setTitle("UKIKU")
-                                        .setSummary((if (animeObjects.size < 5) "Solo " else "Más de ") + animeObjects.size + " animes encontrados")
-                                        .setPrimaryAction(createActivityAction(null, path.replace("/anime/", "").trim { it <= ' ' }))
-                        )
-                        for (animeObject in animeObjects)
-                            listBuilder.addRow(
-                                    RowBuilder()
-                                            .setTitle(animeObject.name)
-                                            .setSubtitle(animeObject.genresString)
-                                            .setPrimaryAction(createOpenAnimeAction(animeObject))
-                                            .setTitleItem(animeObject.icon, ListBuilder.SMALL_IMAGE)
-                            )
-                        listBuilder.addAction(createActivityAction(null, path.replace("/anime/", "").trim { it <= ' ' }))
-                    } else
-                        return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
-                                .addRow(
-                                        RowBuilder()
-                                                .setTitle("No se encontraron animes")
-                                                .setPrimaryAction(createActivityAction(null, null))
-                                ).build()
-                    return listBuilder.build()
+                    return list(context, sliceUri, ListBuilder.INFINITY) {
+                        setAccentColor(ContextCompat.getColor(context, EAHelper.getThemeColor(context)))
+                        val animeObjects = AnimeLoad.LIST
+                        if (animeObjects.isNotEmpty()) {
+                            header {
+                                title = "UKIKU"
+                                summary = (if (animeObjects.size < 5) "Solo " else "Más de ") + animeObjects.size + " animes encontrados"
+                            }
+                            animeObjects.forEach {
+                                row {
+                                    title = it.name
+                                    subtitle = it.genresString
+                                    primaryAction = createOpenAnimeAction(it)
+                                    setTitleItem(it.icon, ListBuilder.SMALL_IMAGE)
+                                }
+                            }
+                            addAction(createActivityAction(null, path.replace("/anime/", "").trim()))
+                        } else {
+                            row {
+                                title = "No se encontraron animes"
+                                primaryAction = createActivityAction(null, null)
+                            }
+                        }
+                    }
                 }
             }
         } else
@@ -167,7 +162,7 @@ class AnimeSlice : SliceProvider() {
             )
     }
 
-    private fun createOpenAnimeAction(animeObject: AnimeObject?): SliceAction {
+    private fun createOpenAnimeAction(animeObject: AnimeSliceObject?): SliceAction {
         return SliceAction.create(
                 PendingIntent.getActivity(
                         context, animeObject?.key ?: 0, Intent(context, ActivityAnime::class.java)

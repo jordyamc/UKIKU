@@ -131,12 +131,18 @@
             android:icon="@drawable/ic_experimental"
             android:key="experimental_player"
             android:title="Reproductor experimental"/>
-        <!--<SwitchPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_samsung_tv"
             android:key="force_local_cast"
-            android:summary="Usar cast local para animes descargados y streaming"
-            android:title="Cast local"/>-->
+            android:summary="Usar proxy para cast"
+            android:title="Cast local"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_remember"
+            android:key="remember_server"
+            android:title="Recordar último servidor"/>
+
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Diseño">

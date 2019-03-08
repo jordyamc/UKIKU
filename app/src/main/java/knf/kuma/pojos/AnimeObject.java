@@ -3,6 +3,7 @@ package knf.kuma.pojos;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import org.jsoup.nodes.Element;
@@ -59,6 +60,8 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     public String state;
     public Day day;
     @Ignore
+    public String followers;
+    @Ignore
     public String rate_stars;
     @Ignore
     public String rate_count;
@@ -107,6 +110,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         this.type = getType(webInfo.type);
         this.state = getState(webInfo.state);
         this.day = webInfo.emisionDay;
+        this.followers = webInfo.followers;
         this.rate_stars = webInfo.rate_stars;
         this.rate_count = webInfo.rate_count;
         this.genres = webInfo.genres;
@@ -243,6 +247,8 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         @Selector(value = "aside.SidebarA.BFixed p", attr = "class", defValue = "Desconocido")
         @ColumnInfo(name = "web_state")
         public String state;
+        @Selector(value = "div.Title:contains(Seguidores) span", defValue = "0")
+        public String followers;
         @Selector(value = "span.vtprmd", defValue = "0.0")
         public String rate_stars;
         @Selector(value = "span#votes_nmbr", defValue = "0")
@@ -272,17 +278,26 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
         @Entity
         public static class AnimeChapter implements Comparable<AnimeChapter>, Serializable {
+            @SerializedName("chapter_key")
             @PrimaryKey
             public int key;
+            @SerializedName("chapter_number")
             public String number;
+            @SerializedName("chapter_eid")
             public String eid;
+            @SerializedName("chapter_link")
             public String link;
+            @SerializedName("chapter_name")
             public String name;
+            @SerializedName("chapter_aid")
             public String aid;
+            @SerializedName("chapter_img")
             @Ignore
             public String img;
+            @SerializedName("chapter_Type")
             @Ignore
             public ChapterType chapterType;
+            @SerializedName("chapter_ isDownloaded")
             @Ignore
             public boolean isDownloaded = false;
 
@@ -401,7 +416,9 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             }
 
             public enum ChapterType {
+                @SerializedName("NEW")
                 NEW(0),
+                @SerializedName("OLD")
                 OLD(1);
                 public int value;
 

@@ -14,6 +14,7 @@ import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.download.FileAccessHelper;
+import knf.kuma.search.SearchObject;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
 @Entity
@@ -50,7 +51,7 @@ public class RecentObject {
     @Ignore
     public int downloadState;
     @Ignore
-    public AnimeObject animeObject;
+    public SearchObject animeObject;
     @Embedded
     public WebInfo webInfo;
 
@@ -124,14 +125,14 @@ public class RecentObject {
         } else {
             this.downloadState = -8;
         }
-        this.animeObject = CacheDB.INSTANCE.animeDAO().getByAid(aid);
+        this.animeObject = CacheDB.INSTANCE.animeDAO().getSOByAid(aid);
     }
 
     private void populate(AnimeDAO dao, WebInfo webInfo) {
         if (isNotNumeric(webInfo.aid) || isNotNumeric(webInfo.eid))
             throw new IllegalStateException("Aid and Eid must be numbers");
         populate(webInfo);
-        this.animeObject = dao.getByAid(aid);
+        this.animeObject = dao.getSOByAid(aid);
     }
 
     private boolean isNotNumeric(String number) {

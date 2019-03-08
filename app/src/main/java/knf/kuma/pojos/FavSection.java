@@ -1,5 +1,7 @@
 package knf.kuma.pojos;
 
+import knf.kuma.search.SearchAdvObject;
+
 public class FavSection extends FavoriteObject {
     private FavSection(int key, String aid, String name, String img, String type, String link, String category) {
         super(key, aid, name, img, type, link, category);
@@ -10,7 +12,7 @@ public class FavSection extends FavoriteObject {
     }
 
     public FavSection(String name) {
-        super(null);
+        super((SearchAdvObject) null);
         if (name.equals(CATEGORY_NONE))
             this.name = "Sin categoría";
         else

@@ -2,22 +2,22 @@ package knf.kuma.recommended
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import java.util.*
 
 class BlacklistDialog : DialogFragment() {
 
     private val genres = getGenres()
-    private var selected: MutableList<String> = ArrayList()
+    private var selected: MutableList<String> = mutableListOf()
     private var listener: MultiChoiceListener? = null
 
-    private val states: BooleanArray
+    private val statesIndex: IntArray
         get() {
-            val states = BooleanArray(genres.size)
-            var index = 0
-            for (genre in genres) {
-                states[index++] = selected.contains(genre)
+            val states = IntArray(selected.size)
+            selected.forEachIndexed { index, genre ->
+                states[index] = genres.indexOf(genre)
             }
             return states
         }
@@ -29,18 +29,18 @@ class BlacklistDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            AlertDialog.Builder(it)
-                    .setTitle("Lista negra")
-                    .setMultiChoiceItems(genres.toTypedArray(), states) { _, index, isSelected ->
-                        if (isSelected) {
-                            selected.add(genres[index])
-                        } else {
-                            selected.remove(genres[index])
-                        }
-                    }.setPositiveButton("SELECCIONAR") { _, _ ->
-                        selected.sort()
-                        listener?.onOkay(selected)
-                    }.setNegativeButton("CERRAR") { dialogInterface, _ -> dialogInterface.dismiss() }.create()
+            MaterialDialog(it).apply {
+                title(text = "Lista negra")
+                listItemsMultiChoice(items = genres, initialSelection = statesIndex, allowEmptySelection = true) { _, _, items ->
+                    selected = mutableListOf<String>().apply {
+                        addAll(items)
+                        sort()
+                    }
+                    listener?.onOkay(selected)
+                }
+                positiveButton(text = "SELECCIONAR")
+                negativeButton(text = "CERRAR")
+            }
         } ?: super.onCreateDialog(savedInstanceState)
     }
 

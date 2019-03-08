@@ -12,7 +12,6 @@ class DirPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
     override fun getPageTitle(position: Int): CharSequence? {
         return when (position) {
-            0 -> "ANIME"
             1 -> "OVA"
             2 -> "PELICULA"
             else -> "ANIME"
@@ -27,7 +26,6 @@ class DirPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> animes
             1 -> ovas
             2 -> movies
             else -> animes

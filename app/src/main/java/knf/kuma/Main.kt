@@ -183,7 +183,6 @@ class Main : AppCompatActivity(),
             when (BUUtils.getType(this@Main)) {
                 BUUtils.BUType.LOCAL -> backupLocation.text = "Almacenamiento local"
                 BUUtils.BUType.DROPBOX -> backupLocation.text = "Dropbox"
-                BUUtils.BUType.DRIVE -> backupLocation.text = "Google Drive"
             }
             subscribeBadges()
         }
@@ -373,6 +372,7 @@ class Main : AppCompatActivity(),
                 1 -> menu.findItem(R.id.by_votes).isChecked = true
                 2 -> menu.findItem(R.id.by_id_dir).isChecked = true
                 3 -> menu.findItem(R.id.by_added_dir).isChecked = true
+                4 -> menu.findItem(R.id.by_followers).isChecked = true
             }
         } else {
             menuInflater.inflate(R.menu.main, menu)
@@ -413,6 +413,10 @@ class Main : AppCompatActivity(),
             }
             R.id.by_added_dir -> {
                 PrefsUtil.dirOrder = 3
+                changeOrder()
+            }
+            R.id.by_followers -> {
+                PrefsUtil.dirOrder = 4
                 changeOrder()
             }
         }
@@ -500,6 +504,17 @@ class Main : AppCompatActivity(),
     }
 
     private fun startChange() {
+        if (intent.dataString?.let {
+                    return@let if ("ukiku.ga/search/" in it) {
+                        val query = it.substringAfter("ukiku.ga/search/")
+                        selectedFragment = RecentFragment.get()
+                        searchView.openSearch()
+                        setFragment(SearchFragment[query])
+                        searchView.setSearchString(query, false)
+                        true
+                    } else
+                        false
+                } == true) return
         when (intent.getIntExtra("start_position", -1)) {
             0 -> setFragment(RecentFragment.get())
             1 -> bottomNavigationView.selectedItemId = R.id.action_bottom_favorites
@@ -555,7 +570,6 @@ class Main : AppCompatActivity(),
             when (BUUtils.getType(this@Main)) {
                 BUUtils.BUType.LOCAL -> backupLocation.text = "Almacenamiento local"
                 BUUtils.BUType.DROPBOX -> backupLocation.text = "Dropbox"
-                BUUtils.BUType.DRIVE -> backupLocation.text = "Google Drive"
             }
         }
         if (isFirst) {

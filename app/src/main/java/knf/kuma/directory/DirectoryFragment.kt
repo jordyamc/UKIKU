@@ -30,7 +30,7 @@ class DirectoryFragment : BottomFragment() {
         fragmentHolder = DirMainFragmentHolder(view, childFragmentManager)
         if (!PrefsUtil.isDirectoryFinished) {
             snackbar = activity?.findViewById<View>(R.id.root)?.showSnackbar("Creando directorio...", Snackbar.LENGTH_INDEFINITE)
-            CacheDB.INSTANCE.animeDAO().allListCount.observe(this@DirectoryFragment, Observer {
+            CacheDB.INSTANCE.animeDAO().countLive.observe(this@DirectoryFragment, Observer {
                 try {
                     snackbar?.setText("Agregados... $it")
                 } catch (e: Exception) {

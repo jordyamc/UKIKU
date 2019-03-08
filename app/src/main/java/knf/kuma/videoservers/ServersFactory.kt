@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.crashlytics.android.answers.Answers
@@ -68,7 +69,54 @@ class ServersFactory {
         this.serversInterface = serversInterface
     }
 
-    private fun showServerList() {
+    private fun saveLastServer(name: String) {
+        PrefsUtil.lastServer = name
+    }
+
+    private fun processSelectedServer(index: Int, text: String, showName: Boolean = false) {
+        selected = index
+        doAsync {
+            try {
+                showSnack("Obteniendo link${if (showName) " $text" else ""}...")
+                val server = servers[selected].verified
+                dismissSnack()
+                if (server == null && servers.size == 1) {
+                    Toaster.toast("Error en servidor, intente mas tarde")
+                    callOnFinish(false, false)
+                } else if (server == null) {
+                    servers.removeAt(selected)
+                    selected = 0
+                    Toaster.toast("Error en servidor")
+                    showServerList()
+                } else if (server.options.size == 0) {
+                    servers.removeAt(selected)
+                    selected = 0
+                    Toaster.toast("Error en servidor")
+                    showServerList()
+                } else if (server.haveOptions()) {
+                    showOptions(server, isCasting)
+                } else {
+                    saveLastServer(text)
+                    when (text.toLowerCase()) {
+                        "mega 1", "mega 2" -> {
+                            this@ServersFactory.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(server.option.url)))
+                            callOnFinish(false, false)
+                        }
+                        else ->
+                            when {
+                                isCasting -> callOnCast(server.option.url)
+                                isStream -> startStreaming(server.option)
+                                else -> startDownload(server.option)
+                            }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun showServerList(useLast: Boolean = true) {
         doOnUI {
             try {
                 if (servers.size == 0) {
@@ -76,58 +124,35 @@ class ServersFactory {
                     callOnFinish(false, false)
                 } else {
                     dismissSnack()
-                    MaterialDialog(this@ServersFactory.context).safeShow {
-                        title(text = "Selecciona servidor")
-                        listItemsSingleChoice(items = Server.getNames(servers), initialSelection = selected) { _, index, text ->
-                            selected = index
-                            doAsync {
-                                try {
-                                    showSnack("Obteniendo link...")
-                                    val server = servers[selected].verified
-                                    dismissSnack()
-                                    if (server == null && servers.size == 1) {
-                                        Toaster.toast("Error en servidor, intente mas tarde")
-                                        callOnFinish(false, false)
-                                    } else if (server == null) {
-                                        servers.removeAt(selected)
-                                        selected = 0
-                                        Toaster.toast("Error en servidor")
-                                        showServerList()
-                                    } else if (server.options.size == 0) {
-                                        servers.removeAt(selected)
-                                        selected = 0
-                                        Toaster.toast("Error en servidor")
-                                        showServerList()
-                                    } else if (server.haveOptions()) {
-                                        showOptions(server, isCasting)
-                                    } else {
-                                        when (text.toLowerCase()) {
-                                            "mega 1", "mega 2" -> {
-                                                this@ServersFactory.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(server.option.url)))
-                                                callOnFinish(false, false)
-                                            }
-                                            else ->
-                                                when {
-                                                    isCasting -> callOnCast(server.option.url)
-                                                    isStream -> startStreaming(server.option)
-                                                    else -> startDownload(server.option)
-                                                }
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
+                    val names = Server.getNames(servers)
+                    val lasServer = PrefsUtil.lastServer
+                    if (PrefsUtil.rememberServer && lasServer != null && names.contains(lasServer) && useLast)
+                        processSelectedServer(names.indexOf(lasServer), lasServer, true)
+                    else
+                        MaterialDialog(this@ServersFactory.context).safeShow {
+                            title(text = "Selecciona servidor")
+                            listItemsSingleChoice(items = names, initialSelection = selected) { _, index, text ->
+                                processSelectedServer(index, text)
+                            }
+                            checkBoxPrompt(text = "Recordar selección", isCheckedDefault = PrefsUtil.rememberServer) {
+                                PrefsUtil.rememberServer = it
+                                if (!it) PrefsUtil.lastServer = null
+                            }
+                            positiveButton(text =
+                            when {
+                                downloadObject.addQueue -> "AÑADIR"
+                                isCasting -> "CAST"
+                                else -> "INICIAR"
+                            })
+                            negativeButton(text = "CANCELAR") {
+                                callOnFinish(false, false)
+                                if (PrefsUtil.lastServer.isNull()) PrefsUtil.rememberServer = false
+                            }
+                            setOnCancelListener {
+                                callOnFinish(false, false)
+                                if (PrefsUtil.lastServer.isNull()) PrefsUtil.rememberServer = false
                             }
                         }
-                        positiveButton(text =
-                        when {
-                            downloadObject.addQueue -> "AÑADIR"
-                            isCasting -> "CAST"
-                            else -> "INICIAR"
-                        })
-                        negativeButton(text = "CANCELAR") { callOnFinish(false, false) }
-                        setOnCancelListener { callOnFinish(false, false) }
-                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -142,6 +167,7 @@ class ServersFactory {
                 MaterialDialog(this@ServersFactory.context).safeShow {
                     title(text = server.name)
                     listItemsSingleChoice(items = Option.getNames(server.options), initialSelection = 0) { _, index, _ ->
+                        saveLastServer(server.name)
                         when {
                             isCast -> callOnCast(server.options[index].url)
                             isStream -> startStreaming(server.options[index])
@@ -154,8 +180,8 @@ class ServersFactory {
                         isCasting -> "CAST"
                         else -> "INICIAR"
                     })
-                    negativeButton(text = "ATRAS") { showServerList() }
-                    setOnCancelListener { showServerList() }
+                    negativeButton(text = "ATRAS") { showServerList(false) }
+                    setOnCancelListener { showServerList(false) }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -286,15 +312,15 @@ class ServersFactory {
     private fun callOnFinish(started: Boolean, success: Boolean) {
         serversInterface.onProgressIndicator(false)
         dismissSnack()
+        clear()
         serversInterface.onFinish(started, success)
-        INSTANCE = null
     }
 
     private fun callOnCast(url: String?) {
         serversInterface.onProgressIndicator(false)
         dismissSnack()
+        clear()
         serversInterface.onCast(url)
-        INSTANCE = null
     }
 
     private fun getSnackManager(): SnackProgressBarManager? {

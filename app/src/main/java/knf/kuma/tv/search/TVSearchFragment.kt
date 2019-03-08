@@ -12,15 +12,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.search.SearchFragment
 import knf.kuma.tv.anime.AnimePresenter
 import knf.kuma.tv.details.TVAnimesDetails
 
 class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, SpeechRecognitionCallback, OnItemViewClickedListener {
     private var arrayObjectAdapter: ArrayObjectAdapter? = null
-    private lateinit var liveData: LiveData<MutableList<AnimeObject>>
-    private lateinit var observer: Observer<MutableList<AnimeObject>>
+    private lateinit var liveData: LiveData<MutableList<BasicAnimeObject>>
+    private lateinit var observer: Observer<MutableList<BasicAnimeObject>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +35,7 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
         }
         arrayObjectAdapter?.clear()
         arrayObjectAdapter?.add(ListRow(headerItem, objectAdapter))
+        setResult("")
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -56,7 +56,7 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
     }
 
     override fun onQueryTextChange(newQuery: String): Boolean {
-        setResult(newQuery)
+        setResult(newQuery.trim())
         return true
     }
 
@@ -67,7 +67,7 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        setResult(query)
+        setResult(query.trim())
         return true
     }
 
@@ -91,7 +91,13 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
                 val objectAdapter = ArrayObjectAdapter(AnimePresenter())
                 for (animeObject in animeObjects)
                     objectAdapter.add(animeObject)
-                val headerItem = HeaderItem(if (animeObjects.isNotEmpty()) "Resultados para '$query'" else "Sin resultados")
+                val headerItem = HeaderItem(
+                        when {
+                            query.isEmpty() -> "Todos los animes"
+                            animeObjects.isNotEmpty() -> "Resultados para '$query'"
+                            else -> "Sin resultados"
+                        }
+                )
                 arrayObjectAdapter?.add(ListRow(headerItem, objectAdapter))
             }
             liveData.observe(it, observer)
@@ -100,7 +106,7 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
         when (item) {
-            is AnimeObject -> context?.let { TVAnimesDetails.start(it, item.link) }
+            is BasicAnimeObject -> context?.let { TVAnimesDetails.start(it, item.link) }
             is String -> context?.let { TVTag.start(it, item) }
         }
     }

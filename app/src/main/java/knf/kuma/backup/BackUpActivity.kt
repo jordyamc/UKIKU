@@ -1,14 +1,12 @@
 package knf.kuma.backup
 
 import android.animation.Animator
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Rect
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -19,7 +17,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.dropbox.core.android.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import knf.kuma.R
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.noCrash
@@ -39,7 +36,6 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
         get() {
             return when (BUUtils.type) {
                 BUUtils.BUType.LOCAL -> ContextCompat.getColor(this, android.R.color.transparent)
-                BUUtils.BUType.DRIVE -> ContextCompat.getColor(this, R.color.drive)
                 BUUtils.BUType.DROPBOX -> ContextCompat.getColor(this, R.color.dropbox)
             }
         }
@@ -51,7 +47,6 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
         setContentView(R.layout.activity_login)
         BUUtils.init(this, savedInstanceState == null)
         login_dropbox.setOnClickListener { onDropBoxLogin() }
-        login_drive.setOnClickListener { onDriveLogin() }
         logOut.setOnClickListener { onLogOut() }
         if (BUUtils.isLogedIn) {
             setState(true)
@@ -77,11 +72,6 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
     private fun onDropBoxLogin() {
         waitingLogin = true
         BUUtils.startClient(BUUtils.BUType.DROPBOX, false)
-    }
-
-    private fun onDriveLogin() {
-        waitingLogin = true
-        BUUtils.startClient(BUUtils.BUType.DRIVE, false)
     }
 
     override fun onAction(syncItemView: SyncItemView, id: String, isBackup: Boolean) {
@@ -120,7 +110,7 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
             setState(true)
             showColor(true)
             initSyncButtons()
-            Answers.getInstance().logLogin(LoginEvent().putMethod(if (BUUtils.type == BUUtils.BUType.DRIVE) "Drive" else "Dropbox"))
+            Answers.getInstance().logLogin(LoginEvent().putMethod("Dropbox"))
         } else if (waitingLogin) {
             colorChanger.showSnackbar("Error al iniciar sesión")
         }
@@ -196,20 +186,6 @@ class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView
             if (token != null)
                 BUUtils.type = BUUtils.BUType.DROPBOX
             BUUtils.setDropBoxClient(token)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == BUUtils.LOGIN_CODE) {
-            Log.e("Result", "Code: $resultCode")
-            if (resultCode == Activity.RESULT_OK) {
-                GoogleSignIn.getSignedInAccountFromIntent(data)
-                BUUtils.type = BUUtils.BUType.DRIVE
-                BUUtils.setDriveClient()
-            } else {
-                onLogin()
-            }
         }
     }
 

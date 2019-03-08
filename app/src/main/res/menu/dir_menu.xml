@@ -23,6 +23,9 @@
                     android:id="@+id/by_votes"
                     android:title="Puntuación"/>
                 <item
+                    android:id="@+id/by_followers"
+                    android:title="Seguidores"/>
+                <item
                     android:id="@+id/by_id_dir"
                     android:title="ID"/>
                 <item

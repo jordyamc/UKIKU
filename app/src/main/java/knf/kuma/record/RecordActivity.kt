@@ -21,6 +21,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecordObject
+import org.jetbrains.anko.doAsync
 
 class RecordActivity : AppCompatActivity() {
     val toolbar: Toolbar by bind(R.id.toolbar)
@@ -88,6 +89,10 @@ class RecordActivity : AppCompatActivity() {
                     positiveButton(text = "Continuar") { CacheDB.INSTANCE.recordsDAO().clear() }
                     negativeButton(text = "cancelar")
                 }
+            R.id.action_status -> doAsync {
+                val count = CacheDB.INSTANCE.chaptersDAO().count
+                doOnUI { "$count episodios vistos".toast() }
+            }
         }
         return super.onOptionsItemSelected(item)
     }

@@ -30,7 +30,11 @@
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.DayNight">
+        android:theme="@style/AppTheme.DayNight"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/AppTheme.Splash"/>
         <activity
             android:name=".Main"
             android:enabled="false"
@@ -41,8 +45,8 @@
             android:name=".tv.ui.TVMain"
             android:banner="@drawable/tv_banner"
             android:screenOrientation="sensorLandscape"
-            tools:replace="android:screenOrientation"
-            android:theme="@style/AppTheme.TV.Browser">
+            android:theme="@style/AppTheme.TV.Browser"
+            tools:replace="android:screenOrientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

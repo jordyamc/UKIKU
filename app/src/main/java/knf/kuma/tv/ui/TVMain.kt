@@ -12,8 +12,6 @@ import android.webkit.WebViewClient
 import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import knf.kuma.backup.BUUtils
 import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
 import knf.kuma.jobscheduler.DirUpdateJob
@@ -70,15 +68,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
         super.onActivityResult(requestCode, resultCode, data)
         try {
             if (data != null)
-                if (requestCode == BUUtils.LOGIN_CODE) {
-                    if (resultCode == Activity.RESULT_OK) {
-                        GoogleSignIn.getSignedInAccountFromIntent(data)
-                        BUUtils.type = BUUtils.BUType.DRIVE
-                        BUUtils.setDriveClient()
-                    } else if (fragment != null) {
-                        fragment?.onLogin()
-                    }
-                } else if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK) {
                     val bundle = data.extras
                     if (requestCode == TVServersFactory.REQUEST_CODE_MULTI)
                         serversFactory?.analyzeMulti(bundle?.getInt("position", 0) ?: 0)

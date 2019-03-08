@@ -67,13 +67,13 @@ class Diagnostic : AppCompatActivity() {
                     else -> StateView.STATE_ERROR
                 })
                 generalState.load(when {
-                    responseCode == 200 && loadingTime > 10000 -> "Correcto"
+                    responseCode == 200 && loadingTime < 10000 -> "Correcto"
                     responseCode == 503 -> "Cloudflare activado"
                     responseCode == 403 -> "Bloqueado por proveedor"
                     loadingTime > 10000 -> "Página lenta"
                     else -> "Desconocido"
                 }, when {
-                    responseCode == 200 && loadingTime > 10000 -> StateView.STATE_OK.also { info.visibility = View.GONE }
+                    responseCode == 200 && loadingTime < 10000 -> StateView.STATE_OK.also { info.visibility = View.GONE }
                     responseCode == 503 || responseCode == 403 || loadingTime > 10000 -> StateView.STATE_WARNING.also { info.visibility = View.VISIBLE }
                     else -> StateView.STATE_ERROR.also { info.visibility = View.GONE }
                 })
@@ -152,7 +152,6 @@ class Diagnostic : AppCompatActivity() {
     private fun runBackupTest() {
         backupState.load(when (BUUtils.getType(this)) {
             BUUtils.BUType.DROPBOX -> "Dropbox"
-            BUUtils.BUType.DRIVE -> "Google Drive"
             else -> "Sin respaldos"
         })
         if (BUUtils.getType(this) != BUUtils.BUType.LOCAL)

@@ -14,6 +14,9 @@ interface FavsDAO {
     @get:Query("SELECT * FROM favoriteobject ORDER BY name")
     val allRaw: MutableList<FavoriteObject>
 
+    @get:Query("SELECT aid FROM favoriteobject")
+    val allAids: List<String>
+
     @get:Query("SELECT * FROM favoriteobject GROUP BY category ORDER BY category")
     val catagories: MutableList<FavoriteObject>
 

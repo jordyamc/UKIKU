@@ -15,8 +15,8 @@ interface ChaptersDAO {
     @get:Query("SELECT count(*) FROM animechapter")
     val countLive: LiveData<Int>
 
-    @Query("SELECT count(*) FROM animechapter")
-    fun init(): Int
+    @get:Query("SELECT count(*) FROM animechapter")
+    val count: Int
 
     @Query("SELECT * FROM animechapter WHERE eid = :eid LIMIT 1")
     fun chapterSeen(eid: String): LiveData<AnimeObject.WebInfo.AnimeChapter>
@@ -24,10 +24,10 @@ interface ChaptersDAO {
     @Query("SELECT count(*) FROM animechapter WHERE eid = :eid")
     fun chapterIsSeen(eid: String): Boolean
 
-    @Query("SELECT * FROM animechapter WHERE eid IN (:eids) ORDER BY eid DESC LIMIT 1")
+    @Query("SELECT * FROM animechapter WHERE eid IN (:eids) ORDER BY eid+0 DESC LIMIT 1")
     fun getLast(eids: MutableList<String>): AnimeObject.WebInfo.AnimeChapter?
 
-    @Query("SELECT * FROM animechapter WHERE aid LIKE :aid ORDER BY `key` DESC LIMIT 1")
+    @Query("SELECT * FROM animechapter WHERE aid = :aid ORDER BY `key` DESC LIMIT 1")
     fun getLastByAid(aid: String): AnimeObject.WebInfo.AnimeChapter?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

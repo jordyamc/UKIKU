@@ -9,9 +9,12 @@ import com.crashlytics.android.Crashlytics
 import knf.kuma.App
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
+import knf.kuma.directory.DirObject
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.Recents
+import knf.kuma.search.SearchObject
+import org.jetbrains.anko.doAsync
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
 import retrofit2.Call
 import retrofit2.Callback
@@ -25,7 +28,7 @@ import javax.inject.Singleton
 @Singleton
 class Repository {
 
-    val search: LiveData<PagedList<AnimeObject>>
+    val search: LiveData<PagedList<SearchObject>>
         get() = getSearch("")
 
     fun reloadRecents() {
@@ -60,83 +63,89 @@ class Repository {
 
     fun getAnime(context: Context, link: String, persist: Boolean): LiveData<AnimeObject> {
         val data = MutableLiveData<AnimeObject>()
-        try {
-            val base = link.substring(0, link.lastIndexOf("/") + 1)
-            val rest = link.substring(link.lastIndexOf("/") + 1)
-            val dao = CacheDB.INSTANCE.animeDAO()
-            if (!Network.isConnected && dao.existLink(link))
-                return CacheDB.INSTANCE.animeDAO().getAnime(link)
-            getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(object : Callback<AnimeObject.WebInfo> {
-                override fun onResponse(call: Call<AnimeObject.WebInfo>, response: Response<AnimeObject.WebInfo>) {
-                    try {
-                        if (response.body() == null || response.code() != 200) {
-                            data.value = CacheDB.INSTANCE.animeDAO().getAnimeRaw(link)
-                            return
-                        }
-                        val animeObject = AnimeObject(link, response.body())
-                        if (persist)
-                            dao.insert(animeObject)
-                        data.value = animeObject
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        data.value = null
+        doAsync {
+            try {
+                val base = link.substring(0, link.lastIndexOf("/") + 1)
+                val rest = link.substring(link.lastIndexOf("/") + 1)
+                val dao = CacheDB.INSTANCE.animeDAO()
+                var cacheUsed = false
+                dao.getAnimeRaw(link)?.let {
+                    cacheUsed = true
+                    doOnUI {
+                        data.value = it
                     }
-
                 }
+                if (Network.isConnected)
+                    getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(object : Callback<AnimeObject.WebInfo> {
+                        override fun onResponse(call: Call<AnimeObject.WebInfo>, response: Response<AnimeObject.WebInfo>) {
+                            try {
+                                if (response.body() == null || response.code() != 200)
+                                    return
+                                val animeObject = AnimeObject(link, response.body())
+                                if (persist)
+                                    dao.insert(animeObject)
+                                data.value = animeObject
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
 
-                override fun onFailure(call: Call<AnimeObject.WebInfo>, t: Throwable) {
-                    t.printStackTrace()
-                    data.value = CacheDB.INSTANCE.animeDAO().getAnimeRaw(link)
-                }
-            })
-        } catch (e: Exception) {
-            e.printStackTrace()
-            data.value = null
+                        }
+
+                        override fun onFailure(call: Call<AnimeObject.WebInfo>, t: Throwable) {
+                            t.printStackTrace()
+                            data.value = CacheDB.INSTANCE.animeDAO().getAnimeRaw(link)
+                        }
+                    })
+                else if (!cacheUsed)
+                    doOnUI { data.value = null }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                doOnUI { data.value = null }
+            }
         }
-
         return data
     }
 
-    fun getAnimeDir(): LiveData<PagedList<AnimeObject>> {
+    fun getAnimeDir(): LiveData<PagedList<DirObject>> {
         return when (PrefsUtil.dirOrder) {
-            0 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDir, 25).build()
             1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirVotes, 25).build()
             2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirID, 25).build()
             3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirAdded, 25).build()
+            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirFollowers, 25).build()
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDir, 25).build()
         }
     }
 
-    fun getOvaDir(): LiveData<PagedList<AnimeObject>> {
+    fun getOvaDir(): LiveData<PagedList<DirObject>> {
         return when (PrefsUtil.dirOrder) {
-            0 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDir, 25).build()
             1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirVotes, 25).build()
             2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirID, 25).build()
             3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirAdded, 25).build()
+            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirFollowers, 25).build()
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDir, 25).build()
         }
     }
 
-    fun getMovieDir(): LiveData<PagedList<AnimeObject>> {
+    fun getMovieDir(): LiveData<PagedList<DirObject>> {
         return when (PrefsUtil.dirOrder) {
-            0 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDir, 25).build()
             1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirVotes, 25).build()
             2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirID, 25).build()
             3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirAdded, 25).build()
+            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirFollowers, 25).build()
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDir, 25).build()
         }
     }
 
-    fun getSearch(query: String): LiveData<PagedList<AnimeObject>> {
+    fun getSearch(query: String): LiveData<PagedList<SearchObject>> {
         return when {
-            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().all, 25).setInitialLoadKey(0).build()
+            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().allSearch, 25).setInitialLoadKey(0).build()
             query.trim { it <= ' ' }.matches("^#\\d+$".toRegex()) -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchID(query.replace("#", "")), 25).setInitialLoadKey(0).build()
             PatternUtil.isCustomSearch(query) -> getFiltered(query, null)
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch("%$query%"), 25).setInitialLoadKey(0).build()
         }
     }
 
-    private fun getFiltered(query: String, genres: String?): LiveData<PagedList<AnimeObject>> {
+    private fun getFiltered(query: String, genres: String?): LiveData<PagedList<SearchObject>> {
         var tQuery = PatternUtil.getCustomSearch(query).trim { it <= ' ' }
         var fQuery = tQuery
         fQuery = if (fQuery != "") "%$fQuery%" else "%"
@@ -176,7 +185,7 @@ class Repository {
         }
     }
 
-    fun getSearch(query: String, genres: String): LiveData<PagedList<AnimeObject>> {
+    fun getSearch(query: String, genres: String): LiveData<PagedList<SearchObject>> {
         return when {
             query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchG(genres), 25).setInitialLoadKey(0).build()
             PatternUtil.isCustomSearch(query) -> getFiltered(query, genres)

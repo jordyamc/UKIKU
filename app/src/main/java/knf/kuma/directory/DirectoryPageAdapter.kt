@@ -18,9 +18,8 @@ import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.load
-import knf.kuma.pojos.AnimeObject
 
-class DirectoryPageAdapter internal constructor(private val fragment: Fragment) : PagedListAdapter<AnimeObject, DirectoryPageAdapter.ItemHolder>(DIFF_CALLBACK), FastScrollRecyclerView.SectionedAdapter {
+class DirectoryPageAdapter internal constructor(private val fragment: Fragment) : PagedListAdapter<DirObject, DirectoryPageAdapter.ItemHolder>(DIFF_CALLBACK), FastScrollRecyclerView.SectionedAdapter {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
         return ItemHolder(LayoutInflater.from(parent.context).inflate(getLayType(), parent, false))
@@ -61,12 +60,12 @@ class DirectoryPageAdapter internal constructor(private val fragment: Fragment) 
 
     companion object {
 
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AnimeObject>() {
-            override fun areItemsTheSame(oldItem: AnimeObject, newItem: AnimeObject): Boolean {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DirObject>() {
+            override fun areItemsTheSame(oldItem: DirObject, newItem: DirObject): Boolean {
                 return oldItem.key == newItem.key
             }
 
-            override fun areContentsTheSame(oldItem: AnimeObject, newItem: AnimeObject): Boolean {
+            override fun areContentsTheSame(oldItem: DirObject, newItem: DirObject): Boolean {
                 return oldItem.name == newItem.name
             }
         }
