@@ -61,8 +61,11 @@ class Repository {
         }
     }
 
-    fun getAnime(context: Context, link: String, persist: Boolean): LiveData<AnimeObject> {
-        val data = MutableLiveData<AnimeObject>()
+    fun getAnime(context: Context, link: String, persist: Boolean): LiveData<AnimeObject?> {
+        return getAnime(context, link, persist, MutableLiveData())
+    }
+
+    fun getAnime(context: Context, link: String, persist: Boolean, data: MutableLiveData<AnimeObject?>): LiveData<AnimeObject?> {
         doAsync {
             try {
                 val base = link.substring(0, link.lastIndexOf("/") + 1)
@@ -79,16 +82,20 @@ class Repository {
                     getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(object : Callback<AnimeObject.WebInfo> {
                         override fun onResponse(call: Call<AnimeObject.WebInfo>, response: Response<AnimeObject.WebInfo>) {
                             try {
-                                if (response.body() == null || response.code() != 200)
+                                if (response.body() == null || response.code() != 200) {
+                                    if (!cacheUsed) data.value = null
                                     return
-                                val animeObject = AnimeObject(link, response.body())
-                                if (persist)
-                                    dao.insert(animeObject)
-                                data.value = animeObject
+                                }
+                                doAsync {
+                                    val animeObject = AnimeObject(link, response.body())
+                                    if (persist)
+                                        dao.insert(animeObject)
+                                    doOnUI { data.value = animeObject }
+                                }
                             } catch (e: Exception) {
                                 e.printStackTrace()
+                                if (!cacheUsed) data.value = null
                             }
-
                         }
 
                         override fun onFailure(call: Call<AnimeObject.WebInfo>, t: Throwable) {

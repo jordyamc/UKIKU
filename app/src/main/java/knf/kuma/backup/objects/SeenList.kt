@@ -59,21 +59,29 @@ class SeenList {
             seenList.deserialize()
             val totalCount = seenList.list?.size ?: 0
             val chapters = ArrayList<AnimeObject.WebInfo.AnimeChapter>()
-            var animeObject: AnimeObject? = null
+            var animeObject: AnimeChapters? = null
             for (obj in seenList.list ?: listOf<SeenObj>()) {
-                if (animeObject == null || animeObject.aid != obj.aid)
-                    animeObject = dao.getFullByAid(obj.aid)
-                val chapterList = animeObject?.chapters ?: listOf()
-                var found = false
-                for (chapter in chapterList) {
-                    if (chapter.number.endsWith(" " + obj.num)) {
-                        chapters.add(chapter)
-                        found = true
-                        break
+                try {
+                    if (animeObject == null || animeObject.aid != obj.aid)
+                        animeObject = dao.getChaptersByAid(obj.aid)
+                    val chapterList = animeObject.chaptersList()
+                    var found = false
+                    for (chapter in chapterList) {
+                        try {
+                            if (chapter.number.endsWith(" " + obj.num)) {
+                                chapters.add(chapter)
+                                found = true
+                                break
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
-                }
-                if (!found)
+                    if (!found)
+                        errorCount++
+                } catch (e: Exception) {
                     errorCount++
+                }
             }
             Toaster.toast("Migrados correctamente " + (totalCount - errorCount) + "/" + totalCount)
             return chapters

@@ -85,9 +85,9 @@
                 android:layout_height="?actionBarSize"
                 android:background="?colorAccent"
                 android:tag=":aesthetic_ignore"
+                android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
                 app:title="Title"
-                app:titleTextAppearance="@style/TextAppearance.AppCompat.Subhead"
-                app:titleTextColor="@android:color/white"/>
+                app:titleTextAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_recycler"

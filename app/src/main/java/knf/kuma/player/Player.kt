@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
 import okhttp3.OkHttpClient
 import xdroid.toaster.Toaster
@@ -81,11 +82,11 @@ class PlayerHolder(private val context: Context,
 
     private fun createExtractorMediaSource(uri: Uri): MediaSource {
         return ExtractorMediaSource.Factory(
-                DefaultDataSourceFactory(context, null, OkHttpDataSourceFactory(OkHttpClient(), BypassUtil.userAgent, null))
+                if (PrefsUtil.useExperimentalOkHttp)
+                    DefaultDataSourceFactory(context, null, OkHttpDataSourceFactory(OkHttpClient(), BypassUtil.userAgent, null))
+                else
+                    DefaultDataSourceFactory(context, BypassUtil.userAgent)
         ).createMediaSource(uri)
-        /*return ExtractorMediaSource.Factory(
-                DefaultDataSourceFactory(context, BypassUtil.userAgent))
-                .createMediaSource(uri)*/
     }
 
     // Prepare playback.

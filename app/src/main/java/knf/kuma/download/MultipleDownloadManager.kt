@@ -15,7 +15,7 @@ object MultipleDownloadManager {
 
     fun startDownload(context: Context, view: View, list: List<AnimeObject.WebInfo.AnimeChapter>, addQueue: Boolean) {
         if (list.isEmpty()) return
-        if (!isSpaceAvailable(list.size)) {
+        if (!addQueue && !isSpaceAvailable(list.size)) {
             "Se requieren mínimo ${minSpaceString(context, list.size)} libres!".toast()
             return
         }
@@ -53,7 +53,7 @@ object MultipleDownloadManager {
         return Formatter.formatFileSize(context, size * CHAPTER_SIZE)
     }
 
-    private fun isSpaceAvailable(size: Int): Boolean {
+    fun isSpaceAvailable(size: Int): Boolean {
         return getAvailable() > size * CHAPTER_SIZE
     }
 

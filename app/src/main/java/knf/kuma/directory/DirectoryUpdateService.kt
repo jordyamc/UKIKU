@@ -9,10 +9,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import knf.kuma.R
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.Network
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.jsoupCookies
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import knf.kuma.pojos.DirectoryPage
@@ -23,6 +20,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     private var manager: NotificationManager? = null
     private var count = 0
     private var page = 0
+    private var maxAnimes = 0
 
     private val startNotification: Notification
         get() {
@@ -33,7 +31,6 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                     .setSmallIcon(R.drawable.ic_dir_update)
                     .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
                     .setWhen(CURRENT_TIME)
-
             return notification.build()
         }
 
@@ -49,8 +46,18 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
         val jspoon = Jspoon.create()
+        calculateMax()
         doFullSearch(jspoon, animeDAO)
         cancelForeground()
+    }
+
+    private fun calculateMax() {
+        noCrash {
+            val main = jsoupCookies("https://animeflv.net/browse").get()
+            val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
+            val last = jsoupCookies("https://animeflv.net/browse?page=$lastPage").get()
+            maxAnimes = (24 * (lastPage - 1)) + last.select("article").size
+        }
     }
 
     private fun doFullSearch(jspoon: Jspoon, animeDAO: AnimeDAO) {
@@ -65,8 +72,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
             try {
                 val document = jsoupCookies("https://animeflv.net/browse?order=added&page=$page").get()
                 if (document.select("article").size != 0) {
-                    page++
-                    val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimesRecreate(this, jspoon, object : DirectoryPage.UpdateInterface {
+                    val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimesRecreate(jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
                             count++
                             updateNotification()
@@ -78,9 +84,10 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                     })
                     if (animeObjects.isNotEmpty())
                         animeDAO.insertAll(animeObjects)
+                    page++
                 } else {
                     finished = true
-                    Log.e("Directory Getter", "Processed $page pages")
+                    Log.e("Directory Getter", "Processed ${page - 1} pages")
                 }
             } catch (e: Exception) {
                 Log.e("Directory Getter", "Page error: $page")
@@ -97,18 +104,22 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     }
 
     private fun updateNotification() {
-        val notification = NotificationCompat.Builder(this, CHANNEL)
-                .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setSmallIcon(R.drawable.ic_dir_update)
-                .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
-                .setWhen(CURRENT_TIME)
-        if (PrefsUtil.collapseDirectoryNotification)
-            notification.setSubText("Actualizando directorio: $count")
-        else
-            notification
-                    .setContentTitle("Actualizando directorio")
-                    .setContentText("Actualizados: $count")
+        val notification = NotificationCompat.Builder(this, CHANNEL).apply {
+            setOngoing(true)
+            priority = NotificationCompat.PRIORITY_MIN
+            setSmallIcon(R.drawable.ic_dir_update)
+            color = ContextCompat.getColor(this@DirectoryUpdateService, EAHelper.getThemeColor(this@DirectoryUpdateService))
+            setWhen(CURRENT_TIME)
+            setSound(null)
+            if (PrefsUtil.collapseDirectoryNotification)
+                setSubText("Actualizando directorio: $count/$maxAnimes~")
+            else {
+                setContentTitle("Actualizando directorio")
+                setContentText("Actualizados: $count/$maxAnimes~")
+                if (maxAnimes > 0)
+                    setProgress(maxAnimes, count, false)
+            }
+        }
         manager?.notify(NOT_CODE, notification.build())
     }
 

@@ -44,6 +44,7 @@ class AppInfo : MaterialAboutActivity() {
         donateCard.title("Donar")
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_paypal), "Paypal", false, paypalUri))
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_patreon), "Patreon", false, Uri.parse("https://www.patreon.com/animeflvapp")))
+        donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_cuplogo), "Ko-fi", false, Uri.parse("https://ko-fi.com/unbarredstream")))
         val extraCard = MaterialAboutCard.Builder()
         extraCard.title("Extras")
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_web), "Página web", true, Uri.parse("https://ukiku.ga")))

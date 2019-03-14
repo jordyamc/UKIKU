@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
@@ -19,7 +17,7 @@ import knf.kuma.pojos.RecordObject
 import xdroid.toaster.Toaster
 import java.util.*
 
-class RecordsAdapter(private val activity: Activity) : PagedListAdapter<RecordObject, RecordsAdapter.RecordItem>(DIFF_CALLBACK) {
+class RecordsAdapter(private val activity: Activity) : RecyclerView.Adapter<RecordsAdapter.RecordItem>() {
     private var items: MutableList<RecordObject> = ArrayList()
 
     private val dao = CacheDB.INSTANCE.recordsDAO()
@@ -37,7 +35,7 @@ class RecordsAdapter(private val activity: Activity) : PagedListAdapter<RecordOb
     }
 
     override fun onBindViewHolder(holder: RecordItem, position: Int) {
-        val item = getItem(position) ?: return
+        val item = items[position]
         val animeObject = item.animeObject
         animeObject?.let { holder.imageView.load(PatternUtil.getCover(animeObject.aid)) }
         holder.title.text = item.name
@@ -57,10 +55,14 @@ class RecordsAdapter(private val activity: Activity) : PagedListAdapter<RecordOb
             recordObject.chapter
     }
 
+    override fun getItemCount(): Int {
+        return items.size
+    }
+
     fun remove(position: Int) {
-        getItem(position)?.let { dao.delete(it) }
-        /*items.removeAt(position)
-        notifyItemRemoved(position)*/
+        dao.delete(items[position])
+        items.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     fun update(items: MutableList<RecordObject>) {
@@ -75,18 +77,5 @@ class RecordsAdapter(private val activity: Activity) : PagedListAdapter<RecordOb
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)
         val chapter: TextView by itemView.bind(R.id.chapter)
-    }
-
-    companion object {
-
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<RecordObject>() {
-            override fun areItemsTheSame(oldItem: RecordObject, newItem: RecordObject): Boolean {
-                return oldItem.key == newItem.key
-            }
-
-            override fun areContentsTheSame(oldItem: RecordObject, newItem: RecordObject): Boolean {
-                return oldItem.chapter == newItem.chapter
-            }
-        }
     }
 }

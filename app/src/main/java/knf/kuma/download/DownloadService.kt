@@ -40,8 +40,10 @@ class DownloadService : IntentService("Download service") {
             setContentTitle(current?.name)
             setContentText(current?.chapter)
             setProgress(100, current?.progress ?: 0, true)
-            setGroup("manager")
-            setGroupSummary(true)
+            if (PrefsUtil.isGroupingEnabled) {
+                setGroup("manager")
+                setGroupSummary(true)
+            }
             setOngoing(true)
             setSound(null)
             setWhen(current?.time ?: 0)

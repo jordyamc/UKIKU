@@ -45,6 +45,11 @@ class EmisionActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
         EAHelper.clear2()
     }
 
+    override fun onResume() {
+        super.onResume()
+        pagerAdapter?.updateChanges()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_emision, menu)
         if (PrefsUtil.emissionShowHidden)

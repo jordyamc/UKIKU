@@ -18,7 +18,7 @@ interface FavsDAO {
     val allAids: List<String>
 
     @get:Query("SELECT * FROM favoriteobject GROUP BY category ORDER BY category")
-    val catagories: MutableList<FavoriteObject>
+    val categories: MutableList<FavoriteObject>
 
     @get:Query("SELECT * FROM favoriteobject ORDER BY aid + 0 ASC")
     val allID: LiveData<MutableList<FavoriteObject>>

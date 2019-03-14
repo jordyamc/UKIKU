@@ -26,6 +26,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.DownloadService
 import knf.kuma.download.FileAccessHelper
+import knf.kuma.download.MultipleDownloadManager
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
@@ -368,7 +369,10 @@ class ServersFactory {
                 serversInterface: ServersInterface
         ) {
             if (!isRunning())
-                INSTANCE = ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
+                if (isStream || MultipleDownloadManager.isSpaceAvailable(1))
+                    INSTANCE = ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
+                else
+                    serversInterface.getView()?.showSnackbar("Sin espacio suficiente")
             else {
                 serversInterface.onFinish(false, false)
                 Toaster.toast("Solo una petición a la vez")
@@ -383,7 +387,10 @@ class ServersFactory {
                 serversInterface: ServersInterface
         ) {
             if (!isRunning())
-                INSTANCE = ServersFactory(context, url, downloadObject, isStream, serversInterface).also { doAsync { it.start() } }
+                if (isStream || MultipleDownloadManager.isSpaceAvailable(1))
+                    INSTANCE = ServersFactory(context, url, downloadObject, isStream, serversInterface).also { doAsync { it.start() } }
+                else
+                    serversInterface.getView()?.showSnackbar("Sin espacio suficiente")
             else {
                 serversInterface.onFinish(false, false)
                 Toaster.toast("Solo una petición a la vez")

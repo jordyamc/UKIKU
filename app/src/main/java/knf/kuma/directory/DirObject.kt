@@ -4,6 +4,6 @@ class DirObject {
     var key = 0
     var aid = ""
     var name = ""
-    var link = ""
+    var link: String? = ""
     var rate_stars = ""
 }

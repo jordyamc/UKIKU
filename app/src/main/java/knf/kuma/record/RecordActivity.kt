@@ -11,16 +11,13 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.paging.LivePagedListBuilder
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.RecordObject
 import org.jetbrains.anko.doAsync
 
 class RecordActivity : AppCompatActivity() {
@@ -58,12 +55,12 @@ class RecordActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 adapter?.remove(viewHolder.adapterPosition)
-                Snackbar.make(recyclerView, "Elemento eliminado", Snackbar.LENGTH_SHORT).show()
+                recyclerView.showSnackbar("Elemento eliminado")
             }
         })
         touchHelper.attachToRecyclerView(recyclerView)
-        LivePagedListBuilder<Int, RecordObject>(CacheDB.INSTANCE.recordsDAO().all, 15).build().observe(this, Observer { recordObjects ->
-            adapter?.submitList(recordObjects)
+        CacheDB.INSTANCE.recordsDAO().allLive.observe(this, Observer { recordObjects ->
+            adapter?.update(recordObjects)
             if (isFirst) {
                 isFirst = false
                 recyclerView.scheduleLayoutAnimation()

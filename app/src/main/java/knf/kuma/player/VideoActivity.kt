@@ -23,6 +23,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
+import knf.kuma.commons.noCrash
 import kotlinx.android.synthetic.main.exo_playback_control_view.*
 import kotlinx.android.synthetic.main.player_view.*
 import org.jetbrains.anko.doAsync
@@ -177,11 +178,13 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback, PreviewL
     // Picture in Picture related functions.
     override fun onUserLeaveHint() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerHolder.audioFocusPlayer.playWhenReady && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
-            enterPictureInPictureMode(
-                    with(PictureInPictureParams.Builder()) {
-                        //setAspectRatio(Rational(16, 9))
-                        build()
-                    })
+            noCrash {
+                enterPictureInPictureMode(
+                        with(PictureInPictureParams.Builder()) {
+                            //setAspectRatio(Rational(16, 9))
+                            build()
+                        })
+            }
         }
     }
 

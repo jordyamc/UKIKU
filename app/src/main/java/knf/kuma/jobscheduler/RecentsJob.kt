@@ -179,7 +179,7 @@ class RecentsJob : Job() {
                 .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, Main::class.java), PendingIntent.FLAG_CANCEL_CURRENT))
                 .setDeleteIntent(PendingIntent.getBroadcast(context, System.currentTimeMillis().toInt(), summaryBroadcast, PendingIntent.FLAG_UPDATE_CURRENT))
                 .build()
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("group_notifications", true))
+        if (PrefsUtil.isGroupingEnabled)
             manager?.notify(KEY_SUMMARY, notification)
     }
 

@@ -20,6 +20,7 @@ import knf.kuma.database.dao.AnimeDAO
 import knf.kuma.jobscheduler.DirUpdateJob
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DirectoryPage
+import knf.kuma.widgets.emision.WEmisionProvider
 import org.jsoup.HttpStatusException
 import pl.droidsonroids.jspoon.Jspoon
 import java.util.*
@@ -29,6 +30,7 @@ class DirectoryService : IntentService("Directory update") {
     private var manager: NotificationManager? = null
     private var count = 0
     private var page = 0
+    private var maxAnimes = 0
     private val TAG = "Directory Getter"
 
     private val keyFailedPages = "failed_pages"
@@ -67,6 +69,7 @@ class DirectoryService : IntentService("Directory update") {
             count = animeDAO.count
         SSLSkipper.skip()
         val jspoon = Jspoon.create()
+        calculateMax()
         setStatus(STATE_PARTIAL)
         doPartialSearch(jspoon, animeDAO)
         setStatus(STATE_FULL)
@@ -75,11 +78,21 @@ class DirectoryService : IntentService("Directory update") {
         cancelForeground()
     }
 
+    private fun calculateMax() {
+        noCrash {
+            val main = jsoupCookies("https://animeflv.net/browse").get()
+            val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
+            val last = jsoupCookies("https://animeflv.net/browse?page=$lastPage").get()
+            maxAnimes = (24 * (lastPage - 1)) + last.select("article").size
+        }
+    }
+
     private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
         animeDAO.allLinksInEmission.forEach {
             noCrash {
                 val animeObject = AnimeObject(it, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(it).get().outerHtml()))
                 animeDAO.updateAnime(animeObject)
+                WEmisionProvider.update(this)
             }
         }
     }
@@ -101,7 +114,7 @@ class DirectoryService : IntentService("Directory update") {
             try {
                 val document = jsoupCookies("https://animeflv.net/browse?order=added&page=$s").get()
                 if (document.select("article").size != 0) {
-                    val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(this, animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
+                    val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
                             count++
                             updateNotification()
@@ -140,7 +153,7 @@ class DirectoryService : IntentService("Directory update") {
                 val document = jsoupCookies("https://animeflv.net/browse?order=added&page=$page").get()
                 if (document.select("article").size != 0) {
                     page++
-                    val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(this, animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
+                    val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
                             count++
                             updateNotification()
@@ -187,19 +200,22 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     private fun updateNotification() {
-        val notification = NotificationCompat.Builder(this, CHANNEL)
-                .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setSmallIcon(R.drawable.ic_directory_not)
-                .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
-                .setWhen(CURRENT_TIME)
-                .setSound(null)
-        if (PrefsUtil.collapseDirectoryNotification)
-            notification.setSubText("Creando directorio: $count")
-        else
-            notification
-                    .setContentTitle("Creando directorio")
-                    .setContentText("Agregados: $count")
+        val notification = NotificationCompat.Builder(this, CHANNEL).apply {
+            setOngoing(true)
+            priority = NotificationCompat.PRIORITY_MIN
+            setSmallIcon(R.drawable.ic_directory_not)
+            color = ContextCompat.getColor(this@DirectoryService, EAHelper.getThemeColor(this@DirectoryService))
+            setWhen(CURRENT_TIME)
+            setSound(null)
+            if (PrefsUtil.collapseDirectoryNotification)
+                setSubText("Creando directorio: $count/$maxAnimes~")
+            else {
+                setContentTitle("Creando directorio")
+                setContentText("Agregados: $count/$maxAnimes~")
+                if (maxAnimes > 0)
+                    setProgress(maxAnimes, count, false)
+            }
+        }
         notShow(NOT_CODE, notification.build())
     }
 

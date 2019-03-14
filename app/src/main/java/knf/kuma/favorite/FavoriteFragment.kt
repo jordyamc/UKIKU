@@ -150,7 +150,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     }
 
     private fun showNewCategoryDialog(isEmpty: Boolean, name: String?) {
-        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
+        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories)
         context?.let {
             MaterialDialog(it).safeShow {
                 title(text = "${if (name == null) "Nueva" else "Renombrar"} categoría")
@@ -179,7 +179,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     }
 
     fun showNewCategory(prefill: String? = null) {
-        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
+        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories)
         context?.let { ctx ->
             MaterialDialog(ctx).safeShow {
                 title(text = "Nueva categoría")
@@ -208,7 +208,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     }
 
     private fun showCategoryRename(name: String) {
-        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
+        val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories)
         context?.let {
             MaterialDialog(it).safeShow {
                 title(text = "Renombrar categoría")
@@ -364,7 +364,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     override fun onSelect(favoriteObject: FavoriteObject) {
         if (favoriteObject !is FavSection) {
-            val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().catagories)
+            val categories = FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories)
             if (categories.size <= 1) {
                 edited = favoriteObject
                 showNewCategory(null)

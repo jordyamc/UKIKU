@@ -248,7 +248,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         @ColumnInfo(name = "web_state")
         public String state;
         @Selector(value = "div.Title:contains(Seguidores) span", defValue = "0")
-        public String followers;
+        public String followers = "0";
         @Selector(value = "span.vtprmd", defValue = "0.0")
         public String rate_stars;
         @Selector(value = "span#votes_nmbr", defValue = "0")

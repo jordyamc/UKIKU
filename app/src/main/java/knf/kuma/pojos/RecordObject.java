@@ -6,7 +6,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import knf.kuma.database.CacheDB;
-import knf.kuma.search.SearchAdvObject;
+import knf.kuma.search.SearchObject;
 
 @Entity
 public class RecordObject {
@@ -25,7 +25,7 @@ public class RecordObject {
     public long date;
     @SerializedName("animeObject")
     @Ignore
-    public transient SearchAdvObject animeObject;
+    public transient SearchObject animeObject;
 
     public RecordObject(int key, String name, String chapter, String aid, String eid, long date) {
         this.key = key;
@@ -34,7 +34,7 @@ public class RecordObject {
         this.aid = aid;
         this.eid = eid;
         this.date = date;
-        this.animeObject = CacheDB.INSTANCE.animeDAO().getByAid(aid);
+        this.animeObject = CacheDB.INSTANCE.animeDAO().getByAidSimple(aid);
     }
 
     @Ignore

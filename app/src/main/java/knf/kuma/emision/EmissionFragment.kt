@@ -10,15 +10,11 @@ import androidx.lifecycle.Observer
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
-import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.search.SearchObject
-import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.recycler_emision.*
-import org.jetbrains.anko.doAsync
-import pl.droidsonroids.jspoon.Jspoon
 import java.util.*
 
 class EmissionFragment : Fragment() {
@@ -51,7 +47,7 @@ class EmissionFragment : Fragment() {
                 if (isFirst) {
                     isFirst = false
                     recycler.scheduleLayoutAnimation()
-                    checkStates(animeObjects)
+                    //checkStates(animeObjects)
                 }
                 error.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
             })
@@ -70,7 +66,7 @@ class EmissionFragment : Fragment() {
         //recycler.layoutManager?.smoothScrollToPosition(recycler,null,0)
     }
 
-    private fun checkStates(animeObjects: MutableList<SearchObject>) {
+    /*private fun checkStates(animeObjects: MutableList<SearchObject>) {
         doAsync {
             try {
                 val updateList = mutableListOf<AnimeObject>()
@@ -92,7 +88,7 @@ class EmissionFragment : Fragment() {
                 e.printStackTrace()
             }
         }
-    }
+    }*/
 
     fun updateChanges() {
         doOnUI { adapter?.notifyDataSetChanged() }

@@ -11,7 +11,7 @@ interface RecordsDAO {
     val all: DataSource.Factory<Int, RecordObject>
 
     @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
-    val allLive: LiveData<List<RecordObject>>
+    val allLive: LiveData<MutableList<RecordObject>>
 
     @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
     val allRaw: MutableList<RecordObject>

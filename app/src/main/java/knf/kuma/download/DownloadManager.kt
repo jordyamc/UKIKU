@@ -354,8 +354,10 @@ class DownloadManager : Service() {
                 setSmallIcon(R.drawable.ic_service)
                 setOngoing(true)
                 priority = NotificationCompat.PRIORITY_MIN
-                setGroup("manager")
-                setGroupSummary(true)
+                if (PrefsUtil.isGroupingEnabled) {
+                    setGroup("manager")
+                    setGroupSummary(true)
+                }
                 if (PrefsUtil.collapseDirectoryNotification)
                     setSubText("Descargas en progreso")
                 else

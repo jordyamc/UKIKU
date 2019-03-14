@@ -39,7 +39,11 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
         holder.imageView.load(PatternUtil.getCover(animeObject.aid))
         holder.title.text = animeObject.name
         holder.hiddenOverlay.setHidden(blacklist.contains(animeObject.aid), false)
-        holder.observeFav(fragment, animeObject.aid, showHeart)
+        holder.heart.visibility = when {
+            showHeart && CacheDB.INSTANCE.favsDAO().isFav(animeObject.aid.toInt()) -> View.VISIBLE
+            else -> View.GONE
+        }
+        //holder.observeFav(fragment, animeObject.aid, showHeart)
         holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView, false, animate = true) }
         holder.cardView.setOnLongClickListener {
             val removed: Boolean = if (blacklist.contains(animeObject.aid)) {
@@ -63,8 +67,8 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
     }
 
     fun update(newList: MutableList<SearchObject>, animate: Boolean = true, callback: () -> Unit) {
-        if (list notSameContent newList)
-            if (list.isNotEmpty() && PrefsUtil.useSmoothAnimations)
+        if (newList.isNotEmpty() && list notSameContent newList)
+            if (PrefsUtil.useSmoothAnimations)
                 doAsync {
                     blacklist = PrefsUtil.emissionBlacklist
                     showHidden = PrefsUtil.emissionShowHidden
@@ -127,7 +131,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
             }
             liveData = CacheDB.INSTANCE.favsDAO().isFavLive(aid.toInt())
             observer = Observer {
-                if (!show)
+                if (!PrefsUtil.emissionShowFavs)
                     heart.visibility = View.GONE
                 else
                     heart.visibility = if (it) View.VISIBLE else View.GONE

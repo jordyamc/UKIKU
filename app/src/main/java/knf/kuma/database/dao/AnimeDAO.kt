@@ -3,6 +3,7 @@ package knf.kuma.database.dao
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
+import knf.kuma.backup.objects.AnimeChapters
 import knf.kuma.database.BaseConverter
 import knf.kuma.directory.DirObject
 import knf.kuma.emision.AnimeSubObject
@@ -15,7 +16,7 @@ import knf.kuma.slices.AnimeSliceObject
 import knf.kuma.tv.search.BasicAnimeObject
 
 @Dao
-@TypeConverters(BaseConverter::class)
+@TypeConverters(BaseConverter::class, AnimeObject.Converter::class)
 interface AnimeDAO {
 
     @get:Query("SELECT `key`,aid,name,link FROM AnimeObject ORDER BY name")
@@ -79,7 +80,7 @@ interface AnimeDAO {
     fun init(): Int
 
     @Query("SELECT * FROM AnimeObject WHERE aid = :aid")
-    fun getAnimeByAid(aid: String): LiveData<AnimeObject>
+    fun getAnimeByAid(aid: String): AnimeObject?
 
     @Query("SELECT `key`,aid,img,link,name,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY name")
     fun getAnimesByAids(aids: List<String>): List<AnimeShortObject>
@@ -159,8 +160,14 @@ interface AnimeDAO {
     @Query("SELECT `key`,name,link,aid,img,type FROM AnimeObject WHERE aid LIKE :aid")
     fun getByAid(aid: String): SearchAdvObject?
 
+    @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE aid LIKE :aid")
+    fun getByAidSimple(aid: String): SearchObject?
+
     @Query("SELECT * FROM AnimeObject WHERE aid LIKE :aid")
     fun getFullByAid(aid: String): AnimeObject?
+
+    @Query("SELECT aid,chapters FROM AnimeObject WHERE aid = :aid")
+    fun getChaptersByAid(aid: String): AnimeChapters
 
     @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE aid = :aid")
     fun getSOByAid(aid: String): SearchObject?
@@ -178,7 +185,7 @@ interface AnimeDAO {
     fun insert(animeObject: AnimeObject)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(objects: MutableList<AnimeObject>)
+    fun insertAll(objects: List<AnimeObject>)
 
     @Query("DELETE FROM animeobject")
     fun nuke()

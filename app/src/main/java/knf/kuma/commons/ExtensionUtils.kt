@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.AnimationDrawable
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -15,6 +16,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -23,6 +25,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
 import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
 import knf.kuma.App
@@ -120,6 +123,9 @@ fun RecyclerView.verifyManager(size: Int = 115) {
 fun <T> MutableList<T>.toArray(): Array<T> {
     return this.toArray()
 }
+
+val canGroupNotifications: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
 fun gridColumns(size: Int = 115): Int {
     val metrics = App.context.resources.displayMetrics
@@ -271,6 +277,13 @@ fun ImageView.setAnimatedResource(@DrawableRes res: Int) {
     animated.callback = this
     animated.setVisible(true, true)
     animated.start()
+}
+
+fun FloatingActionButton.forceHide() {
+    val params = layoutParams as? CoordinatorLayout.LayoutParams
+    params?.behavior = null
+    requestLayout()
+    visibility = View.GONE
 }
 
 fun jsoupCookies(url: String?): Connection = Jsoup.connect(url).cookies(BypassUtil.getMapCookie(App.context)).userAgent(BypassUtil.userAgent).timeout(PrefsUtil.timeoutTime.toInt() * 1000)

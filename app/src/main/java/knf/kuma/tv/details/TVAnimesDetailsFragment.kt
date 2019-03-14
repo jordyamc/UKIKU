@@ -55,72 +55,74 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
         val activity = activity ?: return
         Repository().getAnime(App.context, arguments?.getString("url")
                 ?: "", true).observe(activity, Observer { animeObject ->
-            Glide.with(App.context).asBitmap().load(PatternUtil.getCoverGlide(animeObject.aid)).into(object : SimpleTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    Palette.from(resource).generate { palette ->
-                        val swatch = palette?.darkMutedSwatch
-                        favoriteObject = FavoriteObject(animeObject)
-                        chapters = animeObject.chapters
-                        chapters.reversed()
-                        val selector = ClassPresenterSelector()
-                        val rowPresenter = CustomFullWidthDetailsOverviewRowPresenter(
-                                if (swatch == null)
-                                    DetailsDescriptionPresenter()
-                                else
-                                    DetailsDescriptionPresenter(swatch.titleTextColor, swatch.bodyTextColor))
-                        if (swatch != null) {
-                            rowPresenter.backgroundColor = swatch.rgb
-                            val hsv = FloatArray(3)
-                            val color = swatch.rgb
-                            Color.colorToHSV(color, hsv)
-                            hsv[2] *= 0.8f
-                            rowPresenter.actionsBackgroundColor = Color.HSVToColor(hsv)
-                        }
-                        selector.addClassPresenter(DetailsOverviewRow::class.java, rowPresenter)
-                        selector.addClassPresenter(ChaptersListRow::class.java, ChaptersListPresenter(getLastSeen(chapters)))
-                        selector.addClassPresenter(ListRow::class.java, ListRowPresenter())
-                        mRowsAdapter = ArrayObjectAdapter(selector)
-                        val detailsOverview = DetailsOverviewRow(animeObject)
+            animeObject?.let {
+                Glide.with(App.context).asBitmap().load(PatternUtil.getCoverGlide(animeObject.aid)).into(object : SimpleTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        Palette.from(resource).generate { palette ->
+                            val swatch = palette?.darkMutedSwatch
+                            favoriteObject = FavoriteObject(animeObject)
+                            chapters = animeObject.chapters
+                            chapters.reversed()
+                            val selector = ClassPresenterSelector()
+                            val rowPresenter = CustomFullWidthDetailsOverviewRowPresenter(
+                                    if (swatch == null)
+                                        DetailsDescriptionPresenter()
+                                    else
+                                        DetailsDescriptionPresenter(swatch.titleTextColor, swatch.bodyTextColor))
+                            if (swatch != null) {
+                                rowPresenter.backgroundColor = swatch.rgb
+                                val hsv = FloatArray(3)
+                                val color = swatch.rgb
+                                Color.colorToHSV(color, hsv)
+                                hsv[2] *= 0.8f
+                                rowPresenter.actionsBackgroundColor = Color.HSVToColor(hsv)
+                            }
+                            selector.addClassPresenter(DetailsOverviewRow::class.java, rowPresenter)
+                            selector.addClassPresenter(ChaptersListRow::class.java, ChaptersListPresenter(getLastSeen(chapters)))
+                            selector.addClassPresenter(ListRow::class.java, ListRowPresenter())
+                            mRowsAdapter = ArrayObjectAdapter(selector)
+                            val detailsOverview = DetailsOverviewRow(animeObject)
 
-                        // Add images and action buttons to the details view
-                        detailsOverview.setImageBitmap(activity, resource)
-                        detailsOverview.isImageScaleUpAllowed = true
-                        actionAdapter = SparseArrayObjectAdapter()
-                        if (CacheDB.INSTANCE.favsDAO().isFav(animeObject.key)) {
-                            actionAdapter?.set(1, Action(1, "Quitar favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_full)))
-                        } else {
-                            actionAdapter?.set(1, Action(1, "Añadir favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_empty)))
-                        }
-                        actionAdapter?.set(2, Action(2, "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})", null, ContextCompat.getDrawable(App.context, R.drawable.ic_seeing)))
-                        detailsOverview.actionsAdapter = actionAdapter
-                        rowPresenter.onActionClickedListener = this@TVAnimesDetailsFragment
-                        mRowsAdapter?.add(detailsOverview)
+                            // Add images and action buttons to the details view
+                            detailsOverview.setImageBitmap(activity, resource)
+                            detailsOverview.isImageScaleUpAllowed = true
+                            actionAdapter = SparseArrayObjectAdapter()
+                            if (CacheDB.INSTANCE.favsDAO().isFav(animeObject.key)) {
+                                actionAdapter?.set(1, Action(1, "Quitar favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_full)))
+                            } else {
+                                actionAdapter?.set(1, Action(1, "Añadir favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_empty)))
+                            }
+                            actionAdapter?.set(2, Action(2, "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})", null, ContextCompat.getDrawable(App.context, R.drawable.ic_seeing)))
+                            detailsOverview.actionsAdapter = actionAdapter
+                            rowPresenter.onActionClickedListener = this@TVAnimesDetailsFragment
+                            mRowsAdapter?.add(detailsOverview)
 
-                        // Add a Chapters items row
-                        if (chapters.isNotEmpty()) {
-                            listRowAdapter = ArrayObjectAdapter(
-                                    ChapterPresenter())
-                            for (chapter in chapters)
-                                listRowAdapter?.add(chapter)
-                            val header = HeaderItem(0, "Episodios")
-                            mRowsAdapter?.add(ChaptersListRow(header, listRowAdapter
-                                    ?: ArrayObjectAdapter()))
-                        }
+                            // Add a Chapters items row
+                            if (chapters.isNotEmpty()) {
+                                listRowAdapter = ArrayObjectAdapter(
+                                        ChapterPresenter())
+                                for (chapter in chapters)
+                                    listRowAdapter?.add(chapter)
+                                val header = HeaderItem(0, "Episodios")
+                                mRowsAdapter?.add(ChaptersListRow(header, listRowAdapter
+                                        ?: ArrayObjectAdapter()))
+                            }
 
-                        // Add a Related items row
-                        if (animeObject.related?.isNotEmpty() == true) {
-                            val listRowAdapter = ArrayObjectAdapter(
-                                    RelatedPresenter())
-                            for (related in animeObject.related ?: listOf())
-                                listRowAdapter.add(related)
-                            val header = HeaderItem(0, "Relacionados")
-                            mRowsAdapter?.add(ListRow(header, listRowAdapter))
-                        }
+                            // Add a Related items row
+                            if (animeObject.related?.isNotEmpty() == true) {
+                                val listRowAdapter = ArrayObjectAdapter(
+                                        RelatedPresenter())
+                                for (related in animeObject.related ?: listOf())
+                                    listRowAdapter.add(related)
+                                val header = HeaderItem(0, "Relacionados")
+                                mRowsAdapter?.add(ListRow(header, listRowAdapter))
+                            }
 
-                        noCrash { adapter = mRowsAdapter }
+                            noCrash { adapter = mRowsAdapter }
+                        }
                     }
-                }
-            })
+                })
+            }
         })
     }
 

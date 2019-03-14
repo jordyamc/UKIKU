@@ -43,7 +43,7 @@ import java.util.*
 class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
     private var isEdited = false
     private val viewModel: AnimeViewModel by lazy { ViewModelProviders.of(this).get(AnimeViewModel::class.java) }
-    private lateinit var holder: AnimeActivityHolder
+    private val holder: AnimeActivityHolder by lazy { AnimeActivityHolder(this) }
     private var favoriteObject: FavoriteObject? = null
     private val dao = CacheDB.INSTANCE.favsDAO()
     private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
@@ -58,26 +58,24 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
         } catch (e: InflateException) {
             setContentView(R.layout.activity_anime_info_nwv)
         }
-        if (aidOnly)
-            viewModel.init(intent.getStringExtra(keyAid))
-        else
-            viewModel.init(this@ActivityAnime, intent.dataString, intent.getBooleanExtra(keyPersist, true))
-        holder = AnimeActivityHolder(this@ActivityAnime)
-        doOnUI {
-            if (intent.getBooleanExtra(keyNotification, false))
-                sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
-            setSupportActionBar(holder.toolbar)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setDisplayShowHomeEnabled(false)
-            holder.toolbar.setNavigationOnClickListener { closeActivity() }
-            load()
-        }
+        setSupportActionBar(holder.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+        holder.toolbar.setNavigationOnClickListener { closeActivity() }
+        if (savedInstanceState == null)
+            if (aidOnly)
+                viewModel.init(intent.getStringExtra(keyAid))
+            else
+                viewModel.init(this@ActivityAnime, intent.dataString, intent.getBooleanExtra(keyPersist, true))
+        if (intent.getBooleanExtra(keyNotification, false))
+            sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
+        load()
     }
 
     private fun load() {
-        viewModel.liveData?.observe(this, Observer { animeObject ->
-            doOnUI {
-                if (animeObject != null) {
+        viewModel.liveData.observe(this, Observer { animeObject ->
+            if (animeObject != null) {
+                doOnUI {
                     Crashlytics.setString("screen", "Anime: " + animeObject.name)
                     Answers.getInstance().logContentView(ContentViewEvent().putContentName(animeObject.name).putContentType(animeObject.type).putContentId(animeObject.aid))
                     chapters = animeObject.chapters ?: mutableListOf()
@@ -96,12 +94,12 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
                     holder.showFAB()
                     invalidateOptionsMenu()
                     RecommendHelper.registerAll(genres, RankType.CHECK)
-                } else {
-                    Toaster.toast("Error al cargar información del anime")
-                    onBackPressed()
                 }
+            } else {
+                Toaster.toast("Error al cargar información del anime")
+                onBackPressed()
             }
-        }) ?: Toaster.toast("Error al cargar información del anime")
+        })
     }
 
     private fun setResult() {
@@ -133,11 +131,8 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
 
     override fun onNeedRecreate() {
         try {
-            if (!aidOnly) {
-                viewModel.reload(this, intent.dataString
-                        ?: "", intent.getBooleanExtra(keyPersist, true))
-                load()
-            }
+            if (!aidOnly)
+                viewModel.reload(this, intent.dataString, intent.getBooleanExtra(keyPersist, true))
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -244,14 +239,18 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
 
         fun open(fragment: Fragment, animeObject: DirObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnime::class.java)
-            intent.data = Uri.parse(animeObject.link)
-            intent.putExtra(keyTitle, animeObject.name)
-            intent.putExtra(keyAid, animeObject.aid)
-            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
-            intent.putExtra(keyPersist, persist)
-            intent.putExtra(keyNoTransition, !animate)
-            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+            try {
+                val intent = Intent(fragment.context, ActivityAnime::class.java)
+                intent.data = Uri.parse(animeObject.link)
+                intent.putExtra(keyTitle, animeObject.name)
+                intent.putExtra(keyAid, animeObject.aid)
+                intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+                intent.putExtra(keyPersist, persist)
+                intent.putExtra(keyNoTransition, !animate)
+                fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         fun open(activity: Activity, animeObject: AnimeObject, view: ImageView, persist: Boolean, animate: Boolean) {

@@ -139,7 +139,6 @@ object BUUtils {
 
     fun getType(context: Context?): BUType {
         return when (PreferenceManager.getDefaultSharedPreferences(context).getInt("backup_type", -1)) {
-            -1 -> BUType.LOCAL
             1 -> BUType.DROPBOX
             else -> BUType.LOCAL
         }

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
-    <release code="97" version="4.0">
+    <release code="99" version="4.0.1">
+        <change type="fix">Errores generales</change>
+    </release>
+    <release code="98" version="4.0">
         <change type="fix">Errores generales</change>
         <change type="fix">Errores en TV</change>
         <change type="fix">Errores en respaldos</change>
@@ -16,7 +19,7 @@
         <change type="new">Preview al avanzar en reproductor experimental</change>
         <change type="new">Opcion para usar proxy en CAST</change>
     </release>
-    <release code="96" version="3.1.6">
+    <release code="97" version="3.1.6">
         <change type="fix">Errores generales</change>
         <change type="change">Material Design 2</change>
         <change type="change">Mejora de carga en historial</change>

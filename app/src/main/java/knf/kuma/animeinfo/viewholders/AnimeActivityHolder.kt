@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
-import android.view.animation.AnimationUtils
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -22,15 +21,12 @@ import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimePagerAdapter
 import knf.kuma.animeinfo.img.ActivityImgFull
+import knf.kuma.commons.*
 import knf.kuma.commons.BypassUtil.Companion.clearCookies
 import knf.kuma.commons.BypassUtil.Companion.isLoading
 import knf.kuma.commons.BypassUtil.Companion.isNeeded
 import knf.kuma.commons.BypassUtil.Companion.saveCookies
 import knf.kuma.commons.BypassUtil.Companion.userAgent
-import knf.kuma.commons.PicassoSingle
-import knf.kuma.commons.bind
-import knf.kuma.commons.doOnUI
-import knf.kuma.commons.optionalBind
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
@@ -52,8 +48,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
 
     private val drawableHeartFull: Drawable by lazy { activity.getDrawable(R.drawable.heart_full) }
     private val drawableHeartEmpty: Drawable by lazy { activity.getDrawable(R.drawable.heart_empty) }
-    private val drawableStarHeart: Drawable by lazy { activity.getDrawable(R.drawable.ic_star_heart) }
-    private val drawableHalfStar: Drawable by lazy { activity.getDrawable(R.drawable.ic_seeing) }
 
     init {
         //fab.visibility = View.INVISIBLE
@@ -106,25 +100,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
         }
     }
 
-    fun setFABSeeing() {
-        doOnUI {
-            fab.setImageDrawable(drawableHalfStar)
-            fab.invalidate()
-        }
-    }
-
-    fun setFABState(isFav: Boolean, isSeeing: Boolean = false) {
-        doOnUI {
-            fab.setImageDrawable(when {
-                isFav && isSeeing -> drawableStarHeart
-                isSeeing -> drawableHalfStar
-                isFav -> drawableHeartFull
-                else -> drawableHeartEmpty
-            })
-            fab.invalidate()
-        }
-    }
-
     fun showFAB() {
         doOnUI {
             fab.isEnabled = true
@@ -132,20 +107,9 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
         }
     }
 
-    fun hideFAB() {
-        doOnUI {
-            fab.isEnabled = false
-            //fab.visibility = View.INVISIBLE
-            fab.startAnimation(AnimationUtils.loadAnimation(fab.context, R.anim.scale_down))
-        }
-    }
-
     fun hideFABForce() {
-        doOnUI {
-            fab.isEnabled = false
-            //fab.internalSetVisibility(View.INVISIBLE,true)
-            fab.hide()
-        }
+        fab.isEnabled = false
+        fab.forceHide()
     }
 
     private fun populate(activity: AppCompatActivity) {

@@ -119,6 +119,12 @@ object PrefsUtil {
     val isProxyCastEnabled: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("force_local_cast", false)
 
+    val isGroupingEnabled: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("group_notifications", true) && canGroupNotifications
+
+    val useExperimentalOkHttp: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("experimental_okhttp", false)
+
     fun init(context: Context) {
         PrefsUtil.context = context
     }

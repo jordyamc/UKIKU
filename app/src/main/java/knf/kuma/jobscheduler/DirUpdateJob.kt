@@ -8,6 +8,7 @@ import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
 import com.evernote.android.job.JobRequest
 import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.directory.DirectoryUpdateService
 import xdroid.toaster.Toaster
 import java.util.concurrent.TimeUnit
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit
 class DirUpdateJob : Job() {
 
     override fun onRunJob(params: Job.Params): Job.Result {
-        if (DirectoryUpdateService.isRunning)
+        if (PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning)
             ContextCompat.startForegroundService(context, Intent(context, DirectoryUpdateService::class.java))
         reSchedule(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString("dir_update_time", "7")
                 ?: "7"))

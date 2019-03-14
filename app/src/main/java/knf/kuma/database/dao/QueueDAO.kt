@@ -30,10 +30,10 @@ interface QueueDAO {
     @Query("SELECT count(*) FROM queueobject WHERE aid LIKE :aid")
     fun countAlone(aid: String): Int
 
-    @Query("SELECT * FROM queueobject WHERE aid = :aid ORDER BY eid ASC")
+    @Query("SELECT * FROM queueobject WHERE aid = :aid ORDER BY eid+0 ASC")
     fun getByAid(aid: String): LiveData<MutableList<QueueObject>>
 
-    @Query("SELECT * FROM queueobject WHERE aid = :aid ORDER BY eid ASC")
+    @Query("SELECT * FROM queueobject WHERE aid = :aid ORDER BY eid+0 ASC")
     fun getAllByAid(aid: String): MutableList<QueueObject>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

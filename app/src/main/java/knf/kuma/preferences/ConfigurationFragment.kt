@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
+import com.crashlytics.android.Crashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
@@ -127,10 +128,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                         if (autoBackupObject.value == null)
                                                             BUUtils.backup(AutoBackupObject(App.context, PrefsUtil.autoBackupTime), object : BUUtils.AutoBackupInterface {
                                                                 override fun onResponse(backupObject: AutoBackupObject?) {
-                                                                    /*when (backupObject) {
-                                                                        null -> "Error al actualizar"
-                                                                        else -> "Actualizado correctamente"
-                                                                    }.toast()*/
+                                                                    preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "%s"
                                                                 }
                                                             })
                                                         else
@@ -140,7 +138,9 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                     }
                                                     preferenceScreen.findPreference<Preference>(keyAutoBackup).isEnabled = true
                                                 } catch (e: Exception) {
+                                                    Crashlytics.logException(e)
                                                     preferenceScreen.findPreference<Preference>(keyAutoBackup).summary = "Error al buscar archivo: ${e.message}"
+                                                    preferenceScreen.findPreference<Preference>(keyAutoBackup).isEnabled = true
                                                 }
                                             }
                                         }
@@ -215,6 +215,8 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
 
                     false
                 }
+                if (!canGroupNotifications)
+                    preferenceScreen.removePreference(preferenceScreen.findPreference("group_notifications"))
                 preferenceScreen.findPreference<Preference>("dir_destroy").setOnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
