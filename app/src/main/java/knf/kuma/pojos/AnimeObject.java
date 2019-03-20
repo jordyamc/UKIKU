@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Element;
 
 import java.io.Serializable;
@@ -296,7 +297,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             public String img;
             @SerializedName("chapter_Type")
             @Ignore
-            public ChapterType chapterType;
+            public transient ChapterType chapterType;
             @SerializedName("chapter_ isDownloaded")
             @Ignore
             public boolean isDownloaded = false;
@@ -498,7 +499,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         }
 
         @Override
-        public Day convert(Element node, Selector selector) {
+        public Day convert(@NotNull Element node, @NotNull Selector selector) {
             try {
                 Element element = node.select(selector.value()).first();
                 if (element == null)

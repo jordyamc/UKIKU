@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -17,11 +16,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import knf.kuma.R
+import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_eamap.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
-class EAMapActivity : AppCompatActivity(), OnMapReadyCallback {
+class EAMapActivity : GenericActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 

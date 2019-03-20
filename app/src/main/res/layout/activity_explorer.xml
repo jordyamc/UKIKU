@@ -8,24 +8,20 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay.Simple">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
+            android:background="?attr/colorSurface"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            style="@style/Widget.MaterialComponents.TabLayout"
             android:layout_height="wrap_content"
-            android:background="?colorPrimary"
-            app:tabBackground="?colorPrimary"
-            app:tabSelectedTextColor="?colorAccent"
-            app:tabIndicatorColor="?colorAccent"
-            app:tabTextColor="@android:color/secondary_text_dark">
+            style="@style/Widget.MaterialComponents.TabLayout">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"

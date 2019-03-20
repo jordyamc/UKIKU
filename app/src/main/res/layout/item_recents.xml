@@ -140,8 +140,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="STREAMING"
-                        android:textColor="@color/accent_button_state"/>
+                        android:text="STREAMING"/>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/download"
@@ -149,8 +148,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="DESCARGA"
-                        android:textColor="@color/accent_button_state"/>
+                        android:text="DESCARGA"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

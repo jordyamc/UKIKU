@@ -9,12 +9,13 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay.Simple">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
+            android:background="?attr/colorSurface"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
         <com.google.android.material.tabs.TabLayout
@@ -22,12 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TabLayout"
-            android:background="?colorPrimary"
-            app:tabBackground="?colorPrimary"
-            app:tabMode="scrollable"
-            app:tabSelectedTextColor="?colorAccent"
-            app:tabIndicatorColor="?colorAccent"
-            app:tabTextColor="@android:color/secondary_text_dark"/>
+            app:tabMode="scrollable"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager

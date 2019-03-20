@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.preference.PreferenceManager
 import android.widget.RemoteViews
@@ -64,11 +65,32 @@ class WEmisionProvider : AppWidgetProvider() {
         remoteViews.setRemoteAdapter(R.id.words, svcIntent)
         val clickIntent = Intent(context, EmisionActivity::class.java)
         remoteViews.setTextViewText(R.id.title_day, actualDay)
+        remoteViews.setTextColor(R.id.title_day, getColor(context, true))
         remoteViews.setTextViewText(R.id.title_count, CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)).size.toString())
+        remoteViews.setTextColor(R.id.title_count, getColor(context, true))
         remoteViews.setOnClickPendingIntent(R.id.back_layout, PendingIntent.getActivity(context, 555, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+        remoteViews.setInt(R.id.back_layout, "setBackgroundColor", getColor(context, false))
         remoteViews.setPendingIntentTemplate(R.id.words, PendingIntent.getActivity(context, appWidgetId, Intent(context, ActivityAnime::class.java), PendingIntent.FLAG_UPDATE_CURRENT))
         remoteViews.setEmptyView(R.id.words, R.id.empty)
         return remoteViews
+    }
+
+    private fun getColor(context: Context, isText: Boolean): Int {
+        val type = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_value", "0")
+        return when (type) {
+            "1" -> if (isText)
+                Color.parseColor("#323232")
+            else
+                Color.parseColor("#FFFFFF")
+            "2" -> if (isText)
+                Color.parseColor("#bebebe")
+            else
+                Color.parseColor("#282828")
+            else -> if (isText)
+                Color.parseColor("#323232")
+            else
+                Color.parseColor("#FFFFFFFF")
+        }
     }
 
     private fun getBlacklist(context: Context): Set<String> {

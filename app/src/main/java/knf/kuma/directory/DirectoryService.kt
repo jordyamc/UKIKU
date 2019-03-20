@@ -130,7 +130,7 @@ class DirectoryService : IntentService("Directory update") {
                         animeDAO.insertAll(animeObjects)
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Page error: $s")
+                Log.e(TAG, "Page error: $s | ${e.message}")
                 if (!newStrings.contains(s.toString()))
                     newStrings.add(s.toString())
             }
@@ -184,9 +184,10 @@ class DirectoryService : IntentService("Directory update") {
                 finished = true
                 setStatus(STATE_INTERRUPTED)
             } catch (e: Exception) {
-                Log.e(TAG, "Page error: $page")
+                Log.e(TAG, "Page error: $page | ${e.message}")
                 if (strings?.contains(page.toString()) == false)
                     strings.add(page.toString())
+                page++
             }
 
         }

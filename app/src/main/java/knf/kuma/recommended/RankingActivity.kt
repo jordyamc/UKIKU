@@ -5,16 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.safeShow
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import kotlinx.android.synthetic.main.recycler_ranking.*
 
-class RankingActivity : AppCompatActivity() {
+class RankingActivity : GenericActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))

@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +17,7 @@ import com.crashlytics.android.Crashlytics
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import knf.kuma.R
 import knf.kuma.commons.*
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.GenreStatusObject
 import knf.kuma.recommended.sections.MultipleSection
@@ -28,7 +28,7 @@ import xdroid.toaster.Toaster
  * Created by jordy on 26/03/2018.
  */
 
-class RecommendActivity : AppCompatActivity() {
+class RecommendActivity : GenericActivity() {
     val toolbar: Toolbar by bind(R.id.toolbar)
     val recyclerView: RecyclerView by bind(R.id.recycler)
     val error: LinearLayout by bind(R.id.error)

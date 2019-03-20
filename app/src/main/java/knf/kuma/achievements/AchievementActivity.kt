@@ -15,7 +15,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
@@ -28,6 +27,7 @@ import knf.kuma.R
 import knf.kuma.backup.BUUtils
 import knf.kuma.commons.*
 import knf.kuma.custom.AchievementUnlocked
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
 import org.jetbrains.anko.doAsync
@@ -35,7 +35,7 @@ import xdroid.toaster.Toaster
 import java.text.NumberFormat
 import java.util.*
 
-class AchievementActivity : AppCompatActivity() {
+class AchievementActivity : GenericActivity() {
 
     private val toolbar: Toolbar by bind(R.id.toolbar)
     private val tabs: TabLayout by bind(R.id.tabs)

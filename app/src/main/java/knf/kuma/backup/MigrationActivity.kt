@@ -3,16 +3,16 @@ package knf.kuma.backup
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import knf.kuma.R
 import knf.kuma.backup.screens.MigrateDirectoryFragment
 import knf.kuma.backup.screens.MigrateSuccessFragment
 import knf.kuma.backup.screens.MigrateVersionFragment
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.custom.GenericActivity
 import knf.kuma.directory.DirectoryService
 
-class MigrationActivity : AppCompatActivity(), DirectoryService.OnDirStatus {
+class MigrationActivity : GenericActivity(), DirectoryService.OnDirStatus {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

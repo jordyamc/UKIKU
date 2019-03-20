@@ -37,13 +37,11 @@ class CommentsDialog(private val chapters: MutableList<AnimeObject.WebInfo.Anime
         noCrash {
             val dialog = MaterialDialog(activity)
                     .customView(R.layout.layout_comments_dialog, noVerticalPadding = true)
-            dialog.getCustomView()?.let {
-                with(it) {
-                    spinner = findViewById(R.id.spinner)
-                    progressBar = findViewById(R.id.progress)
-                    scrollView = findViewById(R.id.scroll)
-                    webView = findViewById(R.id.webview)
-                }
+            with(dialog.getCustomView()) {
+                spinner = findViewById(R.id.spinner)
+                progressBar = findViewById(R.id.progress)
+                scrollView = findViewById(R.id.scroll)
+                webView = findViewById(R.id.webview)
             }
             webView.settings.javaScriptEnabled = true
             val newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0"

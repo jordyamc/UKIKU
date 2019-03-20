@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
@@ -30,13 +29,14 @@ import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import kotlinx.android.synthetic.main.exo_playback_control_view.*
 import kotlinx.android.synthetic.main.exo_player.*
 import xdroid.toaster.Toaster
 
-class CustomExoPlayer : AppCompatActivity(), Player.EventListener {
+class CustomExoPlayer : GenericActivity(), Player.EventListener {
     private var exoPlayer: SimpleExoPlayer? = null
     private var currentPosition = C.TIME_UNSET
     private var resumeWindow = C.INDEX_UNSET

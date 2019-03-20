@@ -5,15 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.bind
+import knf.kuma.custom.GenericActivity
 
-class SeeingActivity : AppCompatActivity() {
+class SeeingActivity : GenericActivity() {
     val toolbar: Toolbar by bind(R.id.toolbar)
     val tabs: TabLayout by bind(R.id.tabs)
     val pager: ViewPager by bind(R.id.pager)

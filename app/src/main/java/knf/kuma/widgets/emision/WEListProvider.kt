@@ -68,7 +68,7 @@ class WEListProvider internal constructor(private val context: Context) : Remote
             remoteView.setOnClickFillInIntent(R.id.linear, clickIntent)
             remoteView.setInt(R.id.linear, "setBackgroundColor", getColor(false))
         } catch (e: Exception) {
-            //e
+            e.printStackTrace()
         }
 
         return remoteView
@@ -80,11 +80,11 @@ class WEListProvider internal constructor(private val context: Context) : Remote
             "1" -> if (isText)
                 Color.parseColor("#323232")
             else
-                Color.parseColor("#FFFFFFFF")
+                Color.parseColor("#FFFFFF")
             "2" -> if (isText)
                 Color.parseColor("#bebebe")
             else
-                Color.parseColor("#FF424242")
+                Color.parseColor("#282828")
             else -> if (isText)
                 Color.parseColor("#323232")
             else

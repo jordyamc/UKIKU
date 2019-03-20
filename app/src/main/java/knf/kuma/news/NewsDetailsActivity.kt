@@ -5,16 +5,16 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.LevelListDrawable
 import android.os.Bundle
 import android.text.Html
-import androidx.appcompat.app.AppCompatActivity
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PicassoSingle
 import knf.kuma.commons.doOnUI
+import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_news_details.*
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
-class NewsDetailsActivity : AppCompatActivity(), Html.ImageGetter {
+class NewsDetailsActivity : GenericActivity(), Html.ImageGetter {
     private val newsObject: NewsObject? by lazy { NewsCreator.currentNews }
 
     override fun onCreate(savedInstanceState: Bundle?) {

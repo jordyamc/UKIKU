@@ -6,15 +6,15 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_emision.*
 import java.util.*
 
-class EmisionActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
+class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
     private var pagerAdapter: EmissionPagerAdapter? = null
 
     private val currentDay: Int

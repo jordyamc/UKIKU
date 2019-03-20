@@ -7,15 +7,18 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark">
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay.Simple" parent="ThemeOverlay.MaterialComponents.Dark"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark"/>
 
     <style name="AppTheme.AppInfo" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">?attr/colorSurface</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorBackground">@color/screenBackground</item>
         <item name="mal_toolbarTheme">@style/Theme.Mal.Toolbar.Dark</item>
         <item name="mal_toolbarPopupTheme">@style/Theme.Mal.Toolbar.Dark</item>
         <item name="mal_color_primary">@color/mal_text_primary_dark</item>

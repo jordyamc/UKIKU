@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.annotation.ColorInt
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.answers.Answers
@@ -22,12 +21,13 @@ import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showSnackbar
+import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.SyncItemView
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login_buttons.*
 import kotlinx.android.synthetic.main.activity_login_main.*
 
-class BackUpActivity : AppCompatActivity(), BUUtils.LoginInterface, SyncItemView.OnClick {
+class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.OnClick {
     private val syncItems: MutableList<SyncItemView> by lazy { arrayListOf(sync_favs, sync_history, sync_following, sync_seen) }
     private var waitingLogin = false
 

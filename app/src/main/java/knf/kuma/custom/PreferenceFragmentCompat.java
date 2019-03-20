@@ -22,7 +22,6 @@ import androidx.annotation.RestrictTo;
 import androidx.annotation.XmlRes;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.preference.AndroidResources;
 import androidx.preference.DialogPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.EditTextPreferenceDialogFragmentCompat;
@@ -199,7 +198,7 @@ public abstract class PreferenceFragmentCompat extends Fragment implements
         a.recycle();
         final LayoutInflater themedInflater = inflater.cloneInContext(mStyledContext);
         final View view = themedInflater.inflate(mLayoutResId, container, false);
-        final View rawListContainer = view.findViewById(AndroidResources.ANDROID_R_LIST_CONTAINER);
+        final View rawListContainer = view.findViewById(android.R.id.list_container);
         if (!(rawListContainer instanceof ViewGroup)) {
             throw new RuntimeException("Content has view with id attribute "
                     + "'android.R.id.list_container' that is not a ViewGroup class");

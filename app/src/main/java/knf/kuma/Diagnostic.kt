@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.os.StatFs
 import android.text.format.Formatter
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.backup.BUUtils
 import knf.kuma.commons.*
+import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.StateView
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
@@ -22,7 +22,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 
-class Diagnostic : AppCompatActivity() {
+class Diagnostic : GenericActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme(this))

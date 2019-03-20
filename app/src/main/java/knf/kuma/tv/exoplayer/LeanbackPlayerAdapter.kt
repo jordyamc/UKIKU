@@ -141,7 +141,7 @@ class LeanbackPlayerAdapter
         }
     }
 
-    private fun maybeNotifyPreparedStateChanged(callback: PlayerAdapter.Callback) {
+    private fun maybeNotifyPreparedStateChanged(callback: Callback) {
         val isPrepared = isPrepared
         if (lastNotifiedPreparedState != isPrepared) {
             lastNotifiedPreparedState = isPrepared

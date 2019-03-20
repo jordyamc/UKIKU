@@ -5,16 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.paging.LivePagedListBuilder
 import androidx.recyclerview.widget.LinearLayoutManager
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import kotlinx.android.synthetic.main.recycler_genre.*
 
-class GenreActivity : AppCompatActivity() {
+class GenreActivity : GenericActivity() {
     private var adapter: GenreAdapter? = null
     private var isFirst = true
 

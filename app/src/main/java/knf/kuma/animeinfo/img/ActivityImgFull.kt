@@ -2,17 +2,17 @@ package knf.kuma.animeinfo.img
 
 import android.os.Bundle
 import android.preference.PreferenceManager
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
 import knf.kuma.commons.*
+import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.layout_img_big_base.*
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import java.net.URLEncoder
 
-class ActivityImgFull : AppCompatActivity() {
+class ActivityImgFull : GenericActivity() {
 
     private val keyTitle = "title"
 

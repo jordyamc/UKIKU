@@ -8,7 +8,6 @@ import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -20,9 +19,10 @@ import com.github.stephenvinouze.materialnumberpickercore.MaterialNumberPicker
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.*
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 
-class RandomActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
+class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val toolbar: Toolbar by bind(R.id.toolbar)
     private val refreshLayout: SwipeRefreshLayout by bind(R.id.refresh)
     val recyclerView: RecyclerView by bind(R.id.recycler)

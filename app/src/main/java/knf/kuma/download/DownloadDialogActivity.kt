@@ -4,10 +4,10 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import knf.kuma.commons.*
+import knf.kuma.custom.GenericActivity
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.NotificationObj
@@ -15,7 +15,7 @@ import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
 import java.util.regex.Pattern
 
-class DownloadDialogActivity : AppCompatActivity() {
+class DownloadDialogActivity : GenericActivity() {
 
     private lateinit var downloadObject: DownloadObject
 

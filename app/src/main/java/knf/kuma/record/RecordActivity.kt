@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,10 +16,11 @@ import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.*
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import org.jetbrains.anko.doAsync
 
-class RecordActivity : AppCompatActivity() {
+class RecordActivity : GenericActivity() {
     val toolbar: Toolbar by bind(R.id.toolbar)
     val recyclerView: RecyclerView by bind(R.id.recycler)
     val progressBar: ProgressBar by bind(R.id.progress)

@@ -2,23 +2,22 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorSecondaryVariant">@color/colorAccentLight</item>
+        <item name="colorPrimary">?attr/colorSecondary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorOnSecondary">#fff</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorAccentLight">@color/colorAccentLight</item>
-        <item name="android:colorBackground">@color/screenBackground</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowLightNavigationBar">@bool/isNotDark</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
     <style name="AppTheme.AppInfo" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">?attr/colorSurface</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/screenBackground</item>
@@ -27,7 +26,7 @@
         <item name="mal_color_primary">@color/mal_text_primary</item>
         <item name="mal_color_secondary">@color/mal_text_secondary</item>
         <item name="mal_card_background">?attr/colorSurface</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
         <item name="android:windowLightNavigationBar">@bool/isNotDark</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>

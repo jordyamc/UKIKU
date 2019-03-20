@@ -11,7 +11,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -29,6 +28,7 @@ import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.doOnUI
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirObject
 import knf.kuma.pojos.*
@@ -40,7 +40,7 @@ import knf.kuma.widgets.emision.WEListItem
 import xdroid.toaster.Toaster
 import java.util.*
 
-class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
+class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
     private var isEdited = false
     private val viewModel: AnimeViewModel by lazy { ViewModelProviders.of(this).get(AnimeViewModel::class.java) }
     private val holder: AnimeActivityHolder by lazy { AnimeActivityHolder(this) }
@@ -62,7 +62,6 @@ class ActivityAnime : AppCompatActivity(), AnimeActivityHolder.Interface {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         holder.toolbar.setNavigationOnClickListener { closeActivity() }
-        if (savedInstanceState == null)
             if (aidOnly)
                 viewModel.init(intent.getStringExtra(keyAid))
             else

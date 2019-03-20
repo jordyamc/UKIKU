@@ -14,6 +14,7 @@ import knf.kuma.changelog.objects.Changelog
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
+import knf.kuma.custom.GenericActivity
 import knf.kuma.jobscheduler.DirUpdateJob
 import kotlinx.android.synthetic.main.recycler_changelog.*
 import org.jetbrains.anko.doAsync
@@ -23,7 +24,7 @@ import xdroid.toaster.Toaster
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class ChangelogActivity : AppCompatActivity() {
+class ChangelogActivity : GenericActivity() {
 
     private val changelog: Changelog
         @Throws(Exception::class)

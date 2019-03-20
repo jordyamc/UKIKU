@@ -25,7 +25,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
@@ -54,6 +53,7 @@ import knf.kuma.commons.BypassUtil.Companion.isLoading
 import knf.kuma.commons.BypassUtil.Companion.isNeeded
 import knf.kuma.commons.BypassUtil.Companion.saveCookies
 import knf.kuma.commons.BypassUtil.Companion.userAgent
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryFragment
 import knf.kuma.directory.DirectoryService
@@ -86,7 +86,7 @@ import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
 
-class Main : AppCompatActivity(),
+class Main : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemReselectedListener,

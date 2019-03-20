@@ -30,7 +30,6 @@
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?colorSecondary"
                 android:enabled="false"
                 android:text="Respaldar"
                 android:textColor="@android:color/primary_text_dark"/>
@@ -58,7 +57,6 @@
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?colorSecondary"
                 android:enabled="false"
                 android:text="Restaurar"
                 android:textColor="@android:color/primary_text_dark"/>

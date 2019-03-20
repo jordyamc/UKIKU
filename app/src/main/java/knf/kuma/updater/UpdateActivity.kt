@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.crashlytics.android.Crashlytics
 import com.thin.downloadmanager.DownloadRequest
@@ -23,12 +22,13 @@ import com.thin.downloadmanager.ThinDownloadManager
 import knf.kuma.R
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.getUpdateDir
+import knf.kuma.custom.GenericActivity
 import knf.kuma.download.DownloadManager
 import kotlinx.android.synthetic.main.activity_updater.*
 import xdroid.toaster.Toaster
 import java.io.File
 
-class UpdateActivity : AppCompatActivity() {
+class UpdateActivity : GenericActivity() {
 
     private val update: File
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)

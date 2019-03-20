@@ -95,7 +95,7 @@ class SelfServer : Service() {
             start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
         }
 
-        override fun serve(session: NanoHTTPD.IHTTPSession): NanoHTTPD.Response? {
+        override fun serve(session: NanoHTTPD.IHTTPSession): Response? {
             return if (isFile)
                 if (URLUtil.isFileUrl(data))
                     serveFile(session.headers, File(Uri.parse(data).path))
@@ -116,8 +116,8 @@ class SelfServer : Service() {
 
         }
 
-        private fun serveWeb(header: Map<String, String>, url: String): NanoHTTPD.Response {
-            var res: NanoHTTPD.Response? = null
+        private fun serveWeb(header: Map<String, String>, url: String): Response {
+            var res: Response? = null
             val okHttpClient = OkHttpClient()
             val request = Request.Builder().url(url)
             val response = okHttpClient.newCall(request.build()).execute()
@@ -140,13 +140,13 @@ class SelfServer : Service() {
                     }
                 }
                 Thread.sleep(400)
-                res = createResponse(NanoHTTPD.Response.Status.OK, "video/mp4", pipedIn, total)
+                res = createResponse(Response.Status.OK, "video/mp4", pipedIn, total)
             }
             return res ?: getResponse("Error 404: File not found")
         }
 
-        private fun serveFile(header: Map<String, String>, file_name: String): NanoHTTPD.Response? {
-            var res: NanoHTTPD.Response?
+        private fun serveFile(header: Map<String, String>, file_name: String): Response? {
+            var res: Response?
             val mime = "video/mp4"
             val file = FileAccessHelper.INSTANCE.getFile(file_name)
             try {
@@ -177,7 +177,7 @@ class SelfServer : Service() {
                 val fileLen = file.length()
                 if (range != null && startFrom >= 0) {
                     if (startFrom >= fileLen) {
-                        res = createResponse(NanoHTTPD.Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
+                        res = createResponse(Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
                         res.addHeader("Content-Range", "bytes 0-0/$fileLen")
                         res.addHeader("ETag", etag)
                     } else {
@@ -193,7 +193,7 @@ class SelfServer : Service() {
                         val fis = FileAccessHelper.INSTANCE.getInputStream(file_name)
                         fis?.skip(startFrom)
 
-                        res = createResponse(NanoHTTPD.Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
+                        res = createResponse(Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
                         res.addHeader("Content-Length", "" + dataLen)
                         res.addHeader("Content-Range", "bytes " + startFrom + "-" +
                                 endAt + "/" + fileLen)
@@ -201,9 +201,9 @@ class SelfServer : Service() {
                     }
                 } else {
                     if (etag == header["if-none-match"])
-                        res = createResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "")
+                        res = createResponse(Response.Status.NOT_MODIFIED, mime, "")
                     else {
-                        res = createResponse(NanoHTTPD.Response.Status.OK, mime, FileAccessHelper.INSTANCE.getInputStream(file_name), fileLen)
+                        res = createResponse(Response.Status.OK, mime, FileAccessHelper.INSTANCE.getInputStream(file_name), fileLen)
                         res.addHeader("Content-Length", "" + fileLen)
                         res.addHeader("ETag", etag)
                     }
@@ -215,8 +215,8 @@ class SelfServer : Service() {
             return res ?: getResponse("Error 404: File not found")
         }
 
-        private fun serveFile(header: Map<String, String>, file: File): NanoHTTPD.Response? {
-            var res: NanoHTTPD.Response?
+        private fun serveFile(header: Map<String, String>, file: File): Response? {
+            var res: Response?
             val mime = "video/mp4"
             try {
                 // Calculate etag
@@ -246,7 +246,7 @@ class SelfServer : Service() {
                 val fileLen = file.length()
                 if (range != null && startFrom >= 0) {
                     if (startFrom >= fileLen) {
-                        res = createResponse(NanoHTTPD.Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
+                        res = createResponse(Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
                         res.addHeader("Content-Range", "bytes 0-0/$fileLen")
                         res.addHeader("ETag", etag)
                     } else {
@@ -262,7 +262,7 @@ class SelfServer : Service() {
                         val fis = FileInputStream(file)
                         fis.skip(startFrom)
 
-                        res = createResponse(NanoHTTPD.Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
+                        res = createResponse(Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
                         res.addHeader("Content-Length", "" + dataLen)
                         res.addHeader("Content-Range", "bytes " + startFrom + "-" +
                                 endAt + "/" + fileLen)
@@ -270,9 +270,9 @@ class SelfServer : Service() {
                     }
                 } else {
                     if (etag == header["if-none-match"])
-                        res = createResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "")
+                        res = createResponse(Response.Status.NOT_MODIFIED, mime, "")
                     else {
-                        res = createResponse(NanoHTTPD.Response.Status.OK, mime, FileInputStream(file), fileLen)
+                        res = createResponse(Response.Status.OK, mime, FileInputStream(file), fileLen)
                         res.addHeader("Content-Length", "" + fileLen)
                         res.addHeader("ETag", etag)
                     }
@@ -285,21 +285,21 @@ class SelfServer : Service() {
         }
 
         // Announce that the file server accepts partial content requests
-        private fun createResponse(status: Response.Status, mimeType: String, message: InputStream?, lenght: Long): NanoHTTPD.Response {
+        private fun createResponse(status: Response.Status, mimeType: String, message: InputStream?, lenght: Long): Response {
             val res = NanoHTTPD.newFixedLengthResponse(status, mimeType, message, lenght)
             res.addHeader("Accept-Ranges", "bytes")
             return res
         }
 
         // Announce that the file server accepts partial content requests
-        private fun createResponse(status: Response.Status, mimeType: String, message: String): NanoHTTPD.Response {
+        private fun createResponse(status: Response.Status, mimeType: String, message: String): Response {
             val res = NanoHTTPD.newFixedLengthResponse(status, mimeType, message)
             res.addHeader("Accept-Ranges", "bytes")
             return res
         }
 
-        private fun getResponse(message: String): NanoHTTPD.Response {
-            return createResponse(NanoHTTPD.Response.Status.OK, "text/plain", message)
+        private fun getResponse(message: String): Response {
+            return createResponse(Response.Status.OK, "text/plain", message)
         }
     }
 }

@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
@@ -68,17 +69,14 @@ val getUpdateDir: String
     }
 
 fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
-    try {
-        doOnUI {
-            try {
-                this.func()
-                this@safeShow.show()
-            } catch (e: Exception) {
-                //
-            }
+    doOnUI {
+        try {
+            lifecycleOwner()
+            this.func()
+            this@safeShow.show()
+        } catch (e: Exception) {
+            //
         }
-    } catch (exception: Exception) {
-        //
     }
     return this
 }
@@ -86,6 +84,7 @@ fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
 fun MaterialDialog.safeShow() {
     doOnUI {
         try {
+            lifecycleOwner()
             this@safeShow.show()
         } catch (e: Exception) {
             //

@@ -5,14 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import knf.kuma.R
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
+import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_explorer.*
 
-class ExplorerActivity : AppCompatActivity(), OnFileStateChange {
+class ExplorerActivity : GenericActivity(), OnFileStateChange {
     private var adapter: ExplorerPagerAdapter? = null
     private var isExplorerFiles = true
 

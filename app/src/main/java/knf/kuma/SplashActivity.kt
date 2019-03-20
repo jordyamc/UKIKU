@@ -2,11 +2,11 @@ package knf.kuma
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
 
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AchievementManager.onAppStart()

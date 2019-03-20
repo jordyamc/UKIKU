@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsClient
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -12,9 +11,10 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.asPx
+import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_news.*
 
-class NewsActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
+class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val adapter: NewsAdapter by lazy { NewsAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

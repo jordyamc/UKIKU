@@ -90,7 +90,8 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                     Log.e("Directory Getter", "Processed ${page - 1} pages")
                 }
             } catch (e: Exception) {
-                Log.e("Directory Getter", "Page error: $page")
+                Log.e("Directory Getter", "Page error: $page | ${e.message}")
+                page++
             }
 
         }

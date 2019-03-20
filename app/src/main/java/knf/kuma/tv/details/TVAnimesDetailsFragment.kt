@@ -55,7 +55,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
         val activity = activity ?: return
         Repository().getAnime(App.context, arguments?.getString("url")
                 ?: "", true).observe(activity, Observer { animeObject ->
-            animeObject?.let {
+            if (animeObject != null) {
                 Glide.with(App.context).asBitmap().load(PatternUtil.getCoverGlide(animeObject.aid)).into(object : SimpleTarget<Bitmap>() {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         Palette.from(resource).generate { palette ->

@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProviders
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
 import knf.kuma.animeinfo.viewholders.AnimeDetailsHolder
-import xdroid.toaster.Toaster
 
 class DetailsFragment : Fragment() {
     private var holder: AnimeDetailsHolder? = null
@@ -18,13 +17,9 @@ class DetailsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData?.observe(this, Observer { animeObject ->
+            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData.observe(this, Observer { animeObject ->
                 if (animeObject != null)
                     holder?.populate(this@DetailsFragment, animeObject)
-                else {
-                    Toaster.toast("No se pudo obtener la informacion")
-                    it.finish()
-                }
             })
         }
     }

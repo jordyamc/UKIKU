@@ -16,13 +16,12 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
 import knf.kuma.animeinfo.viewholders.AnimeChaptersHolder
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.FileUtil
-import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.*
 import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.download.MultipleDownloadManager
+import knf.kuma.jobscheduler.DirUpdateJob
 import knf.kuma.pojos.AnimeObject
 import xdroid.toaster.Toaster
 import java.util.*
@@ -37,20 +36,33 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData?.observe(this, Observer { animeObject ->
+            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData.observe(this, Observer { animeObject ->
                 if (animeObject != null) {
                     val chapters = animeObject.chapters
                     chapters?.let {
-                        if (PrefsUtil.isChapsAsc)
-                            chapters.reverse()
-                        holder?.setAdapter(this@ChaptersFragment, chapters)
-                        holder?.goToChapter()
+                        if (checkIntegrity(chapters)) {
+                            if (PrefsUtil.isChapsAsc)
+                                chapters.reverse()
+                            holder?.setAdapter(this@ChaptersFragment, chapters)
+                            holder?.goToChapter()
+                        } else if (Network.isConnected) {
+                            DirUpdateJob.runNow()
+                            "Integridad de directorio comprometida, actualizando directorio...".toast()
+                        }
+                        null
                     }
                 }
             })
         }
     }
 
+    private fun checkIntegrity(list: List<AnimeObject.WebInfo.AnimeChapter>): Boolean {
+        return try {
+            list.isEmpty() || (list[0].aid != null && list[0].eid != null)
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.recycler_chapters, container, false)

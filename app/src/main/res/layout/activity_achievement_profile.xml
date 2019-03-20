@@ -10,12 +10,13 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay.Simple">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/colorPrimary"
+            android:background="?attr/colorSurface"
+            app:contentScrim="?attr/colorSurface"
             app:expandedTitleTextAppearance="@style/NoTitleStyle"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@id/toolbar">
@@ -40,7 +41,7 @@
                         android:layout_height="match_parent"
                         app:cpb_background_progressbar_color="@color/color_bottom_line_disabled"
                         app:cpb_background_progressbar_width="4dp"
-                        app:cpb_progressbar_color="?colorAccent"
+                        app:cpb_progressbar_color="?colorPrimary"
                         app:cpb_progressbar_width="5dp"/>
 
                     <TextView
@@ -75,8 +76,7 @@
                         android:layout_height="wrap_content"
                         android:text=" para siguiente nivel"
                         android:textColor="@color/textPrimary"
-                        android:textSize="14sp"
-                        />
+                        android:textSize="14sp"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -95,12 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:background="?colorPrimary"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:tabBackground="?colorPrimary"
-                app:tabSelectedTextColor="?colorAccent"
-                app:tabIndicatorColor="?colorAccent"
-                app:tabTextColor="@android:color/secondary_text_dark">
+                app:layout_scrollFlags="scroll|enterAlways">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"

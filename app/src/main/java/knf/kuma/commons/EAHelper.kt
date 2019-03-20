@@ -12,7 +12,6 @@ import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
-import androidx.appcompat.app.AppCompatActivity
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LevelEndEvent
 import com.crashlytics.android.answers.LevelStartEvent
@@ -20,6 +19,7 @@ import com.crashlytics.android.answers.PurchaseEvent
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.EADB
 import knf.kuma.iap.IAPWrapper
 import knf.kuma.iap.PayloadHelper
@@ -407,7 +407,7 @@ object EAHelper {
     }
 }
 
-class EAUnlockActivity : AppCompatActivity(), IStepperAdapter {
+class EAUnlockActivity : GenericActivity(), IStepperAdapter {
 
     private val iapWrapper: IAPWrapper by lazy { IAPWrapper(this) }
 

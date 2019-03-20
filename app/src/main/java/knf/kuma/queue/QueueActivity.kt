@@ -11,7 +11,6 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,11 +21,12 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.commons.*
+import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import xdroid.toaster.Toaster
 
-class QueueActivity : AppCompatActivity(), QueueAnimesAdapter.OnAnimeSelectedListener, QueueAllAdapter.OnStartDragListener {
+class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListener, QueueAllAdapter.OnStartDragListener {
     val toolbar: Toolbar by bind(R.id.toolbar)
     val recyclerView: RecyclerView by bind(R.id.recycler)
     private val listToolbar: Toolbar by bind(R.id.list_toolbar)

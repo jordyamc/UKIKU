@@ -15,12 +15,12 @@ import java.util.concurrent.TimeUnit
 
 class DirUpdateJob : Job() {
 
-    override fun onRunJob(params: Job.Params): Job.Result {
+    override fun onRunJob(params: Params): Result {
         if (PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning)
             ContextCompat.startForegroundService(context, Intent(context, DirectoryUpdateService::class.java))
         reSchedule(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString("dir_update_time", "7")
                 ?: "7"))
-        return Job.Result.SUCCESS
+        return Result.SUCCESS
     }
 
     companion object {

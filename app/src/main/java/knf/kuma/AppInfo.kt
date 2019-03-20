@@ -1,8 +1,12 @@
 package knf.kuma
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
+import androidx.core.content.ContextCompat
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
@@ -64,6 +68,14 @@ class AppInfo : MaterialAboutActivity() {
 
     override fun getActivityTitle(): CharSequence? {
         return "Acerca de"
+    }
+
+    override fun onResume() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            val appIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+            setTaskDescription(ActivityManager.TaskDescription(getString(R.string.app_name), appIcon, ContextCompat.getColor(this, R.color.colorPrimary)))
+        }
+        super.onResume()
     }
 
     companion object {

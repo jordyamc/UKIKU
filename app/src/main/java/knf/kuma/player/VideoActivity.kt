@@ -14,7 +14,6 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import com.github.rubensousa.previewseekbar.PreviewLoader
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -24,6 +23,7 @@ import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
+import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.exo_playback_control_view.*
 import kotlinx.android.synthetic.main.player_view.*
 import org.jetbrains.anko.doAsync
@@ -35,7 +35,7 @@ import java.util.concurrent.Future
  * [MediaSessionCompat] and picture in picture as well.
  */
 
-class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback, PreviewLoader {
+class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoader {
     private val mediaSession: MediaSessionCompat by lazy { createMediaSession() }
     private val mediaSessionConnector: MediaSessionConnector by lazy {
         createMediaSessionConnector()
