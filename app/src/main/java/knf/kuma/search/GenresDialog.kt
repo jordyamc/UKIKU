@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import java.util.*
 
@@ -41,6 +42,7 @@ class GenresDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             MaterialDialog(it).apply {
+                lifecycleOwner()
                 title(text = "Géneros")
                 listItemsMultiChoice(items = genres, initialSelection = selectedStates, allowEmptySelection = true) { _: MaterialDialog, _: IntArray, items: List<String> ->
                     selected.apply {

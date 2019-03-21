@@ -18,7 +18,8 @@
         app:spanCount="@integer/span_count"
         app:fastScrollPopupBgColor="?colorAccent"
         app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollThumbColor="?colorAccentLight"
+        app:fastScrollThumbColor="?colorAccent"
+        app:fastScrollThumbInactiveColor="?colorAccentLight"
         tools:listitem="@layout/item_dir_grid"/>
 
     <ProgressBar

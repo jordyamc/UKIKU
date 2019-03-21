@@ -9,7 +9,11 @@ class IAPService(binder: IBinder) : BillingService {
     private val service = AppcoinsBilling.Stub.asInterface(binder)
 
     override fun isBillingSupported(apiVersion: Int, packageName: String, type: String): Int {
-        return service.isBillingSupported(apiVersion, packageName, type)
+        return try {
+            service.isBillingSupported(apiVersion, packageName, type)
+        }catch (e:Exception){
+            6
+        }
     }
 
     override fun getSkuDetails(apiVersion: Int, packageName: String, type: String, skusBundle: Bundle): Bundle {
@@ -21,15 +25,27 @@ class IAPService(binder: IBinder) : BillingService {
     }
 
     override fun getBuyIntent(apiVersion: Int, packageName: String, sku: String, type: String, developerPayload: String): Bundle {
-        return service.getBuyIntent(apiVersion, packageName, sku, type, developerPayload)
+        return try {
+            service.getBuyIntent(apiVersion, packageName, sku, type, developerPayload)
+        }catch (e:Exception){
+            Bundle()
+        }
     }
 
     override fun getPurchases(apiVersion: Int, packageName: String, type: String, continuationToken: String): Bundle {
-        return service.getPurchases(apiVersion, packageName, type, continuationToken)
+        return try {
+            service.getPurchases(apiVersion, packageName, type, continuationToken)
+        }catch (e:Exception){
+            Bundle()
+        }
     }
 
     override fun consumePurchase(apiVersion: Int, packageName: String, purchaseToken: String): Int {
-        return service.consumePurchase(apiVersion, packageName, purchaseToken)
+        return try {
+            service.consumePurchase(apiVersion, packageName, purchaseToken)
+        }catch (e:Exception){
+            6
+        }
     }
 
     override fun getBuyIntentToReplaceSkus(apiVersion: Int, packageName: String, oldSkus: List<String>, newSku: String, type: String, developerPayload: String): Bundle {

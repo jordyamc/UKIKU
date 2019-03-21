@@ -562,7 +562,6 @@ class Main : GenericActivity(),
     @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
-        Crashlytics.setString("screen", "Main")
         invalidateOptionsMenu()
         checkBypass()
         doOnUI {

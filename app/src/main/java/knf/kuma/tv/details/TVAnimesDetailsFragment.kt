@@ -29,7 +29,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     private var mRowsAdapter: ArrayObjectAdapter? = null
     private var favoriteObject: FavoriteObject? = null
     private var currentChapter: AnimeObject.WebInfo.AnimeChapter? = null
-    private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
+    private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>? = ArrayList()
     private var actionAdapter: SparseArrayObjectAdapter? = null
     private var listRowAdapter: ArrayObjectAdapter? = null
 
@@ -39,8 +39,8 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
         onItemViewClickedListener = this
     }
 
-    private fun getLastSeen(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>): Int {
-        if (chapters.isNotEmpty()) {
+    private fun getLastSeen(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?): Int {
+        if (chapters?.isNotEmpty() == true) {
             val chapter = CacheDB.INSTANCE.chaptersDAO().getLast(PatternUtil.getEids(chapters))
             if (chapter != null) {
                 val position = chapters.indexOf(chapter)
@@ -62,7 +62,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                             val swatch = palette?.darkMutedSwatch
                             favoriteObject = FavoriteObject(animeObject)
                             chapters = animeObject.chapters
-                            chapters.reversed()
+                            chapters?.reversed()
                             val selector = ClassPresenterSelector()
                             val rowPresenter = CustomFullWidthDetailsOverviewRowPresenter(
                                     if (swatch == null)
@@ -98,14 +98,16 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                             mRowsAdapter?.add(detailsOverview)
 
                             // Add a Chapters items row
-                            if (chapters.isNotEmpty()) {
-                                listRowAdapter = ArrayObjectAdapter(
-                                        ChapterPresenter())
-                                for (chapter in chapters)
-                                    listRowAdapter?.add(chapter)
-                                val header = HeaderItem(0, "Episodios")
-                                mRowsAdapter?.add(ChaptersListRow(header, listRowAdapter
-                                        ?: ArrayObjectAdapter()))
+                            if (chapters?.isNotEmpty() == true) {
+                                chapters?.let {
+                                    listRowAdapter = ArrayObjectAdapter(
+                                            ChapterPresenter())
+                                    for (chapter in it)
+                                        listRowAdapter?.add(chapter)
+                                    val header = HeaderItem(0, "Episodios")
+                                    mRowsAdapter?.add(ChaptersListRow(header, listRowAdapter
+                                            ?: ArrayObjectAdapter()))
+                                }
                             }
 
                             // Add a Related items row
@@ -137,7 +139,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     }
 
     fun onStartStreaming() {
-        currentChapter?.let { listRowAdapter?.notifyArrayItemRangeChanged(chapters.indexOf(it), 1) }
+        currentChapter?.let { listRowAdapter?.notifyArrayItemRangeChanged(chapters?.indexOf(it)?:0, 1) }
     }
 
     override fun onActionClicked(action: Action) {

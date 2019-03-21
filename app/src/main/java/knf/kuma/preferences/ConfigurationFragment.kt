@@ -206,7 +206,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 preferenceScreen.findPreference<Preference>("dir_update")?.setOnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
-                            ContextCompat.startForegroundService(safeContext.applicationContext, Intent(safeContext.applicationContext, DirectoryUpdateService::class.java))
+                            DirectoryUpdateService.run(App.context)
                         else if (DirectoryUpdateService.isRunning)
                             Toaster.toast("Ya se esta actualizando")
                     } catch (e: Exception) {

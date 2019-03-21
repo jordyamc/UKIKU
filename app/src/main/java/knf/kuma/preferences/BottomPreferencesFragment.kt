@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.crashlytics.android.Crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
@@ -15,6 +16,7 @@ class BottomPreferencesFragment : BottomFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         EAHelper.enter1("C")
+        Crashlytics.setString("screen", "Preferences")
         return inflater.inflate(R.layout.fragment_preferences, container, false)
     }
 

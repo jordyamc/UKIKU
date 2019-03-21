@@ -134,5 +134,10 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
         var CHANNEL = "directory_update"
         var isRunning = false
             private set
+
+        fun run(context: Context) {
+            if (!isRunning)
+                ContextCompat.startForegroundService(context, Intent(context, DirectoryUpdateService::class.java))
+        }
     }
 }

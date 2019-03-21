@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.crashlytics.android.Crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
@@ -41,6 +42,7 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
             it.setRefreshing(true)
         }
         EAHelper.enter1("R")
+        Crashlytics.setString("screen", "Recents")
         return view
     }
 

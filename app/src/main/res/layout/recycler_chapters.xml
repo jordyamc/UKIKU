@@ -19,5 +19,6 @@
         app:fastScrollPopupBgColor="?colorAccent"
         app:fastScrollPopupTextColor="@android:color/white"
         app:fastScrollThumbColor="?colorAccent"
+        app:fastScrollThumbInactiveColor="?colorAccentLight"
         tools:listitem="@layout/item_chapter_preview"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

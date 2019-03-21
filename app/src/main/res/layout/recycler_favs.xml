@@ -19,7 +19,8 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:fastScrollPopupBgColor="?colorAccent"
         app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollThumbColor="?colorAccentLight"
+        app:fastScrollThumbColor="?colorAccent"
+        app:fastScrollThumbInactiveColor="?colorAccentLight"
         tools:listitem="@layout/item_fav"/>
 
     <LinearLayout

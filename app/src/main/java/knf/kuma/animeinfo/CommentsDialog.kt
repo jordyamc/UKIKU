@@ -10,6 +10,7 @@ import android.widget.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import knf.kuma.R
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
@@ -35,8 +36,10 @@ class CommentsDialog(private val chapters: MutableList<AnimeObject.WebInfo.Anime
     @SuppressLint("SetJavaScriptEnabled")
     fun show(activity: Activity) {
         noCrash {
-            val dialog = MaterialDialog(activity)
-                    .customView(R.layout.layout_comments_dialog, noVerticalPadding = true)
+            val dialog = MaterialDialog(activity).apply {
+                lifecycleOwner()
+                customView(R.layout.layout_comments_dialog, noVerticalPadding = true)
+            }
             with(dialog.getCustomView()) {
                 spinner = findViewById(R.id.spinner)
                 progressBar = findViewById(R.id.progress)

@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 100
-        versionName "4.0.2"
+        versionCode 101
+        versionName "4.0.3"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -116,7 +116,7 @@ allprojects {
 dependencies {
     //implementation project(path:':multidisplaycast', configuration:'default')
     implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
-    implementation 'com.github.jordyamc:Multi-Display-Cast:2.13'
+    implementation 'com.github.jordyamc:Multi-Display-Cast:2.14'
     implementation 'com.github.jordyamc:PersistentSearchView:1.0.8'
     implementation 'com.github.jordyamc:AndroidVideoCache:2.7.6'
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -131,7 +131,7 @@ dependencies {
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'com.google.android.gms:play-services-cast:16.1.2'
-    implementation 'com.google.firebase:firebase-core:16.0.7'
+    implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-inappmessaging-display:17.1.0'
     implementation 'com.android.support:customtabs:28.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
@@ -167,9 +167,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:extension-mediasession:2.7.0'
     implementation 'com.google.android.exoplayer:extension-okhttp:2.7.0'
     //MaterialDialogs
-    implementation 'com.afollestad.material-dialogs:core:2.2.0'
-    implementation 'com.afollestad.material-dialogs:lifecycle:2.2.0'
-    implementation 'com.afollestad.material-dialogs:input:2.2.0'
+    implementation 'com.afollestad.material-dialogs:core:2.4.0'
+    implementation 'com.afollestad.material-dialogs:lifecycle:2.4.0'
+    implementation 'com.afollestad.material-dialogs:input:2.4.0'
     //Aesthetic
     implementation 'com.afollestad:aesthetic:1.0.0-beta04'
     //---------

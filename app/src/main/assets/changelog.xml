@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="101" version="4.0.3">
+        <change type="fix">Errores generales en TV</change>
+    </release>
     <release code="100" version="4.0.2">
         <change type="fix">Errores generales</change>
     </release>

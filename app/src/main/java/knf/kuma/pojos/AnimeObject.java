@@ -192,6 +192,14 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         return g.substring(0, g.lastIndexOf(","));
     }
 
+    public Boolean checkIntegrity(){
+        try {
+            return chapters != null && (chapters.size() == 0 || (chapters.get(0).aid != null && chapters.get(0).eid != null));
+        }catch (Exception e){
+            return false;
+        }
+    }
+
     @Override
     public int hashCode() {
         return aid.hashCode();
@@ -350,7 +358,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             @Ignore
             public static AnimeChapter fromDownloaded(ExplorerObject.FileDownObj object) {
-                return new AnimeChapter(Integer.parseInt(object.eid), object.chapter, object.eid, object.link, object.time, object.aid);
+                return new AnimeChapter(Integer.parseInt(object.eid), "Episodio "+object.chapter, object.eid, object.link, object.title, object.aid);
             }
 
             public static List<AnimeChapter> create(String name, String aid, List<Element> elements) {

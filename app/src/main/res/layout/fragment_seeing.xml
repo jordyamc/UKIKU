@@ -51,6 +51,7 @@
         app:fastScrollPopupBgColor="?colorAccent"
         app:fastScrollPopupTextColor="@android:color/white"
         app:fastScrollThumbColor="?colorAccent"
+        app:fastScrollThumbInactiveColor="?colorAccentLight"
         app:spanCount="@integer/span_count"/>
 
 </RelativeLayout>

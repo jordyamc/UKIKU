@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceDialogFragmentCompat
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 
 class ListPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat() {
@@ -72,6 +73,7 @@ class ListPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat() {
                     entryList.add(entry.toString())
                 }
                 MaterialDialog(it).apply {
+                    lifecycleOwner()
                     title(text = preference.dialogTitle.toString())
                     listItemsSingleChoice(items = entryList, initialSelection = mClickedDialogEntryIndex, waitForPositiveButton = false) { dialog, index, _ ->
                         mClickedDialogEntryIndex = index

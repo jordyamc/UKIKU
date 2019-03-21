@@ -20,6 +20,7 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.crashlytics.android.Crashlytics
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.BottomFragment
 import knf.kuma.R
@@ -114,6 +115,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         }
         recyclerView.adapter = adapter
         EAHelper.enter1("F")
+        Crashlytics.setString("screen", "Favorites")
     }
 
     private fun observeList(activity: FragmentActivity, obs: Observer<MutableList<FavoriteObject>>) {

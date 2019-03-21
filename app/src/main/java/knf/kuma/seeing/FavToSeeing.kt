@@ -6,6 +6,7 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
@@ -35,6 +36,7 @@ object FavToSeeing {
                 var count = 0
                 doOnUI {
                     val dialog = MaterialDialog(context).apply {
+                        lifecycleOwner()
                         message(text = "Procesando favoritos... ($count/${favList.size})")
                         cancelable(false)
                         positiveButton(text = "Aceptar") {

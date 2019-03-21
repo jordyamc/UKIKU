@@ -17,7 +17,7 @@ class DirUpdateJob : Job() {
 
     override fun onRunJob(params: Params): Result {
         if (PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning)
-            ContextCompat.startForegroundService(context, Intent(context, DirectoryUpdateService::class.java))
+            DirectoryUpdateService.run(context)
         reSchedule(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString("dir_update_time", "7")
                 ?: "7"))
         return Result.SUCCESS

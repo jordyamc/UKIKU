@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -22,6 +23,7 @@ import knf.kuma.tv.TVBaseActivity
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
+import kotlinx.android.synthetic.main.tv_activity_main.*
 import org.jetbrains.anko.doAsync
 
 class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecker.CheckListener {
@@ -31,16 +33,18 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragment = TVMainFragment.get().also {
-            addFragment(it)
+        if (savedInstanceState==null){
+            fragment = TVMainFragment.get().also {
+                addFragment(it)
+            }
+            DirectoryService.run(this)
+            RecentsJob.schedule(this)
+            DirUpdateJob.schedule(this)
+            RecentsNotReceiver.removeAll(this)
+            UpdateChecker.check(this, this)
+            checkBypass()
+            Answers.getInstance().logCustom(CustomEvent("TV UI"))
         }
-        DirectoryService.run(this)
-        RecentsJob.schedule(this)
-        DirUpdateJob.schedule(this)
-        RecentsNotReceiver.removeAll(this)
-        UpdateChecker.check(this, this)
-        checkBypass()
-        Answers.getInstance().logCustom(CustomEvent("TV UI"))
     }
 
     override fun onNeedUpdate(o_code: String, n_code: String) {
@@ -89,7 +93,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
     @SuppressLint("SetJavaScriptEnabled")
     private fun checkBypass() {
         noCrash {
-            val webView = WebView(this)
+            val webView = webview
             doAsync {
                 if (BypassUtil.isNeeded() && !BypassUtil.isLoading) {
                     "Creando bypass...".toast()
@@ -97,6 +101,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                     Log.e("CloudflareBypass", "is needed")
                     BypassUtil.clearCookies()
                     doOnUI {
+                        webView.visibility = View.VISIBLE
                         webView.settings?.javaScriptEnabled = true
                         webView.webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -111,6 +116,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                                     if (BypassUtil.saveCookies(this@TVMain)) {
                                         "Bypass actualizado".toast()
                                         PicassoSingle.clear()
+                                        webView.visibility = View.GONE
                                     }
                                     Repository().reloadRecents()
                                     BypassUtil.isLoading = false

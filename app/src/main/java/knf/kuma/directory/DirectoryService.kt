@@ -52,8 +52,8 @@ class DirectoryService : IntentService("Directory update") {
         }
 
     override fun onCreate() {
-        super.onCreate()
         startForeground(NOT_CODE, startNotification)
+        super.onCreate()
     }
 
     override fun onHandleIntent(intent: Intent?) {

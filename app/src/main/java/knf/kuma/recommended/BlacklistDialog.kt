@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import java.util.*
 
@@ -30,6 +31,7 @@ class BlacklistDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             MaterialDialog(it).apply {
+                lifecycleOwner()
                 title(text = "Lista negra")
                 listItemsMultiChoice(items = genres, initialSelection = statesIndex, allowEmptySelection = true) { _, _, items ->
                     selected = mutableListOf<String>().apply {

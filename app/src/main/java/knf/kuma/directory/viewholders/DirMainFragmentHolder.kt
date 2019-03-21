@@ -3,6 +3,7 @@ package knf.kuma.directory.viewholders
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import androidx.viewpager.widget.ViewPager
+import com.crashlytics.android.Crashlytics
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.BottomFragment
 import knf.kuma.directory.DirPagerAdapter
@@ -18,6 +19,17 @@ class DirMainFragmentHolder(view: View, manager: FragmentManager) {
         adapter = DirPagerAdapter(manager)
         pager.adapter = adapter
         tabLayout.setupWithViewPager(pager)
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                Crashlytics.setString("screen", "Dir type: ${tab?.text}")
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+        })
     }
 
     fun onChangeOrder() {

@@ -73,9 +73,11 @@ class Repository {
                 val dao = CacheDB.INSTANCE.animeDAO()
                 var cacheUsed = false
                 dao.getAnimeRaw(link)?.let {
-                    cacheUsed = true
-                    doOnUI {
-                        data.value = it
+                    if (it.checkIntegrity()){
+                        cacheUsed = true
+                        doOnUI {
+                            data.value = it
+                        }
                     }
                 }
                 if (Network.isConnected)
