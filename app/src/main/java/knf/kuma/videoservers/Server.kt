@@ -64,6 +64,7 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
             return Arrays.asList(
                     FireServer(context, base),
                     NatsukiServer(context, base),
+                    FembedServer(context, base),
                     FenixServer(context, base),
                     HyperionServer(context, base),
                     IzanagiServer(context, base),
@@ -82,28 +83,6 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                     return server
             }
             return null
-        }
-
-        private fun findPosition(servers: MutableList<Server>, name: String): Int {
-            for ((i, server) in servers.withIndex()) {
-                if (server.name == name)
-                    return i
-            }
-            return 0
-        }
-
-        fun existServer(servers: MutableList<Server>, position: Int): Boolean {
-            val name = VideoServer.Names.downloadServers[position - 1]
-            for (server in servers) {
-                if (server.name == name)
-                    return true
-            }
-            return false
-        }
-
-        fun findServer(servers: MutableList<Server>, position: Int): Server {
-            val name = VideoServer.Names.downloadServers[position - 1]
-            return servers[findPosition(servers, name)]
         }
 
         fun getNames(servers: MutableList<Server>): MutableList<String> {

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="102" version="4.0.4">
+        <change type="fix">Errores generales</change>
+        <change type="new">Servidor Fembed</change>
+        <change type="change">Restaurar compras al entrar a la pantalla del easter egg</change>
+    </release>
     <release code="101" version="4.0.3">
         <change type="fix">Errores generales en TV</change>
     </release>

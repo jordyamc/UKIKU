@@ -308,7 +308,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             public transient ChapterType chapterType;
             @SerializedName("chapter_ isDownloaded")
             @Ignore
-            public boolean isDownloaded = false;
+            public transient boolean isDownloaded = false;
 
             public AnimeChapter(int key, String number, String eid, String link, String name, String aid) {
                 this.key = key;

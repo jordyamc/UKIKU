@@ -20,6 +20,11 @@ open class VideoServer : Parcelable {
         addOption(option)
     }
 
+    constructor(name: String, options: MutableList<Option>) {
+        this.name = name
+        this.options = options
+    }
+
     fun addOption(option: Option) {
         options.add(option)
     }
@@ -52,6 +57,7 @@ open class VideoServer : Parcelable {
         const val IZANAGI = "Izanagi"
         const val HYPERION = "Hyperion"
         const val OKRU = "Okru"
+        const val FEMBED = "Fembed"
         const val FIRE = "Fire"
         const val MANGO = "Mango"
         const val NATSUKI = "Natsuki"
@@ -63,7 +69,7 @@ open class VideoServer : Parcelable {
         const val MEGA = "Mega"
 
         internal val downloadServers: Array<String>
-            get() = arrayOf(IZANAGI, HYPERION, OKRU, FIRE, NATSUKI, FENIX, RV, YOURUPLOAD, ZIPPYSHARE, MEGA, MP4UPLOAD)
+            get() = arrayOf(IZANAGI, HYPERION, OKRU, FEMBED, FIRE, NATSUKI, FENIX, RV, YOURUPLOAD, ZIPPYSHARE, MEGA, MP4UPLOAD)
     }
 
     companion object {

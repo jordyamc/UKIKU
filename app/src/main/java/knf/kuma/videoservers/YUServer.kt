@@ -1,9 +1,7 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import android.util.Log
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.jsoupCookies
 import knf.kuma.videoservers.VideoServer.Names.YOURUPLOAD
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,17 +10,15 @@ import org.jsoup.Jsoup
 class YUServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
     override val isValid: Boolean
-        get() = baseLink.contains("server=yu")
+        get() = baseLink.contains("yourupload.com")
 
     override val name: String
         get() = YOURUPLOAD
 
     override val videoServer: VideoServer?
         get() {
-            val redirLink = PatternUtil.extractLink(baseLink)
-            Log.e("Redir", redirLink)
+            val yuLink = PatternUtil.extractLink(baseLink)
             try {
-                val yuLink = PatternUtil.getYULink(jsoupCookies(redirLink).get().html())
                 val videoLink = PatternUtil.getYUvideoLink(Jsoup.connect(yuLink).get().html())
                 val client = OkHttpClient().newBuilder().followRedirects(false).build()
                 val request = Request.Builder()

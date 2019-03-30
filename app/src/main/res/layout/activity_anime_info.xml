@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/coordinator"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -35,7 +36,7 @@
                 android:adjustViewBounds="true"
                 android:clickable="true"
                 android:fitsSystemWindows="true"
-                android:foreground="?android:attr/selectableItemBackground"
+                android:foreground="?selectableItemBackground"
                 android:scaleType="centerCrop"
                 android:transitionName="img"
                 app:layout_collapseMode="parallax"/>

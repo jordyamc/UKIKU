@@ -22,6 +22,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.EADB
 import knf.kuma.iap.IAPWrapper
+import knf.kuma.iap.Inventory
 import knf.kuma.iap.PayloadHelper
 import knf.kuma.pojos.EAObject
 import kotlinx.android.synthetic.main.activity_ea.*
@@ -430,9 +431,32 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
             doOnUI {
                 progress.visibility = View.GONE
                 vertical_stepper_view.stepperAdapter = this@EAUnlockActivity
-                vertical_stepper_view.currentStep = EAHelper.phase
+                vertical_stepper_view.currentStep = checkPurchases()
             }
         }
+    }
+
+    private fun checkPurchases(): Int {
+        return if (!iapWrapper.isEnabled)
+            EAHelper.phase
+        else {
+            val inventory = iapWrapper.inventory
+            if (inventory.isPurchased(getSkuCode(0)) || inventory.isPurchased(getSkuCode(3))) {
+                for (i in 0..3) EAHelper.setUnlocked(i)
+                4
+            } else if (inventory.isPurchased(getSkuCode(2))) {
+                for (i in 0..2) EAHelper.setUnlocked(i)
+                3
+            } else if (inventory.isPurchased(getSkuCode(1))) {
+                for (i in 0..1) EAHelper.setUnlocked(i)
+                2
+            } else
+                EAHelper.phase
+        }
+    }
+
+    private fun Inventory?.isPurchased(sku: String): Boolean {
+        return this?.purchaseList?.containsKey(sku) ?: false
     }
 
     override fun onDestroy() {

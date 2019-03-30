@@ -14,15 +14,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
 import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.webkit.CookieManager
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
@@ -35,11 +30,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.crashlytics.android.Crashlytics
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import es.munix.multidisplaycast.CastManager
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
@@ -48,11 +41,6 @@ import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.MigrationActivity
 import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.*
-import knf.kuma.commons.BypassUtil.Companion.clearCookies
-import knf.kuma.commons.BypassUtil.Companion.isLoading
-import knf.kuma.commons.BypassUtil.Companion.isNeeded
-import knf.kuma.commons.BypassUtil.Companion.saveCookies
-import knf.kuma.commons.BypassUtil.Companion.userAgent
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryFragment
@@ -98,7 +86,6 @@ class Main : GenericActivity(),
     private val navigationView by bind<NavigationView>(R.id.nav_view)
     private val coordinator by bind<CoordinatorLayout>(R.id.coordinator)
     private val bottomNavigationView by bind<BottomNavigationView>(R.id.bottomNavigation)
-    private val webView: WebView? by optionalBind(R.id.webview)
     internal var selectedFragment: BottomFragment? = null
     private var searchFragment: SearchFragment? = null
     private lateinit var badgeEmission: TextView
@@ -563,7 +550,6 @@ class Main : GenericActivity(),
     override fun onResume() {
         super.onResume()
         invalidateOptionsMenu()
-        checkBypass()
         doOnUI {
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             when (BUUtils.getType(this@Main)) {
@@ -597,44 +583,11 @@ class Main : GenericActivity(),
         setNavigationButtons()
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun checkBypass() {
-        if (webView != null)
-            doAsync {
-                if (isNeeded() && !isLoading) {
-                    val snack = coordinator.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
-                    isLoading = true
-                    Log.e("CloudflareBypass", "is needed")
-                    clearCookies()
-                    doOnUI {
-                        webView?.settings?.javaScriptEnabled = true
-                        webView?.webViewClient = object : WebViewClient() {
-                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                                shouldOverrideUrlLoading(view, request?.url?.toString())
-                                return false
-                            }
+    override fun onBypassUpdated() {
+        onNeedRecreate()
+    }
 
-                            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                                Log.e("CloudflareBypass", "Override $url")
-                                snack.safeDismiss()
-                                if (url == "https://animeflv.net/") {
-                                    Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
-                                    if (saveCookies(this@Main)) {
-                                        coordinator.showSnackbar("Bypass actualizado")
-                                        PicassoSingle.clear()
-                                    }
-                                    onNeedRecreate()
-                                    isLoading = false
-                                }
-                                return false
-                            }
-                        }
-                        webView?.settings?.userAgentString = userAgent
-                        webView?.loadUrl("https://animeflv.net/")
-                    }
-                } else {
-                    Log.e("CloudflareBypass", "Not needed")
-                }
-            }
+    override fun getSnackbarAnchor(): View? {
+        return coordinator
     }
 }

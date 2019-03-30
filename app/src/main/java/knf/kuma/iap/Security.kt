@@ -24,15 +24,21 @@ object Security {
      * @param signedData the signed JSON string (signed, not encrypted)
      * @param signature the signature for the data, signed with the private key
      */
+
     fun verifyPurchase(signedData: String, signature: String): Boolean {
-        if (TextUtils.isEmpty(signedData) ||
-                TextUtils.isEmpty(signature)) {
-            Log.e(TAG, "Purchase verification failed: missing data.")
+        try {
+            if (TextUtils.isEmpty(signedData) ||
+                    TextUtils.isEmpty(signature)) {
+                Log.e(TAG, "Purchase verification failed: missing data.")
+                return false
+            }
+
+            val key = generatePublicKey()
+            return verify(key, signedData, signature)
+        } catch (e: Exception) {
+            e.printStackTrace()
             return false
         }
-
-        val key = Security.generatePublicKey()
-        return Security.verify(key, signedData, signature)
     }
 
     /**
@@ -41,7 +47,7 @@ object Security {
      *
      * @throws IllegalArgumentException if encodedPublicKey is invalid
      */
-    fun generatePublicKey(): PublicKey {
+    private fun generatePublicKey(): PublicKey {
         try {
             val decodedKey = Base64.decode(BuildConfig.IAB_KEY, Base64.DEFAULT)
             val keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM)

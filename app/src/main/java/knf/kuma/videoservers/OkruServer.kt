@@ -2,7 +2,6 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.jsoupCookies
 import knf.kuma.videoservers.VideoServer.Names.OKRU
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -10,7 +9,7 @@ import org.jsoup.Jsoup
 class OkruServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
     override val isValid: Boolean
-        get() = baseLink.contains("server=ok")
+        get() = baseLink.contains("ok.ru")
 
     override val name: String
         get() = OKRU
@@ -19,8 +18,7 @@ class OkruServer(context: Context, baseLink: String) : Server(context, baseLink)
         get() {
             try {
                 val downLink = PatternUtil.extractLink(baseLink)
-                val trueLink = PatternUtil.extractOkruLink(jsoupCookies(downLink).get().select("script").last().html())
-                val eJson = Jsoup.connect(trueLink).get().select("div[data-module='OKVideo']").first().attr("data-options")
+                val eJson = Jsoup.connect(downLink).get().select("div[data-module='OKVideo']").first().attr("data-options")
                 val cutJson = "{" + eJson.substring(eJson.lastIndexOf("\\\"videos"), eJson.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "").replace("%3B", ";") + "}"
                 val array = JSONObject(cutJson).getJSONArray("videos")
                 val videoServer = VideoServer(OKRU)

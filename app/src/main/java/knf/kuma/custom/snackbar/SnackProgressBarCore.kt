@@ -10,9 +10,11 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import knf.kuma.R
+import knf.kuma.commons.noCrash
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_CIRCULAR
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_HORIZONTAL
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_NORMAL
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * Core class constructing the SnackProgressBar.
@@ -47,6 +49,7 @@ internal class SnackProgressBarCore private constructor(
             val inflater = LayoutInflater.from(parentView.context)
             // add overlayLayout as background
             val overlayLayout = inflater.inflate(R.layout.overlay, parentView, false)
+            overlayLayout.tag = "Overlay"
             parentView.addView(overlayLayout)
             // inflate SnackProgressBarLayout and pass viewsToMove
             val snackProgressBarLayout = inflater.inflate(
@@ -64,6 +67,14 @@ internal class SnackProgressBarCore private constructor(
         }
     }
 
+    init {
+        overlayLayout.onClick {
+            noCrash {
+                if (!isShown)
+                    parentView.removeView(overlayLayout)
+            }
+        }
+    }
     /**
      * Gets the attached snackProgressBar.
      */
@@ -175,7 +186,7 @@ internal class SnackProgressBarCore private constructor(
         else {
             setOnBarTouchListener()
             // disable SnackManager by stopping countdown
-            duration = BaseTransientBottomBar.LENGTH_INDEFINITE
+            duration = LENGTH_INDEFINITE
             // assign the actual showDuration if dismiss is required
             if (showDuration != LENGTH_INDEFINITE) {
                 when (showDuration) {
@@ -186,6 +197,11 @@ internal class SnackProgressBarCore private constructor(
             }
         }
         super.show()
+    }
+
+    override fun dismiss() {
+        removeOverlayLayout()
+        super.dismiss()
     }
 
     /**
@@ -319,7 +335,17 @@ internal class SnackProgressBarCore private constructor(
      * Removes the overlayLayout
      */
     internal fun removeOverlayLayout() {
-        parentView.removeView(overlayLayout)
+        noCrash {
+            parentView.removeView(overlayLayout)
+            for (i in 0 until parentView.childCount) {
+                val child = parentView.getChildAt(i)
+                if (child !is ViewGroup && child.tag == "Overlay") {
+                    parentView.removeView(child)
+                    removeOverlayLayout()
+                    break
+                }
+            }
+        }
     }
 
     /**

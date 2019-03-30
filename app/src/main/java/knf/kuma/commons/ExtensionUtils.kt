@@ -38,9 +38,7 @@ import knf.kuma.custom.snackbar.SnackProgressBarManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Connection
@@ -287,6 +285,13 @@ fun FloatingActionButton.forceHide() {
 
 fun jsoupCookies(url: String?): Connection = Jsoup.connect(url).cookies(BypassUtil.getMapCookie(App.context)).userAgent(BypassUtil.userAgent).timeout(PrefsUtil.timeoutTime.toInt() * 1000)
 
+fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builder().apply {
+    url(url)
+    method(method, if (method == "POST") RequestBody.create(MediaType.get("text/plain"), "") else null)
+    header("User-Agent", BypassUtil.userAgent)
+    header("Cookie", BypassUtil.getStringCookie(App.context))
+}.build()
+
 fun isHostValid(hostName: String): Boolean {
     if (BuildConfig.DEBUG)
         Log.e("Hostname", hostName)
@@ -322,7 +327,10 @@ private fun isVideoHostName(hostName: String): Boolean {
                 hostName.contains("mp4upload.com") ||
                 hostName.contains("storage.googleapis.com") ||
                 hostName.contains("playercdn.net") ||
-                hostName.contains("vidcache.net") -> true
+                hostName.contains("vidcache.net") ||
+                hostName.contains("fembed.com") ||
+                hostName.contains("leasewebcdn.me") ||
+                hostName.contains("fvs.io") -> true
         else -> false
     }
 }

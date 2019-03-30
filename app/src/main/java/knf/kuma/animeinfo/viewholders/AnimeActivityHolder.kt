@@ -1,14 +1,9 @@
 package knf.kuma.animeinfo.viewholders
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -21,15 +16,11 @@ import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimePagerAdapter
 import knf.kuma.animeinfo.img.ActivityImgFull
-import knf.kuma.commons.*
-import knf.kuma.commons.BypassUtil.Companion.clearCookies
-import knf.kuma.commons.BypassUtil.Companion.isLoading
-import knf.kuma.commons.BypassUtil.Companion.isNeeded
-import knf.kuma.commons.BypassUtil.Companion.saveCookies
-import knf.kuma.commons.BypassUtil.Companion.userAgent
-import org.jetbrains.anko.doAsync
+import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.forceHide
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import xdroid.toaster.Toaster
 
 
 class AnimeActivityHolder(activity: AppCompatActivity) {
@@ -40,7 +31,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     private val tabLayout: TabLayout by bind(activity, R.id.tabs)
     val pager: ViewPager by bind(activity, R.id.pager)
     private val fab: FloatingActionButton by bind(activity, R.id.fab)
-    private val webView: WebView? by optionalBind(activity, R.id.webview)
 
     private val intent: Intent = activity.intent
     private val animePagerAdapter: AnimePagerAdapter = AnimePagerAdapter(activity.supportFragmentManager)
@@ -79,7 +69,6 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
         })
         fab.onClick { innerInterface.onFabClicked(fab) }
         imageView.onClick { innerInterface.onImgClicked(imageView) }
-        checkBypass(activity)
     }
 
     fun setTitle(title: String) {
@@ -123,38 +112,9 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    fun checkBypass(context: Context) {
-        if (webView != null)
-            doAsync {
-                if (isNeeded() && !isLoading) {
-                    isLoading = true
-                    clearCookies()
-                    webView?.settings?.javaScriptEnabled = true
-                    webView?.webViewClient = object : WebViewClient() {
-                        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                            if (request?.url.toString() == "https://animeflv.net/") {
-                                if (saveCookies(context)) {
-                                    Toaster.toast("Bypass actualizado")
-                                    PicassoSingle.clear()
-                                }
-                                innerInterface.onNeedRecreate()
-                            }
-                            isLoading = false
-                            return false
-                        }
-                    }
-                    webView?.settings?.userAgentString = userAgent
-                    webView?.loadUrl("https://animeflv.net/")
-                }
-            }
-    }
-
     interface Interface {
         fun onFabClicked(actionButton: FloatingActionButton)
 
         fun onImgClicked(imageView: ImageView)
-
-        fun onNeedRecreate()
     }
 }

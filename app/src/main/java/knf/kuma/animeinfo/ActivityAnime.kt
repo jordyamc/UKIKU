@@ -128,14 +128,17 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
 
     }
 
-    override fun onNeedRecreate() {
+    override fun onBypassUpdated() {
         try {
             if (!aidOnly)
                 viewModel.reload(this, intent.dataString, intent.getBooleanExtra(keyPersist, true))
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
 
+    override fun getSnackbarAnchor(): View? {
+        return findViewById(R.id.coordinator)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

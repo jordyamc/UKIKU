@@ -10,7 +10,7 @@ class MegaServer(context: Context, baseLink: String) : Server(context, baseLink)
     private val STREAM = "2"
 
     override val isValid: Boolean
-        get() = baseLink.contains("mega.nz") && !baseLink.contains("embed") || baseLink.contains("server=mega")
+        get() = baseLink.contains("mega.nz")
 
     override val name: String
         get() = "$MEGA $type"
@@ -25,9 +25,7 @@ class MegaServer(context: Context, baseLink: String) : Server(context, baseLink)
         get() {
             return try {
                 if (type == STREAM) {
-                    val downLink = PatternUtil.extractLink(baseLink)
-                    val link = "https://mega.nz/#" + downLink.substring(downLink.lastIndexOf("!"))
-                    VideoServer(name, Option(name, null, link))
+                    VideoServer(name, Option(name, null, PatternUtil.extractLink(baseLink)))
                 } else
                     VideoServer(name, Option(name, null, URLDecoder.decode(baseLink, "utf-8")))
             } catch (e: Exception) {

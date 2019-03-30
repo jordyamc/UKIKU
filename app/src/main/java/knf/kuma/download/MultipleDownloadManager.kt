@@ -54,7 +54,11 @@ object MultipleDownloadManager {
     }
 
     fun isSpaceAvailable(size: Int): Boolean {
-        return getAvailable() > size * CHAPTER_SIZE
+        return try {
+            getAvailable() > size * CHAPTER_SIZE
+        } catch (e: Exception) {
+            true
+        }
     }
 
     private fun getAvailable(): Long {

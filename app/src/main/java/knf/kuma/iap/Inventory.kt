@@ -16,10 +16,6 @@ class Inventory(service: BillingService) {
         loadSkuDetails(service)
     }
 
-    private fun isPurchased(sku: String): Boolean {
-        return purchaseList.containsKey(sku)
-    }
-
     fun addPurchase(purchase: Purchase) {
         purchaseList[purchase.sku] = purchase
     }
@@ -38,8 +34,10 @@ class Inventory(service: BillingService) {
                 val idsList = bundle.getStringArrayList(IAPWrapper.RESPONSE_INAPP_PURCHASE_ID_LIST)
                 if (purchaseDatas != null && signatureList != null && idsList != null)
                     ownedSkus?.forEachIndexed { index, _ ->
-                        val purchase = Purchase(idsList[index], purchaseDatas[index], signatureList[index])
-                        purchaseList[purchase.sku] = purchase
+                        noCrash {
+                            val purchase = Purchase(idsList[index], purchaseDatas[index], signatureList[index])
+                            purchaseList[purchase.sku] = purchase
+                        }
                     }
                 continuationToken = bundle.getString(IAPWrapper.INAPP_CONTINUATION_TOKEN)
             }
