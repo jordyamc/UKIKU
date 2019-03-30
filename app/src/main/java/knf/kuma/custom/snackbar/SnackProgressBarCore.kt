@@ -10,6 +10,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import knf.kuma.R
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_CIRCULAR
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_HORIZONTAL
@@ -335,16 +336,8 @@ internal class SnackProgressBarCore private constructor(
      * Removes the overlayLayout
      */
     internal fun removeOverlayLayout() {
-        noCrash {
+        doOnUI {
             parentView.removeView(overlayLayout)
-            for (i in 0 until parentView.childCount) {
-                val child = parentView.getChildAt(i)
-                if (child !is ViewGroup && child.tag == "Overlay") {
-                    parentView.removeView(child)
-                    removeOverlayLayout()
-                    break
-                }
-            }
         }
     }
 
