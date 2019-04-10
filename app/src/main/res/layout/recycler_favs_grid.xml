@@ -13,13 +13,13 @@
         android:clipToPadding="false"
         android:layoutAnimation="@anim/grid_fall_down"
         android:padding="5dp"
+        app:fastScrollPopupBgColor="?colorSecondary"
+        app:fastScrollPopupTextColor="@android:color/white"
+        app:fastScrollThumbColor="?colorSecondary"
+        app:fastScrollThumbInactiveColor="?colorSecondaryVariant"
         app:layoutManager="GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:spanCount="@integer/span_count"
-        app:fastScrollPopupBgColor="?colorAccent"
-        app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollThumbColor="?colorAccent"
-        app:fastScrollThumbInactiveColor="?colorAccentLight"
         tools:listitem="@layout/item_fav_grid">
     </knf.kuma.custom.FSGridRecyclerView>
 

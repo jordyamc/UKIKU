@@ -51,7 +51,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
     private val aidOnly = intent?.getBooleanExtra(keyAidOnly, false) ?: false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getThemeNA(this))
+        setTheme(EAHelper.getThemeNA())
         super.onCreate(savedInstanceState)
         try {
             setContentView(R.layout.activity_anime_info)
@@ -152,11 +152,6 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_share -> share()
-            R.id.action_comments ->
-                if (chapters.isNotEmpty())
-                    CommentsDialog(chapters).show(this)
-                else
-                    Toaster.toast("Aun no hay episodios!")
         }
         return true
     }

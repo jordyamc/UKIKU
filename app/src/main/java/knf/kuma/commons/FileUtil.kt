@@ -62,16 +62,14 @@ object FileUtil {
 
     fun getFullPathFromTreeUri(treeUri: Uri?, con: Context): String? {
         try {
-            if (treeUri == null) {
-                return null
-            }
-            var volumePath: String? = FileUtil.getVolumePath(FileUtil.getVolumeIdFromTreeUri(treeUri), con)
+            treeUri ?: return null
+            var volumePath: String? = getVolumePath(getVolumeIdFromTreeUri(treeUri), con)
                     ?: return File.separator
             if (volumePath?.endsWith(File.separator) == true) {
                 volumePath = volumePath.substring(0, volumePath.length - 1)
             }
 
-            var documentPath = FileUtil.getDocumentPathFromTreeUri(treeUri)
+            var documentPath = getDocumentPathFromTreeUri(treeUri)
             if (documentPath.endsWith(File.separator)) {
                 documentPath = documentPath.substring(0, documentPath.length - 1)
             }
@@ -260,8 +258,8 @@ object FileUtil {
                 try {
                     val file = FileAccessHelper.INSTANCE.getTmpFile(file_name)
                     file.delete()
-                    if (file.parentFile.list().isEmpty())
-                        file.parentFile.delete()
+                    if (file.parentFile?.list()?.isEmpty() == true)
+                        file.parentFile?.delete()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

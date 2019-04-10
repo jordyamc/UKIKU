@@ -20,7 +20,7 @@ class DownloadDialogActivity : GenericActivity() {
     private lateinit var downloadObject: DownloadObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getThemeDialog(this))
+        setTheme(EAHelper.getThemeDialog())
         super.onCreate(savedInstanceState)
         window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         setFinishOnTouchOutside(false)

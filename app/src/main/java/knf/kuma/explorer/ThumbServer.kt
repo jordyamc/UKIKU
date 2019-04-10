@@ -36,11 +36,11 @@ object ThumbServer {
 
     private class Server(var loadedFile: File) : NanoHTTPD(4691) {
         init {
-            start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
+            start(SOCKET_READ_TIMEOUT, false)
         }
 
         override fun serve(session: IHTTPSession?): Response {
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "image/png", FileInputStream(loadedFile), loadedFile.length())
+            return newFixedLengthResponse(Response.Status.OK, "image/png", FileInputStream(loadedFile), loadedFile.length())
         }
     }
 

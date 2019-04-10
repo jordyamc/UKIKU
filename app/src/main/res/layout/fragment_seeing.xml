@@ -48,10 +48,10 @@
         android:layoutAnimation="@anim/grid_fall_down"
         android:padding="5dp"
         app:layoutManager="GridLayoutManager"
-        app:fastScrollPopupBgColor="?colorAccent"
+        app:fastScrollPopupBgColor="?colorSecondary"
         app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollThumbColor="?colorAccent"
-        app:fastScrollThumbInactiveColor="?colorAccentLight"
+        app:fastScrollThumbColor="?colorSecondary"
+        app:fastScrollThumbInactiveColor="?colorSecondaryVariant"
         app:spanCount="@integer/span_count"/>
 
 </RelativeLayout>

@@ -55,6 +55,7 @@
             android:title="Auto respaldo"/>
     </PreferenceCategory>
     <PreferenceCategory
+        android:key="storage_group"
         android:title="Almacenamiento">
         <ListPreference
             android:defaultValue="0"
@@ -63,6 +64,10 @@
             android:icon="@drawable/ic_download"
             android:key="download_type"
             android:summary="%s"
+            android:title="Descargas"/>
+        <Preference
+            android:icon="@drawable/ic_download"
+            android:key="download_type_q"
             android:title="Descargas"/>
         <SwitchPreference
             android:defaultValue="false"

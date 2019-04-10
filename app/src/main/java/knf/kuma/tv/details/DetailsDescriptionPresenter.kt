@@ -20,7 +20,7 @@ class DetailsDescriptionPresenter : AbstractDetailsDescriptionPresenter {
         this.bodyColor = 0
     }
 
-    override fun onBindDescription(viewHolder: AbstractDetailsDescriptionPresenter.ViewHolder, itemData: Any) {
+    override fun onBindDescription(viewHolder: ViewHolder, itemData: Any) {
         val animeObject = itemData as AnimeObject
         viewHolder.title.text = animeObject.name
         viewHolder.subtitle.text = animeObject.genresString

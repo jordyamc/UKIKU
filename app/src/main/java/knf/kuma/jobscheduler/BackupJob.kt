@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 class BackupJob : Job() {
 
-    override fun onRunJob(params: Job.Params): Job.Result {
+    override fun onRunJob(params: Params): Result {
         BUUtils.init(context)
         return if (BUUtils.isLogedIn) {
             val backupObject = BUUtils.waitAutoBackup(context)
@@ -23,9 +23,9 @@ class BackupJob : Job() {
                 else
                     JobManager.instance().cancelAllForTag(TAG)
             }
-            Job.Result.SUCCESS
+            Result.SUCCESS
         } else
-            Job.Result.FAILURE
+            Result.FAILURE
     }
 
     companion object {

@@ -3,9 +3,9 @@ package knf.kuma.backup
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
+import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.dropbox.core.DbxRequestConfig
 import com.dropbox.core.android.Auth
@@ -215,7 +215,7 @@ object BUUtils {
 
     fun backup(backupObject: AutoBackupObject, backupInterface: AutoBackupInterface) {
         loginInterface = null
-        BUUtils.init(App.context)
+        init(App.context)
         when (type) {
             BUUtils.BUType.DROPBOX -> backupDropbox(backupObject, backupInterface)
             else -> {

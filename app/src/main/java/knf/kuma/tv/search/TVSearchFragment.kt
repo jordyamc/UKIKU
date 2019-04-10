@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.speech.SpeechRecognizer
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.SearchSupportFragment
 import androidx.leanback.widget.*

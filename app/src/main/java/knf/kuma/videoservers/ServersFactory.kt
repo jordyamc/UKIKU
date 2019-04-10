@@ -6,10 +6,10 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.list.listItems
@@ -296,6 +296,7 @@ class ServersFactory {
 
     private fun startDownload(option: Option) {
         if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url)
+        downloadObject.server = option.server ?: ""
         if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0"))
             CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(chapter?.fileName
                     ?: "null")), true, chapter))
@@ -327,7 +328,7 @@ class ServersFactory {
     private fun getSnackManager(): SnackProgressBarManager? {
         val view = serversInterface.getView() ?: return null
         return snackBarManager ?: SnackProgressBarManager(view)
-                .setProgressBarColor(EAHelper.getThemeColor(context))
+                .setProgressBarColor(EAHelper.getThemeColor())
                 .setOverlayLayoutAlpha(0.4f)
                 .setOverlayLayoutColor(android.R.color.background_dark).also { snackBarManager = it }
     }
@@ -340,7 +341,7 @@ class ServersFactory {
 
     private fun dismissSnack() {
         //snackbar?.dismiss()
-        getSnackManager()?.dismiss()
+        getSnackManager()?.dismissAll()
     }
 
     interface ServersInterface {
@@ -398,6 +399,7 @@ class ServersFactory {
         }
 
         fun clear() {
+            INSTANCE?.snackBarManager?.dismissAll()
             INSTANCE = null
         }
 

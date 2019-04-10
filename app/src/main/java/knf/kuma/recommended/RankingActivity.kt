@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.recycler_ranking.*
 class RankingActivity : GenericActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.recycler_ranking)
         setSupportActionBar(toolbar)

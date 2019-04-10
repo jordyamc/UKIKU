@@ -3,10 +3,10 @@ package knf.kuma.changelog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.Crashlytics
 import knf.kuma.R
@@ -56,7 +56,7 @@ class ChangelogActivity : GenericActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.recycler_changelog)
         toolbar.title = "Changelog"
@@ -94,7 +94,7 @@ class ChangelogActivity : GenericActivity() {
                             MaterialDialog(activity).safeShow {
                                 message(text = "Nueva versión, ¿Leer Changelog?")
                                 positiveButton(text = "Leer") {
-                                    ChangelogActivity.open(activity)
+                                    open(activity)
                                     PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply()
                                 }
                                 negativeButton(text = "Omitir") { PreferenceManager.getDefaultSharedPreferences(activity).edit().putInt("version_code", pCode).apply() }

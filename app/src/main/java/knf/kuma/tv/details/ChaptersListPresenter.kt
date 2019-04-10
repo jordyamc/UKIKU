@@ -7,7 +7,7 @@ class ChaptersListPresenter(val position: Int) : ListRowPresenter() {
 
     override fun onBindRowViewHolder(holder: RowPresenter.ViewHolder, item: Any) {
         super.onBindRowViewHolder(holder, item)
-        val vh = holder as ListRowPresenter.ViewHolder
+        val vh = holder as ViewHolder
         vh.gridView.selectedPosition = position
     }
 }

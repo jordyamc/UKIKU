@@ -3,14 +3,11 @@ package knf.kuma.random
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.MaterialDialog
@@ -21,6 +18,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
+import org.jetbrains.anko.doAsync
 
 class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val toolbar: Toolbar by bind(R.id.toolbar)
@@ -38,7 +36,7 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(layout)
         toolbar.title = "Random"
@@ -51,7 +49,7 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         recyclerView.verifyManager()
         recyclerView.adapter = adapter
         refreshLayout.isRefreshing = true
-        refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(this), EAHelper.getThemeColorLight(this), R.color.colorPrimary)
+        refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
         refreshList()
     }
 
@@ -59,14 +57,14 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         counter++
         if (counter >= 15)
             AchievementManager.unlock(listOf(32))
-        Handler().postDelayed({
-            CacheDB.INSTANCE.animeDAO().getRandom(PreferenceManager.getDefaultSharedPreferences(this@RandomActivity).getInt("random_limit", 25))
-                    .observe(this@RandomActivity, Observer { animeObjects ->
-                        refreshLayout.isRefreshing = false
-                        adapter?.update(animeObjects)
-                        recyclerView.scheduleLayoutAnimation()
-                    })
-        }, 1200)
+        doAsync {
+            val list = CacheDB.INSTANCE.animeDAO().getRandom(PrefsUtil.randomLimit)
+            doOnUI {
+                refreshLayout.isRefreshing = false
+                adapter?.update(list)
+                recyclerView.scheduleLayoutAnimation()
+            }
+        }
     }
 
     override fun onRefresh() {
@@ -81,7 +79,7 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val picker = MaterialNumberPicker(
                 this, 5, 100,
-                PreferenceManager.getDefaultSharedPreferences(this).getInt("random_limit", 25),
+                PrefsUtil.randomLimit,
                 ContextCompat.getColor(this, R.color.colorAccent),
                 ContextCompat.getColor(this, R.color.textPrimary),
                 resources.getDimensionPixelSize(R.dimen.num_picker))
@@ -89,7 +87,7 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
             title(text = "Numero de resultados")
             customView(view = picker, scrollable = false)
             positiveButton(text = "OK") {
-                PreferenceManager.getDefaultSharedPreferences(this@RandomActivity).edit().putInt("random_limit", picker.value).apply()
+                PrefsUtil.randomLimit = picker.value
                 refreshLayout.post { refreshLayout.isRefreshing = true }
                 refreshList()
             }

@@ -3,19 +3,21 @@ package knf.kuma.commons
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.preference.PreferenceManager
+import android.os.Build
 import androidx.lifecycle.LiveData
+import androidx.preference.PreferenceManager
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
 
 @SuppressLint("StaticFieldLeak")
 object PrefsUtil {
-    private var context: Context? = null
+    private var context: Context = App.context
 
     val layType: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", context?.getString(R.string.layType)
-                ?: "0") ?: "0"
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("lay_type", context.getString(R.string.layType))
+                ?: "0"
 
     val themeOption: String
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")
@@ -45,7 +47,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val isAdsEnabled: Boolean
-        get() = /*PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", false)*/ false
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", false)
 
     val downloaderType: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
@@ -100,7 +102,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("show_favs", value).apply()
 
     val timeoutTime: Long
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("timeout_time", if (context?.resources?.getBoolean(R.bool.isTv) == true) "0" else "10")?.toLong()
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("timeout_time", if (context.resources.getBoolean(R.bool.isTv)) "0" else "10")?.toLong()
                 ?: 0
 
     var rememberServer: Boolean
@@ -125,9 +127,22 @@ object PrefsUtil {
     val useExperimentalOkHttp: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("experimental_okhttp", false)
 
-    fun init(context: Context) {
-        PrefsUtil.context = context
-    }
+    var storageType: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("storage_type", "Sin almacenamiento")
+                ?: "Sin almacenamiento"
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("storage_type", value).apply()
+
+    var downloadType: String
+        get() = defaultDownloadType
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("download_type", value).apply()
+
+    val maxParallelDownloads: Int
+        get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("max_parallel_downloads", "3")
+                ?: "3")
+
+    var randomLimit: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("random_limit", 25)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("random_limit", value).apply()
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
@@ -160,5 +175,14 @@ object PrefsUtil {
     fun getLiveShowFavIndicator(): LiveData<Boolean> {
         return PreferenceManager.getDefaultSharedPreferences(context).booleanLiveData("show_fav_count", true)
     }
+
+    private val defaultDownloadType: String
+        get() {
+            return if (Build.VERSION.SDK_INT >= SDK_INT_Q)
+                "1"
+            else
+                PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0")
+                        ?: "0"
+        }
 
 }

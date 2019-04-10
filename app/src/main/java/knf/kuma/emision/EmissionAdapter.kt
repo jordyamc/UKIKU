@@ -24,6 +24,7 @@ import org.jetbrains.anko.doAsync
 
 class EmissionAdapter internal constructor(private val fragment: Fragment) : RecyclerView.Adapter<EmissionAdapter.EmissionItem>() {
 
+    val removeListener = fragment as RemoveListener
     var list: MutableList<SearchObject> = ArrayList()
 
     private var blacklist: MutableSet<String> = PrefsUtil.emissionBlacklist
@@ -67,8 +68,8 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
     }
 
     fun update(newList: MutableList<SearchObject>, animate: Boolean = true, callback: () -> Unit) {
-        if (newList.isNotEmpty() && list notSameContent newList)
-            if (PrefsUtil.useSmoothAnimations)
+        if (list notSameContent newList)
+            if (PrefsUtil.useSmoothAnimations && newList.isNotEmpty())
                 doAsync {
                     blacklist = PrefsUtil.emissionBlacklist
                     showHidden = PrefsUtil.emissionShowHidden
@@ -109,6 +110,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
         if (position >= 0 && position <= list.size - 1) {
             list.removeAt(position)
             notifyItemRemoved(position)
+            removeListener.onRemove(list.size <= 0)
         }
     }
 

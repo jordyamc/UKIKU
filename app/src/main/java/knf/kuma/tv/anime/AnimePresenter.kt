@@ -7,15 +7,15 @@ import knf.kuma.tv.search.BasicAnimeObject
 
 class AnimePresenter : Presenter() {
 
-    override fun onCreateViewHolder(parent: ViewGroup): Presenter.ViewHolder {
-        return Presenter.ViewHolder(AnimeCardView(parent.context))
+    override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
+        return ViewHolder(AnimeCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
         (viewHolder.view as AnimeCardView).bind(item as BasicAnimeObject)
     }
 
-    override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {
+    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
 
     }
 }

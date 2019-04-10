@@ -6,13 +6,13 @@ import androidx.leanback.widget.Presenter
 
 class CustomFullWidthDetailsOverviewRowPresenter internal constructor(detailsPresenter: Presenter) : FullWidthDetailsOverviewRowPresenter(detailsPresenter) {
 
-    private var mPreviousState = FullWidthDetailsOverviewRowPresenter.STATE_FULL
+    private var mPreviousState = STATE_FULL
 
     init {
-        initialState = FullWidthDetailsOverviewRowPresenter.STATE_FULL
+        initialState = STATE_FULL
     }
 
-    override fun onLayoutLogo(viewHolder: FullWidthDetailsOverviewRowPresenter.ViewHolder, oldState: Int, logoChanged: Boolean) {
+    override fun onLayoutLogo(viewHolder: ViewHolder, oldState: Int, logoChanged: Boolean) {
         val v = viewHolder.logoViewHolder.view
         val lp = v.layoutParams as ViewGroup.MarginLayoutParams
 
@@ -24,13 +24,13 @@ class CustomFullWidthDetailsOverviewRowPresenter internal constructor(detailsPre
                 .resources.getDimensionPixelSize(androidx.leanback.R.dimen.lb_details_v2_description_margin_top) + lp.height / 2).toFloat()
 
         when (viewHolder.state) {
-            FullWidthDetailsOverviewRowPresenter.STATE_FULL -> if (mPreviousState == FullWidthDetailsOverviewRowPresenter.STATE_HALF) {
+            STATE_FULL -> if (mPreviousState == STATE_HALF) {
                 v.animate().translationYBy(-offset)
             }
-            FullWidthDetailsOverviewRowPresenter.STATE_HALF -> if (mPreviousState == FullWidthDetailsOverviewRowPresenter.STATE_FULL) {
+            STATE_HALF -> if (mPreviousState == STATE_FULL) {
                 v.animate().translationYBy(offset)
             }
-            else -> if (mPreviousState == FullWidthDetailsOverviewRowPresenter.STATE_HALF) {
+            else -> if (mPreviousState == STATE_HALF) {
                 v.animate().translationYBy(-offset)
             }
         }

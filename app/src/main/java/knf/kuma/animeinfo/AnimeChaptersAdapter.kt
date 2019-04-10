@@ -1,5 +1,6 @@
 package knf.kuma.animeinfo
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -14,6 +15,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -81,7 +83,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
     override fun onBindViewHolder(holder: ChapterImgHolder, position: Int, payloads: MutableList<Any>) {
         if (context != null)
             if (selection.contains(position))
-                holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight(context)))
+                holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight()))
             else
                 holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardview_background))
         if (payloads.isEmpty())
@@ -94,7 +96,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         val downloadObject = AtomicReference(downloadsDAO.getByEid(chapter.eid))
         val dFile = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
         if (selection.contains(position))
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight(context)))
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight()))
         else
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardview_background))
         holder.setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.eid), fragment, Observer {
@@ -134,7 +136,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             else
                 holder.setDownloaded(isPlayAvailable(dFile, downloadObject.get()), chapter.eid == s)
         })
-        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.eid)) EAHelper.getThemeColor(context) else R.color.textPrimary))
+        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.eid)) EAHelper.getThemeColor() else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
         holder.chapter.text = chapter.number
         holder.actions.setOnClickListener { view ->
@@ -161,7 +163,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         chaptersDAO.addChapter(chapter)
                         recordsDAO.add(RecordObject.fromChapter(chapter))
                         updateSeeing(chapter.number)
-                        holder.setSeen(context, true)
+                        holder.setSeen(true)
                         ServersFactory.startPlay(context, chapter.epTitle, chapter.fileName)
                     } else {
                         Toaster.toast("Aun no se está descargando")
@@ -172,7 +174,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         chaptersDAO.addChapter(chapter)
                         recordsDAO.add(RecordObject.fromChapter(chapter))
                         updateSeeing(chapter.number)
-                        holder.setSeen(context, true)
+                        holder.setSeen(true)
                     }
                     R.id.casting -> CastUtil.get().openControls()
                     R.id.delete -> MaterialDialog(context).safeShow {
@@ -225,7 +227,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     chaptersDAO.addChapter(chapter)
                                     recordsDAO.add(RecordObject.fromChapter(chapter))
                                     updateSeeing(chapter.number)
-                                    holder.setSeen(context, true)
+                                    holder.setSeen(true)
                                 }
                                 setOrientation(false)
                             }
@@ -235,7 +237,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 chaptersDAO.addChapter(chapter)
                                 recordsDAO.add(RecordObject.fromChapter(chapter))
                                 updateSeeing(chapter.number)
-                                holder.setSeen(context, true)
+                                holder.setSeen(true)
                             }
 
                             override fun onProgressIndicator(boolean: Boolean) {
@@ -281,6 +283,18 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             .setType("text/plain")
                             .putExtra(Intent.EXTRA_TEXT, chapter.epTitle + "\n" + chapter.link), "Compartir"))
                     R.id.import_file -> (fragment as ChaptersFragment).onMove(chapter.fileName)
+                    R.id.commentaries -> {
+                        try {
+                            val tabIntent = CustomTabsIntent.Builder().apply {
+                                setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                                setShowTitle(true)
+                                enableUrlBarHiding()
+                            }.build()
+                            tabIntent.launchUrl(context, Uri.parse(chapter.commentariesLink))
+                        } catch (e: ActivityNotFoundException) {
+                            noCrash { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(chapter.commentariesLink))) }
+                        }
+                    }
                 }
                 true
             }
@@ -292,7 +306,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                 holder.chapter.setTextColor(ContextCompat.getColor(context, R.color.textPrimary))
             } else {
                 chaptersDAO.addChapter(chapter)
-                holder.chapter.setTextColor(ContextCompat.getColor(context, EAHelper.getThemeColor(context)))
+                holder.chapter.setTextColor(ContextCompat.getColor(context, EAHelper.getThemeColor()))
             }
             updateSeeing(chapter.number)
         }
@@ -454,8 +468,8 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             }
         }
 
-        fun setSeen(context: Context?, seen: Boolean) {
-            chapter.post { chapter.setTextColor(ContextCompat.getColor(App.context, if (seen) EAHelper.getThemeColor(context) else R.color.textPrimary)) }
+        fun setSeen(seen: Boolean) {
+            chapter.post { chapter.setTextColor(ContextCompat.getColor(App.context, if (seen) EAHelper.getThemeColor() else R.color.textPrimary)) }
         }
 
         fun setDownloadState(downloadObject: DownloadObject?) {

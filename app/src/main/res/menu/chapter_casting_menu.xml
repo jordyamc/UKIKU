@@ -15,4 +15,7 @@
     <item
         android:id="@+id/import_file"
         android:title="IMPORTAR"/>
+    <item
+        android:id="@+id/commentaries"
+        android:title="COMENTARIOS"/>
 </menu>

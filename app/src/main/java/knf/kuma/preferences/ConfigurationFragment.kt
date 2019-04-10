@@ -165,10 +165,24 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     })
                     true
                 }
-                preferenceScreen.findPreference<Preference>("download_type")?.setOnPreferenceChangeListener { _, o ->
-                    if (o == "1" && !FileAccessHelper.INSTANCE.canDownload(this@ConfigurationFragment, o as? String))
-                        Toaster.toast("Por favor selecciona la raiz de tu SD")
-                    true
+                if (Build.VERSION.SDK_INT >= SDK_INT_Q) {
+                    preferenceScreen.removePreferenceRecursively("download_type")
+                    val preferenceDownloads = preferenceScreen.findPreference<Preference>("download_type_q")
+                    preferenceDownloads?.summary = PrefsUtil.storageType
+                    preferenceDownloads?.setOnPreferenceClickListener {
+                        FileAccessHelper.openTreeChooser(this@ConfigurationFragment)
+                        Toaster.toast("Por favor selecciona la raiz del almacenamiento")
+                        true
+                    }
+                } else {
+                    preferenceScreen.removePreferenceRecursively("download_type_q")
+                    preferenceScreen.findPreference<Preference>("download_type")?.setOnPreferenceChangeListener { _, o ->
+                        if (o == "1" && !FileAccessHelper.INSTANCE.canDownload(this@ConfigurationFragment, o as? String))
+                            Toaster.toast("Por favor selecciona la raiz de tu SD")
+                        else
+                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("tree_uri", null).apply()
+                        true
+                    }
                 }
                 if (PrefsUtil.downloaderType == 0) {
                     preferenceScreen.findPreference<Preference>(keyMaxParallelDownloads)?.isEnabled = false
@@ -347,10 +361,12 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         noCrash {
             if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
-                if (!FileAccessHelper.INSTANCE.isUriValid(data?.data)) {
-                    Toaster.toast("Directorio invalido")
+                val validation = FileAccessHelper.INSTANCE.isUriValid(data?.data)
+                if (!validation.isValid) {
+                    Toaster.toast("Directorio invalido: $validation")
                     FileAccessHelper.openTreeChooser(this)
-                }
+                } else if (Build.VERSION.SDK_INT >= SDK_INT_Q)
+                    preferenceScreen.findPreference<Preference>("download_type_q")?.summary = PrefsUtil.storageType
             } else if (requestCode == 4784 && resultCode == Activity.RESULT_OK) {
                 if (!FileAccessHelper.INSTANCE.toneFile.exists())
                     FileAccessHelper.INSTANCE.toneFile.createNewFile()

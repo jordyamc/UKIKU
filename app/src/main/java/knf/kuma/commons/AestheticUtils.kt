@@ -31,7 +31,7 @@ class AestheticUtils {
                         navigationViewMode(NavigationViewMode.SELECTED_ACCENT)
                         bottomNavigationBackgroundMode(BottomNavBgMode.PRIMARY)
                         bottomNavigationIconTextMode(BottomNavIconTextMode.SELECTED_ACCENT)
-                        swipeRefreshLayoutColorsRes(EAHelper.getThemeColor(context), EAHelper.getThemeColorLight(context), primaryColorRes(context))
+                        swipeRefreshLayoutColorsRes(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), primaryColorRes(context))
                     }
             }
         }
@@ -88,7 +88,7 @@ class AestheticUtils {
 
         @ColorRes
         private fun accentColor(context: Context): Int {
-            return EAHelper.getThemeColor(context)
+            return EAHelper.getThemeColor()
         }
 
         private fun preferences(context: Context): SharedPreferences {

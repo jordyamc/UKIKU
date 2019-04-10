@@ -94,7 +94,7 @@ class AnimeSlice : SliceProvider() {
                 }
                 else -> {
                     return list(context, sliceUri, ListBuilder.INFINITY) {
-                        setAccentColor(ContextCompat.getColor(context, EAHelper.getThemeColor(context)))
+                        setAccentColor(ContextCompat.getColor(context, EAHelper.getThemeColor()))
                         val animeObjects = AnimeLoad.LIST
                         if (animeObjects.isNotEmpty()) {
                             header {

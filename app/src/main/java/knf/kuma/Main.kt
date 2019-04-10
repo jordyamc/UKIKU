@@ -96,7 +96,7 @@ class Main : GenericActivity(),
     private var isFirst = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getThemeNA(this))
+        setTheme(EAHelper.getThemeNA())
         super.onCreate(savedInstanceState)
         if (getString(R.string.app_name) != "UKIKU") {
             Toaster.toast("Te dije que no lo cambiaras")
@@ -145,7 +145,7 @@ class Main : GenericActivity(),
             badgeEmission = navigationView.menu.findItem(R.id.drawer_emision).actionView as TextView
             badgeSeeing = navigationView.menu.findItem(R.id.drawer_seeing).actionView as TextView
             badgeQueue = navigationView.menu.findItem(R.id.drawer_queue).actionView as TextView
-            navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg(this@Main))
+            navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg())
             val header = navigationView.getHeaderView(0).img
             ViewCompat.setOnApplyWindowInsetsListener(header) { v, insets ->
                 v.apply {
@@ -185,7 +185,7 @@ class Main : GenericActivity(),
                         .setExactMode(true)
                         .setShowShadow(false)
                         .setGravityOffset(5f, 5f, true)
-                        .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight(this)))
+                        .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight()))
                 CacheDB.INSTANCE.favsDAO().countLive.observe(this, Observer { integer ->
                     if (badgeView != null && integer != null)
                         if (PrefsUtil.showFavIndicator)
@@ -210,13 +210,13 @@ class Main : GenericActivity(),
                             navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg(it))
                         })
             }
-            badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+            badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeEmission.setTypeface(null, Typeface.BOLD)
             badgeEmission.gravity = Gravity.CENTER_VERTICAL
-            badgeSeeing.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+            badgeSeeing.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeSeeing.setTypeface(null, Typeface.BOLD)
             badgeSeeing.gravity = Gravity.CENTER_VERTICAL
-            badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+            badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeQueue.setTypeface(null, Typeface.BOLD)
             badgeQueue.gravity = Gravity.CENTER_VERTICAL
             PrefsUtil.getLiveEmissionBlackList().observe(this, Observer { strings ->
@@ -241,7 +241,7 @@ class Main : GenericActivity(),
 
     @TargetApi(Build.VERSION_CODES.M)
     private fun checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+        if (Build.VERSION.SDK_INT in Build.VERSION_CODES.M..Build.VERSION_CODES.P &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 55498)
     }
@@ -321,7 +321,7 @@ class Main : GenericActivity(),
                 closeSearch()
             }
 
-            override fun onSuggestion(searchItem: SearchItem?): Boolean = false
+            override fun onSuggestion(searchItem: SearchItem?): Boolean = true
         })
     }
 

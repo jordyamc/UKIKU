@@ -15,7 +15,7 @@ import knf.kuma.commons.*
 import java.util.*
 
 internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adapter<RandomAdapter.RandomItem>() {
-    private var list: MutableList<RandomObject> = ArrayList()
+    private var list: List<RandomObject> = ArrayList()
 
     private val layout: Int
         @LayoutRes
@@ -41,7 +41,7 @@ internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adap
         return list.size
     }
 
-    fun update(list: MutableList<RandomObject>) {
+    fun update(list: List<RandomObject>) {
         if (this.list notSameContent list) {
             this.list = list
             notifyDataSetChanged()

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -15,6 +14,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -52,7 +52,7 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
 
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(layout)
         toolbar.title = "Pendientes"

@@ -265,7 +265,7 @@ object AchievementManager {
             if (EADB.INSTANCE.eaDAO().isUnlocked(3)) list.add(15)
             if (EAHelper.isPart0Unlocked && EAHelper.isPart1Unlocked && EAHelper.isPart2Unlocked && EAHelper.isPart3Unlocked)
                 list.add(28)
-            AchievementManager.unlock(list)
+            unlock(list)
         }
     }
 

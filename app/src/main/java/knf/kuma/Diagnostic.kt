@@ -8,6 +8,10 @@ import android.text.format.Formatter
 import android.view.View
 import androidx.lifecycle.Observer
 import com.afollestad.materialdialogs.MaterialDialog
+import fr.bmartel.speedtest.SpeedTestReport
+import fr.bmartel.speedtest.SpeedTestSocket
+import fr.bmartel.speedtest.inter.ISpeedTestListener
+import fr.bmartel.speedtest.model.SpeedTestError
 import knf.kuma.backup.BUUtils
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
@@ -21,11 +25,13 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class Diagnostic : GenericActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_diagnostic)
         setSupportActionBar(toolbar)
@@ -39,6 +45,7 @@ class Diagnostic : GenericActivity() {
     private fun startTests() {
         runMainTest()
         runBypassTest()
+        runInternetTest()
         runDirectoryTest()
         runMemoryTest()
         runBackupTest()
@@ -114,17 +121,72 @@ class Diagnostic : GenericActivity() {
     private fun loadBypassInfo() {
         clearanceState.apply {
             val data = BypassUtil.getClearance(this@Diagnostic)
-            if (!data.isEmpty())
+            if (data.isNotEmpty())
                 load(data)
         }
         cfduidState.apply {
             val data = BypassUtil.getCFDuid(this@Diagnostic)
-            if (!data.isEmpty())
+            if (data.isNotEmpty())
                 load(data)
         }
         userAgentState.apply {
             load(BypassUtil.userAgent)
         }
+    }
+
+    private fun runInternetTest() {
+        doAsync {
+            SpeedTestSocket().apply {
+                addSpeedTestListener(object : ISpeedTestListener {
+                    override fun onCompletion(report: SpeedTestReport?) {
+                        report?.let { downState.load(formatBigDecimal(it.transferRateOctet)) }
+                    }
+
+                    override fun onProgress(percent: Float, report: SpeedTestReport?) {
+                        report?.let { downState.load(formatBigDecimal(it.transferRateOctet)) }
+                    }
+
+                    override fun onError(speedTestError: SpeedTestError?, errorMessage: String?) {
+                        downState.load("Error: ${errorMessage ?: ""}", StateView.STATE_ERROR)
+                    }
+                })
+                startDownload("http://1.testdebit.info/10M.iso")
+            }
+        }
+        doAsync {
+            SpeedTestSocket().apply {
+                addSpeedTestListener(object : ISpeedTestListener {
+                    override fun onCompletion(report: SpeedTestReport?) {
+                        report?.let { upState.load(formatBigDecimal(it.transferRateOctet)) }
+                    }
+
+                    override fun onProgress(percent: Float, report: SpeedTestReport?) {
+                        report?.let { upState.load(formatBigDecimal(it.transferRateOctet)) }
+                    }
+
+                    override fun onError(speedTestError: SpeedTestError?, errorMessage: String?) {
+                        upState.load("Error: ${errorMessage ?: ""}", StateView.STATE_ERROR)
+                    }
+                })
+                startUpload("http://ipv4.ikoula.testdebit.info/", 5000000)
+            }
+        }
+    }
+
+    private fun formatBigDecimal(bigDecimal: BigDecimal): String {
+        var decimal = bigDecimal.movePointLeft(3)
+        val unit = when {
+            decimal >= BigDecimal.valueOf(1000000) -> {
+                decimal = decimal.movePointLeft(6)
+                "Gb/s"
+            }
+            decimal >= BigDecimal.valueOf(1000) -> {
+                decimal = decimal.movePointLeft(3)
+                "Mb/s"
+            }
+            else -> "Kb/s"
+        }
+        return "${decimal.setScale(1, RoundingMode.HALF_UP)}$unit~"
     }
 
     private fun runDirectoryTest() {

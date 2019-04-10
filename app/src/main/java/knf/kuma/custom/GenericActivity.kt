@@ -16,6 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.*
+import knf.kuma.directory.DirectoryService
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.findOptional
 
@@ -63,6 +64,7 @@ open class GenericActivity : AppCompatActivity() {
                                         getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
                                                 ?: "Bypass actualizado".toast()
                                         PicassoSingle.clear()
+                                        DirectoryService.run(this@GenericActivity)
                                     }
                                     onBypassUpdated()
                                     BypassUtil.isLoading = false

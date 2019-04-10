@@ -16,6 +16,6 @@ object IAPHelper {
     private fun hasHandlerAvailable(intent: Intent, context: Context): Boolean {
         val manager = context.packageManager
         val infos = manager.queryIntentActivities(intent, 0)
-        return !infos.isEmpty()
+        return infos.isNotEmpty()
     }
 }

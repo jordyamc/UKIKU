@@ -91,6 +91,7 @@
     </style>
 
     <style name="AppTheme.Dialog.Base" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorPrimary">?attr/colorSecondary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -99,6 +100,7 @@
     </style>
 
     <style name="AppTheme.Dialog.Base.Light" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorPrimary">?attr/colorSecondary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

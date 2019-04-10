@@ -50,7 +50,7 @@ class RecommendActivity : GenericActivity() {
         get() = PrefsUtil.layType != "0"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(layout)
         toolbar.title = "Sugeridos"

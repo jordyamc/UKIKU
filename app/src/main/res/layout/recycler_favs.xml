@@ -17,10 +17,10 @@
         android:paddingEnd="10dp"
         app:layoutManager="LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:fastScrollPopupBgColor="?colorAccent"
+        app:fastScrollPopupBgColor="?colorSecondary"
         app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollThumbColor="?colorAccent"
-        app:fastScrollThumbInactiveColor="?colorAccentLight"
+        app:fastScrollThumbColor="?colorSecondary"
+        app:fastScrollThumbInactiveColor="?colorSecondaryVariant"
         tools:listitem="@layout/item_fav"/>
 
     <LinearLayout

@@ -3,6 +3,7 @@ package knf.kuma.videoservers
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.Pair
+import knf.kuma.commons.noCrash
 
 class Headers : Parcelable {
     var headers: MutableList<Pair<String, String>> = mutableListOf()
@@ -43,8 +44,10 @@ class Headers : Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, i: Int) {
-        parcel.writeList(headers)
-        parcel.writeList(cookies)
+        noCrash {
+            parcel.writeList(headers as List<*>?)
+            parcel.writeList(cookies as List<*>?)
+        }
     }
 
     companion object CREATOR : Parcelable.Creator<Headers> {

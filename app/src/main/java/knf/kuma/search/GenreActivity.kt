@@ -19,7 +19,7 @@ class GenreActivity : GenericActivity() {
     private var isFirst = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.recycler_genre)
         toolbar.title = intent.getStringExtra("name")

@@ -7,10 +7,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import android.preference.PreferenceManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.preference.PreferenceManager
 import com.crashlytics.android.Crashlytics
 import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
@@ -47,7 +47,7 @@ class RecentsJob : Job() {
     private val summaryBroadcast: Intent
         get() = Intent(context, RecentsNotReceiver::class.java).putExtra("mode", 1)
 
-    override fun onRunJob(params: Job.Params): Job.Result {
+    override fun onRunJob(params: Params): Result {
         try {
             manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val recents = Jspoon.create().adapter(Recents::class.java).fromHtml(jsoupCookies("https://animeflv.net/").get().outerHtml())
@@ -56,18 +56,18 @@ class RecentsJob : Job() {
                 recentObject.key = i
             val local = recentsDAO.all
             if (local.isEmpty() && !BuildConfig.DEBUG)
-                return Job.Result.SUCCESS
+                return Result.SUCCESS
             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notify_favs", false)) {
                 notifyFavChaps(local, objects)
             } else {
                 notifyAllChaps(local, objects)
             }
             recentsDAO.setCache(objects)
-            return Job.Result.SUCCESS
+            return Result.SUCCESS
         } catch (e: Exception) {
             e.printStackTrace()
             Crashlytics.logException(e)
-            return Job.Result.FAILURE
+            return Result.FAILURE
         }
 
     }

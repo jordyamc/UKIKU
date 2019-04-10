@@ -94,8 +94,8 @@ data class Achievement(
                 .setSubtitle(description)
                 .setIcon(tintedIcon(context))
                 .setTextColor(Color.WHITE)
-                .setBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColor(context)))
-                .setIconBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight(context)))
+                .setBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColor()))
+                .setIconBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight()))
         //.setPopUpOnClickListener { context.startActivity(Intent(context,)) }
     }
 }

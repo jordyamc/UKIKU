@@ -57,7 +57,6 @@ class App : Application() {
         super.onCreate()
         JobManager.create(this).addJobCreator(JobsCreator())
         context = this
-        PrefsUtil.init(this)
         Fabric.with(this,
                 Crashlytics.Builder().core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build(),
                 Answers()

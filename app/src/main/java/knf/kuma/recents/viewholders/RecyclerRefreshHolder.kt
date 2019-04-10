@@ -18,7 +18,7 @@ class RecyclerRefreshHolder(view: View) {
     init {
         recyclerView.layoutManager = layoutManager
         recyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(view.context, R.anim.layout_fall_down)
-        refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(view.context), EAHelper.getThemeColorLight(view.context), R.color.colorPrimary)
+        refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
     }
 
     fun scrollToTop() {

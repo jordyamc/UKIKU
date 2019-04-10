@@ -1,7 +1,7 @@
 package knf.kuma.animeinfo.img
 
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
 import knf.kuma.commons.*
@@ -38,7 +38,7 @@ class ActivityImgFull : GenericActivity() {
                     val results = JSONObject(response.body()?.string()
                             ?: "{}").getJSONArray("results")
                     response.close()
-                    for (i in 0..(results.length() - 1)) {
+                    for (i in 0 until results.length()) {
                         val json = results.getJSONObject(i)
                         val name = json.getString(keyTitle).toLowerCase()
                         if (title.toLowerCase() == name) {

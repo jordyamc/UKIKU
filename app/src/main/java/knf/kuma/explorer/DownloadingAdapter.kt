@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
@@ -30,6 +31,7 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: DownloadingItem, position: Int) {
         val downloadObject = downloadObjects[position]
+        holder.server.text = downloadObject.downloadServer
         holder.title.text = downloadObject.name
         holder.chapter.text = downloadObject.chapter
         holder.eta.text = downloadObject.subtext
@@ -120,7 +122,18 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
         return downloadObjects.size
     }
 
+    fun remove(eid: String) {
+        ArrayList(downloadObjects).forEachIndexed { index, downloadObject ->
+            if (downloadObject.eid == eid) {
+                downloadObjects.removeAt(index)
+                doOnUI { notifyItemRemoved(index) }
+                return
+            }
+        }
+    }
+
     inner class DownloadingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val server: TextView = itemView.server
         val title: TextView = itemView.title
         val chapter: TextView = itemView.chapter
         val eta: TextView = itemView.eta

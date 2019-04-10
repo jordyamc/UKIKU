@@ -63,6 +63,7 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
         holder?.scrollToTop()
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         ServersFactory.clear()

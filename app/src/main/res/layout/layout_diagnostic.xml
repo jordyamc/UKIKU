@@ -156,6 +156,42 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
+                        android:text="Internet"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:textColor="?colorAccent"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/downState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Bajada"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/upState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Subida"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
                         android:text="Directorio"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                         android:textColor="?colorAccent"/>

@@ -2,7 +2,87 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90684a6d-0c49-4c34-9f86-a427c19eef30" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/tv/details/TVAnimesDetailsFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/tv/details/TVAnimesDetailsFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../app/src/main/assets/commentaries.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/UriValidation.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/comments.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/markdown-navigator/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/markdown-navigator/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/release/app-release.apk" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/app-release.apk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/release/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/output.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/debug/res/xml/preferences.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/debug/res/xml/preferences.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/assets/changelog.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/assets/changelog.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/App.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/App.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/BottomFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/BottomFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Diagnostic.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Diagnostic.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/achievements/AchievementActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/achievements/AchievementActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/ActivityAnime.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/ActivityAnime.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/CommentsDialog.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/fragments/ChaptersFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/fragments/ChaptersFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/img/ActivityImgFull.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/img/ActivityImgFull.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/viewholders/AnimeActivityHolder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/viewholders/AnimeActivityHolder.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BUUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BUUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BackUpActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BackUpActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/changelog/ChangelogActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/changelog/ChangelogActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/AestheticUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/AestheticUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/BypassUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/BypassUtil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/EAHelper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/EAHelper.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/ExtensionUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/ExtensionUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/FileUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/FileUtil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PrefsUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PrefsUtil.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/AchievementUnlocked.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/AchievementUnlocked.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/GenericActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/GenericActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/ThemedControlsActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/ThemedControlsActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/FileAccessHelper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/FileAccessHelper.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/ExplorerActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/ExplorerActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/DirUpdateJob.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/DirUpdateJob.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/RecentsJob.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/RecentsJob.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/UpdateJob.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/UpdateJob.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsDetailsActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsDetailsActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/Achievement.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/Achievement.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/ConfigurationFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/ConfigurationFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/random/RandomActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/random/RandomActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/viewholders/RecyclerRefreshHolder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/viewholders/RecyclerRefreshHolder.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RankingActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RankingActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RecommendActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RecommendActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/record/RecordActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/record/RecordActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/GenreActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/GenreActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/seeing/SeeingActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/seeing/SeeingActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/slices/AnimeSlice.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/slices/AnimeSlice.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/Headers.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/Headers.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/ServersFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/ServersFactory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEListProvider.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEListProvider.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEmisionProvider.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEmisionProvider.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_seeing.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_seeing.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_chapters.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_chapters.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir_grid.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir_grid.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs_grid.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs_grid.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_casting_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_casting_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_downloaded_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_downloaded_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/menu_anime_info.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/menu_anime_info.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/styles_colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values/styles_colors.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/path_providers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/xml/path_providers.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/preferences.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/xml/preferences.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/tv/app-tv.apk" beforeDir="false" afterPath="$PROJECT_DIR$/../app/tv/app-tv.apk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../version.num" beforeDir="false" afterPath="$PROJECT_DIR$/../version.num" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,17 +96,29 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/get.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
+            <state relative-caret-position="34">
               <caret line="7" selection-start-line="7" selection-end-line="7" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/public/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="455">
+            <state relative-caret-position="25670">
               <caret line="1510" column="46" selection-start-line="1510" selection-start-column="46" selection-end-line="1510" selection-end-column="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/public/comments.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="5" column="5" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
+              <folding>
+                <element signature="n#style#0;n#div#1;n#body#0;n#ht#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -34,7 +126,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/public/about.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="339">
+            <state relative-caret-position="24871">
               <caret line="1463" column="46" selection-start-line="1463" selection-start-column="46" selection-end-line="1463" selection-end-column="46" />
             </state>
           </provider>
@@ -96,12 +188,14 @@
         <option value="$PROJECT_DIR$/public/amp/about.html" />
         <option value="$PROJECT_DIR$/public/about.html" />
         <option value="$PROJECT_DIR$/public/index.html" />
+        <option value="$PROJECT_DIR$/public/comments.php" />
       </list>
     </option>
   </component>
   <component name="PhpServers">
     <servers />
   </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP 7.2" />
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-7" />
     <option name="y" value="2" />
@@ -116,7 +210,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -129,36 +222,20 @@
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="public" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="public" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="public" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="fonts" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="public" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="images" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Animeflv2/docs" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="reference.webide.settings.project.settings.php" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -206,16 +283,19 @@
       <workItem from="1549998777759" duration="71000" />
       <workItem from="1549999362038" duration="2592000" />
       <workItem from="1550013532510" duration="10171000" />
+      <workItem from="1554426229272" duration="5052000" />
+      <workItem from="1554579273602" duration="133000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="35448000" />
+    <option name="totallyTimeSpent" value="40633000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22617611" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23227383" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -226,10 +306,11 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32922733" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32922733" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" weight="0.32995495" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="11" />
+      <window_info anchor="bottom" id="PHP-CGI Server" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -278,6 +359,52 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/public/amp/index.html" />
     <entry file="file://$PROJECT_DIR$/public/amp/about.html" />
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/stubs/superglobals/_superglobals.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="65" selection-start-line="65" selection-end-line="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://JavaScript-modules-diagram//comments.php">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>JavaScript-modules-diagram</ID>
+          <OriginalElement>/comments.php</OriginalElement>
+          <nodes />
+          <notes />
+          <edges />
+          <settings layout="Hierarchic Group" zoom="1.0" x="631.0" y="421.0" />
+          <SelectedNodes />
+          <Categories>
+            <Category>All</Category>
+          </Categories>
+          <SCOPE>All</SCOPE>
+          <VISIBILITY>Details</VISIBILITY>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/get.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="25670">
+          <caret line="1510" column="46" selection-start-line="1510" selection-start-column="46" selection-end-line="1510" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/about.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24871">
+          <caret line="1463" column="46" selection-start-line="1463" selection-start-column="46" selection-end-line="1463" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/test.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6885">
@@ -285,24 +412,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/get.php">
+    <entry file="file://$PROJECT_DIR$/public/comments.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" selection-start-line="7" selection-end-line="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/public/about.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
-          <caret line="1463" column="46" selection-start-line="1463" selection-start-column="46" selection-end-line="1463" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/public/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
-          <caret line="1510" column="46" selection-start-line="1510" selection-start-column="46" selection-end-line="1510" selection-end-column="46" />
+        <state relative-caret-position="85">
+          <caret line="5" column="5" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
+          <folding>
+            <element signature="n#style#0;n#div#1;n#body#0;n#ht#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

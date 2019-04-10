@@ -10,7 +10,6 @@ import android.content.Intent
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.IBinder
-import android.preference.PreferenceManager
 import android.util.Log
 import android.util.Pair
 import androidx.core.app.NotificationCompat
@@ -42,7 +41,7 @@ class DownloadManager : Service() {
             stopForeground(true)
             stopSelf()
         }
-        return Service.START_STICKY
+        return START_STICKY
     }
 
     override fun onCreate() {
@@ -72,8 +71,7 @@ class DownloadManager : Service() {
         fun init() {
             notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val configuration = FetchConfiguration.Builder(context)
-                    .setDownloadConcurrentLimit(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("max_parallel_downloads", "3")
-                            ?: "3"))
+                    .setDownloadConcurrentLimit(PrefsUtil.maxParallelDownloads)
                     .enableLogging(BuildConfig.DEBUG)
                     .enableRetryOnNetworkGain(true)
                     .setHttpDownloader(OkHttpDownloader(OkHttpClient.Builder().followRedirects(true).followSslRedirects(true).build()))
@@ -103,6 +101,7 @@ class DownloadManager : Service() {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null) {
                         if (FileAccessHelper.INSTANCE.isTempFile(download.file)) {
+                            Log.e("Download", "Moving temp")
                             downloadObject.setEta(-2)
                             downloadObject.progress = 0
                             downloadDao.update(downloadObject)
@@ -135,14 +134,14 @@ class DownloadManager : Service() {
                 }
 
                 override fun onError(download: Download, error: Error, throwable: Throwable?) {
+                    Log.e("Download", "Error downloader")
+                    throwable?.printStackTrace()
+                    Crashlytics.logException(throwable)
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null) {
                         errorNotification(downloadObject)
                         downloadDao.delete(downloadObject)
-                        throwable?.printStackTrace()
                         fetch?.delete(download.id)
-                        throwable?.printStackTrace()
-                        Crashlytics.logException(throwable)
                         stopIfNeeded()
                     }
                 }
@@ -255,6 +254,18 @@ class DownloadManager : Service() {
             }
         }
 
+        fun cancelAll() {
+            val downloads = downloadDao.allRaw
+            val dids = mutableListOf<Int>()
+            downloads.forEach {
+                dids.add(it.getDid())
+                notificationManager?.cancel(it.eid?.toInt() ?: 0)
+            }
+            fetch?.delete(dids)
+            downloadDao.delete(downloads)
+            stopIfNeeded()
+        }
+
         fun pause(downloadObject: DownloadObject) {
             pause(downloadObject.getDid())
         }
@@ -334,19 +345,6 @@ class DownloadManager : Service() {
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()
             notificationManager?.notify(downloadObject.eid?.toInt() ?: 0, notification)
-        }
-
-        private fun foregroundNotification(): Notification {
-            return NotificationCompat.Builder(context, CHANNEL_FOREGROUND).apply {
-                setSmallIcon(R.drawable.ic_service)
-                setOngoing(true)
-                priority = NotificationCompat.PRIORITY_MIN
-                setGroup("manager")
-                if (PrefsUtil.collapseDirectoryNotification)
-                    setSubText("Descargas en progreso")
-                else
-                    setContentTitle("Descargas en progreso")
-            }.build()
         }
 
         private fun foregroundGroupNotification(): Notification {

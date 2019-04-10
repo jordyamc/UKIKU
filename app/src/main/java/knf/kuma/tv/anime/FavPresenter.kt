@@ -8,15 +8,15 @@ import knf.kuma.tv.cards.FavCardView
 
 class FavPresenter : Presenter() {
 
-    override fun onCreateViewHolder(parent: ViewGroup): Presenter.ViewHolder {
-        return Presenter.ViewHolder(FavCardView(parent.context))
+    override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
+        return ViewHolder(FavCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
         (viewHolder.view as FavCardView).bind(item as FavoriteObject)
     }
 
-    override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {
+    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
 
     }
 }

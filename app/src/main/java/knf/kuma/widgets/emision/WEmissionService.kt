@@ -29,7 +29,7 @@ class WEmissionService : RemoteViewsService() {
         super.onDestroy()
     }
 
-    override fun onGetViewFactory(intent: Intent): RemoteViewsService.RemoteViewsFactory {
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
         return WEListProvider(applicationContext)
     }
 }

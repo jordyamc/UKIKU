@@ -6,8 +6,8 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/header"
+    <TextView
+        android:id="@+id/header"
               android:layout_width="0dp"
               android:layout_height="wrap_content"
               android:layout_marginTop="10dp"

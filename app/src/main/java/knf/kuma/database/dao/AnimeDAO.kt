@@ -89,7 +89,7 @@ interface AnimeDAO {
     fun getAnimeRaw(link: String): AnimeObject?
 
     @Query("SELECT `key`,name,link,aid,type FROM AnimeObject ORDER BY RANDOM() LIMIT :limit")
-    fun getRandom(limit: Int): LiveData<MutableList<RandomObject>>
+    fun getRandom(limit: Int): List<RandomObject>
 
     @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day AND aid NOT IN (:list) ORDER BY name")
     fun getByDay(day: Int, list: Set<String>): LiveData<MutableList<SearchObject>>

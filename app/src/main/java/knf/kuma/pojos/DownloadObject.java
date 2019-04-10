@@ -33,6 +33,7 @@ public class DownloadObject {
     public String did;
     public String eta;
     public String speed;
+    public String server;
     public Headers headers;
     @Ignore
     public String title;
@@ -45,7 +46,7 @@ public class DownloadObject {
     public boolean canResume;
     public int state;
 
-    public DownloadObject(int key, String eid, String file, String link, String name, String chapter, String did, String eta, String speed, Headers headers, int progress, long d_bytes, long t_bytes, boolean canResume, int state) {
+    public DownloadObject(int key, String eid, String file, String link, String name, String chapter, String did, String eta, String speed, String server, Headers headers, int progress, long d_bytes, long t_bytes, boolean canResume, int state) {
         this.key = key;
         this.eid = eid;
         this.file = file;
@@ -55,6 +56,7 @@ public class DownloadObject {
         this.did = did;
         this.eta = eta;
         this.speed = speed;
+        this.server = server;
         this.headers = headers;
         this.title = name + chapter.substring(chapter.lastIndexOf(" "));
         this.progress = progress;
@@ -180,6 +182,13 @@ public class DownloadObject {
             size = size.substring(0, size.lastIndexOf("."));
         return size;*/
         return progress + "%";
+    }
+
+    public String getDownloadServer() {
+        if ("".equals(server.trim()))
+            return "Desconocido";
+        else
+            return server;
     }
 
     private String formatSize(long v) {

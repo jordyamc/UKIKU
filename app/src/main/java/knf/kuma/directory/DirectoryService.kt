@@ -7,12 +7,12 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
-import android.preference.PreferenceManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
@@ -42,7 +42,7 @@ class DirectoryService : IntentService("Directory update") {
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSmallIcon(R.drawable.ic_directory_not)
                     .setSound(null, AudioManager.STREAM_NOTIFICATION)
-                    .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+                    .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
                     .setWhen(CURRENT_TIME)
             if (PrefsUtil.collapseDirectoryNotification)
                 notification.setSubText("Verificando directorio")
@@ -58,9 +58,10 @@ class DirectoryService : IntentService("Directory update") {
 
     override fun onHandleIntent(intent: Intent?) {
         isRunning = true
-        if (!Network.isConnected) {
+        if (!Network.isConnected || BypassUtil.isNeeded()) {
             stopSelf()
             cancelForeground()
+            return
         }
         setStatus(STATE_VERIFYING)
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -128,6 +129,12 @@ class DirectoryService : IntentService("Directory update") {
                     })
                     if (animeObjects.isNotEmpty())
                         animeDAO.insertAll(animeObjects)
+                }
+            } catch (e: HttpStatusException) {
+                if (e.statusCode == 403 || e.statusCode == 503) {
+                    setStatus(STATE_INTERRUPTED)
+                    stopSelf()
+                    cancelForeground()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Page error: $s | ${e.message}")
@@ -205,7 +212,7 @@ class DirectoryService : IntentService("Directory update") {
             setOngoing(true)
             priority = NotificationCompat.PRIORITY_MIN
             setSmallIcon(R.drawable.ic_directory_not)
-            color = ContextCompat.getColor(this@DirectoryService, EAHelper.getThemeColor(this@DirectoryService))
+            color = ContextCompat.getColor(this@DirectoryService, EAHelper.getThemeColor())
             setWhen(CURRENT_TIME)
             setSound(null)
             if (PrefsUtil.collapseDirectoryNotification)

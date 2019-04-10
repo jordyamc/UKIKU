@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
+    android:minHeight="15dp"
     android:theme="@style/AppTheme.Cardview"
     app:cardCornerRadius="2dp"
     app:cardElevation="2dp">

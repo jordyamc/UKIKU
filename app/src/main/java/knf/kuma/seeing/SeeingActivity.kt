@@ -19,7 +19,7 @@ class SeeingActivity : GenericActivity() {
     val pager: ViewPager by bind(R.id.pager)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_seening)
         toolbar.title = "Siguiendo"

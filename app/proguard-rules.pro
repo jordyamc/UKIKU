@@ -79,3 +79,6 @@
 -dontwarn com.dropbox.core.**
 -dontwarn io.branch.**
 -dontwarn com.bumptech.glide.**
+-dontwarn com.smaato.soma.SomaUnityPlugin*
+-dontwarn com.millennialmedia**
+-dontwarn com.facebook.**

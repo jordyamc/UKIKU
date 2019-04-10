@@ -2,9 +2,9 @@ package knf.kuma.widgets.emision
 
 import android.content.Context
 import android.graphics.Color
-import android.preference.PreferenceManager
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.preference.PreferenceManager
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
@@ -75,8 +75,7 @@ class WEListProvider internal constructor(private val context: Context) : Remote
     }
 
     private fun getColor(isText: Boolean): Int {
-        val type = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_value", "0")
-        return when (type) {
+        return when (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_value", "0")) {
             "1" -> if (isText)
                 Color.parseColor("#323232")
             else

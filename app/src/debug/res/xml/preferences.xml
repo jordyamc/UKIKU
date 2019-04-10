@@ -64,6 +64,10 @@
             android:key="download_type"
             android:summary="%s"
             android:title="Descargas"/>
+        <Preference
+            android:icon="@drawable/ic_download"
+            android:key="download_type_q"
+            android:title="Descargas"/>
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_hide_pref"

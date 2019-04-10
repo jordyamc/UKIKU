@@ -37,7 +37,7 @@ class RecordActivity : GenericActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(layout)
         toolbar.title = "Historial"

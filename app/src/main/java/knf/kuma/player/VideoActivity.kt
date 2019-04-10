@@ -9,11 +9,11 @@ import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.View
+import androidx.preference.PreferenceManager
 import com.github.rubensousa.previewseekbar.PreviewLoader
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -46,7 +46,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     private var requestedFrame = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         setContentView(R.layout.player_view)

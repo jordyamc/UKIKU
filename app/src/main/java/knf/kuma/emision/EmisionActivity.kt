@@ -21,14 +21,14 @@ class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
         get() {
             var day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
             day--
-            return if (day == 0)
-                7
-            else
-                day
+            return when (day) {
+                0 -> 7
+                else -> day
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emision)
         toolbar.title = "Emisión"
@@ -54,8 +54,6 @@ class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
         menuInflater.inflate(R.menu.menu_emision, menu)
         if (PrefsUtil.emissionShowHidden)
             menu.findItem(R.id.action_hideshow).setIcon(R.drawable.ic_hide_pref)
-        /*if (!PrefsUtil.emissionShowFavs)
-            menu.findItem(R.id.action_favs).setIcon(R.drawable.ic_heart_full_menu)*/
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -67,11 +65,6 @@ class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
                 PrefsUtil.emissionShowHidden = !show
                 pagerAdapter?.reloadPages()
             }
-            /*R.id.action_favs -> {
-                val show = PrefsUtil.emissionShowFavs
-                PrefsUtil.emissionShowFavs = !show
-                pagerAdapter?.updateChanges()
-            }*/
         }
         invalidateOptionsMenu()
         return super.onOptionsItemSelected(item)
@@ -90,10 +83,8 @@ class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
     }
 
     private fun getDayByPos(position: Int): Int {
-        var pos = position
-        pos += 2
-        if (pos == 8)
-            pos = 1
+        var pos = position + 2
+        if (pos == 8) pos = 1
         return pos
     }
 

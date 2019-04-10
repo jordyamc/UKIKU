@@ -286,9 +286,12 @@
             android:supportsPictureInPicture="true"/>
         <activity android:name=".custom.ThemedControlsActivity"/>
         <activity android:name=".news.NewsActivity"/>
-        <activity android:name=".news.NewsDetailsActivity"/>
         <activity android:name=".achievements.AchievementActivity"/>
         <activity android:name=".commons.EAUnlockActivity"/>
+        <activity
+            android:name="com.smaato.soma.ExpandedBannerActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:resizeableActivity="false"/>
         <activity
             android:name="es.munix.multidisplaycast.CastControlsActivity"
             android:screenOrientation="sensor"

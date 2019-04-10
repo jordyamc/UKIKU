@@ -132,91 +132,109 @@
     <style name="AppTheme.NoActionBar.Pink" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentPink</item>
         <item name="colorSecondary">@color/colorAccentPink</item>
+        <item name="colorSecondaryVariant">@color/colorAccentPinkLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Purple" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentPurple</item>
         <item name="colorSecondary">@color/colorAccentPurple</item>
+        <item name="colorSecondaryVariant">@color/colorAccentPurpleLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.DeepPurple" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentDeepPurple</item>
         <item name="colorSecondary">@color/colorAccentDeepPurple</item>
+        <item name="colorSecondaryVariant">@color/colorAccentDeepPurpleLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Indigo" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentIndigo</item>
         <item name="colorSecondary">@color/colorAccentIndigo</item>
+        <item name="colorSecondaryVariant">@color/colorAccentIndigoLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Blue" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentBlue</item>
         <item name="colorSecondary">@color/colorAccentBlue</item>
+        <item name="colorSecondaryVariant">@color/colorAccentBlueLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.LightBlue" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentLightBlue</item>
         <item name="colorSecondary">@color/colorAccentLightBlue</item>
+        <item name="colorSecondaryVariant">@color/colorAccentLightBlueLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Cyan" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentCyan</item>
         <item name="colorSecondary">@color/colorAccentCyan</item>
+        <item name="colorSecondaryVariant">@color/colorAccentCyanLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Teal" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentTeal</item>
         <item name="colorSecondary">@color/colorAccentTeal</item>
+        <item name="colorSecondaryVariant">@color/colorAccentTealLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Green" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentGreen</item>
         <item name="colorSecondary">@color/colorAccentGreen</item>
+        <item name="colorSecondaryVariant">@color/colorAccentGreenLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.LightGreen" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentLightGreen</item>
         <item name="colorSecondary">@color/colorAccentLightGreen</item>
+        <item name="colorSecondaryVariant">@color/colorAccentLightGreenLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Lime" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentLime</item>
         <item name="colorSecondary">@color/colorAccentLime</item>
+        <item name="colorSecondaryVariant">@color/colorAccentLimeLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Yellow" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentYellow</item>
         <item name="colorSecondary">@color/colorAccentYellow</item>
+        <item name="colorSecondaryVariant">@color/colorAccentYellowLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Amber" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentAmber</item>
         <item name="colorSecondary">@color/colorAccentAmber</item>
+        <item name="colorSecondaryVariant">@color/colorAccentAmberLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Orange" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentOrange</item>
         <item name="colorSecondary">@color/colorAccentOrange</item>
+        <item name="colorSecondaryVariant">@color/colorAccentOrangeLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.DeepOrange" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentDeepOrange</item>
         <item name="colorSecondary">@color/colorAccentDeepOrange</item>
+        <item name="colorSecondaryVariant">@color/colorAccentDeepOrangeLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Brown" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentBrown</item>
         <item name="colorSecondary">@color/colorAccentBrown</item>
+        <item name="colorSecondaryVariant">@color/colorAccentBrownLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.Gray" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentGray</item>
         <item name="colorSecondary">@color/colorAccentGray</item>
+        <item name="colorSecondaryVariant">@color/colorAccentGrayLight</item>
     </style>
 
     <style name="AppTheme.NoActionBar.BlueGray" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@color/colorAccentBlueGrey</item>
         <item name="colorSecondary">@color/colorAccentBlueGrey</item>
+        <item name="colorSecondaryVariant">@color/colorAccentBlueGreyLight</item>
     </style>
 
     <!--Dialog-->

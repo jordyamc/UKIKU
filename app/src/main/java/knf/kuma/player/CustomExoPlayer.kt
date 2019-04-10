@@ -9,8 +9,8 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.View
+import androidx.preference.PreferenceManager
 import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
@@ -56,7 +56,7 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         setContentView(R.layout.exo_player)
@@ -151,12 +151,6 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
     private fun onSkip() {
         exoPlayer?.seekTo(exoPlayer?.currentWindowIndex ?: 0, (exoPlayer?.currentPosition
                 ?: 0) + 85000)
-    }
-
-    private fun onExitPip() {
-        application.startActivity(Intent(this, javaClass)
-                .putExtra("isReorder", true)
-                .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {

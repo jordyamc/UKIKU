@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -12,6 +11,7 @@ import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
+import androidx.preference.PreferenceManager
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LevelEndEvent
 import com.crashlytics.android.answers.LevelStartEvent
@@ -162,8 +162,8 @@ object EAHelper {
     }
 
     @StyleRes
-    fun getTheme(context: Context?): Int {
-        if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+    fun getTheme(): Int {
+        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
             return R.style.AppTheme_DayNight
         when (PrefsUtil.themeColor) {
             "0" -> return R.style.AppTheme_DayNight
@@ -190,8 +190,8 @@ object EAHelper {
     }
 
     @StyleRes
-    fun getThemeNA(context: Context?): Int {
-        if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+    fun getThemeNA(): Int {
+        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
             return R.style.AppTheme_NoActionBar
         when (PrefsUtil.themeColor) {
             "0" -> return R.style.AppTheme_NoActionBar
@@ -218,8 +218,8 @@ object EAHelper {
     }
 
     @StyleRes
-    fun getThemeDialog(context: Context?): Int {
-        if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+    fun getThemeDialog(): Int {
+        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
             return R.style.AppTheme_Dialog_Base
         when (PrefsUtil.themeColor) {
             "0" -> return R.style.AppTheme_Dialog_Base
@@ -246,31 +246,10 @@ object EAHelper {
     }
 
     @DrawableRes
-    fun getThemeImg(context: Context?): Int {
-        if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.drawable.side_nav_bar
-        when (PrefsUtil.themeColor) {
-            "0" -> return R.drawable.side_nav_bar
-            "1" -> return R.drawable.side_nav_bar_pink
-            "2" -> return R.drawable.side_nav_bar_purple
-            "3" -> return R.drawable.side_nav_bar_deep_purple
-            "4" -> return R.drawable.side_nav_bar_indigo
-            "5" -> return R.drawable.side_nav_bar_blue
-            "6" -> return R.drawable.side_nav_bar_light_blue
-            "7" -> return R.drawable.side_nav_bar_cyan
-            "8" -> return R.drawable.side_nav_bar_teal
-            "9" -> return R.drawable.side_nav_bar_green
-            "10" -> return R.drawable.side_nav_bar_light_green
-            "11" -> return R.drawable.side_nav_bar_lime
-            "12" -> return R.drawable.side_nav_bar_yellow
-            "13" -> return R.drawable.side_nav_bar_amber
-            "14" -> return R.drawable.side_nav_bar_orange
-            "15" -> return R.drawable.side_nav_bar_deep_orange
-            "16" -> return R.drawable.side_nav_bar_brown
-            "17" -> return R.drawable.side_nav_bar_gray
-            "18" -> return R.drawable.side_nav_bar_blue_gray
-            else -> return R.drawable.side_nav_bar
-        }
+    fun getThemeImg(): Int {
+        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+            return getThemeImg("0")
+        return getThemeImg(PrefsUtil.themeColor)
     }
 
     @DrawableRes
@@ -300,31 +279,10 @@ object EAHelper {
     }
 
     @ColorRes
-    fun getThemeColor(context: Context?): Int {
-        if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.color.colorAccent
-        when (PrefsUtil.themeColor) {
-            "0" -> return R.color.colorAccent
-            "1" -> return R.color.colorAccentPink
-            "2" -> return R.color.colorAccentPurple
-            "3" -> return R.color.colorAccentDeepPurple
-            "4" -> return R.color.colorAccentIndigo
-            "5" -> return R.color.colorAccentBlue
-            "6" -> return R.color.colorAccentLightBlue
-            "7" -> return R.color.colorAccentCyan
-            "8" -> return R.color.colorAccentTeal
-            "9" -> return R.color.colorAccentGreen
-            "10" -> return R.color.colorAccentLightGreen
-            "11" -> return R.color.colorAccentLime
-            "12" -> return R.color.colorAccentYellow
-            "13" -> return R.color.colorAccentAmber
-            "14" -> return R.color.colorAccentOrange
-            "15" -> return R.color.colorAccentDeepOrange
-            "16" -> return R.color.colorAccentBrown
-            "17" -> return R.color.colorAccentGray
-            "18" -> return R.color.colorAccentBlueGrey
-            else -> return R.color.colorAccent
-        }
+    fun getThemeColor(): Int {
+        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+            return getThemeColor("0")
+        return getThemeColor(PrefsUtil.themeColor)
     }
 
     @ColorRes
@@ -354,31 +312,10 @@ object EAHelper {
     }
 
     @ColorRes
-    fun getThemeColorLight(context: Context?): Int {
-        if (context == null || !isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.color.colorAccentLight
-        when (PrefsUtil.themeColor) {
-            "0" -> return R.color.colorAccentLight
-            "1" -> return R.color.colorAccentPinkLight
-            "2" -> return R.color.colorAccentPurpleLight
-            "3" -> return R.color.colorAccentDeepPurpleLight
-            "4" -> return R.color.colorAccentIndigoLight
-            "5" -> return R.color.colorAccentBlueLight
-            "6" -> return R.color.colorAccentLightBlueLight
-            "7" -> return R.color.colorAccentCyanLight
-            "8" -> return R.color.colorAccentTealLight
-            "9" -> return R.color.colorAccentGreenLight
-            "10" -> return R.color.colorAccentLightGreenLight
-            "11" -> return R.color.colorAccentLimeLight
-            "12" -> return R.color.colorAccentYellowLight
-            "13" -> return R.color.colorAccentAmberLight
-            "14" -> return R.color.colorAccentOrangeLight
-            "15" -> return R.color.colorAccentDeepOrangeLight
-            "16" -> return R.color.colorAccentBrownLight
-            "17" -> return R.color.colorAccentGrayLight
-            "18" -> return R.color.colorAccentBlueGreyLight
-            else -> return R.color.colorAccentLight
-        }
+    fun getThemeColorLight(): Int {
+        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+            return getThemeColorLight("0")
+        return getThemeColorLight(PrefsUtil.themeColor)
     }
 
     @ColorRes
@@ -413,7 +350,7 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
     private val iapWrapper: IAPWrapper by lazy { IAPWrapper(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ea)
         setSupportActionBar(toolbar)

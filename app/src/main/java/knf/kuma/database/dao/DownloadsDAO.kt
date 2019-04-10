@@ -10,6 +10,12 @@ interface DownloadsDAO {
     @get:Query("SELECT * FROM downloadobject")
     val all: DataSource.Factory<Int, DownloadObject>
 
+    @get:Query("SELECT eid FROM downloadobject")
+    val allEids: List<String>
+
+    @get:Query("SELECT * FROM downloadobject WHERE state < 4")
+    val allRaw: List<DownloadObject>
+
     @get:Query("SELECT * FROM downloadobject WHERE state<=0")
     val active: LiveData<List<DownloadObject>>
 
@@ -45,4 +51,7 @@ interface DownloadsDAO {
 
     @Delete
     fun delete(downloadObject: DownloadObject)
+
+    @Delete
+    fun delete(downloadObjects: List<DownloadObject>)
 }

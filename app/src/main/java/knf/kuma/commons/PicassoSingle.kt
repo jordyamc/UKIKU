@@ -11,7 +11,7 @@ object PicassoSingle {
 
     fun get(): Picasso {
         if (!::picasso.isInitialized)
-            PicassoSingle.picasso = create()
+            picasso = create()
         return picasso
     }
 

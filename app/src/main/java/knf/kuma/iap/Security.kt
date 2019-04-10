@@ -10,10 +10,10 @@ import java.security.spec.X509EncodedKeySpec
 
 
 object Security {
-    private val TAG = "IABUtil/Security"
+    private const val TAG = "IABUtil/Security"
 
-    private val KEY_FACTORY_ALGORITHM = "RSA"
-    private val SIGNATURE_ALGORITHM = "SHA1withRSA"
+    private const val KEY_FACTORY_ALGORITHM = "RSA"
+    private const val SIGNATURE_ALGORITHM = "SHA1withRSA"
 
     /**
      * Verifies that the data was signed with the given signature, and returns

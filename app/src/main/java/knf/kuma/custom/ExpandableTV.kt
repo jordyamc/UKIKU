@@ -18,7 +18,7 @@ import java.util.*
 
 class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : AppCompatTextView(context, attrs, defStyle) {
 
-    private val onExpandListeners: MutableList<ExpandableTV.OnExpandListener>
+    private val onExpandListeners: MutableList<OnExpandListener>
     private var mMaxLines = 4
     private var indicator: ImageButton? = null
     private var needIndicator = true
@@ -54,7 +54,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
         // if this TextView is collapsed and mMaxLines = 0,
         // than make its height equals to zero
         if (this.mMaxLines == 0 && !this.isExpanded && !this.animating) {
-            measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.EXACTLY)
+            measureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY)
         }
 
         super.onMeasure(widthMeasureSpec, measureSpec)
@@ -86,8 +86,8 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
 
             // measure collapsed height
             this.measure(
-                    View.MeasureSpec.makeMeasureSpec(this.measuredWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                    MeasureSpec.makeMeasureSpec(this.measuredWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             )
 
             this.collapsedHeight = this.measuredHeight
@@ -100,8 +100,8 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
 
             // measure expanded height
             this.measure(
-                    View.MeasureSpec.makeMeasureSpec(this.measuredWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                    MeasureSpec.makeMeasureSpec(this.measuredWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
             )
 
             val expandedHeight = this.measuredHeight
@@ -213,7 +213,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
      *
      * @param onExpandListener the listener.
      */
-    fun addOnExpandListener(onExpandListener: ExpandableTV.OnExpandListener) {
+    fun addOnExpandListener(onExpandListener: OnExpandListener) {
         this.onExpandListeners.add(onExpandListener)
     }
 
@@ -222,7 +222,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
      *
      * @param onExpandListener the listener.
      */
-    fun removeOnExpandListener(onExpandListener: ExpandableTV.OnExpandListener) {
+    fun removeOnExpandListener(onExpandListener: OnExpandListener) {
         this.onExpandListeners.remove(onExpandListener)
     }
 
@@ -325,7 +325,7 @@ class ExpandableTV @JvmOverloads constructor(context: Context, attrs: AttributeS
      * implementations of each method. Extend this if you do not intend to override
      * every method of [ExpandableTV.OnExpandListener].
      */
-    class SimpleOnExpandListener : ExpandableTV.OnExpandListener {
+    class SimpleOnExpandListener : OnExpandListener {
         override fun onExpand(view: ExpandableTV) {
             // empty implementation
         }

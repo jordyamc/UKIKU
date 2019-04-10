@@ -13,7 +13,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
-import com.crashlytics.android.Crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil

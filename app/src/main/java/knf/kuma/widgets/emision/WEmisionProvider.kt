@@ -8,8 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.preference.PreferenceManager
 import android.widget.RemoteViews
+import androidx.preference.PreferenceManager
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.database.CacheDB
@@ -76,8 +76,7 @@ class WEmisionProvider : AppWidgetProvider() {
     }
 
     private fun getColor(context: Context, isText: Boolean): Int {
-        val type = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_value", "0")
-        return when (type) {
+        return when (PreferenceManager.getDefaultSharedPreferences(context).getString("theme_value", "0")) {
             "1" -> if (isText)
                 Color.parseColor("#323232")
             else

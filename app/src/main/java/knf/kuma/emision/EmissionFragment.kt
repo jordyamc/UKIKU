@@ -17,8 +17,7 @@ import knf.kuma.search.SearchObject
 import kotlinx.android.synthetic.main.recycler_emision.*
 import java.util.*
 
-class EmissionFragment : Fragment() {
-    private val dao = CacheDB.INSTANCE.animeDAO()
+class EmissionFragment : Fragment(), RemoveListener {
     private var adapter: EmissionAdapter? = null
     private var isFirst = true
 
@@ -62,33 +61,13 @@ class EmissionFragment : Fragment() {
         liveData.observe(this, observer)
     }
 
+    override fun onRemove(showError: Boolean) {
+        if (showError) doOnUI { error.visibility = View.VISIBLE }
+    }
+
     private fun smoothScroll() {
         //recycler.layoutManager?.smoothScrollToPosition(recycler,null,0)
     }
-
-    /*private fun checkStates(animeObjects: MutableList<SearchObject>) {
-        doAsync {
-            try {
-                val updateList = mutableListOf<AnimeObject>()
-                for (animeObject in animeObjects) {
-                    try {
-                        val document = jsoupCookies(animeObject.link).get()
-                        val updated = AnimeObject(animeObject.link, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(document.outerHtml()))
-                        if (updated.state == "Finalizado")
-                            updateList.add(updated)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-                if (updateList.isNotEmpty()) {
-                    dao.updateAnimes(updateList)
-                    WEmisionProvider.update(context)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }*/
 
     fun updateChanges() {
         doOnUI { adapter?.notifyDataSetChanged() }

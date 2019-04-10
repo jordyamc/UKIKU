@@ -32,7 +32,7 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class ExplorerChapsAdapter internal constructor(private val fragment: Fragment, private val recyclerView: RecyclerView, private val explorerObject: ExplorerObject, private var clearInterface: FragmentChapters.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem>() {
+class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val recyclerView: RecyclerView, private val explorerObject: ExplorerObject, private var clearInterface: FragmentChapters.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem>() {
     private val context: Context? = fragment.context
 
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()

@@ -18,7 +18,7 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val adapter: NewsAdapter by lazy { NewsAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
         toolbar.title = "Noticias"
@@ -26,7 +26,7 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         toolbar.setNavigationOnClickListener { onBackPressed() }
-        refresh.setColorSchemeResources(EAHelper.getThemeColor(this), EAHelper.getThemeColorLight(this), R.color.colorPrimary)
+        refresh.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
         refresh.setOnRefreshListener(this)
         refresh.isRefreshing = true
         recycler.adapter = adapter

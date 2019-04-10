@@ -8,15 +8,15 @@ import knf.kuma.tv.cards.ChapterCardView
 
 class ChapterPresenter : Presenter() {
 
-    override fun onCreateViewHolder(parent: ViewGroup): Presenter.ViewHolder {
-        return Presenter.ViewHolder(ChapterCardView(parent.context))
+    override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
+        return ViewHolder(ChapterCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
         (viewHolder.view as ChapterCardView).bind(item as AnimeObject.WebInfo.AnimeChapter)
     }
 
-    override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {
+    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
 
     }
 }

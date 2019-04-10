@@ -10,11 +10,11 @@ import knf.kuma.tv.details.TVAnimesDetails
 
 class RecentsPresenter : Presenter() {
 
-    override fun onCreateViewHolder(parent: ViewGroup): Presenter.ViewHolder {
-        return Presenter.ViewHolder(RecentsCardView(parent.context))
+    override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
+        return ViewHolder(RecentsCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
         (viewHolder.view as RecentsCardView).bind(item as RecentObject)
         viewHolder.view.setOnLongClickListener { v ->
             val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(item.aid)
@@ -23,7 +23,7 @@ class RecentsPresenter : Presenter() {
         }
     }
 
-    override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {
+    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
 
     }
 }

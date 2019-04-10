@@ -10,9 +10,4 @@
         android:icon="@drawable/ic_share"
         android:title="Compartir"
         app:showAsAction="always"/>
-    <item
-        android:id="@+id/action_comments"
-        android:icon="@drawable/ic_comments"
-        android:title="Comentarios"
-        app:showAsAction="always"/>
 </menu>

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.text.Html
-import android.text.Spanned
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.LiveData
@@ -23,7 +22,6 @@ import java.util.regex.Pattern
 
 object NewsCreator {
     private val liveData = MutableLiveData<List<NewsObject>?>()
-    var currentNews: NewsObject? = null
     fun createNews(): LiveData<List<NewsObject>?> {
         reload()
         return liveData
@@ -135,13 +133,6 @@ data class NewsObject(
         //return "$author — ${TimeAgo.using(formated.time)}"
         val simpleDate = SimpleDateFormat("EEE, dd MMM hh:mmaa", Locale.getDefault())
         return "$author — ${simpleDate.format(formated)}"
-    }
-
-    fun richContent(imageGetter: Html.ImageGetter): Spanned {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY, imageGetter, null)
-        else
-            Html.fromHtml(content, imageGetter, null)
     }
 
     override fun equals(other: Any?): Boolean {

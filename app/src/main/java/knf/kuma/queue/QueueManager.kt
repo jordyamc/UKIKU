@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="102" version="4.1">
+        <change type="fix">Errores generales</change>
+        <change type="new">Prueba rapida de velocidad en diagnostico</change>
+        <change type="new">Soporte previo para Android Q</change>
+        <change type="change">Filtros de busqueda mejorados</change>
+        <change type="change">Comentarios mejorados</change>
+        <change type="change">Lista de descargas mejorada</change>
+    </release>
     <release code="102" version="4.0.4">
         <change type="fix">Errores generales</change>
         <change type="new">Servidor Fembed</change>

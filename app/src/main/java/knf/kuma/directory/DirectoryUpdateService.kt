@@ -13,6 +13,7 @@ import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import knf.kuma.pojos.DirectoryPage
+import org.jsoup.HttpStatusException
 import pl.droidsonroids.jspoon.Jspoon
 
 class DirectoryUpdateService : IntentService("Directory re-update") {
@@ -29,7 +30,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                     .setSubText("Actualizando directorio")
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSmallIcon(R.drawable.ic_dir_update)
-                    .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor(this)))
+                    .setColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
                     .setWhen(CURRENT_TIME)
             return notification.build()
         }
@@ -40,8 +41,11 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     }
 
     override fun onHandleIntent(intent: Intent?) {
-        if (!Network.isConnected)
+        if (!Network.isConnected || BypassUtil.isNeeded()) {
             stopSelf()
+            cancelForeground()
+            return
+        }
         isRunning = true
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
@@ -67,6 +71,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
             if (!Network.isConnected) {
                 Log.e("Directory Getter", "Processed $page pages before disconnection")
                 stopSelf()
+                cancelForeground()
                 return
             }
             try {
@@ -89,6 +94,11 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                     finished = true
                     Log.e("Directory Getter", "Processed ${page - 1} pages")
                 }
+            } catch (e: HttpStatusException) {
+                if (e.statusCode == 403 || e.statusCode == 503) {
+                    Log.e("Directory Getter", "Processed $page pages before interrupted")
+                    finished = true
+                }
             } catch (e: Exception) {
                 Log.e("Directory Getter", "Page error: $page | ${e.message}")
                 page++
@@ -109,7 +119,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
             setOngoing(true)
             priority = NotificationCompat.PRIORITY_MIN
             setSmallIcon(R.drawable.ic_dir_update)
-            color = ContextCompat.getColor(this@DirectoryUpdateService, EAHelper.getThemeColor(this@DirectoryUpdateService))
+            color = ContextCompat.getColor(this@DirectoryUpdateService, EAHelper.getThemeColor())
             setWhen(CURRENT_TIME)
             setSound(null)
             if (PrefsUtil.collapseDirectoryNotification)

@@ -17,7 +17,7 @@ class ExplorerActivity : GenericActivity(), OnFileStateChange {
     private var isExplorerFiles = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_explorer)
         toolbar.title = "Explorador"

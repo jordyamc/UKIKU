@@ -60,7 +60,7 @@ class AchievementActivity : GenericActivity() {
     private val levelCalculator = LevelCalculator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_achievement_profile)
         setSupportActionBar(toolbar)

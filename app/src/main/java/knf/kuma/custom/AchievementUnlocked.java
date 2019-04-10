@@ -274,149 +274,152 @@ public class AchievementUnlocked {
 
     @SuppressLint({"ObsoleteSdkInt", "SetTextI18n"})
     private void initGlobalFields() {
-        if (!initiatedGlobalFields) {
-            initiatedGlobalFields = true;
-            margin = convertDpToPixel(16);
-            elevation = convertDpToPixel(10);
-            paddingLarge = convertDpToPixel(10);
-            paddingSmall = convertDpToPixel(5);
-            smallSize = convertDpToPixel(50);
-            largeSize = convertDpToPixel(65);
-            translationY = convertDpToPixel(20);
+        try {
+            if (!initiatedGlobalFields) {
+                margin = convertDpToPixel(16);
+                elevation = convertDpToPixel(10);
+                paddingLarge = convertDpToPixel(10);
+                paddingSmall = convertDpToPixel(5);
+                smallSize = convertDpToPixel(50);
+                largeSize = convertDpToPixel(65);
+                translationY = convertDpToPixel(20);
 
-            achievementLayout = new RelativeLayout(context);
-            achievementLayout.setClipToPadding(FALSE);
-            LayoutParams motherLayoutLP = new LayoutParams(-2, -2);
-            achievementLayout.setLayoutParams(motherLayoutLP);
-            achievementLayout.setTag("motherLayout");
-            LinearLayout textContainerFake = new LinearLayout(context);
-            textContainerFake.setOrientation(VERTICAL);
-            textContainerFake.setPadding(convertDpToPixel(10), 0, convertDpToPixel(20), 0);
-            textContainerFake.setVisibility(View.INVISIBLE);
-            LayoutParams textContainerFakeLP = new LayoutParams(-2, -2);
-            textContainerFakeLP.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-            textContainerFake.setLayoutParams(textContainerFakeLP);
-            textContainerFake.setTag("textContainerFake");
-            TextView titleFake = new TextView(context);
-            titleFake.setText("Title");
-            LayoutParams titleFakeLP = new LayoutParams(-2, -2);
-            titleFake.setLayoutParams(titleFakeLP);
-            titleFake.setTag("titleFake");
-            titleFake.setMaxLines(1);
-            ScrollTextView subtitleFake = new ScrollTextView(context);
-            subtitleFake.setText("Subtitle");
-            subtitleFake.setVisibility(GONE);
-            subtitleFake.setMaxLines(1);
-            LayoutParams subtitleFakeLP = new LayoutParams(-2, -2);
-            subtitleFake.setLayoutParams(subtitleFakeLP);
-            subtitleFake.setTag("subtitleFake");
-            textContainerFake.addView(titleFake);
-            textContainerFake.addView(subtitleFake);
-            achievementLayout.addView(textContainerFake);
-            container = new RelativeLayout(context);
-            container.setClipToPadding(false);
-            container.setClipChildren(false);
+                achievementLayout = new RelativeLayout(context);
+                achievementLayout.setClipToPadding(FALSE);
+                LayoutParams motherLayoutLP = new LayoutParams(-2, -2);
+                achievementLayout.setLayoutParams(motherLayoutLP);
+                achievementLayout.setTag("motherLayout");
+                LinearLayout textContainerFake = new LinearLayout(context);
+                textContainerFake.setOrientation(VERTICAL);
+                textContainerFake.setPadding(convertDpToPixel(10), 0, convertDpToPixel(20), 0);
+                textContainerFake.setVisibility(View.INVISIBLE);
+                LayoutParams textContainerFakeLP = new LayoutParams(-2, -2);
+                textContainerFakeLP.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+                textContainerFake.setLayoutParams(textContainerFakeLP);
+                textContainerFake.setTag("textContainerFake");
+                TextView titleFake = new TextView(context);
+                titleFake.setText("Title");
+                LayoutParams titleFakeLP = new LayoutParams(-2, -2);
+                titleFake.setLayoutParams(titleFakeLP);
+                titleFake.setTag("titleFake");
+                titleFake.setMaxLines(1);
+                ScrollTextView subtitleFake = new ScrollTextView(context);
+                subtitleFake.setText("Subtitle");
+                subtitleFake.setVisibility(GONE);
+                subtitleFake.setMaxLines(1);
+                LayoutParams subtitleFakeLP = new LayoutParams(-2, -2);
+                subtitleFake.setLayoutParams(subtitleFakeLP);
+                subtitleFake.setTag("subtitleFake");
+                textContainerFake.addView(titleFake);
+                textContainerFake.addView(subtitleFake);
+                achievementLayout.addView(textContainerFake);
+                container = new RelativeLayout(context);
+                container.setClipToPadding(false);
+                container.setClipChildren(false);
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                achievementLayout.setClipToOutline(true);
-            }
-
-            LayoutParams achievementBodyLP = new LayoutParams(-2, largeSize);
-            achievementBodyLP.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-            achievementBodyLP.addRule(CENTER_HORIZONTAL, RelativeLayout.TRUE);
-            achievementBodyLP.bottomMargin = achievementBodyLP.topMargin = convertDpToPixel(10);
-
-            if ((VERSION.SDK_INT >= 26 || notchMode) && alignTop) {
-                achievementBodyLP.topMargin += statusBarHeight == null ? Math.round(getStatusBarHeight() * 1.7f) : statusBarHeight;
-            }
-
-            container.setLayoutParams(achievementBodyLP);
-            container.setTag("achievementBody");
-            LinearLayout achievementIconBg = new LinearLayout(context);
-            LayoutParams achievementIconBgLP = new LayoutParams(largeSize, largeSize);
-            achievementIconBg.setLayoutParams(achievementIconBgLP);
-            achievementIconBg.setTag("achievementIconBg");
-            container.addView(achievementIconBg);
-            icon = new AchievementIconView(context);
-            icon.setPadding(convertDpToPixel(7), convertDpToPixel(7), convertDpToPixel(7), convertDpToPixel(7));
-            LayoutParams achievementIconLP = new LayoutParams(largeSize, largeSize);
-            icon.setMaxWidth(largeSize);
-            icon.setLayoutParams(achievementIconLP);
-            icon.setTag("achievementIcon");
-            achievementIconBg.addView(icon);
-            LinearLayout textContainer = new LinearLayout(context);
-            textContainer.setClipToPadding(false);
-            textContainer.setClipChildren(false);
-            textContainer.setOrientation(VERTICAL);
-            textContainer.setTag("textContainer");
-            LayoutParams textContainerLP = new LayoutParams(-2, -2);
-            textContainer.setLayoutParams(textContainerLP);
-            textContainerLP.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-            container.addView(textContainer);
-
-            container.setTag("achievementBody");
-            titleTextView = new TextView(context);
-            titleTextView.setText("Title");
-            titleTextView.setMaxLines(1);
-            LayoutParams titleLP = new LayoutParams(-2, -2);
-            titleTextView.setLayoutParams(titleLP);
-            titleTextView.setTag("title");
-            subtitleTextView = new ScrollTextView(context);
-            subtitleTextView.setText("Subtitle");
-            subtitleTextView.setVisibility(GONE);
-            subtitleTextView.setLayoutParams(titleLP);
-            subtitleTextView.setMaxLines(1);
-            subtitleTextView.setTag("subtitle");
-            textContainer.addView(titleTextView);
-            textContainer.addView(subtitleTextView);
-            achievementLayout.addView(container);
-
-
-            if (mainViewLP == null) {
-                mainViewLP = new WindowManager.LayoutParams(
-                        WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowOverlayCompat.TYPE_SYSTEM_ERROR, focusable,
-                        PixelFormat.TRANSLUCENT);
-            }
-
-            if (titleTextView != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && isLarge) {
-                    titleTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    achievementLayout.setClipToOutline(true);
                 }
-                titleTextView.setSingleLine(true);
-                titleTextView.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
 
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
+                LayoutParams achievementBodyLP = new LayoutParams(-2, largeSize);
+                achievementBodyLP.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                achievementBodyLP.addRule(CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                achievementBodyLP.bottomMargin = achievementBodyLP.topMargin = convertDpToPixel(10);
 
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        ((TextView) achievementLayout.findViewWithTag("titleFake")).setText(titleTextView.getText());
+                if ((VERSION.SDK_INT >= 26 || notchMode) && alignTop) {
+                    achievementBodyLP.topMargin += statusBarHeight == null ? Math.round(getStatusBarHeight() * 1.7f) : statusBarHeight;
+                }
+
+                container.setLayoutParams(achievementBodyLP);
+                container.setTag("achievementBody");
+                LinearLayout achievementIconBg = new LinearLayout(context);
+                LayoutParams achievementIconBgLP = new LayoutParams(largeSize, largeSize);
+                achievementIconBg.setLayoutParams(achievementIconBgLP);
+                achievementIconBg.setTag("achievementIconBg");
+                container.addView(achievementIconBg);
+                icon = new AchievementIconView(context);
+                icon.setPadding(convertDpToPixel(7), convertDpToPixel(7), convertDpToPixel(7), convertDpToPixel(7));
+                LayoutParams achievementIconLP = new LayoutParams(largeSize, largeSize);
+                icon.setMaxWidth(largeSize);
+                icon.setLayoutParams(achievementIconLP);
+                icon.setTag("achievementIcon");
+                achievementIconBg.addView(icon);
+                LinearLayout textContainer = new LinearLayout(context);
+                textContainer.setClipToPadding(false);
+                textContainer.setClipChildren(false);
+                textContainer.setOrientation(VERTICAL);
+                textContainer.setTag("textContainer");
+                LayoutParams textContainerLP = new LayoutParams(-2, -2);
+                textContainer.setLayoutParams(textContainerLP);
+                textContainerLP.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+                container.addView(textContainer);
+
+                container.setTag("achievementBody");
+                titleTextView = new TextView(context);
+                titleTextView.setText("Title");
+                titleTextView.setMaxLines(1);
+                LayoutParams titleLP = new LayoutParams(-2, -2);
+                titleTextView.setLayoutParams(titleLP);
+                titleTextView.setTag("title");
+                subtitleTextView = new ScrollTextView(context);
+                subtitleTextView.setText("Subtitle");
+                subtitleTextView.setVisibility(GONE);
+                subtitleTextView.setLayoutParams(titleLP);
+                subtitleTextView.setMaxLines(1);
+                subtitleTextView.setTag("subtitle");
+                textContainer.addView(titleTextView);
+                textContainer.addView(subtitleTextView);
+                achievementLayout.addView(container);
+
+
+                if (mainViewLP == null) {
+                    mainViewLP = new WindowManager.LayoutParams(
+                            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,
+                            WindowOverlayCompat.TYPE_SYSTEM_ERROR, focusable,
+                            PixelFormat.TRANSLUCENT);
+                }
+
+                if (titleTextView != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && isLarge) {
+                        titleTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
                     }
-                });
+                    titleTextView.setSingleLine(true);
+                    titleTextView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            ((TextView) achievementLayout.findViewWithTag("titleFake")).setText(titleTextView.getText());
+                        }
+                    });
+                }
+                if (subtitleTextView != null) {
+                    subtitleTextView.setSingleLine(true);
+                    subtitleTextView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            ((TextView) achievementLayout.findViewWithTag("subtitleFake")).setText(subtitleTextView.getText());
+                        }
+                    });
+                }
+                initiatedGlobalFields = true;
             }
-            if (subtitleTextView != null) {
-                subtitleTextView.setSingleLine(true);
-                subtitleTextView.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        ((TextView) achievementLayout.findViewWithTag("subtitleFake")).setText(subtitleTextView.getText());
-                    }
-                });
-            }
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

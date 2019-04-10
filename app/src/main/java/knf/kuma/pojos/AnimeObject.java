@@ -11,6 +11,7 @@ import org.jsoup.nodes.Element;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -399,6 +400,19 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             public String getEpTitle() {
                 return name + number.substring(number.lastIndexOf(" "));
+            }
+
+            public String getCommentariesLink() {
+                try {
+                    return "http://ukiku-comments.epizy.com/comments.php?title=" + getEpTitle() + "&url=" + URLEncoder.encode(link, "UTF-8");
+                    /*return "https://web.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FlY4eZXm_YWu.js%3Fversion%3D42%23cb%3Df3448d0a8b0514c%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff304e603e6a096%26relation%3Dparent.parent&href=" +
+                            URLEncoder.encode(link, "UTF-8") +
+                            "&locale=es_LA&numposts=50&sdk=joey&version=v2.3&container_width=100%&height=100%";*/
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return link;
+                }
+
             }
 
             @Override

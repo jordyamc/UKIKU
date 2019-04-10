@@ -92,10 +92,10 @@ class SelfServer : Service() {
     constructor(private val data: String, private val isFile: Boolean) : NanoHTTPD(HTTP_PORT) {
 
         init {
-            start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
+            start(SOCKET_READ_TIMEOUT, false)
         }
 
-        override fun serve(session: NanoHTTPD.IHTTPSession): Response? {
+        override fun serve(session: IHTTPSession): Response? {
             return if (isFile)
                 if (URLUtil.isFileUrl(data))
                     serveFile(session.headers, File(Uri.parse(data).path))
@@ -177,7 +177,7 @@ class SelfServer : Service() {
                 val fileLen = file.length()
                 if (range != null && startFrom >= 0) {
                     if (startFrom >= fileLen) {
-                        res = createResponse(Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
+                        res = createResponse(Response.Status.RANGE_NOT_SATISFIABLE, MIME_PLAINTEXT, "")
                         res.addHeader("Content-Range", "bytes 0-0/$fileLen")
                         res.addHeader("ETag", etag)
                     } else {
@@ -246,7 +246,7 @@ class SelfServer : Service() {
                 val fileLen = file.length()
                 if (range != null && startFrom >= 0) {
                     if (startFrom >= fileLen) {
-                        res = createResponse(Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "")
+                        res = createResponse(Response.Status.RANGE_NOT_SATISFIABLE, MIME_PLAINTEXT, "")
                         res.addHeader("Content-Range", "bytes 0-0/$fileLen")
                         res.addHeader("ETag", etag)
                     } else {
@@ -286,14 +286,14 @@ class SelfServer : Service() {
 
         // Announce that the file server accepts partial content requests
         private fun createResponse(status: Response.Status, mimeType: String, message: InputStream?, lenght: Long): Response {
-            val res = NanoHTTPD.newFixedLengthResponse(status, mimeType, message, lenght)
+            val res = newFixedLengthResponse(status, mimeType, message, lenght)
             res.addHeader("Accept-Ranges", "bytes")
             return res
         }
 
         // Announce that the file server accepts partial content requests
         private fun createResponse(status: Response.Status, mimeType: String, message: String): Response {
-            val res = NanoHTTPD.newFixedLengthResponse(status, mimeType, message)
+            val res = newFixedLengthResponse(status, mimeType, message)
             res.addHeader("Accept-Ranges", "bytes")
             return res
         }

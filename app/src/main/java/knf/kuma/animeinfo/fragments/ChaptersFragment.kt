@@ -68,7 +68,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
         val view = inflater.inflate(R.layout.recycler_chapters, container, false)
         holder = AnimeChaptersHolder(view, childFragmentManager, this).also {
             snackManager = SnackProgressBarManager(it.recyclerView)
-                    .setProgressBarColor(EAHelper.getThemeColor(context))
+                    .setProgressBarColor(EAHelper.getThemeColor())
                     .setOverlayLayoutAlpha(0.4f)
                     .setOverlayLayoutColor(android.R.color.background_dark)
         }

@@ -15,7 +15,7 @@ import knf.kuma.commons.PrefsUtil
 class ThemedControlsActivity : CastControlsActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(EAHelper.getTheme(this))
+        setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
     }
 

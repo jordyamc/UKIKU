@@ -1,8 +1,8 @@
 package knf.kuma.commons
 
 import android.content.Context
-import android.preference.PreferenceManager
 import android.webkit.CookieManager
+import androidx.preference.PreferenceManager
 import org.jsoup.HttpStatusException
 import java.io.IOException
 import java.util.*

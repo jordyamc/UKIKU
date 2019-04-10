@@ -20,7 +20,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
@@ -32,7 +31,6 @@ import com.squareup.picasso.Callback
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
-import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
 import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import kotlinx.coroutines.Dispatchers
@@ -163,12 +161,12 @@ fun <T : View> View.bind(@IdRes res: Int): Lazy<T> {
     return lazy { findViewById<T>(res) }
 }
 
-fun <T : View> AnimeActivityHolder.bind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T> {
+fun <T : View> bind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T> {
     @Suppress("UNCHECKED_CAST")
     return lazy { activity.findViewById<T>(res) }
 }
 
-fun <T : View> AnimeActivityHolder.optionalBind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T?> {
+fun <T : View> optionalBind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T?> {
     @Suppress("UNCHECKED_CAST")
     return lazy { activity.findViewById<T?>(res) }
 }
@@ -182,7 +180,7 @@ fun Request.execute(): Response {
     return OkHttpClient().newBuilder().build().newCall(this).execute()
 }
 
-val Fragment.safeContext: Context
+val safeContext: Context
     get() = App.context
 
 val isTV: Boolean get() = App.context.resources.getBoolean(R.bool.isTv)
@@ -292,6 +290,8 @@ fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builde
     header("Cookie", BypassUtil.getStringCookie(App.context))
 }.build()
 
+const val SDK_INT_Q = 1000000
+
 fun isHostValid(hostName: String): Boolean {
     if (BuildConfig.DEBUG)
         Log.e("Hostname", hostName)
@@ -299,6 +299,7 @@ fun isHostValid(hostName: String): Boolean {
         "fex.net",
         "api.crashlytics.com",
         "e.crashlytics.com",
+        "sdk-android.ad.smaato.net",
         "cdn.myanimelist.net",
         "myanimelist.cdn-dena.com",
         "settings.crashlytics.com",

@@ -159,7 +159,7 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val lineCount = messageText.lineCount
         val textSize = messageText.textSize.toInt()
-        val hasAction = !actionText.text.toString().isEmpty()
+        val hasAction = actionText.text.toString().isNotEmpty()
         // put the action into next line if width is more than 25% of total width, or if other element is taking the space
         val isActionNextLine = (actionText.measuredWidth.toFloat() / backgroundLayout.measuredWidth.toFloat() > 0.25f)
                 || circularDeterminateProgressBar.visibility == View.VISIBLE
@@ -175,7 +175,7 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
                 } else {
                     heightActionNextLine + (textSize - defaultTextSizeDp)
                 }
-                val layoutParams = actionNextLineLayout.layoutParams as LinearLayout.LayoutParams
+                val layoutParams = actionNextLineLayout.layoutParams as LayoutParams
                 if (layoutParams.height != height) {
                     layoutParams.height = height
                     actionNextLineLayout.layoutParams = layoutParams
@@ -207,7 +207,7 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
             }
             else -> (heightMulti + (lineCount * textSize - 2 * defaultTextSizeDp))
         }
-        val layoutParams = mainLayout.layoutParams as LinearLayout.LayoutParams
+        val layoutParams = mainLayout.layoutParams as LayoutParams
         if (layoutParams.height != height) {
             layoutParams.height = height
             mainLayout.layoutParams = layoutParams
@@ -309,7 +309,7 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
      */
     @SuppressLint("ClickableViewAccessibility")
     private fun setOnTouchListener() {
-        backgroundLayout.setOnTouchListener(object : View.OnTouchListener {
+        backgroundLayout.setOnTouchListener(object : OnTouchListener {
             // variables
             private val parentView = parent as View
             private var startX: Float = 0f
@@ -319,8 +319,7 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 val index = event.actionIndex
                 val pointerId = event.getPointerId(index)
-                val action = event.actionMasked
-                when (action) {
+                when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         // callback onBarTouchListener
                         onBarTouchListener?.onTouch(ACTION_DOWN)

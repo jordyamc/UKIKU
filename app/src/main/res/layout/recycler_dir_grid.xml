@@ -16,10 +16,10 @@
         app:layoutManager="GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:spanCount="@integer/span_count"
-        app:fastScrollPopupBgColor="?colorAccent"
+        app:fastScrollPopupBgColor="?colorSecondary"
         app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollThumbColor="?colorAccent"
-        app:fastScrollThumbInactiveColor="?colorAccentLight"
+        app:fastScrollThumbColor="?colorSecondary"
+        app:fastScrollThumbInactiveColor="?colorSecondaryVariant"
         tools:listitem="@layout/item_dir_grid"/>
 
     <ProgressBar

@@ -42,7 +42,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         backgroundManager = GlideBackgroundManager(activity as Activity)
-        headersState = BrowseSupportFragment.HEADERS_ENABLED
+        headersState = HEADERS_ENABLED
         isHeadersTransitionOnBackEnabled = true
         title = "UKIKU"
         brandColor = Color.parseColor("#424242")

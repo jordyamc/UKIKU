@@ -2,6 +2,7 @@ package knf.kuma.cast
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.widget.ImageView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -12,13 +13,17 @@ import es.munix.multidisplaycast.helpers.NotificationsHelper
 import es.munix.multidisplaycast.interfaces.DialogCallback
 import knf.kuma.commons.load
 import knf.kuma.custom.ThemedControlsActivity
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class CastCustom : CastManager() {
 
     private val notificationHelper = CastNotificationHelper()
 
     override fun onLoadImage(context: Context, image: String, imageView: ImageView) {
-        imageView.load(image)
+        imageView.apply {
+            load(image)
+            onClick { context.startActivity(Intent(context, controlsClass).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+        }
     }
 
     override fun getControlsClass(): Class<*> {

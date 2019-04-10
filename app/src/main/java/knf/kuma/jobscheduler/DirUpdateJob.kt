@@ -1,9 +1,7 @@
 package knf.kuma.jobscheduler
 
 import android.content.Context
-import android.content.Intent
-import android.preference.PreferenceManager
-import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
 import com.evernote.android.job.JobRequest

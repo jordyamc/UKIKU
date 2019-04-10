@@ -101,14 +101,14 @@ class ListPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat() {
 
     companion object {
 
-        private val SAVE_STATE_INDEX = "ListPreferenceDialogFragment.index"
-        private val SAVE_STATE_ENTRIES = "ListPreferenceDialogFragment.entries"
-        private val SAVE_STATE_ENTRY_VALUES = "ListPreferenceDialogFragment.entryValues"
+        private const val SAVE_STATE_INDEX = "ListPreferenceDialogFragment.index"
+        private const val SAVE_STATE_ENTRIES = "ListPreferenceDialogFragment.entries"
+        private const val SAVE_STATE_ENTRY_VALUES = "ListPreferenceDialogFragment.entryValues"
 
         fun newInstance(key: String): ListPreferenceDialogFragmentCompat {
             val fragment = ListPreferenceDialogFragmentCompat()
             val b = Bundle(1)
-            b.putString(PreferenceDialogFragmentCompat.ARG_KEY, key)
+            b.putString(ARG_KEY, key)
             fragment.arguments = b
             return fragment
         }

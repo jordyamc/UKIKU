@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleObserver
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -14,7 +15,7 @@ import knf.kuma.R
 import kotlinx.android.synthetic.main.lay_bottom_actions.view.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
-class BottomActionsDialog : BottomSheetDialogFragment() {
+class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
     private var callback: ActionsCallback? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -74,7 +75,6 @@ class BottomActionsDialog : BottomSheetDialogFragment() {
         }
 
     }
-
 
     override fun onDismiss(dialog: DialogInterface) {
         try {

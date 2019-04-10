@@ -4,9 +4,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.preference.PreferenceManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
 import com.evernote.android.job.JobRequest
@@ -19,14 +19,14 @@ import java.util.concurrent.TimeUnit
 
 class UpdateJob : Job() {
 
-    override fun onRunJob(params: Job.Params): Job.Result {
+    override fun onRunJob(params: Params): Result {
         if (Network.isConnected && BuildConfig.BUILD_TYPE != "playstore")
             try {
                 val document = Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num").get()
                 val nCode = Integer.parseInt(document.select("body").first().ownText().trim { it <= ' ' })
                 val sCode = PreferenceManager.getDefaultSharedPreferences(context).getInt("last_notified_update", 0)
                 if (nCode <= sCode)
-                    return Job.Result.SUCCESS
+                    return Result.SUCCESS
                 val oCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
                 if (nCode > oCode) {
                     showNotification()
@@ -36,7 +36,7 @@ class UpdateJob : Job() {
                 e.printStackTrace()
             }
 
-        return Job.Result.SUCCESS
+        return Result.SUCCESS
     }
 
     private fun showNotification() {
