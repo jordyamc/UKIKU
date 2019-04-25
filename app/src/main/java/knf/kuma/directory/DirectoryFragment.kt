@@ -24,11 +24,6 @@ class DirectoryFragment : BottomFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         ViewModelProviders.of(this).get(DirectoryViewModel::class.java)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_directory, container, false)
-        fragmentHolder = DirMainFragmentHolder(view, childFragmentManager)
         if (!PrefsUtil.isDirectoryFinished) {
             snackbar = activity?.findViewById<View>(R.id.root)?.showSnackbar("Creando directorio...", Snackbar.LENGTH_INDEFINITE)
             CacheDB.INSTANCE.animeDAO().countLive.observe(this@DirectoryFragment, Observer {
@@ -48,6 +43,11 @@ class DirectoryFragment : BottomFragment() {
                 }
             })
         }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_directory, container, false)
+        fragmentHolder = DirMainFragmentHolder(view, childFragmentManager)
         EAHelper.enter1("D")
         Crashlytics.setString("screen", "Directory")
         return view

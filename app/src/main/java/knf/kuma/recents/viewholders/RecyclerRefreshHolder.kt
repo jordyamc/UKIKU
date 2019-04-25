@@ -25,6 +25,10 @@ class RecyclerRefreshHolder(view: View) {
         layoutManager.smoothScrollToPosition(recyclerView, null, 0)
     }
 
+    fun scrollTo(position: Int) {
+        layoutManager.smoothScrollToPosition(recyclerView, null, position)
+    }
+
     fun setRefreshing(refreshing: Boolean) {
         refreshLayout.post { refreshLayout.isRefreshing = refreshing }
     }

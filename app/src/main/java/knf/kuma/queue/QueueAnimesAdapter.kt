@@ -12,7 +12,6 @@ import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
-import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import java.util.*
 
@@ -40,8 +39,7 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
         val img = PatternUtil.getCover(queueObject.chapter.aid)
         PicassoSingle.get().load(img).into(holder.imageView)
         holder.title.text = queueObject.chapter.name
-        val count = CacheDB.INSTANCE.queueDAO().countAlone(queueObject.chapter.aid)
-        holder.type.text = String.format(Locale.getDefault(), if (count == 1) "%d episodio" else "%d episodios", count)
+        holder.type.text = String.format(Locale.getDefault(), if (queueObject.count == 1) "%d episodio" else "%d episodios", queueObject.count)
         holder.cardView.setOnClickListener { listener?.onSelect(queueObject) }
         holder.cardView.setOnLongClickListener {
             ActivityAnime.open(activity, queueObject, holder.imageView)
@@ -56,7 +54,7 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
     fun update(list: MutableList<QueueObject>) {
         if (this.list notSameContent list) {
             this.list = list
-            notifyDataSetChanged()
+            doOnUI { notifyDataSetChanged() }
         }
     }
 

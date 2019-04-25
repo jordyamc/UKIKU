@@ -24,6 +24,7 @@ import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
+import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
 class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListener, QueueAllAdapter.OnStartDragListener {
@@ -41,6 +42,8 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
     private var current: QueueObject? = null
 
     private var currentData: LiveData<MutableList<QueueObject>> = MutableLiveData()
+
+    private var isFirst = true
 
     private val layout: Int
         @LayoutRes
@@ -104,22 +107,30 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
     }
 
     private fun reload() {
-        currentData.removeObservers(this)
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true)) {
+        currentData.removeObservers(this@QueueActivity)
+        if (PreferenceManager.getDefaultSharedPreferences(this@QueueActivity).getBoolean("queue_is_grouped", true)) {
             currentData = CacheDB.INSTANCE.queueDAO().all
-            currentData.observe(this, Observer { list ->
+            currentData.observe(this@QueueActivity, Observer { list ->
                 errorView.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
                 val animesAdapter = QueueAnimesAdapter(this@QueueActivity)
                 recyclerView.adapter = animesAdapter
                 dettachHelper()
                 mItemTouchHelper = ItemTouchHelper(NoTouchHelperCallback())
                 mItemTouchHelper?.attachToRecyclerView(recyclerView)
-                animesAdapter.update(QueueObject.getOne(list))
+                doAsync {
+                    animesAdapter.update(QueueObject.getOne(list))
+                    if (isFirst) {
+                        isFirst = false
+                        openInitial(list)
+                    }
+                }
+
             })
         } else {
             currentData = CacheDB.INSTANCE.queueDAO().allAsort
-            currentData.observe(this, object : Observer<MutableList<QueueObject>> {
+            currentData.observe(this@QueueActivity, object : Observer<MutableList<QueueObject>> {
                 override fun onChanged(list: MutableList<QueueObject>?) {
+                    isFirst = false
                     clearInterfaces()
                     errorView.visibility = if (list?.isEmpty() == true) View.VISIBLE else View.GONE
                     val allAdapter = QueueAllAdapter(this@QueueActivity)
@@ -131,6 +142,16 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
                     currentData.removeObserver(this)
                 }
             })
+        }
+    }
+
+    private fun openInitial(list: List<QueueObject>) {
+        val initialID = intent.getStringExtra("initial") ?: return
+        list.forEach {
+            if (it.chapter.aid == initialID) {
+                onSelect(it)
+                return@forEach
+            }
         }
     }
 
@@ -158,20 +179,22 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
         if (queueObject.equalsAnime(current)) {
             closeSheet()
         } else {
-            listToolbar.title = queueObject.chapter.name
-            val liveData = CacheDB.INSTANCE.queueDAO().getByAid(queueObject.chapter.aid)
-            liveData.observe(this, object : Observer<MutableList<QueueObject>> {
-                override fun onChanged(list: MutableList<QueueObject>?) {
-                    if (list?.isEmpty() == true)
-                        bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
-                    else {
-                        listAdapter?.update(queueObject.chapter.aid, list ?: mutableListOf())
-                        bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
+            doOnUI {
+                listToolbar.title = queueObject.chapter.name
+                val liveData = CacheDB.INSTANCE.queueDAO().getByAid(queueObject.chapter.aid)
+                liveData.observe(this, object : Observer<MutableList<QueueObject>> {
+                    override fun onChanged(list: MutableList<QueueObject>?) {
+                        if (list?.isEmpty() == true)
+                            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
+                        else {
+                            listAdapter?.update(queueObject.chapter.aid, list ?: mutableListOf())
+                            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
+                        }
+                        current = queueObject
+                        liveData.removeObserver(this)
                     }
-                    current = queueObject
-                    liveData.removeObserver(this)
-                }
-            })
+                })
+            }
         }
     }
 
@@ -251,8 +274,16 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
 
     companion object {
 
-        fun open(context: Context) {
+        fun open(context: Context?) {
+            context ?: return
             context.startActivity(Intent(context, QueueActivity::class.java))
+        }
+
+        fun open(context: Context?, aid: String) {
+            context ?: return
+            context.startActivity(Intent(context, QueueActivity::class.java).apply {
+                putExtra("initial", aid)
+            })
         }
     }
 }

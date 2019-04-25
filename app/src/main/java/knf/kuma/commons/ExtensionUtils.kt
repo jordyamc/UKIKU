@@ -7,13 +7,12 @@ import android.graphics.drawable.AnimationDrawable
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.ColorInt
-import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
-import androidx.annotation.UiThread
+import androidx.annotation.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -161,6 +160,11 @@ fun <T : View> View.bind(@IdRes res: Int): Lazy<T> {
     return lazy { findViewById<T>(res) }
 }
 
+fun <T : View> View.optionalBind(@IdRes res: Int): Lazy<T?> {
+    @Suppress("UNCHECKED_CAST")
+    return lazy { findViewById<T?>(res) }
+}
+
 fun <T : View> bind(activity: AppCompatActivity, @IdRes res: Int): Lazy<T> {
     @Suppress("UNCHECKED_CAST")
     return lazy { activity.findViewById<T>(res) }
@@ -222,6 +226,8 @@ fun doOnUI(enableLog: Boolean = true, func: () -> Unit) {
     }
 }
 
+fun <T> List<Any>.transform(): List<T> = this.map { it as T }
+
 fun <T> MutableList<T>.removeAll(vararg elements: Collection<T>) {
     elements.forEach {
         removeAll(it)
@@ -242,6 +248,8 @@ fun NotificationCompat.Builder.create(func: NotificationCompat.Builder.() -> Uni
     this.func()
     return this
 }
+
+fun ViewGroup.inflate(@LayoutRes layout: Int, attachToRoot: Boolean = false): View = LayoutInflater.from(context).inflate(layout, this, attachToRoot)
 
 fun File.safeDelete(log: Boolean = false) {
     try {

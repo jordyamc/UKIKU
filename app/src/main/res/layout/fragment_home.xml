@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <knf.kuma.custom.HomeList
+            android:id="@+id/listNew"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hm_isLarge="false"
+            app:hm_showViewAll="false"
+            app:hm_startHidden="true"
+            app:hm_subheader="Nuevos animes"/>
+
+        <knf.kuma.custom.HomeList
+            android:id="@+id/listFavUpdated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hm_errorText="Ningun favorito recientemente actualizado"
+            app:hm_isLarge="true"
+            app:hm_showViewAll="true"
+            app:hm_subheader="Favoritos actualizados"/>
+
+        <knf.kuma.custom.HomeList
+            android:id="@+id/listBestEmission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hm_isLarge="true"
+            app:hm_subheader="Los mejores de la temporada"/>
+
+        <knf.kuma.custom.HomeList
+            android:id="@+id/listPending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hm_isLarge="true"
+            app:hm_showViewAll="true"
+            app:hm_startHidden="true"
+            app:hm_subheader="Sigue viendo"/>
+
+        <knf.kuma.custom.HomeList
+            android:id="@+id/listWaiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hm_showViewAll="true"
+            app:hm_startHidden="true"
+            app:hm_subheader="Animes en espera"/>
+
+        <knf.kuma.custom.HomeList
+            android:id="@+id/listRecommended"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hm_isLarge="true"
+            app:hm_showViewAll="true"
+            app:hm_subheader="Recomendados para ti"/>
+
+        <knf.kuma.custom.HomeList
+            android:id="@+id/listRecommendedStaff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hm_isLarge="true"
+            app:hm_subheader="Recomendados por el staff"/>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -31,6 +31,12 @@ interface AnimeDAO {
     @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY rate_stars DESC")
     val animeDirVotes: DataSource.Factory<Int, DirObject>
 
+    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' AND state LIKE 'En emisión' ORDER BY rate_stars DESC, rate_count+0 DESC LIMIT 10")
+    val emissionVotesLimited: LiveData<List<DirObject>>
+
+    @Query("SELECT `key`,name,link,aid,img,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY RANDOM() LIMIT 10")
+    fun animesWithIDRandom(aids: List<String>): List<SearchAdvObject>
+
     @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` ASC")
     val animeDirID: DataSource.Factory<Int, DirObject>
 
@@ -120,6 +126,9 @@ interface AnimeDAO {
 
     @Query("SELECT aid FROM AnimeObject WHERE genres LIKE :genres")
     fun getAidsByGenres(genres: String): MutableList<String>
+
+    @Query("SELECT aid FROM AnimeObject WHERE genres LIKE :genres ORDER BY RANDOM() LIMIT 15")
+    fun getAidsByGenresLimited(genres: String): MutableList<String>
 
     @Query("SELECT `key`,aid,name,link FROM AnimeObject WHERE name LIKE :query AND genres LIKE :genres ORDER BY name")
     fun getSearchTG(query: String, genres: String): DataSource.Factory<Int, SearchObject>

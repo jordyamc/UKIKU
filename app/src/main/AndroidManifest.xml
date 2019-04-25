@@ -301,6 +301,8 @@
             android:name=".tv.streaming.TVMultiSelection"
             android:theme="@style/AppTheme.TV.Guided"/>
         <activity android:name=".Diagnostic"/>
+        <activity android:name=".recents.RecentsActivity"/>
+        <activity android:name=".Diagnostic$FullBypass"/>
 
         <provider
             android:name=".slices.AnimeSlice"

@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import knf.kuma.App
+import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
@@ -47,7 +48,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val isAdsEnabled: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", false)
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", false) && BuildConfig.DEBUG
 
     val downloaderType: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
@@ -143,6 +144,9 @@ object PrefsUtil {
     var randomLimit: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("random_limit", 25)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("random_limit", value).apply()
+
+    val useHome: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("recents_design", "0") == "1"
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)

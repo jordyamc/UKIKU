@@ -57,7 +57,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
             playerState.window = savedInstanceState.getInt("window", 0)
         }
         hideUI()
-        player.setResizeMode(getResizeMode())
+        player.resizeMode = getResizeMode()
         createMediaSession()
         createPlayer()
         skip.setOnClickListener { playerHolder.skip() }
@@ -129,7 +129,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
                 // MediaSession actions (and they won't show up in the minimized PIP activity):
                 // [ACTION_SKIP_PREVIOUS], [ACTION_SKIP_NEXT], [ACTION_SKIP_TO_QUEUE_ITEM]
                 setQueueNavigator(object : TimelineQueueNavigator(mediaSession) {
-                    override fun getMediaDescription(windowIndex: Int): MediaDescriptionCompat {
+                    override fun getMediaDescription(player: Player?, windowIndex: Int): MediaDescriptionCompat {
                         return MediaCatalog(mutableListOf(), intent)[windowIndex]
                     }
                 })

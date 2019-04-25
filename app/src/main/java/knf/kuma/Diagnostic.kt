@@ -20,6 +20,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.download.FileAccessHelper
+import kotlinx.android.synthetic.main.activity_webview.*
 import kotlinx.android.synthetic.main.layout_diagnostic.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -100,7 +101,14 @@ class Diagnostic : GenericActivity() {
             try {
                 Jsoup.connect("https://animeflv.net/").timeout(0).execute()
                 bypassState.load("No se necesita")
+                doOnUI { bypassRecreate.visibility = View.GONE }
             } catch (e: HttpStatusException) {
+                doOnUI {
+                    bypassRecreate.apply {
+                        visibility = View.VISIBLE
+                        onClick { startActivityForResult(Intent(this@Diagnostic, FullBypass::class.java), 5546) }
+                    }
+                }
                 try {
                     jsoupCookies("https://animeflv.net/").timeout(0).get()
                     bypassState.load("Valido", StateView.STATE_OK)
@@ -241,9 +249,32 @@ class Diagnostic : GenericActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 5546)
+            runBypassTest()
+    }
+
     companion object {
         fun open(context: Context) {
             context.startActivity(Intent(context, Diagnostic::class.java))
+        }
+    }
+
+    class FullBypass : GenericActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_webview)
+        }
+
+        override fun forceCreation(): Boolean = true
+
+        override fun getSnackbarAnchor(): View? {
+            return webview
+        }
+
+        override fun onBypassUpdated() {
+            finish()
         }
     }
 }

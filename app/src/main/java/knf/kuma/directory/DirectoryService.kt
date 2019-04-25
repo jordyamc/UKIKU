@@ -262,7 +262,8 @@ class DirectoryService : IntentService("Directory update") {
             private set
         private val liveStatus = MutableLiveData<Int>()
 
-        fun run(context: Context) {
+        fun run(context: Context?) {
+            if (context == null) return
             if (!isRunning)
                 ContextCompat.startForegroundService(context, Intent(context, DirectoryService::class.java))
         }

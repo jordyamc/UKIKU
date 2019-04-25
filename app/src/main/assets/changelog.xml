@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
-    <release code="102" version="4.1">
+    <release code="104" version="4.2">
+        <change type="fix">Errores generales</change>
+        <change type="new">Estilo home para recientes</change>
+        <change type="new">Botón para saltar 1:30m en CAST (OP y ED)</change>
+    </release>
+    <release code="103" version="4.1">
         <change type="fix">Errores generales</change>
         <change type="new">Prueba rapida de velocidad en diagnostico</change>
         <change type="new">Soporte previo para Android Q</change>

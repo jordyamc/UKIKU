@@ -36,6 +36,9 @@ interface SeeingDAO {
     @Query("SELECT * FROM seeingobject WHERE aid LIKE :aid")
     fun getByAid(aid: String): SeeingObject?
 
+    @Query("SELECT * FROM seeingobject WHERE state IN (:states) ORDER BY RANDOM() LIMIT 10")
+    fun getAllWState(vararg states: Int): LiveData<List<SeeingObject>>
+
     @Query("SELECT count(*) FROM seeingobject WHERE aid = :aid AND state>0 AND state <3")
     fun isSeeing(aid: String): Boolean
 

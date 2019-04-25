@@ -59,6 +59,10 @@ fun MutableList<FavoriteObject>.implAdsFavorite() {
     }
 }
 
+fun ViewGroup.implBannerCast() {
+    this.implBanner(AdsUtils.CAST_BANNER)
+}
+
 fun ViewGroup.implBanner(unitID: String, isSmart: Boolean = false) {
     val adSize = if (isSmart) {
         val dm = Global.getResources().displayMetrics

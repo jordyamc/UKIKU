@@ -21,6 +21,9 @@ public class SeeingObject {
     @SerializedName("STATE_DROPPED")
     @Ignore
     public static final int STATE_DROPPED = 4;
+    @SerializedName("STATE_PAUSED")
+    @Ignore
+    public static final int STATE_PAUSED = 5;
 
     @SerializedName("key")
     @PrimaryKey

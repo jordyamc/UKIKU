@@ -11,6 +11,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import com.appbrain.AppBrain
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.core.CrashlyticsCore
@@ -72,6 +73,7 @@ class App : Application() {
         DownloadManager.init()
         FileAccessHelper.init(this)
         AchievementManager.init(this)
+        AppBrain.addTestDevice("6e5a4187367ad5c0")
         MobileAds.initialize(this, "ca-app-pub-5390653757953587~3582287447")
         initAppCoins()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

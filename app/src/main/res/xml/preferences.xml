@@ -159,6 +159,15 @@
     <PreferenceCategory
         android:title="Diseño">
 
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/recents_type"
+            android:entryValues="@array/recents_type_values"
+            android:icon="@drawable/ic_home"
+            android:key="recents_design"
+            android:summary="%s"
+            android:title="Diseño de recientes"/>
+
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_setting_asc_list"

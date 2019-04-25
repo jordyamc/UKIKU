@@ -16,7 +16,7 @@ import knf.kuma.R
 import knf.kuma.ads.AdCallback
 import knf.kuma.ads.AdCardItemHolder
 import knf.kuma.ads.AdFavoriteObject
-import knf.kuma.ads.implAdsFavorite
+import knf.kuma.ads.implAdsFavoriteBrains
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
@@ -113,7 +113,7 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     fun updateList(list: MutableList<FavoriteObject>) {
         this.list = list
         if (PrefsUtil.layType == "0")
-            this.list.implAdsFavorite()
+            this.list.implAdsFavoriteBrains()
         recyclerView.post { this.notifyDataSetChanged() }
     }
 

@@ -15,7 +15,7 @@ class AdCardItemHolder(parent: ViewGroup, @LayoutRes type: Int = TYPE_NORMAL) : 
     @UiThread
     fun loadAd(ad: AdCallback?) {
         if (ad == null) return
-        container.implBanner(ad.getID())
+        container.implBannerBrains(ad.getID())
     }
 
     companion object {

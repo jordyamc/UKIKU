@@ -62,10 +62,10 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         holder.toolbar.setNavigationOnClickListener { closeActivity() }
-            if (aidOnly)
-                viewModel.init(intent.getStringExtra(keyAid))
-            else
-                viewModel.init(this@ActivityAnime, intent.dataString, intent.getBooleanExtra(keyPersist, true))
+        if (aidOnly)
+            viewModel.init(intent.getStringExtra(keyAid))
+        else
+            viewModel.init(this@ActivityAnime, intent.dataString, intent.getBooleanExtra(keyPersist, true))
         if (intent.getBooleanExtra(keyNotification, false))
             sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
         load()
@@ -272,7 +272,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
-        fun open(activity: Activity, animeObject: AnimeShortObject, view: ImageView, persist: Boolean, animate: Boolean) {
+        fun open(activity: Activity?, animeObject: AnimeShortObject, view: ImageView, persist: Boolean, animate: Boolean) {
             val intent = Intent(activity, ActivityAnime::class.java)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
@@ -280,7 +280,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
             intent.putExtra(keyPersist, persist)
             intent.putExtra(keyNoTransition, !animate)
-            activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+            activity?.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
         fun open(fragment: Fragment, explorerObject: ExplorerObject, view: ImageView) {
@@ -304,7 +304,8 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
-        fun open(activity: Activity, seeingObject: SeeingObject, view: ImageView) {
+        fun open(activity: Activity?, seeingObject: SeeingObject, view: ImageView) {
+            activity ?: return
             val intent = Intent(activity, ActivityAnime::class.java)
             intent.data = Uri.parse(seeingObject.link)
             intent.putExtra(keyTitle, seeingObject.title)

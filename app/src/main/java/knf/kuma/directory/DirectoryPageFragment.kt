@@ -48,27 +48,11 @@ class DirectoryPageFragment : BottomFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            adapter = DirectoryPageAdapter(this)
-            adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    if (positionStart == 0)
-                        scrollTop()
-                }
-
-                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                    if (toPosition == 0)
-                        scrollTop()
-                }
-            })
             observeLiveData(createModel(it), Observer { animeObjects ->
                 hideProgress()
                 adapter?.submitList(animeObjects)
                 makeAnimation()
             })
-            recyclerView.verifyManager()
-            recyclerView.adapter = adapter
         }
     }
 
@@ -134,6 +118,22 @@ class DirectoryPageFragment : BottomFragment() {
         super.onViewCreated(view, savedInstanceState)
         manager = recyclerView.layoutManager
         recyclerView.layoutManager = manager
+        adapter = DirectoryPageAdapter(this)
+        adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                if (positionStart == 0)
+                    scrollTop()
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                if (toPosition == 0)
+                    scrollTop()
+            }
+        })
+        recyclerView.verifyManager()
+        recyclerView.adapter = adapter
         isFirst = true
     }
 

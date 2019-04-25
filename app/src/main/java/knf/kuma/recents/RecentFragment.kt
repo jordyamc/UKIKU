@@ -2,6 +2,7 @@ package knf.kuma.recents
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,9 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.home.HomeFragment
+import knf.kuma.pojos.RecentObject
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.ServersFactory
 
@@ -29,8 +33,17 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
             holder?.setError(objects.isEmpty())
             holder?.setRefreshing(false)
             adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
+            scrollByKey(objects)
         })
         updateList()
+    }
+
+    private fun scrollByKey(list: List<RecentObject>) {
+        if (list.isEmpty()) return
+        val initial = arguments?.getInt("initial", -1) ?: -1
+        if (initial == -1) return
+        val find = list.find { it.key == initial } ?: return
+        holder?.scrollTo(list.indexOf(find))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -71,8 +84,19 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     companion object {
-        fun get(): RecentFragment {
-            return RecentFragment()
+        fun get(initialKey: Int): BottomFragment {
+            val fragment = RecentFragment()
+            val bundle = Bundle()
+            bundle.putInt("initial", initialKey.also { Log.e("Recent", "Add argument key: $it") })
+            fragment.arguments = bundle
+            return fragment
+        }
+
+        fun get(): BottomFragment {
+            return if (PrefsUtil.useHome)
+                HomeFragment()
+            else
+                RecentFragment()
         }
     }
 }

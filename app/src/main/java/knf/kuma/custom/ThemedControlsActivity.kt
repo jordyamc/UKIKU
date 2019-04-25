@@ -6,8 +6,7 @@ import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import es.munix.multidisplaycast.CastControlsActivity
 import knf.kuma.App
-import knf.kuma.ads.AdsUtils
-import knf.kuma.ads.implBanner
+import knf.kuma.ads.implBannerCastBrains
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
@@ -28,6 +27,6 @@ class ThemedControlsActivity : CastControlsActivity() {
 
     override fun setUpAd(placeholder: RelativeLayout) {
         if (PrefsUtil.isAdsEnabled)
-            placeholder.implBanner(AdsUtils.CAST_BANNER)
+            placeholder.implBannerCastBrains()
     }
 }

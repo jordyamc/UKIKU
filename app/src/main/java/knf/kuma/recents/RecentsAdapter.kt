@@ -24,7 +24,7 @@ import knf.kuma.R
 import knf.kuma.ads.AdCallback
 import knf.kuma.ads.AdCardItemHolder
 import knf.kuma.ads.AdRecentObject
-import knf.kuma.ads.implAdsRecent
+import knf.kuma.ads.implAdsRecentBrains
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
@@ -256,7 +256,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         this.isNetworkAvailable = Network.isConnected
         val wasEmpty = this.list.isEmpty()
         this.list = list.distinctBy { it.eid } as MutableList<RecentObject>
-        this.list.implAdsRecent()
+        this.list.implAdsRecentBrains()
         view.post {
             notifyDataSetChanged()
             if (wasEmpty)

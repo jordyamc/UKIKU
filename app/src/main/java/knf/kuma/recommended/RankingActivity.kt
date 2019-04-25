@@ -24,9 +24,9 @@ class RankingActivity : GenericActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(false)
+            title = "Ranking"
         }
         with(toolbar) {
-            title = "Ranking"
             setNavigationIcon(R.drawable.ic_close)
             setNavigationOnClickListener { finish() }
         }

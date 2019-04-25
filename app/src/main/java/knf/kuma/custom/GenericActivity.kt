@@ -21,6 +21,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.findOptional
 
 open class GenericActivity : AppCompatActivity() {
+
     override fun onResume() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             val appIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
@@ -36,12 +37,14 @@ open class GenericActivity : AppCompatActivity() {
 
     }
 
+    open fun forceCreation(): Boolean = false
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun checkBypass() {
         val webView = findOptional<WebView>(R.id.webview)
         if (webView != null)
             doAsync {
-                if (BypassUtil.isNeeded() && !BypassUtil.isLoading) {
+                if ((BypassUtil.isNeeded() || forceCreation()) && !BypassUtil.isLoading) {
                     val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
                             ?: null.also { "Creando bypass...".toast() }
                     BypassUtil.isLoading = true

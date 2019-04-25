@@ -13,6 +13,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.RoomWarnings;
 import androidx.room.TypeConverters;
 import knf.kuma.database.BaseConverter;
+import knf.kuma.database.CacheDB;
 
 @Entity
 @TypeConverters({BaseConverter.class})
@@ -25,6 +26,8 @@ public class QueueObject implements Serializable {
     public long time;
     @Embedded
     public AnimeObject.WebInfo.AnimeChapter chapter;
+    @Ignore
+    public int count = -1;
 
     public QueueObject(int id, boolean isFile, String uri, long time, AnimeObject.WebInfo.AnimeChapter chapter) {
         this.id = id;
@@ -56,6 +59,7 @@ public class QueueObject implements Serializable {
         for (QueueObject object : list) {
             if (!aids.contains(object.chapter.aid)) {
                 aids.add(object.chapter.aid);
+                object.count = CacheDB.INSTANCE.queueDAO().countAlone(object.chapter.aid);
                 n_list.add(object);
             }
         }

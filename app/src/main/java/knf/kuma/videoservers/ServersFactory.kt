@@ -157,6 +157,8 @@ class ServersFactory {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                Toaster.toast("Error al mostrar lista de servidores")
+                callOnFinish(false, false)
             }
         }
 
@@ -186,6 +188,8 @@ class ServersFactory {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                Toaster.toast("Error al mostrar lista de opciones")
+                showServerList(false)
             }
         }
     }

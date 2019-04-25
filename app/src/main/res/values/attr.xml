@@ -18,5 +18,12 @@
     <declare-styleable name="StateView">
         <attr name="sv_title" format="string"/>
     </declare-styleable>
+    <declare-styleable name="HomeList">
+        <attr name="hm_showViewAll" format="boolean"/>
+        <attr name="hm_isLarge" format="boolean"/>
+        <attr name="hm_subheader" format="string"/>
+        <attr name="hm_startHidden" format="boolean"/>
+        <attr name="hm_errorText" format="string"/>
+    </declare-styleable>
     <attr name="colorAccentLight" format="reference"/>
 </resources>
