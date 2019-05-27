@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.distinct
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
@@ -56,7 +57,7 @@ class EmissionFragment : Fragment(), RemoveListener {
         if (::liveData.isInitialized && ::observer.isInitialized)
             liveData.removeObserver(observer)
         liveData = CacheDB.INSTANCE.animeDAO().getByDay(arguments?.getInt("day", 1)
-                ?: 1, blacklist)
+                ?: 1, blacklist).distinct
         observer = obs
         liveData.observe(this, observer)
     }

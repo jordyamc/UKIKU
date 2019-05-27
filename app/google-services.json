@@ -126,6 +126,58 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928658019079:android:ef5411539750a64d",
+        "android_client_info": {
+          "package_name": "knf.kuma.test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "928658019079-53nkgcuua8pe4128ecacls94e6hmvlkf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.test",
+            "certificate_hash": "97490ab8d7b370ab43a3a6475dc4402c19bb7571"
+          }
+        },
+        {
+          "client_id": "928658019079-597ceth59vfrn68t3a8evfq5ech7hotb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.test",
+            "certificate_hash": "e53f97d45da9e4f3443817b5ba19419ddce84e50"
+          }
+        },
+        {
+          "client_id": "928658019079-qf4eeqn4vnbsj6et3lk9fogscbe68hjb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1ecwPZp5LJQF33DMi4w7awCPn_hReQvU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "928658019079-hefr8u04knqb9ocdvdt2jep24elhcvbk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

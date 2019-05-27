@@ -131,7 +131,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
                 heart.visibility = View.GONE
                 return
             }
-            liveData = CacheDB.INSTANCE.favsDAO().isFavLive(aid.toInt())
+            liveData = CacheDB.INSTANCE.favsDAO().isFavLive(aid.toInt()).distinct
             observer = Observer {
                 if (!PrefsUtil.emissionShowFavs)
                     heart.visibility = View.GONE

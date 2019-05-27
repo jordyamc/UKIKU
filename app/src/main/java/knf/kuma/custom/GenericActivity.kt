@@ -12,11 +12,13 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
+import knf.kuma.uagen.randomUA
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.findOptional
 
@@ -47,6 +49,7 @@ open class GenericActivity : AppCompatActivity() {
                 if ((BypassUtil.isNeeded() || forceCreation()) && !BypassUtil.isLoading) {
                     val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
                             ?: null.also { "Creando bypass...".toast() }
+                    bypassLive.postValue(Pair(true, true))
                     BypassUtil.isLoading = true
                     Log.e("CloudflareBypass", "is needed")
                     BypassUtil.clearCookies()
@@ -69,18 +72,24 @@ open class GenericActivity : AppCompatActivity() {
                                         PicassoSingle.clear()
                                         DirectoryService.run(this@GenericActivity)
                                     }
+                                    bypassLive.postValue(Pair(true, false))
                                     onBypassUpdated()
                                     BypassUtil.isLoading = false
                                 }
                                 return false
                             }
                         }
-                        webView.settings?.userAgentString = BypassUtil.userAgent
+                        webView.settings?.userAgentString = randomUA().also { PrefsUtil.userAgent = it }
                         webView.loadUrl("https://animeflv.net/")
                     }
                 } else {
+                    bypassLive.postValue(Pair(false, false))
                     Log.e("CloudflareBypass", "Not needed")
                 }
             }
+    }
+
+    companion object {
+        val bypassLive: MutableLiveData<Pair<Boolean, Boolean>> = MutableLiveData()
     }
 }

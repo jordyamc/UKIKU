@@ -41,10 +41,8 @@ object NewsCreator {
                     val categories = it.select("category").getAllStringNoCD()
                     val description = it.select("description").first().noCDText()
                     val content = it.select("content|encoded").first().noCDHtml()
-                    val commentsFeed = it.select("wfw|commentRss").first().noCDText()
-                    val commentsCount = it.select("slash|comments").first().text().toInt()
                     news.add(NewsObject(
-                            title, link, date, author, categories, description, content, commentsFeed, commentsCount
+                            title, link, date, author, categories, description, content
                     ))
                 }
                 doOnUI {
@@ -122,9 +120,7 @@ data class NewsObject(
         val author: String,
         val categories: List<String>,
         val description: String,
-        val content: String,
-        val commentsFeed: String,
-        val commentsCount: Int
+        val content: String
 ) {
 
     fun metaData(): String {

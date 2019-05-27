@@ -57,7 +57,7 @@
 
     <color name="cardview_background">#FFFFFF</color>
 
-    <color name="divider">#000</color>
+    <color name="divider">#000000</color>
     <color name="textPrimary">#000</color>
     <color name="textSecondary">#323232</color>
 

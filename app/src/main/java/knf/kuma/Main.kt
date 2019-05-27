@@ -41,6 +41,7 @@ import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.MigrationActivity
 import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.*
+import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryFragment
@@ -85,6 +86,7 @@ class Main : GenericActivity(),
     private val drawer by bind<DrawerLayout>(R.id.drawer_layout)
     private val navigationView by bind<NavigationView>(R.id.nav_view)
     private val coordinator by bind<CoordinatorLayout>(R.id.coordinator)
+    private val connectionState by bind<ConnectionState>(R.id.connectionState)
     private val bottomNavigationView by bind<BottomNavigationView>(R.id.bottomNavigation)
     internal var selectedFragment: BottomFragment? = null
     private var searchFragment: SearchFragment? = null
@@ -119,6 +121,7 @@ class Main : GenericActivity(),
         navigationView.setNavigationItemSelectedListener(this)
         bottomNavigationView.setOnNavigationItemSelectedListener(this)
         bottomNavigationView.setOnNavigationItemReselectedListener(this)
+        connectionState.setUp(this, ::onStateDialog)
         setSearch()
         if (savedInstanceState == null) {
             checkServices()
@@ -323,6 +326,13 @@ class Main : GenericActivity(),
 
             override fun onSuggestion(searchItem: SearchItem?): Boolean = true
         })
+    }
+
+    fun onStateDialog(message: String) {
+        MaterialDialog(this).safeShow {
+            message(text = message)
+            positiveButton()
+        }
     }
 
     override fun onBackPressed() {

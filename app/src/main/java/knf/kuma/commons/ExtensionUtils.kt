@@ -19,6 +19,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
@@ -52,6 +54,9 @@ fun Toolbar.changeToolbarFont() {
         }
     }
 }
+
+val <T>LiveData<T>.distinct: LiveData<T>
+    get() = Transformations.distinctUntilChanged(this)
 
 fun getPackage(): String {
     return if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "release" || BuildConfig.BUILD_TYPE == "playstore") "knf.kuma" else "knf.kuma.${BuildConfig.BUILD_TYPE}"

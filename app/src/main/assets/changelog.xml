@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="105" version="4.2.1">
+        <change type="fix">Errores generales</change>
+        <change type="new">Barra de estado para Animeflv</change>
+    </release>
     <release code="104" version="4.2">
         <change type="fix">Errores generales</change>
         <change type="new">Estilo home para recientes</change>

@@ -21,6 +21,7 @@ import knf.kuma.recents.RecentsNotReceiver
 import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVBaseActivity
 import knf.kuma.tv.TVServersFactory
+import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.tv_activity_main.*
@@ -124,7 +125,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                                 return false
                             }
                         }
-                        webView.settings?.userAgentString = BypassUtil.userAgent
+                        webView.settings?.userAgentString = randomUA().also { PrefsUtil.userAgent = it }
                         webView.loadUrl("https://animeflv.net/")
                     }
                 } else {

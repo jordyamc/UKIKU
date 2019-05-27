@@ -4,7 +4,6 @@ import android.content.Context
 import android.webkit.CookieManager
 import androidx.preference.PreferenceManager
 import org.jsoup.HttpStatusException
-import java.io.IOException
 import java.util.*
 
 /**
@@ -18,7 +17,7 @@ class BypassUtil {
     }
 
     companion object {
-        const val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
+        val userAgent get() = PrefsUtil.userAgent
         var isLoading = false
 
         private const val keyCfClearance = "cf_clearance"
@@ -60,7 +59,7 @@ class BypassUtil {
                 response.statusCode() == 503
             } catch (e: HttpStatusException) {
                 e.statusCode == 503
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
                 false
             }

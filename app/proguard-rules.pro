@@ -55,6 +55,7 @@
 -dontwarn okhttp3.**
 
 -dontwarn knf.kuma.**
+-dontwarn kotlinx.coroutines.**
 -keep public enum knf.kuma.**{*;}
 -keep class es.munix.multidisplaycast.**{*;}
 -keep class com.connectsdk.**{* ;}
@@ -82,3 +83,36 @@
 -dontwarn com.smaato.soma.SomaUnityPlugin*
 -dontwarn com.millennialmedia**
 -dontwarn com.facebook.**
+-dontwarn com.google.common.**
+-dontwarn com.google.android.**
+-dontwarn com.google.firebase.**
+-dontwarn org.jetbrains.anko.db.**
+-dontwarn com.afollestad.materialdialogs.**
+-dontwarn com.amazon.**
+-dontwarn xdroid.toaster.**
+-dontwarn com.pavelsikun.seekbarpreference.**
+-dontwarn com.jakewharton.picasso.**
+-dontwarn io.grpc.**
+-dontwarn kotlin.internal.**
+-dontwarn at.blogc.android.**
+-dontwarn com.afollestad.**
+-dontwarn com.connectsdk.**
+-dontwarn com.danielstone.materialaboutlibrary.**
+-dontwarn com.github.rubensousa.previewseekbar.**
+-dontwarn com.mikhaellopez.circularprogressbar.**
+-dontwarn com.simplecityapps.**
+-dontwarn com.tbuonomo.viewpagerdotsindicator.**
+-dontwarn es.munix.multidisplaycast.**
+-dontwarn fr.bmartel.speedtest.**
+-dontwarn me.zhanghai.android.**
+-dontwarn moe.feng.common.**
+-dontwarn com.github.stephenvinouze.materialnumberpickercore.**
+-dontwarn org.cryse.widget.persistentsearch.**
+-dontwarn pl.droidsonroids.jspoon.**
+-dontwarn org.jetbrains.anko.**
+-dontwarn nl.dionsegijn.konfetti.**
+-dontwarn kotlinx.android.**
+-dontwarn kotlin.**
+-dontwarn io.opencensus.**
+-dontwarn dagger.**
+-dontwarn com.tonyodev.**

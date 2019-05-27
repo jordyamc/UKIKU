@@ -2,87 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90684a6d-0c49-4c34-9f86-a427c19eef30" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../app/src/main/assets/commentaries.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/UriValidation.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/comments.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/markdown-navigator/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/markdown-navigator/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/app-release.apk" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/app-release.apk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/release/output.json" beforeDir="false" afterPath="$PROJECT_DIR$/../app/release/output.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/debug/res/xml/preferences.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/debug/res/xml/preferences.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/assets/changelog.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/assets/changelog.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/App.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/App.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/BottomFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/BottomFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Diagnostic.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Diagnostic.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/Main.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/achievements/AchievementActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/achievements/AchievementActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/ActivityAnime.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/ActivityAnime.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/AnimeChaptersAdapter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/CommentsDialog.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/fragments/ChaptersFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/fragments/ChaptersFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/img/ActivityImgFull.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/img/ActivityImgFull.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/viewholders/AnimeActivityHolder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/animeinfo/viewholders/AnimeActivityHolder.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BUUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BUUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BackUpActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/backup/BackUpActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/changelog/ChangelogActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/changelog/ChangelogActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/AestheticUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/AestheticUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/BypassUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/BypassUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/EAHelper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/EAHelper.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/ExtensionUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/ExtensionUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/FileUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/FileUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PrefsUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/commons/PrefsUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/AchievementUnlocked.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/AchievementUnlocked.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/GenericActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/GenericActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/ThemedControlsActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/custom/ThemedControlsActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/directory/DirectoryUpdateService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadDialogActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/DownloadManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/FileAccessHelper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/download/FileAccessHelper.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/emision/EmisionActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/ExplorerActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/explorer/ExplorerActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/DirUpdateJob.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/DirUpdateJob.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/RecentsJob.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/RecentsJob.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/UpdateJob.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/jobscheduler/UpdateJob.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsDetailsActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/news/NewsDetailsActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/CustomExoPlayer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/player/VideoActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/Achievement.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/Achievement.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/pojos/AnimeObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/ConfigurationFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/preferences/ConfigurationFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/queue/QueueManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/random/RandomActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/random/RandomActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/RecentFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/viewholders/RecyclerRefreshHolder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recents/viewholders/RecyclerRefreshHolder.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RankingActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RankingActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RecommendActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/recommended/RecommendActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/record/RecordActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/record/RecordActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/GenreActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/search/GenreActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/seeing/SeeingActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/seeing/SeeingActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/slices/AnimeSlice.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/slices/AnimeSlice.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/Headers.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/Headers.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/ServersFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/videoservers/ServersFactory.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEListProvider.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEListProvider.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEmisionProvider.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/java/knf/kuma/widgets/emision/WEmisionProvider.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_seeing.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/fragment_seeing.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_chapters.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_chapters.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir_grid.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_dir_grid.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs_grid.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/layout/recycler_favs_grid.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_casting_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_casting_menu.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_downloaded_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_downloaded_menu.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/chapter_menu.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/menu/menu_anime_info.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/menu/menu_anime_info.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values/styles.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/values/styles_colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/values/styles_colors.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/path_providers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/xml/path_providers.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/src/main/res/xml/preferences.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../app/src/main/res/xml/preferences.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../app/tv/app-tv.apk" beforeDir="false" afterPath="$PROJECT_DIR$/../app/tv/app-tv.apk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../version.num" beforeDir="false" afterPath="$PROJECT_DIR$/../version.num" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -90,6 +9,11 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution>
+      <executable />
+    </execution>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
@@ -116,9 +40,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="85">
               <caret line="5" column="5" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
-              <folding>
-                <element signature="n#style#0;n#div#1;n#body#0;n#ht#0;n#!!top" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -210,6 +131,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -226,7 +148,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -285,17 +206,19 @@
       <workItem from="1550013532510" duration="10171000" />
       <workItem from="1554426229272" duration="5052000" />
       <workItem from="1554579273602" duration="133000" />
+      <workItem from="1557169873226" duration="514000" />
+      <workItem from="1557945562716" duration="87000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40633000" />
+    <option name="totallyTimeSpent" value="41234000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23227383" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23533008" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -359,13 +282,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/public/amp/index.html" />
     <entry file="file://$PROJECT_DIR$/public/amp/about.html" />
-    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/stubs/superglobals/_superglobals.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="65" selection-start-line="65" selection-end-line="65" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/stubs/superglobals/_superglobals.php" />
     <entry file="uml://JavaScript-modules-diagram//comments.php">
       <provider selected="true" editor-type-id="UmlEditorProvider">
         <state>

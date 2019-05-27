@@ -11,6 +11,7 @@ import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
+import knf.kuma.uagen.randomUA
 
 @SuppressLint("StaticFieldLeak")
 object PrefsUtil {
@@ -140,6 +141,11 @@ object PrefsUtil {
     val maxParallelDownloads: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("max_parallel_downloads", "3")
                 ?: "3")
+
+    var userAgent: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("user_agent", randomUA())
+                ?: randomUA()
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("user_agent", value).apply()
 
     var randomLimit: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("random_limit", 25)

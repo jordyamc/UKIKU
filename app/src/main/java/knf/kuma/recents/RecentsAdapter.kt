@@ -80,9 +80,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             holder.setNew(recentObject.isNew)
             holder.setFav(dao.isFav(Integer.parseInt(recentObject.aid)))
             holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.eid))
-            dao.favObserver(Integer.parseInt(recentObject.aid)).observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
-            holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.eid), fragment, Observer { chapter -> holder.setSeen(chapter != null) })
-            holder.setDownloadObserver(downloadsDAO.getLiveByEid(recentObject.eid), fragment, Observer { downloadObject ->
+            dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
+            holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.eid).distinct, fragment, Observer { chapter -> holder.setSeen(chapter != null) })
+            holder.setDownloadObserver(downloadsDAO.getLiveByEid(recentObject.eid).distinct, fragment, Observer { downloadObject ->
                 holder.setDownloadState(downloadObject)
                 if (downloadObject == null) {
                     recentObject.downloadState = -8
@@ -257,11 +257,12 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         val wasEmpty = this.list.isEmpty()
         this.list = list.distinctBy { it.eid } as MutableList<RecentObject>
         this.list.implAdsRecentBrains()
-        view.post {
-            notifyDataSetChanged()
-            if (wasEmpty)
-                updateListener.invoke()
-        }
+        if (this.list.isNotEmpty())
+            view.post {
+                notifyDataSetChanged()
+                if (wasEmpty)
+                    updateListener.invoke()
+            }
     }
 
     override fun getItemId(position: Int): Long {
