@@ -94,7 +94,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         if (context == null) return
         val chapter = chapters[position]
         val downloadObject = AtomicReference(downloadsDAO.getByEid(chapter.eid))
-        val dFile = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
+        val dFile = FileAccessHelper.getFile(chapter.fileName)
         if (selection.contains(position))
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight()))
         else
@@ -183,7 +183,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             downloadObject.get()?.state = -8
                             chapter.isDownloaded = false
                             holder.setDownloaded(false, false)
-                            FileAccessHelper.INSTANCE.delete(chapter.fileName, false)
+                            FileAccessHelper.delete(chapter.fileName, false)
                             DownloadManager.cancel(chapter.eid)
                             QueueManager.remove(chapter.eid)
                         }

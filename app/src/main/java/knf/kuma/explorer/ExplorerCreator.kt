@@ -25,7 +25,7 @@ object ExplorerCreator {
         postState("Iniciando busqueda")
         doAsync {
             val animeDAO = CacheDB.INSTANCE.animeDAO()
-            val root = FileAccessHelper.INSTANCE.downloadsDirectory
+            val root = FileAccessHelper.downloadsDirectory
             if (root.exists()) {
                 postState("Buscando animes")
                 val list = ArrayList<ExplorerObject>()

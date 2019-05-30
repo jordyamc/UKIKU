@@ -79,7 +79,7 @@ class DownloadService : IntentService("Download service") {
             val inputStream = BufferedInputStream(response.body()?.byteStream())
             val outputStream: BufferedOutputStream
             if (response.code() == 200 || response.code() == 206) {
-                outputStream = BufferedOutputStream(FileAccessHelper.INSTANCE.getOutputStream(current?.file), bufferSize * 1024)
+                outputStream = BufferedOutputStream(FileAccessHelper.getOutputStream(current?.file), bufferSize * 1024)
             } else {
                 Log.e("Download error", "Code: " + response.code())
                 errorNotification()
@@ -98,7 +98,7 @@ class DownloadService : IntentService("Download service") {
             while (count >= 0) {
                 val revised = downloadsDAO.getByEid(intent.getStringExtra("eid"))
                 if (revised == null) {
-                    FileAccessHelper.INSTANCE.delete(file)
+                    FileAccessHelper.delete(file)
                     current?.let { downloadsDAO.delete(it) }
                     QueueManager.remove(current?.eid)
                     cancelForeground()
@@ -123,7 +123,7 @@ class DownloadService : IntentService("Download service") {
             completedNotification()
         } catch (e: Exception) {
             e.printStackTrace()
-            FileAccessHelper.INSTANCE.delete(file)
+            FileAccessHelper.delete(file)
             current?.let {
                 downloadsDAO.delete(it)
                 QueueManager.remove(it.eid)
@@ -173,8 +173,8 @@ class DownloadService : IntentService("Download service") {
 
     private fun updateMedia() {
         try {
-            sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(FileAccessHelper.INSTANCE.getFile(file))))
-            MediaScannerConnection.scanFile(applicationContext, arrayOf(FileAccessHelper.INSTANCE.getFile(file).absolutePath), arrayOf("video/mp4"), null)
+            sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(FileAccessHelper.getFile(file))))
+            MediaScannerConnection.scanFile(applicationContext, arrayOf(FileAccessHelper.getFile(file).absolutePath), arrayOf("video/mp4"), null)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -203,7 +203,7 @@ class DownloadService : IntentService("Download service") {
     override fun onTaskRemoved(rootIntent: Intent) {
         noCrash {
             cancelForeground()
-            FileAccessHelper.INSTANCE.delete(file)
+            FileAccessHelper.delete(file)
             current?.let {
                 if (manager.notNull())
                     errorNotification()

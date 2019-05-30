@@ -36,9 +36,9 @@ import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.FileAccessHelper
-import knf.kuma.jobscheduler.BackupJob
-import knf.kuma.jobscheduler.DirUpdateJob
-import knf.kuma.jobscheduler.RecentsJob
+import knf.kuma.jobscheduler.BackUpWork
+import knf.kuma.jobscheduler.DirUpdateWork
+import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.pojos.AutoBackupObject
 import knf.kuma.widgets.emision.WEmisionProvider
 import org.jetbrains.anko.doAsync
@@ -78,14 +78,14 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Abrir configuración"
-                else if (FileAccessHelper.INSTANCE.toneFile.exists())
+                else if (FileAccessHelper.toneFile.exists())
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Personalizado"
                 preferenceScreen.findPreference<Preference>(keyCustomTone)?.setOnPreferenceClickListener {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         noCrash {
                             startActivity(
                                     Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-                                            .putExtra(Settings.EXTRA_CHANNEL_ID, RecentsJob.CHANNEL_RECENTS)
+                                            .putExtra(Settings.EXTRA_CHANNEL_ID, RecentsWork.CHANNEL_RECENTS)
                                             .putExtra(Settings.EXTRA_APP_PACKAGE, this@ConfigurationFragment.context?.packageName)
                             )
                         }
@@ -100,7 +100,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                 .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                                 .setType("audio/*"), 4784)
                                         1 -> {
-                                            FileAccessHelper.INSTANCE.toneFile.safeDelete()
+                                            FileAccessHelper.toneFile.safeDelete()
                                             preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Sistema"
                                         }
                                     }
@@ -155,7 +155,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "Sin cuenta para respaldos"
                 }
                 preferenceScreen.findPreference<Preference>(keyAutoBackup)?.setOnPreferenceChangeListener { _, o ->
-                    BackupJob.reSchedule(Integer.valueOf((o as? String) ?: "0"))
+                    BackUpWork.reSchedule(Integer.valueOf((o as? String) ?: "0"))
                     BUUtils.backup(AutoBackupObject(activity, (o as? String)
                             ?: "0"), object : BUUtils.AutoBackupInterface {
                         override fun onResponse(backupObject: AutoBackupObject?) {
@@ -177,7 +177,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 } else {
                     preferenceScreen.removePreferenceRecursively("download_type_q")
                     preferenceScreen.findPreference<Preference>("download_type")?.setOnPreferenceChangeListener { _, o ->
-                        if (o == "1" && !FileAccessHelper.INSTANCE.canDownload(this@ConfigurationFragment, o as? String))
+                        if (o == "1" && !FileAccessHelper.canDownload(this@ConfigurationFragment, o as? String))
                             Toaster.toast("Por favor selecciona la raiz de tu SD")
                         else
                             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("tree_uri", null).apply()
@@ -210,11 +210,11 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 preferenceScreen.findPreference<Preference>("recents_time")?.setOnPreferenceChangeListener { _, o ->
                     preferenceScreen.findPreference<Preference>("notify_favs")?.isEnabled = "0" != o
-                    RecentsJob.reSchedule(o.toString().toInt() * 15)
+                    RecentsWork.reSchedule(o.toString().toInt() * 15)
                     true
                 }
                 preferenceScreen.findPreference<Preference>("dir_update_time")?.setOnPreferenceChangeListener { _, o ->
-                    DirUpdateJob.reSchedule(o.toString().toInt() * 15)
+                    DirUpdateWork.reSchedule(o.toString().toInt() * 15)
                     true
                 }
                 preferenceScreen.findPreference<Preference>("dir_update")?.setOnPreferenceClickListener {
@@ -302,7 +302,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 preferenceScreen.findPreference<Preference>("hide_chaps")?.setOnPreferenceChangeListener { _, o ->
                     if (!FileAccessHelper.NOMEDIA_CREATING) {
-                        FileAccessHelper.INSTANCE.checkNoMedia(o as? Boolean == true)
+                        FileAccessHelper.checkNoMedia(o as? Boolean == true)
                         true
                     } else {
                         (preferenceScreen.findPreference("hide_chaps") as? SwitchPreference)?.isChecked = o as? Boolean != true
@@ -333,7 +333,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     preferenceScreen.findPreference<Preference>("reset_recents")?.setOnPreferenceClickListener {
                         doAsync {
                             CacheDB.INSTANCE.recentsDAO().clear()
-                            RecentsJob.run()
+                            RecentsWork.run()
                         }
                         true
                     }
@@ -361,25 +361,25 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         noCrash {
             if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
-                val validation = FileAccessHelper.INSTANCE.isUriValid(data?.data)
+                val validation = FileAccessHelper.isUriValid(data?.data)
                 if (!validation.isValid) {
                     Toaster.toast("Directorio invalido: $validation")
                     FileAccessHelper.openTreeChooser(this)
                 } else if (Build.VERSION.SDK_INT >= SDK_INT_Q)
                     preferenceScreen.findPreference<Preference>("download_type_q")?.summary = PrefsUtil.storageType
             } else if (requestCode == 4784 && resultCode == Activity.RESULT_OK) {
-                if (!FileAccessHelper.INSTANCE.toneFile.exists())
-                    FileAccessHelper.INSTANCE.toneFile.createNewFile()
+                if (!FileAccessHelper.toneFile.exists())
+                    FileAccessHelper.toneFile.createNewFile()
                 FileUtil.moveFile(
                         safeContext.contentResolver,
                         data?.data,
-                        FileOutputStream(FileAccessHelper.INSTANCE.toneFile), false)
+                        FileOutputStream(FileAccessHelper.toneFile), false)
                         .observe(this, Observer {
                             try {
                                 if (it != null) {
                                     if (it.second) {
                                         if (it.first == -1) {
-                                            FileAccessHelper.INSTANCE.toneFile.safeDelete()
+                                            FileAccessHelper.toneFile.safeDelete()
                                             Toaster.toast("Error al copiar")
                                         } else {
                                             Toaster.toast("Tono seleccionado!")

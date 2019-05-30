@@ -11,7 +11,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PrefsUtil;
-import knf.kuma.database.CacheDB;
+import knf.kuma.database.CacheDBWrap;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.download.FileAccessHelper;
 import knf.kuma.search.SearchObject;
@@ -71,7 +71,7 @@ public class RecentObject {
     }
 
     public static List<RecentObject> create(List<WebInfo> infos) {
-        AnimeDAO dao = CacheDB.INSTANCE.animeDAO();
+        AnimeDAO dao = CacheDBWrap.INSTANCE.animeDAO();
         List<RecentObject> objects = new ArrayList<>();
         for (WebInfo info : infos) {
             try {
@@ -117,7 +117,7 @@ public class RecentObject {
         this.isNew = chapter.matches("^.* [10]$");
         this.anime = PatternUtil.INSTANCE.getAnimeUrl(this.url, this.aid);
         File file = FileAccessHelper.INSTANCE.getFile(getFileName());
-        DownloadObject downloadObject = CacheDB.INSTANCE.downloadsDAO().getByEid(eid);
+        DownloadObject downloadObject = CacheDBWrap.INSTANCE.downloadsDAO().getByEid(eid);
         this.isChapterDownloaded = file.exists();
         this.isDownloading = downloadObject != null && downloadObject.state == DownloadObject.DOWNLOADING;
         if (downloadObject != null) {
@@ -125,7 +125,7 @@ public class RecentObject {
         } else {
             this.downloadState = -8;
         }
-        this.animeObject = CacheDB.INSTANCE.animeDAO().getSOByAid(aid);
+        this.animeObject = CacheDBWrap.INSTANCE.animeDAO().getSOByAid(aid);
     }
 
     private void populate(AnimeDAO dao, WebInfo webInfo) {

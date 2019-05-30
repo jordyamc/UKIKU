@@ -63,7 +63,18 @@ class BypassUtil {
                 e.printStackTrace()
                 false
             }
+        }
 
+        fun isConnectionBlocked(): Boolean {
+            return try {
+                val response = jsoupCookies("https://animeflv.net/").execute()
+                response.statusCode() == 403
+            } catch (e: HttpStatusException) {
+                e.statusCode == 403
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
         }
 
         fun getMapCookie(context: Context): Map<String, String> {

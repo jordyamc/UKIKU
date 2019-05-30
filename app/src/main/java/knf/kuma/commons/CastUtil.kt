@@ -1,6 +1,5 @@
 package knf.kuma.commons
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -10,6 +9,7 @@ import com.google.android.material.snackbar.Snackbar
 import es.munix.multidisplaycast.CastManager
 import es.munix.multidisplaycast.interfaces.CastListener
 import es.munix.multidisplaycast.interfaces.PlayStatusListener
+import knf.kuma.App
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.cast.CastCustom
 import knf.kuma.cast.CastMedia
@@ -134,12 +134,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
 
     companion object {
         var NO_PLAYING = "no_play"
-        @SuppressLint("StaticFieldLeak")
-        private lateinit var ourInstance: CastUtil
-
-        fun init(context: Context) {
-            ourInstance = CastUtil(context)
-        }
+        private val ourInstance: CastUtil by lazy { CastUtil(App.context) }
 
         @Contract(pure = true)
         fun get(): CastUtil {

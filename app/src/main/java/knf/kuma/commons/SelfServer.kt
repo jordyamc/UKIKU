@@ -148,7 +148,7 @@ class SelfServer : Service() {
         private fun serveFile(header: Map<String, String>, file_name: String): Response? {
             var res: Response?
             val mime = "video/mp4"
-            val file = FileAccessHelper.INSTANCE.getFile(file_name)
+            val file = FileAccessHelper.getFile(file_name)
             try {
                 // Calculate etag
                 val etag = Integer.toHexString((file.absolutePath +
@@ -190,7 +190,7 @@ class SelfServer : Service() {
                         }
 
                         val dataLen = newLen
-                        val fis = FileAccessHelper.INSTANCE.getInputStream(file_name)
+                        val fis = FileAccessHelper.getInputStream(file_name)
                         fis?.skip(startFrom)
 
                         res = createResponse(Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
@@ -203,7 +203,7 @@ class SelfServer : Service() {
                     if (etag == header["if-none-match"])
                         res = createResponse(Response.Status.NOT_MODIFIED, mime, "")
                     else {
-                        res = createResponse(Response.Status.OK, mime, FileAccessHelper.INSTANCE.getInputStream(file_name), fileLen)
+                        res = createResponse(Response.Status.OK, mime, FileAccessHelper.getInputStream(file_name), fileLen)
                         res.addHeader("Content-Length", "" + fileLen)
                         res.addHeader("ETag", etag)
                     }

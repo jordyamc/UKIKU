@@ -21,7 +21,7 @@ import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.download.MultipleDownloadManager
-import knf.kuma.jobscheduler.DirUpdateJob
+import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.pojos.AnimeObject
 import xdroid.toaster.Toaster
 import java.util.*
@@ -46,7 +46,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                             holder?.setAdapter(this@ChaptersFragment, chapters)
                             holder?.goToChapter()
                         } else if (Network.isConnected) {
-                            DirUpdateJob.runNow()
+                            DirUpdateWork.runNow()
                             "Integridad de directorio comprometida, actualizando directorio...".toast()
                         }
                         null
@@ -130,13 +130,13 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                             .setProgressMax(100)
                             .setShowProgressPercentage(true)
                     snackManager.show(snackbar, SnackProgressBarManager.LENGTH_INDEFINITE)
-                    FileUtil.moveFile(App.context.contentResolver, data?.data, FileAccessHelper.INSTANCE.getOutputStream(moveFile)).observe(this, Observer { pair ->
+                    FileUtil.moveFile(App.context.contentResolver, data?.data, FileAccessHelper.getOutputStream(moveFile)).observe(this, Observer { pair ->
                         try {
                             if (pair != null) {
                                 if (pair.second) {
                                     if (pair.first == -1) {
                                         Toaster.toast("Error al importar")
-                                        FileAccessHelper.INSTANCE.delete(moveFile)
+                                        FileAccessHelper.delete(moveFile)
                                     } else
                                         Toaster.toast("Importado exitosamente")
                                     holder?.adapter?.notifyDataSetChanged()

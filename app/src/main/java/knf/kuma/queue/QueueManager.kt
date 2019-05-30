@@ -86,7 +86,7 @@ object QueueManager {
             for (file in list)
                 CacheDB.INSTANCE.queueDAO().add(
                         QueueObject(
-                                Uri.fromFile(FileAccessHelper.INSTANCE.getFile(file.fileName)),
+                                Uri.fromFile(FileAccessHelper.getFile(file.fileName)),
                                 true,
                                 AnimeObject.WebInfo.AnimeChapter.fromDownloaded(file)))
             val intent = PrefsUtil.getPlayerIntent()
@@ -98,7 +98,7 @@ object QueueManager {
     }
 
     private fun startQueueExternal(context: Context, list: List<QueueObject>) {
-        val startUri = if (list[0].isFile) FileAccessHelper.INSTANCE.getDataUri(list[0].chapter.fileName) else list[0].getUri()
+        val startUri = if (list[0].isFile) FileAccessHelper.getDataUri(list[0].chapter.fileName) else list[0].getUri()
         val titles = QueueObject.getTitles(list)
         val uris = QueueObject.getUris(list)
         uris[0] = startUri ?: Uri.EMPTY
@@ -116,7 +116,7 @@ object QueueManager {
     }
 
     private fun startQueueExternalDownloaded(context: Context, list: List<ExplorerObject.FileDownObj>) {
-        val startUri = FileAccessHelper.INSTANCE.getDataUri(list[0].fileName)
+        val startUri = FileAccessHelper.getDataUri(list[0].fileName)
         val titles = ExplorerObject.FileDownObj.getTitles(list)
         val uris = ExplorerObject.FileDownObj.getUris(list)
         uris[0] = startUri ?: Uri.EMPTY

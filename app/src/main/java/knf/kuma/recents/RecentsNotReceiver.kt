@@ -5,8 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import knf.kuma.database.CacheDB
-import knf.kuma.jobscheduler.RecentsJob
+import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.pojos.NotificationObj
+import org.jetbrains.anko.notificationManager
 
 class RecentsNotReceiver : BroadcastReceiver() {
 
@@ -17,7 +18,7 @@ class RecentsNotReceiver : BroadcastReceiver() {
         else {
             notificationDAO.delete(NotificationObj.fromIntent(intent))
             if (notificationDAO.getByType(NotificationObj.RECENT).isEmpty())
-                (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(RecentsJob.KEY_SUMMARY)
+                context.notificationManager.cancel(RecentsWork.KEY_SUMMARY)
         }
     }
 
@@ -28,7 +29,7 @@ class RecentsNotReceiver : BroadcastReceiver() {
             for (obj in notificationDAO.all)
                 manager.cancel(obj.key)
             notificationDAO.clear()
-            manager.cancel(RecentsJob.KEY_SUMMARY)
+            manager.cancel(RecentsWork.KEY_SUMMARY)
         }
     }
 }

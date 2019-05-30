@@ -218,9 +218,24 @@ fun noCrash(enableLog: Boolean = true, func: () -> Unit): String? {
     }
 }
 
+fun <T> noCrashLet(onCrash: () -> Unit = {}, func: () -> T): T? {
+    return try {
+        func()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onCrash()
+        null
+    }
+}
+
 fun String?.toast() {
     if (!this.isNullOrEmpty())
         Toaster.toast(this)
+}
+
+fun String?.toastLong() {
+    if (!this.isNullOrEmpty())
+        Toaster.toastLong(this)
 }
 
 fun doOnUI(enableLog: Boolean = true, func: () -> Unit) {

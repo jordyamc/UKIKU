@@ -15,8 +15,8 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
-import knf.kuma.jobscheduler.DirUpdateJob
-import knf.kuma.jobscheduler.RecentsJob
+import knf.kuma.jobscheduler.DirUpdateWork
+import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.recents.RecentsNotReceiver
 import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVBaseActivity
@@ -39,8 +39,8 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                 addFragment(it)
             }
             DirectoryService.run(this)
-            RecentsJob.schedule(this)
-            DirUpdateJob.schedule(this)
+            RecentsWork.schedule(this)
+            DirUpdateWork.schedule(this)
             RecentsNotReceiver.removeAll(this)
             UpdateChecker.check(this, this)
             checkBypass()

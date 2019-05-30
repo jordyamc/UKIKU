@@ -99,7 +99,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
+                                                    val file = FileAccessHelper.getFile(chapter.fileName)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
                                                     if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
@@ -119,7 +119,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
+                                                    val file = FileAccessHelper.getFile(chapter.fileName)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
                                                     if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
@@ -139,7 +139,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.INSTANCE.getFile(chapter.fileName)
+                                                    val file = FileAccessHelper.getFile(chapter.fileName)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
                                                     if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)

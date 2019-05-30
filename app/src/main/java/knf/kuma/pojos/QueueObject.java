@@ -13,7 +13,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.RoomWarnings;
 import androidx.room.TypeConverters;
 import knf.kuma.database.BaseConverter;
-import knf.kuma.database.CacheDB;
+import knf.kuma.database.CacheDBWrap;
 
 @Entity
 @TypeConverters({BaseConverter.class})
@@ -59,7 +59,7 @@ public class QueueObject implements Serializable {
         for (QueueObject object : list) {
             if (!aids.contains(object.chapter.aid)) {
                 aids.add(object.chapter.aid);
-                object.count = CacheDB.INSTANCE.queueDAO().countAlone(object.chapter.aid);
+                object.count = CacheDBWrap.INSTANCE.queueDAO().countAlone(object.chapter.aid);
                 n_list.add(object);
             }
         }

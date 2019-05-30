@@ -22,6 +22,7 @@ class DownloadDialogActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeDialog())
         super.onCreate(savedInstanceState)
+        title = " "
         window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         setFinishOnTouchOutside(false)
         val dialog = MaterialDialog(this).safeShow {

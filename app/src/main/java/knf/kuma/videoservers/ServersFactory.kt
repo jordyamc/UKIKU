@@ -302,7 +302,7 @@ class ServersFactory {
         if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url)
         downloadObject.server = option.server ?: ""
         if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0"))
-            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.INSTANCE.getFile(chapter?.fileName
+            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(chapter?.fileName
                     ?: "null")), true, chapter))
         Answers.getInstance().logCustom(CustomEvent("Download").putCustomAttribute("Server", option.server))
         downloadObject.link = option.url
@@ -411,15 +411,15 @@ class ServersFactory {
             if (context == null) return
             Log.e("Video", "On play")
             AchievementManager.onPlayChapter()
-            val file = FileAccessHelper.INSTANCE.getFile(file_name)
+            val file = FileAccessHelper.getFile(file_name)
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 context.startActivity(PrefsUtil.getPlayerIntent()
                         .setData(Uri.fromFile(file))
                         .putExtra("isFile", true)
                         .putExtra("title", title))
             } else {
-                val intent = Intent(Intent.ACTION_VIEW, FileAccessHelper.INSTANCE.getDataUri(file_name))
-                        .setDataAndType(FileAccessHelper.INSTANCE.getDataUri(file_name), "video/mp4")
+                val intent = Intent(Intent.ACTION_VIEW, FileAccessHelper.getDataUri(file_name))
+                        .setDataAndType(FileAccessHelper.getDataUri(file_name), "video/mp4")
                         .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                         .putExtra("title", title)
                 context.startActivity(intent)
@@ -431,7 +431,7 @@ class ServersFactory {
         }
 
         fun getPlayIntent(context: Context, title: String, file_name: String): PendingIntent {
-            val file = FileAccessHelper.INSTANCE.getFile(file_name)
+            val file = FileAccessHelper.getFile(file_name)
             return if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 PendingIntent.getActivity(context, Math.abs(file_name.hashCode()),
                         PrefsUtil.getPlayerIntent()
@@ -439,8 +439,8 @@ class ServersFactory {
                                 .putExtra("title", getEpTitle(title, file_name))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_UPDATE_CURRENT)
             } else {
-                val intent = Intent(Intent.ACTION_VIEW, FileAccessHelper.INSTANCE.getDataUri(file_name))
-                        .setDataAndType(FileAccessHelper.INSTANCE.getDataUri(file_name), "video/mp4")
+                val intent = Intent(Intent.ACTION_VIEW, FileAccessHelper.getDataUri(file_name))
+                        .setDataAndType(FileAccessHelper.getDataUri(file_name), "video/mp4")
                         .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                         .putExtra("title", getEpTitle(title, file_name))
                 PendingIntent.getActivity(context, Math.abs(file_name.hashCode()), intent, PendingIntent.FLAG_UPDATE_CURRENT)

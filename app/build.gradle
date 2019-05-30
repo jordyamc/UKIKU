@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 105
-        versionName "4.2.1"
+        versionCode 106
+        versionName "4.2.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -141,8 +141,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     api 'com.google.guava:guava:27.0.1-android'
     implementation 'androidx.annotation:annotation:1.0.2'
-    implementation "androidx.slice:slice-builders-ktx:1.0.0-alpha6"
+    implementation 'androidx.slice:slice-builders-ktx:1.0.0-alpha6'
     implementation 'androidx.slice:slice-builders:1.0.0'
+    implementation 'androidx.work:work-runtime-ktx:2.0.1'
     implementation 'androidx.room:room-runtime:2.0.0'
     kapt 'androidx.room:room-compiler:2.0.0'
     androidTestImplementation 'androidx.room:room-testing:2.0.0'
@@ -160,7 +161,6 @@ dependencies {
     implementation "com.tomasznajda.ktx:gson:1.0.0"
     implementation 'me.zhanghai.android.materialratingbar:library:1.3.2'
     implementation 'at.blogc:expandabletextview:1.0.5'
-    implementation 'com.evernote:android-job:1.3.0-rc1'
     implementation 'com.pavelsikun:material-seekbar-preference:2.3.0'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.8.4'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.8.4'
@@ -183,8 +183,8 @@ dependencies {
     implementation 'io.github.luizgrp.sectionedrecyclerviewadapter:sectionedrecyclerviewadapter:1.2.0'
     implementation 'nl.dionsegijn:konfetti:1.1.2'
     implementation 'me.zhanghai.android.materialprogressbar:library:1.6.1'
-    implementation 'com.tonyodev.fetch2:fetch2:2.3.6'
-    implementation 'com.tonyodev.fetch2okhttp:fetch2okhttp:2.3.6'
+    implementation "androidx.tonyodev.fetch2:xfetch2:3.1.1"
+    implementation "androidx.tonyodev.fetch2okhttp:xfetch2okhttp:3.1.1"
     implementation 'q.rorbin:badgeview:1.1.3'
     implementation 'com.jaredrummler:android-device-names:1.1.8'
     implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.0'

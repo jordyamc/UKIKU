@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import knf.kuma.App
 import knf.kuma.database.dao.EaDAO
 import knf.kuma.pojos.EAObject
 
@@ -14,12 +15,11 @@ abstract class EADB : RoomDatabase() {
     abstract fun eaDAO(): EaDAO
 
     companion object {
-        lateinit var INSTANCE: EADB
+        val INSTANCE: EADB by lazy { init(App.context) }
 
-        fun init(context: Context) {
-            INSTANCE = Room.databaseBuilder(context, EADB::class.java, "ee-db")
-                    .allowMainThreadQueries()
-                    .build()
-        }
+        private fun init(context: Context): EADB =
+                Room.databaseBuilder(context, EADB::class.java, "ee-db")
+                        .allowMainThreadQueries()
+                        .build()
     }
 }

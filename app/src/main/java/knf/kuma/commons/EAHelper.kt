@@ -16,6 +16,7 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LevelEndEvent
 import com.crashlytics.android.answers.LevelStartEvent
 import com.crashlytics.android.answers.PurchaseEvent
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
@@ -35,8 +36,14 @@ import java.math.BigDecimal
 import java.util.*
 
 object EAHelper {
-    private var CODE1: String = ""
-    private var CODE2: String = ""
+    private val CODE1: String by lazy {
+        PreferenceManager.getDefaultSharedPreferences(App.context).getString("ea_code1", null)
+                ?: generate(App.context, "ea_code1", arrayOf("R", "F", "D", "C"))
+    }
+    private val CODE2: String by lazy {
+        PreferenceManager.getDefaultSharedPreferences(App.context).getString("ea_code2", null)
+                ?: generate(App.context, "ea_code2", arrayOf("1", "2", "3", "4", "5", "6", "7"))
+    }
     private var CURRENT_1 = ""
     private var CURRENT_2 = ""
 
@@ -80,14 +87,6 @@ object EAHelper {
             1 -> CODE1
             else -> "\u26B2 easteregg"
         }
-    }
-
-    fun init(context: Context) {
-        val manager = PreferenceManager.getDefaultSharedPreferences(context)
-        CODE1 = manager.getString("ea_code1", null)
-                ?: generate(context, "ea_code1", arrayOf("R", "F", "D", "C"))
-        CODE2 = manager.getString("ea_code2", null)
-                ?: generate(context, "ea_code2", arrayOf("1", "2", "3", "4", "5", "6", "7"))
     }
 
     fun checkStart(query: String) {

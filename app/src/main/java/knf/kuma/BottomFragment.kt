@@ -13,7 +13,7 @@ abstract class BottomFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
-            val validation = FileAccessHelper.INSTANCE.isUriValid(data?.data)
+            val validation = FileAccessHelper.isUriValid(data?.data)
             if (!validation.isValid) {
                 Toaster.toast("Directorio invalido: $validation")
                 FileAccessHelper.openTreeChooser(this)

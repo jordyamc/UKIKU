@@ -49,9 +49,9 @@ import knf.kuma.directory.DirectoryService
 import knf.kuma.emision.EmisionActivity
 import knf.kuma.explorer.ExplorerActivity
 import knf.kuma.favorite.FavoriteFragment
-import knf.kuma.jobscheduler.DirUpdateJob
-import knf.kuma.jobscheduler.RecentsJob
-import knf.kuma.jobscheduler.UpdateJob
+import knf.kuma.jobscheduler.DirUpdateWork
+import knf.kuma.jobscheduler.RecentsWork
+import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.news.NewsActivity
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.queue.QueueActivity
@@ -134,9 +134,9 @@ class Main : GenericActivity(),
         doAsync {
             checkPermissions()
             DirectoryService.run(this@Main)
-            UpdateJob.schedule()
-            RecentsJob.schedule(this@Main)
-            DirUpdateJob.schedule(this@Main)
+            UpdateWork.schedule()
+            RecentsWork.schedule(this@Main)
+            DirUpdateWork.schedule(this@Main)
             RecentsNotReceiver.removeAll(this@Main)
             EAHelper.clear1()
         }

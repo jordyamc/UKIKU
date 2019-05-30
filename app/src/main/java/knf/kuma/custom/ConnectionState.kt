@@ -70,7 +70,19 @@ class ConnectionState : LinearLayout {
                 okState()
                 dismiss()
             }
-            403 -> errorBlockedState(onShowDialog)
+            403 -> {
+                errorBlockedState(onShowDialog)
+                GenericActivity.bypassLive.observe(owner, Observer {
+                    GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
+                        if (it.first && it.second) {
+                            warningCreatingState()
+                        } else if (it.first && !it.second) {
+                            okState()
+                            dismiss()
+                        }
+                    }
+                })
+            }
             503 -> {
                 warningState(onShowDialog)
                 GenericActivity.bypassLive.observe(owner, Observer {

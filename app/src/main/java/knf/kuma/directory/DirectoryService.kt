@@ -17,7 +17,7 @@ import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
-import knf.kuma.jobscheduler.DirUpdateJob
+import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DirectoryPage
 import knf.kuma.widgets.emision.WEmisionProvider
@@ -57,12 +57,12 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     override fun onHandleIntent(intent: Intent?) {
-        isRunning = true
         if (!Network.isConnected || BypassUtil.isNeeded()) {
-            stopSelf()
             cancelForeground()
+            stopSelf()
             return
         }
+        isRunning = true
         setStatus(STATE_VERIFYING)
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
@@ -90,10 +90,12 @@ class DirectoryService : IntentService("Directory update") {
 
     private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
         animeDAO.allLinksInEmission.forEach {
-            noCrash {
+            try {
                 val animeObject = AnimeObject(it, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(it).get().outerHtml()))
                 animeDAO.updateAnime(animeObject)
                 WEmisionProvider.update(this)
+            } catch (e: Exception) {
+                return@forEach
             }
         }
     }
@@ -184,7 +186,7 @@ class DirectoryService : IntentService("Directory update") {
                     Log.e(TAG, "Processed $page pages")
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("directory_finished", true).apply()
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet(keyFailedPages, strings).apply()
-                    DirUpdateJob.schedule(this)
+                    DirUpdateWork.schedule(this)
                     setStatus(STATE_FINISHED)
                 }
             } catch (e: HttpStatusException) {
@@ -198,13 +200,14 @@ class DirectoryService : IntentService("Directory update") {
             }
 
         }
-        cancelForeground()
     }
 
     private fun cancelForeground() {
-        isRunning = false
-        stopForeground(true)
-        notCancel(NOT_CODE)
+        noCrash {
+            isRunning = false
+            stopForeground(true)
+            notCancel(NOT_CODE)
+        }
     }
 
     private fun updateNotification() {

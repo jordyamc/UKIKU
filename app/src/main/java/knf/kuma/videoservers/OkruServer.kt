@@ -23,13 +23,13 @@ class OkruServer(context: Context, baseLink: String) : Server(context, baseLink)
                 val array = JSONObject(cutJson).getJSONArray("videos")
                 val videoServer = VideoServer(OKRU)
                 for (i in 0 until array.length()) {
-                    val `object` = array.getJSONObject(i)
-                    when (`object`.getString("name")) {
-                        "hd" -> videoServer.addOption(Option(name, "HD", `object`.getString("url")))
-                        "sd" -> videoServer.addOption(Option(name, "SD", `object`.getString("url")))
-                        "low" -> videoServer.addOption(Option(name, "LOW", `object`.getString("url")))
-                        "lowest" -> videoServer.addOption(Option(name, "LOWEST", `object`.getString("url")))
-                        "mobile" -> videoServer.addOption(Option(name, "MOBILE", `object`.getString("url")))
+                    val json = array.getJSONObject(i)
+                    when (json.getString("name")) {
+                        "hd" -> videoServer.addOption(Option(name, "HD", json.getString("url")))
+                        "sd" -> videoServer.addOption(Option(name, "SD", json.getString("url")))
+                        "low" -> videoServer.addOption(Option(name, "LOW", json.getString("url")))
+                        "lowest" -> videoServer.addOption(Option(name, "LOWEST", json.getString("url")))
+                        "mobile" -> videoServer.addOption(Option(name, "MOBILE", json.getString("url")))
                     }
                 }
                 return videoServer

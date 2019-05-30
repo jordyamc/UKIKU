@@ -28,7 +28,9 @@ import knf.kuma.pojos.DownloadObject
 import knf.kuma.videoservers.ServersFactory
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.notificationManager
 import xdroid.toaster.Toaster
+import java.util.*
 
 class DownloadManager : Service() {
 
@@ -61,19 +63,20 @@ class DownloadManager : Service() {
         private val context: Context = App.context
         private var fetch: Fetch? = null
         private val downloadDao = CacheDB.INSTANCE.downloadsDAO()
-        private var notificationManager: NotificationManager? = null
+        private val notificationManager: NotificationManager by lazy { context.notificationManager }
 
         fun setParallelDownloads(newValue: String?) {
             if (newValue.isNullOrEmpty()) return
             fetch?.setDownloadConcurrentLimit(Integer.parseInt(newValue))
         }
 
-        fun init() {
-            notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        init {
             val configuration = FetchConfiguration.Builder(context)
                     .setDownloadConcurrentLimit(PrefsUtil.maxParallelDownloads)
                     .enableLogging(BuildConfig.DEBUG)
                     .enableRetryOnNetworkGain(true)
+                    .setAutoRetryMaxAttempts(3)
+                    .createDownloadFileOnEnqueue(false)
                     .setHttpDownloader(OkHttpDownloader(OkHttpClient.Builder().followRedirects(true).followSslRedirects(true).build()))
                     .build()
             fetch = Fetch.getInstance(configuration).addListener(object : FetchListener {
@@ -100,7 +103,7 @@ class DownloadManager : Service() {
                 override fun onCompleted(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null) {
-                        if (FileAccessHelper.INSTANCE.isTempFile(download.file)) {
+                        if (FileAccessHelper.isTempFile(download.file)) {
                             Log.e("Download", "Moving temp")
                             downloadObject.setEta(-2)
                             downloadObject.progress = 0
@@ -118,7 +121,7 @@ class DownloadManager : Service() {
                                         downloadObject.progress = 100
                                         downloadObject.state = DownloadObject.COMPLETED
                                         downloadDao.update(downloadObject)
-                                        notificationManager?.cancel(downloadObject.eid.toInt())
+                                        notificationManager.cancel(downloadObject.eid.toInt())
                                         completedNotification(downloadObject)
                                     }
                                     stopIfNeeded()
@@ -198,21 +201,21 @@ class DownloadManager : Service() {
                 override fun onCancelled(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null)
-                        notificationManager?.cancel(downloadObject.getDid())
+                        notificationManager.cancel(downloadObject.getDid())
                     stopIfNeeded()
                 }
 
                 override fun onRemoved(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null)
-                        notificationManager?.cancel(downloadObject.getDid())
+                        notificationManager.cancel(downloadObject.getDid())
                     stopIfNeeded()
                 }
 
                 override fun onDeleted(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null)
-                        notificationManager?.cancel(downloadObject.getDid())
+                        notificationManager.cancel(downloadObject.getDid())
                     stopIfNeeded()
                 }
             })
@@ -220,13 +223,14 @@ class DownloadManager : Service() {
 
         fun start(downloadObject: DownloadObject): Boolean {
             try {
-                val file = FileAccessHelper.INSTANCE.getFileCreate(downloadObject.file)
+                val file = FileAccessHelper.getFileCreate(downloadObject.file)
                 file?.let {
                     val request = Request(downloadObject.link, file.absolutePath)
                     if (downloadObject.headers != null)
                         for (header in downloadObject.headers?.headers
                                 ?: listOf<Pair<String, String>>())
                             request.addHeader(header.first, header.second)
+                    request.enqueueAction = EnqueueAction.REPLACE_EXISTING
                     downloadObject.setDid(request.id)
                     downloadObject.canResume = true
                     downloadDao.insert(downloadObject)
@@ -248,7 +252,7 @@ class DownloadManager : Service() {
             val downloadObject = downloadDao.getByEid(eid)
             if (downloadObject != null) {
                 downloadDao.delete(downloadObject)
-                notificationManager?.cancel(downloadObject.eid?.toInt() ?: 0)
+                notificationManager.cancel(downloadObject.eid?.toInt() ?: 0)
                 if (downloadObject.did != null)
                     fetch?.delete(downloadObject.getDid())
             }
@@ -259,7 +263,7 @@ class DownloadManager : Service() {
             val dids = mutableListOf<Int>()
             downloads.forEach {
                 dids.add(it.getDid())
-                notificationManager?.cancel(it.eid?.toInt() ?: 0)
+                notificationManager.cancel(it.eid?.toInt() ?: 0)
             }
             fetch?.delete(dids)
             downloadDao.delete(downloads)
@@ -315,7 +319,7 @@ class DownloadManager : Service() {
                 if (!isPaused)
                     setSubText(downloadObject.subtext)
             }
-            notificationManager?.notify(downloadObject.eid?.toInt() ?: 0, notification.build())
+            notificationManager.notify(downloadObject.eid?.toInt() ?: 0, notification.build())
         }
 
         private fun completedNotification(downloadObject: DownloadObject) {
@@ -330,7 +334,7 @@ class DownloadManager : Service() {
                     .setWhen(downloadObject.time)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()
-            notificationManager?.notify(downloadObject.eid?.toInt() ?: 0, notification)
+            notificationManager.notify(downloadObject.eid?.toInt() ?: 0, notification)
             updateMedia(downloadObject)
         }
 
@@ -339,12 +343,12 @@ class DownloadManager : Service() {
                     .setColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
                     .setSmallIcon(android.R.drawable.stat_notify_error)
                     .setContentTitle(downloadObject.name)
-                    .setContentText("Error al descargar " + downloadObject.chapter?.toLowerCase())
+                    .setContentText("Error al descargar " + downloadObject.chapter?.toLowerCase(Locale.ENGLISH))
                     .setOngoing(false)
                     .setWhen(downloadObject.time)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()
-            notificationManager?.notify(downloadObject.eid?.toInt() ?: 0, notification)
+            notificationManager.notify(downloadObject.eid?.toInt() ?: 0, notification)
         }
 
         private fun foregroundGroupNotification(): Notification {
@@ -366,8 +370,8 @@ class DownloadManager : Service() {
         private fun updateMedia(downloadObject: DownloadObject) {
             try {
                 val file = downloadObject.file
-                context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(FileAccessHelper.INSTANCE.getFile(file))))
-                MediaScannerConnection.scanFile(context, arrayOf(FileAccessHelper.INSTANCE.getFile(file).absolutePath), arrayOf("video/mp4"), null)
+                context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(FileAccessHelper.getFile(file))))
+                MediaScannerConnection.scanFile(context, arrayOf(FileAccessHelper.getFile(file).absolutePath), arrayOf("video/mp4"), null)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -389,7 +393,7 @@ class DownloadManager : Service() {
         private fun stopIfNeeded() {
             if (downloadDao.countActive() == 0) {
                 ContextCompat.startForegroundService(context, Intent(context, DownloadManager::class.java).setAction("stop.foreground"))
-                notificationManager?.cancel(22498)
+                notificationManager.cancel(22498)
             }
         }
     }

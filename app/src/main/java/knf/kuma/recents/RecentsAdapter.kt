@@ -90,7 +90,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 } else {
                     recentObject.isDownloading = downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING || downloadObject.state == DownloadObject.PAUSED
                     recentObject.downloadState = downloadObject.state
-                    val file = FileAccessHelper.INSTANCE.getFile(recentObject.fileName)
+                    val file = FileAccessHelper.getFile(recentObject.fileName)
                     recentObject.isChapterDownloaded = file.exists()
                     if (downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING)
                         holder.downIcon.setImageResource(R.drawable.ic_download)
@@ -110,7 +110,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                             MaterialDialog(context).safeShow {
                                 message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase()} de ${recentObject.name}?")
                                 positiveButton(text = "CONFIRMAR") {
-                                    FileAccessHelper.INSTANCE.delete(recentObject.fileName, true)
+                                    FileAccessHelper.delete(recentObject.fileName, true)
                                     DownloadManager.cancel(recentObject.eid)
                                     QueueManager.remove(recentObject.eid)
                                     recentObject.isChapterDownloaded = false
@@ -182,7 +182,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             }
             holder.download.setOnClickListener {
                 val obj = downloadsDAO.getByEid(recentObject.eid)
-                if (FileAccessHelper.INSTANCE.canDownload(fragment) &&
+                if (FileAccessHelper.canDownload(fragment) &&
                         !recentObject.isChapterDownloaded &&
                         !recentObject.isDownloading &&
                         recentObject.downloadState != DownloadObject.PENDING) {
@@ -361,7 +361,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         }
 
         fun setCasting(casting: Boolean, file_name: String) {
-            streaming.post { streaming.text = if (casting) "CAST" else if (FileAccessHelper.INSTANCE.getFile(file_name).exists()) "ELIMINAR" else "STREAMING" }
+            streaming.post { streaming.text = if (casting) "CAST" else if (FileAccessHelper.getFile(file_name).exists()) "ELIMINAR" else "STREAMING" }
         }
 
         @UiThread

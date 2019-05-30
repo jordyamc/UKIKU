@@ -62,7 +62,7 @@ object MultipleDownloadManager {
     }
 
     private fun getAvailable(): Long {
-        val stat = StatFs(FileAccessHelper.INSTANCE.rootFile.path)
+        val stat = StatFs(FileAccessHelper.rootFile.path)
         return stat.blockSizeLong * stat.availableBlocksLong
     }
 }

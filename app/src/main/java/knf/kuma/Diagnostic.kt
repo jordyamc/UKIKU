@@ -20,9 +20,9 @@ import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.download.FileAccessHelper
-import kotlinx.android.synthetic.main.activity_webview.*
 import kotlinx.android.synthetic.main.layout_diagnostic.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
@@ -210,8 +210,8 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun runMemoryTest() {
-        internalState.load(getAvailable(FileAccessHelper.INSTANCE.internalRoot.path))
-        FileAccessHelper.INSTANCE.externalRoot?.path?.let { externalState.load(getAvailable(it)) }
+        internalState.load(getAvailable(FileAccessHelper.internalRoot.path))
+        FileAccessHelper.externalRoot?.path?.let { externalState.load(getAvailable(it)) }
     }
 
     private fun getAvailable(path: String): String {
@@ -264,17 +264,17 @@ class Diagnostic : GenericActivity() {
     class FullBypass : GenericActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_webview)
+            try {
+                setContentView(R.layout.activity_webview)
+            } catch (e: Exception) {
+                setContentView(R.layout.activity_webview_nwv)
+            }
         }
 
         override fun forceCreation(): Boolean = true
 
-        override fun getSnackbarAnchor(): View? {
-            return webview
-        }
+        override fun getSnackbarAnchor(): View? = find(R.id.coordinator)
 
-        override fun onBypassUpdated() {
-            finish()
-        }
+        override fun onBypassUpdated() = finish()
     }
 }

@@ -201,7 +201,7 @@ object FileUtil {
             for ((g_count, pair) in pairs.withIndex()) {
                 try {
                     val inputStream = resolver.openInputStream(pair.first)
-                    val outputStream = FileAccessHelper.INSTANCE.getOutputStream(pair.second)
+                    val outputStream = FileAccessHelper.getOutputStream(pair.second)
                     val total = inputStream?.available()?.toLong() ?: 0
                     val buffer = ByteArray(128 * 1024)
                     var read: Int = inputStream?.read(buffer) ?: 0
@@ -226,7 +226,7 @@ object FileUtil {
                     success++
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    FileAccessHelper.INSTANCE.delete(pair.second)
+                    FileAccessHelper.delete(pair.second)
                 }
 
             }
@@ -239,8 +239,8 @@ object FileUtil {
     fun moveFile(file_name: String, callback: MoveCallback) {
         doAsync {
             try {
-                val inputStream = FileAccessHelper.INSTANCE.getTmpInputStream(file_name)
-                val outputStream = FileAccessHelper.INSTANCE.getOutputStream(file_name)
+                val inputStream = FileAccessHelper.getTmpInputStream(file_name)
+                val outputStream = FileAccessHelper.getOutputStream(file_name)
                 val total = inputStream?.available()?.toLong() ?: 0
                 val buffer = ByteArray(128 * 1024)
                 var read: Int = inputStream?.read(buffer) ?: 0
@@ -256,7 +256,7 @@ object FileUtil {
                 outputStream?.flush()
                 outputStream?.close()
                 try {
-                    val file = FileAccessHelper.INSTANCE.getTmpFile(file_name)
+                    val file = FileAccessHelper.getTmpFile(file_name)
                     file.delete()
                     if (file.parentFile?.list()?.isEmpty() == true)
                         file.parentFile?.delete()

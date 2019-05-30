@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<knf.kuma.custom.WrapWebView
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/webview"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</knf.kuma.custom.WrapWebView>
+    <knf.kuma.custom.WrapWebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

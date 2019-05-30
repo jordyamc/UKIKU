@@ -58,8 +58,7 @@
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.DayNight"
-        android:usesCleartextTraffic="true"
-        tools:replace="android:banner">
+        android:usesCleartextTraffic="true">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

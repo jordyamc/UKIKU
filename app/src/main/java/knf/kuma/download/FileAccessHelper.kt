@@ -1,8 +1,6 @@
 package knf.kuma.download
 
-import android.annotation.SuppressLint
 import android.annotation.TargetApi
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -14,15 +12,16 @@ import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import knf.kuma.App
 import knf.kuma.commons.*
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.*
 
-typealias DeleteListener = () -> Unit
+object FileAccessHelper {
 
-
-class FileAccessHelper private constructor(private val context: Context) {
+    const val SD_REQUEST = 51247
+    var NOMEDIA_CREATING = false
 
     val downloadsDirectory: File
         get() {
@@ -30,7 +29,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                 if (PrefsUtil.downloadType == "0") {
                     File(Environment.getExternalStorageDirectory(), "UKIKU/downloads")
                 } else {
-                    File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads")
+                    File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -41,12 +40,12 @@ class FileAccessHelper private constructor(private val context: Context) {
 
     val internalRoot: File get() = Environment.getExternalStorageDirectory()
 
-    val externalRoot: File? get() = FileUtil.getFullPathFromTreeUri(treeUri, context)?.let { File(it) }
+    val externalRoot: File? get() = FileUtil.getFullPathFromTreeUri(treeUri, App.context)?.let { File(it) }
 
     private val treeUri: Uri?
         get() {
             return try {
-                Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString("tree_uri", null))
+                Uri.parse(PreferenceManager.getDefaultSharedPreferences(App.context).getString("tree_uri", null))
             } catch (e: Exception) {
                 null
             }
@@ -59,7 +58,7 @@ class FileAccessHelper private constructor(private val context: Context) {
             if (PrefsUtil.downloadType == "0") {
                 File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
             } else {
-                File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -74,7 +73,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                 if (PrefsUtil.downloadType == "0") {
                     Environment.getExternalStorageDirectory()
                 } else {
-                    File(FileUtil.getFullPathFromTreeUri(treeUri, context))
+                    File(FileUtil.getFullPathFromTreeUri(treeUri, App.context))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -84,32 +83,30 @@ class FileAccessHelper private constructor(private val context: Context) {
         }
 
     fun getTmpFile(file_name: String): File {
-        return File(FileUtil.getFullPathFromTreeUri(treeUri, context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+        return File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
     }
 
     val toneFile: File
         get() {
-            return File(context.getExternalFilesDir(null), "custom_tone")
+            return File(App.context.getExternalFilesDir(null), "custom_tone")
         }
 
     fun setToneFile(enable: Boolean) {
         if (!enable) toneFile.delete()
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("is_custom_tone", enable).apply()
+        PreferenceManager.getDefaultSharedPreferences(App.context).edit().putBoolean("is_custom_tone", enable).apply()
     }
 
     fun getFileCreate(file_name: String): File? {
         return try {
             if (PrefsUtil.downloadType == "0") {
-                Log.e("File create", "Internal")
                 val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
                 file.parentFile?.mkdirs()
                 if (!file.exists())
                     file.createNewFile()
                 file
             } else {
-                Log.e("File create", "External Temp")
                 createTmpIfNotExist()
-                val file = File(FileUtil.getFullPathFromTreeUri(treeUri, context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                val file = File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
                 file.parentFile?.mkdirs()
                 if (!file.exists())
                     file.createNewFile()
@@ -125,7 +122,7 @@ class FileAccessHelper private constructor(private val context: Context) {
 
     internal fun isTempFile(file: String): Boolean {
         return try {
-            val path = FileUtil.getFullPathFromTreeUri(treeUri, context) ?: return false
+            val path = FileUtil.getFullPathFromTreeUri(treeUri, App.context) ?: return false
             file.contains(path)
         } catch (e: Exception) {
             false
@@ -154,7 +151,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                             inside.delete()
                     }
                 treeUri?.let {
-                    val documentRoot = find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads")
+                    val documentRoot = find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads")
                     val nomediaRoot = documentRoot?.findFile(".nomedia")
                     if (noMediaNeeded && (nomediaRoot == null || !nomediaRoot.exists()))
                         documentRoot?.createFile("application/nomedia", ".nomedia")
@@ -185,7 +182,7 @@ class FileAccessHelper private constructor(private val context: Context) {
             if (PrefsUtil.downloadType == "0") {
                 File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/$file_name")
             } else {
-                File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads/$file_name")
+                File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/$file_name")
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -199,7 +196,7 @@ class FileAccessHelper private constructor(private val context: Context) {
             if (PrefsUtil.downloadType == "0") {
                 File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/${PatternUtil.getNameFromFile(file_name)}")
             } else {
-                File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads/${PatternUtil.getNameFromFile(file_name)}")
+                File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/${PatternUtil.getNameFromFile(file_name)}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -227,7 +224,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                     dir?.delete()
             } else {
                 treeUri?.let {
-                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    val documentFile = DocumentFile.fromTreeUri(App.context, it)
                     if (documentFile != null && documentFile.exists()) {
                         val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
                         file?.delete()
@@ -243,9 +240,9 @@ class FileAccessHelper private constructor(private val context: Context) {
     }
 
     private fun createTmpIfNotExist() {
-        if (!File(FileUtil.getFullPathFromTreeUri(treeUri, context), "Android/data/${getPackage()}").exists()) {
+        if (!File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/${getPackage()}").exists()) {
             treeUri?.let {
-                val documentFile = DocumentFile.fromTreeUri(context, it)
+                val documentFile = DocumentFile.fromTreeUri(App.context, it)
                 if (documentFile != null && documentFile.exists()) {
                     val file = find(documentFile, "Android/data/${getPackage()}/files/downloads/tmp.file")
                     file?.delete()
@@ -267,7 +264,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                 FileOutputStream(File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
                 treeUri?.let {
-                    context.contentResolver.openOutputStream(find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
+                    App.context.contentResolver.openOutputStream(find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
                             ?: Uri.EMPTY, "rw")
                 }
             }
@@ -290,7 +287,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                 FileOutputStream(File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
                 treeUri?.let {
-                    FileOutputStream(context.contentResolver.openFileDescriptor(find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
+                    FileOutputStream(App.context.contentResolver.openFileDescriptor(find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
                             ?: Uri.EMPTY, "rw")?.fileDescriptor)
                 }
             }
@@ -313,7 +310,7 @@ class FileAccessHelper private constructor(private val context: Context) {
                 FileInputStream(File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
                 treeUri?.let {
-                    context.contentResolver.openInputStream(find(DocumentFile.fromTreeUri(context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
+                    App.context.contentResolver.openInputStream(find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
                             ?: Uri.EMPTY)
                 }
             }
@@ -326,7 +323,7 @@ class FileAccessHelper private constructor(private val context: Context) {
 
     fun getTmpInputStream(file_name: String): InputStream? {
         return try {
-            val file = File(FileUtil.getFullPathFromTreeUri(treeUri, context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+            val file = File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
             if (file.parentFile?.exists() == false)
                 file.parentFile?.mkdirs()
             FileInputStream(file)
@@ -343,11 +340,11 @@ class FileAccessHelper private constructor(private val context: Context) {
                 File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists()
             } else {
                 treeUri?.let {
-                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    val documentFile = DocumentFile.fromTreeUri(App.context, it)
                     if (documentFile != null && documentFile.exists()) {
                         find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
                     }
-                    File(FileUtil.getFullPathFromTreeUri(treeUri, context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists()
+                    File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name).exists()
                 } ?: false
             }
         } catch (e: Exception) {
@@ -364,7 +361,7 @@ class FileAccessHelper private constructor(private val context: Context) {
             try {
                 val uri = treeUri
                 if (uri != null) {
-                    val documentFile = DocumentFile.fromTreeUri(context, uri)
+                    val documentFile = DocumentFile.fromTreeUri(App.context, uri)
                     if (documentFile != null && documentFile.exists()) {
                         true
                     } else {
@@ -390,7 +387,7 @@ class FileAccessHelper private constructor(private val context: Context) {
             try {
                 val uri = treeUri
                 if (uri != null) {
-                    val documentFile = DocumentFile.fromTreeUri(context, uri)
+                    val documentFile = DocumentFile.fromTreeUri(App.context, uri)
                     if (documentFile != null && documentFile.exists()) {
                         true
                     } else {
@@ -412,10 +409,10 @@ class FileAccessHelper private constructor(private val context: Context) {
     fun getDataUri(file_name: String): Uri? {
         try {
             return if (PrefsUtil.downloadType == "0") {
-                FileProvider.getUriForFile(context, "${getPackage()}.fileprovider", File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
+                FileProvider.getUriForFile(App.context, "${getPackage()}.fileprovider", File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
                 treeUri?.let {
-                    val documentFile = DocumentFile.fromTreeUri(context, it)
+                    val documentFile = DocumentFile.fromTreeUri(App.context, it)
                     if (documentFile != null && documentFile.exists()) {
                         val root = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
                         return@let root?.uri
@@ -457,76 +454,65 @@ class FileAccessHelper private constructor(private val context: Context) {
                 PrefsUtil.storageType = "Memoria Interna"
             else
                 PrefsUtil.storageType = "Memoria SD"
-            context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("tree_uri", uri.toString()).apply()
+            App.context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            PreferenceManager.getDefaultSharedPreferences(App.context).edit().putString("tree_uri", uri.toString()).apply()
             uriValidation.isValid = true
         }
         return uriValidation
     }
 
-    companion object {
-        const val SD_REQUEST = 51247
-        @SuppressLint("StaticFieldLeak")
-        lateinit var INSTANCE: FileAccessHelper
-        var NOMEDIA_CREATING = false
-
-        fun init(context: Context) {
-            INSTANCE = FileAccessHelper(context)
+    fun openTreeChooser(fragment: Fragment) {
+        try {
+            fragment.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
+            Log.e("FileAccess", "On open drocument tree")
+        } catch (e: Exception) {
+            Toaster.toast("Error al buscar SD")
         }
 
-        fun openTreeChooser(fragment: Fragment) {
-            try {
-                fragment.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
-                Log.e("FileAccess", "On open drocument tree")
-            } catch (e: Exception) {
-                Toaster.toast("Error al buscar SD")
-            }
+    }
 
-        }
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun isSDCardRoot(uri: Uri, uriValidation: UriValidation): Boolean {
+        return isExternalStorageDocument(uri, uriValidation) && isRootUri(uri, uriValidation) && (Build.VERSION.SDK_INT >= SDK_INT_Q || !isInternalStorage(uri, uriValidation))
+    }
 
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-        private fun isSDCardRoot(uri: Uri, uriValidation: UriValidation): Boolean {
-            return isExternalStorageDocument(uri, uriValidation) && isRootUri(uri, uriValidation) && (Build.VERSION.SDK_INT >= SDK_INT_Q || !isInternalStorage(uri, uriValidation))
-        }
-
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        private fun isRootUri(uri: Uri, uriValidation: UriValidation): Boolean {
-            return DocumentsContract.getTreeDocumentId(uri).endsWith(":")
-                    .also {
-                        if (!it) {
-                            Log.e("Storage", "$uri is not root")
-                            uriValidation.errorMessage = "No es la raiz!"
-                        }
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun isRootUri(uri: Uri, uriValidation: UriValidation): Boolean {
+        return DocumentsContract.getTreeDocumentId(uri).endsWith(":")
+                .also {
+                    if (!it) {
+                        Log.e("Storage", "$uri is not root")
+                        uriValidation.errorMessage = "No es la raiz!"
                     }
-        }
-
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        private fun isInternalStorage(uri: Uri, uriValidation: UriValidation): Boolean {
-            return isExternalStorageDocument(uri, uriValidation) && DocumentsContract.getTreeDocumentId(uri).contains("primary")
-                    .also {
-                        if (it) {
-                            Log.e("Storage", "$uri is internal storage")
-                            uriValidation.errorMessage = "Memoria interna"
-                        }
-                    }
-        }
-
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        private fun isInternalStorage(uri: Uri): Boolean {
-            return isExternalStorageDocument(uri) && DocumentsContract.getTreeDocumentId(uri).contains("primary")
-        }
-
-        private fun isExternalStorageDocument(uri: Uri, uriValidation: UriValidation): Boolean {
-            return ("com.android.externalstorage.documents" == uri.authority).also {
-                if (!it) {
-                    Log.e("Storage", "$uri is not external storage document")
-                    uriValidation.errorMessage = "No es almacenamiento externo"
                 }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun isInternalStorage(uri: Uri, uriValidation: UriValidation): Boolean {
+        return isExternalStorageDocument(uri, uriValidation) && DocumentsContract.getTreeDocumentId(uri).contains("primary")
+                .also {
+                    if (it) {
+                        Log.e("Storage", "$uri is internal storage")
+                        uriValidation.errorMessage = "Memoria interna"
+                    }
+                }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun isInternalStorage(uri: Uri): Boolean {
+        return isExternalStorageDocument(uri) && DocumentsContract.getTreeDocumentId(uri).contains("primary")
+    }
+
+    private fun isExternalStorageDocument(uri: Uri, uriValidation: UriValidation): Boolean {
+        return ("com.android.externalstorage.documents" == uri.authority).also {
+            if (!it) {
+                Log.e("Storage", "$uri is not external storage document")
+                uriValidation.errorMessage = "No es almacenamiento externo"
             }
         }
+    }
 
-        private fun isExternalStorageDocument(uri: Uri): Boolean {
-            return ("com.android.externalstorage.documents" == uri.authority)
-        }
+    private fun isExternalStorageDocument(uri: Uri): Boolean {
+        return ("com.android.externalstorage.documents" == uri.authority)
     }
 }

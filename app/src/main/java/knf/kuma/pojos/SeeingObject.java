@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import knf.kuma.database.CacheDB;
+import knf.kuma.database.CacheDBWrap;
 
 @Entity
 public class SeeingObject {
@@ -51,7 +51,7 @@ public class SeeingObject {
         this.aid = aid;
         this.title = title;
         this.chapter = chapter;
-        this.lastChapter = CacheDB.INSTANCE.chaptersDAO().getLastByAid(aid);
+        this.lastChapter = CacheDBWrap.INSTANCE.chaptersDAO().getLastByAid(aid);
         this.state = state;
     }
 

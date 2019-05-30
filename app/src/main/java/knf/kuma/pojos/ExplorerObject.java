@@ -29,7 +29,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 import knf.kuma.commons.PatternUtil;
-import knf.kuma.database.CacheDB;
+import knf.kuma.database.CacheDBWrap;
 import knf.kuma.download.FileAccessHelper;
 import knf.kuma.emision.AnimeSubObject;
 import knf.kuma.explorer.ThumbServer;
@@ -110,7 +110,7 @@ public class ExplorerObject {
                 isProcessed = true;
                 isProcessing = false;
                 new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(chapters));
-                CacheDB.INSTANCE.explorerDAO().update(this);
+                CacheDBWrap.INSTANCE.explorerDAO().update(this);
             } catch (Exception e) {
                 Crashlytics.logException(e);
                 Toaster.toast("Error al obtener lista de episodios");

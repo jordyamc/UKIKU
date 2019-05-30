@@ -97,7 +97,7 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
 
     private fun delete(obj: ExplorerObject.FileDownObj, position: Int) {
         if (position < 0) return
-        FileAccessHelper.INSTANCE.delete(obj.fileName, true)
+        FileAccessHelper.delete(obj.fileName, true)
         downloadsDAO.deleteByEid(obj.eid)
         QueueManager.remove(obj.eid)
         explorerObject.chapters.removeAt(position)
@@ -114,7 +114,7 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
     internal fun deleteAll() {
         doAsync {
             for ((i, obj) in explorerObject.chapters.withIndex()) {
-                FileAccessHelper.INSTANCE.delete(obj.fileName, true)
+                FileAccessHelper.delete(obj.fileName, true)
                 downloadsDAO.deleteByEid(obj.eid)
                 QueueManager.remove(obj.eid)
                 doOnUI {

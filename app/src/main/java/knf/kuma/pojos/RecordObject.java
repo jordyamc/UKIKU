@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import knf.kuma.database.CacheDB;
+import knf.kuma.database.CacheDBWrap;
 import knf.kuma.search.SearchObject;
 
 @Entity
@@ -34,7 +34,7 @@ public class RecordObject {
         this.aid = aid;
         this.eid = eid;
         this.date = date;
-        this.animeObject = CacheDB.INSTANCE.animeDAO().getByAidSimple(aid);
+        this.animeObject = CacheDBWrap.INSTANCE.animeDAO().getByAidSimple(aid);
     }
 
     @Ignore
