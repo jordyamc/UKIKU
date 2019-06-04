@@ -1,8 +1,10 @@
 package knf.kuma.commons
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.Menu
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +31,8 @@ class CastUtil private constructor(private val context: Context) : CastListener,
         CastManager.getInstance().setCastListener(javaClass.simpleName, this)
         casting.value = NO_PLAYING
     }
+
+    fun registerActivity(activity: Activity, menu: Menu, menuId: Int) = CastManager.getInstance().registerForActivity(activity, menu, menuId)
 
     fun connected(): Boolean {
         return CastManager.getInstance().isConnected
@@ -66,7 +70,6 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     override fun isConnected() {
-
     }
 
     override fun isDisconnected() {
@@ -140,5 +143,7 @@ class CastUtil private constructor(private val context: Context) : CastListener,
         fun get(): CastUtil {
             return ourInstance
         }
+
+        fun registerActivity(activity: Activity, menu: Menu, menuId: Int) = get().registerActivity(activity, menu, menuId)
     }
 }

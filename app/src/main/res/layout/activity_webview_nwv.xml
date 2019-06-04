@@ -35,4 +35,32 @@
             android:textSize="22sp"/>
     </LinearLayout>
 
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.4"
+        android:background="#000"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/logText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:lineSpacingExtra="8sp"
+        android:padding="16dp"
+        android:scrollbars="vertical"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:visibility="gone"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_terminal"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

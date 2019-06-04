@@ -3,9 +3,9 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/casting"
-        android:icon="@drawable/ic_casting_menu"
-        android:title="Casting"
+        android:id="@+id/castMenu"
+        android:orderInCategory="2"
+        android:title="Connect"
         app:showAsAction="always"/>
 
     <item

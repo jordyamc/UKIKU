@@ -19,6 +19,7 @@ class BypassUtil {
     companion object {
         val userAgent get() = PrefsUtil.userAgent
         var isLoading = false
+        var isChecking = false
 
         private const val keyCfClearance = "cf_clearance"
         private const val keyCfDuid = "__cfduid"

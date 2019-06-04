@@ -83,8 +83,10 @@ public class ExplorerObject {
         this.aid = object.getAid();
         File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.getFinalName());
         file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
-        if (file_list == null || file_list.length == 0)
+        if (file_list == null || file_list.length == 0) {
+            file.delete();
             throw new IllegalStateException("Directory empty: " + object.getFinalName());
+        }
         this.count = file_list.length;
         this.path = file.getAbsolutePath();
     }

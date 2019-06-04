@@ -15,7 +15,6 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
-import knf.kuma.jobscheduler.DirUpdateWork
 import kotlinx.android.synthetic.main.recycler_changelog.*
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
@@ -89,7 +88,6 @@ class ChangelogActivity : GenericActivity() {
                     val cCode = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0)
                     val pCode = PackageInfoCompat.getLongVersionCode(activity.packageManager.getPackageInfo(activity.packageName, 0)).toInt()
                     if (pCode > cCode && cCode != 0) {
-                        runWVersion(pCode)
                         doOnUI {
                             MaterialDialog(activity).safeShow {
                                 message(text = "Nueva versión, ¿Leer Changelog?")
@@ -106,12 +104,6 @@ class ChangelogActivity : GenericActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }
-        }
-
-        private fun runWVersion(code: Int) {
-            when (code) {
-                36 -> DirUpdateWork.runNow()
             }
         }
     }

@@ -2,6 +2,7 @@ package knf.kuma.custom
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import knf.kuma.App
+import knf.kuma.Diagnostic
 import knf.kuma.R
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.Network
@@ -44,28 +46,31 @@ class ConnectionState : LinearLayout {
         inflater.inflate(R.layout.lay_status_bar, this)
     }
 
+    private var isInitialized = false
 
     fun setUp(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
-            normalState()
-            visibility = View.VISIBLE
-            delay(1000)
-            if (!Network.isConnected) {
-                noNetworkState()
-                while (!Network.isConnected) {
-                    delay(3000)
-                }
+        if (!isInitialized || visibility == View.VISIBLE)
+            GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
                 normalState()
+                visibility = View.VISIBLE
+                delay(1000)
+                if (!Network.isConnected) {
+                    noNetworkState()
+                    while (!Network.isConnected) {
+                        delay(3000)
+                    }
+                    normalState()
+                }
+                doNetworkTests(owner, onShowDialog)
+                isInitialized = true
             }
-            doNetworkTests(owner, onShowDialog)
-        }
     }
 
     private suspend fun doNetworkTests(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
         when (withContext(Dispatchers.IO + untilDestroyJob(owner)) {
             doCookiesTest()
         }) {
-            -2 -> networkTimeoutState(onShowDialog)
+            -2 -> networkTimeoutState(owner, onShowDialog)
             200 -> {
                 okState()
                 dismiss()
@@ -159,7 +164,7 @@ class ConnectionState : LinearLayout {
         message.text = "Error HTTP 403!"
         message.textColor = Color.WHITE
         container.onClick { onShowDialog("Tu proveedor de internet bloquea la conexion entre UKIKU y Animeflv") }
-        container.setOnLongClickListener(null)
+        container.onLongClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
     }
 
     private fun networkErrorState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
@@ -173,7 +178,7 @@ class ConnectionState : LinearLayout {
         container.onLongClick { setUp(owner, onShowDialog) }
     }
 
-    private fun networkTimeoutState(onShowDialog: (message: String) -> Unit) {
+    private fun networkTimeoutState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
         container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
         progress.visibility = View.GONE
         icon.setImageResource(R.drawable.ic_error)
@@ -181,7 +186,7 @@ class ConnectionState : LinearLayout {
         message.text = "Animeflv lento!"
         message.textColor = Color.WHITE
         container.onClick { onShowDialog("Se detectó un problema con la página de Animeflv, es posible que esté en mantenimiento, este problema se solucionará solo, no es necesario reportarlo!") }
-        container.setOnLongClickListener(null)
+        container.onLongClick { setUp(owner, onShowDialog) }
     }
 
     private fun warningState(onShowDialog: (message: String) -> Unit) {
@@ -192,7 +197,7 @@ class ConnectionState : LinearLayout {
         message.text = "Cloudflare activado!"
         message.textColor = Color.WHITE
         container.onClick { onShowDialog("Cloudflare activado, espera al bypass") }
-        container.setOnLongClickListener(null)
+        container.onLongClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
     }
 
     private fun warningCreatingState() {

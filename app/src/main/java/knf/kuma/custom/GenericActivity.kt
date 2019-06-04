@@ -32,9 +32,10 @@ open class GenericActivity : AppCompatActivity() {
                 val appIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
                 setTaskDescription(ActivityManager.TaskDescription(getString(R.string.app_name), appIcon, ContextCompat.getColor(this, R.color.colorPrimary)))
             }
-            checkBypass()
-            super.onResume()
         }
+        logText("On Resume check")
+        checkBypass()
+        super.onResume()
     }
 
     open fun getSnackbarAnchor(): View? = null
@@ -45,15 +46,34 @@ open class GenericActivity : AppCompatActivity() {
 
     open fun forceCreation(): Boolean = false
 
-    private fun checkBypass() {
-        doAsync(exceptionHandler = { it.also { Crashlytics.logException(it) }.message?.toastLong() }) {
-            if ((BypassUtil.isNeeded() || forceCreation()) && !BypassUtil.isLoading) {
+    open fun logText(text: String) {
+
+    }
+
+    fun checkBypass() {
+        if (BypassUtil.isChecking) {
+            logText("Already checking")
+            return
+        }
+        BypassUtil.isChecking = true
+        doAsync(exceptionHandler = {
+            it.also {
+                Crashlytics.logException(it)
+                logText("Error: ${it.message}")
+            }.message?.toastLong()
+        }) {
+            if ((BypassUtil.isNeeded() || forceCreation()).also { logText("Is needed or forced: $it") }
+                    && !BypassUtil.isLoading.also { logText("Is already loading: $it") }) {
+                BypassUtil.isChecking = false
+                logText("Starting creation")
+                BypassUtil.isLoading = true
                 val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
                 bypassLive.postValue(Pair(true, true))
-                BypassUtil.isLoading = true
                 Log.e("CloudflareBypass", "is needed")
                 runWebView(snack)
             } else {
+                BypassUtil.isChecking = false
+                logText("Creation not needed, aborting")
                 bypassLive.postValue(Pair(false, false))
                 Log.e("CloudflareBypass", "Not needed")
             }
@@ -62,12 +82,16 @@ open class GenericActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun runWebView(snack: Snackbar?) {
+        logText("Clearing cookies")
         BypassUtil.clearCookies()
-        doOnUI {
+        doOnUI(onLog = { logText("Error: $it") }) {
+            logText("Searching webview")
             val webView = noCrashLet {
-                findOptional<WrapWebView>(R.id.webview) ?: AppWebView(App.context)
+                findOptional<WrapWebView>(R.id.webview).also { if (it != null) logText("Use layout webview") }
+                //?: AppWebView(App.context).also { logText("Use Application webview, not visible mode") }
             }
             if (webView != null) {
+                logText("Applying settings for webview")
                 webView.settings?.javaScriptEnabled = true
                 webView.webViewClient = object : WebViewClient() {
                     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -77,15 +101,23 @@ open class GenericActivity : AppCompatActivity() {
 
                     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                         Log.e("CloudflareBypass", "Override $url")
+                        logText("Override: $url")
+                        logText("Waiting for resolve...")
                         if (url == "https://animeflv.net/") {
+                            logText("Cookies for animeflv:")
+                            logText(CookieManager.getInstance().getCookie("https://animeflv.net/"))
                             Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
                             if (BypassUtil.saveCookies(App.context)) {
+                                logText("Cookies saved")
                                 webView.loadUrl("about:blank")
-                                doAsync {
-                                    if (BypassUtil.isConnectionBlocked())
+                                doAsync(exceptionHandler = { logText("Error: ${it.message}") }) {
+                                    logText("Checking connection state")
+                                    if (BypassUtil.isConnectionBlocked()) {
+                                        logText("Connection blocked, retry connection...")
                                         runWebView(snack)
-                                    else {
-                                        doOnUI {
+                                    } else {
+                                        doOnUI(onLog = { logText("Error: $it") }) {
+                                            logText("Connection was successful")
                                             snack?.safeDismiss()
                                             getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
                                             bypassLive.postValue(Pair(true, false))
@@ -98,18 +130,28 @@ open class GenericActivity : AppCompatActivity() {
                                         }
                                     }
                                 }
-                            }
+                            } else logText("Invalid cookies!")
                         }
                         return false
                     }
                 }
-                webView.settings?.userAgentString = randomUA().also { PrefsUtil.userAgent = it }
+                webView.settings?.userAgentString = randomUA().also {
+                    PrefsUtil.userAgent = it
+                    logText("Use user agent: $it")
+                }
                 webView.loadUrl("https://animeflv.net/")
             } else {
+                logText("Error finding suitable webview")
                 snack?.safeDismiss()
                 getSnackbarAnchor()?.showSnackbar("Error al iniciar WebView")
+                onBypassUpdated()
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        BypassUtil.isLoading = false
     }
 
     companion object {

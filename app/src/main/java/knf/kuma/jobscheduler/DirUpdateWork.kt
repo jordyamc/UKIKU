@@ -5,14 +5,14 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
-import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.util.concurrent.TimeUnit
 
 class DirUpdateWork(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
     override fun doWork(): Result {
-        if (PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning && !DirectoryUpdateService.isRunning)
+        if (PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
             DirectoryUpdateService.run(context)
         return Result.success()
     }
@@ -21,31 +21,29 @@ class DirUpdateWork(val context: Context, workerParameters: WorkerParameters) : 
         const val TAG = "dir-update-job"
 
         fun schedule(context: Context) {
-            doAsync {
-                val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-                val time = Integer.valueOf(preferences.getString("dir_update_time", "7") ?: "7")
-                if (WorkManager.getInstance().getWorkInfosByTag(TAG).get().size == 0 &&
-                        PrefsUtil.isDirectoryFinished &&
-                        time > 0)
-                    PeriodicWorkRequestBuilder<DirUpdateWork>(time.toLong(), TimeUnit.DAYS).apply {
-                        setConstraints(networkConnectedConstraints())
-                        addTag(TAG)
-                    }.build().enqueue()
-            }
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val time = (preferences.getString("dir_update_time", "7") ?: "7").toLong()
+            if (PrefsUtil.isDirectoryFinished && time > 0)
+                PeriodicWorkRequestBuilder<DirUpdateWork>(time, TimeUnit.DAYS).apply {
+                    setConstraints(networkConnectedConstraints())
+                    addTag(TAG)
+                }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.KEEP)
         }
 
         fun reSchedule(value: Int) {
-            WorkManager.getInstance().cancelAllWorkByTag(TAG)
-            if (PrefsUtil.isDirectoryFinished && value > 0)
+            if (value > 0)
                 PeriodicWorkRequestBuilder<DirUpdateWork>(value.toLong(), TimeUnit.DAYS).apply {
                     setConstraints(networkConnectedConstraints())
                     addTag(TAG)
-                }.build().enqueue()
+                }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.REPLACE)
+            else
+                WorkManager.getInstance().cancelAllWorkByTag(TAG)
         }
 
         fun runNow() {
             if (Network.isConnected) {
                 OneTimeWorkRequestBuilder<DirUpdateWork>().apply {
+                    addTag(TAG)
                     setConstraints(networkConnectedConstraints())
                 }.build().enqueue()
             } else {

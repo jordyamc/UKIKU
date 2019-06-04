@@ -20,11 +20,11 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.ContentViewEvent
 import com.crashlytics.android.answers.ShareEvent
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import es.munix.multidisplaycast.CastManager
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.animeinfo.img.ActivityImgFull
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
+import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.doOnUI
@@ -69,6 +69,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         if (intent.getBooleanExtra(keyNotification, false))
             sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
         load()
+        checkBypass()
     }
 
     private fun load() {
@@ -144,7 +145,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (favoriteObject != null) {
             menuInflater.inflate(R.menu.menu_anime_info, menu)
-            CastManager.getInstance().registerForActivity(this, menu, R.id.castMenu)
+            CastUtil.registerActivity(this, menu, R.id.castMenu)
         }
         return true
     }

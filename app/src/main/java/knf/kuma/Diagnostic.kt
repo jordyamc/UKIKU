@@ -5,9 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.StatFs
 import android.text.format.Formatter
+import android.text.method.ScrollingMovementMethod
 import android.view.View
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
@@ -262,19 +265,57 @@ class Diagnostic : GenericActivity() {
     }
 
     class FullBypass : GenericActivity() {
+        private val overlay: View by lazy { find(R.id.overlay) as View }
+        private val logText: TextView by lazy { find(R.id.logText) as TextView }
+        private val fab: FloatingActionButton by lazy { find(R.id.fab) as FloatingActionButton }
+        private var isOpened = false
+        private var isFinishPending = false
+        private val builder = StringBuilder("Initializing log...\n")
         override fun onCreate(savedInstanceState: Bundle?) {
+            setTheme(EAHelper.getTheme())
             super.onCreate(savedInstanceState)
             try {
                 setContentView(R.layout.activity_webview)
             } catch (e: Exception) {
                 setContentView(R.layout.activity_webview_nwv)
             }
+            logText.movementMethod = ScrollingMovementMethod()
+            fab.onClick {
+                if (isOpened && isFinishPending)
+                    finish()
+                else if (isOpened) {
+                    isOpened = false
+                    overlay.visibility = View.GONE
+                    logText.visibility = View.GONE
+                    fab.setImageResource(R.drawable.ic_terminal)
+                } else {
+                    isOpened = true
+                    overlay.visibility = View.VISIBLE
+                    logText.visibility = View.VISIBLE
+                    fab.setImageResource(R.drawable.ic_close)
+                }
+            }
+            logText("On Create check")
+            checkBypass()
         }
 
         override fun forceCreation(): Boolean = true
 
-        override fun getSnackbarAnchor(): View? = find(R.id.coordinator)
+        //override fun getSnackbarAnchor(): View? = find(R.id.coordinator)
 
-        override fun onBypassUpdated() = finish()
+        override fun onBypassUpdated() {
+            if (isOpened)
+                isFinishPending = true
+            else
+                finish()
+        }
+
+        override fun logText(text: String) {
+            builder.apply {
+                append(text)
+                append("\n")
+            }
+            doOnUI { logText.text = builder.toString() }
+        }
     }
 }

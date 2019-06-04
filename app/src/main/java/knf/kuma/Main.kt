@@ -33,7 +33,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import es.munix.multidisplaycast.CastManager
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.BUUtils
@@ -121,13 +120,13 @@ class Main : GenericActivity(),
         navigationView.setNavigationItemSelectedListener(this)
         bottomNavigationView.setOnNavigationItemSelectedListener(this)
         bottomNavigationView.setOnNavigationItemReselectedListener(this)
-        connectionState.setUp(this, ::onStateDialog)
         setSearch()
         if (savedInstanceState == null) {
             checkServices()
             startChange()
         } else
             returnSelectFragment()
+        checkBypass()
     }
 
     private fun checkServices() {
@@ -328,7 +327,7 @@ class Main : GenericActivity(),
         })
     }
 
-    fun onStateDialog(message: String) {
+    private fun onStateDialog(message: String) {
         MaterialDialog(this).safeShow {
             message(text = message)
             positiveButton()
@@ -375,7 +374,7 @@ class Main : GenericActivity(),
             menuInflater.inflate(R.menu.main, menu)
         }
         searchView.setStartPositionFromMenuItem(findViewById(R.id.action_search))
-        CastManager.getInstance().registerForActivity(this, menu, R.id.castMenu)
+        CastUtil.registerActivity(this, menu, R.id.castMenu)
         return true
     }
 
@@ -560,6 +559,7 @@ class Main : GenericActivity(),
     override fun onResume() {
         super.onResume()
         invalidateOptionsMenu()
+        connectionState.setUp(this, ::onStateDialog)
         doOnUI {
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             when (BUUtils.getType(this@Main)) {

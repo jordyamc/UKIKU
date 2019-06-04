@@ -46,6 +46,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                     override fun updateSelection(i: Int, i1: Int, b: Boolean, b1: Boolean) {
                         adapter?.selectRange(i, i1, b)
                     }
+
                 }).withStartFinishedListener(object : DragSelectionProcessor.ISelectionStartFinishedListener {
                     override fun onSelectionStarted(i: Int, b: Boolean) {
 

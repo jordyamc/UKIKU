@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.lifecycle.Observer
 import knf.kuma.R
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
@@ -37,25 +36,7 @@ class ExplorerActivity : GenericActivity(), OnFileStateChange {
         menuInflater.inflate(R.menu.menu_explorer_connected, menu)
         if (isExplorerFiles)
             menu.findItem(R.id.delete_all).isVisible = false
-        if (!CastUtil.get().connected())
-            menu.findItem(R.id.casting).isVisible = false
-        else {
-            CastUtil.get().casting.observe(this, Observer { s ->
-                try {
-                    if (s == CastUtil.NO_PLAYING) {
-                        menu.findItem(R.id.casting).isEnabled = false
-                    } else {
-                        menu.findItem(R.id.casting).isEnabled = true
-                        menu.findItem(R.id.casting).setOnMenuItemClickListener {
-                            CastUtil.get().openControls()
-                            true
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            })
-        }
+        CastUtil.registerActivity(this, menu, R.id.castMenu)
         return super.onCreateOptionsMenu(menu)
     }
 

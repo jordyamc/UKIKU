@@ -238,11 +238,11 @@ fun String?.toastLong() {
         Toaster.toastLong(this)
 }
 
-fun doOnUI(enableLog: Boolean = true, func: () -> Unit) {
+fun doOnUI(enableLog: Boolean = true, onLog: (text: String) -> Unit = {}, func: () -> Unit) {
     GlobalScope.launch(Dispatchers.Main) {
         noCrash(enableLog) {
             func()
-        }
+        }?.also { onLog(it) }
     }
 }
 
@@ -254,14 +254,11 @@ fun <T> MutableList<T>.removeAll(vararg elements: Collection<T>) {
     }
 }
 
-infix fun <T> Collection<T>?.notSameContent(collection: Collection<T>?) =
-        collection.let {
-            !(this != null && it != null && this.size == it.size && this.containsAll<T>(it))
-        }
+infix fun <T : Any> Collection<T>?.notSameContent(collection: Collection<T>?) = !isSameContent(collection)
 
-infix fun <T> Collection<T>?.isSameContent(collection: Collection<T>?) =
+infix fun <T : Any> Collection<T>?.isSameContent(collection: Collection<T>?) =
         collection.let {
-            this != null && it != null && this.size == it.size && this.containsAll<T>(it)
+            this != null && it != null && this.size == it.size && this.containsAll(it)
         }
 
 fun NotificationCompat.Builder.create(func: NotificationCompat.Builder.() -> Unit): NotificationCompat.Builder {
