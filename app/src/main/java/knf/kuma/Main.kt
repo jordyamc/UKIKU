@@ -35,8 +35,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
-import knf.kuma.backup.BUUtils
 import knf.kuma.backup.BackUpActivity
+import knf.kuma.backup.Backups
 import knf.kuma.backup.MigrationActivity
 import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.*
@@ -53,6 +53,7 @@ import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.news.NewsActivity
 import knf.kuma.preferences.BottomPreferencesFragment
+import knf.kuma.preferences.ConfigurationFragment
 import knf.kuma.queue.QueueActivity
 import knf.kuma.random.RandomActivity
 import knf.kuma.recents.RecentFragment
@@ -78,7 +79,8 @@ class Main : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemReselectedListener,
-        UpdateChecker.CheckListener, BypassUtil.BypassListener {
+        UpdateChecker.CheckListener, BypassUtil.BypassListener,
+        ConfigurationFragment.UAChangeListener {
 
     private val toolbar by bind<Toolbar>(R.id.toolbar)
     private val searchView by bind<PersistentSearchView>(R.id.searchview)
@@ -166,12 +168,13 @@ class Main : GenericActivity(),
             actionLogin.setOnClickListener { BackUpActivity.start(this@Main) }
             actionMigrate.setOnClickListener { MigrationActivity.start(this@Main) }
             actionMap.setOnClickListener { EAMapActivity.start(this@Main) }
-            actionMigrate.visibility = if (BUUtils.isAnimeflvInstalled(this@Main)) View.VISIBLE else View.GONE
+            actionMigrate.visibility = if (Backups.isAnimeflvInstalled) View.VISIBLE else View.GONE
             actionMap.visibility = if (EAHelper.phase == 3) View.VISIBLE else View.GONE
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
-            when (BUUtils.getType(this@Main)) {
-                BUUtils.BUType.LOCAL -> backupLocation.text = "Almacenamiento local"
-                BUUtils.BUType.DROPBOX -> backupLocation.text = "Dropbox"
+            when (Backups.type) {
+                Backups.Type.NONE -> backupLocation.text = "Sin respaldos"
+                Backups.Type.DROPBOX -> backupLocation.text = "Dropbox"
+                Backups.Type.LOCAL -> backupLocation.text = "Local"
             }
             subscribeBadges()
         }
@@ -562,14 +565,19 @@ class Main : GenericActivity(),
         connectionState.setUp(this, ::onStateDialog)
         doOnUI {
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
-            when (BUUtils.getType(this@Main)) {
-                BUUtils.BUType.LOCAL -> backupLocation.text = "Almacenamiento local"
-                BUUtils.BUType.DROPBOX -> backupLocation.text = "Dropbox"
+            when (Backups.type) {
+                Backups.Type.NONE -> backupLocation.text = "Sin respaldos"
+                Backups.Type.DROPBOX -> backupLocation.text = "Dropbox"
+                Backups.Type.LOCAL -> backupLocation.text = "Local"
             }
         }
         if (isFirst) {
             isFirst = false
         }
+    }
+
+    override fun onUAChange() {
+        checkBypass()
     }
 
     override fun onAttachedToWindow() {

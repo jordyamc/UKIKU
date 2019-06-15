@@ -15,7 +15,7 @@ import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
 import fr.bmartel.speedtest.model.SpeedTestError
-import knf.kuma.backup.BUUtils
+import knf.kuma.backup.Backups
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.StateView
@@ -130,6 +130,12 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun loadBypassInfo() {
+        ipState.apply {
+            doAsync {
+                val document = Jsoup.connect("http://checkip.org/").get()
+                load(document.select("div#yourip h1 span").text())
+            }
+        }
         clearanceState.apply {
             val data = BypassUtil.getClearance(this@Diagnostic)
             if (data.isNotEmpty())
@@ -223,11 +229,12 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun runBackupTest() {
-        backupState.load(when (BUUtils.getType(this)) {
-            BUUtils.BUType.DROPBOX -> "Dropbox"
+        backupState.load(when (Backups.type) {
+            Backups.Type.DROPBOX -> "Dropbox"
+            Backups.Type.LOCAL -> "Local"
             else -> "Sin respaldos"
         })
-        if (BUUtils.getType(this) != BUUtils.BUType.LOCAL)
+        if (Backups.type != Backups.Type.NONE)
             lastBackupState.load(PrefsUtil.lastBackup)
     }
 
@@ -311,6 +318,7 @@ class Diagnostic : GenericActivity() {
         }
 
         override fun logText(text: String) {
+            super.logText(text)
             builder.apply {
                 append(text)
                 append("\n")

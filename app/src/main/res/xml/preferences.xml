@@ -261,6 +261,13 @@
             android:title="Espera de conexión"/>
         <SwitchPreference
             android:defaultValue="false"
+            android:icon="@drawable/ic_incognito"
+            android:key="default_useragent"
+            android:summaryOff="Se usará agente al azar en bypass"
+            android:summaryOn="Se usará agente por defecto en bypass"
+            android:title="Usar agente del dispositivo"/>
+        <SwitchPreference
+            android:defaultValue="false"
             android:icon="@drawable/ic_setting_gps"
             android:key="daynigth_permission"
             android:title="Tema dia/noche preciso"/>

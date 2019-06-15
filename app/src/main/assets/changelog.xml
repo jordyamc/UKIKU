@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="108" version="4.2.4">
+        <change type="fix">Errores generales</change>
+        <change type="change">Estructura interna de respaldos mejorado</change>
+        <change type="change">Método de respaldo local (memoria interna)</change>
+    </release>
     <release code="107" version="4.2.3">
         <change type="fix">Errores generales</change>
     </release>

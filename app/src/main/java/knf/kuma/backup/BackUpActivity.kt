@@ -17,7 +17,10 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.dropbox.core.android.Auth
 import knf.kuma.R
-import knf.kuma.backup.objects.BackupObject
+import knf.kuma.backup.framework.BackupService
+import knf.kuma.backup.framework.DropBoxService
+import knf.kuma.backup.framework.LocalService
+import knf.kuma.commons.EAHelper
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showSnackbar
@@ -26,17 +29,20 @@ import knf.kuma.custom.SyncItemView
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login_buttons.*
 import kotlinx.android.synthetic.main.activity_login_main.*
+import kotlin.math.max
 
-class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.OnClick {
+class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     private val syncItems: MutableList<SyncItemView> by lazy { arrayListOf(sync_favs, sync_history, sync_following, sync_seen) }
+    private var service: BackupService? = null
     private var waitingLogin = false
 
     private val backColor: Int
         @ColorInt
         get() {
-            return when (BUUtils.type) {
-                BUUtils.BUType.LOCAL -> ContextCompat.getColor(this, android.R.color.transparent)
-                BUUtils.BUType.DROPBOX -> ContextCompat.getColor(this, R.color.dropbox)
+            return when (Backups.type) {
+                Backups.Type.NONE -> ContextCompat.getColor(this, android.R.color.transparent)
+                Backups.Type.LOCAL -> ContextCompat.getColor(this, EAHelper.getThemeColorLight())
+                Backups.Type.DROPBOX -> ContextCompat.getColor(this, R.color.dropbox)
             }
         }
 
@@ -45,10 +51,11 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
         if (!resources.getBoolean(R.bool.isTablet))
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setContentView(R.layout.activity_login)
-        BUUtils.init(this, savedInstanceState == null)
+        service = Backups.createService()
         login_dropbox.setOnClickListener { onDropBoxLogin() }
+        login_local.setOnClickListener { onLocalLogin() }
         logOut.setOnClickListener { onLogOut() }
-        if (BUUtils.isLogedIn) {
+        if (service?.isLoggedIn == true) {
             setState(true)
             showColor(savedInstanceState == null)
             initSyncButtons()
@@ -59,7 +66,7 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
 
     private fun initSyncButtons() {
         for (itemView in syncItems) {
-            itemView.init(this)
+            itemView.init(service, this)
         }
     }
 
@@ -71,32 +78,46 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
 
     private fun onDropBoxLogin() {
         waitingLogin = true
-        BUUtils.startClient(BUUtils.BUType.DROPBOX, false)
+        service = DropBoxService().also { it.logIn() }
+    }
+
+    private fun onLocalLogin() {
+        MaterialDialog(this).safeShow {
+            message(text = "Los datos se quedarán en la memoria, no se podrá sincronizar datos entre dispositivos, usar este método?")
+            positiveButton(text = "usar") {
+                service = LocalService().also {
+                    it.start()
+                    it.logIn()
+                }
+                onLogin()
+            }
+            negativeButton(text = "cancelar")
+        }
     }
 
     override fun onAction(syncItemView: SyncItemView, id: String, isBackup: Boolean) {
         noCrash {
             if (isBackup)
-                BUUtils.backup(colorChanger, id, object : BUUtils.BackupInterface {
-                    override fun onResponse(backupObject: BackupObject<*>?) {
-                        noCrash {
-                            if (backupObject == null)
-                                colorChanger.showSnackbar("Error al respaldar")
-                            syncItemView.enableBackup(backupObject, this@BackUpActivity)
-                        }
+                Backups.backup(colorChanger, service, id) {
+                    noCrash {
+                        if (it == null)
+                            colorChanger.showSnackbar("Error al respaldar")
+                        syncItemView.enableBackup(it, this@BackUpActivity)
                     }
-                })
+                }
             else
-                BUUtils.restoreDialog(colorChanger, id, syncItemView.bakup)
+                Backups.restoreDialog(this, colorChanger, id, syncItemView.backupObj)
         }
     }
 
     private fun onLogOut() {
         MaterialDialog(this).safeShow {
-            message(text = "Los datos se quedaran en el dispositivo, ¿desea continuar?")
+            message(text = "Los datos no respaldados podrian ser perdidos al borrar la app, ¿desea continuar?")
             positiveButton(text = "continuar") {
                 PreferenceManager.getDefaultSharedPreferences(this@BackUpActivity).edit().putString("auto_backup", "0").apply()
-                BUUtils.logOut()
+                service?.logOut()
+                service = null
+                Backups.type = Backups.Type.NONE
                 revertColor()
                 setState(false)
                 clearSyncButtons()
@@ -105,12 +126,11 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
         }
     }
 
-    override fun onLogin() {
-        if (BUUtils.isLogedIn) {
+    private fun onLogin() {
+        if (service?.isLoggedIn == true) {
             setState(true)
             showColor(true)
             initSyncButtons()
-            Answers.getInstance().logLogin(LoginEvent().putMethod("Dropbox"))
         } else if (waitingLogin) {
             colorChanger.showSnackbar("Error al iniciar sesión")
         }
@@ -126,7 +146,7 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
                     colorChanger.getDrawingRect(bounds)
                     val centerX = bounds.centerX()
                     val centerY = bounds.centerY()
-                    val finalRadius = Math.max(bounds.width(), bounds.height())
+                    val finalRadius = max(bounds.width(), bounds.height())
                     val animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, 0f, finalRadius.toFloat())
                     animator.duration = 1000
                     animator.interpolator = AccelerateDecelerateInterpolator()
@@ -147,7 +167,7 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
             colorChanger.getDrawingRect(bounds)
             val centerX = bounds.centerX()
             val centerY = bounds.centerY()
-            val finalRadius = Math.max(bounds.width(), bounds.height())
+            val finalRadius = max(bounds.width(), bounds.height())
             val animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, finalRadius.toFloat(), 0f)
             animator.duration = 1000
             animator.interpolator = AccelerateDecelerateInterpolator()
@@ -172,10 +192,10 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
         }
     }
 
-    private fun setState(isLogedIn: Boolean) {
+    private fun setState(isLoggedIn: Boolean) {
         runOnUiThread {
-            lay_main?.visibility = if (isLogedIn) View.GONE else View.VISIBLE
-            lay_buttons?.visibility = if (isLogedIn) View.VISIBLE else View.GONE
+            lay_main?.visibility = if (isLoggedIn) View.GONE else View.VISIBLE
+            lay_buttons?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
         }
     }
 
@@ -183,9 +203,11 @@ class BackUpActivity : GenericActivity(), BUUtils.LoginInterface, SyncItemView.O
         super.onResume()
         if (waitingLogin) {
             val token = Auth.getOAuth2Token()
-            if (token != null)
-                BUUtils.type = BUUtils.BUType.DROPBOX
-            BUUtils.setDropBoxClient(token)
+            if (service is DropBoxService && service?.logIn(token) == true) {
+                Backups.type = Backups.Type.DROPBOX
+                Answers.getInstance().logLogin(LoginEvent().putMethod("Dropbox"))
+            }
+            onLogin()
         }
     }
 

@@ -7,7 +7,8 @@ import android.view.View
 import android.widget.RelativeLayout
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
-import knf.kuma.backup.BUUtils
+import knf.kuma.backup.Backups
+import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.Network
 import knf.kuma.commons.noCrash
@@ -19,7 +20,7 @@ class SyncItemView : RelativeLayout {
     private var showDivider = true
     private var actionId: String = "neutral"
 
-    var bakup: BackupObject<*>? = null
+    var backupObj: BackupObject<*>? = null
         private set
 
     constructor(context: Context) : super(context) {
@@ -83,7 +84,7 @@ class SyncItemView : RelativeLayout {
     }
 
     fun clear() {
-        bakup = null
+        backupObj = null
         post {
             backup?.isEnabled = false
             restore?.isEnabled = false
@@ -91,13 +92,11 @@ class SyncItemView : RelativeLayout {
         }
     }
 
-    fun init(onClick: OnClick) {
-        BUUtils.search(actionId, object : BUUtils.SearchInterface {
-            override fun onResponse(backupObject: BackupObject<*>?) {
-                bakup = backupObject
-                enableBackup(bakup, onClick)
-            }
-        })
+    fun init(service: BackupService?, onClick: OnClick) {
+        Backups.search(service, actionId) {
+            backupObj = it
+            enableBackup(backupObj, onClick)
+        }
     }
 
     interface OnClick {

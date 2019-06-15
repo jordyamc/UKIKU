@@ -146,9 +146,9 @@ public class RecentObject {
     }
 
     public static class WebInfo {
-        @Selector(value = "img", attr = "src", format = "/(\\d+)[/.]")
+        @Selector(value = "img[src]", attr = "src", format = "/(\\d+)\\.\\w+")
         public String aid;
-        @Selector(value = "a", attr = "href", format = "/(\\d+)[/.]")
+        @Selector(value = "a", attr = "href", format = "/(\\d+)/")
         public String eid;
         @Selector(value = "img", attr = "alt")
         public String name;
@@ -156,7 +156,7 @@ public class RecentObject {
         public String chapter;
         @Selector(value = "a", attr = "href")
         public String url;
-        @Selector(value = "img", attr = "src")
+        @Selector(value = "img[src]", attr = "src")
         public String img;
     }
 }

@@ -12,7 +12,7 @@ object DownloadedObserver {
     fun observe(size: Int, fileName: String) {
         observer?.stopWatching()
         directory = FileAccessHelper.getDownloadsDirectoryFromFile(fileName)
-        if (size == directory.list().size || AchievementManager.isUnlocked(35)) {
+        if (size == directory.list()?.size ?: 0 || AchievementManager.isUnlocked(35)) {
             unlock()
             return
         }

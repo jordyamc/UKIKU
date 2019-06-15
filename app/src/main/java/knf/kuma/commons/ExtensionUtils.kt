@@ -315,8 +315,6 @@ fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builde
     header("Cookie", BypassUtil.getStringCookie(App.context))
 }.build()
 
-const val SDK_INT_Q = 1000000
-
 fun isHostValid(hostName: String): Boolean {
     if (BuildConfig.DEBUG)
         Log.e("Hostname", hostName)

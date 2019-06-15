@@ -24,7 +24,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import knf.kuma.R
-import knf.kuma.backup.BUUtils
+import knf.kuma.backup.Backups
 import knf.kuma.commons.*
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.custom.GenericActivity
@@ -148,7 +148,7 @@ class AchievementActivity : GenericActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (BUUtils.getType(this) != BUUtils.BUType.LOCAL) {
+        if (Backups.type != Backups.Type.NONE) {
             menuInflater.inflate(R.menu.menu_achievements, menu)
             syncButton = menu?.findItem(R.id.sync)
         }

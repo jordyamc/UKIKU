@@ -1,8 +1,6 @@
 package knf.kuma.animeinfo.viewholders
 
 import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
@@ -29,6 +27,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.zhanghai.android.materialratingbar.MaterialRatingBar
+import org.jetbrains.anko.clipboardManager
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
@@ -47,7 +46,7 @@ class AnimeDetailsHolder(val view: View) {
     private val recyclerViewGenres: RecyclerView = view.recycler_genres
     private val spinnerList: Spinner = view.spinner_list
     private val recyclerViewRelated: RecyclerView = view.recycler_related
-    private val clipboardManager = view.context.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    private val clipboardManager = view.context.applicationContext.clipboardManager
     private var retard = 0
     private var needAnimation = true
 
@@ -64,7 +63,7 @@ class AnimeDetailsHolder(val view: View) {
                 cardViews[0].setOnLongClickListener {
                     try {
                         val clip = ClipData.newPlainText("Anime title", animeObject.name)
-                        clipboardManager.primaryClip = clip
+                        clipboardManager.setPrimaryClip(clip)
                         Toaster.toast("Título copiado")
                     } catch (e: Exception) {
                         e.printStackTrace()

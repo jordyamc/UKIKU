@@ -6,6 +6,9 @@
     <external-path
         name="downloads"
         path="UKIKU/downloads/"/>
+    <external-path
+        name="backups"
+        path="UKIKU/backups/"/>
     <files-path
         name="files"
         path="."/>

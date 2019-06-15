@@ -154,6 +154,9 @@ object PrefsUtil {
     val useHome: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("recents_design", "0") == "1"
 
+    val useDefaultUserAgent: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("default_useragent", false)
+
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
     }
@@ -188,7 +191,7 @@ object PrefsUtil {
 
     private val defaultDownloadType: String
         get() {
-            return if (Build.VERSION.SDK_INT >= SDK_INT_Q)
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 "1"
             else
                 PreferenceManager.getDefaultSharedPreferences(context).getString("download_type", "0")

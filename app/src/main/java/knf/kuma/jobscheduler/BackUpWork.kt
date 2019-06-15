@@ -1,23 +1,27 @@
 package knf.kuma.jobscheduler
 
 import android.content.Context
-import androidx.preference.PreferenceManager
 import androidx.work.*
 import knf.kuma.App
-import knf.kuma.backup.BUUtils
+import knf.kuma.backup.Backups
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.pojos.AutoBackupObject
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
 class BackUpWork(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
     override fun doWork(): Result {
-        BUUtils.init(context)
-        return if (BUUtils.isLogedIn) {
-            val backupObject = BUUtils.waitAutoBackup(context)
+        val service = Backups.createService()
+        return if (service?.isLoggedIn == true) {
+            val backupObject = runBlocking(Dispatchers.IO) {
+                service.search(Backups.keyAutoBackup)
+            }
             if (backupObject != null) {
                 if (backupObject == AutoBackupObject(context))
-                    BUUtils.backupAllNUI(context)
+                    Backups.backupAll()
                 else
                     WorkManager.getInstance().cancelAllWorkByTag(TAG)
             }
@@ -27,23 +31,20 @@ class BackUpWork(val context: Context, workerParameters: WorkerParameters) : Wor
     }
 
     companion object {
-        internal const val TAG = "backup-job"
+        internal const val TAG = "backupObj-job"
 
         fun checkInit() {
-            doAsync {
-                BUUtils.init(App.context)
-                if (BUUtils.isLogedIn) {
-                    val backupObject = BUUtils.waitAutoBackup(App.context)
-                    if (backupObject != null && backupObject == AutoBackupObject(App.context)) {
-                        val days = backupObject.value
-                        if (days == null) {
-                            BUUtils.backup(AutoBackupObject(App.context, PrefsUtil.autoBackupTime), object : BUUtils.AutoBackupInterface {
-                                override fun onResponse(backupObject: AutoBackupObject?) {
-
-                                }
-                            })
-                        } else if (days != PrefsUtil.autoBackupTime) {
-                            PreferenceManager.getDefaultSharedPreferences(App.context).edit().putString("auto_backup", days).apply()
+            GlobalScope.launch(Dispatchers.IO) {
+                val service = Backups.createService()
+                if (service?.isLoggedIn == true) {
+                    val obj = service.search(Backups.keyAutoBackup) as? AutoBackupObject
+                    val localObj = AutoBackupObject(App.context)
+                    if (obj == localObj) {
+                        val days = obj.value
+                        if (days.isNullOrBlank())
+                            service.backup(localObj, Backups.keyAutoBackup)
+                        else if (days != PrefsUtil.autoBackupTime) {
+                            PrefsUtil.autoBackupTime = days
                             reSchedule(days.toInt())
                         }
                     }

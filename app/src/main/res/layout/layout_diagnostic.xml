@@ -124,8 +124,7 @@
                             android:background="@drawable/background_ripple"
                             android:padding="5dp"
                             android:src="@drawable/ic_settings_reload"
-                            android:visibility="gone"
-                            />
+                            android:visibility="gone"/>
                     </LinearLayout>
 
                     <knf.kuma.custom.StateView
@@ -133,6 +132,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:sv_title="Estado general"/>
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/ipState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:sv_title="IP"/>
 
                     <knf.kuma.custom.StateView
                         android:id="@+id/clearanceState"

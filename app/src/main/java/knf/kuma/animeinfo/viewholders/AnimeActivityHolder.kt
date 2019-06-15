@@ -36,8 +36,8 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     private val animePagerAdapter: AnimePagerAdapter = AnimePagerAdapter(activity.supportFragmentManager)
     private val innerInterface: Interface = activity as Interface
 
-    private val drawableHeartFull: Drawable by lazy { activity.getDrawable(R.drawable.heart_full) }
-    private val drawableHeartEmpty: Drawable by lazy { activity.getDrawable(R.drawable.heart_empty) }
+    private val drawableHeartFull: Drawable by lazy { activity.getDrawable(R.drawable.heart_full) as Drawable }
+    private val drawableHeartEmpty: Drawable by lazy { activity.getDrawable(R.drawable.heart_empty) as Drawable }
 
     init {
         //fab.visibility = View.INVISIBLE

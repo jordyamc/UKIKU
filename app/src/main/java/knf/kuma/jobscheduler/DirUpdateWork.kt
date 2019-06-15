@@ -18,9 +18,10 @@ class DirUpdateWork(val context: Context, workerParameters: WorkerParameters) : 
     }
 
     companion object {
-        const val TAG = "dir-update-job"
+        const val TAG = "dir-update-work"
 
         fun schedule(context: Context) {
+            WorkManager.getInstance().cancelAllWorkByTag("dir-update-job")
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val time = (preferences.getString("dir_update_time", "7") ?: "7").toLong()
             if (PrefsUtil.isDirectoryFinished && time > 0)

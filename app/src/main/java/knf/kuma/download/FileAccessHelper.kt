@@ -473,7 +473,7 @@ object FileAccessHelper {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private fun isSDCardRoot(uri: Uri, uriValidation: UriValidation): Boolean {
-        return isExternalStorageDocument(uri, uriValidation) && isRootUri(uri, uriValidation) && (Build.VERSION.SDK_INT >= SDK_INT_Q || !isInternalStorage(uri, uriValidation))
+        return isExternalStorageDocument(uri, uriValidation) && isRootUri(uri, uriValidation) && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || !isInternalStorage(uri, uriValidation))
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

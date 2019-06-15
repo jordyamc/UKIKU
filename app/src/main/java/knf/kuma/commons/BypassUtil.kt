@@ -2,7 +2,10 @@ package knf.kuma.commons
 
 import android.content.Context
 import android.webkit.CookieManager
+import android.webkit.WebSettings
 import androidx.preference.PreferenceManager
+import knf.kuma.App
+import knf.kuma.uagen.UAGenerator
 import org.jsoup.HttpStatusException
 import java.util.*
 
@@ -17,7 +20,9 @@ class BypassUtil {
     }
 
     companion object {
-        val userAgent get() = PrefsUtil.userAgent
+        val userAgent: String
+            get() = if (PrefsUtil.useDefaultUserAgent) noCrashLet { WebSettings.getDefaultUserAgent(App.context) }
+                    ?: PrefsUtil.userAgent else PrefsUtil.userAgent
         var isLoading = false
         var isChecking = false
 
@@ -29,14 +34,12 @@ class BypassUtil {
             val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/").trim { it <= ' ' }
             if (cookies.contains(keyCfClearance)) {
                 val parts = cookies.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val preferences = PreferenceManager.getDefaultSharedPreferences(context).edit()
                 for (cookie in parts) {
                     if (cookie.contains(keyCfDuid))
-                        preferences.putString(keyCfDuid, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
+                        setCFDuid(context, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
                     if (cookie.contains(keyCfClearance))
-                        preferences.putString(keyCfClearance, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
+                        setClearance(context, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
                 }
-                preferences.apply()
                 return true
             }
             return false
@@ -52,6 +55,9 @@ class BypassUtil {
                     cookieManager.setCookie(".animeflv.net", cookieparts[0].trim() + "=; Expires=Wed, 31 Dec 2025 23:59:59 GMT")
                 }
             }
+            setCFDuid(App.context)
+            setClearance(App.context)
+            PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
         }
 
         fun isNeeded(): Boolean {
@@ -81,13 +87,13 @@ class BypassUtil {
         fun getMapCookie(context: Context): Map<String, String> {
             val map = LinkedHashMap<String, String>()
             map["device"] = "computer"
-            map[keyCfClearance] = getClearance(context)
-            map[keyCfDuid] = getCFDuid(context)
+            getClearance(context).let { if (it != defaultValue) map[keyCfClearance] = it }
+            getCFDuid(context).let { if (it != defaultValue) map[keyCfDuid] = it }
             return map
         }
 
         fun getStringCookie(context: Context): String {
-            return "device=computer; cf_clearance=${getClearance(context)}; __cfduid=${getCFDuid(context)}"
+            return "device=computer;${getClearanceString(context)}${getCFDuidString(context)}".dropLastWhile { it == ' ' || it == ';' }
         }
 
         fun getClearance(context: Context): String {
@@ -95,9 +101,29 @@ class BypassUtil {
                     ?: defaultValue
         }
 
+        fun setClearance(context: Context, value: String = defaultValue) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(keyCfClearance, value).apply()
+        }
+
+        private fun getClearanceString(context: Context): String {
+            val value = PreferenceManager.getDefaultSharedPreferences(context).getString(keyCfClearance, defaultValue)
+                    ?: defaultValue
+            return if (value == defaultValue) "" else " cf_clearance=$value;"
+        }
+
         fun getCFDuid(context: Context): String {
             return PreferenceManager.getDefaultSharedPreferences(context).getString(keyCfDuid, defaultValue)
                     ?: defaultValue
+        }
+
+        fun setCFDuid(context: Context, value: String = defaultValue) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(keyCfDuid, value).apply()
+        }
+
+        private fun getCFDuidString(context: Context): String {
+            val value = PreferenceManager.getDefaultSharedPreferences(context).getString(keyCfDuid, defaultValue)
+                    ?: defaultValue
+            return if (value == defaultValue) "" else " __cfduid=$value;"
         }
     }
 }

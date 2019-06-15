@@ -12,16 +12,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
-import knf.kuma.App
 import knf.kuma.R
-import knf.kuma.backup.BUUtils
-import knf.kuma.backup.objects.BackupObject
+import knf.kuma.backup.Backups
 import knf.kuma.commons.*
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.database.CacheDB
 import knf.kuma.database.EADB
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.FavoriteObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.text.SimpleDateFormat
@@ -170,29 +171,21 @@ object AchievementManager {
         }
     }
 
-    fun backup(callback: () -> Unit = {}) {
-        BUUtils.init(App.context)
-        if (BUUtils.isLogedIn)
-            BUUtils.backupNUI(App.context, "achievements", object : BUUtils.BackupInterface {
-                override fun onResponse(backupObject: BackupObject<*>?) {
-                    callback.invoke()
-                }
-            })
-    }
+    fun backup(callback: () -> Unit = {}) =
+            Backups.backup(id = Backups.keyAchievements) {
+                callback()
+            }
 
     fun restore(callback: () -> Unit = {}) {
-        BUUtils.init(App.context)
-        if (BUUtils.isLogedIn)
-            BUUtils.search(App.context, "achievements", object : BUUtils.SearchInterface {
-                override fun onResponse(backupObject: BackupObject<*>?) {
-                    if (backupObject != null)
-                        doAsync {
-                            CacheDB.INSTANCE.achievementsDAO().update((backupObject.data?.filterIsInstance<Achievement>()
-                                    ?: arrayListOf()).filter { it.isUnlocked })
-                            callback.invoke()
-                        }
+        GlobalScope.launch(Dispatchers.IO) {
+            val service = Backups.createService()
+            if (service?.isLoggedIn == true)
+                service.search(Backups.keyAchievements)?.let { backupObj ->
+                    CacheDB.INSTANCE.achievementsDAO().update((backupObj.data?.filterIsInstance<Achievement>()
+                            ?: arrayListOf()).filter { it.isUnlocked })
+                    callback()
                 }
-            })
+        }
     }
 
     private fun updateCount(count: Int, keys: List<Int>) {

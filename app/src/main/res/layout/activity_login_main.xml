@@ -29,4 +29,17 @@
         app:icon="@drawable/ic_dropbox"
         app:iconTint="#fff"/>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/login_local"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?colorAccentLight"
+        android:padding="20dp"
+        android:text="Local"
+        android:textColor="#fff"
+        android:theme="@style/AppTheme.Button.Local"
+        app:icon="@drawable/ic_save_w"
+        app:iconTint="#fff"/>
+
 </LinearLayout>

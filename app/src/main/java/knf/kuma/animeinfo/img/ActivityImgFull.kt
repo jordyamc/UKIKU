@@ -19,7 +19,8 @@ class ActivityImgFull : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_img_big_base)
-        pager.adapter = ImgPagerAdapter(supportFragmentManager, intent.getStringExtra(keyTitle), listOf(intent.dataString))
+        pager.adapter = ImgPagerAdapter(supportFragmentManager, intent.getStringExtra(keyTitle)
+                ?: "", listOf(intent.dataString ?: ""))
         indicator.setViewPager(pager)
         searchInMAL()
     }

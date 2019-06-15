@@ -11,6 +11,9 @@ interface AchievementsDAO {
     @get:Query("SELECT * FROM achievement")
     val all: List<Achievement>
 
+    @get:Query("SELECT * FROM achievement WHERE isUnlocked = 1")
+    val allCompleted: List<Achievement>
+
     @get:Query("SELECT SUM(points) FROM achievement WHERE isUnlocked = 1")
     val totalPoints: LiveData<Int?>
 

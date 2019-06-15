@@ -1,6 +1,7 @@
 package knf.kuma.tv.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.SparseArray
@@ -9,10 +10,15 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.*
 import androidx.lifecycle.Observer
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.LoginEvent
 import com.dropbox.core.android.Auth
 import knf.kuma.App
+import knf.kuma.Diagnostic
 import knf.kuma.R
-import knf.kuma.backup.BUUtils
+import knf.kuma.backup.Backups
+import knf.kuma.backup.framework.BackupService
+import knf.kuma.backup.framework.DropBoxService
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.FavoriteObject
@@ -28,15 +34,16 @@ import knf.kuma.tv.anime.RecordPresenter
 import knf.kuma.tv.anime.SyncPresenter
 import knf.kuma.tv.details.TVAnimesDetails
 import knf.kuma.tv.search.TVSearch
+import knf.kuma.tv.sync.BypassObject
 import knf.kuma.tv.sync.LogOutObject
 import knf.kuma.tv.sync.SyncObject
 import xdroid.toaster.Toaster
 
-class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnItemViewClickedListener, View.OnClickListener, BUUtils.LoginInterface {
+class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnItemViewClickedListener, View.OnClickListener {
     private var mRows: SparseArray<AnimeRow>? = null
 
     private var backgroundManager: GlideBackgroundManager? = null
-
+    private var service: BackupService? = null
     private var waitingLogin = false
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -52,9 +59,8 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
         createRows()
         prepareEntranceTransition()
         fetchData()
-        BUUtils.init(activity as Activity, this, savedInstanceState == null)
-        if (!BUUtils.isLogedIn)
-            onLogin()
+        service = Backups.createService()
+        onLogin()
     }
 
     private fun createDataRows() {
@@ -138,12 +144,14 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
             context?.let { TVAnimesDetails.start(it, item.link) }
         } else if (item is SyncObject) {
             if (item is LogOutObject) {
-                BUUtils.logOut()
+                service?.logOut()
                 onLogin()
-            } else {
+            } else if (item is BypassObject)
+                startActivity(Intent(context, Diagnostic.FullBypass::class.java))
+            else {
                 waitingLogin = true
                 if (item.isDropbox)
-                    BUUtils.startClient(BUUtils.BUType.DROPBOX, false)
+                    service = DropBoxService().also { it.logIn() }
             }
         }
     }
@@ -152,24 +160,27 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewSelectedListener, OnIt
         super.onResume()
         if (waitingLogin) {
             val token = Auth.getOAuth2Token()
-            if (token != null)
-                BUUtils.type = BUUtils.BUType.DROPBOX
-            BUUtils.setDropBoxClient(token)
+            if (service is DropBoxService && service?.logIn(token) == true) {
+                Backups.type = Backups.Type.DROPBOX
+                Answers.getInstance().logLogin(LoginEvent().putMethod("Dropbox"))
+            }
+            onLogin()
         }
     }
 
-    override fun onLogin() {
-        if (!BUUtils.isLogedIn && waitingLogin) {
+    fun onLogin() {
+        if (service?.isLoggedIn == false && waitingLogin) {
             Toaster.toast("Error al iniciar sesión")
         } else {
             val adapter = ArrayObjectAdapter(SyncPresenter())
             val headerItem = HeaderItem(SYNC.toLong(), "Sincronización")
-            if (BUUtils.isLogedIn) {
+            if (service?.isLoggedIn == true) {
                 adapter.add(LogOutObject())
-                BUUtils.silentRestoreAll()
+                Backups.restoreAll()
             } else {
                 adapter.add(SyncObject(true))
             }
+            adapter.add(BypassObject())
             if (getAdapter().size() == 3)
                 (getAdapter() as ArrayObjectAdapter).add(SYNC, ListRow(headerItem, adapter))
             else

@@ -19,13 +19,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "knf.kuma"
         minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 107
-        versionName "4.2.3"
+        targetSdkVersion 29
+        versionCode 108
+        versionName "4.2.4"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -52,9 +52,11 @@ android {
                     "\"" + APPCOINS_ADDRESS + "\""
             buildConfigField "String", "DROPBOX_TOKEN",
                     "\"" + DROPBOX_TOKEN + "\""
-            manifestPlaceholders = [iabPermission: "com.appcoins.dev.BILLING"]
             buildConfigField "String", "EASTER_SEARCH",
                     "\"" + EASTER_SEARCH + "\""
+            buildConfigField "String", "CIPHER_PWD",
+                    "\"" + UKIKU_PWD + "\""
+            manifestPlaceholders = [iabPermission: "com.appcoins.dev.BILLING"]
         }
         release {
             minifyEnabled true
@@ -74,6 +76,8 @@ android {
                     "\"" + DROPBOX_TOKEN + "\""
             buildConfigField "String", "EASTER_SEARCH",
                     "\"" + EASTER_SEARCH + "\""
+            buildConfigField "String", "CIPHER_PWD",
+                    "\"" + UKIKU_PWD + "\""
         }
         tv {
             initWith release
@@ -116,12 +120,12 @@ allprojects {
 dependencies {
     //implementation project(path:':multidisplaycast', configuration:'default')
     implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
-    implementation 'com.github.jordyamc:Multi-Display-Cast:8de086b4cf'
+    implementation 'com.github.jordyamc:Multi-Display-Cast:2.18'
     implementation 'com.github.jordyamc:PersistentSearchView:1.0.9'
     implementation 'com.github.jordyamc:UAGenerator:1.0.1'
     implementation 'com.github.jordyamc:AndroidVideoCache:2.7.6'
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.preference:preference:1.1.0-alpha04'
+    implementation 'androidx.preference:preference:1.1.0-beta01'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.1.0-alpha04'
@@ -133,20 +137,20 @@ dependencies {
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'com.google.android.gms:play-services-cast:16.2.0'
     implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-inappmessaging-display:17.1.1'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:17.2.0'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0-alpha01'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-alpha01'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0-alpha01'
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     api 'com.google.guava:guava:27.0.1-android'
-    implementation 'androidx.annotation:annotation:1.0.2'
+    implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.slice:slice-builders-ktx:1.0.0-alpha6'
     implementation 'androidx.slice:slice-builders:1.0.0'
     implementation 'androidx.work:work-runtime-ktx:2.0.1'
-    implementation 'androidx.room:room-runtime:2.0.0'
-    kapt 'androidx.room:room-compiler:2.0.0'
-    androidTestImplementation 'androidx.room:room-testing:2.0.0'
+    implementation 'androidx.room:room-runtime:2.1.0'
+    kapt 'androidx.room:room-compiler:2.1.0'
+    androidTestImplementation 'androidx.room:room-testing:2.1.0'
     implementation 'com.google.dagger:dagger-android-support:2.22.1'
     kapt 'com.google.dagger:dagger-android-processor:2.22.1'
     implementation 'androidx.paging:paging-runtime:2.1.0'
@@ -206,8 +210,8 @@ dependencies {
     implementation 'org.jetbrains.anko:anko:0.10.8'
     implementation 'org.jetbrains.anko:anko-coroutines:0.10.8'
     //------
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.0@aar') {
         transitive = true

@@ -6,10 +6,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import android.view.View
-import android.webkit.CookieManager
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -20,11 +17,14 @@ import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
 import knf.kuma.retrofit.Repository
-import knf.kuma.uagen.randomUA
+import knf.kuma.uagen.UAGenerator
+import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.findOptional
 
 open class GenericActivity : AppCompatActivity() {
+
+    private var tryCount = 0
 
     override fun onResume() {
         noCrash {
@@ -47,7 +47,7 @@ open class GenericActivity : AppCompatActivity() {
     open fun forceCreation(): Boolean = false
 
     open fun logText(text: String) {
-
+        Log.e("Bypass", text)
     }
 
     fun checkBypass() {
@@ -105,7 +105,7 @@ open class GenericActivity : AppCompatActivity() {
                         logText("Waiting for resolve...")
                         if (url == "https://animeflv.net/") {
                             logText("Cookies for animeflv:")
-                            logText(CookieManager.getInstance().getCookie("https://animeflv.net/"))
+                            logText(CookieManager.getInstance().getCookie(".animeflv.net"))
                             Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
                             if (BypassUtil.saveCookies(App.context)) {
                                 logText("Cookies saved")
@@ -113,10 +113,19 @@ open class GenericActivity : AppCompatActivity() {
                                 doAsync(exceptionHandler = { logText("Error: ${it.message}") }) {
                                     logText("Checking connection state")
                                     if (BypassUtil.isConnectionBlocked()) {
-                                        logText("Connection blocked, retry connection...")
-                                        runWebView(snack)
+                                        if (tryCount < 4) {
+                                            tryCount++
+                                            logText("Connection blocked, retry connection... tries left: ${3 - tryCount}")
+                                            runWebView(snack)
+                                        } else {
+                                            tryCount = 0
+                                            logText("Connection was blocked, no tries left")
+                                            BypassUtil.isLoading = false
+                                            onBypassUpdated()
+                                        }
                                     } else {
                                         doOnUI(onLog = { logText("Error: $it") }) {
+                                            tryCount = 0
                                             logText("Connection was successful")
                                             snack?.safeDismiss()
                                             getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
@@ -130,15 +139,15 @@ open class GenericActivity : AppCompatActivity() {
                                         }
                                     }
                                 }
-                            } else logText("Invalid cookies!")
+                            } else logText("cf_clearance not found")
                         }
                         return false
                     }
                 }
-                webView.settings?.userAgentString = randomUA().also {
-                    PrefsUtil.userAgent = it
-                    logText("Use user agent: $it")
-                }
+                webView.settings?.userAgentString = (if (PrefsUtil.useDefaultUserAgent) {
+                    noCrashLet { WebSettings.getDefaultUserAgent(App.context) }
+                            ?: UAGenerator.getRandomUserAgent()
+                } else UAGenerator.getRandomUserAgent()).also { PrefsUtil.userAgent = it }
                 webView.loadUrl("https://animeflv.net/")
             } else {
                 logText("Error finding suitable webview")
@@ -152,6 +161,11 @@ open class GenericActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         BypassUtil.isLoading = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ServersFactory.clear()
     }
 
     companion object {
