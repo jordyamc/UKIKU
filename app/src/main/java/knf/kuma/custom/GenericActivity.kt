@@ -35,7 +35,7 @@ open class GenericActivity : AppCompatActivity() {
         }
         logText("On Resume check")
         checkBypass()
-        super.onResume()
+        noCrash { super.onResume() }
     }
 
     open fun getSnackbarAnchor(): View? = null

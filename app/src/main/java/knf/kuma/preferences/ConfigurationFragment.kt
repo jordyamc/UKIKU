@@ -74,8 +74,8 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 preferenceManager.sharedPreferences.edit().putBoolean(keyDaynigthPermission, Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED).apply()
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                     preferenceScreen.findPreference<Preference>(keyDaynigthPermission)?.isEnabled = false
-                preferenceScreen.findPreference<Preference>(keyDaynigthPermission)?.onPreferenceChangeListener = { _, o ->
-                    val check = o as? Boolean
+                preferenceScreen.findPreference<Preference>(keyDaynigthPermission)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    val check = newValue as? Boolean
                     if (check == true && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                         if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 5587)
@@ -89,7 +89,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Abrir configuración"
                 else if (FileAccessHelper.toneFile.exists())
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Personalizado"
-                preferenceScreen.findPreference<Preference>(keyCustomTone)?.onPreferenceClickListener = {
+                preferenceScreen.findPreference<Preference>(keyCustomTone)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         noCrash {
                             startActivity(
@@ -116,7 +116,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                 }
                             }
                         }
-                    return@setOnPreferenceClickListener true
+                    true
                 }
                 if (Backups.type != Backups.Type.NONE) {
                     if (Network.isConnected) {
@@ -156,10 +156,10 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 } else {
                     preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "Sin cuenta para respaldos"
                 }
-                preferenceScreen.findPreference<Preference>(keyAutoBackup)?.onPreferenceChangeListener = { _, o ->
-                    BackUpWork.reSchedule(Integer.valueOf((o as? String) ?: "0"))
+                preferenceScreen.findPreference<Preference>(keyAutoBackup)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    BackUpWork.reSchedule(Integer.valueOf((newValue as? String) ?: "0"))
                     GlobalScope.launch(Dispatchers.Main) {
-                        Backups.createService()?.backup(AutoBackupObject(App.context, (o as? String)
+                        Backups.createService()?.backup(AutoBackupObject(App.context, (newValue as? String)
                                 ?: "0"), Backups.keyAutoBackup)
                         preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "%s"
                     }
@@ -169,15 +169,15 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     preferenceScreen.removePreferenceRecursively("download_type")
                     val preferenceDownloads = preferenceScreen.findPreference<Preference>("download_type_q")
                     preferenceDownloads?.summary = PrefsUtil.storageType
-                    preferenceDownloads?.onPreferenceClickListener = {
+                    preferenceDownloads?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                         FileAccessHelper.openTreeChooser(this@ConfigurationFragment)
                         Toaster.toast("Por favor selecciona la raiz del almacenamiento")
                         true
                     }
                 } else {
                     preferenceScreen.removePreferenceRecursively("download_type_q")
-                    preferenceScreen.findPreference<Preference>("download_type")?.onPreferenceChangeListener = { _, o ->
-                        if (o == "1" && !FileAccessHelper.canDownload(this@ConfigurationFragment, o as? String))
+                    preferenceScreen.findPreference<Preference>("download_type")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                        if (newValue == "1" && !FileAccessHelper.canDownload(this@ConfigurationFragment, newValue as? String))
                             Toaster.toast("Por favor selecciona la raiz de tu SD")
                         else
                             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("tree_uri", null).apply()
@@ -191,8 +191,8 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     preferenceScreen.findPreference<Preference>(keyMaxParallelDownloads)?.isEnabled = true
                     preferenceScreen.findPreference<Preference>(keyBufferSize)?.isEnabled = false
                 }
-                preferenceScreen.findPreference<Preference>("downloader_type")?.onPreferenceChangeListener = { _, o ->
-                    if (o == "0") {
+                preferenceScreen.findPreference<Preference>("downloader_type")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    if (newValue == "0") {
                         preferenceScreen.findPreference<Preference>(keyMaxParallelDownloads)?.isEnabled = false
                         preferenceScreen.findPreference<Preference>(keyBufferSize)?.isEnabled = true
                     } else {
@@ -201,30 +201,30 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     }
                     true
                 }
-                preferenceScreen.findPreference<Preference>("default_useragent")?.onPreferenceChangeListener = { _, o ->
+                preferenceScreen.findPreference<Preference>("default_useragent")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                     GlobalScope.launch(Dispatchers.Main) {
                         delay(1000)
                         uaChangeListener?.onUAChange()
                     }
                     true
                 }
-                preferenceScreen.findPreference<Preference>("theme_option")?.onPreferenceChangeListener = { _, o ->
-                    AppCompatDelegate.setDefaultNightMode(((o as? String) ?: "0").toInt())
-                    PreferenceManager.getDefaultSharedPreferences(safeContext).edit().putString("theme_value", o.toString()).apply()
+                preferenceScreen.findPreference<Preference>("theme_option")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    AppCompatDelegate.setDefaultNightMode(((newValue as? String) ?: "0").toInt())
+                    PreferenceManager.getDefaultSharedPreferences(safeContext).edit().putString("theme_value", newValue.toString()).apply()
                     WEmisionProvider.update(safeContext)
                     activity?.recreate()
                     true
                 }
-                preferenceScreen.findPreference<Preference>("recents_time")?.onPreferenceChangeListener = { _, o ->
-                    preferenceScreen.findPreference<Preference>("notify_favs")?.isEnabled = "0" != o
-                    RecentsWork.reSchedule(o.toString().toInt() * 15)
+                preferenceScreen.findPreference<Preference>("recents_time")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    preferenceScreen.findPreference<Preference>("notify_favs")?.isEnabled = "0" != newValue
+                    RecentsWork.reSchedule(newValue.toString().toInt() * 15)
                     true
                 }
-                preferenceScreen.findPreference<Preference>("dir_update_time")?.onPreferenceChangeListener = { _, o ->
-                    DirUpdateWork.reSchedule(o.toString().toInt() * 15)
+                preferenceScreen.findPreference<Preference>("dir_update_time")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    DirUpdateWork.reSchedule(newValue.toString().toInt() * 15)
                     true
                 }
-                preferenceScreen.findPreference<Preference>("dir_update")?.onPreferenceClickListener = {
+                preferenceScreen.findPreference<Preference>("dir_update")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
                             DirectoryUpdateService.run(App.context)
@@ -238,7 +238,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 if (!canGroupNotifications)
                     preferenceScreen.removePreference(preferenceScreen.findPreference("group_notifications"))
-                preferenceScreen.findPreference<Preference>("dir_destroy")?.onPreferenceClickListener = {
+                preferenceScreen.findPreference<Preference>("dir_destroy")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
                             activity?.let { safe ->
@@ -264,7 +264,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 }
                 when {
                     EAHelper.phase == 4 ->
-                        preferenceScreen.findPreference<Preference>(keyThemeColor)?.onPreferenceChangeListener = { _, _ ->
+                        preferenceScreen.findPreference<Preference>(keyThemeColor)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                             startActivity(Intent(activity, Main::class.java).putExtra("start_position", 3))
                             activity?.finish()
                             true
@@ -276,7 +276,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         pref.title = "Color de tema"
                         pref.summary = "Resuelve el secreto para desbloquear"
                         pref.setIcon(R.drawable.ic_palette)
-                        pref.onPreferenceClickListener = {
+                        pref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                             Toaster.toast(EAHelper.eaMessage)
                             true
                         }
@@ -298,26 +298,26 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         isEnabled = true
                     }
                 }
-                preferenceScreen.findPreference<Preference>(keyArchievementsPermissions)?.onPreferenceChangeListener = { _, _ ->
+                preferenceScreen.findPreference<Preference>(keyArchievementsPermissions)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
                     } catch (e: ActivityNotFoundException) {
                         Toaster.toast("No se pudo abrir la configuracion")
                     }
-                    return@setOnPreferenceChangeListener true
+                    true
                 }
-                preferenceScreen.findPreference<Preference>("hide_chaps")?.onPreferenceChangeListener = { _, o ->
+                preferenceScreen.findPreference<Preference>("hide_chaps")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                     if (!FileAccessHelper.NOMEDIA_CREATING) {
-                        FileAccessHelper.checkNoMedia(o as? Boolean == true)
+                        FileAccessHelper.checkNoMedia(newValue as? Boolean == true)
                         true
                     } else {
-                        (preferenceScreen.findPreference("hide_chaps") as? SwitchPreference)?.isChecked = o as? Boolean != true
+                        (preferenceScreen.findPreference("hide_chaps") as? SwitchPreference)?.isChecked = newValue as? Boolean != true
                         false
                     }
                 }
-                preferenceScreen.findPreference<Preference>("max_parallel_downloads")?.onPreferenceChangeListener = { _, o ->
-                    DownloadManager.setParallelDownloads(o as? String)
+                preferenceScreen.findPreference<Preference>("max_parallel_downloads")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    DownloadManager.setParallelDownloads(newValue as? String)
                     true
                 }
                 preferenceScreen.findPreference<SwitchPreference>("remember_server")?.apply {
@@ -326,7 +326,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         isEnabled = false
                     else {
                         summary = lastServer
-                        onPreferenceChangeListener = { preference, newValue ->
+                        onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
                             if (newValue as? Boolean == false) {
                                 PrefsUtil.lastServer = null
                                 preference.summary = null
@@ -337,7 +337,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     }
                 }
                 if (BuildConfig.DEBUG) {
-                    preferenceScreen.findPreference<Preference>("reset_recents")?.onPreferenceClickListener = {
+                    preferenceScreen.findPreference<Preference>("reset_recents")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                         doAsync {
                             CacheDB.INSTANCE.recentsDAO().clear()
                             RecentsWork.run()
