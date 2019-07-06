@@ -157,6 +157,9 @@ object PrefsUtil {
     val useDefaultUserAgent: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("default_useragent", false)
 
+    val usePlaceholders: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("list_placeholder", false)
+
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
     }

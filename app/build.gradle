@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 109
-        versionName "4.2.5"
+        versionCode 110
+        versionName "4.2.6"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -125,7 +125,7 @@ dependencies {
     implementation 'com.github.jordyamc:UAGenerator:1.0.1'
     implementation 'com.github.jordyamc:AndroidVideoCache:2.7.6'
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.preference:preference:1.1.0-beta01'
+    implementation 'androidx.preference:preference:1.1.0-rc01'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.1.0-alpha04'
@@ -135,14 +135,14 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.google.android.gms:play-services-cast:16.2.0'
-    implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-inappmessaging-display:17.2.0'
+    implementation 'com.google.android.gms:play-services-cast:17.0.0'
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:18.0.1'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0-alpha01'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-alpha01'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0-alpha01'
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
     api 'com.google.guava:guava:27.0.1-android'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.slice:slice-builders-ktx:1.0.0-alpha6'
@@ -171,9 +171,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:extension-mediasession:2.8.4'
     implementation 'com.google.android.exoplayer:extension-okhttp:2.8.4'
     //MaterialDialogs
-    implementation 'com.afollestad.material-dialogs:core:3.0.0-beta2'
-    implementation 'com.afollestad.material-dialogs:lifecycle:3.0.0-beta2'
-    implementation 'com.afollestad.material-dialogs:input:3.0.0-beta2'
+    implementation 'com.afollestad.material-dialogs:core:3.1.0'
+    implementation 'com.afollestad.material-dialogs:lifecycle:3.1.0'
+    implementation 'com.afollestad.material-dialogs:input:3.1.0'
     //Aesthetic
     implementation 'com.afollestad:aesthetic:1.0.0-beta04'
     //---------

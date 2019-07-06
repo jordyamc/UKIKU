@@ -221,6 +221,11 @@
             android:key="show_favs"
             android:summary="Marcar favoritos en emisión"
             android:title="Indicador de favoritos"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_list_placeholder"
+            android:key="list_placeholder"
+            android:title="Usar placeholder en listas" />
         <!--<SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_cash"

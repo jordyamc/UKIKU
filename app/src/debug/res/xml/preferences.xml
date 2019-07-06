@@ -220,6 +220,11 @@
             android:title="Indicador de favoritos"/>
         <SwitchPreference
             android:defaultValue="false"
+            android:icon="@drawable/ic_list_placeholder"
+            android:key="list_placeholder"
+            android:title="Usar placeholder en listas" />
+        <SwitchPreference
+            android:defaultValue="false"
             android:icon="@drawable/ic_cash"
             android:key="ads_enabled"
             android:summary="Mostrar anuncios para ayudar al programador"

@@ -48,13 +48,13 @@ interface FavsDAO {
     fun favObserver(key: Int): LiveData<FavoriteObject?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addFav(favoriteObject: FavoriteObject)
+    fun addFav(favoriteObject: FavoriteObject?)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAll(list: List<FavoriteObject>)
 
     @Delete
-    fun deleteFav(favoriteObject: FavoriteObject)
+    fun deleteFav(favoriteObject: FavoriteObject?)
 
     @Query("DELETE FROM favoriteobject")
     fun clear()

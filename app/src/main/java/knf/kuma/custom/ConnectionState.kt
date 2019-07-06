@@ -163,8 +163,9 @@ class ConnectionState : LinearLayout {
         icon.visibility = View.VISIBLE
         message.text = "Error HTTP 403!"
         message.textColor = Color.WHITE
-        container.onClick { onShowDialog("Tu proveedor de internet bloquea la conexion entre UKIKU y Animeflv") }
-        container.onLongClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
+        container.onClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
+        container.setOnLongClickListener(null)
+        //container.onLongClick { onShowDialog("Tu proveedor de internet bloquea la conexion entre UKIKU y Animeflv") }
     }
 
     private fun networkErrorState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {

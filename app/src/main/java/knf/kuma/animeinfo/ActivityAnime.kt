@@ -37,6 +37,9 @@ import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.search.SearchObject
 import knf.kuma.widgets.emision.WEListItem
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.sdk27.coroutines.onLongClick
+import org.jetbrains.anko.toast
 import xdroid.toaster.Toaster
 import java.util.*
 
@@ -81,6 +84,26 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                     chapters = animeObject.chapters ?: mutableListOf()
                     genres = animeObject.genres ?: mutableListOf()
                     favoriteObject = FavoriteObject(animeObject)
+                    favoriteObject?.let { fav ->
+                        holder.imageView.onLongClick(returnValue = true) {
+                            doAsync {
+                                val isFav = dao.isFav(fav.key)
+                                if (isFav) {
+                                    holder.setFABState(false)
+                                    dao.deleteFav(fav)
+                                    RecommendHelper.registerAll(genres, RankType.UNFAV)
+                                    doOnUI { toast("Removido de favoritos") }
+                                } else {
+                                    holder.setFABState(true)
+                                    dao.addFav(fav)
+                                    RecommendHelper.registerAll(genres, RankType.FAV)
+                                    AchievementManager.onFavAdded(fav)
+                                    doOnUI { toast("Añadido a favoritos") }
+                                }
+                            }
+                        }
+                        dao.isFavLive(fav.key).observe(this, Observer { holder.setFABState(it) })
+                    }
                     holder.setTitle(animeObject.name)
                     holder.loadImg(PatternUtil.getCover(animeObject.aid), View.OnClickListener {
                         startActivity(

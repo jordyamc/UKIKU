@@ -117,40 +117,40 @@ class Repository {
 
     fun getAnimeDir(): LiveData<PagedList<DirObject>> {
         return when (PrefsUtil.dirOrder) {
-            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirVotes, 25).build()
-            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirID, 25).build()
-            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirAdded, 25).build()
-            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirFollowers, 25).build()
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDir, 25).build()
+            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirVotes, pagedConfig(25)).build()
+            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirID, pagedConfig(25)).build()
+            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirAdded, pagedConfig(25)).build()
+            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirFollowers, pagedConfig(25)).build()
+            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDir, pagedConfig(25)).build()
         }
     }
 
     fun getOvaDir(): LiveData<PagedList<DirObject>> {
         return when (PrefsUtil.dirOrder) {
-            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirVotes, 25).build()
-            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirID, 25).build()
-            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirAdded, 25).build()
-            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirFollowers, 25).build()
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDir, 25).build()
+            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirVotes, pagedConfig(25)).build()
+            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirID, pagedConfig(25)).build()
+            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirAdded, pagedConfig(25)).build()
+            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirFollowers, pagedConfig(25)).build()
+            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDir, pagedConfig(25)).build()
         }
     }
 
     fun getMovieDir(): LiveData<PagedList<DirObject>> {
         return when (PrefsUtil.dirOrder) {
-            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirVotes, 25).build()
-            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirID, 25).build()
-            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirAdded, 25).build()
-            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirFollowers, 25).build()
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDir, 25).build()
+            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirVotes, pagedConfig(25)).build()
+            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirID, pagedConfig(25)).build()
+            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirAdded, pagedConfig(25)).build()
+            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirFollowers, pagedConfig(25)).build()
+            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDir, pagedConfig(25)).build()
         }
     }
 
     fun getSearch(query: String): LiveData<PagedList<SearchObject>> {
         return when {
-            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().allSearch, 25).setInitialLoadKey(0).build()
+            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().allSearch, pagedConfig(25)).setInitialLoadKey(0).build()
             query.trim { it <= ' ' }.matches("^#\\d+$".toRegex()) -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchID(query.replace("#", "")), 25).setInitialLoadKey(0).build()
             PatternUtil.isCustomSearch(query) -> getFiltered(query, null)
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch("%$query%"), 25).setInitialLoadKey(0).build()
+            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch("%$query%"), pagedConfig(25)).setInitialLoadKey(0).build()
         }
     }
 
@@ -160,45 +160,45 @@ class Repository {
         fQuery = if (fQuery != "") "%$fQuery%" else "%"
         when (PatternUtil.getCustomAttr(query).toLowerCase()) {
             "emision" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "En emisión"), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "En emisión"), pagedConfig(25)).setInitialLoadKey(0).build()
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "En emisión", genres), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "En emisión", genres), pagedConfig(25)).setInitialLoadKey(0).build()
             "finalizado" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "Finalizado"), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "Finalizado"), pagedConfig(25)).setInitialLoadKey(0).build()
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "Finalizado", genres), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "Finalizado", genres), pagedConfig(25)).setInitialLoadKey(0).build()
             "anime" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Anime"), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Anime"), pagedConfig(25)).setInitialLoadKey(0).build()
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Anime", genres), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Anime", genres), pagedConfig(25)).setInitialLoadKey(0).build()
             "ova" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "OVA"), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "OVA"), pagedConfig(25)).setInitialLoadKey(0).build()
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "OVA", genres), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "OVA", genres), pagedConfig(25)).setInitialLoadKey(0).build()
             "pelicula" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Película"), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Película"), pagedConfig(25)).setInitialLoadKey(0).build()
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Película", genres), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Película", genres), pagedConfig(25)).setInitialLoadKey(0).build()
             "personalizado" -> {
                 if (tQuery == "")
                     tQuery = "%"
                 return if (genres == null)
-                    LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch(tQuery), 25).setInitialLoadKey(0).build()
+                    LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch(tQuery), pagedConfig(25)).setInitialLoadKey(0).build()
                 else
-                    LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG(tQuery, genres), 25).setInitialLoadKey(0).build()
+                    LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG(tQuery, genres), pagedConfig(25)).setInitialLoadKey(0).build()
             }
             else -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch(fQuery), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch(fQuery), pagedConfig(25)).setInitialLoadKey(0).build()
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG(fQuery, genres), 25).setInitialLoadKey(0).build()
+                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG(fQuery, genres), pagedConfig(25)).setInitialLoadKey(0).build()
         }
     }
 
     fun getSearch(query: String, genres: String): LiveData<PagedList<SearchObject>> {
         return when {
-            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchG(genres), 25).setInitialLoadKey(0).build()
+            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchG(genres), pagedConfig(25)).setInitialLoadKey(0).build()
             PatternUtil.isCustomSearch(query) -> getFiltered(query, genres)
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG("%$query%", genres), 25).setInitialLoadKey(0).build()
+            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG("%$query%", genres), pagedConfig(25)).setInitialLoadKey(0).build()
         }
     }
 

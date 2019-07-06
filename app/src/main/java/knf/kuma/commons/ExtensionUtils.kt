@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
@@ -305,6 +306,11 @@ fun FloatingActionButton.forceHide() {
     requestLayout()
     visibility = View.GONE
 }
+
+fun pagedConfig(size: Int): PagedList.Config = PagedList.Config.Builder()
+        .setPageSize(size)
+        .setEnablePlaceholders(PrefsUtil.usePlaceholders)
+        .build()
 
 fun jsoupCookies(url: String?): Connection = Jsoup.connect(url).cookies(BypassUtil.getMapCookie(App.context)).userAgent(BypassUtil.userAgent).timeout(PrefsUtil.timeoutTime.toInt() * 1000)
 

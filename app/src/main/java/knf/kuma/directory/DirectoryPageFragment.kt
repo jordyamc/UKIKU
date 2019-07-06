@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.annotation.UiThread
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -26,7 +25,7 @@ class DirectoryPageFragment : BottomFragment() {
     private var adapter: DirectoryPageAdapter? = null
     private var isFirst = true
     private var listUpdated = false
-    private lateinit var model: DirectoryViewModel
+    private val model: DirectoryViewModel by lazy { ViewModelProviders.of(this).get(DirectoryViewModel::class.java) }
 
     private lateinit var liveData: LiveData<PagedList<DirObject>>
     private lateinit var observer: Observer<PagedList<DirObject>>
@@ -39,16 +38,10 @@ class DirectoryPageFragment : BottomFragment() {
             R.layout.recycler_dir_grid
         }
 
-    private fun createModel(activity: FragmentActivity): DirectoryViewModel {
-        if (!::model.isInitialized)
-            model = ViewModelProviders.of(activity).get(DirectoryViewModel::class.java)
-        return model
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            observeLiveData(createModel(it), Observer { animeObjects ->
+            observeLiveData(model, Observer { animeObjects ->
                 hideProgress()
                 adapter?.submitList(animeObjects)
                 makeAnimation()
@@ -71,12 +64,11 @@ class DirectoryPageFragment : BottomFragment() {
         activity?.let {
             adapter?.submitList(null)
             showProgress()
-            observeLiveData(createModel(it), Observer { animeObjects ->
+            observeLiveData(model, Observer { animeObjects ->
                 hideProgress()
                 listUpdated = true
                 adapter?.submitList(animeObjects)
                 makeAnimation()
-                scrollTop()
             })
         }
     }

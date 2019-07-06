@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
@@ -35,11 +36,16 @@ class DirectoryPageAdapter internal constructor(private val fragment: Fragment) 
     }
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {
+        if (fragment.context == null) return
         val animeObject = getItem(position)
-        if (fragment.context != null && animeObject?.aid != null) {
+        if (animeObject?.aid != null) {
             holder.imageView.load(PatternUtil.getCover(animeObject.aid))
+            holder.progressView.visibility = View.GONE
             holder.textView.text = animeObject.name
             holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView, persist = false) }
+        } else {
+            holder.progressView.visibility = View.VISIBLE
+            holder.textView.text = null
         }
     }
 
@@ -55,6 +61,7 @@ class DirectoryPageAdapter internal constructor(private val fragment: Fragment) 
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
+        val progressView: ProgressBar by itemView.bind(R.id.progress)
         val textView: TextView by itemView.bind(R.id.title)
     }
 

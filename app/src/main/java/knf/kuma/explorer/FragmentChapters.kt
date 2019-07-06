@@ -47,7 +47,10 @@ class FragmentChapters : Fragment() {
     }
 
     private fun playAll(list: List<ExplorerObject.FileDownObj>) {
-        noCrash { QueueManager.startQueueDownloaded(context, list) }
+        noCrash {
+            adapter?.notifyDataSetChanged()
+            QueueManager.startQueueDownloaded(context, list)
+        }
     }
 
     @SuppressLint("RestrictedApi")

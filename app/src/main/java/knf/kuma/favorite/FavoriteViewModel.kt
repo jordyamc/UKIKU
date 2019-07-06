@@ -13,7 +13,6 @@ class FavoriteViewModel : ViewModel() {
             FavSectionHelper.init()
         else
             when (PrefsUtil.favsOrder) {
-                0 -> CacheDB.INSTANCE.favsDAO().all
                 1 -> CacheDB.INSTANCE.favsDAO().allID
                 else -> CacheDB.INSTANCE.favsDAO().all
             }
