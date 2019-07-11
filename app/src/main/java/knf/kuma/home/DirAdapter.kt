@@ -25,7 +25,6 @@ class DirAdapter(val fragment: HomeFragment) : UpdateableAdapter<DirAdapter.Rece
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentViewHolder = RecentViewHolder(parent.inflate(R.layout.item_fav_grid_card))
 
-
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: RecentViewHolder, position: Int) {

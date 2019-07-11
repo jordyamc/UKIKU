@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +47,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         (holder as? SeeingItemNormal)?.apply {
             PicassoSingle.get().load(PatternUtil.getCover(seeingObject.aid)).into(imageView)
             title.text = seeingObject.title
+            progressView?.visibility = View.GONE
             cardView.setOnClickListener { ActivityAnime.open(activity, seeingObject, imageView) }
             cardView.setOnLongClickListener { view ->
                 val popupMenu = PopupMenu(activity, view)
@@ -142,6 +144,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
     internal open inner class SeeingItemNormal(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
+        val progressView: ProgressBar? by itemView.optionalBind(R.id.progress)
         val title: TextView by itemView.bind(R.id.title)
     }
 

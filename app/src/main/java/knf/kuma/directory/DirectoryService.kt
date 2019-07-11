@@ -56,7 +56,13 @@ class DirectoryService : IntentService("Directory update") {
         super.onCreate()
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground(NOT_CODE, startNotification)
+        return super.onStartCommand(intent, flags, startId)
+    }
+
     override fun onHandleIntent(intent: Intent?) {
+        startForeground(NOT_CODE, startNotification)
         if (!Network.isConnected || BypassUtil.isNeeded()) {
             cancelForeground()
             stopSelf()

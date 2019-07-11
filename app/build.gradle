@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 110
-        versionName "4.2.6"
+        versionCode 111
+        versionName "4.2.7"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -139,9 +139,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.0.0'
     implementation 'com.google.firebase:firebase-inappmessaging-display:18.0.1'
     implementation 'androidx.browser:browser:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0-alpha01'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-alpha01'
-    implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0-alpha01'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0-alpha02'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-alpha02'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0-alpha02'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     api 'com.google.guava:guava:27.0.1-android'
     implementation 'androidx.annotation:annotation:1.1.0'

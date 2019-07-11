@@ -148,7 +148,7 @@ class Repository {
     fun getSearch(query: String): LiveData<PagedList<SearchObject>> {
         return when {
             query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().allSearch, pagedConfig(25)).setInitialLoadKey(0).build()
-            query.trim { it <= ' ' }.matches("^#\\d+$".toRegex()) -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchID(query.replace("#", "")), 25).setInitialLoadKey(0).build()
+            query.trim { it <= ' ' }.matches("^#\\d+$".toRegex()) -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchID(query.replace("#", "")), pagedConfig(25)).setInitialLoadKey(0).build()
             PatternUtil.isCustomSearch(query) -> getFiltered(query, null)
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch("%$query%"), pagedConfig(25)).setInitialLoadKey(0).build()
         }

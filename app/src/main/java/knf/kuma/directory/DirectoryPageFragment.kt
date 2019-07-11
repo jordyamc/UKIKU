@@ -24,6 +24,7 @@ class DirectoryPageFragment : BottomFragment() {
     private var manager: RecyclerView.LayoutManager? = null
     private var adapter: DirectoryPageAdapter? = null
     private var isFirst = true
+    private var waitingScroll = false
     private var listUpdated = false
     private val model: DirectoryViewModel by lazy { ViewModelProviders.of(this).get(DirectoryViewModel::class.java) }
 
@@ -62,6 +63,7 @@ class DirectoryPageFragment : BottomFragment() {
 
     fun onChangeOrder() {
         activity?.let {
+            waitingScroll = true
             adapter?.submitList(null)
             showProgress()
             observeLiveData(model, Observer { animeObjects ->
@@ -114,14 +116,18 @@ class DirectoryPageFragment : BottomFragment() {
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                if (positionStart == 0)
+                if (positionStart == 0 && waitingScroll) {
                     scrollTop()
+                    waitingScroll = false
+                }
             }
 
             override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                 super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                if (toPosition == 0)
+                if (toPosition == 0 && waitingScroll) {
                     scrollTop()
+                    waitingScroll = false
+                }
             }
         })
         recyclerView.verifyManager()

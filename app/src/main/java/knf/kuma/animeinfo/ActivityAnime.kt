@@ -51,7 +51,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
     private val dao = CacheDB.INSTANCE.favsDAO()
     private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
     private var genres: MutableList<String> = ArrayList()
-    private val aidOnly = intent?.getBooleanExtra(keyAidOnly, false) ?: false
+    private val aidOnly get() = intent?.getBooleanExtra(keyAidOnly, false) ?: false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeNA())

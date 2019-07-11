@@ -32,6 +32,7 @@ class SearchFragment : BottomFragment() {
     private var manager: RecyclerView.LayoutManager? = null
 
     private var isFirst = true
+    private var waitingScroll = false
 
     private var query: String = ""
 
@@ -114,17 +115,19 @@ class SearchFragment : BottomFragment() {
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                 super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                if (toPosition == 0) {
+                if (toPosition == 0 && waitingScroll) {
                     manager?.smoothScrollToPosition(recyclerView, null, 0)
                     fab.extend()
+                    waitingScroll = false
                 }
             }
 
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                if (positionStart == 0) {
+                if (positionStart == 0 && waitingScroll) {
                     manager?.smoothScrollToPosition(recyclerView, null, 0)
                     fab.extend()
+                    waitingScroll = false
                 }
             }
         })
@@ -143,6 +146,7 @@ class SearchFragment : BottomFragment() {
     }
 
     fun setSearch(q: String) {
+        waitingScroll = true
         this.query = q.trim()
         model?.setSearch(q.trim(), genresString, this, Observer { animeObjects ->
             if (animeObjects != null) {
