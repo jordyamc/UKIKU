@@ -5,5 +5,5 @@ class DirObject {
     var aid = ""
     var name = ""
     var link: String? = null
-    var rate_stars = ""
+    var rate_stars: String? = ""
 }

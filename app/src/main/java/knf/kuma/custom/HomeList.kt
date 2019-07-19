@@ -19,6 +19,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 class HomeList : LinearLayout {
 
     private var showAll = false
+    private var showAllText = "Ver Todos"
     private var isLarge = false
     private var startHidden = false
     private var showError = false
@@ -51,6 +52,7 @@ class HomeList : LinearLayout {
         attrs?.let {
             val array = context.obtainStyledAttributes(it, R.styleable.HomeList)
             showAll = array.getBoolean(R.styleable.HomeList_hm_showViewAll, false)
+            showAllText = array.getString(R.styleable.HomeList_hm_viewAllText) ?: "Ver Todos"
             isLarge = array.getBoolean(R.styleable.HomeList_hm_isLarge, false)
             startHidden = array.getBoolean(R.styleable.HomeList_hm_startHidden, false)
             subheaderText = array.getString(R.styleable.HomeList_hm_subheader) ?: "Subheader"
@@ -68,6 +70,7 @@ class HomeList : LinearLayout {
     override fun onFinishInflate() {
         super.onFinishInflate()
         if (startHidden) visibility = View.GONE
+        viewAll.text = showAllText
         subheader.text = subheaderText
         errorTV.text = errorText
         if (showAll) viewAll.visibility = View.VISIBLE
@@ -93,6 +96,10 @@ class HomeList : LinearLayout {
 
     fun <T> setViewAllClass(clazz: Class<T>) {
         viewAll.onClick { context.startActivity(Intent(context, clazz)) }
+    }
+
+    fun setViewAllOnClick(func: () -> Unit) {
+        viewAll.onClick { func() }
     }
 
     fun setAdapter(adapter: UpdateableAdapter<*>) {

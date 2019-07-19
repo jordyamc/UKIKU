@@ -22,6 +22,7 @@ import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.findOptional
 
+
 open class GenericActivity : AppCompatActivity() {
 
     private var tryCount = 0
@@ -129,7 +130,7 @@ open class GenericActivity : AppCompatActivity() {
                                             logText("Connection was successful")
                                             snack?.safeDismiss()
                                             getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
-                                            bypassLive.postValue(Pair(true, false))
+                                            bypassLive.postValue(Pair(first = true, second = false))
                                             Repository().reloadRecents()
                                             onBypassUpdated()
                                             BypassUtil.isLoading = false

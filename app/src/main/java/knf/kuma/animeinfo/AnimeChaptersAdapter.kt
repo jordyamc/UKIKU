@@ -108,7 +108,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             holder.progressBarRoot.visibility = View.VISIBLE
         } else
             holder.progressBarRoot.visibility = View.GONE
-        holder.setDownloadObserver(downloadsDAO.getLiveByEid(chapter.eid), fragment, Observer { downloadObject1 ->
+        holder.setDownloadObserver(downloadsDAO.getLiveByEid(chapter.eid).distinct, fragment, Observer { downloadObject1 ->
             holder.setDownloadState(downloadObject1)
             val casting = CastUtil.get().casting.value
             val isCasting = casting != null && casting == chapter.eid

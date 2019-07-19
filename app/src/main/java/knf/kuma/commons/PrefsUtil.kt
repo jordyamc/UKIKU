@@ -160,6 +160,10 @@ object PrefsUtil {
     val usePlaceholders: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("list_placeholder", false)
 
+    var recentLastHiddenNew: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("recent_last_hidden_new", 0)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("recent_last_hidden_new", value).apply()
+
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
     }

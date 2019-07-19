@@ -31,7 +31,7 @@ class DirAdapter(val fragment: HomeFragment) : UpdateableAdapter<DirAdapter.Rece
         val item = list[position]
         holder.img.load(PatternUtil.getCover(item.aid))
         holder.title.text = item.name
-        holder.type?.text = item.rate_stars
+        holder.type?.text = "\u2605${item.rate_stars ?: "?.?"}"
         holder.root.onClick { ActivityAnime.open(fragment, item, holder.img, true, true) }
     }
 

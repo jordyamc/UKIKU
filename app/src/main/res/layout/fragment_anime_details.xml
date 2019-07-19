@@ -239,7 +239,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:isIndicator="true"
+                        android:secondaryProgressTint="#00000000"
                         android:numStars="5"
+                        android:stepSize="0.1"
                         android:padding="8dp"/>
                 </LinearLayout>
             </LinearLayout>

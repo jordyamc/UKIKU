@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -197,4 +198,22 @@ public class DownloadObject {
         return String.format(Locale.US, "%.1f%sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
     }
 
+    @Override
+    public int hashCode() {
+        return (file + link + key + state + eta + speed + progress + d_bytes + t_bytes).hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return obj instanceof DownloadObject
+                && key == ((DownloadObject) obj).key
+                && state == ((DownloadObject) obj).state
+                && file.equals(((DownloadObject) obj).file)
+                && link.equals(((DownloadObject) obj).link)
+                && eta.equals(((DownloadObject) obj).eta)
+                && speed.equals(((DownloadObject) obj).speed)
+                && progress == ((DownloadObject) obj).progress
+                && d_bytes == ((DownloadObject) obj).d_bytes
+                && t_bytes == ((DownloadObject) obj).t_bytes;
+    }
 }

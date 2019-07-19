@@ -65,16 +65,16 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (list[position] is AdRecentObject) 1 else 0
+        return noCrashLet { if (list[position] is AdRecentObject) 1 else 0 } ?: 1
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (context == null) return
         if (holder is AdCardItemHolder)
-            holder.loadAd(list[position] as? AdCallback)
+            noCrash { holder.loadAd(list[position] as? AdCallback) }
         else if (holder is ItemHolder) {
             holder.unsetObservers()
-            val recentObject = list[position]
+            val recentObject = noCrashLet { list[position] } ?: return
             holder.setState(isNetworkAvailable, recentObject.isChapterDownloaded || recentObject.isDownloading)
             PicassoSingle.get().load(PatternUtil.getCover(recentObject.aid)).into(holder.imageView)
             holder.setNew(recentObject.isNew)
@@ -108,7 +108,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                     holder.streaming.setOnClickListener {
                         if (recentObject.isChapterDownloaded || recentObject.isDownloading) {
                             MaterialDialog(context).safeShow {
-                                message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase()} de ${recentObject.name}?")
+                                message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase(Locale.ENGLISH)} de ${recentObject.name}?")
                                 positiveButton(text = "CONFIRMAR") {
                                     FileAccessHelper.delete(recentObject.fileName, true)
                                     DownloadManager.cancel(recentObject.eid)
@@ -173,10 +173,10 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             holder.cardView.setOnLongClickListener {
                 if (!chaptersDAO.chapterIsSeen(recentObject.eid)) {
                     chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
-                    holder.animeOverlay.setSeen(true, true)
+                    holder.animeOverlay.setSeen(seen = true, animate = true)
                 } else {
                     chaptersDAO.deleteChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject))
-                    holder.animeOverlay.setSeen(false, true)
+                    holder.animeOverlay.setSeen(seen = false, animate = true)
                 }
                 true
             }
@@ -187,7 +187,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                         !recentObject.isDownloading &&
                         recentObject.downloadState != DownloadObject.PENDING) {
                     holder.setLocked(true)
-                    ServersFactory.start(context, recentObject.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), false, false, object : ServersFactory.ServersInterface {
+                    ServersFactory.start(context, recentObject.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), isStream = false, addQueue = false, serversInterface = object : ServersFactory.ServersInterface {
                         override fun onFinish(started: Boolean, success: Boolean) {
                             if (started) {
                                 recentObject.isChapterDownloaded = true
@@ -266,7 +266,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     override fun getItemId(position: Int): Long {
-        return list[position].key.toLong()
+        return noCrashLet { list[position].key.toLong() } ?: 0
     }
 
     override fun getItemCount(): Int {
@@ -300,7 +300,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             this.chapterLiveData.observe(owner, observer)
         }
 
-        fun unsetChapterObserver() {
+        private fun unsetChapterObserver() {
             chapterObserver?.let {
                 chapterLiveData.removeObserver(it)
                 chapterObserver = null
@@ -313,7 +313,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             this.downloadLiveData.observe(owner, observer)
         }
 
-        fun unsetDownloadObserver() {
+        private fun unsetDownloadObserver() {
             downloadObserver?.let {
                 downloadLiveData.removeObserver(it)
                 downloadObserver = null
@@ -325,7 +325,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             CastUtil.get().casting.observe(owner, observer)
         }
 
-        fun unsetCastingObserver() {
+        private fun unsetCastingObserver() {
             castingObserver?.let {
                 CastUtil.get().casting.removeObserver(it)
                 castingObserver = null

@@ -10,8 +10,10 @@ import com.crashlytics.android.Crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
+import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.SeeingObject
 import knf.kuma.queue.QueueActivity
 import knf.kuma.recents.RecentsActivity
@@ -25,12 +27,13 @@ import org.jetbrains.anko.doAsync
 class HomeFragment : BottomFragment() {
 
     private val viewModel: RecentsViewModel by lazy { ViewModelProviders.of(this).get(RecentsViewModel::class.java) }
+    private var lastNew: String = "0"
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel.dbLiveData.observe(this, Observer { list ->
             doAsync {
-                listNew.updateList(list.filter { it.isNew })
+                listNew.updateList(filterNew(list.filter { it.isNew }))
                 val favFiltered = list.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }
                 if (favFiltered.isEmpty()) {
                     listFavUpdated.apply {
@@ -74,7 +77,13 @@ class HomeFragment : BottomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        listNew.setAdapter(RecentsAdapter(this, isLarge = false, showSeen = false))
+        listNew.apply {
+            setAdapter(RecentsAdapter(this@HomeFragment, isLarge = false, showSeen = false))
+            setViewAllOnClick {
+                PrefsUtil.recentLastHiddenNew = lastNew.toInt()
+                listNew.hide()
+            }
+        }
         listFavUpdated.apply {
             setAdapter(RecentsAdapter(this@HomeFragment, true))
             setViewAllClass(RecentsActivity::class.java)
@@ -93,6 +102,15 @@ class HomeFragment : BottomFragment() {
             setViewAllClass(RecommendActivity::class.java)
         }
         listRecommendedStaff.setAdapter(SearchAdapter(this))
+    }
+
+    private fun filterNew(list: List<RecentObject>): List<RecentObject> {
+        if (list.isNotEmpty()) {
+            lastNew = list[0].aid
+            if (list[0].aid.toInt() == PrefsUtil.recentLastHiddenNew)
+                return emptyList()
+        }
+        return list
     }
 
     override fun onReselect() {

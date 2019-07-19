@@ -97,6 +97,7 @@ class AnimeDetailsHolder(val view: View) {
                     layScore.visibility = View.GONE
                 else {
                     ratingCount.text = animeObject.rate_count
+                    ratingBar.stepSize = 0.1f
                     ratingBar.rating = animeObject.rate_stars?.toFloat() ?: 0f
                 }
                 showCard(cardViews[2])

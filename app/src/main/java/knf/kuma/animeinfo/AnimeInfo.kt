@@ -36,7 +36,7 @@ class AnimeInfo(code: String) {
     private var date: String? = null
 
     init {
-        val matcher = Pattern.compile("\"([^\",/<>]*)\"").matcher(code)
+        val matcher = Pattern.compile("\"([^\"/<>]*)\",?").matcher(code)
         var i = 0
         while (matcher.find()) {
             when (i) {

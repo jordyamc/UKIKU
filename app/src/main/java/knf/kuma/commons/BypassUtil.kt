@@ -31,7 +31,7 @@ class BypassUtil {
         private const val defaultValue = ""
 
         fun saveCookies(context: Context): Boolean {
-            val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/").trim { it <= ' ' }
+            val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/").trim()
             if (cookies.contains(keyCfClearance)) {
                 val parts = cookies.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 for (cookie in parts) {

@@ -6,7 +6,6 @@ import android.content.res.Resources
 import android.graphics.drawable.AnimationDrawable
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -322,8 +321,8 @@ fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builde
 }.build()
 
 fun isHostValid(hostName: String): Boolean {
-    if (BuildConfig.DEBUG)
-        Log.e("Hostname", hostName)
+    /*if (BuildConfig.DEBUG)
+        Log.e("Hostname", hostName)*/
     return when (hostName) {
         "fex.net",
         "api.crashlytics.com",

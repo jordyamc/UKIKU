@@ -10,6 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:orientation="vertical">
 
         <knf.kuma.custom.HomeList
@@ -17,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:hm_isLarge="false"
-            app:hm_showViewAll="false"
+            app:hm_showViewAll="true"
+            app:hm_viewAllText="Ocultar"
             app:hm_startHidden="true"
             app:hm_subheader="Nuevos animes"/>
 

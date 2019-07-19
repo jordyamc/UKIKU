@@ -51,7 +51,7 @@ class DirectoryPageAdapter internal constructor(private val fragment: Fragment) 
 
     override fun getSectionName(position: Int): String {
         return when (PrefsUtil.dirOrder) {
-            1 -> getItem(position)?.rate_stars ?: ""
+            1 -> "\u2605${getItem(position)?.rate_stars ?: "?.?"}"
             2 -> getItem(position)?.aid ?: ""
             3 -> getItem(position)?.aid ?: ""
             else -> getItem(position)?.name?.first()?.toUpperCase()?.toString() ?: ""
