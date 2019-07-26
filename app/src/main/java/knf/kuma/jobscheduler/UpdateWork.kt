@@ -62,7 +62,7 @@ class UpdateWork(val context: Context, workerParameters: WorkerParameters) : Wor
         fun schedule() {
             doAsync {
                 if (WorkManager.getInstance().getWorkInfosByTag(TAG).get().size == 0)
-                    PeriodicWorkRequestBuilder<UpdateWork>(6, TimeUnit.HOURS).apply {
+                    PeriodicWorkRequestBuilder<UpdateWork>(6, TimeUnit.HOURS, 1, TimeUnit.HOURS).apply {
                         setConstraints(networkConnectedConstraints())
                         addTag(TAG)
                     }.build().enqueue()

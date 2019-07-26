@@ -55,7 +55,7 @@ class BackUpWork(val context: Context, workerParameters: WorkerParameters) : Wor
         fun reSchedule(days: Int) {
             WorkManager.getInstance().cancelAllWorkByTag(TAG)
             if (days > 0) {
-                PeriodicWorkRequestBuilder<BackUpWork>(days.toLong(), TimeUnit.DAYS).apply {
+                PeriodicWorkRequestBuilder<BackUpWork>(days.toLong(), TimeUnit.DAYS, 1, TimeUnit.HOURS).apply {
                     setConstraints(networkConnectedConstraints())
                     setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.MINUTES)
                     addTag(TAG)

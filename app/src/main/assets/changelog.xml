@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="113" version="4.2.9">
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="112" version="4.2.8">
         <change type="fix">Errores generales</change>
         <change type="change">Opción para ocultar animes nuevos en "Home"</change>

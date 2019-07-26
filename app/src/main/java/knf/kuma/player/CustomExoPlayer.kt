@@ -66,7 +66,7 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
         pip.setOnClickListener { onPip() }
         skip.setOnClickListener { onSkip() }
         hideUI()
-        player.setResizeMode(resizeMode)
+        player.resizeMode = resizeMode
         player.requestFocus()
         if (savedInstanceState != null)
             currentPosition = savedInstanceState.getLong("position", C.TIME_UNSET)
@@ -260,7 +260,7 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
                         else -> null
                     }
             if (exception != null) {
-                Toaster.toast("Error al reproducir: " + exception.message)
+                Toaster.toast("Error al reproducir: " + exception.message, emptyArray<Any>())
                 Crashlytics.logException(exception)
             } else
                 Toaster.toast("Error desconocido al reproducir")

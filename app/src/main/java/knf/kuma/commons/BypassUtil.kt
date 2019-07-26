@@ -63,9 +63,9 @@ class BypassUtil {
         fun isNeeded(): Boolean {
             return try {
                 val response = jsoupCookies("https://animeflv.net/").execute()
-                response.statusCode() == 503
+                response.statusCode().let { it == 503 || it == 403 }
             } catch (e: HttpStatusException) {
-                e.statusCode == 503
+                e.statusCode.let { it == 503 || it == 403 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 false

@@ -191,7 +191,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
                 val preferences = PreferenceManager.getDefaultSharedPreferences(context)
                 val time = (preferences.getString("recents_time", "1") ?: "1").toInt() * 15
                 if (time > 0 && WorkManager.getInstance().getWorkInfosByTag(TAG).get().size == 0)
-                    PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES).apply {
+                    PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
                         setConstraints(networkConnectedConstraints())
                         setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
                         addTag(TAG)
@@ -202,7 +202,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
         fun reSchedule(time: Int) {
             WorkManager.getInstance().cancelAllWorkByTag(TAG)
             if (time > 0)
-                PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES).apply {
+                PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
                     setConstraints(networkConnectedConstraints())
                     setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
                     addTag(TAG)

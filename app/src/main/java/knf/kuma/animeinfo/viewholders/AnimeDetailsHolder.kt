@@ -1,5 +1,6 @@
 package knf.kuma.animeinfo.viewholders
 
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -56,6 +57,7 @@ class AnimeDetailsHolder(val view: View) {
         recyclerViewRelated.layoutManager = LinearLayoutManager(view.context)
     }
 
+    @SuppressLint("SetTextI18n")
     fun populate(fragment: Fragment, animeObject: AnimeObject) {
         doOnUI {
             title.text = animeObject.name
@@ -96,7 +98,8 @@ class AnimeDetailsHolder(val view: View) {
                 if (animeObject.rate_stars == null || animeObject.rate_stars == "0.0")
                     layScore.visibility = View.GONE
                 else {
-                    ratingCount.text = animeObject.rate_count
+                    ratingCount.text = "${animeObject.rate_count} (${animeObject.rate_stars
+                            ?: "?.?"})"
                     ratingBar.stepSize = 0.1f
                     ratingBar.rating = animeObject.rate_stars?.toFloat() ?: 0f
                 }

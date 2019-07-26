@@ -249,9 +249,7 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
-        isRunning = false
-        stopForeground(true)
-        notCancel(NOT_CODE)
+        cancelForeground()
         super.onTaskRemoved(rootIntent)
     }
 

@@ -18,14 +18,15 @@ class DirUpdateWork(val context: Context, workerParameters: WorkerParameters) : 
     }
 
     companion object {
-        const val TAG = "dir-update-work"
+        const val TAG = "dir-update-work-unique"
 
         fun schedule(context: Context) {
             WorkManager.getInstance().cancelAllWorkByTag("dir-update-job")
+            WorkManager.getInstance().cancelAllWorkByTag("dir-update-work")
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val time = (preferences.getString("dir_update_time", "7") ?: "7").toLong()
             if (PrefsUtil.isDirectoryFinished && time > 0)
-                PeriodicWorkRequestBuilder<DirUpdateWork>(time, TimeUnit.DAYS).apply {
+                PeriodicWorkRequestBuilder<DirUpdateWork>(time, TimeUnit.DAYS, 1, TimeUnit.HOURS).apply {
                     setConstraints(networkConnectedConstraints())
                     addTag(TAG)
                 }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.KEEP)
@@ -33,7 +34,7 @@ class DirUpdateWork(val context: Context, workerParameters: WorkerParameters) : 
 
         fun reSchedule(value: Int) {
             if (value > 0)
-                PeriodicWorkRequestBuilder<DirUpdateWork>(value.toLong(), TimeUnit.DAYS).apply {
+                PeriodicWorkRequestBuilder<DirUpdateWork>(value.toLong(), TimeUnit.DAYS, 1, TimeUnit.HOURS).apply {
                     setConstraints(networkConnectedConstraints())
                     addTag(TAG)
                 }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.REPLACE)
