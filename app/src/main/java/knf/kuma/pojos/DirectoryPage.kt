@@ -2,7 +2,9 @@ package knf.kuma.pojos
 
 import android.util.Log
 import knf.kuma.commons.Network
+import knf.kuma.commons.execute
 import knf.kuma.commons.jsoupCookies
+import knf.kuma.commons.okHttpCookies
 import knf.kuma.database.dao.AnimeDAO
 import pl.droidsonroids.jspoon.Jspoon
 import pl.droidsonroids.jspoon.annotation.Selector
@@ -18,10 +20,14 @@ class DirectoryPage {
             if (Network.isConnected) {
                 if (!animeDAO.existLink("https://animeflv.net$link"))
                     try {
-                        val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies("https://animeflv.net$link").validateTLSCertificates(true).get().outerHtml())
-                        animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
-                        Log.e("Directory Getter", "Added: https://animeflv.net$link")
-                        updateInterface.onAdd()
+                        val response = okHttpCookies("https://animeflv.net$link").execute(followRedirects = false)
+                        val body = response.body()?.string()
+                        if (response.code() == 200 && body != null) {
+                            val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
+                            animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
+                            Log.e("Directory Getter", "Added: https://animeflv.net$link")
+                            updateInterface.onAdd()
+                        } else check(response.code() < 400) { "Response code: ${response.code()}" }
                     } catch (e: Exception) {
                         Log.e("Directory Getter", "Error adding: https://animeflv.net" + link + "\nCause: " + e.message)
                         updateInterface.onError()

@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Build
 import android.text.Html
 import androidx.appcompat.app.AppCompatActivity
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import knf.kuma.commons.doOnUI
@@ -65,7 +64,8 @@ object NewsCreator {
 
     fun openNews(activity: AppCompatActivity, newsObject: NewsObject) {
         try {
-            CustomTabsIntent.Builder().build().launchUrl(activity, Uri.parse(newsObject.link))
+            //CustomTabsIntent.Builder().build().launchUrl(activity, Uri.parse(newsObject.link))
+            NewsDialog.show(activity, newsObject.link)
         } catch (e: ActivityNotFoundException) {
             try {
                 activity.startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(newsObject.link)))

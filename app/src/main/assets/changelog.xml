@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="114" version="4.2.10">
+        <change type="fix">Errores generales</change>
+        <change type="change">Mejoras en interfaz de TV</change>
+    </release>
     <release code="113" version="4.2.9">
         <change type="fix">Errores generales</change>
     </release>

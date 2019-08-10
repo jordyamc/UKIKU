@@ -106,9 +106,10 @@ class AnimeDetailsHolder(val view: View) {
                 showCard(cardViews[2])
             }
             noCrash {
-                fragment.context?.let {
-                    if (animeObject.genres?.isNotEmpty() == true) {
-                        recyclerViewGenres.adapter = AnimeTagsAdapter(it, animeObject.genres)
+                fragment.context?.let { context ->
+                    if (animeObject.genres?.isNotEmpty() == true &&
+                            animeObject.genresString.trim().let { it != "" && it != "Sin generos" }) {
+                        recyclerViewGenres.adapter = AnimeTagsAdapter(context, animeObject.genres)
                         showCard(cardViews[3])
                     }
                 }

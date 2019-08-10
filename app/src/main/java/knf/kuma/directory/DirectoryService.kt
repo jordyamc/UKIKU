@@ -130,7 +130,7 @@ class DirectoryService : IntentService("Directory update") {
                         }
 
                         override fun onError() {
-                            Log.e(TAG, "At page: $s")
+                            Log.e(TAG, "Error at page: $s")
                             if (!newStrings.contains(s))
                                 newStrings.add(s.toString())
                         }

@@ -15,7 +15,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -285,12 +284,13 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                     R.id.import_file -> (fragment as ChaptersFragment).onMove(chapter.fileName)
                     R.id.commentaries -> {
                         try {
-                            val tabIntent = CustomTabsIntent.Builder().apply {
+                            /*val tabIntent = CustomTabsIntent.Builder().apply {
                                 setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary))
                                 setShowTitle(true)
                                 enableUrlBarHiding()
                             }.build()
-                            tabIntent.launchUrl(context, Uri.parse(chapter.commentariesLink))
+                            tabIntent.launchUrl(context, Uri.parse(chapter.commentariesLink))*/
+                            CommentariesDialog.show(fragment, chapter.commentariesLink)
                         } catch (e: ActivityNotFoundException) {
                             noCrash { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(chapter.commentariesLink))) }
                         }

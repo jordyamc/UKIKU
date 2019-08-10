@@ -209,6 +209,7 @@ object AchievementManager {
     }
 
     fun unlock(keys: Collection<Int>) {
+        if (context.resources.getBoolean(R.bool.isTv)) return
         doAsync {
             val list = mutableListOf<Achievement>()
             keys.forEach {

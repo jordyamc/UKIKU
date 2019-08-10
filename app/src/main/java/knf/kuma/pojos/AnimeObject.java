@@ -225,16 +225,16 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         SATURDAY(7),
         SUNDAY(1),
         NONE(0);
-        public int value;
+        public final int value;
 
         Day(int value) {
             this.value = value;
         }
 
         public static Day fromValue(int value) {
-            for (Day color : values()) {
-                if (color.value == value) {
-                    return color;
+            for (Day day : values()) {
+                if (day.value == value) {
+                    return day;
                 }
             }
             return NONE;
@@ -265,7 +265,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         public String rate_count;
         @Selector(value = "span.Date.fa-calendar", converter = DayConverter.class)
         public Day emisionDay;
-        @Selector("nav.Nvgnrs a")
+        @Selector("nav.Nvgnrs a[href]")
         public List<String> genres = new ArrayList<>();
         @Selector("ul.ListAnmRel li:has(a[href~=^\\/[a-z]+\\/\\d+\\/.+$])")
         public List<AnimeRelated> related = new ArrayList<>();
@@ -404,7 +404,8 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             public String getCommentariesLink() {
                 try {
-                    return "http://ukiku-comments.epizy.com/comments.php?title=" + getEpTitle() + "&url=" + URLEncoder.encode(link, "UTF-8");
+                    return "https://www.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FXBwzv5Yrm_1.js%3Fversion%3D42%23cb%3Df29a45da9909%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff388549d580a978%26relation%3Dparent.parent&href=" + URLEncoder.encode(link, "UTF-8") + "&locale=es_LA&numposts=100&sdk=joey&version=v2.9&width=100%25";
+                    //return "http://ukiku-comments.epizy.com/comments.php?title=" + getEpTitle() + "&url=" + URLEncoder.encode(link, "UTF-8");
                     /*return "https://web.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FlY4eZXm_YWu.js%3Fversion%3D42%23cb%3Df3448d0a8b0514c%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff304e603e6a096%26relation%3Dparent.parent&href=" +
                             URLEncoder.encode(link, "UTF-8") +
                             "&locale=es_LA&numposts=50&sdk=joey&version=v2.3&container_width=100%&height=100%";*/

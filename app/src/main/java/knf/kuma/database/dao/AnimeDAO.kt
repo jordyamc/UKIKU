@@ -22,58 +22,70 @@ interface AnimeDAO {
     @get:Query("SELECT `key`,aid,name,link FROM AnimeObject ORDER BY name")
     val allSearch: DataSource.Factory<Int, SearchObject>
 
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject ORDER BY name")
+    val allLive: LiveData<List<DirObject>>
+
     @get:Query("SELECT link FROM AnimeObject WHERE state LIKE 'En emisión'")
     val allLinksInEmission: List<String>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY name")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY name")
     val animeDir: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY rate_stars DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY rate_stars DESC")
     val animeDirVotes: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' AND state LIKE 'En emisión' ORDER BY rate_stars DESC, rate_count+0 DESC LIMIT 10")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' AND state LIKE 'En emisión' ORDER BY rate_stars DESC, rate_count+0 DESC LIMIT 10")
     val emissionVotesLimited: LiveData<List<DirObject>>
+
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY rate_stars DESC, rate_count+0 DESC LIMIT 20")
+    val allVotesLimited: LiveData<List<DirObject>>
 
     @Query("SELECT `key`,name,link,aid,img,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY RANDOM() LIMIT 10")
     fun animesWithIDRandom(aids: List<String>): List<SearchAdvObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` ASC")
+    @Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY RANDOM() LIMIT 15")
+    fun animesDirWithIDRandom(aids: List<String>): List<DirObject>
+
+    @Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY RANDOM()")
+    fun animesDirWithIDRandomNL(aids: List<String>): LiveData<List<DirObject>>
+
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` ASC")
     val animeDirID: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` DESC")
     val animeDirAdded: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY followers+0 DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY followers+0 DESC")
     val animeDirFollowers: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY name")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY name")
     val ovaDir: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY rate_stars DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY rate_stars DESC")
     val ovaDirVotes: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY `key` ASC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY `key` ASC")
     val ovaDirID: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY `key` DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY `key` DESC")
     val ovaDirAdded: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY followers+0 DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'OVA' OR type LIKE '%special' ORDER BY followers+0 DESC")
     val ovaDirFollowers: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Película' ORDER BY name")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Película' ORDER BY name")
     val movieDir: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Película' ORDER BY rate_stars DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Película' ORDER BY rate_stars DESC")
     val movieDirVotes: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Película' ORDER BY `key` ASC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Película' ORDER BY `key` ASC")
     val movieDirID: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Película' ORDER BY `key` DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Película' ORDER BY `key` DESC")
     val movieDirAdded: DataSource.Factory<Int, DirObject>
 
-    @get:Query("SELECT `key`,aid,name,link,rate_stars FROM AnimeObject WHERE type LIKE 'Película' ORDER BY followers+0 DESC")
+    @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Película' ORDER BY followers+0 DESC")
     val movieDirFollowers: DataSource.Factory<Int, DirObject>
 
     @get:Query("SELECT count(*) FROM AnimeObject")
@@ -99,6 +111,12 @@ interface AnimeDAO {
 
     @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day AND aid NOT IN (:list) ORDER BY name")
     fun getByDay(day: Int, list: Set<String>): LiveData<MutableList<SearchObject>>
+
+    @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day ORDER BY name")
+    fun getByDay(day: Int): LiveData<MutableList<SearchObject>>
+
+    @Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day ORDER BY name")
+    fun getByDayDir(day: Int): LiveData<MutableList<DirObject>>
 
     @Query("SELECT count(*) FROM AnimeObject WHERE state = 'En emisión' AND NOT day = 0 AND aid NOT IN (:list)")
     fun getInEmission(list: Set<String>): LiveData<Int>

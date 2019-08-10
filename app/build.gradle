@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.29.0'
+        classpath 'io.fabric.tools:gradle:1.31.0'
     }
 }
 apply plugin: 'com.android.application'
@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 113
-        versionName "4.2.9"
+        versionCode 114
+        versionName "4.2.10"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {

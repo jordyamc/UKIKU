@@ -199,7 +199,7 @@
             android:name=".tv.search.TVSearch"
             android:theme="@style/AppTheme.TV.Base"/>
         <activity
-            android:name=".tv.search.TVTag"
+            android:name=".tv.search.TVDir"
             android:theme="@style/AppTheme.TV.Grid"/>
         <activity
             android:name=".download.DownloadDialogActivity"

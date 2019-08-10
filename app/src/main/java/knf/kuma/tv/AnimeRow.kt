@@ -44,4 +44,11 @@ class AnimeRow {
         this.title = title
         return this
     }
+
+    fun setList(list: List<Any>) {
+        adapter?.apply {
+            clear()
+            addAll(0, list)
+        }
+    }
 }

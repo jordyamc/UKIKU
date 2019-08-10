@@ -51,7 +51,6 @@ class PlaybackFragment : VideoSupportFragment() {
     @TargetApi(Build.VERSION_CODES.N)
     override fun onPause() {
         super.onPause()
-
         if (mPlayerGlue?.isPlaying == true)
             mPlayerGlue?.pause()
         if (Util.SDK_INT <= 23) {

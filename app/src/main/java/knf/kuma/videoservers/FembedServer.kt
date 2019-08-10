@@ -21,8 +21,7 @@ class FembedServer internal constructor(context: Context, baseLink: String) : Se
             return try {
                 val downLink = PatternUtil.extractLink(baseLink)
                 val json = JSONObject(okHttpCookies(downLink.replace("/v/", "/api/source/"), "POST").execute().body()?.string())
-                if (!json.getBoolean("success"))
-                    throw IllegalStateException("Request was not succeeded")
+                check(json.getBoolean("success")) { "Request was not succeeded" }
                 val array = json.getJSONArray("data")
                 val options = mutableListOf<Option>()
                 for (item in array) {

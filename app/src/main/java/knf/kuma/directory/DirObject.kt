@@ -1,9 +1,10 @@
 package knf.kuma.directory
 
-class DirObject {
-    var key = 0
-    var aid = ""
-    var name = ""
-    var link: String? = null
+data class DirObject(
+        var key: Int = 0,
+        var aid: String = "",
+        var name: String = "",
+        var link: String? = null,
+        var type: String = "",
     var rate_stars: String? = ""
-}
+)

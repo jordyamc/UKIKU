@@ -185,8 +185,8 @@ fun <T : View> Activity.optionalBind(@IdRes res: Int): Lazy<T?> {
     return lazy { findViewById<T?>(res) }
 }
 
-fun Request.execute(): Response {
-    return OkHttpClient().newBuilder().build().newCall(this).execute()
+fun Request.execute(followRedirects: Boolean = true): Response {
+    return OkHttpClient().newBuilder().followRedirects(followRedirects).build().newCall(this).execute()
 }
 
 val safeContext: Context
@@ -289,6 +289,8 @@ fun Any?.isNull(): Boolean {
 fun Any?.notNull(): Boolean {
     return this != null
 }
+
+fun String.r(from: String, to: String) = replace(from, to)
 
 @UiThread
 fun ImageView.setAnimatedResource(@DrawableRes res: Int) {

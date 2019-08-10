@@ -1,6 +1,7 @@
 package knf.kuma.home
 
 import knf.kuma.database.CacheDB
+import knf.kuma.directory.DirObject
 import knf.kuma.search.SearchAdvObject
 import org.jetbrains.anko.doAsync
 
@@ -30,9 +31,17 @@ object StaffRecommendations {
             "2586", "3137", "3011", "135", "136", "2110"
     )
 
+    fun randomIds(count: Int): List<String> = recommendations.shuffled().take(count)
+
     fun createList(onCreate: (list: List<SearchAdvObject>) -> Unit) {
         doAsync {
             onCreate(CacheDB.INSTANCE.animeDAO().animesWithIDRandom(recommendations))
+        }
+    }
+
+    fun createDirList(onCreate: (list: List<DirObject>) -> Unit) {
+        doAsync {
+            onCreate(CacheDB.INSTANCE.animeDAO().animesDirWithIDRandom(recommendations))
         }
     }
 }

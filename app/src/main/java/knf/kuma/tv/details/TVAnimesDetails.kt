@@ -58,7 +58,8 @@ class TVAnimesDetails : TVBaseActivity(), TVServersFactory.ServersInterface {
         private const val keyUrl = "url"
         private const val keyIsVideoServer = "is_video_server"
 
-        fun start(context: Context, url: String) {
+        fun start(context: Context, url: String?) {
+            url ?: return
             context.startActivity(Intent(context, TVAnimesDetails::class.java).putExtra(keyUrl, url))
         }
     }

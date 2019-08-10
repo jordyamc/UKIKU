@@ -11,4 +11,16 @@ open class SearchObject {
     var name = ""
     @SerializedName("adv_link")
     var link = ""
+
+    override fun equals(other: Any?): Boolean {
+        return other is SearchObject &&
+                key == other.key &&
+                aid == other.aid &&
+                name == other.name &&
+                link == other.link
+    }
+
+    override fun hashCode(): Int {
+        return "$key$aid$name$link".hashCode()
+    }
 }

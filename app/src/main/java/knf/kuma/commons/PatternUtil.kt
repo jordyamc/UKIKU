@@ -15,9 +15,9 @@ object PatternUtil {
     @Suppress("DEPRECATION")
     fun fromHtml(html: String): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(html.replace("\\\\u", "\\u"), Html.FROM_HTML_MODE_LEGACY).toString()
+            Html.fromHtml(html.r("\\\\u", "\\u").r("\\/", "/"), Html.FROM_HTML_MODE_LEGACY).toString()
         else
-            Html.fromHtml(html.replace("\\\\u", "\\u")).toString()
+            Html.fromHtml(html.r("\\\\u", "\\u").r("\\/", "/")).toString()
     }
 
     fun getLinkNumber(link: String): String {

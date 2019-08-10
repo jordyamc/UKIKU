@@ -15,7 +15,8 @@ object PicassoSingle {
         return picasso
     }
 
-    private fun create(): Picasso = Picasso.Builder(App.context).downloader(CookieImageDownloader(App.context)).build()
+    private fun create(): Picasso = Picasso.Builder(App.context)
+            .downloader(CookieImageDownloader(App.context)).build()
 
     fun clear() {
         picasso = create()
