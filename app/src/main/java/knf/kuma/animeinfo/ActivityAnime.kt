@@ -24,13 +24,12 @@ import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.animeinfo.img.ActivityImgFull
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
-import knf.kuma.commons.CastUtil
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.doOnUI
+import knf.kuma.backup.firestore.syncData
+import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirObject
+import knf.kuma.directory.DirObjectCompact
 import knf.kuma.pojos.*
 import knf.kuma.recommended.AnimeShortObject
 import knf.kuma.recommended.RankType
@@ -83,6 +82,10 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                     Answers.getInstance().logContentView(ContentViewEvent().putContentName(animeObject.name).putContentType(animeObject.type).putContentId(animeObject.aid))
                     chapters = animeObject.chapters ?: mutableListOf()
                     genres = animeObject.genres ?: mutableListOf()
+                    if (PrefsUtil.isFamilyFriendly && genres.map { it.toLowerCase() }.contains("ecchi")) {
+                        toast("Anime no familiar")
+                        onBackPressed()
+                    }
                     favoriteObject = FavoriteObject(animeObject)
                     favoriteObject?.let { fav ->
                         holder.imageView.onLongClick(returnValue = true) {
@@ -100,6 +103,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                                     AchievementManager.onFavAdded(fav)
                                     doOnUI { toast("Añadido a favoritos") }
                                 }
+                                syncData { favs() }
                             }
                         }
                         dao.isFavLive(fav.key).observe(this, Observer { holder.setFABState(it) })
@@ -144,6 +148,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                     RecommendHelper.registerAll(genres, RankType.FAV)
                     AchievementManager.onFavAdded(it)
                 }
+                syncData { favs() }
             }
         }
     }
@@ -247,6 +252,18 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         }
 
         fun open(fragment: Fragment, animeObject: SearchObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, ActivityAnime::class.java)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
+        fun open(fragment: Fragment, animeObject: DirObjectCompact, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, ActivityAnime::class.java)
             intent.data = Uri.parse(animeObject.link)

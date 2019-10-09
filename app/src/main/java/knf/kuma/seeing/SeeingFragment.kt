@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
@@ -37,6 +39,7 @@ class SeeingFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        adContainer.implBanner(AdsType.SEEING_BANNER, true)
         when (arguments?.getInt("state", 0)) {
             1 -> {
                 error_text.text = "No estas viendo ningún anime"

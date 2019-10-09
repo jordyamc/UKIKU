@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.crashlytics.android.Crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB
@@ -58,7 +60,7 @@ class HomeFragment : BottomFragment() {
             listBestEmission.updateList(it)
         })
         CacheDB.INSTANCE.queueDAO().all.observe(this, Observer {
-            doAsync { listPending.updateList(QueueObject.getOne(it)) }
+            doAsync { listPending.updateList(QueueObject.takeOne(it)) }
         })
         CacheDB.INSTANCE.seeingDAO().getAllWState(SeeingObject.STATE_CONSIDERING, SeeingObject.STATE_PAUSED).observe(this, Observer {
             listWaiting.updateList(it)
@@ -102,6 +104,8 @@ class HomeFragment : BottomFragment() {
             setViewAllClass(RecommendActivity::class.java)
         }
         listRecommendedStaff.setAdapter(SearchAdapter(this))
+        adContainer.implBanner(AdsType.HOME_BANNER, true)
+        adContainer2.implBanner(AdsType.HOME_BANNER2, true)
     }
 
     private fun filterNew(list: List<RecentObject>): List<RecentObject> {

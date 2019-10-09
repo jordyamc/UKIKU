@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/lay_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     android:orientation="vertical"
-    android:visibility="gone">
+    android:visibility="gone"
+    tools:visibility="visible">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="Iniciar sesión"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/login_dropbox"
@@ -27,7 +28,30 @@
         android:textColor="#fff"
         android:theme="@style/AppTheme.Button.Dropbox"
         app:icon="@drawable/ic_dropbox"
-        app:iconTint="#fff"/>
+        app:iconTint="#fff" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/login_firestore"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="Firestore"
+        android:textColor="@color/raised_button_text_state"
+        app:backgroundTint="@color/firebase_selector"
+        app:icon="@drawable/ic_cloud_firestore"
+        app:iconTint="@color/raised_button_text_state" />
+
+    <TextView
+        android:id="@+id/ads_required"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Requiere anuncios"
+        android:textColor="?colorSecondary"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/login_local"
@@ -40,6 +64,6 @@
         android:textColor="#fff"
         android:theme="@style/AppTheme.Button.Local"
         app:icon="@drawable/ic_save_w"
-        app:iconTint="#fff"/>
+        app:iconTint="#fff" />
 
 </LinearLayout>

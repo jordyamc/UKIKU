@@ -20,6 +20,8 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onCancel
+import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.crashlytics.android.Crashlytics
 import knf.kuma.App
@@ -27,6 +29,7 @@ import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.R
 import knf.kuma.backup.Backups
+import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.commons.*
 import knf.kuma.custom.PreferenceFragmentCompat
 import knf.kuma.database.CacheDB
@@ -118,7 +121,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         }
                     true
                 }
-                if (Backups.type != Backups.Type.NONE) {
+                if (Backups.type == Backups.Type.DROPBOX) {
                     if (Network.isConnected) {
                         activity?.let {
                             preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "Cargando..."
@@ -153,8 +156,10 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     } else {
                         preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "Sin internet"
                     }
-                } else {
+                } else if (Backups.type == Backups.Type.NONE) {
                     preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "Sin cuenta para respaldos"
+                } else {
+                    preferenceScreen.findPreference<Preference>(keyAutoBackup)?.isVisible = false
                 }
                 preferenceScreen.findPreference<Preference>(keyAutoBackup)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                     BackUpWork.reSchedule(Integer.valueOf((newValue as? String) ?: "0"))
@@ -213,6 +218,78 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     PreferenceManager.getDefaultSharedPreferences(safeContext).edit().putString("theme_value", newValue.toString()).apply()
                     WEmisionProvider.update(safeContext)
                     activity?.recreate()
+                    true
+                }
+                preferenceScreen.findPreference<SwitchPreference>("ads_enabled")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    if (newValue == false && !BuildConfig.DEBUG) {
+                        context?.let { FirestoreManager.doSignOut(it) }
+                        Backups.type = Backups.Type.NONE
+                    }
+                    true
+                }
+                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+                    if (newValue == true) {
+                        activity?.let {
+                            MaterialDialog(it).safeShow {
+                                title(text = "Configurar contraseña")
+                                input { _, input ->
+                                    doOnUI {
+                                        val crypted = input.toString().encrypt(BuildConfig.CIPHER_PWD)
+                                        PrefsUtil.ffPass = crypted
+                                        val file = ffFile
+                                        if (!file.exists())
+                                            file.createNewFile()
+                                        file.writeText(crypted)
+                                        doAsync { CacheDB.INSTANCE.animeDAO().nukeEcchi() }
+                                    }
+                                }
+                                onCancel {
+                                    PrefsUtil.isFamilyFriendly = false
+                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                }
+                            }
+                        }
+                    } else {
+                        activity?.let {
+                            MaterialDialog(it).safeShow {
+                                title(text = "Ingresa contraseña")
+                                input { _, input ->
+                                    doOnUI {
+                                        val file = ffFile
+                                        if (file.exists()) {
+                                            val text = file.readText()
+                                            val decrypt = text.decrypt(BuildConfig.CIPHER_PWD)
+                                            if (decrypt == input.toString()) {
+                                                PrefsUtil.ffPass = ""
+                                                file.delete()
+                                                DirectoryUpdateService.run(context)
+                                            } else {
+                                                PrefsUtil.isFamilyFriendly = true
+                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                                Toaster.toast("Contraseña incorrecta")
+                                            }
+                                        } else {
+                                            val decrypt = PrefsUtil.ffPass.decrypt(BuildConfig.CIPHER_PWD)
+                                            if (decrypt != input.toString()) {
+                                                file.createNewFile()
+                                                file.writeText(decrypt)
+                                                PrefsUtil.isFamilyFriendly = true
+                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                                Toaster.toast("Contraseña incorrecta")
+                                            } else {
+                                                PrefsUtil.ffPass = ""
+                                                DirectoryUpdateService.run(context)
+                                            }
+                                        }
+                                    }
+                                }
+                                onCancel {
+                                    PrefsUtil.isFamilyFriendly = true
+                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                }
+                            }
+                        }
+                    }
                     true
                 }
                 preferenceScreen.findPreference<Preference>("recents_time")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->

@@ -28,7 +28,7 @@ class AnimeInfo(code: String) {
                     else -> AnimeObject.Day.NONE
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                //e.printStackTrace()
                 return AnimeObject.Day.NONE
             }
         }

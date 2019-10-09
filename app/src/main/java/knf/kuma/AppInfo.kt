@@ -6,14 +6,23 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList
+import knf.kuma.ads.FullscreenAdLoader
+import knf.kuma.ads.getFAdLoaderInterstitial
+import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.EAUnlockActivity
+import knf.kuma.commons.Economy
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
+import knf.tools.kprobability.item
+import knf.tools.kprobability.probabilityOf
 
 /**
  * Created by jordy on 05/03/2018.
@@ -35,6 +44,26 @@ class AppInfo : MaterialAboutActivity() {
             return uriBuilder.build()
         }
 
+    private val rewardedAd: FullscreenAdLoader by lazy { getFAdLoaderRewarded(this, ::onUpdateCount) }
+    private var interstitial: FullscreenAdLoader = getFAdLoaderInterstitial(this, ::onUpdateCount)
+    private lateinit var videoItem: MaterialAboutActionItem
+
+    private fun showAd() {
+        probabilityOf<() -> Unit> {
+            item({ rewardedAd.show() }, 70.0)
+            item({ interstitial.show() }, 30.0)
+        }.random()()
+    }
+
+    private fun onUpdateCount() {
+        PrefsUtil.rewardedVideoCount = PrefsUtil.rewardedVideoCount + 1
+        doOnUI {
+            videoItem.subText = "Vistos: ${PrefsUtil.rewardedVideoCount}"
+            setMaterialAboutList(getMaterialAboutList(this))
+        }
+    }
+
+
     override fun getMaterialAboutList(context: Context): MaterialAboutList {
         val infoCard = MaterialAboutCard.Builder()
         infoCard.addItem(ConvenienceBuilder.createAppTitleItem(this))
@@ -49,8 +78,14 @@ class AppInfo : MaterialAboutActivity() {
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_paypal), "Paypal", false, paypalUri))
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_patreon), "Patreon", false, Uri.parse("https://www.patreon.com/animeflvapp")))
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_cuplogo), "Ko-fi", false, Uri.parse("https://ko-fi.com/unbarredstream")))
+        if (BuildConfig.BUILD_TYPE != "playstore")
+            donateCard.addItem(MaterialAboutActionItem.Builder().text("Ver anuncio").subText("Vistos: ${PrefsUtil.rewardedVideoCount}").icon(R.drawable.ic_cash).setOnClickAction {
+                showAd()
+            }.build().also { videoItem = it })
+
         val extraCard = MaterialAboutCard.Builder()
         extraCard.title("Extras")
+        extraCard.addItem(MaterialAboutActionItem.Builder().text("Cartera de loli-coins").icon(R.drawable.ic_coin).setOnClickAction { Economy.showWallet(this, true) { showAd() } }.build())
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_web), "Página web", true, Uri.parse("https://ukiku.ga")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_github), "Proyecto en github", true, Uri.parse("https://github.com/jordyamc/UKIKU")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_facebook), "Facebook", true, Uri.parse("https://www.facebook.com/ukikuapp")))
@@ -68,6 +103,12 @@ class AppInfo : MaterialAboutActivity() {
 
     override fun getActivityTitle(): CharSequence? {
         return "Acerca de"
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        rewardedAd.load()
+        interstitial.load()
     }
 
     override fun onResume() {

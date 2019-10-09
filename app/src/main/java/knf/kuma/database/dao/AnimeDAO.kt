@@ -217,4 +217,7 @@ interface AnimeDAO {
     @Query("DELETE FROM animeobject")
     fun nuke()
 
+    @Query("DELETE FROM animeobject WHERE UPPER(genres) LIKE '%ECCHI%'")
+    fun nukeEcchi()
+
 }

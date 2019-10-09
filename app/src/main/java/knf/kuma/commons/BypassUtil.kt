@@ -72,6 +72,26 @@ class BypassUtil {
             }
         }
 
+        fun isNeededFlag(): Int {
+            return try {
+                val response = jsoupCookies("https://animeflv.net/").execute()
+                when (response.statusCode()) {
+                    503 -> 1
+                    403 -> 2
+                    else -> 0
+                }
+            } catch (e: HttpStatusException) {
+                when (e.statusCode) {
+                    503 -> 1
+                    403 -> 2
+                    else -> 0
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                0
+            }
+        }
+
         fun isConnectionBlocked(): Boolean {
             return try {
                 val response = jsoupCookies("https://animeflv.net/").execute()

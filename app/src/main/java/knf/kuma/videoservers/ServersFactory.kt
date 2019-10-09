@@ -20,6 +20,8 @@ import com.google.android.material.snackbar.Snackbar
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.animeinfo.ktx.fileName
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
@@ -301,9 +303,11 @@ class ServersFactory {
     private fun startDownload(option: Option) {
         if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url)
         downloadObject.server = option.server ?: ""
-        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0"))
+        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0")) {
             CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(chapter?.fileName
                     ?: "null")), true, chapter))
+            syncData { queue() }
+        }
         Answers.getInstance().logCustom(CustomEvent("Download").putCustomAttribute("Server", option.server))
         downloadObject.link = option.url
         downloadObject.headers = option.headers

@@ -13,6 +13,8 @@ import android.webkit.WebViewClient
 import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
+import knf.kuma.BuildConfig
+import knf.kuma.Main
 import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
 import knf.kuma.jobscheduler.DirUpdateWork
@@ -25,8 +27,12 @@ import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.tv_activity_main.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecker.CheckListener {
 
     private var fragment: TVMainFragment? = null
@@ -34,7 +40,12 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState==null){
+        if (BuildConfig.BUILD_TYPE == "playstore") {
+            finish()
+            startActivity(Intent(this, Main::class.java))
+            return
+        }
+        if (savedInstanceState == null) {
             fragment = TVMainFragment.get().also {
                 addFragment(it)
             }

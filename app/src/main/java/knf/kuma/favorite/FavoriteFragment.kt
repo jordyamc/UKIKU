@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.FragmentActivity
@@ -24,6 +25,9 @@ import com.crashlytics.android.Crashlytics
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.FavSection
@@ -92,6 +96,8 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         recyclerView = view.find(R.id.recycler)
         recyclerView.verifyManager()
         errorLayout = view.find(R.id.error)
+        if (PrefsUtil.layType == "1")
+            view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.FAVORITE_BANNER, true)
         return view
     }
 
@@ -171,6 +177,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             edited?.let { favObj ->
                                 favObj.category = input
                                 CacheDB.INSTANCE.favsDAO().addFav(favObj)
+                                syncData { favs() }
                                 edited = null
                             }
                         }
@@ -198,6 +205,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             edited?.let {
                                 it.category = input
                                 CacheDB.INSTANCE.favsDAO().addFav(it)
+                                syncData { favs() }
                             }
                             doOnUI {
                                 showAddToCategory(edited == null, input)
@@ -229,6 +237,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                                 favoriteObject.category = input
                             }
                             CacheDB.INSTANCE.favsDAO().addAll(objects)
+                            syncData { favs() }
                         }
                     }
                 }
@@ -262,6 +271,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                                     list.add(favoriteObject)
                                 }
                                 CacheDB.INSTANCE.favsDAO().addAll(list)
+                                syncData { favs() }
                             }
                         }
                     }
@@ -285,6 +295,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             favoriteObject.category = FavoriteObject.CATEGORY_NONE
                         }
                         CacheDB.INSTANCE.favsDAO().addAll(objects)
+                        syncData { favs() }
                     }
                 }
                 negativeButton(text = "Cancelar")
@@ -312,6 +323,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             list.add(favoriteObject)
                         }
                         CacheDB.INSTANCE.favsDAO().addAll(list)
+                        syncData { favs() }
                     }
                     positiveButton(text = "agregar")
                     if (isNotDefault || !isEdit)
@@ -331,6 +343,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                                             favoriteObject.category = FavoriteObject.CATEGORY_NONE
                                         }
                                         CacheDB.INSTANCE.favsDAO().addAll(objects)
+                                        syncData { favs() }
                                     }
                                 }
                             else if (!isEdit)
@@ -380,6 +393,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                                     edited = favoriteObject.also {
                                         it.category = if (text == "Sin categoría") "_NONE_" else text
                                         CacheDB.INSTANCE.favsDAO().addFav(it)
+                                        syncData { favs() }
                                     }
                                 } else
                                     Toaster.toast("Error al mover")

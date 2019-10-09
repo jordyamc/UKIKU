@@ -5,7 +5,11 @@ import android.os.Bundle
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class SplashActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

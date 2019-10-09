@@ -3,6 +3,7 @@ package knf.kuma.pojos;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -11,13 +12,19 @@ import androidx.room.PrimaryKey;
 /**
  * Created by jordy on 26/03/2018.
  */
-
+@Keep
 @Entity
 public class GenreStatusObject implements Comparable<GenreStatusObject> {
     public String name;
     public int count;
     @PrimaryKey
     public int key;
+
+    public GenreStatusObject() {
+        this.key = 0;
+        this.name = "";
+        this.count = 0;
+    }
 
     public GenreStatusObject(int key, String name, int count) {
         this.key = key;
@@ -32,15 +39,11 @@ public class GenreStatusObject implements Comparable<GenreStatusObject> {
         this.count = 0;
     }
 
-    public static List<String> getNames(List<GenreStatusObject> list) {
+    public static List<String> names(List<GenreStatusObject> list) {
         List<String> names = new ArrayList<>();
         for (GenreStatusObject object : list)
-            names.add(object.getName());
+            names.add(object.name);
         return names;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public boolean isBlocked() {
@@ -66,6 +69,6 @@ public class GenreStatusObject implements Comparable<GenreStatusObject> {
 
     @Override
     public int compareTo(@NonNull GenreStatusObject o) {
-        return name.compareTo(o.getName());
+        return name.compareTo(o.name);
     }
 }

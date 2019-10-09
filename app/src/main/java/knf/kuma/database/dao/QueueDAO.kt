@@ -15,6 +15,9 @@ interface QueueDAO {
     @get:Query("SELECT * FROM queueobject ORDER BY name")
     val all: LiveData<MutableList<QueueObject>>
 
+    @get:Query("SELECT * FROM queueobject ORDER BY name")
+    val allRaw: MutableList<QueueObject>
+
     @get:Query("SELECT * FROM queueobject ORDER BY time ASC")
     val allAsort: LiveData<MutableList<QueueObject>>
 
@@ -39,6 +42,9 @@ interface QueueDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun add(queueObject: QueueObject)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun add(queueObjects: List<QueueObject>)
+
     @Update
     fun update(vararg objects: QueueObject)
 
@@ -53,4 +59,7 @@ interface QueueDAO {
 
     @Query("DELETE FROM queueobject WHERE eid LIKE :eid")
     fun removeByEID(eid: String)
+
+    @Query("DELETE FROM queueobject")
+    fun nuke()
 }

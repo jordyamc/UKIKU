@@ -1,8 +1,20 @@
 package knf.kuma.ads
 
+import android.content.Context
 import android.view.ViewGroup
 import com.appbrain.AppBrainBanner
+import com.appbrain.BannerListener
+import com.appbrain.InterstitialBuilder
+import com.appbrain.InterstitialListener
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.CustomEvent
+import knf.kuma.commons.Economy
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
+import knf.kuma.news.AdNewsObject
+import knf.kuma.news.NewsObject
+import knf.kuma.pojos.Achievement
+import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
 
@@ -11,7 +23,22 @@ object AdsUtilsBrains {
     const val RECENT_BANNER2 = "recent_banner_2"
     const val FAVORITE_BANNER = "favorite_banner"
     const val FAVORITE_BANNER2 = "favorite_banner_2"
+    const val DIRECTORY_BANNER = "directory_banner"
+    const val HOME_BANNER = "home_banner"
+    const val HOME_BANNER2 = "home_banner_2"
+    const val EMISSION_BANNER = "emission_banner"
+    const val SEEING_BANNER = "seeing_banner"
+    const val RECOMMEND_BANNER = "recommend_banner"
+    const val QUEUE_BANNER = "queue_banner"
+    const val RECORD_BANNER = "record_banner"
+    const val RANDOM_BANNER = "random_banner"
+    const val NEWS_BANNER = "news_banner"
+    const val INFO_BANNER = "info_banner"
+    const val ACHIEVEMENT_BANNER = "achievement_banner"
+    const val EXPLORER_BANNER = "explorer_banner"
     const val CAST_BANNER = "cast_banner"
+    const val REWARDED = "rewarded"
+    const val INTERSTITIAL = "interstitial"
 }
 
 fun MutableList<RecentObject>.implAdsRecentBrains() {
@@ -56,12 +83,129 @@ fun MutableList<FavoriteObject>.implAdsFavoriteBrains() {
     }
 }
 
+fun MutableList<NewsObject>.implAdsNewsBrain() {
+    if (!PrefsUtil.isAdsEnabled || isEmpty()) return
+    var adIndex = 0
+    ArrayList(this).forEachIndexed { index, _ ->
+        if (index % 5 == 0 && index > 0) {
+            val adID: String = when (adIndex) {
+                0 -> {
+                    adIndex = 1
+                    AdsUtilsBrains.NEWS_BANNER
+                }
+                else -> {
+                    adIndex = 0
+                    AdsUtilsBrains.NEWS_BANNER
+                }
+            }
+            add(index, AdNewsObject(adID))
+        }
+    }
+}
+
+fun MutableList<Achievement>.implAdsAchievementBrain() {
+    if (!PrefsUtil.isAdsEnabled || isEmpty()) return
+    var adIndex = 0
+    ArrayList(this).forEachIndexed { index, _ ->
+        if (index % 8 == 0 && index > 0) {
+            val adID: String = when (adIndex) {
+                0 -> {
+                    adIndex = 1
+                    AdsUtilsBrains.ACHIEVEMENT_BANNER
+                }
+                else -> {
+                    adIndex = 0
+                    AdsUtilsBrains.ACHIEVEMENT_BANNER
+                }
+            }
+            add(index, AchievementAd(adID))
+        }
+    }
+}
+
 fun ViewGroup.implBannerCastBrains() {
     this.implBannerBrains(AdsUtilsBrains.CAST_BANNER)
 }
 
+fun ViewGroup.implBannerBrains(unitID: AdsType, isSmart: Boolean = false) {
+    val id = when (unitID) {
+        AdsType.RECENT_BANNER -> AdsUtilsBrains.RECENT_BANNER
+        AdsType.RECENT_BANNER2 -> AdsUtilsBrains.RECENT_BANNER2
+        AdsType.FAVORITE_BANNER -> AdsUtilsBrains.FAVORITE_BANNER
+        AdsType.FAVORITE_BANNER2 -> AdsUtilsBrains.FAVORITE_BANNER2
+        AdsType.DIRECTORY_BANNER -> AdsUtilsBrains.DIRECTORY_BANNER
+        AdsType.HOME_BANNER -> AdsUtilsBrains.HOME_BANNER
+        AdsType.HOME_BANNER2 -> AdsUtilsBrains.HOME_BANNER2
+        AdsType.EMISSION_BANNER -> AdsUtilsBrains.EMISSION_BANNER
+        AdsType.SEEING_BANNER -> AdsUtilsBrains.SEEING_BANNER
+        AdsType.RECOMMEND_BANNER -> AdsUtilsBrains.RECOMMEND_BANNER
+        AdsType.QUEUE_BANNER -> AdsUtilsBrains.QUEUE_BANNER
+        AdsType.RECORD_BANNER -> AdsUtilsBrains.RECORD_BANNER
+        AdsType.RANDOM_BANNER -> AdsUtilsBrains.RANDOM_BANNER
+        AdsType.NEWS_BANNER -> AdsUtilsBrains.NEWS_BANNER
+        AdsType.INFO_BANNER -> AdsUtilsBrains.INFO_BANNER
+        AdsType.ACHIEVEMENT_BANNER -> AdsUtilsBrains.ACHIEVEMENT_BANNER
+        AdsType.EXPLORER_BANNER -> AdsUtilsBrains.EXPLORER_BANNER
+        AdsType.CAST_BANNER -> AdsUtilsBrains.CAST_BANNER
+        AdsType.REWARDED -> AdsUtilsBrains.REWARDED
+        AdsType.INTERSTITIAL -> AdsUtilsBrains.INTERSTITIAL
+    }
+    implBannerBrains(id, isSmart)
+}
+
 fun ViewGroup.implBannerBrains(unitID: String, isSmart: Boolean = false) {
-    removeAllViews()
-    val adView = AppBrainBanner(context)
-    addView(adView)
+    if (PrefsUtil.isAdsEnabled)
+        doOnUI {
+            removeAllViews()
+            val adView = AppBrainBanner(context)
+            adView.bannerListener = object : BannerListener {
+                override fun onClick() {
+                    Answers.getInstance().logCustom(CustomEvent("Ad clicked"))
+                }
+
+                override fun onAdRequestDone(p0: Boolean) {
+                }
+            }
+            addView(adView)
+        }
+}
+
+fun getFAdLoaderBrains(context: Context, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderBrains(context, onUpdate)
+
+class FAdLoaderBrains(private val context: Context, onUpdate: () -> Unit) : FullscreenAdLoader {
+    var isAdClicked = false
+    private val builder: InterstitialBuilder by lazy {
+        InterstitialBuilder.create().apply {
+            setOnDoneCallback { builder.preload(context) }
+            listener = object : InterstitialListener {
+                override fun onClick() {
+                    Answers.getInstance().logCustom(CustomEvent("Interstitial Ad clicked"))
+                    isAdClicked = true
+                }
+
+                override fun onDismissed(p0: Boolean) {
+                    Answers.getInstance().logCustom(CustomEvent("Interstitial Ad watched"))
+                    Economy.reward(isAdClicked)
+                    onUpdate()
+                }
+
+                override fun onAdFailedToLoad(p0: InterstitialListener.InterstitialError?) {
+                }
+
+                override fun onPresented() {
+                }
+
+                override fun onAdLoaded() {
+                }
+            }
+        }.also { it.preload(context) }
+    }
+
+    override fun load() {
+        builder.preload(context)
+    }
+
+    override fun show() {
+        builder.show(context)
+    }
 }

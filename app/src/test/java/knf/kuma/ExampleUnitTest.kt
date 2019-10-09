@@ -1,5 +1,6 @@
 package knf.kuma
 
+import knf.kuma.achievements.LevelCalculator
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -13,5 +14,15 @@ class ExampleUnitTest {
     @Throws(Exception::class)
     fun addition_isCorrect() {
         assertEquals(4, (2 + 2).toLong())
+    }
+
+    @Test
+    fun testPoints() {
+        val lc = LevelCalculator()
+        var last = 0
+        lc.levels.forEachIndexed { index, i ->
+            print("Level ${index + 1}: ${i - last}\n")
+            last = i
+        }
     }
 }

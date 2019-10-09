@@ -15,6 +15,7 @@ import knf.kuma.App
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
+import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.animeinfo.viewholders.AnimeChaptersHolder
 import knf.kuma.commons.*
 import knf.kuma.custom.snackbar.SnackProgressBar

@@ -10,12 +10,15 @@ import com.crashlytics.android.Crashlytics
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.viewholders.DirMainFragmentHolder
+import kotlinx.android.synthetic.main.fragment_directory.*
 
 class DirectoryFragment : BottomFragment() {
     private var fragmentHolder: DirMainFragmentHolder? = null
@@ -51,6 +54,11 @@ class DirectoryFragment : BottomFragment() {
         EAHelper.enter1("D")
         Crashlytics.setString("screen", "Directory")
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
     }
 
     override fun onDestroyView() {

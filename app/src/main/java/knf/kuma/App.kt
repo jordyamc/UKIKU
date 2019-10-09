@@ -15,6 +15,7 @@ import com.appbrain.AppBrain
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.core.CrashlyticsCore
+import com.google.android.gms.ads.MobileAds
 import es.munix.multidisplaycast.CastManager
 import io.branch.referral.Branch
 import io.fabric.sdk.android.Fabric
@@ -27,7 +28,9 @@ import knf.kuma.jobscheduler.BackUpWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.widgets.emision.WEmissionService
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
+import kotlin.contracts.ExperimentalContracts
 
 class App : Application() {
     //private lateinit var appCoinsAds: AppCoinsAds
@@ -47,6 +50,8 @@ class App : Application() {
         manager?.createNotificationChannel(NotificationChannel(WEmissionService.CHANNEL, "Actualizador de widget", NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
     }
 
+    @ExperimentalCoroutinesApi
+    @ExperimentalContracts
     override fun onCreate() {
         super.onCreate()
         context = this
@@ -55,6 +60,7 @@ class App : Application() {
         CastManager.register(this)
         AchievementManager.init(this)
         AppBrain.addTestDevice("6e5a4187367ad5c0")
+        MobileAds.initialize(this)
         initAppCoins()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels()
@@ -64,6 +70,7 @@ class App : Application() {
                     Answers()
             )
             Branch.getAutoInstance(context)
+            //FirestoreManager.start()
         }
     }
 

@@ -20,9 +20,9 @@ open class MediaCatalog(private val list: MutableList<MediaDescriptionCompat>, p
             playList.forEach {
                 list.add(
                         with(MediaDescriptionCompat.Builder()) {
-                            setTitle(it.title)
+                            setTitle(it.title())
                             setMediaId(count.toString())
-                            setMediaUri(it.getUri())
+                            setMediaUri(it.createUri())
                             build()
                         })
                 count++

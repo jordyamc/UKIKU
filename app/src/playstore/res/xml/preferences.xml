@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Actualizaciones">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/recents_options"
+            android:entryValues="@array/recents_values"
+            android:icon="@drawable/ic_recents"
+            android:key="recents_time"
+            android:summary="%s"
+            android:title="Revisar recientes" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_group"
+            android:key="group_notifications"
+            android:title="Agrupar notificaciones" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_heart"
+            android:key="notify_favs"
+            android:summaryOff="Se notificaran todos los capitulos"
+            android:summaryOn="Se notificaran capitulos solo si estan en favoritos"
+            android:title="Solo favoritos" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_img"
+            android:key="recent_image"
+            android:summary="Episodios recientes"
+            android:title="Portada en notificación" />
+        <ListPreference
+            android:defaultValue="7"
+            android:entries="@array/dir_options"
+            android:entryValues="@array/dir_values"
+            android:icon="@drawable/ic_directory"
+            android:key="dir_update_time"
+            android:summary="%s"
+            android:title="Recrear directorio" />
+        <Preference
+            android:icon="@drawable/ic_note"
+            android:key="custom_tone"
+            android:summary="Sistema"
+            android:title="Tono de notificación" />
+        <ListPreference
+            android:defaultValue="0"
+            android:enabled="false"
+            android:entries="@array/autobackup"
+            android:entryValues="@array/autobackup_values"
+            android:icon="@drawable/ic_cloud_upload"
+            android:key="auto_backup"
+            android:summary="%s"
+            android:title="Auto respaldo" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="storage_group"
+        android:title="Almacenamiento"
+        app:isPreferenceVisible="false">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/storage_type"
+            android:entryValues="@array/storage_values"
+            android:icon="@drawable/ic_download"
+            android:key="download_type"
+            android:summary="%s"
+            android:title="Descargas" />
+        <Preference
+            android:icon="@drawable/ic_download"
+            android:key="download_type_q"
+            android:title="Descargas" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_hide_pref"
+            android:key="hide_chaps"
+            android:title="Ocultar de galeria" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_import"
+            android:key="show_import"
+            android:title="Importar archivos" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/savetype"
+            android:entryValues="@array/savetype_values"
+            android:icon="@drawable/ic_save"
+            android:key="save_type"
+            android:summary="%s"
+            android:title="Formato de guardado" />
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/downloader_type"
+            android:entryValues="@array/downloader_type_values"
+            android:icon="@drawable/ic_downloader"
+            android:key="downloader_type"
+            android:summary="%s"
+            android:title="Administrador de descarga" />
+        <ListPreference
+            android:defaultValue="3"
+            android:entries="@array/parallel_count"
+            android:entryValues="@array/parallel_count"
+            android:icon="@drawable/ic_download_multiple"
+            android:key="max_parallel_downloads"
+            android:summary="Máximo %s"
+            android:title="Descargas paralelas" />
+        <ListPreference
+            android:defaultValue="32"
+            android:entries="@array/buffer_size"
+            android:entryValues="@array/buffer_size_values"
+            android:icon="@drawable/ic_buffer"
+            android:key="buffer_size"
+            android:summary="%s"
+            android:title="Tamaño de buffer" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Reproducción"
+        app:isPreferenceVisible="false">
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/player_options"
+            android:entryValues="@array/player_values"
+            android:icon="@drawable/ic_player"
+            android:key="player_type"
+            android:summary="%s"
+            android:title="Tipo de reproductor" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/player_resize_options"
+            android:entryValues="@array/player_resize_values"
+            android:icon="@drawable/ic_resize"
+            android:key="player_resize"
+            android:summary="%s"
+            android:title="Redimensión de video" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_experimental"
+            android:key="experimental_player"
+            android:title="Reproductor experimental" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:dependency="experimental_player"
+            android:icon="@drawable/ic_library_video"
+            android:key="experimental_okhttp"
+            android:summary="Mejora la conexión en algunos casos"
+            android:title="Usar OkHttp" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_samsung_tv"
+            android:key="force_local_cast"
+            android:summary="Usar proxy para cast"
+            android:title="Cast local" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_remember"
+            android:key="remember_server"
+            android:title="Recordar último servidor" />
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Diseño">
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/recents_type"
+            android:entryValues="@array/recents_type_values"
+            android:icon="@drawable/ic_home"
+            android:key="recents_design"
+            android:summary="%s"
+            android:title="Diseño de recientes" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_setting_asc_list"
+            android:key="asc_chapters"
+            android:summaryOff="Descendente"
+            android:summaryOn="Ascendente"
+            android:title="Orden de capitulos" />
+        <ListPreference
+            android:defaultValue="@string/layType"
+            android:entries="@array/layType_options"
+            android:entryValues="@array/layType_values"
+            android:icon="@drawable/ic_lay_type"
+            android:key="lay_type"
+            android:summary="%s"
+            android:title="Diseño de listas" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_download_progress"
+            android:key="show_progress"
+            android:title="Progreso de descarga" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_sectioned_favs"
+            android:key="fav_sections"
+            android:title="Favoritos por categoria" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_number"
+            android:key="show_fav_count"
+            android:title="Indicador de favoritos" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_collapse"
+            android:key="collapse_dir_nots"
+            android:summary="Crear y actualizar directorio"
+            android:title="Notificaciones pequeñas" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_scale"
+            android:key="scale_img"
+            android:summary="Portada en pantalla completa"
+            android:title="Mejor calidad de imagen" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_animations"
+            android:key="smooth_animations"
+            android:title="Mejorar animaciones" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_heart_full_menu"
+            android:key="show_favs"
+            android:summary="Marcar favoritos en emisión"
+            android:title="Indicador de favoritos" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_list_placeholder"
+            android:key="list_placeholder"
+            android:title="Usar placeholder en listas" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_cash"
+            android:key="ads_enabled"
+            android:summary="Mostrar anuncios para ayudar al programador"
+            android:title="Mostrar anuncios" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="category_design"
+        android:title="Personalización">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/theme_options"
+            android:entryValues="@array/theme_values"
+            android:icon="@drawable/ic_theme"
+            android:key="theme_option"
+            android:summary="%s"
+            android:title="Estilo de tema" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/theme_colors"
+            android:entryValues="@array/theme_colors_values"
+            android:icon="@drawable/ic_palette"
+            android:key="theme_color"
+            android:summary="%s"
+            android:title="Color de tema" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Extras">
+
+        <androidx.preference.ListPreference
+            android:defaultValue="10"
+            android:entries="@array/timeout_options"
+            android:entryValues="@array/timeout_values"
+            android:icon="@drawable/ic_timeout"
+            android:key="timeout_time"
+            android:summary="%s"
+            android:title="Espera de conexión" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_incognito"
+            android:key="default_useragent"
+            android:summaryOff="Se usará agente al azar en bypass"
+            android:summaryOn="Se usará agente por defecto en bypass"
+            android:title="Usar agente del dispositivo" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_setting_gps"
+            android:key="daynigth_permission"
+            android:title="Tema dia/noche preciso" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_trophy_normal"
+            android:key="achievements_permissions"
+            android:title="Habilitar logros" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_changelog_get"
+            android:key="changelog_load"
+            android:summaryOff="Web"
+            android:summaryOn="Archivo local"
+            android:title="Obtencion de changelog" />
+        <Preference
+            android:icon="@drawable/ic_settings_reload"
+            android:key="dir_update"
+            android:title="Actualizar directorio" />
+        <Preference
+            android:icon="@drawable/ic_danger"
+            android:key="dir_destroy"
+            android:title="Recrear directorio" />
+    </PreferenceCategory>
+</PreferenceScreen>

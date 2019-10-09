@@ -2,12 +2,14 @@ package knf.kuma.pojos;
 
 import com.google.gson.annotations.SerializedName;
 
+import androidx.annotation.Keep;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import knf.kuma.database.CacheDBWrap;
 import knf.kuma.search.SearchObject;
 
+@Keep
 @Entity
 public class RecordObject {
     @SerializedName("key")

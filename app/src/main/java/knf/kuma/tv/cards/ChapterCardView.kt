@@ -19,7 +19,7 @@ class ChapterCardView(context: Context) : BindableCardView<AnimeObject.WebInfo.A
 
     override fun bind(data: AnimeObject.WebInfo.AnimeChapter) {
         PicassoSingle.get().load(data.img).into(imageView)
-        indicator?.visibility = if (CacheDB.INSTANCE.chaptersDAO().chapterIsSeen(data.eid)) View.VISIBLE else View.GONE
+        indicator?.visibility = if (CacheDB.INSTANCE.seenDAO().chapterIsSeen(data.eid)) View.VISIBLE else View.GONE
         chapter?.text = data.number
     }
 }

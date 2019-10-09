@@ -3,6 +3,7 @@ package knf.kuma.pojos
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import androidx.annotation.Keep
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.room.Entity
@@ -17,18 +18,19 @@ import knf.kuma.database.BaseConverter
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Keep
 @Entity
 @TypeConverters(BaseConverter::class)
-data class Achievement(
+open class Achievement(
         @SerializedName("key")
         @PrimaryKey
-        var key: Long,
+        var key: Long = -1,
         @SerializedName("name")
-        var name: String,
+        var name: String = "",
         @SerializedName("description")
-        var description: String,
+        var description: String = "",
         @SerializedName("points")
-        var points: Int,
+        var points: Int = -1,
         @SerializedName("isSecret")
         var isSecret: Boolean = false,
         @SerializedName("group")
@@ -40,7 +42,9 @@ data class Achievement(
         @SerializedName("goal")
         var goal: Int = 0,
         @SerializedName("isUnlocked")
-        var isUnlocked: Boolean = false
+        var isUnlocked: Boolean = false,
+        @SerializedName("isRevealed")
+        var isRevealed: Boolean = false
 ) {
 
     fun getState(): String {
@@ -55,21 +59,21 @@ data class Achievement(
     }
 
     fun usableName(): String {
-        return if (isSecret && !isUnlocked)
+        return if (isSecret && !isUnlocked && !isRevealed)
             "Logro secreto"
         else
             name
     }
 
     fun usableDescription(): String {
-        return if (isSecret && !isUnlocked)
+        return if (isSecret && !isUnlocked && !isRevealed)
             "Usa mas la app para desbloquear"
         else
             description
     }
 
     fun usableIcon(): Int {
-        return if (isSecret && !isUnlocked)
+        return if (isSecret && !isUnlocked && !isRevealed)
             R.drawable.ic_locked
         else
             AchievementManager.getIcon(key)

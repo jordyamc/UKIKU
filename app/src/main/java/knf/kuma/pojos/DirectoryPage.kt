@@ -1,10 +1,8 @@
 package knf.kuma.pojos
 
 import android.util.Log
-import knf.kuma.commons.Network
-import knf.kuma.commons.execute
-import knf.kuma.commons.jsoupCookies
-import knf.kuma.commons.okHttpCookies
+import knf.kuma.BuildConfig
+import knf.kuma.commons.*
 import knf.kuma.database.dao.AnimeDAO
 import pl.droidsonroids.jspoon.Jspoon
 import pl.droidsonroids.jspoon.annotation.Selector
@@ -24,8 +22,17 @@ class DirectoryPage {
                         val body = response.body()?.string()
                         if (response.code() == 200 && body != null) {
                             val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
-                            animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
-                            Log.e("Directory Getter", "Added: https://animeflv.net$link")
+                            if (BuildConfig.BUILD_TYPE != "playstore" && !PrefsUtil.isFamilyFriendly) {
+                                animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
+                                Log.e("Directory Getter", "Added: https://animeflv.net$link")
+                            } else {
+                                if (webInfo.genres.contains("Ecchi"))
+                                    Log.e("Directory Getter", "Skip: https://animeflv.net$link")
+                                else {
+                                    animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
+                                    Log.e("Directory Getter", "Added: https://animeflv.net$link")
+                                }
+                            }
                             updateInterface.onAdd()
                         } else check(response.code() < 400) { "Response code: ${response.code()}" }
                     } catch (e: Exception) {
@@ -47,8 +54,17 @@ class DirectoryPage {
             if (Network.isConnected) {
                 try {
                     val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies("https://animeflv.net$link").get().outerHtml())
-                    animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
-                    Log.e("Directory Getter", "Replaced: https://animeflv.net$link")
+                    if (BuildConfig.BUILD_TYPE != "playstore" && !PrefsUtil.isFamilyFriendly) {
+                        animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
+                        Log.e("Directory Getter", "Replaced: https://animeflv.net$link")
+                    } else {
+                        if (webInfo.genres.contains("Ecchi"))
+                            Log.e("Directory Getter", "Skip: https://animeflv.net$link")
+                        else {
+                            animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
+                            Log.e("Directory Getter", "Replaced: https://animeflv.net$link")
+                        }
+                    }
                     updateInterface.onAdd()
                 } catch (e: Exception) {
                     Log.e("Directory Getter", "Error replacing: https://animeflv.net" + link + "\nCause: " + e.message)

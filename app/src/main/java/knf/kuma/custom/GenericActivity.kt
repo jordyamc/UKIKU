@@ -63,15 +63,19 @@ open class GenericActivity : AppCompatActivity() {
                 logText("Error: ${it.message}")
             }.message?.toastLong()
         }) {
-            if ((BypassUtil.isNeeded() || forceCreation()).also { logText("Is needed or forced: $it") }
+            var flag: Int
+            if ((BypassUtil.isNeededFlag().also { flag = it } >= 1 || forceCreation()).also { logText("Is needed or forced: $it") }
                     && !BypassUtil.isLoading.also { logText("Is already loading: $it") }) {
                 BypassUtil.isChecking = false
-                logText("Starting creation")
-                BypassUtil.isLoading = true
-                val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
-                bypassLive.postValue(Pair(true, true))
-                Log.e("CloudflareBypass", "is needed")
-                runWebView(snack)
+                if (flag != 2 || forceCreation()) {
+                    logText("Starting creation")
+                    BypassUtil.isLoading = true
+                    val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
+                    bypassLive.postValue(Pair(true, true))
+                    Log.e("CloudflareBypass", "is needed")
+                    runWebView(snack)
+                } else
+                    logText("Blocked, code 403")
             } else {
                 BypassUtil.isChecking = false
                 logText("Creation not needed, aborting")

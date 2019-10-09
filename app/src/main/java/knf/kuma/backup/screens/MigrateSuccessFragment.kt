@@ -11,6 +11,7 @@ import com.crashlytics.android.Crashlytics
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.App
 import knf.kuma.R
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.backup.objects.FavList
 import knf.kuma.backup.objects.SeenList
 import knf.kuma.commons.safeDismiss
@@ -62,11 +63,13 @@ class MigrateSuccessFragment : Fragment() {
                             val list = FavList.decode(App.context.contentResolver.openInputStream(it))
                                     ?: return@let null
                             CacheDB.INSTANCE.favsDAO().addAll(list)
+                            syncData { favs() }
                         }
                         REQUEST_SEEN -> {
                             val chapters = SeenList.decode(App.context.contentResolver.openInputStream(it))
                                     ?: return@let null
-                            CacheDB.INSTANCE.chaptersDAO().addAll(chapters)
+                            CacheDB.INSTANCE.seenDAO().addAll(chapters)
+                            syncData { seen() }
                         }
                         else -> null
                     }

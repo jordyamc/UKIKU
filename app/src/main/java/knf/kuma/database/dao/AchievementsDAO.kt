@@ -15,7 +15,13 @@ interface AchievementsDAO {
     val allCompleted: List<Achievement>
 
     @get:Query("SELECT SUM(points) FROM achievement WHERE isUnlocked = 1")
-    val totalPoints: LiveData<Int?>
+    val totalUnlockedPoints: LiveData<Int?>
+
+    @get:Query("SELECT SUM(points) FROM achievement")
+    val totalPoints: Int
+
+    @get:Query("SELECT * FROM achievement")
+    val allListener: LiveData<List<Achievement>>
 
     @get:Query("SELECT * FROM achievement WHERE isUnlocked = 0 AND count >= goal AND NOT goal = 0")
     val completionListener: LiveData<List<Achievement>>
@@ -27,7 +33,7 @@ interface AchievementsDAO {
     val completedAchievements: List<Achievement>
 
     @Query("SELECT * FROM achievement WHERE isUnlocked = :isUnlocked ORDER BY points ASC, name")
-    fun achievementList(isUnlocked: Int): LiveData<List<Achievement>>
+    fun achievementList(isUnlocked: Int): LiveData<MutableList<Achievement>>
 
     @Query("SELECT * FROM achievement WHERE `key`=:key")
     fun find(key: Int): Achievement?

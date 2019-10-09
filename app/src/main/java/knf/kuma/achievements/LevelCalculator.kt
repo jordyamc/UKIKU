@@ -5,7 +5,7 @@ class LevelCalculator {
     var toLvlUp: Int = 400
     var progress: Int = 0
     var max: Int = 400
-    private lateinit var levels: List<Int>
+    lateinit var levels: List<Int>
 
     init {
         createLevels()
@@ -36,7 +36,7 @@ class LevelCalculator {
     private fun createLevels() {
         val lvls = mutableListOf<Int>()
         var last = 0
-        for (i in 1..50) {
+        for (i in 1..60) {
             val xp = (last + (400 + (175 * (i - 1)))).also { last = it }
             lvls.add(xp)
         }

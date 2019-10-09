@@ -7,12 +7,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.RecentObject
+import knf.kuma.pojos.SeenObject
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
@@ -53,15 +54,16 @@ class RecentsAdapter(val fragment: HomeFragment, private val isLarge: Boolean = 
             }
         }
         if (showSeen) {
-            holder.seenOverlay.setSeen(CacheDB.INSTANCE.chaptersDAO().chapterIsSeen(item.eid), false)
+            holder.seenOverlay.setSeen(CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.eid), false)
             holder.root.onLongClick(returnValue = true) {
-                if (CacheDB.INSTANCE.chaptersDAO().chapterIsSeen(item.eid)) {
-                    CacheDB.INSTANCE.chaptersDAO().deleteChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(item))
+                if (CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.eid)) {
+                    CacheDB.INSTANCE.seenDAO().deleteChapter(SeenObject.fromRecent(item))
                     holder.seenOverlay.setSeen(seen = false, animate = true)
                 } else {
-                    CacheDB.INSTANCE.chaptersDAO().addChapter(AnimeObject.WebInfo.AnimeChapter.fromRecent(item))
+                    CacheDB.INSTANCE.seenDAO().addChapter(SeenObject.fromRecent(item))
                     holder.seenOverlay.setSeen(seen = true, animate = true)
                 }
+                syncData { seen() }
             }
         }
     }

@@ -21,8 +21,6 @@
         android:layout_marginEnd="10dp"
         android:animateLayoutChanges="true"
         android:clipToPadding="false"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
         app:contentPadding="8dp">
 
         <RelativeLayout
@@ -35,6 +33,8 @@
 
             <include
                 layout="@layout/activity_login_buttons"/>
+
+            <include layout="@layout/activity_login_firestore" />
 
         </RelativeLayout>
 

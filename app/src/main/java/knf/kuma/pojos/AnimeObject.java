@@ -193,10 +193,10 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         return g.substring(0, g.lastIndexOf(","));
     }
 
-    public Boolean checkIntegrity(){
+    public Boolean checkIntegrity() {
         try {
             return chapters != null && (chapters.size() == 0 || (chapters.get(0).aid != null && chapters.get(0).eid != null));
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
@@ -208,7 +208,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof AnimeObject && aid.equals(((AnimeObject) obj).aid);
+        return obj instanceof AnimeObject && aid.equals(((AnimeObject) obj).aid) && day.equals(((AnimeObject) obj).day) && state.equals(((AnimeObject) obj).state);
     }
 
     @Override
@@ -311,6 +311,9 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             @Ignore
             public transient boolean isDownloaded = false;
 
+            public AnimeChapter() {
+            }
+
             public AnimeChapter(int key, String number, String eid, String link, String name, String aid) {
                 this.key = key;
                 this.number = number;
@@ -359,7 +362,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             @Ignore
             public static AnimeChapter fromDownloaded(ExplorerObject.FileDownObj object) {
-                return new AnimeChapter(Integer.parseInt(object.eid), "Episodio "+object.chapter, object.eid, object.link, object.title, object.aid);
+                return new AnimeChapter(Integer.parseInt(object.eid), "Episodio " + object.chapter, object.eid, object.link, object.title, object.aid);
             }
 
             public static List<AnimeChapter> create(String name, String aid, List<Element> elements) {
@@ -391,18 +394,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 return chapters;
             }
 
-            public String getFileName() {
-                if (PrefsUtil.INSTANCE.getSaveWithName())
-                    return eid + "$" + PatternUtil.INSTANCE.getFileName(link);
-                else
-                    return eid + "$" + aid + "-" + number.substring(number.lastIndexOf(" ") + 1) + ".mp4";
-            }
-
-            public String getEpTitle() {
-                return name + number.substring(number.lastIndexOf(" "));
-            }
-
-            public String getCommentariesLink() {
+            public String commentariesLink() {
                 try {
                     return "https://www.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FXBwzv5Yrm_1.js%3Fversion%3D42%23cb%3Df29a45da9909%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff388549d580a978%26relation%3Dparent.parent&href=" + URLEncoder.encode(link, "UTF-8") + "&locale=es_LA&numposts=100&sdk=joey&version=v2.9&width=100%25";
                     //return "http://ukiku-comments.epizy.com/comments.php?title=" + getEpTitle() + "&url=" + URLEncoder.encode(link, "UTF-8");
@@ -549,7 +541,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                         return Day.NONE;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 return Day.NONE;
             }
         }

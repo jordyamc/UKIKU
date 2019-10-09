@@ -9,7 +9,7 @@ fun String.encrypt(password: String): String {
     val secretKeySpec = SecretKeySpec(password.toByteArray(), "AES")
     val iv = ByteArray(16)
     val charArray = password.toCharArray()
-    for (i in 0 until charArray.size) {
+    for (i in charArray.indices) {
         iv[i] = charArray[i].toByte()
     }
     val ivParameterSpec = IvParameterSpec(iv)
@@ -25,7 +25,7 @@ fun String.decrypt(password: String): String {
     val secretKeySpec = SecretKeySpec(password.toByteArray(), "AES")
     val iv = ByteArray(16)
     val charArray = password.toCharArray()
-    for (i in 0 until charArray.size) {
+    for (i in charArray.indices) {
         iv[i] = charArray[i].toByte()
     }
     val ivParameterSpec = IvParameterSpec(iv)

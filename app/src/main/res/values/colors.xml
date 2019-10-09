@@ -59,9 +59,11 @@
 
     <color name="divider">#000000</color>
     <color name="textPrimary">#000</color>
+    <color name="textSecondaryAlpha">#8A000000</color>
     <color name="textSecondary">#323232</color>
 
     <color name="dropbox">#007EE5</color>
+    <color name="firestore">#FFA000</color>
     <color name="drive">#ffbb00</color>
     <color name="text_disable">#42000000</color>
 

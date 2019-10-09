@@ -14,7 +14,11 @@ import knf.kuma.pojos.AnimeObject
 import knf.kuma.tv.AnimeRow
 import knf.kuma.tv.details.TVAnimesDetails
 import knf.kuma.tv.directory.DirPresenter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class TVEmissionFragment : BrowseSupportFragment(), OnItemViewClickedListener {
     private val mRows: SparseArray<AnimeRow> = SparseArray()
     override fun onActivityCreated(savedInstanceState: Bundle?) {

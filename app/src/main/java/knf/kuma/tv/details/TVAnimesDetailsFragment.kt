@@ -13,6 +13,7 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import knf.kuma.App
 import knf.kuma.R
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
@@ -22,8 +23,12 @@ import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.tv.anime.ChapterPresenter
 import knf.kuma.tv.anime.RelatedPresenter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListener, OnActionClickedListener {
 
     private var mRowsAdapter: ArrayObjectAdapter? = null
@@ -41,9 +46,9 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
 
     private fun getLastSeen(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?): Int {
         if (chapters?.isNotEmpty() == true) {
-            val chapter = CacheDB.INSTANCE.chaptersDAO().getLast(PatternUtil.getEids(chapters))
+            val chapter = CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters))
             if (chapter != null) {
-                val position = chapters.indexOf(chapter)
+                val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
                 if (position >= 0)
                     return position
             }
@@ -155,6 +160,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                     action.label1 = "Quitar favorito"
                     action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
                 }
+                syncData { favs() }
             }
             actionAdapter?.set(1, action)
         }

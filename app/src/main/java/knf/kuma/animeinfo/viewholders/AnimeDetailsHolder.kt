@@ -13,8 +13,12 @@ import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.animeinfo.AnimeRelatedAdapter
 import knf.kuma.animeinfo.AnimeTagsAdapter
+import knf.kuma.backup.firestore.syncData
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.removeAllDecorations
@@ -27,13 +31,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import me.zhanghai.android.materialratingbar.MaterialRatingBar
 import org.jetbrains.anko.clipboardManager
 import org.jetbrains.anko.doAsync
+import uz.jamshid.library.ExactRatingBar
 import xdroid.toaster.Toaster
 
 class AnimeDetailsHolder(val view: View) {
-    private var cardViews: MutableList<MaterialCardView> = arrayListOf(view.card_title, view.card_desc, view.card_details, view.card_genres, view.card_list, view.card_related)
+    private var cardViews: MutableList<MaterialCardView> = arrayListOf(view.card_title, view.card_desc, view.card_banner, view.card_details, view.card_genres, view.card_list, view.card_related)
     internal val title: TextView = view.title
     private val expandIcon: ImageButton = view.expand_icon
     private val desc: ExpandableTV = view.expandable_desc
@@ -43,7 +47,7 @@ class AnimeDetailsHolder(val view: View) {
     internal val followers: TextView = view.followers
     private val layScore: LinearLayout = view.lay_score
     private val ratingCount: TextView = view.rating_count
-    private val ratingBar: MaterialRatingBar = view.ratingBar
+    private val ratingBar: ExactRatingBar = view.ratingBar
     private val recyclerViewGenres: RecyclerView = view.recycler_genres
     private val spinnerList: Spinner = view.spinner_list
     private val recyclerViewRelated: RecyclerView = view.recycler_related
@@ -91,6 +95,12 @@ class AnimeDetailsHolder(val view: View) {
                 }
             }
             noCrash {
+                if (PrefsUtil.isAdsEnabled) {
+                    showCard(cardViews[2])
+                    view.adContainer.implBanner(AdsType.INFO_BANNER, true)
+                }
+            }
+            noCrash {
                 type.text = animeObject.type
                 state.text = getStateString(animeObject.state, animeObject.day)
                 id.text = animeObject.aid
@@ -100,17 +110,16 @@ class AnimeDetailsHolder(val view: View) {
                 else {
                     ratingCount.text = "${animeObject.rate_count} (${animeObject.rate_stars
                             ?: "?.?"})"
-                    ratingBar.stepSize = 0.1f
-                    ratingBar.rating = animeObject.rate_stars?.toFloat() ?: 0f
+                    ratingBar.setStar(animeObject.rate_stars?.toFloat() ?: 0f)
                 }
-                showCard(cardViews[2])
+                showCard(cardViews[3])
             }
             noCrash {
                 fragment.context?.let { context ->
                     if (animeObject.genres?.isNotEmpty() == true &&
                             animeObject.genresString.trim().let { it != "" && it != "Sin generos" }) {
                         recyclerViewGenres.adapter = AnimeTagsAdapter(context, animeObject.genres)
-                        showCard(cardViews[3])
+                        showCard(cardViews[4])
                     }
                 }
             }
@@ -129,10 +138,11 @@ class AnimeDetailsHolder(val view: View) {
                                 CacheDB.INSTANCE.seeingDAO().remove(SeeingObject.fromAnime(animeObject, position))
                             else
                                 CacheDB.INSTANCE.seeingDAO().add(SeeingObject.fromAnime(animeObject, position))
+                            syncData { seeing() }
                         }
                     }
                 }
-                showCard(cardViews[4])
+                showCard(cardViews[5])
             }
             noCrash {
                 if (animeObject.related?.isNotEmpty() == true) {
@@ -140,9 +150,9 @@ class AnimeDetailsHolder(val view: View) {
                     if (animeObject.related.size > 1)
                         recyclerViewRelated.addItemDecoration(DividerItemDecoration(view.context, LinearLayout.VERTICAL))
                     recyclerViewRelated.adapter = AnimeRelatedAdapter(fragment, animeObject.related)
-                    showCard(cardViews[5])
+                    showCard(cardViews[6])
                 } else {
-                    doOnUI { cardViews[5].visibility = View.GONE }
+                    doOnUI { cardViews[6].visibility = View.GONE }
                 }
             }
             needAnimation = false

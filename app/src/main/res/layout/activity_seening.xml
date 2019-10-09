@@ -9,19 +9,21 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay.Simple">
+        android:backgroundTint="?colorSurface"
+        android:theme="@style/AppTheme.AppBarOverlay.Simple.NoBackground">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
-            android:background="?attr/colorSurface"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:tabBackground="@android:color/transparent"
             style="@style/Widget.MaterialComponents.TabLayout"
             app:tabMode="scrollable"/>
     </com.google.android.material.appbar.AppBarLayout>

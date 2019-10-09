@@ -4,6 +4,7 @@ import android.net.Uri
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.common.images.WebImage
+import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.SelfServer
 import knf.kuma.pojos.AnimeObject

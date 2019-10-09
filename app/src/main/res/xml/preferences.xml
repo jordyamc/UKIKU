@@ -226,12 +226,12 @@
             android:icon="@drawable/ic_list_placeholder"
             android:key="list_placeholder"
             android:title="Usar placeholder en listas" />
-        <!--<SwitchPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_cash"
             android:key="ads_enabled"
-            android:title="Mostrar anuncios"
-            android:summary="Mostrar anuncios para ayudar al programador"/>-->
+            android:summary="Mostrar anuncios para ayudar al programador"
+            android:title="Mostrar anuncios" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="category_design"
@@ -255,7 +255,11 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Extras">
-
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_ff"
+            android:key="family_friendly"
+            android:title="Modo family friendly" />
         <androidx.preference.ListPreference
             android:defaultValue="10"
             android:entries="@array/timeout_options"

@@ -17,6 +17,7 @@ import knf.kuma.App
 import knf.kuma.Diagnostic
 import knf.kuma.R
 import knf.kuma.backup.Backups
+import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.framework.DropBoxService
 import knf.kuma.commons.distinct
@@ -41,14 +42,19 @@ import knf.kuma.tv.sections.SectionObject
 import knf.kuma.tv.sync.BypassObject
 import knf.kuma.tv.sync.LogOutObject
 import knf.kuma.tv.sync.SyncObject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import xdroid.toaster.Toaster
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.OnClickListener {
     private var mRows: SparseArray<AnimeRow>? = null
 
     private var backgroundManager: GlideBackgroundManager? = null
     private var service: BackupService? = null
-    private var waitingLogin = false
+    private var waitingLoginDropbox = false
+    private var waitingLoginFirestore = false
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -215,20 +221,32 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
         } else if (item is SyncObject) {
             if (item is LogOutObject) {
                 service?.logOut()
+                activity?.let { FirestoreManager.doSignOut(it) }
+                Backups.type = Backups.Type.NONE
                 onLogin()
             } else if (item is BypassObject)
                 startActivity(Intent(context, Diagnostic.FullBypass::class.java))
             else {
-                waitingLogin = true
-                if (item.isDropbox)
-                    service = DropBoxService().also { it.logIn() }
+                when (item.type) {
+                    Backups.Type.DROPBOX -> {
+                        waitingLoginDropbox = true
+                        if (item.type == Backups.Type.DROPBOX)
+                            service = DropBoxService().also { it.logIn() }
+                    }
+                    Backups.Type.FIRESTORE -> {
+                        waitingLoginFirestore = true
+                        activity?.let { FirestoreManager.doLogin(it) }
+                    }
+                    else -> {
+                    }
+                }
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (waitingLogin) {
+        if (waitingLoginDropbox) {
             val token = Auth.getOAuth2Token()
             if (service is DropBoxService && service?.logIn(token) == true) {
                 Backups.type = Backups.Type.DROPBOX
@@ -236,19 +254,30 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
             }
             onLogin()
         }
+        if (waitingLoginFirestore) {
+            onLogin()
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @ExperimentalContracts
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        activity?.let { FirestoreManager.handleLogin(it, requestCode, resultCode, data) }
     }
 
     fun onLogin() {
-        if (service?.isLoggedIn == false && waitingLogin) {
+        if (service?.isLoggedIn == false && waitingLoginDropbox) {
             Toaster.toast("Error al iniciar sesión")
         } else {
             val adapter = ArrayObjectAdapter(SyncPresenter())
             val headerItem = HeaderItem(SYNC.toLong(), "Sincronización")
-            if (service?.isLoggedIn == true) {
+            if (service?.isLoggedIn == true || FirestoreManager.isLoggedIn) {
                 adapter.add(LogOutObject())
                 Backups.restoreAll()
             } else {
-                adapter.add(SyncObject(true))
+                adapter.add(SyncObject(Backups.Type.DROPBOX))
+                adapter.add(SyncObject(Backups.Type.FIRESTORE))
             }
             adapter.add(BypassObject())
             if (getAdapter().size() == 7)
@@ -256,7 +285,8 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
             else
                 (getAdapter() as ArrayObjectAdapter).replace(SYNC, ListRow(headerItem, adapter))
         }
-        waitingLogin = false
+        waitingLoginDropbox = false
+        waitingLoginFirestore = false
     }
 
     companion object {

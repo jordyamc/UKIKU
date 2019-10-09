@@ -16,13 +16,50 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         tools:text="Hints"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/unlock"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/layBuy"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/accent_button_state"
-        app:strokeColor="@color/accent_button_state"
-        tools:text="Desbloquear $0"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Comprar"
+            android:textAppearance="@style/Base.TextAppearance.MaterialComponents.Headline6" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/unlock"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:textColor="@color/accent_button_state"
+                app:strokeColor="@color/accent_button_state"
+                tools:text="$0" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/unlockCoins"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:textColor="@color/accent_button_state"
+                app:icon="@drawable/ic_coin_ach"
+                app:strokeColor="@color/accent_button_state"
+                tools:text="1000" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

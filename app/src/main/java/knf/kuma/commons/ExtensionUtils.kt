@@ -6,6 +6,8 @@ import android.content.res.Resources
 import android.graphics.drawable.AnimationDrawable
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +36,7 @@ import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
+import knf.kuma.database.CacheDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -67,6 +70,22 @@ val getUpdateDir: String
         "debug", "release" -> "release"
         else -> BuildConfig.BUILD_TYPE
     }
+
+fun currentTime(): Long = System.currentTimeMillis()
+
+val ffFile: File get() = File(File(Environment.getExternalStorageDirectory(), "UKIKU/backups"), "data.dat")
+
+fun verifiyFF() {
+    if (PrefsUtil.isFamilyFriendly && !ffFile.exists()) {
+        ffFile.createNewFile()
+        ffFile.writeText(PrefsUtil.ffPass)
+
+    } else if (!PrefsUtil.isFamilyFriendly && ffFile.exists()) {
+        PrefsUtil.isFamilyFriendly = true
+        PrefsUtil.ffPass = ffFile.readText()
+        CacheDB.INSTANCE.animeDAO().nukeEcchi()
+    }
+}
 
 fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
     doOnUI {
@@ -218,6 +237,15 @@ fun noCrash(enableLog: Boolean = true, func: () -> Unit): String? {
     }
 }
 
+fun noCrashExec(exec: () -> Unit = {}, func: () -> Unit) {
+    try {
+        func()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        exec()
+    }
+}
+
 fun <T> noCrashLet(onCrash: () -> Unit = {}, func: () -> T): T? {
     return try {
         func()
@@ -225,6 +253,24 @@ fun <T> noCrashLet(onCrash: () -> Unit = {}, func: () -> T): T? {
         e.printStackTrace()
         onCrash()
         null
+    }
+}
+
+fun <T> noCrashLet(onCrash: T, func: () -> T): T {
+    return try {
+        func()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onCrash
+    }
+}
+
+fun <T> noCrashLetNullable(onCrash: T? = null, func: () -> T): T? {
+    return try {
+        func()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onCrash
     }
 }
 
@@ -323,29 +369,55 @@ fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builde
 }.build()
 
 fun isHostValid(hostName: String): Boolean {
-    /*if (BuildConfig.DEBUG)
-        Log.e("Hostname", hostName)*/
+    if (validateAds(hostName)) return true
     return when (hostName) {
         "fex.net",
         "api.crashlytics.com",
         "e.crashlytics.com",
+        "reports.crashlytics.com",
         "sdk-android.ad.smaato.net",
         "cdn.myanimelist.net",
         "myanimelist.cdn-dena.com",
         "settings.crashlytics.com",
         "somoskudasai.com",
         "animeflv.net",
+        "m.animeflv.net",
         "github.com",
         "raw.githubusercontent.com",
         "cdn.animeflv.net",
-        "m.animeflv.net",
         "s1.animeflv.net",
         "streamango.com",
         "ok.ru",
         "www.rapidvideo.com",
         "www.yourupload.com" -> true
         else -> isVideoHostName(hostName)
-    }
+    }.also { if (!it) Log.e("Hostname", "Not verified: $hostName") }
+}
+
+private fun validateAds(hostName: String): Boolean {
+    listOf(
+            "android",
+            "doubleclick",
+            "invitemedia.com",
+            "media.admob.com",
+            "gstatic",
+            "google",
+            "goo.gl",
+            "gvtl",
+            "gvt2",
+            "urchin",
+            "gkecnapps",
+            "youtube",
+            "youtu.be",
+            "yt.be",
+            "ytimg",
+            "g.co",
+            "ggpht",
+            "gkecnapps",
+            "appbrain",
+            "apptornado"
+    ).forEach { if (hostName.contains(it)) return true }
+    return false
 }
 
 private fun isVideoHostName(hostName: String): Boolean {

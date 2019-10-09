@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
@@ -50,6 +51,7 @@ class RankingActivity : GenericActivity() {
                     positiveButton(text = "continuar") {
                         setResult(4321)
                         CacheDB.INSTANCE.genresDAO().reset()
+                        syncData { genres() }
                         finish()
                     }
                     negativeButton(text = "cancelar")

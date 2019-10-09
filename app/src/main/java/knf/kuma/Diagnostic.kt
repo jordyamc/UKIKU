@@ -16,6 +16,7 @@ import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
 import fr.bmartel.speedtest.model.SpeedTestError
 import knf.kuma.backup.Backups
+import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.StateView
@@ -229,8 +230,10 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun runBackupTest() {
+        uuid.text = FirestoreManager.uid ?: "Solo firestore"
         backupState.load(when (Backups.type) {
             Backups.Type.DROPBOX -> "Dropbox"
+            Backups.Type.FIRESTORE -> "Firestore"
             Backups.Type.LOCAL -> "Local"
             else -> "Sin respaldos"
         })

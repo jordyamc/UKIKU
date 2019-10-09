@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/lay_firestore"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:visibility="visible">
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncFavs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_favs"
+        app:ssi_title="Favoritos" />
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncSeen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_seen"
+        app:ssi_title="Vistos" />
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncAchievements"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_achievements"
+        app:ssi_title="Logros" />
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncEA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_ea"
+        app:ssi_title="Easter egg" />
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncGenres"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_genres"
+        app:ssi_title="Datos de uso" />
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_history"
+        app:ssi_title="Historial" />
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncQueue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_queue"
+        app:ssi_title="Pendientes" />
+
+    <knf.kuma.custom.SyncStaticItemView
+        android:id="@+id/staticSyncSeeing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ssi_prefId="ls_seeing"
+        app:ssi_showDivider="false"
+        app:ssi_title="Seguidos" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/logOutFirestore"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:padding="20dp"
+        android:text="Cerrar sesion"
+        android:textColor="@android:color/primary_text_dark" />
+</LinearLayout>

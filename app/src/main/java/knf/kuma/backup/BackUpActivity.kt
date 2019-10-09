@@ -16,23 +16,25 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.LoginEvent
 import com.dropbox.core.android.Auth
+import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.framework.DropBoxService
 import knf.kuma.backup.framework.LocalService
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.noCrash
-import knf.kuma.commons.safeShow
-import knf.kuma.commons.showSnackbar
+import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.SyncItemView
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login_buttons.*
+import kotlinx.android.synthetic.main.activity_login_firestore.*
 import kotlinx.android.synthetic.main.activity_login_main.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.contracts.ExperimentalContracts
 import kotlin.math.max
 
 class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
-    private val syncItems: MutableList<SyncItemView> by lazy { arrayListOf(sync_favs, sync_history, sync_following, sync_seen) }
+    private val syncItems: MutableList<SyncItemView> by lazy { arrayListOf(sync_favs, sync_history, sync_following, sync_seen, sync_seen_new) }
     private var service: BackupService? = null
     private var waitingLogin = false
 
@@ -43,6 +45,7 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
                 Backups.Type.NONE -> ContextCompat.getColor(this, android.R.color.transparent)
                 Backups.Type.LOCAL -> ContextCompat.getColor(this, EAHelper.getThemeColorLight())
                 Backups.Type.DROPBOX -> ContextCompat.getColor(this, R.color.dropbox)
+                Backups.Type.FIRESTORE -> ContextCompat.getColor(this, R.color.firestore)
             }
         }
 
@@ -53,14 +56,26 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
         setContentView(R.layout.activity_login)
         service = Backups.createService()
         login_dropbox.setOnClickListener { onDropBoxLogin() }
+        if (!PrefsUtil.isAdsEnabled && !BuildConfig.DEBUG) {
+            login_firestore.isEnabled = false
+            ads_required.visibility = View.VISIBLE
+        }
+        login_firestore.setOnClickListener { onFirestoreLogin() }
         login_local.setOnClickListener { onLocalLogin() }
         logOut.setOnClickListener { onLogOut() }
-        if (service?.isLoggedIn == true) {
-            setState(true)
-            showColor(savedInstanceState == null)
-            initSyncButtons()
-        } else {
-            setState(false)
+        logOutFirestore.setOnClickListener { onLogOut() }
+        when {
+            service?.isLoggedIn == true -> {
+                setState(true)
+                showColor(savedInstanceState == null)
+                initSyncButtons()
+            }
+            FirestoreManager.isLoggedIn -> {
+                setState(true)
+                showColor(savedInstanceState == null)
+                initFirestoreSync()
+            }
+            else -> setState(false)
         }
     }
 
@@ -68,6 +83,17 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
         for (itemView in syncItems) {
             itemView.init(service, this)
         }
+    }
+
+    private fun initFirestoreSync() {
+        staticSyncAchievements.suscribe(this, FirestoreManager.achievementsLiveData)
+        staticSyncEA.suscribe(this, FirestoreManager.eaLiveData)
+        staticSyncFavs.suscribe(this, FirestoreManager.favsLiveData)
+        staticSyncGenres.suscribe(this, FirestoreManager.genresLiveData)
+        staticSyncHistory.suscribe(this, FirestoreManager.historyLiveData)
+        staticSyncQueue.suscribe(this, FirestoreManager.queueLiveData)
+        staticSyncSeeing.suscribe(this, FirestoreManager.seeingLiveData)
+        staticSyncSeen.suscribe(this, FirestoreManager.seenLiveData)
     }
 
     private fun clearSyncButtons() {
@@ -79,6 +105,10 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     private fun onDropBoxLogin() {
         waitingLogin = true
         service = DropBoxService().also { it.logIn() }
+    }
+
+    private fun onFirestoreLogin() {
+        FirestoreManager.doLogin(this)
     }
 
     private fun onLocalLogin() {
@@ -114,20 +144,27 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
         MaterialDialog(this).safeShow {
             message(text = "Los datos no respaldados podrian ser perdidos al borrar la app, ¿desea continuar?")
             positiveButton(text = "continuar") {
-                PreferenceManager.getDefaultSharedPreferences(this@BackUpActivity).edit().putString("auto_backup", "0").apply()
-                service?.logOut()
-                service = null
-                Backups.type = Backups.Type.NONE
-                revertColor()
-                setState(false)
-                clearSyncButtons()
+                if (Backups.type == Backups.Type.FIRESTORE) {
+                    FirestoreManager.doSignOut(this@BackUpActivity)
+                    Backups.type = Backups.Type.NONE
+                    revertColor()
+                    setState(false)
+                } else {
+                    PreferenceManager.getDefaultSharedPreferences(this@BackUpActivity).edit().putString("auto_backup", "0").apply()
+                    service?.logOut()
+                    service = null
+                    Backups.type = Backups.Type.NONE
+                    revertColor()
+                    setState(false)
+                    clearSyncButtons()
+                }
             }
             negativeButton(text = "cancelar")
         }
     }
 
     private fun onLogin() {
-        if (service?.isLoggedIn == true) {
+        if (service?.isLoggedIn == true || FirestoreManager.isLoggedIn) {
             setState(true)
             showColor(true)
             initSyncButtons()
@@ -195,7 +232,20 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     private fun setState(isLoggedIn: Boolean) {
         runOnUiThread {
             lay_main?.visibility = if (isLoggedIn) View.GONE else View.VISIBLE
-            lay_buttons?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+            when (Backups.type) {
+                Backups.Type.LOCAL, Backups.Type.DROPBOX -> {
+                    lay_buttons?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                    lay_firestore?.visibility = View.GONE
+                }
+                Backups.Type.FIRESTORE -> {
+                    lay_firestore?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                    lay_buttons?.visibility = View.GONE
+                }
+                Backups.Type.NONE -> {
+                    lay_buttons?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                    lay_firestore?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                }
+            }
         }
     }
 
@@ -209,6 +259,14 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             }
             onLogin()
         }
+    }
+
+    @ExperimentalContracts
+    @ExperimentalCoroutinesApi
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        FirestoreManager.handleLogin(this, requestCode, resultCode, data)
+        onLogin()
     }
 
     companion object {

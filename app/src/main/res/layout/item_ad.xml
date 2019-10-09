@@ -8,7 +8,6 @@
     android:layout_marginStart="10dp"
     android:layout_marginTop="10dp"
     android:layout_marginEnd="10dp"
-    android:minHeight="15dp"
     android:theme="@style/AppTheme.Cardview"
     app:cardCornerRadius="2dp"
     app:cardElevation="2dp">

@@ -9,6 +9,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.safeShow
@@ -26,6 +28,7 @@ class FragmentDownloads : FragmentBase() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        adContainer.implBanner(AdsType.EXPLORER_BANNER, true)
         CacheDB.INSTANCE.downloadsDAO().active.observe(this, Observer { downloadObjects ->
             progress?.visibility = View.GONE
             error?.visibility = if (downloadObjects.isEmpty()) View.VISIBLE else View.GONE

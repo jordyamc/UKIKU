@@ -108,6 +108,22 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:theme="@style/AppTheme.Cardview"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:id="@+id/adContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -128,7 +144,7 @@
                     android:padding="8dp"
                     android:text="Detalles"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                    android:textColor="?colorAccent"/>
+                    android:textColor="?colorAccent" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -136,7 +152,7 @@
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:text="Tipo"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
                 <TextView
                     android:id="@+id/type"
@@ -146,7 +162,7 @@
                     android:paddingEnd="8dp"
                     android:paddingBottom="2dp"
                     android:text="TIPO"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -154,7 +170,7 @@
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:text="Estado"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
                 <TextView
                     android:id="@+id/state"
@@ -164,7 +180,7 @@
                     android:paddingEnd="8dp"
                     android:paddingBottom="2dp"
                     android:text="ESTADO"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -172,7 +188,7 @@
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:text="ID"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
                 <TextView
                     android:id="@+id/aid"
@@ -182,7 +198,7 @@
                     android:paddingEnd="8dp"
                     android:paddingBottom="2dp"
                     android:text="####"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -190,7 +206,7 @@
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:text="Seguidores"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
                 <TextView
                     android:id="@+id/followers"
@@ -200,7 +216,7 @@
                     android:paddingEnd="8dp"
                     android:paddingBottom="2dp"
                     android:text="0"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"/>
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
 
                 <LinearLayout
                     android:id="@+id/lay_score"
@@ -221,7 +237,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Votos"
-                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
                         <TextView
                             android:id="@+id/rating_count"
@@ -230,19 +246,24 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="1dp"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                            tools:text="-0000"/>
+                            tools:text="-0000" />
                     </LinearLayout>
 
-                    <me.zhanghai.android.materialratingbar.MaterialRatingBar
-                        android:id="@+id/ratingBar"
-                        style="@style/Widget.AppCompat.RatingBar.Indicator"
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:isIndicator="true"
-                        android:secondaryProgressTint="#00000000"
-                        android:numStars="5"
-                        android:stepSize="0.1"
-                        android:padding="8dp"/>
+                        android:padding="8dp">
+
+                        <uz.jamshid.library.ExactRatingBar
+                            android:id="@+id/ratingBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            app:isIndicator="true"
+                            app:starCount="5"
+                            app:starFillColor="?colorSecondary"
+                            app:starSize="60" />
+                    </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

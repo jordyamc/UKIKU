@@ -8,17 +8,24 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import knf.kuma.ads.AdCallback
+import knf.kuma.ads.AdCardItemHolder
+import knf.kuma.ads.implAdsAchievement
 import knf.kuma.commons.bind
+import knf.kuma.commons.noCrashLet
 import knf.kuma.pojos.Achievement
+import knf.kuma.pojos.AchievementAd
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.text.NumberFormat
 import java.util.*
 
-class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit) : RecyclerView.Adapter<AchievementAdapter.ItemHolder>() {
+class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var list: List<Achievement> = listOf()
+    private var list: MutableList<Achievement> = mutableListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        if (viewType == 1)
+            return AdCardItemHolder(parent, AdCardItemHolder.TYPE_ACHIEVEMENT)
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_achievements, parent, false))
     }
 
@@ -26,18 +33,27 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
         return list.size
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: ItemHolder, position: Int) {
-        val achievement = list[position]
-        holder.icon.setImageResource(achievement.usableIcon())
-        holder.name.text = achievement.usableName()
-        holder.state.text = achievement.getState()
-        holder.exp.text = "${NumberFormat.getNumberInstance(Locale.US).format(achievement.points)} XP"
-        holder.root.onClick { onClick.invoke(achievement) }
+    override fun getItemViewType(position: Int): Int {
+        return noCrashLet { if (list[position] is AchievementAd) 1 else 0 } ?: 1
     }
 
-    fun setAchievements(list: List<Achievement>) {
+    @SuppressLint("SetTextI18n")
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val achievement = list[position]
+        if (holder is AdCardItemHolder) {
+            holder.loadAd(achievement as? AdCallback)
+        } else if (holder is ItemHolder) {
+            holder.icon.setImageResource(achievement.usableIcon())
+            holder.name.text = achievement.usableName()
+            holder.state.text = achievement.getState()
+            holder.exp.text = "${NumberFormat.getNumberInstance(Locale.US).format(achievement.points)} XP"
+            holder.root.onClick { onClick.invoke(achievement) }
+        }
+    }
+
+    fun setAchievements(list: MutableList<Achievement>) {
         this.list = list
+        this.list.implAdsAchievement()
         notifyDataSetChanged()
     }
 

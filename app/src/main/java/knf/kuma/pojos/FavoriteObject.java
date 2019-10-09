@@ -5,12 +5,14 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import knf.kuma.search.SearchAdvObject;
 
+@Keep
 @Entity
 public class FavoriteObject implements Comparable<FavoriteObject> {
     @SerializedName("CATEGORY_NONE")

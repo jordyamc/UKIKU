@@ -1,5 +1,6 @@
 package knf.kuma.recommended
 
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.removeAll
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.GenreStatusObject
@@ -14,6 +15,7 @@ object RecommendHelper {
         doAsync {
             for (genre in list)
                 register(genre, type)
+            syncData { genres() }
         }
     }
 
@@ -39,6 +41,7 @@ object RecommendHelper {
             val status = getStatus(name)
             status.block()
             CacheDB.INSTANCE.genresDAO().insertStatus(status)
+            syncData { genres() }
         }
     }
 
@@ -47,6 +50,7 @@ object RecommendHelper {
             val status = getStatus(name)
             status.reset()
             CacheDB.INSTANCE.genresDAO().insertStatus(status)
+            syncData { genres() }
         }
     }
 

@@ -98,12 +98,12 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
             if (intent.getBooleanExtra("isPlayList", false)) {
                 val sourceList = ArrayList<MediaSource>()
                 playList = CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist"))
-                noCrash { video_title.text = playList[0].title }
+                noCrash { video_title.text = playList[0].title() }
                 for (queueObject in playList) {
                     if (queueObject.isFile)
-                        sourceList.add(ExtractorMediaSource.Factory(FileDataSourceFactory()).createMediaSource(queueObject.getUri()))
+                        sourceList.add(ExtractorMediaSource.Factory(FileDataSourceFactory()).createMediaSource(queueObject.createUri()))
                     else
-                        sourceList.add(ExtractorMediaSource.Factory(DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(queueObject.getUri()))
+                        sourceList.add(ExtractorMediaSource.Factory(DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(queueObject.createUri()))
                 }
                 source = ConcatenatingMediaSource(*sourceList.toTypedArray())
             } else if (!intent.getBooleanExtra("isFile", false)) {
@@ -273,7 +273,7 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
             val latestPosition = exoPlayer?.currentWindowIndex ?: 0
             if (latestPosition != listPosition) {
                 listPosition = latestPosition
-                video_title.text = playList[listPosition].title
+                video_title.text = playList[listPosition].title()
             }
         } catch (e: Exception) {
             e.printStackTrace()

@@ -14,6 +14,12 @@
         <attr name="si_title" format="string"/>
         <attr name="si_showDivider" format="boolean"/>
         <attr name="si_actionId" format="string"/>
+        <attr name="si_hideBackup" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="SyncStaticItemView">
+        <attr name="ssi_title" format="string" />
+        <attr name="ssi_showDivider" format="boolean" />
+        <attr name="ssi_prefId" format="string" />
     </declare-styleable>
     <declare-styleable name="StateView">
         <attr name="sv_title" format="string"/>

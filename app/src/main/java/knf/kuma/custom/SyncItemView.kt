@@ -18,6 +18,7 @@ class SyncItemView : RelativeLayout {
 
     private var cardTitle: String? = "Error"
     private var showDivider = true
+    private var hideBackup = false
     private var actionId: String = "neutral"
 
     var backupObj: BackupObject<*>? = null
@@ -47,6 +48,7 @@ class SyncItemView : RelativeLayout {
         val array = context.obtainStyledAttributes(attrs, R.styleable.SyncItemView)
         cardTitle = array.getString(R.styleable.SyncItemView_si_title)
         showDivider = array.getBoolean(R.styleable.SyncItemView_si_showDivider, true)
+        hideBackup = array.getBoolean(R.styleable.SyncItemView_si_hideBackup, false)
         actionId = array.getString(R.styleable.SyncItemView_si_actionId) ?: "neutral"
         array.recycle()
     }
@@ -56,6 +58,8 @@ class SyncItemView : RelativeLayout {
         title.text = cardTitle
         if (!showDivider)
             separator?.visibility = View.GONE
+        if (hideBackup)
+            backup?.isEnabled = false
     }
 
     fun enableBackup(backupObject: BackupObject<*>?, onClick: OnClick) {

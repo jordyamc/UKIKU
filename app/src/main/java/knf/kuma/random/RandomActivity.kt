@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -15,10 +16,13 @@ import com.afollestad.materialdialogs.customview.customView
 import com.github.stephenvinouze.materialnumberpickercore.MaterialNumberPicker
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 
 class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val toolbar: Toolbar by bind(R.id.toolbar)
@@ -44,6 +48,7 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
+        find<FrameLayout>(R.id.adContainer).implBanner(AdsType.RANDOM_BANNER, true)
         refreshLayout.setOnRefreshListener(this)
         adapter = RandomAdapter(this)
         recyclerView.verifyManager()

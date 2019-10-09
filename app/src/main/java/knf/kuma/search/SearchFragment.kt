@@ -13,11 +13,14 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.SearchEvent
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import knf.kuma.BottomFragment
+import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.verifyManager
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
+import knf.kuma.retrofit.Repository
 import org.jetbrains.anko.find
 import java.util.*
 
@@ -28,7 +31,8 @@ class SearchFragment : BottomFragment() {
     private lateinit var errorView: View
 
     private var model: SearchViewModel? = null
-    private var adapter: SearchAdapter? = null
+    private var searchAdapter: SearchAdapter? = null
+    private var searchAdapterCompact: SearchAdapterCompact? = null
     private var manager: RecyclerView.LayoutManager? = null
 
     private var isFirst = true
@@ -37,6 +41,8 @@ class SearchFragment : BottomFragment() {
     private var query: String = ""
 
     private var selected: MutableList<String> = ArrayList()
+
+    private val needOnlineSearch: Boolean by lazy { !PrefsUtil.isDirectoryFinished && Network.isConnected && BuildConfig.BUILD_TYPE != "playstore" && !PrefsUtil.isFamilyFriendly }
 
     private val genresString: String
         get() {
@@ -73,17 +79,18 @@ class SearchFragment : BottomFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        model = activity?.let { ViewModelProviders.of(it).get(SearchViewModel::class.java) }?.also {
-            it.setSearch(query, "", this, Observer { animeObjects ->
-                adapter?.submitList(animeObjects)
-                errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
-                if (isFirst) {
-                    progressBar.visibility = View.GONE
-                    isFirst = false
-                    recyclerView.scheduleLayoutAnimation()
-                }
-            })
-        }
+        if (!needOnlineSearch)
+            model = activity?.let { ViewModelProviders.of(it).get(SearchViewModel::class.java) }?.also {
+                it.setSearch(query, "", this, Observer { animeObjects ->
+                    searchAdapter?.submitList(animeObjects)
+                    errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
+                    if (isFirst) {
+                        progressBar.visibility = View.GONE
+                        isFirst = false
+                        recyclerView.scheduleLayoutAnimation()
+                    }
+                })
+            }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -111,46 +118,88 @@ class SearchFragment : BottomFragment() {
             }
         })
         manager = recyclerView.layoutManager
-        adapter = SearchAdapter(this)
-        adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                if (toPosition == 0 && waitingScroll) {
-                    manager?.smoothScrollToPosition(recyclerView, null, 0)
-                    fab.extend()
-                    waitingScroll = false
+        if (needOnlineSearch) {
+            fab.hide()
+            searchAdapterCompact = SearchAdapterCompact(this)
+            searchAdapterCompact?.submitList(Repository().getSearchCompact("") {
+                if (it) {
+                    errorView.visibility = if (it) View.VISIBLE else View.GONE
+                    Answers.getInstance().logSearch(SearchEvent().putQuery(query))
                 }
-            }
-
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                if (positionStart == 0 && waitingScroll) {
-                    manager?.smoothScrollToPosition(recyclerView, null, 0)
-                    fab.extend()
-                    waitingScroll = false
-                }
-            }
-        })
-        recyclerView.adapter = adapter
-        fab.setOnClickListener {
-            val dialog = GenresDialog()
-            dialog.init(genres, selected, object : GenresDialog.MultiChoiceListener {
-                override fun onOkay(selected: MutableList<String>) {
-                    this@SearchFragment.selected = selected
-                    setFabIcon()
-                    setSearch(query)
+                if (isFirst) {
+                    progressBar.visibility = View.GONE
+                    isFirst = false
+                    recyclerView.scheduleLayoutAnimation()
                 }
             })
-            dialog.show(childFragmentManager, "genres")
+            searchAdapterCompact?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                    if (toPosition == 0 && waitingScroll) {
+                        manager?.smoothScrollToPosition(recyclerView, null, 0)
+                        waitingScroll = false
+                    }
+                }
+            })
+            recyclerView.adapter = searchAdapterCompact
+        } else {
+            searchAdapter = SearchAdapter(this)
+            searchAdapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                    if (toPosition == 0 && waitingScroll) {
+                        manager?.smoothScrollToPosition(recyclerView, null, 0)
+                        fab.extend()
+                        waitingScroll = false
+                    }
+                }
+
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    if (positionStart == 0 && waitingScroll) {
+                        manager?.smoothScrollToPosition(recyclerView, null, 0)
+                        fab.extend()
+                        waitingScroll = false
+                    }
+                }
+            })
+            recyclerView.adapter = searchAdapter
+            fab.setOnClickListener {
+                val dialog = GenresDialog()
+                dialog.init(genres, selected, object : GenresDialog.MultiChoiceListener {
+                    override fun onOkay(selected: MutableList<String>) {
+                        this@SearchFragment.selected = selected
+                        setFabIcon()
+                        setSearchNormal(query)
+                    }
+                })
+                dialog.show(childFragmentManager, "genres")
+            }
         }
     }
 
-    fun setSearch(q: String) {
+    fun setSearch(q: String) = if (needOnlineSearch) setSearchCompact(q) else setSearchNormal(q)
+
+    private fun setSearchCompact(q: String) {
+        waitingScroll = true
+        this.query = q.trim()
+        searchAdapterCompact?.submitList(Repository().getSearchCompact(q) {
+            errorView.visibility = if (it) View.VISIBLE else View.GONE
+            Answers.getInstance().logSearch(SearchEvent().putQuery(query))
+            if (isFirst) {
+                progressBar.visibility = View.GONE
+                isFirst = false
+                recyclerView.scheduleLayoutAnimation()
+            }
+        })
+    }
+
+    private fun setSearchNormal(q: String) {
         waitingScroll = true
         this.query = q.trim()
         model?.setSearch(q.trim(), genresString, this, Observer { animeObjects ->
             if (animeObjects != null) {
-                adapter?.submitList(animeObjects)
+                searchAdapter?.submitList(animeObjects)
                 errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
                 Answers.getInstance().logSearch(SearchEvent().putQuery(query))
                 if (genresString != "")
@@ -182,7 +231,7 @@ class SearchFragment : BottomFragment() {
         }
 
         val genres: MutableList<String>
-            get() = Arrays.asList(
+            get() = mutableListOf(
                     "Acción",
                     "Artes Marciales",
                     "Aventuras",

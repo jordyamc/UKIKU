@@ -15,7 +15,11 @@ import knf.kuma.database.CacheDB
 import knf.kuma.search.SearchFragment
 import knf.kuma.tv.anime.AnimePresenter
 import knf.kuma.tv.details.TVAnimesDetails
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, SpeechRecognitionCallback, OnItemViewClickedListener {
     private var arrayObjectAdapter: ArrayObjectAdapter? = null
     private lateinit var liveData: LiveData<MutableList<BasicAnimeObject>>

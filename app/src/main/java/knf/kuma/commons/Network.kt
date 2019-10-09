@@ -7,6 +7,9 @@ import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.text.format.Formatter
 import knf.kuma.App
+import java.io.BufferedReader
+import java.io.FileInputStream
+import java.io.InputStreamReader
 
 @SuppressLint("StaticFieldLeak")
 object Network {
@@ -17,7 +20,7 @@ object Network {
                 val cm = App.context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
                 val activeNetwork = cm?.activeNetworkInfo
                 activeNetwork != null && activeNetwork.isConnected
-            } catch (e: NullPointerException) {
+            } catch (e: Exception) {
                 false
             }
 
@@ -28,4 +31,16 @@ object Network {
             val wm = App.context.applicationContext.getSystemService(WIFI_SERVICE) as? WifiManager
             return Formatter.formatIpAddress(wm?.connectionInfo?.ipAddress ?: 0)
         }
+
+    val isAdsBlocked: Boolean by lazy {
+        return@lazy try {
+            BufferedReader(InputStreamReader(FileInputStream("/etc/hosts"))).readLines().forEach {
+                if (it.contains("admob"))
+                    return@lazy true
+            }
+            false
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

@@ -60,10 +60,11 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
 
     companion object {
 
-        private fun getServers(context: Context, base: String): MutableList<Server> {
-            return Arrays.asList(
+        private fun getServers(context: Context, base: String): List<Server> {
+            return listOf(
                     FireServer(context, base),
                     NatsukiServer(context, base),
+                    VeryStreamServer(context, base),
                     FembedServer(context, base),
                     FenixServer(context, base),
                     HyperionServer(context, base),

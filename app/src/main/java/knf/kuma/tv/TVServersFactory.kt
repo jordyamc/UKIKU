@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.leanback.widget.Presenter
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.iterator
 import knf.kuma.commons.jsoupCookies
@@ -13,6 +14,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.SeenObject
 import knf.kuma.tv.exoplayer.TVPlayer
 import knf.kuma.tv.streaming.TVMultiSelection
 import knf.kuma.tv.streaming.TVServerSelection
@@ -20,11 +22,15 @@ import knf.kuma.tv.streaming.TVServerSelectionFragment
 import knf.kuma.videoservers.Option
 import knf.kuma.videoservers.Server
 import knf.kuma.videoservers.VideoServer
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
 import xdroid.toaster.Toaster
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class TVServersFactory private constructor(private val activity: Activity, private val url: String, private val chapter: AnimeObject.WebInfo.AnimeChapter, val viewHolder: Presenter.ViewHolder?, private val serversInterface: ServersInterface) {
     private val downloadObject: DownloadObject = DownloadObject.fromChapter(chapter, false)
 
@@ -119,8 +125,12 @@ class TVServersFactory private constructor(private val activity: Activity, priva
     }
 
     private fun startStreaming(option: Option) {
-        CacheDB.INSTANCE.chaptersDAO().addChapter(chapter)
+        CacheDB.INSTANCE.seenDAO().addChapter(SeenObject.fromChapter(chapter))
         CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(chapter))
+        syncData {
+            history()
+            seen()
+        }
         Answers.getInstance().logCustom(CustomEvent("Streaming").putCustomAttribute("Server", option.server))
         activity.startActivity(Intent(activity, TVPlayer::class.java)
                 .putExtra("url", option.url)

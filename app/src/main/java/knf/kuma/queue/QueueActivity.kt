@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
@@ -20,11 +21,14 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 
 class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListener, QueueAllAdapter.OnStartDragListener {
@@ -84,7 +88,7 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
         }
         bottomSheetBehavior = BottomSheetBehavior.from(cardView)
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
-        bottomSheetBehavior?.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetBehavior?.bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN)
                     current = null
@@ -93,11 +97,12 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
             }
-        })
+        }
         setLayoutManager(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true))
         listRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayout.VERTICAL))
         listAdapter = QueueListAdapter { closeSheet() }
         listRecyclerView.adapter = listAdapter
+        find<FrameLayout>(R.id.adContainer).implBanner(AdsType.QUEUE_BANNER, true)
         /*Aesthetic.get().colorAccent().take(1).subscribe {
             listToolbar.backgroundColor = it
         }*/
@@ -118,7 +123,7 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
                 mItemTouchHelper = ItemTouchHelper(NoTouchHelperCallback())
                 mItemTouchHelper?.attachToRecyclerView(recyclerView)
                 doAsync {
-                    animesAdapter.update(QueueObject.getOne(list))
+                    animesAdapter.update(QueueObject.takeOne(list))
                     if (isFirst) {
                         isFirst = false
                         openInitial(list)

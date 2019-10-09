@@ -69,11 +69,11 @@ class DirectoryPageAdapter internal constructor(private val fragment: Fragment) 
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DirObject>() {
             override fun areItemsTheSame(oldItem: DirObject, newItem: DirObject): Boolean {
-                return oldItem.key == newItem.key
+                return oldItem.key == newItem.key && oldItem.link == newItem.link
             }
 
             override fun areContentsTheSame(oldItem: DirObject, newItem: DirObject): Boolean {
-                return oldItem.name == newItem.name
+                return oldItem.name == newItem.name && oldItem.link == newItem.link
             }
         }
     }

@@ -40,4 +40,9 @@
             android:textSize="20sp"
             tools:text="Sin logros"/>
     </LinearLayout>
+
+    <nl.dionsegijn.konfetti.KonfettiView
+        android:id="@+id/konfetti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </RelativeLayout>

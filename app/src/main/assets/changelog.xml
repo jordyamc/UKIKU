@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="116" version="4.3">
+        <change type="fix">Errores generales</change>
+        <change type="new">Anuncios opcionales</change>
+        <change type="new">Método de backup Firestore</change>
+        <change type="new">Modo family friendly</change>
+        <change type="new">Moneda de la app loli-coins</change>
+        <change type="change">Nuevo servidor VeryStream</change>
+    </release>
     <release code="114" version="4.2.10">
         <change type="fix">Errores generales</change>
         <change type="change">Mejoras en interfaz de TV</change>

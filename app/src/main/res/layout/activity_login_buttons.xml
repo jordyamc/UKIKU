@@ -43,6 +43,15 @@
         app:si_showDivider="true"
         app:si_title="Vistos"/>
 
+    <knf.kuma.custom.SyncItemView
+        android:id="@+id/sync_seen_new"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:si_actionId="seencompact"
+        app:si_hideBackup="true"
+        app:si_showDivider="true"
+        app:si_title="Vistos (nuevo)" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logOut"
         style="@style/Widget.MaterialComponents.Button"

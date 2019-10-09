@@ -20,17 +20,26 @@ import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import knf.kuma.R
+import knf.kuma.ads.FullscreenAdLoader
+import knf.kuma.ads.getFAdLoaderInterstitial
+import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.backup.Backups
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
+import knf.tools.kprobability.item
+import knf.tools.kprobability.probabilityOf
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.toast
 import xdroid.toaster.Toaster
 import java.text.NumberFormat
 import java.util.*
@@ -44,6 +53,7 @@ class AchievementActivity : GenericActivity() {
     private val level: TextView by bind(R.id.level)
     private val countDown: TextView by bind(R.id.countdown)
     private val cardView: MaterialCardView by bind(R.id.sheet)
+    private val buyButton: MaterialButton by bind(R.id.buyButton)
     private val icon: ImageView by bind(R.id.achievement_icon)
     private val xpIndicator: TextView by bind(R.id.achievement_xp)
     private val state: TextView by bind(R.id.achievement_state)
@@ -59,6 +69,9 @@ class AchievementActivity : GenericActivity() {
 
     private val levelCalculator = LevelCalculator()
 
+    private val rewardedAd: FullscreenAdLoader by lazy { getFAdLoaderRewarded(this) }
+    private var interstitial: FullscreenAdLoader = getFAdLoaderInterstitial(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
@@ -71,10 +84,12 @@ class AchievementActivity : GenericActivity() {
         bottomSheet = BottomSheetBehavior.from(cardView)
         bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
         pager.offscreenPageLimit = 2
-        pager.adapter = AchievementsPagerAdapter(supportFragmentManager) {
+        pager.adapter = AchievementsFragmentsPagerAdapter(supportFragmentManager) {
             onMoreInfo(it)
         }
         tabs.setupWithViewPager(pager)
+        rewardedAd.load()
+        interstitial.load()
     }
 
     override fun onAttachedToWindow() {
@@ -98,25 +113,45 @@ class AchievementActivity : GenericActivity() {
     @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
-        CacheDB.INSTANCE.achievementsDAO().totalPoints.observe(this, Observer {
-            levelCalculator.calculate(it ?: 0)
-            if (levelCalculator.level != 40) {
-                progress.progressMax = levelCalculator.max.toFloat()
-                progress.progress = levelCalculator.progress.toFloat()
-                progressIndText.visibility = View.VISIBLE
-                countDown.text = "${NumberFormat.getNumberInstance(Locale.US).format(levelCalculator.toLvlUp)} XP"
-            } else {
-                progress.progressMax = 100f
-                progress.progress = 100f
-                progressIndText.visibility = View.GONE
-                countDown.text = "MAXIMO NIVEL"
+        CacheDB.INSTANCE.achievementsDAO().totalUnlockedPoints.observe(this, Observer {
+            doOnUI {
+                levelCalculator.calculate(it ?: 0)
+                if (it != CacheDB.INSTANCE.achievementsDAO().totalPoints) {
+                    progress.progressMax = levelCalculator.max.toFloat()
+                    progress.progress = levelCalculator.progress.toFloat()
+                    progressIndText.visibility = View.VISIBLE
+                    countDown.text = "${NumberFormat.getNumberInstance(Locale.US).format(levelCalculator.toLvlUp)} XP"
+                } else {
+                    progress.progressMax = 100f
+                    progress.progress = 100f
+                    progressIndText.visibility = View.GONE
+                    countDown.text = "MAXIMO NIVEL"
+                }
+                level.text = levelCalculator.level.toString()
             }
-            level.text = levelCalculator.level.toString()
         })
     }
 
     @SuppressLint("SetTextI18n")
     private fun onMoreInfo(achievement: Achievement) {
+        if (achievement.isSecret && !achievement.isRevealed && !achievement.isUnlocked) {
+            val cost = ((achievement.points / 1000) * 25)
+            buyButton.text = cost.toString()
+            buyButton.visibility = View.VISIBLE
+            buyButton.onClick {
+                doOnUI {
+                    if (Economy.buy(cost)) {
+                        achievement.isRevealed = true
+                        doAsync {
+                            CacheDB.INSTANCE.achievementsDAO().update(achievement)
+                            syncData { achievements() }
+                        }
+                        onMoreInfo(achievement)
+                    } else
+                        toast("Loli-coins insuficientes")
+                }
+            }
+        } else buyButton.visibility = View.GONE
         icon.setImageResource(achievement.usableIcon())
         xpIndicator.text = "${NumberFormat.getNumberInstance(Locale.US).format(achievement.points)} XP"
         state.text = achievement.getState()
@@ -147,11 +182,19 @@ class AchievementActivity : GenericActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    private fun showAd() {
+        probabilityOf<() -> Unit> {
+            item({ rewardedAd.show() }, 70.0)
+            item({ interstitial.show() }, 30.0)
+        }.random()()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (Backups.type != Backups.Type.NONE) {
-            menuInflater.inflate(R.menu.menu_achievements, menu)
+        menuInflater.inflate(R.menu.menu_achievements, menu)
+        if (Backups.type != Backups.Type.NONE && Backups.type != Backups.Type.FIRESTORE) {
             syncButton = menu?.findItem(R.id.sync)
-        }
+        } else
+            menu?.findItem(R.id.sync)?.isVisible = false
         return super.onCreateOptionsMenu(menu)
 
 
@@ -169,6 +212,11 @@ class AchievementActivity : GenericActivity() {
                 syncButton?.isEnabled = false
                 AchievementManager.restore {
                     invalidateOptionsMenu()
+                }
+            }
+            R.id.coins -> {
+                Economy.showWallet(this) {
+                    showAd()
                 }
             }
         }

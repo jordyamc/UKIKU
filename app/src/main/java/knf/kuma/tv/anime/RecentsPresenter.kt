@@ -7,7 +7,11 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecentObject
 import knf.kuma.tv.cards.RecentsCardView
 import knf.kuma.tv.details.TVAnimesDetails
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class RecentsPresenter : Presenter() {
 
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {

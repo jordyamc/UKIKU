@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.distinct
 import knf.kuma.commons.doOnUI
@@ -33,6 +35,11 @@ class EmissionFragment : Fragment(), RemoveListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return LayoutInflater.from(context).inflate(R.layout.recycler_emision, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        adContainer.implBanner(AdsType.EMISSION_BANNER, true)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

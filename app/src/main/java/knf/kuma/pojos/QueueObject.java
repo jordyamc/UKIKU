@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Keep;
 import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -15,6 +16,7 @@ import androidx.room.TypeConverters;
 import knf.kuma.database.BaseConverter;
 import knf.kuma.database.CacheDBWrap;
 
+@Keep
 @Entity
 @TypeConverters({BaseConverter.class})
 @SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
@@ -28,6 +30,14 @@ public class QueueObject implements Serializable {
     public AnimeObject.WebInfo.AnimeChapter chapter;
     @Ignore
     public int count = -1;
+
+    public QueueObject() {
+        this.id = 0;
+        this.isFile = false;
+        this.uri = "";
+        this.time = 0;
+        this.chapter = null;
+    }
 
     public QueueObject(int id, boolean isFile, String uri, long time, AnimeObject.WebInfo.AnimeChapter chapter) {
         this.id = id;
@@ -46,14 +56,14 @@ public class QueueObject implements Serializable {
         this.chapter = chapter;
     }
 
-    public static Uri[] getUris(List<QueueObject> list) {
+    public static Uri[] uris(List<QueueObject> list) {
         List<Uri> uris = new ArrayList<>();
         for (QueueObject object : list)
-            uris.add(object.getUri());
+            uris.add(object.createUri());
         return uris.toArray(new Uri[]{});
     }
 
-    public static List<QueueObject> getOne(List<QueueObject> list) {
+    public static List<QueueObject> takeOne(List<QueueObject> list) {
         List<String> aids = new ArrayList<>();
         List<QueueObject> n_list = new ArrayList<>();
         for (QueueObject object : list) {
@@ -69,15 +79,15 @@ public class QueueObject implements Serializable {
     public static String[] getTitles(List<QueueObject> list) {
         List<String> titles = new ArrayList<>();
         for (QueueObject object : list)
-            titles.add(object.getTitle());
+            titles.add(object.title());
         return titles.toArray(new String[]{});
     }
 
-    public Uri getUri() {
+    public Uri createUri() {
         return Uri.parse(uri);
     }
 
-    public String getTitle() {
+    public String title() {
         try {
             return chapter.name + chapter.number.substring(chapter.number.lastIndexOf(" "));
         } catch (Exception e) {

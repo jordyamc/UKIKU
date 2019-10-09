@@ -252,7 +252,11 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Extras">
-
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_ff"
+            android:key="family_friendly"
+            android:title="Modo family friendly" />
         <androidx.preference.ListPreference
             android:defaultValue="10"
             android:entries="@array/timeout_options"

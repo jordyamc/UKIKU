@@ -8,11 +8,15 @@ import androidx.paging.PagedList
 import com.crashlytics.android.Crashlytics
 import knf.kuma.App
 import knf.kuma.commons.*
+import knf.kuma.custom.BackgroundExecutor
+import knf.kuma.custom.MainExecutor
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirObject
+import knf.kuma.directory.DirObjectCompact
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.Recents
+import knf.kuma.search.SearchCompactDataSource
 import knf.kuma.search.SearchObject
 import org.jetbrains.anko.doAsync
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
@@ -200,6 +204,13 @@ class Repository {
             PatternUtil.isCustomSearch(query) -> getFiltered(query, genres)
             else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG("%$query%", genres), pagedConfig(25)).setInitialLoadKey(0).build()
         }
+    }
+
+    fun getSearchCompact(query: String, onInit: (isEmpty: Boolean) -> Unit): PagedList<DirObjectCompact> {
+        return PagedList.Builder<Int, DirObjectCompact>(SearchCompactDataSource(getFactory("https://animeflv.net"), query, onInit), 24).apply {
+            setFetchExecutor(BackgroundExecutor())
+            setNotifyExecutor(MainExecutor())
+        }.build()
     }
 
     private fun getFactory(link: String): Factory {

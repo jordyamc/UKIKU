@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
+import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
@@ -80,6 +81,7 @@ class DirectoryService : IntentService("Directory update") {
         setStatus(STATE_PARTIAL)
         doPartialSearch(jspoon, animeDAO)
         setStatus(STATE_FULL)
+        doEcchiRemove(animeDAO)
         doFullSearch(jspoon, animeDAO)
         doEmissionRefresh(jspoon, animeDAO)
         cancelForeground()
@@ -94,11 +96,19 @@ class DirectoryService : IntentService("Directory update") {
         }
     }
 
+    private fun doEcchiRemove(animeDAO: AnimeDAO) {
+        if (BuildConfig.BUILD_TYPE == "playstore" || PrefsUtil.isFamilyFriendly) {
+            animeDAO.nukeEcchi()
+        }
+    }
+
     private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
         animeDAO.allLinksInEmission.forEach {
             try {
                 val animeObject = AnimeObject(it, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(it).get().outerHtml()))
-                animeDAO.updateAnime(animeObject)
+                val current = animeDAO.getAnimeByAid(animeObject.aid)
+                if (current == null || current != animeObject)
+                    animeDAO.updateAnime(animeObject)
                 WEmisionProvider.update(this)
             } catch (e: Exception) {
                 return@forEach

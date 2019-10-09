@@ -1,9 +1,6 @@
 package knf.kuma.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import knf.kuma.pojos.GenreStatusObject
 
 /**
@@ -28,6 +25,12 @@ interface GenresDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertStatus(statusObject: GenreStatusObject)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertStatus(statusObjects: List<GenreStatusObject>)
+
+    @Update
+    fun update(list: List<GenreStatusObject>)
 
     @Query("DELETE FROM genrestatusobject WHERE count >= 0")
     fun reset()

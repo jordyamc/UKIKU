@@ -2,11 +2,13 @@ package knf.kuma.pojos;
 
 import com.google.gson.annotations.SerializedName;
 
+import androidx.annotation.Keep;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import knf.kuma.database.CacheDBWrap;
 
+@Keep
 @Entity
 public class SeeingObject {
     @SerializedName("STATE_WATCHING")
@@ -42,7 +44,7 @@ public class SeeingObject {
     public int state;
     @SerializedName("lastChapter")
     @Ignore
-    public AnimeObject.WebInfo.AnimeChapter lastChapter;
+    public SeenObject lastChapter;
 
     public SeeingObject(int key, String img, String link, String aid, String title, String chapter, int state) {
         this.key = key;
@@ -51,7 +53,7 @@ public class SeeingObject {
         this.aid = aid;
         this.title = title;
         this.chapter = chapter;
-        this.lastChapter = CacheDBWrap.INSTANCE.chaptersDAO().getLastByAid(aid);
+        this.lastChapter = CacheDBWrap.INSTANCE.seenDAO().getLastByAid(aid);
         this.state = state;
     }
 

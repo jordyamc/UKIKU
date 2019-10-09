@@ -11,12 +11,15 @@ import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor
 import knf.kuma.animeinfo.AnimeChaptersAdapter
 import knf.kuma.animeinfo.BottomActionsDialog
+import knf.kuma.animeinfo.ktx.fileName
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import kotlinx.android.synthetic.main.recycler_chapters.view.*
 import org.jetbrains.anko.doAsync
@@ -59,32 +62,36 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                     val snackbar = recyclerView.showSnackbar("Procesando...", duration = Snackbar.LENGTH_INDEFINITE)
                                     when (state) {
                                         BottomActionsDialog.STATE_SEEN -> doAsync {
-                                            val dao = CacheDB.INSTANCE.chaptersDAO()
+                                            val dao = CacheDB.INSTANCE.seenDAO()
                                             for (i13 in ArrayList(adapter?.selection
                                                     ?: arrayListOf())) {
-                                                dao.addChapter(chapters[i13])
+                                                dao.addChapter(SeenObject.fromChapter(chapters[i13]))
                                             }
+                                            syncData { seen() }
                                             val seeingDAO = CacheDB.INSTANCE.seeingDAO()
                                             val seeingObject = seeingDAO.getByAid(chapters[0].aid)
                                             if (seeingObject != null) {
                                                 seeingObject.chapter = chapters[0].number
                                                 seeingDAO.update(seeingObject)
+                                                syncData { seeing() }
                                             }
                                             recyclerView.post { adapter?.deselectAll() }
                                             snackbar.safeDismiss()
                                         }
                                         BottomActionsDialog.STATE_UNSEEN -> doAsync {
                                             try {
-                                                val dao = CacheDB.INSTANCE.chaptersDAO()
+                                                val dao = CacheDB.INSTANCE.seenDAO()
                                                 for (i12 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
-                                                    dao.deleteChapter(chapters[i12])
+                                                    dao.deleteChapter(SeenObject.fromChapter(chapters[i12]))
                                                 }
+                                                syncData { seen() }
                                                 val seeingDAO = CacheDB.INSTANCE.seeingDAO()
                                                 val seeingObject = seeingDAO.getByAid(chapters[0].aid)
                                                 if (seeingObject != null) {
                                                     seeingObject.chapter = chapters[0].number
                                                     seeingDAO.update(seeingObject)
+                                                    syncData { seeing() }
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
                                                 snackbar.safeDismiss()
@@ -188,9 +195,9 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
 
     fun goToChapter() {
         if (chapters.isNotEmpty()) {
-            val chapter = CacheDB.INSTANCE.chaptersDAO().getLast(PatternUtil.getEids(chapters))
+            val chapter = CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters))
             if (chapter != null) {
-                val position = chapters.indexOf(chapter)
+                val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
                 if (position >= 0)
                     manager.scrollToPositionWithOffset(position, 150)
             }

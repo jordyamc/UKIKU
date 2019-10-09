@@ -16,14 +16,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.ExplorerObject
 import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
@@ -36,7 +37,7 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
     private val context: Context? = fragment.context
 
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
-    private val chaptersDAO = CacheDB.INSTANCE.chaptersDAO()
+    private val chaptersDAO = CacheDB.INSTANCE.seenDAO()
     private val recordsDAO = CacheDB.INSTANCE.recordsDAO()
     private val explorerDAO = CacheDB.INSTANCE.explorerDAO()
 
@@ -59,8 +60,12 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
         holder.chapter.text = String.format(Locale.getDefault(), "Episodio %s", chapObject.chapter)
         holder.time.text = chapObject.time
         holder.cardView.setOnClickListener {
-            chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject))
+            chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject))
             recordsDAO.add(RecordObject.fromDownloaded(chapObject))
+            syncData {
+                history()
+                seen()
+            }
             holder.seenOverlay.setSeen(true, true)
             if (CastUtil.get().connected()) {
                 CastUtil.get().play(recyclerView, CastMedia.create(chapObject))
@@ -70,12 +75,13 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
         }
         holder.cardView.setOnLongClickListener {
             if (!chaptersDAO.chapterIsSeen(chapObject.eid)) {
-                chaptersDAO.addChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject))
+                chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject))
                 holder.seenOverlay.setSeen(true, true)
             } else {
-                chaptersDAO.deleteChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(chapObject))
+                chaptersDAO.deleteChapter(SeenObject.fromDownloaded(chapObject))
                 holder.seenOverlay.setSeen(false, true)
             }
+            syncData { seen() }
             true
         }
         holder.action.setOnClickListener {

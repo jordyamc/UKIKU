@@ -294,6 +294,26 @@
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                         android:textColor="?colorAccent"/>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="UUID"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                        <TextView
+                            android:id="@+id/uuid"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
+                    </LinearLayout>
+
+
                     <knf.kuma.custom.StateView
                         android:id="@+id/backupState"
                         android:layout_width="match_parent"

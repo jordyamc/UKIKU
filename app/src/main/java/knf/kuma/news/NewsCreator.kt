@@ -8,6 +8,7 @@ import android.text.Html
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import knf.kuma.ads.AdCallback
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.toast
 import org.jetbrains.anko.doAsync
@@ -20,8 +21,8 @@ import java.util.*
 import java.util.regex.Pattern
 
 object NewsCreator {
-    private val liveData = MutableLiveData<List<NewsObject>?>()
-    fun createNews(): LiveData<List<NewsObject>?> {
+    private val liveData = MutableLiveData<MutableList<NewsObject>?>()
+    fun createNews(): LiveData<MutableList<NewsObject>?> {
         reload()
         return liveData
     }
@@ -113,7 +114,7 @@ object NewsCreator {
     }
 }
 
-data class NewsObject(
+open class NewsObject(
         val title: String,
         val link: String,
         val date: String,
@@ -138,4 +139,8 @@ data class NewsObject(
     override fun hashCode(): Int {
         return link.hashCode()
     }
+}
+
+class AdNewsObject(private val adId: String) : NewsObject("", "", "", "", emptyList(), "", ""), AdCallback {
+    override fun getID(): String = adId
 }

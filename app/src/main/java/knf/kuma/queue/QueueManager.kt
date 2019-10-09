@@ -6,13 +6,12 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.preference.PreferenceManager
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.animeinfo.ktx.fileName
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
-import knf.kuma.pojos.AnimeObject
-import knf.kuma.pojos.ExplorerObject
-import knf.kuma.pojos.QueueObject
-import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.*
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
@@ -25,24 +24,29 @@ object QueueManager {
     fun add(uri: Uri, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter?) {
         if (chapter == null) return
         CacheDB.INSTANCE.queueDAO().add(QueueObject(uri, isFile, chapter))
+        syncData { queue() }
         Toaster.toast("Episodio añadido a cola")
     }
 
     fun remove(queueObject: QueueObject) {
         CacheDB.INSTANCE.queueDAO().remove(queueObject)
+        syncData { queue() }
     }
 
     fun update(vararg objects: QueueObject) {
         CacheDB.INSTANCE.queueDAO().update(*objects)
+        syncData { queue() }
     }
 
     fun remove(list: MutableList<QueueObject>) {
         CacheDB.INSTANCE.queueDAO().remove(list)
+        syncData { queue() }
     }
 
     fun remove(eid: String?) {
         if (eid == null) return
         CacheDB.INSTANCE.queueDAO().removeByEID(eid)
+        syncData { queue() }
     }
 
     fun removeAll(aid: String) {
@@ -98,9 +102,9 @@ object QueueManager {
     }
 
     private fun startQueueExternal(context: Context, list: List<QueueObject>) {
-        val startUri = if (list[0].isFile) FileAccessHelper.getDataUri(list[0].chapter.fileName) else list[0].getUri()
+        val startUri = if (list[0].isFile) FileAccessHelper.getDataUri(list[0].chapter.fileName) else list[0].createUri()
         val titles = QueueObject.getTitles(list)
-        val uris = QueueObject.getUris(list)
+        val uris = QueueObject.uris(list)
         uris[0] = startUri ?: Uri.EMPTY
         val intent = Intent(Intent.ACTION_VIEW)
                 .setPackage(isMxInstalled(context))
@@ -149,22 +153,26 @@ object QueueManager {
     }
 
     private fun markAllSeen(list: List<QueueObject>) {
-        doAsync {
-            for (queueObject in list) {
-                CacheDB.INSTANCE.chaptersDAO().addChapter(queueObject.chapter)
+        if (list.isNotEmpty())
+            doAsync {
+                CacheDB.INSTANCE.seenDAO().addAll(list.map { SeenObject.fromChapter(it.chapter) })
+                CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(list.last().chapter))
+                syncData {
+                    history()
+                    seen()
+                }
             }
-            if (list.isNotEmpty())
-                CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(list[list.size - 1].chapter))
-        }
     }
 
     private fun markAllSeenDownloaded(list: List<ExplorerObject.FileDownObj>) {
-        doAsync {
-            for (file in list) {
-                CacheDB.INSTANCE.chaptersDAO().addChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(file))
+        if (list.isNotEmpty())
+            doAsync {
+                CacheDB.INSTANCE.seenDAO().addAll(list.map { SeenObject.fromDownloaded(it) })
+                CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(list.last())))
+                syncData {
+                    history()
+                    seen()
+                }
             }
-            if (list.isNotEmpty())
-                CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(list[list.size - 1])))
-        }
     }
 }

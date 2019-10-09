@@ -8,8 +8,13 @@ import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
 import knf.kuma.tv.anime.AnimePresenter
 import knf.kuma.tv.details.TVAnimesDetails
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
+import kotlin.contracts.ExperimentalContracts
 
+
+@ExperimentalCoroutinesApi
+@ExperimentalContracts
 class TVTagFragment : VerticalGridSupportFragment(), OnItemViewClickedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {

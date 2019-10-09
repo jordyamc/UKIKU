@@ -46,30 +46,30 @@ object AchievementManager {
             setDismissible(true)
         }
         preloadAchievements()
-        achievementsDAO.completionListener.also { completionLiveData = it }.observeForever(Observer {
+        achievementsDAO.completionListener.also { completionLiveData = it }.distinct.observeForever(Observer {
             if (it.isEmpty()) return@Observer
             val list: List<Int> = it.map { achievement -> achievement.key.toInt() }
             unlock(list)
         })
-        CacheDB.INSTANCE.chaptersDAO().countLive.also { liveList.add(it) }.observeForever {
+        CacheDB.INSTANCE.seenDAO().countLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(33, 39))
         }
-        CacheDB.INSTANCE.favsDAO().countLive.also { liveList.add(it) }.observeForever {
+        CacheDB.INSTANCE.favsDAO().countLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(11, 1, 2, 3, 4, 5))
         }
-        CacheDB.INSTANCE.seeingDAO().countLive.also { liveList.add(it) }.observeForever {
+        CacheDB.INSTANCE.seeingDAO().countLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(16, 17, 18, 19))
         }
-        CacheDB.INSTANCE.seeingDAO().countCompletedLive.also { liveList.add(it) }.observeForever {
+        CacheDB.INSTANCE.seeingDAO().countCompletedLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(20, 21, 22, 23))
         }
-        CacheDB.INSTANCE.seeingDAO().countDroppedLive.also { liveList.add(it) }.observeForever {
+        CacheDB.INSTANCE.seeingDAO().countDroppedLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(24, 25, 26, 27))
         }
-        CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("363", "1706", "2950", "1182", "2479", "2478")).also { liveList.add(it) }.observeForever {
+        CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("363", "1706", "2950", "1182", "2479", "2478")).also { liveList.add(it) }.distinct.observeForever {
             if (it == 6) unlock(listOf(38))
         }
-        CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("1487", "1488", "1019", "460", "1493", "1494")).also { liveList.add(it) }.observeForever {
+        CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("1487", "1488", "1019", "460", "1493", "1494")).also { liveList.add(it) }.distinct.observeForever {
             if (it == 6) unlock(listOf(45))
         }
     }
@@ -134,7 +134,13 @@ object AchievementManager {
                     Achievement(42, "Compartiendo sabiduria", "Comparte 20 animes", points = 2000, goal = 20),
                     Achievement(43, "Boku no pico?", "Busca boku no hero", points = 2000, isSecret = true),
                     Achievement(44, "Alzheimer?", "Abre el historial 20 veces", points = 2000, goal = 20),
-                    Achievement(45, "A Sam le gusta esto", "Completa todo Evangelion", points = 6000, isSecret = true)
+                    Achievement(45, "A Sam le gusta esto", "Completa todo Evangelion", points = 6000, isSecret = true),
+                    Achievement(46, "Tu primera loli", "Obtén 1 loli-coin", points = 1000, goal = 1, isSecret = true),
+                    Achievement(47, "Nyanpasu", "Obtén 10 loli-coins", points = 1500, goal = 10, isSecret = true),
+                    Achievement(48, "Al dev le gusta esto", "Obtén 50 loli-coins", points = 3000, goal = 50, isSecret = true),
+                    Achievement(49, "Eso muerde el cebo", "Obtén 100 loli-coins", points = 4500, goal = 100, isSecret = true),
+                    Achievement(50, "La ONU te busca", "Obtén 500 loli-coins", points = 6000, goal = 500, isSecret = true),
+                    Achievement(51, "Al Chico Loli le gusta esto", "Obtén 1000 loli-coins", points = 7500, goal = 1000, isSecret = true)
             )
         }
     }
@@ -167,6 +173,7 @@ object AchievementManager {
             43L -> R.drawable.ic_achievement_midoriya
             44L -> R.drawable.ic_achievement_memory
             45L -> R.drawable.ic_achievement_evangelion
+            in 46..51 -> R.drawable.ic_cash_multi
             else -> R.drawable.ic_umaru_simple
         }
     }
@@ -196,7 +203,7 @@ object AchievementManager {
         }
     }
 
-    private fun incrementCount(by: Int, keys: List<Int>) {
+    fun incrementCount(by: Int, keys: List<Int>) {
         doAsync {
             val list = achievementsDAO.find(keys)
             list.forEach { it.count += by }
@@ -227,6 +234,7 @@ object AchievementManager {
                 }
             }
             achievementsDAO.update(list)
+
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context)) {
                 val achievementList = mutableListOf<AchievementUnlocked.AchievementData>()
                 list.forEach { achievementList.add(it.achievementData(context)) }

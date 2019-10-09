@@ -14,6 +14,7 @@ import com.google.android.material.card.MaterialCardView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
@@ -67,6 +68,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
                             R.id.droped -> seeingDAO.update(seeingObject.also { it.state = 4 })
                             R.id.paused -> seeingDAO.update(seeingObject.also { it.state = 5 })
                         }
+                        syncData { seeing() }
                         if (isFullList)
                             doOnUI {
                                 (holder as? SeeingItem)?.chapter?.text = getCardText(seeingObject)

@@ -38,6 +38,8 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
 import knf.kuma.backup.MigrationActivity
+import knf.kuma.backup.firestore.FirestoreManager
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.*
 import knf.kuma.custom.ConnectionState
@@ -52,6 +54,7 @@ import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.news.NewsActivity
+import knf.kuma.pojos.migrateSeen
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.preferences.ConfigurationFragment
 import knf.kuma.queue.QueueActivity
@@ -66,14 +69,17 @@ import knf.kuma.seeing.SeeingActivity
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.nav_header_main.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.cryse.widget.persistentsearch.PersistentSearchView
 import org.cryse.widget.persistentsearch.SearchItem
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.hintTextColor
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.textColor
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
+import kotlin.contracts.ExperimentalContracts
 
 class Main : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -98,6 +104,8 @@ class Main : GenericActivity(),
     private var readyToFinish = false
     private var isFirst = true
 
+    @ExperimentalCoroutinesApi
+    @ExperimentalContracts
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeNA())
         super.onCreate(savedInstanceState)
@@ -129,6 +137,8 @@ class Main : GenericActivity(),
         } else
             returnSelectFragment()
         checkBypass()
+        migrateSeen()
+        FirestoreManager.start()
     }
 
     private fun checkServices() {
@@ -140,6 +150,7 @@ class Main : GenericActivity(),
             DirUpdateWork.schedule(this@Main)
             RecentsNotReceiver.removeAll(this@Main)
             EAHelper.clear1()
+            verifiyFF()
         }
     }
 
@@ -158,23 +169,35 @@ class Main : GenericActivity(),
                 }
                 insets
             }
+            val actionShare = navigationView.getHeaderView(0).action_share
             val actionInfo = navigationView.getHeaderView(0).action_info
             val actionTrophy = navigationView.getHeaderView(0).action_trophy
             val actionLogin = navigationView.getHeaderView(0).action_login
             val actionMigrate = navigationView.getHeaderView(0).action_migrate
             val actionMap = navigationView.getHeaderView(0).action_map
-            actionInfo.setOnClickListener { AppInfo.open(this@Main) }
-            actionTrophy.setOnClickListener { AchievementActivity.open(this@Main) }
-            actionLogin.setOnClickListener { BackUpActivity.start(this@Main) }
-            actionMigrate.setOnClickListener { MigrationActivity.start(this@Main) }
-            actionMap.setOnClickListener { EAMapActivity.start(this@Main) }
+            actionShare.onClick {
+                startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, "Hola,\n" +
+                            "\n" +
+                            "UKIKU es una aplicación rápida y simple que uso para ver mis animes favoritos.\n" +
+                            "\n" +
+                            "Descárgala gratis desde https://ukiku.ga/")
+                }, "Compartir UKIKU"))
+            }
+            actionInfo.onClick { AppInfo.open(this@Main) }
+            actionTrophy.onClick { AchievementActivity.open(this@Main) }
+            actionLogin.onClick { BackUpActivity.start(this@Main) }
+            actionMigrate.onClick { MigrationActivity.start(this@Main) }
+            actionMap.onClick { EAMapActivity.start(this@Main) }
             actionMigrate.visibility = if (Backups.isAnimeflvInstalled) View.VISIBLE else View.GONE
             actionMap.visibility = if (EAHelper.phase == 3) View.VISIBLE else View.GONE
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
-            when (Backups.type) {
-                Backups.Type.NONE -> backupLocation.text = "Sin respaldos"
-                Backups.Type.DROPBOX -> backupLocation.text = "Dropbox"
-                Backups.Type.LOCAL -> backupLocation.text = "Local"
+            backupLocation.text = when (Backups.type) {
+                Backups.Type.NONE -> "Sin respaldos"
+                Backups.Type.DROPBOX -> "Dropbox"
+                Backups.Type.FIRESTORE -> "Firestore"
+                Backups.Type.LOCAL -> "Local"
             }
             subscribeBadges()
         }
@@ -457,7 +480,7 @@ class Main : GenericActivity(),
                 if (fragment !is SearchFragment)
                     selectedFragment = fragment
                 val transaction = supportFragmentManager.beginTransaction()
-                transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout)
+                //transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout)
                 transaction.replace(R.id.root, fragment)
                 transaction.commit()
                 invalidateOptionsMenu()
@@ -565,15 +588,21 @@ class Main : GenericActivity(),
         connectionState.setUp(this, ::onStateDialog)
         doOnUI {
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
-            when (Backups.type) {
-                Backups.Type.NONE -> backupLocation.text = "Sin respaldos"
-                Backups.Type.DROPBOX -> backupLocation.text = "Dropbox"
-                Backups.Type.LOCAL -> backupLocation.text = "Local"
+            backupLocation.text = when (Backups.type) {
+                Backups.Type.NONE -> "Sin respaldos"
+                Backups.Type.DROPBOX -> "Dropbox"
+                Backups.Type.FIRESTORE -> "Firestore"
+                Backups.Type.LOCAL -> "Local"
             }
         }
         if (isFirst) {
             isFirst = false
         }
+    }
+
+    override fun onPause() {
+        syncData { achievements() }
+        super.onPause()
     }
 
     override fun onUAChange() {

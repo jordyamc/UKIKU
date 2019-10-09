@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.LayoutRes
@@ -16,12 +17,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.crashlytics.android.Crashlytics
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.GenreStatusObject
 import knf.kuma.recommended.sections.MultipleSection
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 
 /**
@@ -58,6 +62,7 @@ class RecommendActivity : GenericActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
+        find<FrameLayout>(R.id.adContainer).implBanner(AdsType.RECOMMEND_BANNER, true)
         setAdapter()
     }
 
@@ -189,7 +194,7 @@ class RecommendActivity : GenericActivity() {
     }
 
     private fun showBlacklist() {
-        val blacklist = GenreStatusObject.getNames(CacheDB.INSTANCE.genresDAO().blacklist)
+        val blacklist = GenreStatusObject.names(CacheDB.INSTANCE.genresDAO().blacklist)
         val dialog = BlacklistDialog()
         dialog.init(blacklist, object : BlacklistDialog.MultiChoiceListener {
             override fun onOkay(selected: MutableList<String>) {

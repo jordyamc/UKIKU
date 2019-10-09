@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
@@ -11,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.verifyManager
@@ -61,6 +64,7 @@ class FragmentFiles : Fragment() {
         error = view.find(R.id.error)
         progressBar = view.find(R.id.progress)
         state = view.find(R.id.state)
+        view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.EXPLORER_BANNER, true)
         return view
     }
 

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
@@ -12,9 +13,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
+import knf.kuma.pojos.RecordObject
 import knf.kuma.queue.QueueManager
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -43,11 +48,14 @@ class FragmentChapters : Fragment() {
         recyclerView.verifyManager(170)
         progressBar = view.find(R.id.progress)
         fab = view.find(R.id.fab)
+        view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.EXPLORER_BANNER, true)
         return view
     }
 
     private fun playAll(list: List<ExplorerObject.FileDownObj>) {
         noCrash {
+            CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromDownloaded(list.last()))
+            syncData { history() }
             adapter?.notifyDataSetChanged()
             QueueManager.startQueueDownloaded(context, list)
         }

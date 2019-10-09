@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.SeenObject
 import xdroid.toaster.Toaster
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -49,7 +49,7 @@ class SeenList {
 
     companion object {
 
-        fun decode(inputStream: InputStream?): MutableList<AnimeObject.WebInfo.AnimeChapter>? {
+        fun decode(inputStream: InputStream?): MutableList<SeenObject>? {
             if (inputStream == null) return null
             var errorCount = 0
             val dao = CacheDB.INSTANCE.animeDAO()
@@ -58,7 +58,7 @@ class SeenList {
             }.type)
             seenList.deserialize()
             val totalCount = seenList.list?.size ?: 0
-            val chapters = ArrayList<AnimeObject.WebInfo.AnimeChapter>()
+            val chapters = ArrayList<SeenObject>()
             var animeObject: AnimeChapters? = null
             for (obj in seenList.list ?: listOf<SeenObj>()) {
                 try {
@@ -69,7 +69,7 @@ class SeenList {
                     for (chapter in chapterList) {
                         try {
                             if (chapter.number.endsWith(" " + obj.num)) {
-                                chapters.add(chapter)
+                                chapters.add(SeenObject.fromChapter(chapter))
                                 found = true
                                 break
                             }

@@ -28,11 +28,13 @@ object Backups {
     private const val keyHistory = "history"
     private const val keyFollowing = "following"
     private const val keySeen = "seen"
+    private const val keySeenNew = "seencompact"
     const val keyAchievements = "achievements"
     const val keyAutoBackup = "autobackup"
 
     var type: Type
         get() = when (PreferenceManager.getDefaultSharedPreferences(App.context).getInt("backup_type", -1)) {
+            2 -> Type.FIRESTORE
             1 -> Type.DROPBOX
             0 -> Type.LOCAL
             else -> Type.NONE
@@ -69,6 +71,7 @@ object Backups {
             service?.backup(BackupObject(getList(keyHistory)), keyHistory)
             service?.backup(BackupObject(getList(keyFollowing)), keyFollowing)
             service?.backup(BackupObject(getList(keySeen)), keySeen)
+            service?.backup(BackupObject(getList(keySeenNew)), keySeenNew)
         }
     }
 
@@ -90,6 +93,7 @@ object Backups {
             service?.search(keyHistory)?.let { restore(null, false, keyHistory, it) }
             service?.search(keyFollowing)?.let { restore(null, false, keyFollowing, it) }
             service?.search(keySeen)?.let { restore(null, false, keySeen, it) }
+            service?.search(keySeenNew)?.let { restore(null, false, keySeenNew, it) }
         }
     }
 
@@ -114,9 +118,16 @@ object Backups {
                         (backupObject.data?.filterIsInstance<SeeingObject>() as? MutableList<SeeingObject>)?.let { CacheDB.INSTANCE.seeingDAO().addAll(it) }
                     }
                     keySeen -> {
-                        if (replace)
+                        if (replace) {
                             CacheDB.INSTANCE.chaptersDAO().clear()
-                        (backupObject.data?.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>() as? MutableList<AnimeObject.WebInfo.AnimeChapter>)?.let { CacheDB.INSTANCE.chaptersDAO().addAll(it) }
+                            CacheDB.INSTANCE.seenDAO().clear()
+                        }
+                        (backupObject.data?.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>() as? MutableList<AnimeObject.WebInfo.AnimeChapter>)?.let { CacheDB.INSTANCE.seenDAO().addAll(it.map { SeenObject.fromChapter(it) }) }
+                    }
+                    keySeenNew -> {
+                        if (replace)
+                            CacheDB.INSTANCE.seenDAO().clear()
+                        (backupObject.data?.filterIsInstance<SeenObject>() as? MutableList<SeenObject>)?.let { CacheDB.INSTANCE.seenDAO().addAll(it) }
                     }
                 }
                 snackbar?.safeDismiss()
@@ -144,8 +155,8 @@ object Backups {
             keyFavs -> CacheDB.INSTANCE.favsDAO().allRaw
             keyHistory -> CacheDB.INSTANCE.recordsDAO().allRaw
             keyFollowing -> CacheDB.INSTANCE.seeingDAO().allRaw
-            keySeen -> CacheDB.INSTANCE.chaptersDAO().all
-            keyAchievements -> CacheDB.INSTANCE.achievementsDAO().allCompleted
+            keySeenNew -> CacheDB.INSTANCE.seenDAO().all
+            keyAchievements -> CacheDB.INSTANCE.achievementsDAO().all
             else -> mutableListOf<RecordObject>()
         }
     }
@@ -159,6 +170,9 @@ object Backups {
 
             }.type
             keyFollowing -> object : TypeToken<BackupObject<SeeingObject>>() {
+
+            }.type
+            keySeenNew -> object : TypeToken<BackupObject<SeenObject>>() {
 
             }.type
             keySeen -> object : TypeToken<BackupObject<AnimeObject.WebInfo.AnimeChapter>>() {
@@ -183,7 +197,8 @@ object Backups {
     enum class Type(var value: Int) {
         NONE(-1),
         LOCAL(0),
-        DROPBOX(1)
+        DROPBOX(1),
+        FIRESTORE(2)
     }
 
 }

@@ -1,5 +1,6 @@
 package knf.kuma.achievements
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
+import kotlinx.android.synthetic.main.fragment_achievements.*
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
 import org.jetbrains.anko.find
+
 
 class AchievementFragment : Fragment() {
 
@@ -24,12 +29,15 @@ class AchievementFragment : Fragment() {
     private val adapter = AchievementAdapter {
         onClick.invoke(it)
     }
+    private val isLockedScreen: Boolean by lazy { arguments?.getInt(isUnlockedKey, 0) ?: 0 == 0 }
+    private var isListEmpty: Boolean = false
     private var isFirst = true
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         CacheDB.INSTANCE.achievementsDAO().achievementList(arguments?.getInt(isUnlockedKey, 0) ?: 0)
                 .observe(this, Observer {
+                    isListEmpty = it.isEmpty()
                     adapter.setAchievements(it)
                     error.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
                     if (isFirst) {
@@ -48,6 +56,27 @@ class AchievementFragment : Fragment() {
             recyclerView.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
             recyclerView.adapter = adapter
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isLockedScreen && isListEmpty)
+            konfetti.build().apply {
+                addColors(Color.BLUE, Color.RED, Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                setDirection(0.0, 359.0)
+                setSpeed(4f, 7f)
+                setFadeOutEnabled(true)
+                setTimeToLive(2000)
+                addShapes(Shape.RECT, Shape.CIRCLE)
+                addSizes(Size(12, 6f), Size(16, 6f))
+                setPosition(-50f, konfetti.width + 50f, -50f, -50f)
+            }.streamFor(200, 10000L)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (isLockedScreen && isListEmpty)
+            konfetti.reset()
     }
 
     fun setCallback(onClick: OnClick) {

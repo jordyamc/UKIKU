@@ -12,6 +12,8 @@ import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
 import knf.kuma.uagen.randomUA
+import java.util.*
+import kotlin.collections.LinkedHashSet
 
 @SuppressLint("StaticFieldLeak")
 object PrefsUtil {
@@ -49,7 +51,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val isAdsEnabled: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", false) && BuildConfig.DEBUG
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", BuildConfig.BUILD_TYPE == "playstore" || App.context.resources.getBoolean(R.bool.isTv))
 
     val downloaderType: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
@@ -160,9 +162,67 @@ object PrefsUtil {
     val usePlaceholders: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("list_placeholder", false)
 
+    var instanceUuid: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("instance_uuid", null)
+                ?: UUID.randomUUID().toString().also { instanceUuid = it }
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("instance_uuid", value).apply()
+
     var recentLastHiddenNew: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("recent_last_hidden_new", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("recent_last_hidden_new", value).apply()
+
+    var rewardedVideoCount: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("rewarded_videos_seen", 0)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("rewarded_videos_seen", value).apply()
+
+    var coins: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("coinsNum", null)?.decrypt(BuildConfig.CIPHER_PWD)?.toInt()
+                ?: 0
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("coinsNum", value.toString().encrypt(BuildConfig.CIPHER_PWD)).apply()
+
+    val coinsLive: LiveData<String>
+        get() = PreferenceManager.getDefaultSharedPreferences(context).stringLiveData("coinsNum", "")
+
+    var lsAchievements: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_achievements", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_achievements", value).apply()
+
+    var lsEa: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_ea", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_ea", value).apply()
+
+    var lsFavs: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_favs", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_favs", value).apply()
+
+    var lsGenres: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_genres", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_genres", value).apply()
+
+    var lsHistory: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_history", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_history", value).apply()
+
+    var lsQueue: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_queue", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_queue", value).apply()
+
+    var lsSeeing: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_seeing", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_seeing", value).apply()
+
+    var lsSeen: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_seen", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_seen", value).apply()
+
+    var isFamilyFriendly: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("family_friendly", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("family_friendly", value).apply()
+
+    var ffPass: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("ff_pass", "")
+                ?: ""
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("ff_pass", value).apply()
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)

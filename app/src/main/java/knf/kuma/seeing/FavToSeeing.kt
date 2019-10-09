@@ -7,6 +7,7 @@ import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
@@ -14,6 +15,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.SeeingObject
+import knf.kuma.pojos.SeenObject
 import org.jetbrains.anko.doAsync
 
 object FavToSeeing {
@@ -46,15 +48,27 @@ object FavToSeeing {
                     dialog.getActionButton(WhichButton.POSITIVE).isEnabled = false
                     dialog.safeShow()
                     doAsync {
-                        favList.forEach {
-                            if (it.isCompleted) {
-                                if (!it.isSeeing)
-                                    CacheDB.INSTANCE.seeingDAO().add(SeeingObject.fromAnime(it).apply { state = SeeingObject.STATE_COMPLETED })
-                                if (withChapters)
-                                    CacheDB.INSTANCE.chaptersDAO().addAll(it.chapters)
+                        var needSeeingUpdate = false
+                        var needSeenUpdate = false
+                        favList.forEach { favoriteObject ->
+                            if (favoriteObject.isCompleted) {
+                                if (!favoriteObject.isSeeing) {
+                                    CacheDB.INSTANCE.seeingDAO().add(SeeingObject.fromAnime(favoriteObject).apply { state = SeeingObject.STATE_COMPLETED })
+                                    needSeeingUpdate = true
+                                }
+                                if (withChapters) {
+                                    CacheDB.INSTANCE.seenDAO().addAll(favoriteObject.chapters.map { SeenObject.fromChapter(it) })
+                                    needSeenUpdate = true
+                                }
                             }
                             count++
                             doOnUI { dialog.message(text = "Procesando favoritos... ($count/${favList.size})") }
+                        }
+                        syncData {
+                            if (needSeeingUpdate)
+                                seeing()
+                            if (needSeenUpdate)
+                                seen()
                         }
                         doOnUI { dialog.getActionButton(WhichButton.POSITIVE).isEnabled = true }
                     }

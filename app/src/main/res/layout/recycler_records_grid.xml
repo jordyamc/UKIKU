@@ -26,7 +26,8 @@
         <knf.kuma.custom.GridRecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:clipToPadding="false"
             android:layoutAnimation="@anim/grid_fall_down"
             android:padding="5dp"
@@ -34,6 +35,11 @@
             app:spanCount="@integer/span_count"
             tools:listitem="@layout/item_record_grid">
         </knf.kuma.custom.GridRecyclerView>
+
+        <FrameLayout
+            android:id="@+id/adContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
