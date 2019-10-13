@@ -7,13 +7,15 @@
 
     <string name="directory_channel_title">Actualizacion de directorio</string>
 
+    <string name="theme_default">3</string>
+
     <string-array name="theme_options">
         <item>Automático</item>
         <item>Dia</item>
         <item>Noche</item>
     </string-array>
     <string-array name="theme_values">
-        <item>0</item>
+        <item>3</item>
         <item>1</item>
         <item>2</item>
     </string-array>

@@ -1,6 +1,5 @@
 package knf.kuma.backup.framework
 
-import knf.kuma.BuildConfig
 import knf.kuma.backup.Backups
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.decrypt
@@ -22,12 +21,12 @@ abstract class BackupService {
 
     fun String.checkResponse(id: String): String =
             if (id == Backups.keyAchievements)
-                this.decrypt(BuildConfig.CIPHER_PWD)
+                this.decrypt()
             else this
 
     fun String.checkData(id: String): String =
             if (id == Backups.keyAchievements)
-                this.encrypt(BuildConfig.CIPHER_PWD)
+                this.encrypt()
             else this
 
 }

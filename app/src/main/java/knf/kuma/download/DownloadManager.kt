@@ -23,6 +23,7 @@ import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.FileUtil
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.videoservers.ServersFactory
@@ -259,15 +260,17 @@ class DownloadManager : Service() {
         }
 
         fun cancelAll() {
-            val downloads = downloadDao.allRaw
-            val dids = mutableListOf<Int>()
-            downloads.forEach {
-                dids.add(it.getDid())
-                notificationManager.cancel(it.eid?.toInt() ?: 0)
+            noCrash {
+                val downloads = downloadDao.allRaw
+                val dids = mutableListOf<Int>()
+                downloads.forEach {
+                    dids.add(it.getDid())
+                    notificationManager.cancel(it.eid?.toInt() ?: 0)
+                }
+                fetch?.delete(dids)
+                downloadDao.delete(downloads)
+                stopIfNeeded()
             }
-            fetch?.delete(dids)
-            downloadDao.delete(downloads)
-            stopIfNeeded()
         }
 
         fun pause(downloadObject: DownloadObject) {

@@ -57,6 +57,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/accent_button_state"
                 app:icon="@drawable/ic_coin_ach"
+                app:iconGravity="textStart"
                 app:strokeColor="@color/accent_button_state"
                 tools:text="1000" />
         </LinearLayout>

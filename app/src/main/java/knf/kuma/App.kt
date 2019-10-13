@@ -55,7 +55,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         context = this
-        AppCompatDelegate.setDefaultNightMode(Integer.parseInt(PrefsUtil.themeOption))
+        AppCompatDelegate.setDefaultNightMode(PrefsUtil.themeOption.toInt())
         BackUpWork.checkInit()
         CastManager.register(this)
         AchievementManager.init(this)

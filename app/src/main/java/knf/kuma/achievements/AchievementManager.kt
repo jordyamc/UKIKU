@@ -253,14 +253,14 @@ object AchievementManager {
             val list = mutableListOf<Int>()
             list.add(0)
             if (PrefsUtil.firstStart == 0L)
-                PrefsUtil.firstStart = Calendar.getInstance().timeInMillis
-            val time = (Calendar.getInstance().timeInMillis - PrefsUtil.firstStart)
+                PrefsUtil.firstStart = System.currentTimeMillis()
+            val time = (System.currentTimeMillis() - PrefsUtil.firstStart)
             if (time >= 7776000000) list.add(8)
             if (time >= 15552000000) list.add(9)
             if (time >= 31104000000) list.add(10)
-            if (Calendar.getInstance().timeInMillis - PrefsUtil.lastStart >= 604800000)
+            if (System.currentTimeMillis() - PrefsUtil.lastStart >= 604800000)
                 list.add(36)
-            PrefsUtil.lastStart = Calendar.getInstance().timeInMillis
+            PrefsUtil.lastStart = System.currentTimeMillis()
             if (EADB.INSTANCE.eaDAO().isUnlocked(0)) list.add(12)
             if (EADB.INSTANCE.eaDAO().isUnlocked(1)) list.add(13)
             if (EADB.INSTANCE.eaDAO().isUnlocked(2)) list.add(14)

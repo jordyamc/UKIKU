@@ -301,13 +301,15 @@ object FirestoreManager {
                     var needsNext = true
                     while (needsNext) {
                         needsNext = suspendCoroutine {
-                            val reference = subcollection.document("seen_$needsNext")
-                            reference.get().addOnCompleteListener { subDocument ->
-                                if (subDocument.result?.exists() == true) {
-                                    reference.delete()
-                                    it.resume(true)
-                                } else
-                                    it.resume(false)
+                            noCrashLet(false) {
+                                val reference = subcollection.document("seen_$needsNext")
+                                reference.get().addOnCompleteListener { subDocument ->
+                                    if (subDocument.result?.exists() == true) {
+                                        reference.delete()
+                                        it.resume(true)
+                                    } else
+                                        it.resume(false)
+                                }
                             }
                         }
                         nextIndex++

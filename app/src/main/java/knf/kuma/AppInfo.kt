@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
@@ -20,7 +21,6 @@ import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.EAUnlockActivity
 import knf.kuma.commons.Economy
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
 import knf.tools.kprobability.item
 import knf.tools.kprobability.probabilityOf
 
@@ -44,8 +44,8 @@ class AppInfo : MaterialAboutActivity() {
             return uriBuilder.build()
         }
 
-    private val rewardedAd: FullscreenAdLoader by lazy { getFAdLoaderRewarded(this, ::onUpdateCount) }
-    private var interstitial: FullscreenAdLoader = getFAdLoaderInterstitial(this, ::onUpdateCount)
+    private val rewardedAd: FullscreenAdLoader by lazy { getFAdLoaderRewarded(this) }
+    private var interstitial: FullscreenAdLoader = getFAdLoaderInterstitial(this)
     private lateinit var videoItem: MaterialAboutActionItem
 
     private fun showAd() {
@@ -55,12 +55,13 @@ class AppInfo : MaterialAboutActivity() {
         }.random()()
     }
 
-    private fun onUpdateCount() {
-        PrefsUtil.rewardedVideoCount = PrefsUtil.rewardedVideoCount + 1
-        doOnUI {
-            videoItem.subText = "Vistos: ${PrefsUtil.rewardedVideoCount}"
-            setMaterialAboutList(getMaterialAboutList(this))
-        }
+    private fun setupUpdateCount() {
+        PrefsUtil.rewardedVideoCountLive.observe(this, Observer {
+            if (::videoItem.isInitialized) {
+                videoItem.subText = "Vistos: $it"
+                setMaterialAboutList(getMaterialAboutList(this))
+            }
+        })
     }
 
 
@@ -109,6 +110,7 @@ class AppInfo : MaterialAboutActivity() {
         super.onCreate(savedInstanceState)
         rewardedAd.load()
         interstitial.load()
+        setupUpdateCount()
     }
 
     override fun onResume() {

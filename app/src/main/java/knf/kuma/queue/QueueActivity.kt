@@ -88,7 +88,7 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
         }
         bottomSheetBehavior = BottomSheetBehavior.from(cardView)
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
-        bottomSheetBehavior?.bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetBehavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN)
                     current = null
@@ -97,7 +97,7 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
             }
-        }
+        })
         setLayoutManager(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("queue_is_grouped", true))
         listRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayout.VERTICAL))
         listAdapter = QueueListAdapter { closeSheet() }

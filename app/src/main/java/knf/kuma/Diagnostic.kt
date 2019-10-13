@@ -89,7 +89,7 @@ class Diagnostic : GenericActivity() {
                     responseCode == 503 || responseCode == 403 || loadingTime > 10000 -> StateView.STATE_WARNING.also { info.visibility = View.VISIBLE }
                     else -> StateView.STATE_ERROR.also { info.visibility = View.GONE }
                 })
-                info.onClick {
+                info.setOnClickListener {
                     when {
                         responseCode == 503 -> show503Info()
                         responseCode == 403 -> show403Info()
@@ -290,7 +290,7 @@ class Diagnostic : GenericActivity() {
                 setContentView(R.layout.activity_webview_nwv)
             }
             logText.movementMethod = ScrollingMovementMethod()
-            fab.onClick {
+            fab.setOnClickListener {
                 if (isOpened && isFinishPending)
                     finish()
                 else if (isOpened) {

@@ -15,7 +15,6 @@ import knf.kuma.commons.bind
 import knf.kuma.commons.noCrashLet
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.text.NumberFormat
 import java.util.*
 
@@ -47,7 +46,7 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
             holder.name.text = achievement.usableName()
             holder.state.text = achievement.getState()
             holder.exp.text = "${NumberFormat.getNumberInstance(Locale.US).format(achievement.points)} XP"
-            holder.root.onClick { onClick.invoke(achievement) }
+            holder.root.setOnClickListener { onClick.invoke(achievement) }
         }
     }
 

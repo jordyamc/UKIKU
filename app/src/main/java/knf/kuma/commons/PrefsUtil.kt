@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
+import com.securepreferences.SecurePreferences
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -24,8 +25,8 @@ object PrefsUtil {
                 ?: "0"
 
     val themeOption: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", "0")
-                ?: "0"
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_option", context.getString(R.string.theme_default))
+                ?: context.getString(R.string.theme_default)
 
     val themeColor: String
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("theme_color", "0")
@@ -175,13 +176,21 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("rewarded_videos_seen", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("rewarded_videos_seen", value).apply()
 
-    var coins: Int
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("coinsNum", null)?.decrypt(BuildConfig.CIPHER_PWD)?.toInt()
-                ?: 0
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("coinsNum", value.toString().encrypt(BuildConfig.CIPHER_PWD)).apply()
+    val rewardedVideoCountLive: LiveData<Int>
+        get() = PreferenceManager.getDefaultSharedPreferences(context).intLiveData("rewarded_videos_seen", 0)
 
-    val coinsLive: LiveData<String>
-        get() = PreferenceManager.getDefaultSharedPreferences(context).stringLiveData("coinsNum", "")
+    var coins: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("coinsNum", null)?.decrypt()?.toInt()
+                ?: 0
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("coinsNum", value.toString().encrypt()).apply()
+
+    var userCoins: Int
+        get() = SecurePreferences(context).getInt("userCoins", try {
+            coins
+        } catch (e: Exception) {
+            0
+        })
+        set(value) = SecurePreferences(context).edit().putInt("userCoins", value).apply()
 
     var lsAchievements: Long
         get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_achievements", -1)

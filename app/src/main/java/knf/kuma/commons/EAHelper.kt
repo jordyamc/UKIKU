@@ -12,7 +12,10 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.preference.PreferenceManager
-import com.crashlytics.android.answers.*
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.LevelEndEvent
+import com.crashlytics.android.answers.LevelStartEvent
+import com.crashlytics.android.answers.PurchaseEvent
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -450,7 +453,6 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
                 doOnUI {
                     if (Economy.buy(getPurchaseCost(index))) {
                         unlock(index)
-                        Answers.getInstance().logCustom(CustomEvent("Coins used").putCustomAttribute("coins", getPurchaseCost(index)))
                         Toaster.toast("Compra realizada")
                     } else
                         Toaster.toast("No tienes suficientes loli-coins!!")
@@ -494,22 +496,22 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
     private fun unlock(sku: String?) {
         when (sku) {
             "ee_2" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 2").putItemPrice(BigDecimal.valueOf(7L)))
+                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 2").putItemPrice(BigDecimal.valueOf(7L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(1)
                 vertical_stepper_view.nextStep()
             }
             "ee_3" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 3").putItemPrice(BigDecimal.valueOf(13L)))
+                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 3").putItemPrice(BigDecimal.valueOf(13L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(2)
                 vertical_stepper_view.nextStep()
             }
             "ee_4" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 4").putItemPrice(BigDecimal.valueOf(5L)))
+                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 4").putItemPrice(BigDecimal.valueOf(5L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(3)
                 vertical_stepper_view.nextStep()
             }
             "ee_all" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg complete").putItemPrice(BigDecimal.valueOf(20L)))
+                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg complete").putItemPrice(BigDecimal.valueOf(20L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(1)
                 EAHelper.setUnlocked(2)
                 EAHelper.setUnlocked(3)

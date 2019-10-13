@@ -234,7 +234,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                 title(text = "Configurar contraseña")
                                 input { _, input ->
                                     doOnUI {
-                                        val crypted = input.toString().encrypt(BuildConfig.CIPHER_PWD)
+                                        val crypted = input.toString().encrypt()
                                         PrefsUtil.ffPass = crypted
                                         val file = ffFile
                                         if (!file.exists())
@@ -258,7 +258,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         val file = ffFile
                                         if (file.exists()) {
                                             val text = file.readText()
-                                            val decrypt = text.decrypt(BuildConfig.CIPHER_PWD)
+                                            val decrypt = text.decrypt()
                                             if (decrypt == input.toString()) {
                                                 PrefsUtil.ffPass = ""
                                                 file.delete()
@@ -269,7 +269,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                 Toaster.toast("Contraseña incorrecta")
                                             }
                                         } else {
-                                            val decrypt = PrefsUtil.ffPass.decrypt(BuildConfig.CIPHER_PWD)
+                                            val decrypt = PrefsUtil.ffPass.decrypt()
                                             if (decrypt != input.toString()) {
                                                 file.createNewFile()
                                                 file.writeText(decrypt)

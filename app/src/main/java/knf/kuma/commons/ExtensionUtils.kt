@@ -237,6 +237,17 @@ fun noCrash(enableLog: Boolean = true, func: () -> Unit): String? {
     }
 }
 
+fun noCrashException(enableLog: Boolean = true, func: () -> Unit): Exception? {
+    return try {
+        func()
+        null
+    } catch (e: Exception) {
+        if (enableLog)
+            e.printStackTrace()
+        e
+    }
+}
+
 fun noCrashExec(exec: () -> Unit = {}, func: () -> Unit) {
     try {
         func()
@@ -287,6 +298,14 @@ fun String?.toastLong() {
 fun doOnUI(enableLog: Boolean = true, onLog: (text: String) -> Unit = {}, func: () -> Unit) {
     GlobalScope.launch(Dispatchers.Main) {
         noCrash(enableLog) {
+            func()
+        }?.also { onLog(it) }
+    }
+}
+
+fun doOnUIException(enableLog: Boolean = true, onLog: (e: Exception) -> Unit = {}, func: () -> Unit) {
+    GlobalScope.launch(Dispatchers.Main) {
+        noCrashException(enableLog) {
             func()
         }?.also { onLog(it) }
     }

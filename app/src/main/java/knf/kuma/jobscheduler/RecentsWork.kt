@@ -10,9 +10,11 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.crashlytics.android.Crashlytics
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.R
@@ -66,7 +68,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
         } catch (e: Exception) {
             e.printStackTrace()
             Crashlytics.logException(e)
-            return Result.retry()
+            return Result.failure()
         }
     }
 
@@ -188,20 +190,26 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
         internal const val TAG = "recents-job"
 
         fun schedule(context: Context) {
-            doAsync {
-                val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-                val time = (preferences.getString("recents_time", "1") ?: "1").toInt() * 15
-                if (time > 0 && WorkManager.getInstance().getWorkInfosByTag(TAG).get().size == 0)
-                    PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
-                        setConstraints(networkConnectedConstraints())
-                        setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
-                        addTag(TAG)
-                    }.build().enqueue()
+            WorkManager.getInstance(context).getWorkInfosByTagLiveData(TAG).let { ld ->
+                lateinit var observer: Observer<List<WorkInfo>>
+                ld.observeForever(Observer<List<WorkInfo>> {
+                    ld.removeObserver(observer)
+                    doAsync {
+                        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+                        val time = (preferences.getString("recents_time", "1") ?: "1").toInt() * 15
+                        if (time > 0 && it.isEmpty())
+                            PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
+                                setConstraints(networkConnectedConstraints())
+                                setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
+                                addTag(TAG)
+                            }.build().enqueue()
+                    }
+                }.also { observer = it })
             }
         }
 
         fun reSchedule(time: Int) {
-            WorkManager.getInstance().cancelAllWorkByTag(TAG)
+            WorkManager.getInstance(App.context).cancelAllWorkByTag(TAG)
             if (time > 0)
                 PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
                     setConstraints(networkConnectedConstraints())

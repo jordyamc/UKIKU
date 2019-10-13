@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="117" version="4.3.1">
+        <change type="fix">Modo obscuro por defecto para Android 10</change>
+        <change type="fix">Error al obtener monedas en algunos telefonos</change>
+    </release>
     <release code="116" version="4.3">
         <change type="fix">Errores generales</change>
         <change type="new">Anuncios opcionales</change>
