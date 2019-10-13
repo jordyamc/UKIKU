@@ -41,7 +41,7 @@ object Economy {
     fun buy(price: Int): Boolean {
         val total = PrefsUtil.userCoins
         return if (total >= price) {
-            PrefsUtil.userCoins -= price
+            PrefsUtil.userCoins = (total - price).also { doOnUI { coinsLiveData.value = it } }
             doAsync { repeat(price) { Answers.getInstance().logCustom(CustomEvent("Coins used")) } }
             true
         } else false
