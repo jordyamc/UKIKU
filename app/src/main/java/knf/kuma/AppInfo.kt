@@ -21,6 +21,7 @@ import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.EAUnlockActivity
 import knf.kuma.commons.Economy
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.profile.TopActivity
 import knf.tools.kprobability.item
 import knf.tools.kprobability.probabilityOf
 
@@ -56,7 +57,7 @@ class AppInfo : MaterialAboutActivity() {
     }
 
     private fun setupUpdateCount() {
-        PrefsUtil.rewardedVideoCountLive.observe(this, Observer {
+        Economy.rewardedVideoLiveData.observe(this, Observer {
             if (::videoItem.isInitialized) {
                 videoItem.subText = "Vistos: $it"
                 setMaterialAboutList(getMaterialAboutList(this))
@@ -80,13 +81,14 @@ class AppInfo : MaterialAboutActivity() {
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_patreon), "Patreon", false, Uri.parse("https://www.patreon.com/animeflvapp")))
         donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_cuplogo), "Ko-fi", false, Uri.parse("https://ko-fi.com/unbarredstream")))
         if (BuildConfig.BUILD_TYPE != "playstore")
-            donateCard.addItem(MaterialAboutActionItem.Builder().text("Ver anuncio").subText("Vistos: ${PrefsUtil.rewardedVideoCount}").icon(R.drawable.ic_cash).setOnClickAction {
+            donateCard.addItem(MaterialAboutActionItem.Builder().text("Ver anuncio").subText("Vistos: ${PrefsUtil.userRewardedVideoCount}").icon(R.drawable.ic_cash).setOnClickAction {
                 showAd()
             }.build().also { videoItem = it })
 
         val extraCard = MaterialAboutCard.Builder()
         extraCard.title("Extras")
         extraCard.addItem(MaterialAboutActionItem.Builder().text("Cartera de loli-coins").icon(R.drawable.ic_coin).setOnClickAction { Economy.showWallet(this, true) { showAd() } }.build())
+        extraCard.addItem(MaterialAboutActionItem.Builder().text("Top videos vistos").icon(R.drawable.ic_podium).setOnClickAction { TopActivity.open(this) }.build())
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_web), "Página web", true, Uri.parse("https://ukiku.ga")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_github), "Proyecto en github", true, Uri.parse("https://github.com/jordyamc/UKIKU")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_facebook), "Facebook", true, Uri.parse("https://www.facebook.com/ukikuapp")))

@@ -10,6 +10,7 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.backup.firestore.FirestoreManager
 import knf.tools.kprobability.item
 import knf.tools.kprobability.probabilityOf
 import kotlinx.android.synthetic.main.dialog_wallet.view.*
@@ -22,6 +23,7 @@ val Int.coins: String get() = "$this loli-coin${if (this == 1) "" else "s"}"
 object Economy {
 
     private val coinsLiveData = MutableLiveData(PrefsUtil.userCoins)
+    val rewardedVideoLiveData = MutableLiveData(PrefsUtil.userRewardedVideoCount)
 
     fun reward(isAdClicked: Boolean = false) {
         doOnUIException(onLog = { Crashlytics.logException(it);toast("Error al obtener loli-coins\n${it.message}") }) {
@@ -32,7 +34,8 @@ object Economy {
             }.random()
             doAsync { repeat(reward) { Answers.getInstance().logCustom(CustomEvent("Coins generated")) } }
             PrefsUtil.userCoins = (PrefsUtil.userCoins + reward).also { coinsLiveData.value = it }
-            PrefsUtil.rewardedVideoCount += 1
+            PrefsUtil.userRewardedVideoCount = (PrefsUtil.userRewardedVideoCount + 1).also { rewardedVideoLiveData.value = it }
+            FirestoreManager.updateTop()
             AchievementManager.incrementCount(reward, listOf(46, 47, 48, 49, 50, 51))
             toast("Has ganado ${reward.coins}!!!!!")
         }
@@ -48,21 +51,23 @@ object Economy {
     }
 
     fun showWallet(activity: AppCompatActivity, themed: Boolean = false, onShow: () -> Unit) {
-        val view = activity.layoutInflater.inflate(R.layout.dialog_wallet, null)
-        if (themed) {
-            view.coinsCount.setTextColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
-            view.backgroundTop.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
-            view.backgroundBottom.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColor()))
-        }
-        view.coinsCount.text = PrefsUtil.userCoins.toString()
-        coinsLiveData.observe(activity, Observer {
-            doOnUI {
-                view.coinsCount.text = it.toString()
+        doOnUI {
+            val view = activity.layoutInflater.inflate(R.layout.dialog_wallet, null)
+            if (themed) {
+                view.coinsCount.setTextColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
+                view.backgroundTop.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
+                view.backgroundBottom.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColor()))
             }
-        })
-        view.showAdButton.onClick { onShow() }
-        AlertDialog.Builder(activity).apply {
-            setView(view)
-        }.show()
+            view.coinsCount.text = PrefsUtil.userCoins.toString()
+            coinsLiveData.observe(activity, Observer {
+                doOnUI {
+                    view.coinsCount.text = it.toString()
+                }
+            })
+            view.showAdButton.onClick { onShow() }
+            AlertDialog.Builder(activity).apply {
+                setView(view)
+            }.show()
+        }
     }
 }

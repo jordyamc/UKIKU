@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/coins"
+        android:icon="@drawable/ic_coin"
+        android:title="Conseguir monedas"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/editName"
+        android:icon="@drawable/ic_account_edit"
+        android:title="Editar nombre"
+        app:showAsAction="always" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/top25"
+            android:title="Top 25" />
+        <item
+            android:id="@+id/top50"
+            android:title="Top 50" />
+        <item
+            android:id="@+id/top75"
+            android:title="Top 75" />
+        <item
+            android:id="@+id/top100"
+            android:title="Top 100" />
+    </group>
+</menu>

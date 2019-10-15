@@ -19,10 +19,7 @@ import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.PicassoSingle
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.create
-import knf.kuma.commons.jsoupCookies
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadDialogActivity
 import knf.kuma.download.FileAccessHelper
@@ -192,19 +189,22 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
         fun schedule(context: Context) {
             WorkManager.getInstance(context).getWorkInfosByTagLiveData(TAG).let { ld ->
                 lateinit var observer: Observer<List<WorkInfo>>
-                ld.observeForever(Observer<List<WorkInfo>> {
-                    ld.removeObserver(observer)
-                    doAsync {
-                        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-                        val time = (preferences.getString("recents_time", "1") ?: "1").toInt() * 15
-                        if (time > 0 && it.isEmpty())
-                            PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
-                                setConstraints(networkConnectedConstraints())
-                                setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
-                                addTag(TAG)
-                            }.build().enqueue()
-                    }
-                }.also { observer = it })
+                doOnUI {
+                    ld.observeForever(Observer<List<WorkInfo>> {
+                        ld.removeObserver(observer)
+                        doAsync {
+                            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+                            val time = (preferences.getString("recents_time", "1")
+                                    ?: "1").toInt() * 15
+                            if (time > 0 && it.isEmpty())
+                                PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
+                                    setConstraints(networkConnectedConstraints())
+                                    setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
+                                    addTag(TAG)
+                                }.build().enqueue()
+                        }
+                    }.also { observer = it })
+                }
             }
         }
 

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,6 +22,8 @@ import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onCancel
+import com.afollestad.materialdialogs.input.getInputField
+import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.crashlytics.android.Crashlytics
@@ -47,6 +50,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.support.v4.toast
 import xdroid.toaster.Toaster
 import java.io.FileOutputStream
 
@@ -233,16 +237,22 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             MaterialDialog(it).safeShow {
                                 title(text = "Configurar contraseña")
                                 input { _, input ->
-                                    doOnUI {
-                                        val crypted = input.toString().encrypt()
-                                        PrefsUtil.ffPass = crypted
+                                    doOnUI(onLog = {
+                                        PrefsUtil.isFamilyFriendly = false
+                                        preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                        toast("Error al encriptar")
+                                    }) {
+                                        val encrypted = input.toString().encrypt()
+                                        PrefsUtil.ffPass = encrypted
                                         val file = ffFile
                                         if (!file.exists())
                                             file.createNewFile()
-                                        file.writeText(crypted)
+                                        file.writeText(encrypted)
                                         doAsync { CacheDB.INSTANCE.animeDAO().nukeEcchi() }
                                     }
                                 }
+                                getInputLayout().boxBackgroundColor = Color.TRANSPARENT
+                                getInputField().setBackgroundColor(Color.TRANSPARENT)
                                 onCancel {
                                     PrefsUtil.isFamilyFriendly = false
                                     preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
@@ -254,7 +264,11 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             MaterialDialog(it).safeShow {
                                 title(text = "Ingresa contraseña")
                                 input { _, input ->
-                                    doOnUI {
+                                    doOnUI(onLog = {
+                                        PrefsUtil.isFamilyFriendly = true
+                                        preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                        toast("Error al desencriptar")
+                                    }) {
                                         val file = ffFile
                                         if (file.exists()) {
                                             val text = file.readText()
@@ -283,6 +297,8 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         }
                                     }
                                 }
+                                getInputLayout().boxBackgroundColor = Color.TRANSPARENT
+                                getInputField().setBackgroundColor(Color.TRANSPARENT)
                                 onCancel {
                                     PrefsUtil.isFamilyFriendly = true
                                     preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true

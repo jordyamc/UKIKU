@@ -168,21 +168,25 @@ object PrefsUtil {
                 ?: UUID.randomUUID().toString().also { instanceUuid = it }
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("instance_uuid", value).apply()
 
+    var instanceName: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("instance_name", "Anónimo")
+                ?: "Anónimo"
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("instance_name", value).apply()
+
     var recentLastHiddenNew: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("recent_last_hidden_new", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("recent_last_hidden_new", value).apply()
 
-    var rewardedVideoCount: Int
+    private val rewardedVideoCount: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("rewarded_videos_seen", 0)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("rewarded_videos_seen", value).apply()
 
-    val rewardedVideoCountLive: LiveData<Int>
-        get() = PreferenceManager.getDefaultSharedPreferences(context).intLiveData("rewarded_videos_seen", 0)
+    var userRewardedVideoCount: Int
+        get() = SecurePreferences(context).getInt("user_rewarded_videos_seen", rewardedVideoCount)
+        set(value) = SecurePreferences(context).edit().putInt("user_rewarded_videos_seen", value).apply()
 
-    var coins: Int
+    private val coins: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("coinsNum", null)?.decrypt()?.toInt()
                 ?: 0
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("coinsNum", value.toString().encrypt()).apply()
 
     var userCoins: Int
         get() = SecurePreferences(context).getInt("userCoins", try {
@@ -232,6 +236,10 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("ff_pass", "")
                 ?: ""
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("ff_pass", value).apply()
+
+    var topCount: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("top_count", 25)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("top_count", value).apply()
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)

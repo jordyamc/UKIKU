@@ -10,6 +10,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
@@ -37,7 +38,7 @@ object FirestoreManager {
     enum class State { IDLE, UPLOAD, SYNC }
 
     val firestoreDB by lazy { Firebase.firestore }
-    private val user: FirebaseUser? get() = FirebaseAuth.getInstance().currentUser
+    val user: FirebaseUser? get() = FirebaseAuth.getInstance().currentUser
     val uid: String? get() = user?.uid
 
     private val listeners = mutableListOf<ListenerRegistration>()
@@ -59,7 +60,6 @@ object FirestoreManager {
     @ExperimentalCoroutinesApi
     fun start() {
         if (isLoggedIn && (PrefsUtil.isAdsEnabled || BuildConfig.DEBUG)) {
-            Log.e("Current user", "${user?.displayName}")
             QueueManager.open()
             doAsync {
                 firestoreDB.document("users/$uid/backups/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
@@ -194,6 +194,23 @@ object FirestoreManager {
                 }.also { listeners.add(it) }
             }
         }
+        doAsync {
+            firestoreDB.document("top/${uid
+                    ?: PrefsUtil.instanceUuid}").addSnapshotListener { documentSnapshot, _ ->
+                doAsync {
+                    if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        documentSnapshot.toObject<TopData>()?.let {
+                            if (it.isForced) {
+                                user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(it.name).build())
+                                        ?: { PrefsUtil.instanceName = it.name }()
+                            }
+                            PrefsUtil.userRewardedVideoCount = it.number
+                            Log.e("Firestore", "Top updated")
+                        }
+                    }
+                }
+            }.also { listeners.add(it) }
+        }
     }
 
     fun stop() {
@@ -207,7 +224,7 @@ object FirestoreManager {
         if (checkForFiles)
             firestoreDB.collection("users/$uid/backups").get()
                     .addOnSuccessListener {
-                        if (it.isEmpty)
+                        if (it.isEmpty) {
                             MaterialDialog(activity).safeShow {
                                 title(text = "¿Nuevo usuario?")
                                 message(text = "Este parece ser tu primer inicio de sesion, tus datos necesitan ser subidos a la nube, primero asegurate que éste sea tu dispositivo principal!")
@@ -220,7 +237,8 @@ object FirestoreManager {
                                     doSignOut(activity)
                                 }
                             }
-                        else {
+                            firestoreDB.document("top/${PrefsUtil.instanceUuid}").delete()
+                        } else {
                             firestoreDB.document("users/$uid/backups/info")
                                     .get().addOnCompleteListener { document ->
                                         val data = document.result?.data
@@ -257,6 +275,7 @@ object FirestoreManager {
                 genres()
                 queue()
                 seeing()
+                top()
             }
             GlobalScope.launch(Dispatchers.IO) {
                 delay(10000)
@@ -305,11 +324,13 @@ object FirestoreManager {
                             noCrashLet(false) {
                                 val reference = subcollection.document("seen_$needsNext")
                                 reference.get().addOnCompleteListener { subDocument ->
-                                    if (subDocument.result?.exists() == true) {
-                                        reference.delete()
-                                        it.resume(true)
-                                    } else
-                                        it.resume(false)
+                                    noCrashExec(exec = { it.resume(false) }) {
+                                        if (subDocument.result?.exists() == true) {
+                                            reference.delete()
+                                            it.resume(true)
+                                        } else
+                                            it.resume(false)
+                                    }
                                 }
                             }
                         }
@@ -398,6 +419,23 @@ object FirestoreManager {
                 }
             }
 
+    fun updateTop() =
+            doAsync {
+                noCrash {
+                    firestoreDB.document("top/${uid
+                            ?: PrefsUtil.instanceUuid}").set(TopData.create())
+                    Log.e("Firestore", "Top upload success")
+                }
+            }
+
+    @ExperimentalContracts
+    fun listenTop(callback: (list: List<TopData>) -> Unit) =
+            firestoreDB.collection("top").addSnapshotListener { querySnapshot, exception ->
+                exception?.let { Log.e("Firestore", "Top Query Error", it) }
+                Log.e("Firestore", "On tops update")
+                querySnapshot?.let { callback(it.documents.mapNotNull { document -> document.toObject<TopData>() }) }
+            }
+
     fun doLogin(activity: Activity) {
         if (isLoggedIn) {
             MaterialDialog(activity).safeShow {
@@ -416,7 +454,7 @@ object FirestoreManager {
                     AuthUI.getInstance()
                             .createSignInIntentBuilder()
                             .setAvailableProviders(providers)
-                            .setLogo(R.mipmap.ic_launcher)
+                            .setLogo(R.drawable.ic_launcher_login)
                             .build()
                     , 5548
             )
@@ -466,6 +504,7 @@ class SyncRequest(private val collection: CollectionReference) {
     fun genres() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateGenres(collection) } }
     fun queue() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateQueue(collection) } }
     fun seeing() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateSeeing(collection) } }
+    fun top() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateTop() } }
 
     fun sync() {
         if (FirestoreManager.isLoggedIn)

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="118" version="4.3.2">
+        <change type="fix">Errores generales</change>
+        <change type="new">UI mas compacta en pantalla de backups</change>
+        <change type="new">Top de videos vistos</change>
+    </release>
     <release code="117" version="4.3.1">
         <change type="fix">Modo obscuro por defecto para Android 10</change>
         <change type="fix">Error al obtener monedas en algunos telefonos</change>

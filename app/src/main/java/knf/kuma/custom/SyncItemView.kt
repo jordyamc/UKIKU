@@ -66,7 +66,8 @@ class SyncItemView : RelativeLayout {
         post {
             noCrash {
                 if (Network.isConnected) {
-                    backup?.isEnabled = true
+                    if (!hideBackup)
+                        backup?.isEnabled = true
                     if (backupObject == null)
                         date.text = "Sin respaldo"
                     else {
