@@ -35,7 +35,7 @@ object Network {
     val isAdsBlocked: Boolean by lazy {
         return@lazy try {
             BufferedReader(InputStreamReader(FileInputStream("/etc/hosts"))).readLines().forEach {
-                if (it.contains("admob"))
+                if (it.contains("admob") || it.contains("appbrains"))
                     return@lazy true
             }
             false

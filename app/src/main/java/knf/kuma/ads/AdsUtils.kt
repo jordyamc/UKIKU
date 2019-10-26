@@ -95,8 +95,7 @@ fun getFAdLoaderRewarded(context: Activity, onUpdate: () -> Unit = {}): Fullscre
 
 fun getFAdLoaderInterstitial(context: Activity, onUpdate: () -> Unit = {}): FullscreenAdLoader =
         probabilityOf<() -> FullscreenAdLoader> {
-            if (!Network.isAdsBlocked)
-                item({ getFAdLoaderInterstitialMob(context, onUpdate) }, 90.0)
+            item({ getFAdLoaderInterstitialMob(context, onUpdate) }, 90.0)
             item({ getFAdLoaderBrains(context, onUpdate) }, 10.0)
         }.random()()
 

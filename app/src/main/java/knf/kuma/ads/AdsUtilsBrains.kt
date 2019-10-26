@@ -9,6 +9,7 @@ import com.appbrain.InterstitialListener
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.commons.Economy
+import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.news.AdNewsObject
@@ -17,6 +18,7 @@ import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
+import xdroid.toaster.Toaster
 
 object AdsUtilsBrains {
     const val RECENT_BANNER = "recent_banner"
@@ -206,6 +208,9 @@ class FAdLoaderBrains(private val context: Context, onUpdate: () -> Unit) : Full
     }
 
     override fun show() {
-        builder.show(context)
+        if (Network.isAdsBlocked)
+            Toaster.toast("Anuncios bloqueados por host")
+        else
+            builder.show(context)
     }
 }

@@ -10,7 +10,6 @@ import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.afollestad.materialdialogs.MaterialDialog
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.BuildConfig
@@ -61,14 +60,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onNeedUpdate(o_code: String, n_code: String) {
         runOnUiThread {
-            MaterialDialog(this@TVMain).safeShow {
-                title(text = "Actualización")
-                message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
-                positiveButton(text = "si") {
-                    UpdateActivity.start(this@TVMain)
-                }
-                negativeButton(text = "despues")
-            }
+            UpdateActivity.start(this@TVMain)
         }
     }
 

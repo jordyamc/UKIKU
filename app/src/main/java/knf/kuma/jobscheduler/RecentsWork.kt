@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -47,6 +48,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
         get() = Intent(context, RecentsNotReceiver::class.java).putExtra("mode", 1)
 
     override fun doWork(): Result {
+        if (!Network.isConnected) return Result.success().also { Log.e("Recents", "No Network") }
         try {
             val recents = Jspoon.create().adapter(Recents::class.java).fromHtml(jsoupCookies("https://animeflv.net/").get().outerHtml())
             val objects = RecentObject.create(recents.list ?: listOf())
@@ -197,8 +199,9 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
                             val time = (preferences.getString("recents_time", "1")
                                     ?: "1").toInt() * 15
                             if (time > 0 && it.isEmpty())
+                                Log.e("Recents", "On schedule")
                                 PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
-                                    setConstraints(networkConnectedConstraints())
+                                    //setConstraints(networkConnectedConstraints())
                                     setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
                                     addTag(TAG)
                                 }.build().enqueue()
@@ -210,14 +213,15 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
 
         fun reSchedule(time: Int) {
             WorkManager.getInstance(App.context).cancelAllWorkByTag(TAG)
+            Log.e("Recents", "On remove")
             if (time > 0)
                 PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
-                    setConstraints(networkConnectedConstraints())
+                    //setConstraints(networkConnectedConstraints())
                     setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
                     addTag(TAG)
-                }.build().enqueue()
+                }.build().enqueue().also { Log.e("Recents", "On schedule") }
         }
 
-        fun run() = OneTimeWorkRequestBuilder<RecentsWork>().apply { setConstraints(networkConnectedConstraints()) }.build().enqueue()
+        fun run() = OneTimeWorkRequestBuilder<RecentsWork>().build().enqueue()
     }
 }

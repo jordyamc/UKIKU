@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="119" version="4.3.3">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Error al notificar recientes</change>
+    </release>
     <release code="118" version="4.3.2">
         <change type="fix">Errores generales</change>
         <change type="new">UI mas compacta en pantalla de backups</change>

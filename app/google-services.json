@@ -77,6 +77,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "928658019079-l31ed0lu7jti5446jatpu8tooj86up5a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.tv",
+            "certificate_hash": "f06e235ca364d6a99baf4d647f6ee31e2b0fb650"
+          }
+        },
+        {
+          "client_id": "928658019079-k78msvf0ukud9e71u844n129cv17dgu4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.kuma.tv",
+            "certificate_hash": "b239693f42a944b7eca4203d8d9e4022cd1dd4a3"
+          }
+        },
+        {
           "client_id": "928658019079-597ceth59vfrn68t3a8evfq5ech7hotb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

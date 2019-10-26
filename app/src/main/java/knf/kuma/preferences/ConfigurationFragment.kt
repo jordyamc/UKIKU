@@ -236,19 +236,33 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                         activity?.let {
                             MaterialDialog(it).safeShow {
                                 title(text = "Configurar contraseña")
-                                input { _, input ->
-                                    doOnUI(onLog = {
-                                        PrefsUtil.isFamilyFriendly = false
-                                        preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
-                                        toast("Error al encriptar")
-                                    }) {
-                                        val encrypted = input.toString().encrypt()
-                                        PrefsUtil.ffPass = encrypted
-                                        val file = ffFile
-                                        if (!file.exists())
-                                            file.createNewFile()
-                                        file.writeText(encrypted)
-                                        doAsync { CacheDB.INSTANCE.animeDAO().nukeEcchi() }
+                                input { _, inputText ->
+                                    MaterialDialog(it).safeShow {
+                                        title(text = "Repetir contraseña")
+                                        input { _, input ->
+                                            if (input == inputText)
+                                                doOnUI(onLog = {
+                                                    PrefsUtil.isFamilyFriendly = false
+                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                                    toast("Error al encriptar")
+                                                }) {
+                                                    val encrypted = input.toString().encrypt()
+                                                    PrefsUtil.ffPass = encrypted
+                                                    val file = ffFile
+                                                    if (!file.exists())
+                                                        file.createNewFile()
+                                                    file.writeText(encrypted)
+                                                    doAsync { CacheDB.INSTANCE.animeDAO().nukeEcchi() }
+                                                }
+                                            else
+                                                toast("Las contraseñas no coinciden")
+                                        }
+                                        getInputLayout().boxBackgroundColor = Color.TRANSPARENT
+                                        getInputField().setBackgroundColor(Color.TRANSPARENT)
+                                        onCancel {
+                                            PrefsUtil.isFamilyFriendly = false
+                                            preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                        }
                                     }
                                 }
                                 getInputLayout().boxBackgroundColor = Color.TRANSPARENT

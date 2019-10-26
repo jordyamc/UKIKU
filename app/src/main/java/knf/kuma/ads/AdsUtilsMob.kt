@@ -12,6 +12,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import knf.kuma.BuildConfig
 import knf.kuma.commons.Economy
+import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.news.AdNewsObject
@@ -241,6 +242,8 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
     override fun show() {
         if (::rewardedAd.isInitialized && rewardedAd.isLoaded)
             showRewarded()
+        else if (Network.isAdsBlocked)
+            toast("Anuncios bloqueados por host")
         else
             toast("Anuncio aún cargando...")
     }
@@ -272,9 +275,10 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
     }
 
     override fun show() {
-        if (interstitialAd.isLoaded)
-            interstitialAd.show()
-        else
-            toast("Anuncio aún cargando...")
+        when {
+            interstitialAd.isLoaded -> interstitialAd.show()
+            Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
+            else -> toast("Anuncio aún cargando...")
+        }
     }
 }

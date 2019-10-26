@@ -59,6 +59,10 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
         if (!PrefsUtil.isAdsEnabled && !BuildConfig.DEBUG) {
             login_firestore.isEnabled = false
             ads_required.visibility = View.VISIBLE
+        } else if (PrefsUtil.isAdsEnabled && Network.isAdsBlocked && !BuildConfig.DEBUG) {
+            login_firestore.isEnabled = false
+            ads_required.text = "Anuncios bloqueados por host"
+            ads_required.visibility = View.VISIBLE
         }
         login_firestore.setOnClickListener { onFirestoreLogin() }
         login_local.setOnClickListener { onLocalLogin() }

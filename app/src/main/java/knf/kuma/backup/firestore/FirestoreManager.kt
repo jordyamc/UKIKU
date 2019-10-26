@@ -18,6 +18,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.backup.Backups
@@ -29,6 +30,7 @@ import knf.kuma.pojos.SeenObject
 import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
+import xdroid.toaster.Toaster.toast
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.resume
@@ -59,7 +61,7 @@ object FirestoreManager {
     @ExperimentalContracts
     @ExperimentalCoroutinesApi
     fun start() {
-        if (isLoggedIn && (PrefsUtil.isAdsEnabled || BuildConfig.DEBUG)) {
+        if (isLoggedIn && ((PrefsUtil.isAdsEnabled && !Network.isAdsBlocked) || BuildConfig.DEBUG)) {
             QueueManager.open()
             doAsync {
                 firestoreDB.document("users/$uid/backups/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
@@ -193,6 +195,10 @@ object FirestoreManager {
                     }
                 }.also { listeners.add(it) }
             }
+        } else if (isLoggedIn) {
+            doSignOut(App.context)
+            Backups.type = Backups.Type.NONE
+            toast("Firestore deshabilitado")
         }
         doAsync {
             firestoreDB.document("top/${uid

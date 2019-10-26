@@ -51,8 +51,8 @@ class AppInfo : MaterialAboutActivity() {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, 70.0)
-            item({ interstitial.show() }, 30.0)
+            item({ rewardedAd.show() }, 80.0)
+            item({ interstitial.show() }, 20.0)
         }.random()()
     }
 
