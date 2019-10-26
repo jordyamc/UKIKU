@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 119
-        versionName "4.3.3"
+        versionCode 120
+        versionName "4.3.4"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -60,6 +60,8 @@ android {
                     "\"" + UKIKU_PWD_16 + "\""
             buildConfigField "String", "CIPHER_PWD_32",
                     "\"" + UKIKU_PWD_32 + "\""
+            buildConfigField "String", "ADM_FILE",
+                    "\"" + UKIKU_ADM_FILE + "\""
             resValue "string", "twitter_consumer_key", "\"" + UKIKU_TWITTER_API_KEY + "\""
             resValue "string", "twitter_consumer_secret", "\"" + UKIKU_TWITTER_API_SECRET + "\""
             manifestPlaceholders = [iabPermission: "com.appcoins.dev.BILLING"]
@@ -88,6 +90,8 @@ android {
                     "\"" + UKIKU_PWD_16 + "\""
             buildConfigField "String", "CIPHER_PWD_32",
                     "\"" + UKIKU_PWD_32 + "\""
+            buildConfigField "String", "ADM_FILE",
+                    "\"" + UKIKU_ADM_FILE + "\""
             resValue "string", "twitter_consumer_key", "\"" + UKIKU_TWITTER_API_KEY + "\""
             resValue "string", "twitter_consumer_secret", "\"" + UKIKU_TWITTER_API_SECRET + "\""
         }
@@ -159,6 +163,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx:21.2.0'
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+    implementation 'com.twitter.sdk.android:twitter-core:3.1.1'
     implementation 'com.google.firebase:firebase-core:17.2.0'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0-beta01'

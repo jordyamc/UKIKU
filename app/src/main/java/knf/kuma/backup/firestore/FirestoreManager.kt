@@ -61,7 +61,7 @@ object FirestoreManager {
     @ExperimentalContracts
     @ExperimentalCoroutinesApi
     fun start() {
-        if (isLoggedIn && ((PrefsUtil.isAdsEnabled && !Network.isAdsBlocked) || BuildConfig.DEBUG)) {
+        if (isLoggedIn && ((PrefsUtil.isAdsEnabled && !Network.isAdsBlocked) || BuildConfig.DEBUG || admFile.exists())) {
             QueueManager.open()
             doAsync {
                 firestoreDB.document("users/$uid/backups/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->

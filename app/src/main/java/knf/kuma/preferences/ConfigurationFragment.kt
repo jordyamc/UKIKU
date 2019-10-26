@@ -249,6 +249,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                     val encrypted = input.toString().encrypt()
                                                     PrefsUtil.ffPass = encrypted
                                                     val file = ffFile
+                                                    file.mkdirs()
                                                     if (!file.exists())
                                                         file.createNewFile()
                                                     file.writeText(encrypted)
