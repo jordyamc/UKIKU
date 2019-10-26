@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
-import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
@@ -37,7 +36,7 @@ import uz.jamshid.library.ExactRatingBar
 import xdroid.toaster.Toaster
 
 class AnimeDetailsHolder(val view: View) {
-    private var cardViews: MutableList<MaterialCardView> = arrayListOf(view.card_title, view.card_desc, view.card_banner, view.card_details, view.card_genres, view.card_list, view.card_related)
+    private var cardViews: MutableList<View> = arrayListOf(view.card_title, view.card_desc, view.adContainer, view.card_details, view.card_genres, view.card_list, view.card_related)
     internal val title: TextView = view.title
     private val expandIcon: ImageButton = view.expand_icon
     private val desc: ExpandableTV = view.expandable_desc
@@ -159,7 +158,7 @@ class AnimeDetailsHolder(val view: View) {
         }
     }
 
-    private fun showCard(view: MaterialCardView) {
+    private fun showCard(view: View) {
         if (view.visibility == View.VISIBLE || !needAnimation) return
         retard += 100
         GlobalScope.launch(Dispatchers.Main) {
