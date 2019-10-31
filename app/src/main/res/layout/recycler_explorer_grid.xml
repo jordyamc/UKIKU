@@ -24,7 +24,7 @@
             app:spanCount="@integer/span_count"
             tools:listitem="@layout/item_explorer_grid" />
 
-        <FrameLayout
+        <knf.kuma.custom.BannerContainerView
             android:id="@+id/adContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

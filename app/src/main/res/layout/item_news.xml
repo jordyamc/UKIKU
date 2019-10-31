@@ -8,6 +8,8 @@
     android:layout_height="wrap_content"
     android:foreground="?selectableItemBackground"
     android:transitionName="background"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     app:cardCornerRadius="2dp"
     app:cardElevation="2dp"
     app:contentPadding="8dp">

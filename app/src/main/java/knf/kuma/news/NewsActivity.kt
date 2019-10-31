@@ -31,7 +31,7 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         refresh.isRefreshing = true
         recycler.adapter = adapter
         //recycler.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
-        recycler.addItemDecoration(SpacingItemDecoration(16.asPx, 10.asPx))
+        recycler.addItemDecoration(SpacingItemDecoration(0, 10.asPx))
         NewsCreator.createNews().observe(this, Observer {
             if (it == null || it.isEmpty())
                 error.visibility = View.VISIBLE

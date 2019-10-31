@@ -20,6 +20,7 @@ import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.EAUnlockActivity
 import knf.kuma.commons.Economy
+import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.profile.TopActivity
 import knf.tools.kprobability.item
@@ -51,7 +52,8 @@ class AppInfo : MaterialAboutActivity() {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, 80.0)
+            if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
+                item({ rewardedAd.show() }, 80.0)
             item({ interstitial.show() }, 20.0)
         }.random()()
     }

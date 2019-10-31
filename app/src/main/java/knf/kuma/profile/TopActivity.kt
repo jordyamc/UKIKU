@@ -14,6 +14,7 @@ import com.afollestad.materialdialogs.input.input
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.ListenerRegistration
+import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.ads.FullscreenAdLoader
 import knf.kuma.ads.getFAdLoaderInterstitial
@@ -45,7 +46,8 @@ class TopActivity : GenericActivity() {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, 80.0)
+            if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
+                item({ rewardedAd.show() }, 80.0)
             item({ interstitial.show() }, 20.0)
         }.random()()
     }

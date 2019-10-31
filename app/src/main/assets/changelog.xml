@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="122" version="4.3.6">
+        <change type="fix">Errores generales</change>
+        <change type="change">Overlay para mejorar visibilidad de botones en informacion de anime
+        </change>
+    </release>
     <release code="121" version="4.3.5">
         <change type="fix">Errores generales</change>
     </release>

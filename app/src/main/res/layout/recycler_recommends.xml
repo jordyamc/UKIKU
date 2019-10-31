@@ -34,9 +34,9 @@
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:listitem="@layout/item_fav"></androidx.recyclerview.widget.RecyclerView>
+            tools:listitem="@layout/item_fav" />
 
-        <FrameLayout
+        <knf.kuma.custom.BannerContainerView
             android:id="@+id/adContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

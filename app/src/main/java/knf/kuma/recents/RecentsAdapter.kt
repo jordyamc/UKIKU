@@ -32,7 +32,6 @@ import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
-import knf.kuma.directory.DirectoryService
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.*
@@ -178,8 +177,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                         if (animeObject != null) {
                             ActivityAnime.open(fragment, animeObject, holder.imageView)
                         } else {
-                            toast("Aún no esta en directorio!")
-                            DirectoryService.run(context)
+                            ActivityAnime.open(fragment, recentObject, holder.imageView)
                         }
                     }
                 }

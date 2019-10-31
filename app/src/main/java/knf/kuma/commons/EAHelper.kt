@@ -385,7 +385,8 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, 70.0)
+            if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
+                item({ rewardedAd.show() }, 70.0)
             item({ interstitial.show() }, 30.0)
         }.random()()
     }

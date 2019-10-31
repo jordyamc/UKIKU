@@ -24,6 +24,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
+import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.ads.FullscreenAdLoader
 import knf.kuma.ads.getFAdLoaderInterstitial
@@ -184,7 +185,8 @@ class AchievementActivity : GenericActivity() {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, 70.0)
+            if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
+                item({ rewardedAd.show() }, 70.0)
             item({ interstitial.show() }, 30.0)
         }.random()()
     }

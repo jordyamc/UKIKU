@@ -58,7 +58,8 @@ class DirectoryFragment : BottomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
+        if (PrefsUtil.isDirectoryFinished)
+            adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
     }
 
     override fun onDestroyView() {

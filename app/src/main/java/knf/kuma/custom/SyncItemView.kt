@@ -13,6 +13,8 @@ import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.Network
 import knf.kuma.commons.noCrash
 import kotlinx.android.synthetic.main.sync_item_layout.view.*
+import org.jetbrains.anko.sdk27.coroutines.onLongClick
+import xdroid.toaster.Toaster
 
 class SyncItemView : RelativeLayout {
 
@@ -74,12 +76,14 @@ class SyncItemView : RelativeLayout {
                         date.text = backupObject.date
                         restore?.isEnabled = true
                     }
+                    backup?.onLongClick(returnValue = true) { Toaster.toast("Respaldar a la nube") }
                     backup?.setOnClickListener {
                         noCrash {
                             onClick.onAction(this@SyncItemView, actionId, true)
                             AchievementManager.onBackup()
                         }
                     }
+                    restore?.onLongClick(returnValue = true) { Toaster.toast("Restaurar desde la nube") }
                     restore?.setOnClickListener { noCrash { onClick.onAction(this@SyncItemView, actionId, false) } }
                 } else {
                     date.text = "Sin internet"

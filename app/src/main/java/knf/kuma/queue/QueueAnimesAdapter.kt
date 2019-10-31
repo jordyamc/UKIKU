@@ -39,7 +39,8 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
         val queueObject = list[position]
         val img = PatternUtil.getCover(queueObject.chapter.aid)
         PicassoSingle.get().load(img).into(holder.imageView)
-        holder.title.text = HtmlCompat.fromHtml(queueObject.chapter.name, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        holder.title.text = HtmlCompat.fromHtml(queueObject.chapter.name
+                ?: "", HtmlCompat.FROM_HTML_MODE_LEGACY)
         holder.type.text = String.format(Locale.getDefault(), if (queueObject.count == 1) "%d episodio" else "%d episodios", queueObject.count)
         holder.cardView.setOnClickListener { listener?.onSelect(queueObject) }
         holder.cardView.setOnLongClickListener {

@@ -2,6 +2,9 @@ package knf.kuma.ads
 
 import android.app.Activity
 import android.view.ViewGroup
+import com.google.android.gms.ads.AdSize
+import knf.kuma.App
+import knf.kuma.BuildConfig
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.news.NewsObject
@@ -37,7 +40,7 @@ enum class AdsType {
 fun MutableList<RecentObject>.implAdsRecent() {
     if (PrefsUtil.isAdsEnabled)
         probabilityOf<() -> Unit> {
-            if (!Network.isAdsBlocked)
+            if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
                 item({ implAdsRecentMob() }, 90.0)
             item({ implAdsRecentBrains() }, 10.0)
         }.random()()
@@ -45,7 +48,7 @@ fun MutableList<RecentObject>.implAdsRecent() {
 
 fun MutableList<FavoriteObject>.implAdsFavorite() {
     probabilityOf<() -> Unit> {
-        if (!Network.isAdsBlocked)
+        if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
             item({ implAdsFavoriteMob() }, 90.0)
         item({ implAdsFavoriteBrains() }, 10.0)
     }.random()()
@@ -53,7 +56,7 @@ fun MutableList<FavoriteObject>.implAdsFavorite() {
 
 fun MutableList<NewsObject>.implAdsNews() {
     probabilityOf<() -> Unit> {
-        if (!Network.isAdsBlocked)
+        if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
             item({ implAdsNewsMob() }, 90.0)
         item({ implAdsNewsBrain() }, 10.0)
     }.random()()
@@ -61,7 +64,7 @@ fun MutableList<NewsObject>.implAdsNews() {
 
 fun MutableList<Achievement>.implAdsAchievement() {
     probabilityOf<() -> Unit> {
-        if (!Network.isAdsBlocked)
+        if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
             item({ implAdsAchievementMob() }, 90.0)
         item({ implAdsAchievementBrain() }, 10.0)
     }.random()()
@@ -69,7 +72,7 @@ fun MutableList<Achievement>.implAdsAchievement() {
 
 fun ViewGroup.implBannerCast() {
     probabilityOf<() -> Unit> {
-        if (!Network.isAdsBlocked)
+        if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
             item({ implBannerCastMob() }, 90.0)
         item({ implBannerCastBrains() }, 10.0)
     }.random()()
@@ -77,7 +80,7 @@ fun ViewGroup.implBannerCast() {
 
 fun ViewGroup.implBanner(unitID: String, isSmart: Boolean = false) {
     probabilityOf<() -> Unit> {
-        if (!Network.isAdsBlocked)
+        if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
             item({ implBannerMob(unitID, isSmart) }, 90.0)
         item({ implBannerBrains(unitID, isSmart) }, 10.0)
     }.random()()
@@ -85,7 +88,7 @@ fun ViewGroup.implBanner(unitID: String, isSmart: Boolean = false) {
 
 fun ViewGroup.implBanner(unitID: AdsType, isSmart: Boolean = false) {
     probabilityOf<() -> Unit> {
-        if (!Network.isAdsBlocked)
+        if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
             item({ implBannerMob(unitID, isSmart) }, 90.0)
         item({ implBannerBrains(unitID, isSmart) }, 10.0)
     }.random()()
@@ -95,9 +98,23 @@ fun getFAdLoaderRewarded(context: Activity, onUpdate: () -> Unit = {}): Fullscre
 
 fun getFAdLoaderInterstitial(context: Activity, onUpdate: () -> Unit = {}): FullscreenAdLoader =
         probabilityOf<() -> FullscreenAdLoader> {
-            item({ getFAdLoaderInterstitialMob(context, onUpdate) }, 90.0)
+            if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
+                item({ getFAdLoaderInterstitialMob(context, onUpdate) }, 90.0)
             item({ getFAdLoaderBrains(context, onUpdate) }, 10.0)
         }.random()()
+
+fun getAdSize(width: Float): AdSize {
+    val metrics = App.context.resources.displayMetrics
+    val density = metrics.density
+    var adWidthPixels = width
+    if (adWidthPixels == 0f) {
+        adWidthPixels = metrics.widthPixels.toFloat()
+    }
+
+    val adWidth = (adWidthPixels / density).toInt()
+    return AdSize.getCurrentOrientationBannerAdSizeWithWidth(App.context, adWidth)
+
+}
 
 interface FullscreenAdLoader {
     fun load()

@@ -37,7 +37,7 @@
             tools:listitem="@layout/item_record">
         </androidx.recyclerview.widget.RecyclerView>
 
-        <FrameLayout
+        <knf.kuma.custom.BannerContainerView
             android:id="@+id/adContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

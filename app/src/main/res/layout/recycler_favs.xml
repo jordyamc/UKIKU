@@ -18,9 +18,7 @@
             android:layout_weight="1"
             android:clipToPadding="false"
             android:layoutAnimation="@anim/layout_fall_down"
-            android:paddingStart="10dp"
             android:paddingTop="10dp"
-            android:paddingEnd="10dp"
             app:fastScrollPopupBgColor="?colorSecondary"
             app:fastScrollPopupTextColor="@android:color/white"
             app:fastScrollThumbColor="?colorSecondary"
@@ -29,10 +27,11 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:listitem="@layout/item_fav" />
 
-        <FrameLayout
+        <knf.kuma.custom.BannerContainerView
             android:id="@+id/adContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:showBottomSpace="true" />
     </LinearLayout>
 
     <LinearLayout

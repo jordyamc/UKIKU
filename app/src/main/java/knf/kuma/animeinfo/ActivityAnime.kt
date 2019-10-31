@@ -263,6 +263,18 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
+        fun open(fragment: Fragment, recentObject: RecentObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, ActivityAnime::class.java)
+            intent.data = Uri.parse(recentObject.url)
+            intent.putExtra(keyTitle, recentObject.name)
+            intent.putExtra(keyAid, recentObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(recentObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
         fun open(fragment: Fragment, animeObject: DirObjectCompact, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, ActivityAnime::class.java)

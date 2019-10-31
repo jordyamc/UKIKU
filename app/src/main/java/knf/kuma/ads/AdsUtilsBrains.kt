@@ -12,6 +12,7 @@ import knf.kuma.commons.Economy
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
+import knf.kuma.custom.BannerContainerView
 import knf.kuma.news.AdNewsObject
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
@@ -158,7 +159,6 @@ fun ViewGroup.implBannerBrains(unitID: AdsType, isSmart: Boolean = false) {
 fun ViewGroup.implBannerBrains(unitID: String, isSmart: Boolean = false) {
     if (PrefsUtil.isAdsEnabled)
         doOnUI {
-            removeAllViews()
             val adView = AppBrainBanner(context)
             adView.bannerListener = object : BannerListener {
                 override fun onClick() {
@@ -168,7 +168,12 @@ fun ViewGroup.implBannerBrains(unitID: String, isSmart: Boolean = false) {
                 override fun onAdRequestDone(p0: Boolean) {
                 }
             }
-            addView(adView)
+            if (this is BannerContainerView) {
+                show(adView)
+            } else {
+                removeAllViews()
+                addView(adView)
+            }
         }
 }
 

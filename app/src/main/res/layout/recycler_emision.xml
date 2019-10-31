@@ -22,9 +22,9 @@
             app:layoutManager="knf.kuma.custom.FixedGridLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:spanCount="@integer/span_count"
-            tools:listitem="@layout/item_emision"></knf.kuma.custom.GridRecyclerView>
+            tools:listitem="@layout/item_emision" />
 
-        <FrameLayout
+        <knf.kuma.custom.BannerContainerView
             android:id="@+id/adContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

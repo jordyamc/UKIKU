@@ -5,7 +5,10 @@ import android.util.Log
 import android.view.ViewGroup
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdCallback
@@ -15,6 +18,7 @@ import knf.kuma.commons.Economy
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
+import knf.kuma.custom.BannerContainerView
 import knf.kuma.news.AdNewsObject
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
@@ -24,24 +28,24 @@ import knf.kuma.pojos.RecentObject
 import xdroid.toaster.Toaster.toast
 
 object AdsUtilsMob {
-    const val RECENT_BANNER = "ca-app-pub-5390653757953587/7671520004"
-    const val RECENT_BANNER2 = "ca-app-pub-5390653757953587/9263803277"
-    const val FAVORITE_BANNER = "ca-app-pub-5390653757953587/3484862982"
-    const val FAVORITE_BANNER2 = "ca-app-pub-5390653757953587/5919454637"
-    const val DIRECTORY_BANNER = "ca-app-pub-5390653757953587/3243144237"
-    const val HOME_BANNER = "ca-app-pub-5390653757953587/5095281956"
-    const val HOME_BANNER2 = "ca-app-pub-5390653757953587/9925964473"
-    const val EMISSION_BANNER = "ca-app-pub-5390653757953587/8320211094"
-    const val SEEING_BANNER = "ca-app-pub-5390653757953587/2035387232"
-    const val RECOMMEND_BANNER = "ca-app-pub-5390653757953587/3304715801"
-    const val QUEUE_BANNER = "ca-app-pub-5390653757953587/6258182200"
-    const val RECORD_BANNER = "ca-app-pub-5390653757953587/9869042584"
-    const val RANDOM_BANNER = "ca-app-pub-5390653757953587/5034969561"
-    const val NEWS_BANNER = "ca-app-pub-5390653757953587/1562628412"
-    const val INFO_BANNER = "ca-app-pub-5390653757953587/5488026017"
-    const val ACHIEVEMENT_BANNER = "ca-app-pub-5390653757953587/4233626428"
-    const val EXPLORER_BANNER = "ca-app-pub-5390653757953587/1041869769"
-    const val CAST_BANNER = "ca-app-pub-5390653757953587/5535283585"
+    val RECENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/7671520004"
+    val RECENT_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/9263803277"
+    val FAVORITE_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/3484862982"
+    val FAVORITE_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5919454637"
+    val DIRECTORY_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/3243144237"
+    val HOME_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5095281956"
+    val HOME_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/9925964473"
+    val EMISSION_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/8320211094"
+    val SEEING_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/2035387232"
+    val RECOMMEND_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/3304715801"
+    val QUEUE_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/6258182200"
+    val RECORD_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/9869042584"
+    val RANDOM_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5034969561"
+    val NEWS_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/1562628412"
+    val INFO_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5488026017"
+    val ACHIEVEMENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/4233626428"
+    val EXPLORER_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/1041869769"
+    val CAST_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5535283585"
     const val REWARDED = "ca-app-pub-5390653757953587/5420761189"
     const val INTERSTITIAL = "ca-app-pub-5390653757953587/5880297311"
     val adRequest: AdRequest
@@ -168,9 +172,8 @@ fun ViewGroup.implBannerMob(unitID: AdsType, isSmart: Boolean = false) {
 fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
     if (PrefsUtil.isAdsEnabled)
         doOnUI {
-            removeAllViews()
             val adView = AdView(context)
-            adView.adSize = if (isSmart) AdSize.SMART_BANNER else AdSize.BANNER
+            adView.adSize = getAdSize(width.toFloat())
             adView.adUnitId = unitID
             adView.adListener = object : AdListener() {
                 override fun onAdLoaded() {
@@ -197,7 +200,12 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
 
                 }
             }
-            addView(adView)
+            if (this is BannerContainerView) {
+                show(adView)
+            } else {
+                removeAllViews()
+                addView(adView)
+            }
             adView.loadAd(AdsUtilsMob.adRequest)
         }
 }

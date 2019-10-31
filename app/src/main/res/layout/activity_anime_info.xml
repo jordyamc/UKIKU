@@ -48,6 +48,13 @@
                 android:background="@android:color/black"
                 android:fitsSystemWindows="true"/>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_gravity="top"
+                android:background="@drawable/shadow_gradient"
+                android:fitsSystemWindows="true" />
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
