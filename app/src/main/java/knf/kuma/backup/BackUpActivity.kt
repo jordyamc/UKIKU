@@ -56,10 +56,10 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
         setContentView(R.layout.activity_login)
         service = Backups.createService()
         login_dropbox.setOnClickListener { onDropBoxLogin() }
-        if (!PrefsUtil.isAdsEnabled && !BuildConfig.DEBUG && !admFile.exists()) {
+        if (!PrefsUtil.isAdsEnabled && !BuildConfig.DEBUG && !admFile.exists() && !PrefsUtil.isSubscriptionEnabled) {
             login_firestore.isEnabled = false
             ads_required.visibility = View.VISIBLE
-        } else if (PrefsUtil.isAdsEnabled && Network.isAdsBlocked && !BuildConfig.DEBUG && !admFile.exists()) {
+        } else if (PrefsUtil.isAdsEnabled && Network.isAdsBlocked && !BuildConfig.DEBUG && !admFile.exists() && !PrefsUtil.isSubscriptionEnabled) {
             login_firestore.isEnabled = false
             ads_required.text = "Anuncios bloqueados por host"
             ads_required.visibility = View.VISIBLE

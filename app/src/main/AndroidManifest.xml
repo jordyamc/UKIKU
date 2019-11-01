@@ -333,6 +333,7 @@
         <activity android:name=".recents.RecentsActivity" />
         <activity android:name=".Diagnostic$FullBypass" />
         <activity android:name=".profile.TopActivity" />
+        <activity android:name=".ads.SubscriptionActivity" />
 
         <provider
             android:name=".slices.AnimeSlice"

@@ -225,7 +225,8 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     true
                 }
                 preferenceScreen.findPreference<SwitchPreference>("ads_enabled")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                    if (newValue == false && !BuildConfig.DEBUG) {
+                    if (BuildConfig.DEBUG || PrefsUtil.isSubscriptionEnabled) return@OnPreferenceChangeListener true
+                    if (newValue == false) {
                         context?.let { FirestoreManager.doSignOut(it) }
                         Backups.type = Backups.Type.NONE
                     }

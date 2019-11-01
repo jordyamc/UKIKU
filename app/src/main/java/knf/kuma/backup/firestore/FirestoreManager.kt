@@ -21,6 +21,7 @@ import com.google.firebase.ktx.Firebase
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.data.*
 import knf.kuma.commons.*
@@ -61,7 +62,7 @@ object FirestoreManager {
     @ExperimentalContracts
     @ExperimentalCoroutinesApi
     fun start() {
-        if (isLoggedIn && ((PrefsUtil.isAdsEnabled && !Network.isAdsBlocked) || BuildConfig.DEBUG || admFile.exists())) {
+        if (isLoggedIn && ((PrefsUtil.isAdsEnabled && !Network.isAdsBlocked) || BuildConfig.DEBUG || admFile.exists() || PrefsUtil.isSubscriptionEnabled)) {
             QueueManager.open()
             doAsync {
                 firestoreDB.document("users/$uid/backups/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
@@ -194,6 +195,22 @@ object FirestoreManager {
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
+                firestoreDB.document("subscriptions/$uid").get().addOnSuccessListener {
+                    if (it.exists() && PrefsUtil.subscriptionOrderId == null && PrefsUtil.subscriptionToken == null) {
+                        it.toObject<SubscriptionReceiver.SubscriptionInfo>()?.let {
+                            GlobalScope.launch(Dispatchers.IO) {
+                                val info = SubscriptionReceiver.checkStatus(it.token, it.orderId)
+                                if (info.isVerified) {
+                                    PrefsUtil.subscriptionToken = it.token
+                                    PrefsUtil.subscriptionOrderId = it.orderId
+                                    toast("Suscripción restaurada")
+                                } else {
+                                    firestoreDB.document("subscriptions/$uid").delete()
+                                }
+                            }
+                        }
+                    }
+                }
             }
         } else if (isLoggedIn) {
             doSignOut(App.context)

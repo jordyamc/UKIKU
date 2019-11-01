@@ -313,6 +313,12 @@
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
                     </LinearLayout>
 
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/subscriptionState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:sv_title="Suscripción" />
+
 
                     <knf.kuma.custom.StateView
                         android:id="@+id/backupState"

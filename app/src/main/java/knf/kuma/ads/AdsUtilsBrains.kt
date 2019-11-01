@@ -2,10 +2,7 @@ package knf.kuma.ads
 
 import android.content.Context
 import android.view.ViewGroup
-import com.appbrain.AppBrainBanner
-import com.appbrain.BannerListener
-import com.appbrain.InterstitialBuilder
-import com.appbrain.InterstitialListener
+import com.appbrain.*
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.commons.Economy
@@ -183,6 +180,7 @@ class FAdLoaderBrains(private val context: Context, onUpdate: () -> Unit) : Full
     var isAdClicked = false
     private val builder: InterstitialBuilder by lazy {
         InterstitialBuilder.create().apply {
+            adId = AdId.DEFAULT
             setOnDoneCallback { builder.preload(context) }
             listener = object : InterstitialListener {
                 override fun onClick() {

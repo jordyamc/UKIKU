@@ -150,6 +150,15 @@ object Backups {
                 false
             }
 
+    val isKeyInstalled: Boolean
+        get() =
+            try {
+                App.context.packageManager.getPackageInfo("knf.kuma.key", 0)
+                true
+            } catch (e: Exception) {
+                false
+            }
+
     private fun getList(id: String): List<*> {
         return when (id) {
             keyFavs -> CacheDB.INSTANCE.favsDAO().allRaw

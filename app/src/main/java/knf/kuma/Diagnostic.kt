@@ -15,6 +15,7 @@ import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
 import fr.bmartel.speedtest.model.SpeedTestError
+import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.commons.*
@@ -25,6 +26,9 @@ import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.download.FileAccessHelper
 import kotlinx.android.synthetic.main.layout_diagnostic.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -231,6 +235,20 @@ class Diagnostic : GenericActivity() {
 
     private fun runBackupTest() {
         uuid.text = FirestoreManager.uid ?: "Solo firestore"
+        GlobalScope.launch(Dispatchers.IO) {
+            if (PrefsUtil.isSubscriptionEnabled) {
+                val status = SubscriptionReceiver.checkStatus(PrefsUtil.subscriptionToken
+                        ?: "", PrefsUtil.subscriptionOrderId ?: "")
+                if (status.isActive) {
+                    if (status.isActive)
+                        subscriptionState.load("Activa")
+                    else
+                        subscriptionState.load("Activa pero no renovada")
+                } else
+                    subscriptionState.load("Cancelada o inexistente")
+            } else
+                subscriptionState.load("No suscrito")
+        }
         backupState.load(when (Backups.type) {
             Backups.Type.DROPBOX -> "Dropbox"
             Backups.Type.FIRESTORE -> "Firestore"

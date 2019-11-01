@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.securepreferences.SecurePreferences
 import knf.kuma.App
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
@@ -52,7 +51,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val isAdsEnabled: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", BuildConfig.BUILD_TYPE == "playstore" || App.context.resources.getBoolean(R.bool.isTv))
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", /*BuildConfig.BUILD_TYPE == "playstore" ||*/ App.context.resources.getBoolean(R.bool.isTv))
 
     val downloaderType: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
@@ -241,6 +240,14 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("top_count", 25)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("top_count", value).apply()
 
+    var subscriptionToken: String?
+        get() = SecurePreferences(context).getString("subscription_token", null)
+        set(value) = SecurePreferences(context).edit().putString("subscription_token", value).apply()
+
+    var subscriptionOrderId: String?
+        get() = SecurePreferences(context).getString("subscription_orderId", null)
+        set(value) = SecurePreferences(context).edit().putString("subscription_orderId", value).apply()
+
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
     }
@@ -272,6 +279,8 @@ object PrefsUtil {
     fun getLiveShowFavIndicator(): LiveData<Boolean> {
         return PreferenceManager.getDefaultSharedPreferences(context).booleanLiveData("show_fav_count", true)
     }
+
+    val isSubscriptionEnabled: Boolean get() = subscriptionToken != null && subscriptionOrderId != null
 
     private val defaultDownloadType: String
         get() {

@@ -409,6 +409,8 @@ fun isHostValid(hostName: String): Boolean {
         "streamango.com",
         "ok.ru",
         "www.rapidvideo.com",
+        "nuclient-verification.herokuapp.com",
+        "worldvideodownload.com",
         "www.yourupload.com" -> true
         else -> isVideoHostName(hostName)
     }.also { if (!it) Log.e("Hostname", "Not verified: $hostName") }

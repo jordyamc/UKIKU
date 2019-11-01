@@ -169,93 +169,101 @@ object EAHelper {
 
     @StyleRes
     fun getTheme(): Int {
-        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.style.AppTheme_DayNight
-        when (PrefsUtil.themeColor) {
-            "0" -> return R.style.AppTheme_DayNight
-            "1" -> return R.style.AppTheme_Pink
-            "2" -> return R.style.AppTheme_Purple
-            "3" -> return R.style.AppTheme_DeepPurple
-            "4" -> return R.style.AppTheme_Indigo
-            "5" -> return R.style.AppTheme_Blue
-            "6" -> return R.style.AppTheme_LightBlue
-            "7" -> return R.style.AppTheme_Cyan
-            "8" -> return R.style.AppTheme_Teal
-            "9" -> return R.style.AppTheme_Green
-            "10" -> return R.style.AppTheme_LightGreen
-            "11" -> return R.style.AppTheme_Lime
-            "12" -> return R.style.AppTheme_Yellow
-            "13" -> return R.style.AppTheme_Amber
-            "14" -> return R.style.AppTheme_Orange
-            "15" -> return R.style.AppTheme_DeepOrange
-            "16" -> return R.style.AppTheme_Brown
-            "17" -> return R.style.AppTheme_Gray
-            "18" -> return R.style.AppTheme_BlueGray
-            else -> return R.style.AppTheme_DayNight
+        return noCrashLet(R.style.AppTheme_NoActionBar) {
+            if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+                R.style.AppTheme_DayNight
+            when (PrefsUtil.themeColor) {
+                "0" -> R.style.AppTheme_DayNight
+                "1" -> R.style.AppTheme_Pink
+                "2" -> R.style.AppTheme_Purple
+                "3" -> R.style.AppTheme_DeepPurple
+                "4" -> R.style.AppTheme_Indigo
+                "5" -> R.style.AppTheme_Blue
+                "6" -> R.style.AppTheme_LightBlue
+                "7" -> R.style.AppTheme_Cyan
+                "8" -> R.style.AppTheme_Teal
+                "9" -> R.style.AppTheme_Green
+                "10" -> R.style.AppTheme_LightGreen
+                "11" -> R.style.AppTheme_Lime
+                "12" -> R.style.AppTheme_Yellow
+                "13" -> R.style.AppTheme_Amber
+                "14" -> R.style.AppTheme_Orange
+                "15" -> R.style.AppTheme_DeepOrange
+                "16" -> R.style.AppTheme_Brown
+                "17" -> R.style.AppTheme_Gray
+                "18" -> R.style.AppTheme_BlueGray
+                else -> R.style.AppTheme_DayNight
+            }
         }
     }
 
     @StyleRes
     fun getThemeNA(): Int {
-        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.style.AppTheme_NoActionBar
-        when (PrefsUtil.themeColor) {
-            "0" -> return R.style.AppTheme_NoActionBar
-            "1" -> return R.style.AppTheme_NoActionBar_Pink
-            "2" -> return R.style.AppTheme_NoActionBar_Purple
-            "3" -> return R.style.AppTheme_NoActionBar_DeepPurple
-            "4" -> return R.style.AppTheme_NoActionBar_Indigo
-            "5" -> return R.style.AppTheme_NoActionBar_Blue
-            "6" -> return R.style.AppTheme_NoActionBar_LightBlue
-            "7" -> return R.style.AppTheme_NoActionBar_Cyan
-            "8" -> return R.style.AppTheme_NoActionBar_Teal
-            "9" -> return R.style.AppTheme_NoActionBar_Green
-            "10" -> return R.style.AppTheme_NoActionBar_LightGreen
-            "11" -> return R.style.AppTheme_NoActionBar_Lime
-            "12" -> return R.style.AppTheme_NoActionBar_Yellow
-            "13" -> return R.style.AppTheme_NoActionBar_Amber
-            "14" -> return R.style.AppTheme_NoActionBar_Orange
-            "15" -> return R.style.AppTheme_NoActionBar_DeepOrange
-            "16" -> return R.style.AppTheme_NoActionBar_Brown
-            "17" -> return R.style.AppTheme_NoActionBar_Gray
-            "18" -> return R.style.AppTheme_NoActionBar_BlueGray
-            else -> return R.style.AppTheme_NoActionBar
+        return noCrashLet(R.style.AppTheme_NoActionBar) {
+            if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+                R.style.AppTheme_NoActionBar
+            when (PrefsUtil.themeColor) {
+                "0" -> R.style.AppTheme_NoActionBar
+                "1" -> R.style.AppTheme_NoActionBar_Pink
+                "2" -> R.style.AppTheme_NoActionBar_Purple
+                "3" -> R.style.AppTheme_NoActionBar_DeepPurple
+                "4" -> R.style.AppTheme_NoActionBar_Indigo
+                "5" -> R.style.AppTheme_NoActionBar_Blue
+                "6" -> R.style.AppTheme_NoActionBar_LightBlue
+                "7" -> R.style.AppTheme_NoActionBar_Cyan
+                "8" -> R.style.AppTheme_NoActionBar_Teal
+                "9" -> R.style.AppTheme_NoActionBar_Green
+                "10" -> R.style.AppTheme_NoActionBar_LightGreen
+                "11" -> R.style.AppTheme_NoActionBar_Lime
+                "12" -> R.style.AppTheme_NoActionBar_Yellow
+                "13" -> R.style.AppTheme_NoActionBar_Amber
+                "14" -> R.style.AppTheme_NoActionBar_Orange
+                "15" -> R.style.AppTheme_NoActionBar_DeepOrange
+                "16" -> R.style.AppTheme_NoActionBar_Brown
+                "17" -> R.style.AppTheme_NoActionBar_Gray
+                "18" -> R.style.AppTheme_NoActionBar_BlueGray
+                else -> R.style.AppTheme_NoActionBar
+            }
         }
     }
 
     @StyleRes
     fun getThemeDialog(): Int {
-        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return R.style.AppTheme_Dialog_Base
-        when (PrefsUtil.themeColor) {
-            "0" -> return R.style.AppTheme_Dialog_Base
-            "1" -> return R.style.AppTheme_Dialog_Pink
-            "2" -> return R.style.AppTheme_Dialog_Purple
-            "3" -> return R.style.AppTheme_Dialog_DeepPurple
-            "4" -> return R.style.AppTheme_Dialog_Indigo
-            "5" -> return R.style.AppTheme_Dialog_Blue
-            "6" -> return R.style.AppTheme_Dialog_LightBlue
-            "7" -> return R.style.AppTheme_Dialog_Cyan
-            "8" -> return R.style.AppTheme_Dialog_Teal
-            "9" -> return R.style.AppTheme_Dialog_Green
-            "10" -> return R.style.AppTheme_Dialog_LightGreen
-            "11" -> return R.style.AppTheme_Dialog_Lime
-            "12" -> return R.style.AppTheme_Dialog_Yellow
-            "13" -> return R.style.AppTheme_Dialog_Amber
-            "14" -> return R.style.AppTheme_Dialog_Orange
-            "15" -> return R.style.AppTheme_Dialog_DeepOrange
-            "16" -> return R.style.AppTheme_Dialog_Brown
-            "17" -> return R.style.AppTheme_Dialog_Gray
-            "18" -> return R.style.AppTheme_Dialog_BlueGray
-            else -> return R.style.AppTheme_Dialog_Base
+        return noCrashLet(R.style.AppTheme_Dialog_Base) {
+            if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+                R.style.AppTheme_Dialog_Base
+            when (PrefsUtil.themeColor) {
+                "0" -> R.style.AppTheme_Dialog_Base
+                "1" -> R.style.AppTheme_Dialog_Pink
+                "2" -> R.style.AppTheme_Dialog_Purple
+                "3" -> R.style.AppTheme_Dialog_DeepPurple
+                "4" -> R.style.AppTheme_Dialog_Indigo
+                "5" -> R.style.AppTheme_Dialog_Blue
+                "6" -> R.style.AppTheme_Dialog_LightBlue
+                "7" -> R.style.AppTheme_Dialog_Cyan
+                "8" -> R.style.AppTheme_Dialog_Teal
+                "9" -> R.style.AppTheme_Dialog_Green
+                "10" -> R.style.AppTheme_Dialog_LightGreen
+                "11" -> R.style.AppTheme_Dialog_Lime
+                "12" -> R.style.AppTheme_Dialog_Yellow
+                "13" -> R.style.AppTheme_Dialog_Amber
+                "14" -> R.style.AppTheme_Dialog_Orange
+                "15" -> R.style.AppTheme_Dialog_DeepOrange
+                "16" -> R.style.AppTheme_Dialog_Brown
+                "17" -> R.style.AppTheme_Dialog_Gray
+                "18" -> R.style.AppTheme_Dialog_BlueGray
+                else -> R.style.AppTheme_Dialog_Base
+            }
         }
     }
 
     @DrawableRes
     fun getThemeImg(): Int {
-        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return getThemeImg("0")
-        return getThemeImg(PrefsUtil.themeColor)
+        return noCrashLet(getThemeImg("0")) {
+            if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+                getThemeImg("0")
+            getThemeImg(PrefsUtil.themeColor)
+        }
     }
 
     @DrawableRes
@@ -286,9 +294,11 @@ object EAHelper {
 
     @ColorRes
     fun getThemeColor(): Int {
-        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return getThemeColor("0")
-        return getThemeColor(PrefsUtil.themeColor)
+        return noCrashLet(getThemeColor("0")) {
+            if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+                getThemeColor("0")
+            getThemeColor(PrefsUtil.themeColor)
+        }
     }
 
     @ColorRes
@@ -319,9 +329,11 @@ object EAHelper {
 
     @ColorRes
     fun getThemeColorLight(): Int {
-        if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
-            return getThemeColorLight("0")
-        return getThemeColorLight(PrefsUtil.themeColor)
+        return noCrashLet(getThemeColorLight("0")) {
+            if (!isPart0Unlocked || !isPart1Unlocked || !isPart2Unlocked or !isPart3Unlocked)
+                getThemeColorLight("0")
+            getThemeColorLight(PrefsUtil.themeColor)
+        }
     }
 
     @ColorRes

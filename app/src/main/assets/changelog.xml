@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="123" version="4.3.7">
+        <change type="fix">Errores generales</change>
+        <change type="new">Suscripcion para Firestore sin anuncios</change>
+    </release>
     <release code="122" version="4.3.6">
         <change type="fix">Errores generales</change>
         <change type="change">Overlay para mejorar visibilidad de botones en informacion de anime

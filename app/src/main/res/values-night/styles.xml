@@ -26,6 +26,7 @@
         <item name="mal_color_primary">@color/mal_text_primary_dark</item>
         <item name="mal_color_secondary">@color/mal_text_secondary_dark</item>
         <item name="mal_card_background">@color/cardview_background</item>
+        <item name="md_color_button_text">?attr/colorSecondary</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
     </style>
 

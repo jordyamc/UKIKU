@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.afollestad.materialdialogs.MaterialDialog
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
@@ -17,14 +18,13 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutList
 import knf.kuma.ads.FullscreenAdLoader
 import knf.kuma.ads.getFAdLoaderInterstitial
 import knf.kuma.ads.getFAdLoaderRewarded
+import knf.kuma.backup.Backups
 import knf.kuma.changelog.ChangelogActivity
-import knf.kuma.commons.EAUnlockActivity
-import knf.kuma.commons.Economy
-import knf.kuma.commons.Network
-import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.*
 import knf.kuma.profile.TopActivity
 import knf.tools.kprobability.item
 import knf.tools.kprobability.probabilityOf
+import org.jetbrains.anko.toast
 
 /**
  * Created by jordy on 05/03/2018.
@@ -74,6 +74,20 @@ class AppInfo : MaterialAboutActivity() {
         infoCard.addItem(ConvenienceBuilder.createVersionActionItem(this, getDrawable(R.drawable.ic_version), "Versión", true))
         infoCard.addItem(MaterialAboutActionItem.Builder().text("Changelog").icon(R.drawable.ic_changelog_get).setOnClickAction { ChangelogActivity.open(this@AppInfo) }.build())
         infoCard.addItem(MaterialAboutActionItem.Builder().text("Diagnóstico").icon(R.drawable.ic_diagnostic).setOnClickAction { Diagnostic.open(this@AppInfo) }.build())
+        infoCard.addItem(MaterialAboutActionItem.Builder().text("Suscripción").icon(R.drawable.ic_key).setOnClickAction {
+            if (Backups.isKeyInstalled) {
+                val intent = packageManager.getLaunchIntentForPackage("knf.kuma.key")
+                intent?.let { startActivity(intent) } ?: toast("Error al abrir UKIKU Key")
+            } else {
+                MaterialDialog(this).safeShow {
+                    message(text = "Con la suscripción podrás usar el backup por Firestore sin activar los anuncios!")
+                    positiveButton(text = "Suscribirse") {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=knf.kuma.key")))
+                    }
+                    negativeButton(text = "cancelar")
+                }
+            }
+        }.build())
         val authorCard = MaterialAboutCard.Builder()
         authorCard.title("Autor")
         authorCard.addItem(ConvenienceBuilder.createWebsiteActionItem(this@AppInfo, getDrawable(R.drawable.ic_author), "Jordy Mendoza", true, Uri.parse("https://t.me/UnbarredStream")))
