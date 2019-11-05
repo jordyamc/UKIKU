@@ -241,23 +241,27 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                     MaterialDialog(it).safeShow {
                                         title(text = "Repetir contraseña")
                                         input { _, input ->
-                                            if (input == inputText)
+                                            if (input.toString() == inputText.toString())
                                                 doOnUI(onLog = {
                                                     PrefsUtil.isFamilyFriendly = false
                                                     preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
                                                     toast("Error al encriptar")
                                                 }) {
                                                     val encrypted = input.toString().encrypt()
+                                                    check(encrypted.decrypt() == input.toString())
                                                     PrefsUtil.ffPass = encrypted
                                                     val file = ffFile
-                                                    file.mkdirs()
+                                                    file.parentFile?.mkdirs()
                                                     if (!file.exists())
                                                         file.createNewFile()
                                                     file.writeText(encrypted)
                                                     doAsync { CacheDB.INSTANCE.animeDAO().nukeEcchi() }
                                                 }
-                                            else
+                                            else {
                                                 toast("Las contraseñas no coinciden")
+                                                PrefsUtil.isFamilyFriendly = false
+                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                            }
                                         }
                                         getInputLayout().boxBackgroundColor = Color.TRANSPARENT
                                         getInputField().setBackgroundColor(Color.TRANSPARENT)
@@ -299,16 +303,18 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                 Toaster.toast("Contraseña incorrecta")
                                             }
                                         } else {
-                                            val decrypt = PrefsUtil.ffPass.decrypt()
-                                            if (decrypt != input.toString()) {
-                                                file.createNewFile()
-                                                file.writeText(decrypt)
-                                                PrefsUtil.isFamilyFriendly = true
-                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
-                                                Toaster.toast("Contraseña incorrecta")
-                                            } else {
-                                                PrefsUtil.ffPass = ""
-                                                DirectoryUpdateService.run(context)
+                                            if (PrefsUtil.ffPass != "") {
+                                                val decrypt = PrefsUtil.ffPass.decrypt()
+                                                if (decrypt != input.toString()) {
+                                                    file.createNewFile()
+                                                    file.writeText(decrypt)
+                                                    PrefsUtil.isFamilyFriendly = true
+                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                                    Toaster.toast("Contraseña incorrecta")
+                                                } else {
+                                                    PrefsUtil.ffPass = ""
+                                                    DirectoryUpdateService.run(context)
+                                                }
                                             }
                                         }
                                     }

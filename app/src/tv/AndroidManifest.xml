@@ -33,15 +33,6 @@
         android:theme="@style/AppTheme.DayNight"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".SplashActivity"
-            android:theme="@style/AppTheme.Splash"/>
-        <activity
-            android:name=".Main"
-            android:enabled="false"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
             android:name=".tv.ui.TVMain"
             android:banner="@drawable/tv_banner"
             android:screenOrientation="sensorLandscape"
@@ -82,42 +73,6 @@
                 android:resource="@xml/shortcuts"/>
         </activity>
         <activity
-            android:name=".animeinfo.ActivityAnime"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
-            <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-
-                <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/anime/"
-                    android:scheme="https"/>
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".player.CustomExoPlayer"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:immersive="true"
-            android:launchMode="singleTask"
-            android:resizeableActivity="true"
-            android:supportsPictureInPicture="true"/>
-        <activity
-            android:name=".animeinfo.img.ActivityImgFull"
-            android:theme="@style/AppTheme.FullScreen"/>
-        <activity android:name=".record.RecordActivity"/>
-        <activity android:name=".seeing.SeeingActivity"/>
-        <activity android:name=".emision.EmisionActivity"/>
-        <activity android:name=".explorer.ExplorerActivity"/>
-        <activity
-            android:name=".updater.UpdateActivity"
-            android:excludeFromRecents="true"
-            android:exported="true"/>
-        <activity android:name=".random.RandomActivity"/>
-        <activity android:name=".changelog.ChangelogActivity"/>
-        <activity
             android:name=".backup.BackUpActivity"
             android:theme="@style/AppTheme.Translucent"/>
         <activity
@@ -133,15 +88,6 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".backup.MigrationActivity"
-            android:theme="@style/AppTheme.Translucent"/>
-        <activity
-            android:name=".AppInfo"
-            android:theme="@style/AppTheme.AppInfo"/>
-        <activity android:name=".recommended.RecommendActivity"/>
-        <activity android:name=".recommended.RankingActivity"/>
-        <activity android:name=".search.GenreActivity"/>
 
         <service android:name=".directory.DirectoryService"/>
         <service android:name=".directory.DirectoryUpdateService"/>
@@ -185,7 +131,6 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-5390653757953587~9838518341" />
 
-        <activity android:name=".queue.QueueActivity"/>
         <activity
             android:name=".tv.streaming.TVServerSelection"
             android:theme="@style/AppTheme.TV.Guided"/>

@@ -11,7 +11,7 @@ import org.json.JSONObject
 class FembedServer internal constructor(context: Context, baseLink: String) : Server(context, baseLink) {
 
     override val isValid: Boolean
-        get() = baseLink.contains("fembed.com")
+        get() = baseLink.contains("embedsito.com")
 
     override val name: String
         get() = FEMBED

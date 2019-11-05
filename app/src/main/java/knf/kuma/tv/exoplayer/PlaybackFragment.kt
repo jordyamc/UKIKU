@@ -9,7 +9,7 @@ import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import okhttp3.OkHttpClient
 
 class PlaybackFragment : VideoSupportFragment() {
     private var mPlayerGlue: VideoPlayerGlue? = null
@@ -96,12 +97,10 @@ class PlaybackFragment : VideoSupportFragment() {
 
     private fun prepareMediaForPlaying(mediaSourceUri: Uri) {
         activity?.let {
-            val userAgent = Util.getUserAgent(it, "VideoPlayerGlue")
-            val mediaSource = ExtractorMediaSource(
-                    mediaSourceUri,
-                    DefaultDataSourceFactory(it, userAgent),
-                    DefaultExtractorsFactory(), null, null)
-
+            val userAgent = Util.getUserAgent(it, "UKIKU")
+            val mediaSource = ExtractorMediaSource.Factory(
+                    DefaultDataSourceFactory(it, null, OkHttpDataSourceFactory(OkHttpClient(), userAgent, null)))
+                    .createMediaSource(mediaSourceUri)
             mPlayer?.prepare(mediaSource)
         }
     }
