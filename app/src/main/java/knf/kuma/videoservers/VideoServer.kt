@@ -7,22 +7,26 @@ import java.util.*
 open class VideoServer : Parcelable {
     var name: String
     var options: MutableList<Option> = ArrayList()
+    var skipVerification = false
 
     val option: Option
         get() = options[0]
 
-    constructor(name: String) {
+    constructor(name: String, skipVerification: Boolean = false) {
         this.name = name
+        this.skipVerification = skipVerification
     }
 
-    constructor(name: String, option: Option) {
+    constructor(name: String, option: Option, skipVerification: Boolean = false) {
         this.name = name
         addOption(option)
+        this.skipVerification = skipVerification
     }
 
-    constructor(name: String, options: MutableList<Option>) {
+    constructor(name: String, options: MutableList<Option>, skipVerification: Boolean = false) {
         this.name = name
         this.options = options
+        this.skipVerification = skipVerification
     }
 
     fun addOption(option: Option) {

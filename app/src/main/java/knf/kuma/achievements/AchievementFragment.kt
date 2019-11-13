@@ -36,7 +36,7 @@ class AchievementFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         CacheDB.INSTANCE.achievementsDAO().achievementList(arguments?.getInt(isUnlockedKey, 0) ?: 0)
-                .observe(this, Observer {
+                .observe(viewLifecycleOwner, Observer {
                     isListEmpty = it.isEmpty()
                     adapter.setAchievements(it)
                     error.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE

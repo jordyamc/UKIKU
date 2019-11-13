@@ -12,6 +12,7 @@ import knf.kuma.ads.AdCallback
 import knf.kuma.ads.AdCardItemHolder
 import knf.kuma.ads.implAdsAchievement
 import knf.kuma.commons.bind
+import knf.kuma.commons.noCrash
 import knf.kuma.commons.noCrashLet
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
@@ -46,7 +47,7 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
             holder.name.text = achievement.usableName()
             holder.state.text = achievement.getState()
             holder.exp.text = "${NumberFormat.getNumberInstance(Locale.US).format(achievement.points)} XP"
-            holder.root.setOnClickListener { onClick.invoke(achievement) }
+            holder.root.setOnClickListener { noCrash { onClick.invoke(achievement) } }
         }
     }
 

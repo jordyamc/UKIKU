@@ -110,7 +110,8 @@ open class GenericActivity : AppCompatActivity() {
                         logText("Waiting for resolve...")
                         if (url == "https://animeflv.net/") {
                             logText("Cookies for animeflv:")
-                            logText(CookieManager.getInstance().getCookie(".animeflv.net"))
+                            logText(noCrashLet { CookieManager.getInstance().getCookie(".animeflv.net") }
+                                    ?: "Error!")
                             Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
                             if (BypassUtil.saveCookies(App.context)) {
                                 logText("Cookies saved")

@@ -20,7 +20,10 @@ import knf.kuma.ads.getFAdLoaderInterstitial
 import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.backup.Backups
 import knf.kuma.changelog.ChangelogActivity
-import knf.kuma.commons.*
+import knf.kuma.commons.EAUnlockActivity
+import knf.kuma.commons.Economy
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.safeShow
 import knf.kuma.profile.TopActivity
 import knf.tools.kprobability.item
 import knf.tools.kprobability.probabilityOf
@@ -52,9 +55,8 @@ class AppInfo : MaterialAboutActivity() {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            if (!Network.isAdsBlocked && BuildConfig.BUILD_TYPE == "playstore")
-                item({ rewardedAd.show() }, 80.0)
-            item({ interstitial.show() }, 20.0)
+            item({ rewardedAd.show() }, 90.0)
+            item({ interstitial.show() }, 10.0)
         }.random()()
     }
 

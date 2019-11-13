@@ -4,8 +4,7 @@ import android.content.Context
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.jsoupCookies
 import knf.kuma.videoservers.VideoServer.Names.OKRU
-import org.json.JSONObject
-import org.jsoup.Jsoup
+import java.net.URLEncoder
 
 class OkruServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -19,16 +18,12 @@ class OkruServer(context: Context, baseLink: String) : Server(context, baseLink)
         get() {
             try {
                 val downLink = PatternUtil.extractLink(baseLink)
-                val response = JSONObject(jsoupCookies("https://worldvideodownload.com/tr/index/getir").data(mutableMapOf<String, String>().apply {
-                    put("lang", "en")
-                    put("url", downLink)
-                }).ignoreContentType(true).post().body().html()).getString("html")
-                val document = Jsoup.parse(response)
-                val videoServer = VideoServer(OKRU)
-                document.select(".row").forEach {
-                    videoServer.addOption(Option(OKRU, it.select("#quality").text(), it.select("a").attr("href").replace("\\u003d", "=").replace("\\u0026", "&")))
+                val page = jsoupCookies("https://okvid.download/?url=${URLEncoder.encode(downLink, "UTF-8")}").get()
+                val vs = VideoServer(OKRU, true)
+                page.select("table.table tr:has(td:contains(0))").forEach { item ->
+                    vs.addOption(Option(OKRU, item.select("td")[0].text().let { it.substring(it.lastIndexOf("x") + 1) }, item.select("a").attr("href")))
                 }
-                return videoServer
+                return vs
             } catch (e: Exception) {
                 e.printStackTrace()
                 return null

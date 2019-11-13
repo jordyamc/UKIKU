@@ -41,7 +41,7 @@ object NoSSLOkHttpClient {
                 connectTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 readTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-                hostnameVerifier { hostName, _ -> isHostValid(hostName) }
+                hostnameVerifier { hostName, _ -> /*isHostValid(hostName)*/ true }
             }
             return builder.build()
         } catch (e: Exception) {

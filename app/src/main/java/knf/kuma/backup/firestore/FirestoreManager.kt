@@ -30,7 +30,6 @@ import knf.kuma.database.EADB
 import knf.kuma.pojos.SeenObject
 import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
-import xdroid.toaster.Toaster
 import xdroid.toaster.Toaster.toast
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -197,15 +196,17 @@ object FirestoreManager {
                 }.also { listeners.add(it) }
                 firestoreDB.document("subscriptions/$uid").get().addOnSuccessListener {
                     if (it.exists() && PrefsUtil.subscriptionOrderId == null && PrefsUtil.subscriptionToken == null) {
-                        it.toObject<SubscriptionReceiver.SubscriptionInfo>()?.let {
-                            GlobalScope.launch(Dispatchers.IO) {
-                                val info = SubscriptionReceiver.checkStatus(it.token, it.orderId)
-                                if (info.isVerified) {
-                                    PrefsUtil.subscriptionToken = it.token
-                                    PrefsUtil.subscriptionOrderId = it.orderId
-                                    toast("Suscripción restaurada")
-                                } else {
-                                    firestoreDB.document("subscriptions/$uid").delete()
+                        noCrash {
+                            it.toObject<SubscriptionReceiver.SubscriptionInfo>()?.let {
+                                GlobalScope.launch(Dispatchers.IO) {
+                                    val info = SubscriptionReceiver.checkStatus(it.token, it.orderId)
+                                    if (info.isVerified) {
+                                        PrefsUtil.subscriptionToken = it.token
+                                        PrefsUtil.subscriptionOrderId = it.orderId
+                                        toast("Suscripción restaurada")
+                                    } else {
+                                        firestoreDB.document("subscriptions/$uid").delete()
+                                    }
                                 }
                             }
                         }
@@ -278,7 +279,7 @@ object FirestoreManager {
                                                 }
                                             }
                                         } else {
-                                            Toaster.toast("Se descargarán tus datos de la nube")
+                                            toast("Se descargarán tus datos de la nube")
                                             start()
                                         }
                                     }
@@ -497,7 +498,7 @@ object FirestoreManager {
             } else if (response != null) {
                 val error = response.error
                 error?.printStackTrace()
-                Toaster.toast("Error al iniciar sesion: ${error?.message}")
+                toast("Error al iniciar sesion: ${error?.message}")
             }
         }
     }

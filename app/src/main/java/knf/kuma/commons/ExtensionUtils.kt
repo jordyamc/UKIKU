@@ -412,6 +412,7 @@ fun isHostValid(hostName: String): Boolean {
         "www.rapidvideo.com",
         "nuclient-verification.herokuapp.com",
         "worldvideodownload.com",
+        "okvid.download",
         "www.yourupload.com" -> true
         else -> isVideoHostName(hostName)
     }.also { if (!it) Log.e("Hostname", "Not verified: $hostName") }
@@ -438,7 +439,10 @@ private fun validateAds(hostName: String): Boolean {
             "ggpht",
             "gkecnapps",
             "appbrain",
-            "apptornado"
+            "apptornado",
+            "startappservice",
+            "criteo",
+            "appcoachs"
     ).forEach { if (hostName.contains(it)) return true }
     return false
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.jsoupCookies
+import knf.kuma.commons.noCrashLet
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.retrofit.Repository
@@ -22,7 +23,7 @@ class AnimeViewModel : ViewModel() {
         link?.let {
             if (it.contains("/ver/")) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    val nLink = withContext(Dispatchers.IO) { "https://animeflv.net" + jsoupCookies(it).get().select("a[href~=/anime/]").attr("href") }
+                    val nLink = withContext(Dispatchers.IO) { "https://animeflv.net" + noCrashLet { jsoupCookies(it).get().select("a[href~=/anime/]").attr("href") } }
                     repository.getAnime(context, nLink, persist, liveData)
                 }
             } else

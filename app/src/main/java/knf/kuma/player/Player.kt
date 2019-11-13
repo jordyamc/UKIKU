@@ -158,7 +158,7 @@ class PlayerHolder(private val context: Context,
                     ExoPlaybackException.TYPE_SOURCE -> exception = error.sourceException
                 }
                 if (exception != null) {
-                    Toaster.toast("Error al reproducir: " + exception.message)
+                    Toaster.toast("Error al reproducir: " + exception.message?.replace("%", "%%"))
                     Crashlytics.logException(exception)
                 } else {
                     Toaster.toast("Error desconocido al reproducir")

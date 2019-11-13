@@ -260,7 +260,7 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
                         else -> null
                     }
             if (exception != null) {
-                Toaster.toast("Error al reproducir: " + exception.message, emptyArray<Any>())
+                Toaster.toast("Error al reproducir: " + exception.message?.replace("%", "%%"), emptyArray<Any>())
                 Crashlytics.logException(exception)
             } else
                 Toaster.toast("Error desconocido al reproducir")

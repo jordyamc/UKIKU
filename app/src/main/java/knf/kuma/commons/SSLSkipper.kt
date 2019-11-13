@@ -30,7 +30,7 @@ object SSLSkipper {
             }
         })
 
-        val trustAllHostnames = HostnameVerifier { hostName, _ -> isHostValid(hostName) }
+        val trustAllHostnames = HostnameVerifier { hostName, _ -> /*isHostValid(hostName)*/ true }
 
         try {
             System.setProperty("jsse.enableSNIExtension", "false")

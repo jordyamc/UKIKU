@@ -16,6 +16,7 @@ import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.core.CrashlyticsCore
 import com.google.android.gms.ads.MobileAds
+import com.startapp.android.publish.adsCommon.StartAppSDK
 import es.munix.multidisplaycast.CastManager
 import io.branch.referral.Branch
 import io.fabric.sdk.android.Fabric
@@ -61,6 +62,8 @@ class App : Application() {
         AchievementManager.init(this)
         AppBrain.addTestDevice("6e5a4187367ad5c0")
         MobileAds.initialize(this)
+        StartAppSDK.init(this, "210290575", false)
+        StartAppSDK.setUserConsent(this, "pas", System.currentTimeMillis(), true)
         initAppCoins()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels()

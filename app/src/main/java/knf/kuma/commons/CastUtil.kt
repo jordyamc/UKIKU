@@ -45,15 +45,16 @@ class CastUtil private constructor(private val context: Context) : CastListener,
             if (connected()) {
                 if (!castMedia.url.endsWith(":" + SelfServer.HTTP_PORT))
                     SelfServer.stop()
-                startLoading(view)
-                setEid(castMedia.eid)
                 Log.e("Cast", castMedia.url)
                 CastManager.getInstance().playMedia(castMedia.url, "video/mp4", castMedia.title, castMedia.subTitle, castMedia.image)
+                startLoading(view)
+                setEid(castMedia.eid)
                 AchievementManager.unlock(listOf(6))
             } else {
                 Toaster.toast("No hay dispositivo seleccionado")
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             stopLoading()
             Toaster.toast("Error al reproducir")
         }

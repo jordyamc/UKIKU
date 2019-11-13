@@ -27,9 +27,10 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
     private fun verify(videoServer: VideoServer?): VideoServer? {
         if (videoServer == null)
             return null
+        if (videoServer.skipVerification) return videoServer
         val client = OkHttpClient().newBuilder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
                 .followRedirects(true)
                 .followSslRedirects(true).build()
         for (option in ArrayList(videoServer.options))

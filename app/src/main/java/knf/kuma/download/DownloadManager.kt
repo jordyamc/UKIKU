@@ -21,6 +21,7 @@ import com.tonyodev.fetch2core.Func
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import knf.kuma.App
 import knf.kuma.R
+import knf.kuma.commons.EAHelper
 import knf.kuma.commons.FileUtil
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
@@ -307,6 +308,7 @@ class DownloadManager : Service() {
                 setContentText(downloadObject.chapter)
                 setOnlyAlertOnce(!isPaused || downloadObject.eta.toLong() == -2L)
                 setProgress(100, downloadObject.progress, downloadObject.state == DownloadObject.PENDING)
+                color = ContextCompat.getColor(App.context, EAHelper.getThemeColor())
                 setGroup("manager")
                 setOngoing(!isPaused)
                 setSound(null)
