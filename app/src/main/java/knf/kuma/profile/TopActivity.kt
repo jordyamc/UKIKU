@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.ListenerRegistration
 import knf.kuma.R
+import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.FullscreenAdLoader
 import knf.kuma.ads.getFAdLoaderInterstitial
 import knf.kuma.ads.getFAdLoaderRewarded
@@ -45,8 +46,8 @@ class TopActivity : GenericActivity() {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, 90.0)
-            item({ interstitial.show() }, 10.0)
+            item({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
+            item({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
         }.random()()
     }
 

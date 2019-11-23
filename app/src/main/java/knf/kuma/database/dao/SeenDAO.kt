@@ -29,6 +29,12 @@ interface SeenDAO {
     @Query("SELECT * FROM seenobject WHERE aid = :aid ORDER BY eid+0 DESC LIMIT 1")
     fun getLastByAid(aid: String): SeenObject?
 
+    @Query("SELECT * FROM seenobject WHERE eid IN (:eids)")
+    fun getAllFrom(eids: MutableList<String>): List<SeenObject>
+
+    @Query("SELECT * FROM seenobject WHERE aid = :aid")
+    fun getAllByAid(aid: String): List<SeenObject>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addChapter(chapter: SeenObject)
 

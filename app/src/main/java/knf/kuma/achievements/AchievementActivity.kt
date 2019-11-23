@@ -25,6 +25,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import knf.kuma.R
+import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.FullscreenAdLoader
 import knf.kuma.ads.getFAdLoaderInterstitial
 import knf.kuma.ads.getFAdLoaderRewarded
@@ -184,8 +185,8 @@ class AchievementActivity : GenericActivity() {
 
     private fun showAd() {
         probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, 90.0)
-            item({ interstitial.show() }, 10.0)
+            item({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
+            item({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
         }.random()()
     }
 

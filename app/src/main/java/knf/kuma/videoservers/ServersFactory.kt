@@ -135,7 +135,7 @@ class ServersFactory {
                         MaterialDialog(this@ServersFactory.context).safeShow {
                             title(text = "Selecciona servidor")
                             listItemsSingleChoice(items = names, initialSelection = selected) { _, index, text ->
-                                processSelectedServer(index, text)
+                                processSelectedServer(index, text.toString())
                             }
                             checkBoxPrompt(text = "Recordar selección", isCheckedDefault = PrefsUtil.rememberServer) {
                                 PrefsUtil.rememberServer = it

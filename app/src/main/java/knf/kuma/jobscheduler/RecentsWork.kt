@@ -194,18 +194,18 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
                 doOnUI {
                     ld.observeForever(Observer<List<WorkInfo>> {
                         ld.removeObserver(observer)
-                        doAsync {
-                            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-                            val time = (preferences.getString("recents_time", "1")
-                                    ?: "1").toInt() * 15
-                            if (time > 0 && it.isEmpty())
-                                Log.e("Recents", "On schedule")
-                                PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
-                                    //setConstraints(networkConnectedConstraints())
-                                    setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
-                                    addTag(TAG)
-                                }.build().enqueue()
-                        }
+                        if (it.isEmpty())
+                            doAsync {
+                                val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+                                val time = (preferences.getString("recents_time", "1")
+                                        ?: "1").toInt() * 15
+                                if (time > 0)
+                                    PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
+                                        //setConstraints(networkConnectedConstraints())
+                                        setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
+                                        addTag(TAG)
+                                    }.build().enqueue()
+                            }
                     }.also { observer = it })
                 }
             }

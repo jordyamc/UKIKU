@@ -63,8 +63,10 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
             pager.setCurrentItem(1, true)
         tabLayout.addOnTabSelectedListener(object : TabLayout.ViewPagerOnTabSelectedListener(pager) {
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                if (tab?.position == 1)
+                if (tab?.position == 1) {
+                    appBarLayout.setExpanded(false, true)
                     animePagerAdapter.onChaptersReselect()
+                }
             }
         })
         fab.onClick { innerInterface.onFabClicked(fab) }

@@ -10,7 +10,7 @@ import androidx.leanback.app.VideoSupportFragmentGlueHost
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
-import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
@@ -98,8 +98,8 @@ class PlaybackFragment : VideoSupportFragment() {
     private fun prepareMediaForPlaying(mediaSourceUri: Uri) {
         activity?.let {
             val userAgent = Util.getUserAgent(it, "UKIKU")
-            val mediaSource = ExtractorMediaSource.Factory(
-                    DefaultDataSourceFactory(it, null, OkHttpDataSourceFactory(OkHttpClient(), userAgent, null)))
+            val mediaSource = ProgressiveMediaSource.Factory(
+                    DefaultDataSourceFactory(it, null, OkHttpDataSourceFactory(OkHttpClient(), userAgent)))
                     .createMediaSource(mediaSourceUri)
             mPlayer?.prepare(mediaSource)
         }

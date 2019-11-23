@@ -290,7 +290,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         toast("Error al desencriptar")
                                     }) {
                                         val file = ffFile
-                                        if (file.exists()) {
+                                        if (file.exists() && !admFile.exists()) {
                                             val text = file.readText()
                                             val decrypt = text.decrypt()
                                             if (decrypt == input.toString()) {
@@ -302,6 +302,10 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                 preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
                                                 Toaster.toast("Contraseña incorrecta")
                                             }
+                                        } else if (admFile.exists()) {
+                                            PrefsUtil.ffPass = ""
+                                            file.delete()
+                                            DirectoryUpdateService.run(context)
                                         } else {
                                             if (PrefsUtil.ffPass != "") {
                                                 val decrypt = PrefsUtil.ffPass.decrypt()

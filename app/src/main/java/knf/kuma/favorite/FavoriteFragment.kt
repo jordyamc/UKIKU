@@ -391,7 +391,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             doAsync {
                                 if (text != favoriteObject.category) {
                                     edited = favoriteObject.also {
-                                        it.category = if (text == "Sin categoría") "_NONE_" else text
+                                        it.category = if (text == "Sin categoría") "_NONE_" else text.toString()
                                         CacheDB.INSTANCE.favsDAO().addFav(it)
                                         syncData { favs() }
                                     }

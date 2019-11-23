@@ -10,6 +10,7 @@ import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
+import knf.kuma.commons.noCrashLet
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -76,6 +77,9 @@ object FavToSeeing {
             }
         }
     }
+
+    fun getLast(list: List<SeenObject>): SeenObject? =
+            list.maxBy { noCrashLet(-1) { "(\\d+)".toRegex().findAll(it.number).last().destructured.component1().toInt() } }
 
     private val FavoriteObject.isCompleted: Boolean get() = CacheDB.INSTANCE.animeDAO().isCompleted(aid)
     private val FavoriteObject.isSeeing: Boolean get() = CacheDB.INSTANCE.seeingDAO().isSeeingAll(aid)

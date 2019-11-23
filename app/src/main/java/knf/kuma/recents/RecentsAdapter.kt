@@ -67,7 +67,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (context == null) return
+        if (context == null || list.isEmpty()) return
         if (holder is AdCardItemHolder)
             noCrash { holder.loadAd(list[position] as? AdCallback) }
         else if (holder is ItemHolder) {

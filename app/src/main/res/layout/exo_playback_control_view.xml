@@ -85,15 +85,16 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.github.rubensousa.previewseekbar.exoplayer.PreviewTimeBar
+            <com.google.android.exoplayer2.ui.DefaultTimeBar
                 android:id="@id/exo_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="8dp"
+                app:buffered_color="?colorSecondaryVariant"
                 app:played_color="?colorAccent"
-                app:previewFrameLayout="@id/previewFrameLayout"/>
+                app:scrubber_color="?colorSecondary" />
 
             <RelativeLayout
                 android:layout_width="match_parent"

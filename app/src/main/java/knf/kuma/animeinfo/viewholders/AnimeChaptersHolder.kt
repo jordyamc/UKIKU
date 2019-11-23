@@ -13,9 +13,8 @@ import knf.kuma.animeinfo.AnimeChaptersAdapter
 import knf.kuma.animeinfo.BottomActionsDialog
 import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.safeDismiss
-import knf.kuma.commons.showSnackbar
+import knf.kuma.commons.*
+import knf.kuma.custom.CenterLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
@@ -27,7 +26,7 @@ import java.util.*
 
 class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManager, private val callback: ChapHolderCallback) {
     val recyclerView: RecyclerView = view.recycler
-    private val manager: LinearLayoutManager = LinearLayoutManager(view.context)
+    private val manager: LinearLayoutManager = CenterLayoutManager(view.context)
     private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
     var adapter: AnimeChaptersAdapter? = null
         private set
@@ -206,11 +205,13 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
 
     fun smoothGoToChapter() {
         if (chapters.isNotEmpty()) {
-            val chapter = CacheDB.INSTANCE.chaptersDAO().getLast(PatternUtil.getEids(chapters))
-            if (chapter != null) {
-                val position = chapters.indexOf(chapter)
-                if (position >= 0)
-                    recyclerView.post { manager.smoothScrollToPosition(recyclerView, null, position) }
+            doOnUI {
+                val chapter = CacheDB.INSTANCE.seenDAO().getAllFrom(PatternUtil.getEids(chapters)).maxBy { noCrashLet(-1) { "(\\d+)".toRegex().findAll(it.number).last().destructured.component1().toInt() } }
+                if (chapter != null) {
+                    val position = chapters.indexOfFirst { it.eid == chapter.eid }
+                    if (position >= 0)
+                        recyclerView.post { manager.smoothScrollToPosition(recyclerView, null, position) }
+                }
             }
         }
     }

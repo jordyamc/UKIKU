@@ -49,6 +49,7 @@ import knf.kuma.directory.DirectoryFragment
 import knf.kuma.directory.DirectoryService
 import knf.kuma.emision.EmisionActivity
 import knf.kuma.explorer.ExplorerActivity
+import knf.kuma.faq.FaqActivity
 import knf.kuma.favorite.FavoriteFragment
 import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
@@ -293,7 +294,7 @@ class Main : GenericActivity(),
                     checkPermissions()
             }
             negativeButton(text = "Salir") { finish() }
-            setCancelable(false)
+            cancelable(false)
         }
     }
 
@@ -468,6 +469,7 @@ class Main : GenericActivity(),
             R.id.drawer_records -> RecordActivity.open(this)
             R.id.drawer_seeing -> SeeingActivity.open(this)
             R.id.drawer_random -> RandomActivity.open(this)
+            R.id.drawer_faq -> FaqActivity.open(this)
         }
         closeSearchBar()
         closeDrawer()

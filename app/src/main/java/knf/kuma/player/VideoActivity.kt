@@ -61,8 +61,6 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         createMediaSession()
         createPlayer()
         skip.setOnClickListener { playerHolder.skip() }
-        exo_progress.attachPreviewFrameLayout(previewFrameLayout)
-        exo_progress.setPreviewLoader(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isInPictureInPictureMode)
             player.useController = false
     }
@@ -140,12 +138,12 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     private fun activateMediaSession() {
         // Note: do not pass a null to the 3rd param below, it will cause a NullPointerException.
         // To pass Kotlin arguments to Java varargs, use the Kotlin spread operator `*`.
-        mediaSessionConnector.setPlayer(playerHolder.audioFocusPlayer, null)
+        mediaSessionConnector.setPlayer(playerHolder.audioFocusPlayer)
         mediaSession.isActive = true
     }
 
     private fun deactivateMediaSession() {
-        mediaSessionConnector.setPlayer(null, null)
+        mediaSessionConnector.setPlayer(null)
         mediaSession.isActive = false
     }
 
@@ -217,8 +215,6 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     override fun onPlayerStateChanged(state: Int, playWhenReady: Boolean) {
         if (state == Player.STATE_READY)
             doOnUI { hideUI() }
-        if (state == Player.STATE_READY && playWhenReady)
-            exo_progress.hidePreview()
     }
 
     override fun onFinish() {

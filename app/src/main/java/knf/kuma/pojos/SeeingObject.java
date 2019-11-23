@@ -7,6 +7,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import knf.kuma.database.CacheDBWrap;
+import knf.kuma.seeing.FavToSeeing;
 
 @Keep
 @Entity
@@ -53,7 +54,7 @@ public class SeeingObject {
         this.aid = aid;
         this.title = title;
         this.chapter = chapter;
-        this.lastChapter = CacheDBWrap.INSTANCE.seenDAO().getLastByAid(aid);
+        this.lastChapter = FavToSeeing.INSTANCE.getLast(CacheDBWrap.INSTANCE.seenDAO().getAllByAid(aid));
         this.state = state;
     }
 

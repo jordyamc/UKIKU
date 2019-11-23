@@ -5,6 +5,7 @@ import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.RemoteException
 import android.support.v4.media.MediaDescriptionCompat
 import android.util.Log
 import android.webkit.URLUtil
@@ -16,8 +17,8 @@ import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -81,11 +82,11 @@ class PlayerHolder(private val context: Context,
     }
 
     private fun createExtractorMediaSource(uri: Uri): MediaSource {
-        return ExtractorMediaSource.Factory(
+        return ProgressiveMediaSource.Factory(
                 if (PrefsUtil.useExperimentalOkHttp)
-                    DefaultDataSourceFactory(context, null, OkHttpDataSourceFactory(OkHttpClient(), BypassUtil.userAgent, null))
+                    DefaultDataSourceFactory(context, null, OkHttpDataSourceFactory(OkHttpClient(), BypassUtil.userAgent))
                 else
-                    DefaultDataSourceFactory(context, BypassUtil.userAgent)
+                    DefaultDataSourceFactory(context, BypassUtil.userAgent, null)
         ).createMediaSource(uri)
     }
 
@@ -141,7 +142,7 @@ class PlayerHolder(private val context: Context,
      */
     private fun attachLogging(exoPlayer: ExoPlayer) {
         // Show toasts on state changes.
-        exoPlayer.addListener(object : Player.DefaultEventListener() {
+        exoPlayer.addListener(object : Player.EventListener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 when (playbackState) {
                     Player.STATE_ENDED -> {
@@ -151,11 +152,13 @@ class PlayerHolder(private val context: Context,
             }
 
             override fun onPlayerError(error: ExoPlaybackException?) {
-                var exception: Exception? = null
+                var exception: Throwable? = null
                 when (error?.type) {
                     ExoPlaybackException.TYPE_RENDERER -> exception = error.rendererException
                     ExoPlaybackException.TYPE_UNEXPECTED -> exception = error.unexpectedException
                     ExoPlaybackException.TYPE_SOURCE -> exception = error.sourceException
+                    ExoPlaybackException.TYPE_OUT_OF_MEMORY -> exception = error.outOfMemoryError
+                    ExoPlaybackException.TYPE_REMOTE -> exception = RemoteException(error.message)
                 }
                 if (exception != null) {
                     Toaster.toast("Error al reproducir: " + exception.message?.replace("%", "%%"))
@@ -185,7 +188,7 @@ class PlayerHolder(private val context: Context,
             }
         })
         // Write to log on state changes.
-        exoPlayer.addListener(object : Player.DefaultEventListener() {
+        exoPlayer.addListener(object : Player.EventListener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 Log.i("Player", "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady")
                 playerCallback.onPlayerStateChanged(playbackState, playWhenReady)
@@ -204,6 +207,8 @@ class PlayerHolder(private val context: Context,
                     else -> "?"
                 }
             }
+
+
         })
 
     }

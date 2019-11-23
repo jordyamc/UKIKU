@@ -178,11 +178,6 @@ object PatternUtil {
         return matcher.group(1)
     }
 
-    fun getEids(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>): MutableList<String> {
-        val eids = ArrayList<String>()
-        for (chapter in chapters) {
-            eids.add(chapter.eid)
-        }
-        return eids
-    }
+    fun getEids(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>): MutableList<String> =
+            chapters.map { it.eid }.toMutableList()
 }

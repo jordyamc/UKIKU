@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import knf.kuma.App
 import knf.kuma.BottomFragment
 import knf.kuma.R
@@ -37,7 +37,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData.observe(this, Observer { animeObject ->
+            ViewModelProvider(it).get(AnimeViewModel::class.java).liveData.observe(viewLifecycleOwner, Observer { animeObject ->
                 if (animeObject != null) {
                     val chapters = animeObject.chapters
                     chapters?.let {
@@ -109,7 +109,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
     override fun onDownloadMultiple(addQueue: Boolean, chapters: List<AnimeObject.WebInfo.AnimeChapter>) {
         activity?.let {
             holder?.let { holder ->
-                MultipleDownloadManager.startDownload(it, holder.recyclerView, chapters, addQueue)
+                MultipleDownloadManager.startDownload(it, holder.recyclerView, chapters.sortedBy { noCrashLet(9999) { "(\\d+)".toRegex().findAll(it.number).last().destructured.component1().toInt() } }, addQueue)
             }
         }
     }

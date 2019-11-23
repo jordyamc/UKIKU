@@ -27,6 +27,9 @@ interface ChaptersDAO {
     @Query("SELECT * FROM animechapter WHERE eid IN (:eids) ORDER BY eid+0 DESC LIMIT 1")
     fun getLast(eids: MutableList<String>): AnimeObject.WebInfo.AnimeChapter?
 
+    @Query("SELECT * FROM animechapter WHERE eid IN (:eids)")
+    fun getAllFrom(eids: MutableList<String>): List<AnimeObject.WebInfo.AnimeChapter>
+
     @Query("SELECT * FROM animechapter WHERE aid = :aid ORDER BY `key` DESC LIMIT 1")
     fun getLastByAid(aid: String): AnimeObject.WebInfo.AnimeChapter?
 

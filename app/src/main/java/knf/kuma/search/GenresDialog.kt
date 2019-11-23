@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
+import knf.kuma.commons.transform
 import java.util.*
 
 class GenresDialog : DialogFragment() {
@@ -44,10 +45,10 @@ class GenresDialog : DialogFragment() {
             MaterialDialog(it).apply {
                 lifecycleOwner()
                 title(text = "Géneros")
-                listItemsMultiChoice(items = genres, initialSelection = selectedStates, allowEmptySelection = true) { _: MaterialDialog, _: IntArray, items: List<String> ->
+                listItemsMultiChoice(items = genres, initialSelection = selectedStates, allowEmptySelection = true) { _: MaterialDialog, _: IntArray, items: List<CharSequence> ->
                     selected.apply {
                         clear()
-                        addAll(items)
+                        addAll(items.transform())
                         sort()
                     }
                     listener?.onOkay(selected)
