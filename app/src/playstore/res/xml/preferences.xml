@@ -227,7 +227,7 @@
             android:key="list_placeholder"
             android:title="Usar placeholder en listas" />
         <SwitchPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:icon="@drawable/ic_cash"
             android:key="ads_enabled"
             android:summary="Mostrar anuncios para ayudar al programador"

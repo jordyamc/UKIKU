@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.securepreferences.SecurePreferences
 import knf.kuma.App
+import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
@@ -51,7 +52,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val isAdsEnabled: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", /*BuildConfig.BUILD_TYPE == "playstore" ||*/ App.context.resources.getBoolean(R.bool.isTv))
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", BuildConfig.BUILD_TYPE == "playstore" || App.context.resources.getBoolean(R.bool.isTv))
 
     val downloaderType: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")

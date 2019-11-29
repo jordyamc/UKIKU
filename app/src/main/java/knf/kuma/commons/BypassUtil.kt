@@ -25,6 +25,7 @@ class BypassUtil {
                     ?: PrefsUtil.userAgent else PrefsUtil.userAgent
         var isLoading = false
         var isChecking = false
+        var isVerifing = false
 
         private const val keyCfClearance = "cf_clearance"
         private const val keyCfDuid = "__cfduid"
@@ -37,8 +38,12 @@ class BypassUtil {
                 for (cookie in parts) {
                     if (cookie.contains(keyCfDuid))
                         setCFDuid(context, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
-                    if (cookie.contains(keyCfClearance))
-                        setClearance(context, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
+                    if (cookie.contains(keyCfClearance)) {
+                        val clearance = cookie.trim().substring(cookie.trim().indexOf("=") + 1)
+                        if (clearance.isBlank())
+                            return false
+                        setClearance(context, clearance)
+                    }
                 }
                 return true
             }

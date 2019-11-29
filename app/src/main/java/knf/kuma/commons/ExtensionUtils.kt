@@ -2,6 +2,7 @@ package knf.kuma.commons
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Resources
 import android.graphics.drawable.AnimationDrawable
 import android.net.Uri
@@ -335,6 +336,8 @@ fun NotificationCompat.Builder.create(func: NotificationCompat.Builder.() -> Uni
 
 fun ViewGroup.inflate(@LayoutRes layout: Int, attachToRoot: Boolean = false): View = LayoutInflater.from(context).inflate(layout, this, attachToRoot)
 
+fun inflate(context: Context, @LayoutRes layout: Int, attachToRoot: Boolean = false): View = LayoutInflater.from(context).inflate(layout, null, attachToRoot)
+
 fun File.safeDelete(log: Boolean = false) {
     try {
         delete()
@@ -358,6 +361,17 @@ fun Any?.notNull(): Boolean {
 }
 
 fun String.r(from: String, to: String) = replace(from, to)
+
+fun Context.findActivity(): Activity? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) {
+            return context
+        }
+        context = context.baseContext
+    }
+    return null
+}
 
 @UiThread
 fun ImageView.setAnimatedResource(@DrawableRes res: Int) {

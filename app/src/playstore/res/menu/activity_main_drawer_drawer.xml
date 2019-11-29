@@ -41,4 +41,8 @@
         android:id="@+id/drawer_random"
         android:icon="@drawable/ic_random"
         android:title="Random" />
+    <item
+        android:id="@+id/drawer_faq"
+        android:icon="@drawable/ic_faq"
+        android:title="FAQ" />
 </menu>

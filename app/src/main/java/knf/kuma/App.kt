@@ -60,8 +60,6 @@ class App : Application() {
         CastManager.register(this)
         AchievementManager.init(this)
         MobileAds.initialize(this)
-        /*if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled")) {
-        }*/
         StartAppSDK.init(this, "210290575", false)
         StartAppSDK.setUserConsent(this, "pas", System.currentTimeMillis(), true)
         initAppCoins()

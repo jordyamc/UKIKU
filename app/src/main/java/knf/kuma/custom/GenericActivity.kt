@@ -99,6 +99,11 @@ open class GenericActivity : AppCompatActivity() {
                 logText("Applying settings for webview")
                 webView.settings?.javaScriptEnabled = true
                 webView.webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        shouldOverrideUrlLoading(view, url)
+                    }
+
                     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                         shouldOverrideUrlLoading(view, request?.url?.toString())
                         return false
@@ -108,6 +113,7 @@ open class GenericActivity : AppCompatActivity() {
                         Log.e("CloudflareBypass", "Override $url")
                         logText("Override: $url")
                         logText("Waiting for resolve...")
+                        //view?.loadUrl(url)
                         if (url == "https://animeflv.net/") {
                             logText("Cookies for animeflv:")
                             logText(noCrashLet { CookieManager.getInstance().getCookie(".animeflv.net") }
@@ -116,17 +122,20 @@ open class GenericActivity : AppCompatActivity() {
                             if (BypassUtil.saveCookies(App.context)) {
                                 logText("Cookies saved")
                                 webView.loadUrl("about:blank")
+                                BypassUtil.isVerifing = true
                                 doAsync(exceptionHandler = { logText("Error: ${it.message}") }) {
                                     logText("Checking connection state")
                                     if (BypassUtil.isConnectionBlocked()) {
                                         if (tryCount < 4) {
                                             tryCount++
                                             logText("Connection blocked, retry connection... tries left: ${3 - tryCount}")
+                                            BypassUtil.isVerifing = false
                                             runWebView(snack)
                                         } else {
                                             tryCount = 0
                                             logText("Connection was blocked, no tries left")
                                             BypassUtil.isLoading = false
+                                            BypassUtil.isVerifing = false
                                             onBypassUpdated()
                                         }
                                     } else {
@@ -138,6 +147,7 @@ open class GenericActivity : AppCompatActivity() {
                                             bypassLive.postValue(Pair(first = true, second = false))
                                             Repository().reloadRecents()
                                             onBypassUpdated()
+                                            BypassUtil.isVerifing = false
                                             BypassUtil.isLoading = false
                                             PicassoSingle.clear()
                                             if (!PrefsUtil.isDirectoryFinished)
@@ -145,15 +155,18 @@ open class GenericActivity : AppCompatActivity() {
                                         }
                                     }
                                 }
-                            } else logText("cf_clearance not found")
+                            } else logText("cf_clearance not found or empty")
+                        } else if (url != "about:blank" && BypassUtil.isLoading && !BypassUtil.isVerifing) {
+                            view?.loadUrl(url)
                         }
-                        return false
+                        return true
                     }
                 }
                 webView.settings?.userAgentString = (if (PrefsUtil.useDefaultUserAgent) {
                     noCrashLet { WebSettings.getDefaultUserAgent(App.context) }
                             ?: UAGenerator.getRandomUserAgent()
                 } else UAGenerator.getRandomUserAgent()).also { PrefsUtil.userAgent = it }
+                logText("Open animeflv.net")
                 webView.loadUrl("https://animeflv.net/")
             } else {
                 logText("Error finding suitable webview")
