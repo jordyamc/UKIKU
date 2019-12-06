@@ -255,7 +255,7 @@
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_ff"
-            android:key="family_friendly"
+            android:key="family_friendly_enabled"
             android:title="Modo family friendly" />
         <androidx.preference.ListPreference
             android:defaultValue="10"

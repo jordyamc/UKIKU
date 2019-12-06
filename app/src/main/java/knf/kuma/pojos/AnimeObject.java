@@ -410,9 +410,9 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             @Override
             public int compareTo(@NonNull AnimeChapter animeChapter) {
-                int num1 = Integer.parseInt(number.substring(number.lastIndexOf(" ") + 1));
-                int num2 = Integer.parseInt(animeChapter.number.substring(animeChapter.number.lastIndexOf(" ") + 1));
-                return num2 - num1;
+                double num1 = Double.valueOf(number.substring(number.lastIndexOf(" ") + 1));
+                double num2 = Double.valueOf(animeChapter.number.substring(animeChapter.number.lastIndexOf(" ") + 1));
+                return Double.compare(num2, num1);
             }
 
             @Override

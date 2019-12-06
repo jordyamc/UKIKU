@@ -59,7 +59,7 @@ class BackUpWork(val context: Context, workerParameters: WorkerParameters) : Wor
                     setConstraints(networkConnectedConstraints())
                     setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.MINUTES)
                     addTag(TAG)
-                }.build().enqueue()
+                }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.REPLACE)
             }
         }
     }

@@ -67,7 +67,8 @@ open class GenericActivity : AppCompatActivity() {
             if ((BypassUtil.isNeededFlag().also { flag = it } >= 1 || forceCreation()).also { logText("Is needed or forced: $it") }
                     && !BypassUtil.isLoading.also { logText("Is already loading: $it") }) {
                 BypassUtil.isChecking = false
-                if (flag != 2 || forceCreation()) {
+                logText("Flag: $flag")
+                if (flag == 1 || forceCreation()) {
                     logText("Starting creation")
                     BypassUtil.isLoading = true
                     val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)

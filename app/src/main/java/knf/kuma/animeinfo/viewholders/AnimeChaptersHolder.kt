@@ -206,7 +206,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
     fun smoothGoToChapter() {
         if (chapters.isNotEmpty()) {
             doOnUI {
-                val chapter = CacheDB.INSTANCE.seenDAO().getAllFrom(PatternUtil.getEids(chapters)).maxBy { noCrashLet(-1) { "(\\d+)".toRegex().findAll(it.number).last().destructured.component1().toInt() } }
+                val chapter = CacheDB.INSTANCE.seenDAO().getAllFrom(PatternUtil.getEids(chapters)).maxBy { noCrashLet(-1.0) { "(\\d+\\.?\\d?)".toRegex().findAll(it.number).last().destructured.component1().toDouble() } }
                 if (chapter != null) {
                     val position = chapters.indexOfFirst { it.eid == chapter.eid }
                     if (position >= 0)

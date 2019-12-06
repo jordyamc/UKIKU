@@ -108,6 +108,11 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                         webView.visibility = View.VISIBLE
                         webView.settings?.javaScriptEnabled = true
                         webView.webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                shouldOverrideUrlLoading(view, url)
+                            }
+
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                 shouldOverrideUrlLoading(view, request?.url?.toString())
                                 return false
@@ -124,8 +129,10 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                                     }
                                     Repository().reloadRecents()
                                     BypassUtil.isLoading = false
+                                } else if (url != "about:blank" && BypassUtil.isLoading) {
+                                    view?.loadUrl(url)
                                 }
-                                return false
+                                return true
                             }
                         }
                         webView.settings?.userAgentString = randomUA().also { PrefsUtil.userAgent = it }

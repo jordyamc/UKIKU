@@ -74,7 +74,7 @@ val getUpdateDir: String
 
 fun currentTime(): Long = System.currentTimeMillis()
 
-val ffFile: File get() = File(File(Environment.getExternalStorageDirectory(), "UKIKU/backups"), "data.dat")
+val ffFile: File get() = File(File(Environment.getExternalStorageDirectory(), "UKIKU/backups"), "data.crypt")
 val admFile: File get() = File(File(Environment.getExternalStorageDirectory(), "UKIKU/backups"), BuildConfig.ADM_FILE)
 
 fun verifiyFF() {
@@ -82,7 +82,6 @@ fun verifiyFF() {
         ffFile.parentFile?.mkdirs()
         ffFile.createNewFile()
         ffFile.writeText(PrefsUtil.ffPass)
-
     } else if (!PrefsUtil.isFamilyFriendly && ffFile.exists()) {
         PrefsUtil.isFamilyFriendly = true
         PrefsUtil.ffPass = ffFile.readText()

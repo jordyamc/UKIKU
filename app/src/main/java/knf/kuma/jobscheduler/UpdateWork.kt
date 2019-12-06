@@ -6,8 +6,8 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import knf.kuma.BuildConfig
@@ -61,11 +61,10 @@ class UpdateWork(val context: Context, workerParameters: WorkerParameters) : Wor
 
         fun schedule() {
             doAsync {
-                if (WorkManager.getInstance().getWorkInfosByTag(TAG).get().size == 0)
-                    PeriodicWorkRequestBuilder<UpdateWork>(6, TimeUnit.HOURS, 1, TimeUnit.HOURS).apply {
-                        setConstraints(networkConnectedConstraints())
-                        addTag(TAG)
-                    }.build().enqueue()
+                PeriodicWorkRequestBuilder<UpdateWork>(6, TimeUnit.HOURS, 1, TimeUnit.HOURS).apply {
+                    setConstraints(networkConnectedConstraints())
+                    addTag(TAG)
+                }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.KEEP)
             }
         }
     }

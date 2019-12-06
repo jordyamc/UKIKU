@@ -99,7 +99,7 @@ object PatternUtil {
     }
 
     fun getNumFromFile(file: String): String {
-        val matcher = Pattern.compile("^.*\\$[a-z-0-9]*-(\\d+)\\.mp4$").matcher(file)
+        val matcher = Pattern.compile("^.*\\$[a-z-0-9]*-(\\d+\\.?\\d*)\\.mp4$").matcher(file)
         matcher.find()
         return matcher.group(1)
     }
@@ -155,7 +155,7 @@ object PatternUtil {
 
     fun getEpListMap(code: String): HashMap<String, String> {
         val map = LinkedHashMap<String, String>()
-        val matcher = Pattern.compile("\\[(\\d+),(\\d+)]").matcher(code)
+        val matcher = Pattern.compile("\\[(\\d+\\.?\\d?),(\\d+)]").matcher(code)
         while (matcher.find()) {
             map[matcher.group(1)] = matcher.group(2)
         }

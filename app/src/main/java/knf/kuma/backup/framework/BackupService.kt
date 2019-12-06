@@ -21,12 +21,12 @@ abstract class BackupService {
 
     fun String.checkResponse(id: String): String =
             if (id == Backups.keyAchievements)
-                this.decrypt()
+                this.decrypt() ?: this
             else this
 
     fun String.checkData(id: String): String =
             if (id == Backups.keyAchievements)
-                this.encrypt()
+                this.encrypt() ?: this
             else this
 
 }

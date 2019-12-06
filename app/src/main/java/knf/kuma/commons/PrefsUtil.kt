@@ -229,13 +229,13 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_seen", value).apply()
 
     var isFamilyFriendly: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("family_friendly", false)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("family_friendly", value).apply()
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("family_friendly_enabled", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("family_friendly_enabled", value).apply()
 
     var ffPass: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("ff_pass", "")
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("ff_pass_cbc", "")
                 ?: ""
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("ff_pass", value).apply()
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("ff_pass_cbc", value).apply()
 
     var topCount: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("top_count", 25)

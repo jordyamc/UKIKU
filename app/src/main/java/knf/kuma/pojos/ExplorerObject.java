@@ -114,6 +114,7 @@ public class ExplorerObject {
                 new Handler(Looper.getMainLooper()).post(() -> liveData.setValue(chapters));
                 CacheDBWrap.INSTANCE.explorerDAO().update(this);
             } catch (Exception e) {
+                e.printStackTrace();
                 Crashlytics.logException(e);
                 Toaster.toast("Error al obtener lista de episodios");
                 isProcessed = true;
@@ -216,9 +217,9 @@ public class ExplorerObject {
 
         @Override
         public int compareTo(@NonNull FileDownObj o) {
-            int num1 = Integer.parseInt(chapter.substring(chapter.lastIndexOf(" ") + 1));
-            int num2 = Integer.parseInt(o.chapter.substring(o.chapter.lastIndexOf(" ") + 1));
-            return Integer.compare(num1, num2);
+            double num1 = Double.valueOf(chapter.substring(chapter.lastIndexOf(" ") + 1));
+            double num2 = Double.valueOf(o.chapter.substring(o.chapter.lastIndexOf(" ") + 1));
+            return Double.compare(num1, num2);
         }
     }
 

@@ -2,27 +2,21 @@ package knf.kuma.commons
 
 import android.util.Base64
 import knf.kuma.BuildConfig
-import java.security.InvalidAlgorithmParameterException
+import se.simbio.encryption.Encryption
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-fun String.encrypt(): String {
-    return try {
-        encrypt16(BuildConfig.CIPHER_PWD_16)
-    } catch (e: InvalidAlgorithmParameterException) {
-        encrypt12(BuildConfig.CIPHER_PWD_12)
-    }
+object CipherContainer {
+    val encryption = Encryption.getDefault(BuildConfig.CIPHER_PWD_16, BuildConfig.CIPHER_PWD_12, ByteArray(16))
 }
 
-fun String.decrypt(): String {
-    return try {
-        decrypt16(BuildConfig.CIPHER_PWD_16)
-    } catch (e: InvalidAlgorithmParameterException) {
-        decrypt12(BuildConfig.CIPHER_PWD_12)
-    }
-}
+fun String.encrypt(): String? = CipherContainer.encryption.encryptOrNull(this)
+fun String.encryptOrThrow(): String = CipherContainer.encryption.encrypt(this)
+
+fun String.decrypt(): String? = CipherContainer.encryption.decryptOrNull(this)
+fun String.decryptOrThrow(): String = CipherContainer.encryption.decrypt(this)
 
 fun String.encrypt12(password: String): String {
     val secretKeySpec = SecretKeySpec(password.toByteArray(), "AES")

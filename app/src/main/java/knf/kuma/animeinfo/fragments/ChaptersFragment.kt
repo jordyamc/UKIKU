@@ -89,9 +89,9 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
     }
 
     override fun onImportMultiple(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>) {
-        when {
-            chapters.size == 0 -> Toaster.toast("No se puede importar ningun episodio")
-            chapters.size == 1 -> {
+        when (chapters.size) {
+            0 -> Toaster.toast("No se puede importar ningun episodio")
+            1 -> {
                 this.moveFile = chapters[0].fileName
                 onMove(chapters[0].fileName)
             }

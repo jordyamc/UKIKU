@@ -204,7 +204,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
                                         //setConstraints(networkConnectedConstraints())
                                         setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
                                         addTag(TAG)
-                                    }.build().enqueue()
+                                    }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.REPLACE)
                             }
                     }.also { observer = it })
                 }
@@ -213,13 +213,12 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
 
         fun reSchedule(time: Int) {
             WorkManager.getInstance(App.context).cancelAllWorkByTag(TAG)
-            Log.e("Recents", "On remove")
             if (time > 0)
                 PeriodicWorkRequestBuilder<RecentsWork>(time.toLong(), TimeUnit.MINUTES, 5, TimeUnit.MINUTES).apply {
                     //setConstraints(networkConnectedConstraints())
                     setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
                     addTag(TAG)
-                }.build().enqueue().also { Log.e("Recents", "On schedule") }
+                }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.REPLACE)
         }
 
         fun run() = OneTimeWorkRequestBuilder<RecentsWork>().build().enqueue()

@@ -232,7 +232,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     }
                     true
                 }
-                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+                preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
                     if (newValue == true) {
                         activity?.let {
                             MaterialDialog(it).safeShow {
@@ -244,10 +244,10 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                             if (input.toString() == inputText.toString())
                                                 doOnUI(onLog = {
                                                     PrefsUtil.isFamilyFriendly = false
-                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
                                                     toast("Error al encriptar")
                                                 }) {
-                                                    val encrypted = input.toString().encrypt()
+                                                    val encrypted = input.toString().encryptOrThrow()
                                                     check(encrypted.decrypt() == input.toString())
                                                     PrefsUtil.ffPass = encrypted
                                                     val file = ffFile
@@ -260,14 +260,14 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                             else {
                                                 toast("Las contraseñas no coinciden")
                                                 PrefsUtil.isFamilyFriendly = false
-                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
                                             }
                                         }
                                         getInputLayout().boxBackgroundColor = Color.TRANSPARENT
                                         getInputField().setBackgroundColor(Color.TRANSPARENT)
                                         onCancel {
                                             PrefsUtil.isFamilyFriendly = false
-                                            preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                            preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
                                         }
                                     }
                                 }
@@ -275,7 +275,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                 getInputField().setBackgroundColor(Color.TRANSPARENT)
                                 onCancel {
                                     PrefsUtil.isFamilyFriendly = false
-                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = false
+                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
                                 }
                             }
                         }
@@ -286,7 +286,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                 input { _, input ->
                                     doOnUI(onLog = {
                                         PrefsUtil.isFamilyFriendly = true
-                                        preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                        preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
                                         toast("Error al desencriptar")
                                     }) {
                                         val file = ffFile
@@ -299,7 +299,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                                 DirectoryUpdateService.run(context)
                                             } else {
                                                 PrefsUtil.isFamilyFriendly = true
-                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
                                                 Toaster.toast("Contraseña incorrecta")
                                             }
                                         } else if (admFile.exists()) {
@@ -309,11 +309,11 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         } else {
                                             if (PrefsUtil.ffPass != "") {
                                                 val decrypt = PrefsUtil.ffPass.decrypt()
-                                                if (decrypt != input.toString()) {
+                                                if (decrypt == null || decrypt != input.toString()) {
                                                     file.createNewFile()
-                                                    file.writeText(decrypt)
+                                                    file.writeText(PrefsUtil.ffPass)
                                                     PrefsUtil.isFamilyFriendly = true
-                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
                                                     Toaster.toast("Contraseña incorrecta")
                                                 } else {
                                                     PrefsUtil.ffPass = ""
@@ -327,7 +327,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                 getInputField().setBackgroundColor(Color.TRANSPARENT)
                                 onCancel {
                                     PrefsUtil.isFamilyFriendly = true
-                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly")?.isChecked = true
+                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
                                 }
                             }
                         }
