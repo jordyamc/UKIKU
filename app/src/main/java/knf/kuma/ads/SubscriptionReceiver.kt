@@ -18,25 +18,23 @@ object SubscriptionReceiver {
 
     data class SubscriptionInfo(
             val token: String = "",
-            val orderId: String = "",
             val purchaseTime: Long = 0L
     )
 
     fun check(intent: Intent) {
         GlobalScope.launch(Dispatchers.IO) {
-            if (intent.hasExtra("orderId") && intent.hasExtra("token"))
-                check(intent.getStringExtra("token"), intent.getStringExtra("orderId"))
+            if (intent.hasExtra("token"))
+                check(intent.getStringExtra("token"))
             else
-                check(PrefsUtil.subscriptionToken, PrefsUtil.subscriptionOrderId)
+                check(PrefsUtil.subscriptionToken)
         }
     }
 
-    private suspend fun check(token: String?, orderId: String?) {
-        if (token == null || orderId == null || !Network.isConnected) return
-        val status = checkStatus(token, orderId)
+    private suspend fun check(token: String?) {
+        if (token == null || !Network.isConnected) return
+        val status = checkStatus(token)
         if (status.isVerified) {
             PrefsUtil.subscriptionToken = token
-            PrefsUtil.subscriptionOrderId = orderId
         } else {
             PrefsUtil.subscriptionToken = null
             PrefsUtil.subscriptionOrderId = null
@@ -45,8 +43,8 @@ object SubscriptionReceiver {
         }
     }
 
-    suspend fun checkStatus(token: String, orderId: String): VerifyStatus = withContext(Dispatchers.IO) {
-        val json = JSONObject(URL(String.format("https://nuclient-verification.herokuapp.com/subscriptions.php?token=%s&orderid=%s", token, orderId)).readText())
+    suspend fun checkStatus(token: String): VerifyStatus = withContext(Dispatchers.IO) {
+        val json = JSONObject(URL("https://nuclient-verification.herokuapp.com/subscriptions.php?token=${token}").readText())
         VerifyStatus(json.getBoolean("isVerified"), json.getBoolean("isActive"))
     }
 }

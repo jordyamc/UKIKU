@@ -238,7 +238,7 @@ class Diagnostic : GenericActivity() {
         GlobalScope.launch(Dispatchers.IO) {
             if (PrefsUtil.isSubscriptionEnabled) {
                 val status = SubscriptionReceiver.checkStatus(PrefsUtil.subscriptionToken
-                        ?: "", PrefsUtil.subscriptionOrderId ?: "")
+                        ?: "")
                 if (status.isActive) {
                     if (status.isActive)
                         subscriptionState.load("Activa")

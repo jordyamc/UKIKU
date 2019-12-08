@@ -199,10 +199,9 @@ object FirestoreManager {
                         noCrash {
                             it.toObject<SubscriptionReceiver.SubscriptionInfo>()?.let {
                                 GlobalScope.launch(Dispatchers.IO) {
-                                    val info = SubscriptionReceiver.checkStatus(it.token, it.orderId)
+                                    val info = SubscriptionReceiver.checkStatus(it.token)
                                     if (info.isVerified) {
                                         PrefsUtil.subscriptionToken = it.token
-                                        PrefsUtil.subscriptionOrderId = it.orderId
                                         toast("Suscripción restaurada")
                                     } else {
                                         firestoreDB.document("subscriptions/$uid").delete()
