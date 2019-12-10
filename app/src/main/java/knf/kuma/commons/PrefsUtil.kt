@@ -245,10 +245,6 @@ object PrefsUtil {
         get() = SecurePreferences(context).getString("subscription_token", null)
         set(value) = SecurePreferences(context).edit().putString("subscription_token", value).apply()
 
-    var subscriptionOrderId: String?
-        get() = SecurePreferences(context).getString("subscription_orderId", null)
-        set(value) = SecurePreferences(context).edit().putString("subscription_orderId", value).apply()
-
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
     }
@@ -281,7 +277,7 @@ object PrefsUtil {
         return PreferenceManager.getDefaultSharedPreferences(context).booleanLiveData("show_fav_count", true)
     }
 
-    val isSubscriptionEnabled: Boolean get() = subscriptionToken != null && subscriptionOrderId != null
+    val isSubscriptionEnabled: Boolean get() = subscriptionToken != null
 
     private val defaultDownloadType: String
         get() {

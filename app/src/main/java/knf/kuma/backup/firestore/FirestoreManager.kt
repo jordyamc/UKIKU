@@ -195,7 +195,7 @@ object FirestoreManager {
                     }
                 }.also { listeners.add(it) }
                 firestoreDB.document("subscriptions/$uid").get().addOnSuccessListener {
-                    if (it.exists() && PrefsUtil.subscriptionOrderId == null && PrefsUtil.subscriptionToken == null) {
+                    if (it.exists() && PrefsUtil.subscriptionToken == null) {
                         noCrash {
                             it.toObject<SubscriptionReceiver.SubscriptionInfo>()?.let {
                                 GlobalScope.launch(Dispatchers.IO) {

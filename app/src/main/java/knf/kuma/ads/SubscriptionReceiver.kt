@@ -37,7 +37,6 @@ object SubscriptionReceiver {
             PrefsUtil.subscriptionToken = token
         } else {
             PrefsUtil.subscriptionToken = null
-            PrefsUtil.subscriptionOrderId = null
             if (!PrefsUtil.isAdsEnabled)
                 FirestoreManager.doSignOut(App.context)
         }
