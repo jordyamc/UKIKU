@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.browser.customtabs.CustomTabsClient
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
@@ -30,7 +29,6 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         refresh.setOnRefreshListener(this)
         refresh.isRefreshing = true
         recycler.adapter = adapter
-        //recycler.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         recycler.addItemDecoration(SpacingItemDecoration(0, 10.asPx))
         NewsCreator.createNews().observe(this, Observer {
             if (it == null || it.isEmpty())
@@ -42,8 +40,6 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
             }
             refresh.isRefreshing = false
         })
-        val packageName = CustomTabsClient.getPackageName(this, null) ?: ""
-        CustomTabsClient.connectAndInitialize(this, packageName)
     }
 
     override fun onRefresh() {
