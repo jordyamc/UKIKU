@@ -43,7 +43,12 @@ object SubscriptionReceiver {
     }
 
     suspend fun checkStatus(token: String): VerifyStatus = withContext(Dispatchers.IO) {
-        val json = JSONObject(URL("https://nuclient-verification.herokuapp.com/subscriptions.php?token=${token}").readText())
-        VerifyStatus(json.getBoolean("isVerified"), json.getBoolean("isActive"))
+        try {
+            val json = JSONObject(URL("https://nuclient-verification.herokuapp.com/subscriptions.php?token=${token}").readText())
+            VerifyStatus(json.getBoolean("isVerified"), json.getBoolean("isActive"))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            VerifyStatus(isVerified = true, isActive = true)
+        }
     }
 }

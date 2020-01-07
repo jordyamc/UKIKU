@@ -1,20 +1,14 @@
 package knf.kuma.ads
 
-import android.app.Activity
-import android.content.Context
-import android.view.View
-import android.view.ViewGroup
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
-import com.startapp.android.publish.ads.banner.Banner
+/*import com.startapp.android.publish.ads.banner.Banner
 import com.startapp.android.publish.ads.banner.BannerListener
 import com.startapp.android.publish.adsCommon.Ad
 import com.startapp.android.publish.adsCommon.StartAppAd
-import com.startapp.android.publish.adsCommon.adListeners.AdDisplayListener
-import knf.kuma.commons.Economy
+import com.startapp.android.publish.adsCommon.adListeners.AdDisplayListener*/
+import android.app.Activity
+import android.content.Context
+import android.view.ViewGroup
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
-import knf.kuma.custom.BannerContainerView
 import knf.kuma.news.AdNewsObject
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
@@ -158,7 +152,7 @@ fun ViewGroup.implBannerStartApp(unitID: AdsType, isSmart: Boolean = false) {
 }
 
 fun ViewGroup.implBannerStartApp(unitID: String, isSmart: Boolean = false) {
-    if (PrefsUtil.isAdsEnabled)
+    /*if (PrefsUtil.isAdsEnabled)
         doOnUI {
             val adView = Banner(context, object : BannerListener {
                 override fun onClick(p0: View?) {
@@ -179,14 +173,14 @@ fun ViewGroup.implBannerStartApp(unitID: String, isSmart: Boolean = false) {
             }
             adView.loadAd()
             adView.showBanner()
-        }
+        }*/
 }
 
 fun getFAdLoaderRewardedStartApp(context: Activity, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderRewardedStartApp(context, onUpdate)
 fun getFAdLoaderInterstitialStartApp(context: Context, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderInterstitialStartApp(context, onUpdate)
 
 class FAdLoaderRewardedStartApp(private val context: Context, val onUpdate: () -> Unit) : FullscreenAdLoader {
-    var isAdClicked = false
+    /*var isAdClicked = false
     private val startAppAd: StartAppAd by lazy {
         StartAppAd(context).apply {
             setVideoListener {
@@ -196,14 +190,14 @@ class FAdLoaderRewardedStartApp(private val context: Context, val onUpdate: () -
                 onUpdate()
             }
         }
-    }
+    }*/
 
     override fun load() {
-        startAppAd.loadAd(StartAppAd.AdMode.REWARDED_VIDEO)
+        //startAppAd.loadAd(StartAppAd.AdMode.REWARDED_VIDEO)
     }
 
     override fun show() {
-        startAppAd.showAd(object : AdDisplayListener {
+        /*startAppAd.showAd(object : AdDisplayListener {
             override fun adHidden(p0: Ad?) {
 
             }
@@ -218,20 +212,20 @@ class FAdLoaderRewardedStartApp(private val context: Context, val onUpdate: () -
             override fun adClicked(p0: Ad?) {
                 isAdClicked = true
             }
-        })
+        })*/
     }
 }
 
 class FAdLoaderInterstitialStartApp(private val context: Context, val onUpdate: () -> Unit) : FullscreenAdLoader {
-    var isAdClicked = false
-    private val startAppAd: StartAppAd by lazy { StartAppAd(context) }
+    /*var isAdClicked = false
+    private val startAppAd: StartAppAd by lazy { StartAppAd(context) }*/
 
     override fun load() {
-        startAppAd.loadAd()
+        //startAppAd.loadAd()
     }
 
     override fun show() {
-        startAppAd.showAd(object : AdDisplayListener {
+        /*startAppAd.showAd(object : AdDisplayListener {
             override fun adHidden(p0: Ad?) {
 
             }
@@ -249,6 +243,6 @@ class FAdLoaderInterstitialStartApp(private val context: Context, val onUpdate: 
             override fun adClicked(p0: Ad?) {
                 isAdClicked = true
             }
-        })
+        })*/
     }
 }

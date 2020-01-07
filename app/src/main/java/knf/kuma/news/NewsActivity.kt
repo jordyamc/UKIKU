@@ -42,7 +42,7 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
             }
             refresh.isRefreshing = false
         })
-        val packageName = CustomTabsClient.getPackageName(this, null)
+        val packageName = CustomTabsClient.getPackageName(this, null) ?: ""
         CustomTabsClient.connectAndInitialize(this, packageName)
     }
 

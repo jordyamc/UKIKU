@@ -31,24 +31,26 @@ class BypassUtil {
         private const val keyCfDuid = "__cfduid"
         private const val defaultValue = ""
 
-        fun saveCookies(context: Context): Boolean {
-            val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/").trim()
-            if (cookies.contains(keyCfClearance)) {
-                val parts = cookies.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                for (cookie in parts) {
-                    if (cookie.contains(keyCfDuid))
-                        setCFDuid(context, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
-                    if (cookie.contains(keyCfClearance)) {
-                        val clearance = cookie.trim().substring(cookie.trim().indexOf("=") + 1)
-                        if (clearance.isBlank())
-                            return false
-                        setClearance(context, clearance)
+        fun saveCookies(context: Context): Boolean =
+                noCrashLet(false) {
+                    val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/")?.trim()
+                            ?: ""
+                    if (cookies.contains(keyCfClearance)) {
+                        val parts = cookies.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        for (cookie in parts) {
+                            if (cookie.contains(keyCfDuid))
+                                setCFDuid(context, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
+                            if (cookie.contains(keyCfClearance)) {
+                                val clearance = cookie.trim().substring(cookie.trim().indexOf("=") + 1)
+                                if (clearance.isBlank())
+                                    return@noCrashLet false
+                                setClearance(context, clearance)
+                            }
+                        }
+                        return@noCrashLet true
                     }
+                    false
                 }
-                return true
-            }
-            return false
-        }
 
         fun clearCookies() {
             val cookieManager = CookieManager.getInstance()
