@@ -40,7 +40,7 @@ class FragmentFiles : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.explorerDAO().all.observe(this, Observer { explorerObjects ->
+        CacheDB.INSTANCE.explorerDAO().all.observe(viewLifecycleOwner, Observer { explorerObjects ->
             adapter?.update(explorerObjects)
             if (explorerObjects.isNotEmpty()) {
                 progressBar.visibility = View.GONE
@@ -51,7 +51,7 @@ class FragmentFiles : Fragment() {
                 }
             }
         })
-        ExplorerCreator.stateListener.observe(this, Observer { s ->
+        ExplorerCreator.stateListener.observe(viewLifecycleOwner, Observer { s ->
             state.text = s
             state.visibility = if (s == null) View.GONE else View.VISIBLE
         })

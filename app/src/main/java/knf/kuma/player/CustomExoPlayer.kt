@@ -14,18 +14,17 @@ import androidx.preference.PreferenceManager
 import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.upstream.FileDataSourceFactory
-import com.google.android.exoplayer2.util.Util
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import knf.kuma.R
+import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
@@ -100,17 +99,11 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
                 playList = CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist"))
                 noCrash { video_title.text = playList[0].title() }
                 for (queueObject in playList) {
-                    if (queueObject.isFile)
-                        sourceList.add(ExtractorMediaSource.Factory(FileDataSourceFactory()).createMediaSource(queueObject.createUri()))
-                    else
-                        sourceList.add(ExtractorMediaSource.Factory(DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(queueObject.createUri()))
+                    sourceList.add(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this, BypassUtil.userAgent, null)).createMediaSource(queueObject.createUri()))
                 }
                 source = ConcatenatingMediaSource(*sourceList.toTypedArray())
-            } else if (!intent.getBooleanExtra("isFile", false)) {
-                source = ExtractorMediaSource.Factory(DefaultHttpDataSourceFactory(Util.getUserAgent(this, "UKIKU"))).createMediaSource(intent.data)
-            } else {
-                source = ExtractorMediaSource.Factory(FileDataSourceFactory()).createMediaSource(intent.data)
-            }
+            } else
+                source = ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this, BypassUtil.userAgent, null)).createMediaSource(intent.data)
             exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
             player.player = exoPlayer
             exoPlayer?.addListener(this)

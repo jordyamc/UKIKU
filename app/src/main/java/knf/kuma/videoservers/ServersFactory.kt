@@ -415,10 +415,9 @@ class ServersFactory {
             if (context == null) return
             Log.e("Video", "On play")
             AchievementManager.onPlayChapter()
-            val file = FileAccessHelper.getFile(file_name)
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 context.startActivity(PrefsUtil.getPlayerIntent()
-                        .setData(Uri.fromFile(file))
+                        .setData(FileAccessHelper.getFileUri(file_name))
                         .putExtra("isFile", true)
                         .putExtra("title", title))
             } else {

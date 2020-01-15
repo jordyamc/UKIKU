@@ -67,6 +67,25 @@ object FileAccessHelper {
 
     }
 
+    fun getFileUri(file_name: String?): Uri? {
+        if (file_name.isNullOrEmpty()) throw IllegalStateException("Name can't be null!")
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+            Uri.fromFile(
+                    try {
+                        if (PrefsUtil.downloadType == "0") {
+                            File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        } else {
+                            File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        File(Environment.getDataDirectory(), "test.txt")
+                    }
+            )
+        else
+            getDataUri(file_name)
+    }
+
     val rootFile: File
         get() {
             return try {
