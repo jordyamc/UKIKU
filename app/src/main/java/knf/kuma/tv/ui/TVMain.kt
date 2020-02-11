@@ -12,6 +12,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.commons.*
@@ -108,31 +109,33 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                         webView.visibility = View.VISIBLE
                         webView.settings?.javaScriptEnabled = true
                         webView.webViewClient = object : WebViewClient() {
+
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
                                 shouldOverrideUrlLoading(view, url)
                             }
 
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                                shouldOverrideUrlLoading(view, request?.url?.toString())
-                                return false
+                                return shouldOverrideUrlLoading(view, request?.url?.toString())
                             }
 
                             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                                 Log.e("CloudflareBypass", "Override $url")
-                                if (url == "https://animeflv.net/") {
-                                    Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
-                                    if (BypassUtil.saveCookies(this@TVMain)) {
-                                        "Bypass actualizado".toast()
-                                        PicassoSingle.clear()
-                                        webView.visibility = View.GONE
+                                Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
+                                if (BypassUtil.isLoading && BypassUtil.saveCookies(App.context)) {
+                                    doAsync {
+                                        if (BypassUtil.isNeededFlag() == 0) {
+                                            doOnUI {
+                                                "Bypass actualizado".toast()
+                                                PicassoSingle.clear()
+                                                Repository().reloadRecents()
+                                                BypassUtil.isLoading = false
+                                                webView.visibility = View.GONE
+                                            }
+                                        }
                                     }
-                                    Repository().reloadRecents()
-                                    BypassUtil.isLoading = false
-                                } else if (url != "about:blank" && BypassUtil.isLoading) {
-                                    view?.loadUrl(url)
                                 }
-                                return true
+                                return false
                             }
                         }
                         webView.settings?.userAgentString = randomUA().also { PrefsUtil.userAgent = it }

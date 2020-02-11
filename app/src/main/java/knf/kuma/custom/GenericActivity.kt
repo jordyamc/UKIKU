@@ -115,52 +115,48 @@ open class GenericActivity : AppCompatActivity() {
                         logText("Override: $url")
                         logText("Waiting for resolve...")
                         //view?.loadUrl(url)
-                        if (url == "https://animeflv.net/") {
-                            logText("Cookies for animeflv:")
-                            logText(noCrashLet { CookieManager.getInstance().getCookie(".animeflv.net") }
-                                    ?: "Error!")
-                            Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
-                            if (BypassUtil.saveCookies(App.context)) {
-                                logText("Cookies saved")
-                                webView.loadUrl("about:blank")
-                                BypassUtil.isVerifing = true
-                                doAsync(exceptionHandler = { logText("Error: ${it.message}") }) {
-                                    logText("Checking connection state")
-                                    if (BypassUtil.isConnectionBlocked()) {
-                                        if (tryCount < 4) {
-                                            tryCount++
-                                            logText("Connection blocked, retry connection... tries left: ${3 - tryCount}")
-                                            BypassUtil.isVerifing = false
-                                            runWebView(snack)
-                                        } else {
-                                            tryCount = 0
-                                            logText("Connection was blocked, no tries left")
-                                            BypassUtil.isLoading = false
-                                            BypassUtil.isVerifing = false
-                                            onBypassUpdated()
-                                        }
+                        logText("Cookies for animeflv:")
+                        logText(noCrashLet { CookieManager.getInstance().getCookie(".animeflv.net") }
+                                ?: "Error!")
+                        Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
+                        if (BypassUtil.isLoading && BypassUtil.saveCookies(App.context)) {
+                            logText("Cookies saved")
+                            //webView.loadUrl("about:blank")
+                            doAsync(exceptionHandler = { logText("Error: ${it.message}") }) {
+                                logText("Checking connection state")
+                                if (BypassUtil.isConnectionBlocked()) {
+                                    if (tryCount < 3) {
+                                        tryCount++
+                                        logText("Connection blocked, retry connection... tries left: ${3 - tryCount}")
+                                        BypassUtil.isVerifing = false
+                                        runWebView(snack)
                                     } else {
-                                        doOnUI(onLog = { logText("Error: $it") }) {
-                                            tryCount = 0
-                                            logText("Connection was successful")
-                                            snack?.safeDismiss()
-                                            getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
-                                            bypassLive.postValue(Pair(first = true, second = false))
-                                            Repository().reloadRecents()
-                                            onBypassUpdated()
-                                            BypassUtil.isVerifing = false
-                                            BypassUtil.isLoading = false
-                                            PicassoSingle.clear()
-                                            if (!PrefsUtil.isDirectoryFinished)
-                                                DirectoryService.run(this@GenericActivity)
-                                        }
+                                        tryCount = 0
+                                        logText("Connection was blocked, no tries left")
+                                        BypassUtil.isLoading = false
+                                        BypassUtil.isVerifing = false
+                                        onBypassUpdated()
                                     }
-                                }
-                            } else logText("cf_clearance not found or empty")
-                        } else if (url != "about:blank" && BypassUtil.isLoading && !BypassUtil.isVerifing) {
-                            view?.loadUrl(url)
+                                } else if (BypassUtil.isNeededFlag() == 0)
+                                    doOnUI(onLog = { logText("Error: $it") }) {
+                                        webView.loadUrl("about:blank")
+                                        tryCount = 0
+                                        logText("Connection was successful")
+                                        snack?.safeDismiss()
+                                        getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
+                                        bypassLive.postValue(Pair(first = true, second = false))
+                                        Repository().reloadRecents()
+                                        onBypassUpdated()
+                                        BypassUtil.isLoading = false
+                                        PicassoSingle.clear()
+                                        if (!PrefsUtil.isDirectoryFinished)
+                                            DirectoryService.run(this@GenericActivity)
+                                    }
+                            }
+                        } else {
+                            logText("cf_clearance not found or empty")
                         }
-                        return true
+                        return false
                     }
                 }
                 webView.settings?.userAgentString = (if (PrefsUtil.useDefaultUserAgent) {

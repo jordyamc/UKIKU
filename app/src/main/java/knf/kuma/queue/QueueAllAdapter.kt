@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
+import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.notSameContent
 import knf.kuma.pojos.QueueObject
 import kotlinx.android.synthetic.main.item_queue_full.view.*
@@ -28,7 +29,7 @@ internal class QueueAllAdapter internal constructor(activity: Activity) : Recycl
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: AnimeHolder, position: Int) {
         val queueObject = list[position]
-        holder.title.text = queueObject.chapter.name
+        holder.title.text = PatternUtil.fromHtml(queueObject.chapter.name)
         holder.chapter.text = queueObject.chapter.number
         holder.state.setImageResource(if (queueObject.isFile) R.drawable.ic_queue_file else R.drawable.ic_web)
         holder.dragView.setOnTouchListener { _, event ->
