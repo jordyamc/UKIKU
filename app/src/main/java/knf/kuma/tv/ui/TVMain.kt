@@ -3,13 +3,12 @@ package knf.kuma.tv.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.webkit.CookieManager
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.App
@@ -23,13 +22,13 @@ import knf.kuma.recents.RecentsNotReceiver
 import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVBaseActivity
 import knf.kuma.tv.TVServersFactory
-import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.tv_activity_main.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
 import kotlin.contracts.ExperimentalContracts
+
 
 @ExperimentalCoroutinesApi
 @ExperimentalContracts
@@ -107,8 +106,28 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                     BypassUtil.clearCookies()
                     doOnUI {
                         webView.visibility = View.VISIBLE
-                        webView.settings?.javaScriptEnabled = true
+                        webView.settings.javaScriptEnabled = true
+                        webView.settings.domStorageEnabled = true
+                        webView.settings.loadWithOverviewMode = true
+                        webView.settings.useWideViewPort = true
+                        webView.webChromeClient = WebChromeClient()
                         webView.webViewClient = object : WebViewClient() {
+                            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                    onReceivedError(view, error?.errorCode
+                                            ?: 0, error?.description?.toString(), request?.url?.toString())
+                                else
+                                    onReceivedError(view, 0, "Null", request?.url?.toString())
+                            }
+
+                            override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
+                                Log.e("CloudflareBypass", "Page error: $description, $errorCode")
+                            }
+
+                            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                                super.onPageStarted(view, url, favicon)
+                                shouldOverrideUrlLoading(view, url)
+                            }
 
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
@@ -138,8 +157,11 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                                 return false
                             }
                         }
-                        webView.settings?.userAgentString = randomUA().also { PrefsUtil.userAgent = it }
+                        //webView.settings.userAgentString = randomUA().also { PrefsUtil.userAgent = it }
+                        webView.settings.userAgentString = null
+                        PrefsUtil.userAgent = webView.settings.userAgentString
                         webView.loadUrl("https://animeflv.net/")
+                        Log.e("CloudflareBypass", "UA: ${PrefsUtil.userAgent}")
                     }
                 } else {
                     Log.e("CloudflareBypass", "Not needed")

@@ -158,7 +158,7 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("recents_design", "0") == "1"
 
     val useDefaultUserAgent: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("default_useragent", false)
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("default_useragent", BuildConfig.BUILD_TYPE == "tv" || context.resources.getBoolean(R.bool.isTv))
 
     val usePlaceholders: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("list_placeholder", false)
@@ -244,6 +244,10 @@ object PrefsUtil {
     var subscriptionToken: String?
         get() = SecurePreferences(context).getString("subscription_token", null)
         set(value) = SecurePreferences(context).edit().putString("subscription_token", value).apply()
+
+    var isPSWarned: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isPSWarned", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isPSWarned", value).apply()
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)

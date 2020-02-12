@@ -99,7 +99,20 @@ open class GenericActivity : AppCompatActivity() {
             if (webView != null) {
                 logText("Applying settings for webview")
                 webView.settings?.javaScriptEnabled = true
+                webView.settings?.domStorageEnabled = true
                 webView.webViewClient = object : WebViewClient() {
+                    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                            onReceivedError(view, error?.errorCode
+                                    ?: 0, error?.description?.toString(), request?.url?.toString())
+                        else
+                            onReceivedError(view, 0, "Null", request?.url?.toString())
+                    }
+
+                    override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
+                        logText("Page error: $description, $errorCode")
+                    }
+
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
                         shouldOverrideUrlLoading(view, url)
@@ -160,8 +173,7 @@ open class GenericActivity : AppCompatActivity() {
                     }
                 }
                 webView.settings?.userAgentString = (if (PrefsUtil.useDefaultUserAgent) {
-                    noCrashLet { WebSettings.getDefaultUserAgent(App.context) }
-                            ?: UAGenerator.getRandomUserAgent()
+                    webView.settings.userAgentString
                 } else UAGenerator.getRandomUserAgent()).also { PrefsUtil.userAgent = it }
                 logText("Open animeflv.net")
                 webView.loadUrl("https://animeflv.net/")
