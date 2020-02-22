@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 135
-        versionName "4.3.19"
+        versionCode 136
+        versionName "4.3.20"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -153,8 +153,8 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.fragment:fragment:1.2.0-rc04'
-    implementation 'com.google.android.material:material:1.2.0-alpha03'
+    implementation 'androidx.fragment:fragment:1.2.2'
+    implementation 'com.google.android.material:material:1.2.0-alpha04'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.mediarouter:mediarouter:1.1.0'
@@ -163,22 +163,22 @@ dependencies {
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'com.google.android.gms:play-services-cast:18.0.0'
     implementation 'com.google.android.gms:play-services-ads:18.3.0'
-    implementation 'com.google.firebase:firebase-firestore:21.3.1'
-    implementation 'com.google.firebase:firebase-firestore-ktx:21.3.1'
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:21.4.0'
     implementation 'com.google.firebase:firebase-auth:19.2.0'
-    implementation 'com.google.firebase:firebase-config:19.1.0'
+    implementation 'com.google.firebase:firebase-config:19.1.1'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
     implementation 'com.twitter.sdk.android:twitter-core:3.1.1'
-    implementation 'com.google.firebase:firebase-core:17.2.1'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0-rc03'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-rc03'
-    implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0-rc03'
+    implementation 'com.google.firebase:firebase-core:17.2.2'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     api 'com.google.guava:guava:27.0.1-android'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.slice:slice-builders-ktx:1.0.0-alpha6'
     implementation 'androidx.slice:slice-builders:1.0.0'
-    implementation 'androidx.work:work-runtime-ktx:2.3.0-beta02'
+    implementation 'androidx.work:work-runtime-ktx:2.3.2'
     implementation 'androidx.room:room-runtime:2.2.3'
     kapt 'androidx.room:room-compiler:2.2.3'
     androidTestImplementation 'androidx.room:room-testing:2.2.3'
@@ -233,7 +233,7 @@ dependencies {
     implementation 'com.github.jordyamc:kprobability:1.0.4'
     implementation 'com.github.Jamshid-M:ExactRatingBar:1.0.0'
     kapt 'com.github.bumptech.glide:compiler:4.10.0'
-    implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:3.0.3'
+    implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
     implementation 'fr.bmartel:jspeedtest:1.32.1'
     implementation 'com.github.simbiose:Encryption:2.0.1'
     implementation 'com.appbrain:appbrain-sdk:+@aar'
@@ -244,11 +244,11 @@ dependencies {
     implementation 'com.github.marlonlom:timeago:4.0.1'
     implementation 'com.scottyab:secure-preferences-lib:0.1.7'
     implementation 'com.github.florent37:expansionpanel:1.2.2'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3'
     implementation 'org.jetbrains.anko:anko:0.10.8'
     implementation 'org.jetbrains.anko:anko-coroutines:0.10.8'
     //------

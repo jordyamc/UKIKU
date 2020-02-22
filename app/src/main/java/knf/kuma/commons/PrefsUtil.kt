@@ -158,7 +158,7 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("recents_design", "0") == "1"
 
     val useDefaultUserAgent: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("default_useragent", BuildConfig.BUILD_TYPE == "tv" || context.resources.getBoolean(R.bool.isTv))
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("default_useragent", true)
 
     val usePlaceholders: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("list_placeholder", false)

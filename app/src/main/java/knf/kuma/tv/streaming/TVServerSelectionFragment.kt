@@ -27,7 +27,7 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
     override fun onCreateActions(actions: MutableList<GuidedAction>, savedInstanceState: Bundle?) {
         val list = arguments?.getStringArrayList(SERVERS_DATA) ?: arrayListOf()
         for ((id, name) in list.withIndex()) {
-            if (name != "Mega")
+            if (name.contains("mega", true))
                 actions.add(GuidedAction.Builder(context)
                         .id(id.toLong())
                         .title(name)

@@ -112,17 +112,6 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                         webView.settings.useWideViewPort = true
                         webView.webChromeClient = WebChromeClient()
                         webView.webViewClient = object : WebViewClient() {
-                            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                                    onReceivedError(view, error?.errorCode
-                                            ?: 0, error?.description?.toString(), request?.url?.toString())
-                                else
-                                    onReceivedError(view, 0, "Null", request?.url?.toString())
-                            }
-
-                            override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
-                                Log.e("CloudflareBypass", "Page error: $description, $errorCode")
-                            }
 
                             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                                 super.onPageStarted(view, url, favicon)

@@ -29,7 +29,7 @@ class Headers : Parcelable {
         cookies.add(Pair(key, value))
     }
 
-    private fun getCookies(): String {
+    fun getCookies(): String {
         val builder = StringBuilder()
         for (pair in cookies)
             builder.append(pair.first)

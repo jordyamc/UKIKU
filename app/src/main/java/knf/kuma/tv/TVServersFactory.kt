@@ -132,10 +132,12 @@ class TVServersFactory private constructor(private val activity: Activity, priva
             seen()
         }
         Answers.getInstance().logCustom(CustomEvent("Streaming").putCustomAttribute("Server", option.server))
-        activity.startActivity(Intent(activity, TVPlayer::class.java)
-                .putExtra("url", option.url)
-                .putExtra("title", downloadObject.name)
-                .putExtra("chapter", downloadObject.chapter))
+        activity.startActivity(Intent(activity, TVPlayer::class.java).apply {
+            putExtra("url", option.url)
+            putExtra("title", downloadObject.name)
+            putExtra("chapter", downloadObject.chapter)
+            putExtra("cookies", option.headers?.getCookies())
+        })
         serversInterface.onFinish(false, true)
     }
 

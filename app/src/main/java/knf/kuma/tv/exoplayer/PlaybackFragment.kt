@@ -9,15 +9,13 @@ import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import okhttp3.OkHttpClient
 
 class PlaybackFragment : VideoSupportFragment() {
     private var mPlayerGlue: VideoPlayerGlue? = null
@@ -91,15 +89,18 @@ class PlaybackFragment : VideoSupportFragment() {
     private fun play(video: Video?) {
         mPlayerGlue?.title = video?.title
         mPlayerGlue?.subtitle = video?.chapter
-        prepareMediaForPlaying(video?.uri ?: Uri.EMPTY)
+        prepareMediaForPlaying(video?.uri ?: Uri.EMPTY, video?.cookies)
         mPlayerGlue?.play()
     }
 
-    private fun prepareMediaForPlaying(mediaSourceUri: Uri) {
+    private fun prepareMediaForPlaying(mediaSourceUri: Uri, cookies: String?) {
         activity?.let {
             val userAgent = Util.getUserAgent(it, "UKIKU")
             val mediaSource = ProgressiveMediaSource.Factory(
-                    DefaultDataSourceFactory(it, null, OkHttpDataSourceFactory(OkHttpClient(), userAgent)))
+                    DefaultHttpDataSourceFactory(userAgent, null, 10000, 10000, true).apply {
+                        if (cookies != null)
+                            defaultRequestProperties.set("Cookie", cookies)
+                    })
                     .createMediaSource(mediaSourceUri)
             mPlayer?.prepare(mediaSource)
         }

@@ -22,6 +22,12 @@ interface DownloadsDAO {
     @Query("SELECT * FROM downloadobject WHERE eid LIKE :eid")
     fun getByEid(eid: String): DownloadObject?
 
+    @Query("SELECT COUNT(*) FROM downloadobject WHERE eid = :eid")
+    fun countByEid(eid: String): Int
+
+    @Transaction
+    fun existByEid(eid: String): Boolean = countByEid(eid) > 0
+
     @Query("SELECT * FROM downloadobject WHERE did = :did")
     fun getByDid(did: Int): DownloadObject?
 

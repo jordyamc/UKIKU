@@ -56,10 +56,9 @@ class DownloadService : IntentService("Download service") {
     }
 
     override fun onHandleIntent(intent: Intent?) {
+        val currentEid = intent?.getStringExtra("eid") ?: return
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (intent == null)
-            return
-        current = downloadsDAO.getByEid(intent.getStringExtra("eid"))
+        current = downloadsDAO.getByEid(currentEid)
         if (current == null)
             return
         file = current?.file
@@ -96,8 +95,7 @@ class DownloadService : IntentService("Download service") {
             val data = ByteArray(bufferSize * 1024)
             var count: Int = inputStream.read(data, 0, bufferSize * 1024)
             while (count >= 0) {
-                val revised = downloadsDAO.getByEid(intent.getStringExtra("eid"))
-                if (revised == null) {
+                if (!downloadsDAO.existByEid(currentEid)) {
                     FileAccessHelper.delete(file)
                     current?.let { downloadsDAO.delete(it) }
                     QueueManager.remove(current?.eid)
@@ -142,7 +140,7 @@ class DownloadService : IntentService("Download service") {
                 .setGroup("manager")
                 .setOngoing(true)
                 .setSound(null)
-                .setWhen(current?.time ?: 0)
+                .setWhen(current?.time ?: System.currentTimeMillis())
                 .setPriority(NotificationCompat.PRIORITY_LOW)
         val pending = downloadsDAO.countPending()
         if (pending > 0)

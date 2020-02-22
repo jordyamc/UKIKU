@@ -101,17 +101,6 @@ open class GenericActivity : AppCompatActivity() {
                 webView.settings?.javaScriptEnabled = true
                 webView.settings?.domStorageEnabled = true
                 webView.webViewClient = object : WebViewClient() {
-                    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                            onReceivedError(view, error?.errorCode
-                                    ?: 0, error?.description?.toString(), request?.url?.toString())
-                        else
-                            onReceivedError(view, 0, "Null", request?.url?.toString())
-                    }
-
-                    override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
-                        logText("Page error: $description, $errorCode")
-                    }
 
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
@@ -129,9 +118,8 @@ open class GenericActivity : AppCompatActivity() {
                         logText("Waiting for resolve...")
                         //view?.loadUrl(url)
                         logText("Cookies for animeflv:")
-                        logText(noCrashLet { CookieManager.getInstance().getCookie(".animeflv.net") }
+                        logText(noCrashLet { CookieManager.getInstance().getCookie("https://animeflv.net/") }
                                 ?: "Error!")
-                        Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
                         if (BypassUtil.isLoading && BypassUtil.saveCookies(App.context)) {
                             logText("Cookies saved")
                             //webView.loadUrl("about:blank")
@@ -166,7 +154,7 @@ open class GenericActivity : AppCompatActivity() {
                                             DirectoryService.run(this@GenericActivity)
                                     }
                             }
-                        } else {
+                        } else if (BypassUtil.isLoading) {
                             logText("cf_clearance not found or empty")
                         }
                         return false
