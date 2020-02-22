@@ -136,7 +136,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
             putExtra("url", option.url)
             putExtra("title", downloadObject.name)
             putExtra("chapter", downloadObject.chapter)
-            putExtra("cookies", option.headers?.getCookies())
+            putExtra("headers", option.headers?.createHeadersMap())
         })
         serversInterface.onFinish(false, true)
     }

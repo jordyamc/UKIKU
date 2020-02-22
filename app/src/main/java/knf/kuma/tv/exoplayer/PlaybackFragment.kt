@@ -89,17 +89,18 @@ class PlaybackFragment : VideoSupportFragment() {
     private fun play(video: Video?) {
         mPlayerGlue?.title = video?.title
         mPlayerGlue?.subtitle = video?.chapter
-        prepareMediaForPlaying(video?.uri ?: Uri.EMPTY, video?.cookies)
+        prepareMediaForPlaying(video?.uri ?: Uri.EMPTY, video?.headers)
         mPlayerGlue?.play()
     }
 
-    private fun prepareMediaForPlaying(mediaSourceUri: Uri, cookies: String?) {
+    private fun prepareMediaForPlaying(mediaSourceUri: Uri, headers: HashMap<String, String>?) {
         activity?.let {
             val userAgent = Util.getUserAgent(it, "UKIKU")
             val mediaSource = ProgressiveMediaSource.Factory(
                     DefaultHttpDataSourceFactory(userAgent, null, 10000, 10000, true).apply {
-                        if (cookies != null)
-                            defaultRequestProperties.set("Cookie", cookies)
+                        headers?.forEach { header ->
+                            defaultRequestProperties.set(header.key, header.value)
+                        }
                     })
                     .createMediaSource(mediaSourceUri)
             mPlayer?.prepare(mediaSource)

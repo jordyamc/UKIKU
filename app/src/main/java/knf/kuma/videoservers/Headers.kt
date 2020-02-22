@@ -2,16 +2,10 @@ package knf.kuma.videoservers
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.util.Pair
 import knf.kuma.commons.noCrash
 
 class Headers : Parcelable {
     var headers: MutableList<Pair<String, String>> = mutableListOf()
-        get() {
-            if (cookies.size > 0)
-                field.add(Pair("Cookie", getCookies()))
-            return field
-        }
     private var cookies: MutableList<Pair<String, String>> = mutableListOf()
 
     constructor()
@@ -19,6 +13,21 @@ class Headers : Parcelable {
     constructor(parcel: Parcel) {
         headers = parcel.readArrayList(null)?.filterIsInstance<Pair<String, String>>() as MutableList<Pair<String, String>>
         cookies = parcel.readArrayList(null)?.filterIsInstance<Pair<String, String>>() as MutableList<Pair<String, String>>
+    }
+
+    fun createHeaders(): List<Pair<String, String>> =
+            mutableListOf<Pair<String, String>>().apply {
+                addAll(headers)
+                if (cookies.size > 0)
+                    add("Cookie" to getCookies())
+            }
+
+    fun createHeadersMap(): HashMap<String, String> {
+        val map = HashMap<String, String>()
+        createHeaders().forEach {
+            map[it.first] = it.second
+        }
+        return map
     }
 
     fun addHeader(key: String, value: String) {

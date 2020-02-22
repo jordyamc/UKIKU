@@ -11,7 +11,6 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.IBinder
 import android.util.Log
-import android.util.Pair
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.crashlytics.android.Crashlytics
@@ -111,7 +110,7 @@ class DownloadManager : Service() {
                             downloadObject.progress = 0
                             downloadDao.update(downloadObject)
                             FileUtil.moveFile(downloadObject.file, object : FileUtil.MoveCallback {
-                                override fun onProgress(pair: Pair<Int, Boolean>) {
+                                override fun onProgress(pair: android.util.Pair<Int, Boolean>) {
                                     if (!pair.second) {
                                         downloadObject.progress = pair.first
                                         updateNotification(downloadObject, false)
@@ -229,8 +228,8 @@ class DownloadManager : Service() {
                 file?.let {
                     val request = Request(downloadObject.link, file.absolutePath)
                     if (downloadObject.headers != null)
-                        for (header in downloadObject.headers?.headers
-                                ?: listOf<Pair<String, String>>())
+                        for (header in downloadObject.headers?.createHeaders()
+                                ?: listOf())
                             request.addHeader(header.first, header.second)
                     request.enqueueAction = EnqueueAction.REPLACE_EXISTING
                     downloadObject.setDid(request.id)

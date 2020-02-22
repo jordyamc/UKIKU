@@ -66,7 +66,7 @@ class DownloadService : IntentService("Download service") {
             val request = Request.Builder()
                     .url(intent.dataString ?: "")
             if (current?.headers != null)
-                for (pair in current?.headers?.headers ?: mutableListOf()) {
+                for (pair in current?.headers?.createHeaders() ?: mutableListOf()) {
                     request.addHeader(pair.first, pair.second)
                 }
             val response = OkHttpClient().newBuilder()
