@@ -169,6 +169,7 @@
     </style>
 
     <style name="AppTheme.Splash" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/drawable_splash</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>

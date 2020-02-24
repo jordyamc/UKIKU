@@ -4,13 +4,17 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalCoroutinesApi
@@ -35,6 +39,12 @@ class SplashActivity : GenericActivity() {
                     PrefsUtil.isPSWarned = true
                     startActivity(Intent(this@SplashActivity, Main::class.java))
                     finish()
+                }
+                getActionButton(WhichButton.NEGATIVE).isEnabled = false
+                cancelOnTouchOutside(false)
+                doOnUI {
+                    delay(3000)
+                    getActionButton(WhichButton.NEGATIVE).isEnabled = true
                 }
             }
             else -> {

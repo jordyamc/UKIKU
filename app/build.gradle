@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 137
-        versionName "4.3.21"
+        versionCode 138
+        versionName "4.3.22"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -123,6 +123,7 @@ android {
 configurations.all {
     resolutionStrategy {
         force 'org.jsoup:jsoup:1.10.3'
+        force 'com.google.firebase:firebase-analytics:17.2.1'
     }
 }
 
