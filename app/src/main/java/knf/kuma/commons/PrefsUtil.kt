@@ -106,9 +106,10 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_favs", true)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("show_favs", value).apply()
 
-    val timeoutTime: Long
+    var timeoutTime: Long
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("timeout_time", if (context.resources.getBoolean(R.bool.isTv)) "0" else "10")?.toLong()
                 ?: 0
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("timeout_time", value.toString()).apply()
 
     var rememberServer: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("remember_server", false)

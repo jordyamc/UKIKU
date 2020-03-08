@@ -18,6 +18,7 @@ import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import kotlinx.android.synthetic.main.lay_status_bar.view.*
 import kotlinx.coroutines.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
 import org.jetbrains.anko.textColor
@@ -135,6 +136,33 @@ class ConnectionState : LinearLayout {
         }
     }
 
+    private fun tryTimeoutFix(): Boolean {
+        val timeout = when (PrefsUtil.timeoutTime) {
+            10L -> {
+                PrefsUtil.timeoutTime = 20L
+                20L
+            }
+            20L -> {
+                PrefsUtil.timeoutTime = 30L
+                30L
+            }
+            else -> return false
+        } * 1000
+        return try {
+            Jsoup.connect("https://animeflv.net")
+                    .cookies(BypassUtil.getMapCookie(App.context))
+                    .userAgent(BypassUtil.userAgent)
+                    .timeout(timeout.toInt())
+                    .method(Connection.Method.GET)
+                    .execute()
+            true
+        } catch (e: SocketTimeoutException) {
+            false
+        } catch (e: Exception) {
+            true
+        }
+    }
+
     private fun normalState() {
         container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
         progress.visibility = View.VISIBLE
@@ -188,6 +216,15 @@ class ConnectionState : LinearLayout {
         message.textColor = Color.WHITE
         container.onClick { onShowDialog("Se detectó un problema con la página de Animeflv, es posible que esté en mantenimiento, este problema se solucionará solo, no es necesario reportarlo!") }
         container.onLongClick { setUp(owner, onShowDialog) }
+        owner.doAsync {
+            var isFixed = false
+            repeat(3) {
+                if (!isFixed && tryTimeoutFix()) {
+                    isFixed = true
+                    setUp(owner, onShowDialog)
+                }
+            }
+        }
     }
 
     private fun warningState(onShowDialog: (message: String) -> Unit) {

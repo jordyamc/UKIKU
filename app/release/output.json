@@ -6,12 +6,13 @@
     "apkData": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 138,
-      "versionName": "4.3.22",
+      "versionCode": 139,
+      "versionName": "4.3.23",
       "enabled": true,
       "outputFile": "app-release.apk",
       "fullName": "release",
-      "baseName": "release"
+      "baseName": "release",
+      "dirName": ""
     },
     "path": "app-release.apk",
     "properties": {}
