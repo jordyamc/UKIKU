@@ -7,7 +7,6 @@ import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.doAsync
-import java.io.FileFilter
 import java.util.*
 
 object ExplorerCreator {
@@ -24,30 +23,15 @@ object ExplorerCreator {
         val explorerDAO = CacheDB.INSTANCE.explorerDAO()
         postState("Iniciando busqueda")
         doAsync {
-            val animeDAO = CacheDB.INSTANCE.animeDAO()
-            val root = FileAccessHelper.downloadsDirectory
-            if (root.exists()) {
+            val creator = FileAccessHelper.downloadExplorerCreator
+            if (creator.exist()) {
                 postState("Buscando animes")
-                val list = ArrayList<ExplorerObject>()
-                val files = root.listFiles(FileFilter { it.isDirectory })
-                if (files != null) {
-                    val names = ArrayList<String>()
-                    var progress = 0
-                    for (file in files) {
-                        names.add(file.name)
-                    }
-                    for (animeObject in animeDAO.getAllByFile(names))
-                        try {
-                            progress++
-                            postState(String.format(Locale.getDefault(), "Procesando animes %d/%d", progress, files.size))
-                            list.add(ExplorerObject(animeObject))
-                        } catch (e: IllegalStateException) {
-                            e.printStackTrace()
-                        }
-                    postState("Creando lista")
-                    explorerDAO.insert(list)
+                val list = creator.createDirectoryList { progress, total ->
+                    postState(String.format(Locale.getDefault(), "Procesando animes %d/%d", progress, total))
                 }
-                if (list.size == 0) {
+                postState("Creando lista")
+                explorerDAO.insert(list)
+                if (list.isEmpty()) {
                     listener.onEmpty()
                     postState(null)
                 }

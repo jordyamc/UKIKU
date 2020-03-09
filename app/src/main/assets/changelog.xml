@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="140" version="4.3.24">
+        <change type="fix">Error en explorador - Android 10</change>
+    </release>
     <release code="139" version="4.3.23">
         <change type="fix">Errores generales</change>
     </release>

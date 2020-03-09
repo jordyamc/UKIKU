@@ -33,6 +33,7 @@ import knf.kuma.database.CacheDBWrap;
 import knf.kuma.download.FileAccessHelper;
 import knf.kuma.emision.AnimeSubObject;
 import knf.kuma.explorer.ThumbServer;
+import knf.kuma.explorer.creator.SubFile;
 import xdroid.toaster.Toaster;
 
 @Entity
@@ -55,7 +56,7 @@ public class ExplorerObject {
     @Ignore
     private boolean isProcessing = false;
     @Ignore
-    private File[] file_list;
+    private List<SubFile> file_list;
 
     public ExplorerObject(int key, String img, String link, String fileName, String name, String aid, int count, String path, List<FileDownObj> chapters) {
         this.key = key;
@@ -66,13 +67,12 @@ public class ExplorerObject {
         this.aid = aid;
         this.count = count;
         this.path = path;
-        File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
-        this.file_list = file.listFiles();
+        this.file_list = FileAccessHelper.INSTANCE.getDownloadsDirectoryFiles(fileName);
         this.chapters = chapters;
     }
 
     @Ignore
-    public ExplorerObject(@Nullable AnimeSubObject object) throws IllegalStateException {
+    public ExplorerObject(@Nullable AnimeSubObject object, List<SubFile> subFiles) throws IllegalStateException {
         if (object == null)
             throw new IllegalStateException("Anime not found!!!");
         this.key = object.getKey();
@@ -81,14 +81,12 @@ public class ExplorerObject {
         this.fileName = object.getFinalName();
         this.name = object.getName();
         this.aid = object.getAid();
-        File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(object.getFinalName());
-        file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
-        if (file_list == null || file_list.length == 0) {
-            file.delete();
+        file_list = FileAccessHelper.INSTANCE.getDownloadsDirectoryFiles(object.getFileName());
+        if (file_list.size() == 0) {
             throw new IllegalStateException("Directory empty: " + object.getFinalName());
         }
-        this.count = file_list.length;
-        this.path = file.getAbsolutePath();
+        this.count = file_list.size();
+        this.path = "";
     }
 
     private void process(Context context) {
@@ -96,9 +94,8 @@ public class ExplorerObject {
         AsyncTask.execute(() -> {
             try {
                 chapters = new ArrayList<>();
-                File file = FileAccessHelper.INSTANCE.getDownloadsDirectory(fileName);
-                this.file_list = file.listFiles((file1, s) -> s.endsWith(".mp4"));
-                for (File chap : file_list)
+                this.file_list = FileAccessHelper.INSTANCE.getDownloadsDirectoryFiles(fileName);
+                for (SubFile chap : file_list)
                     try {
                         String file_name = chap.getName();
                         chapters.add(new FileDownObj(context, name, aid, PatternUtil.INSTANCE.getNumFromFile(file_name), file_name, chap));
@@ -140,19 +137,19 @@ public class ExplorerObject {
         public String chapter;
         public String aid;
         public String eid;
-        public String path;
+        public SubFile file;
         public String time;
         public String fileName;
         public String link;
         public File thumb;
 
-        FileDownObj(Context context, String title, String aid, String chapter, String name, File file) {
+        FileDownObj(Context context, String title, String aid, String chapter, String name, SubFile file) {
             this.title = title;
             this.chapter = chapter;
             this.aid = aid;
             this.eid = PatternUtil.INSTANCE.getEidFromFile(name);
             this.fileName = name;
-            this.path = file.getAbsolutePath();
+            this.file = file;
             this.time = getTime(context, file);
             if (time.equals(""))
                 throw new IllegalStateException("No duration");
@@ -186,10 +183,10 @@ public class ExplorerObject {
                 return ThumbServer.INSTANCE.loadFile(thumb);
         }
 
-        private String getTime(Context context, File file) {
+        private String getTime(Context context, SubFile file) {
             try {
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(context, Uri.fromFile(file));
+                retriever.setDataSource(context, file.getFileUri());
                 long duration = Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
                 long hours = TimeUnit.MILLISECONDS.toHours(duration);
                 long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
@@ -234,6 +231,16 @@ public class ExplorerObject {
         public String ListToString(List<FileDownObj> list) {
             return new Gson().toJson(list, new TypeToken<List<FileDownObj>>() {
             }.getType());
+        }
+
+        @TypeConverter
+        public String UriToString(Uri uri) {
+            return uri.toString();
+        }
+
+        @TypeConverter
+        public Uri StringToUri(String text) {
+            return Uri.parse(text);
         }
     }
 }

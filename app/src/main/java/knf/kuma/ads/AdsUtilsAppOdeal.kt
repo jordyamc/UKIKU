@@ -17,6 +17,8 @@ import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
+import kotlinx.android.synthetic.main.appodeal_ad_card.view.*
+import kotlinx.android.synthetic.main.appodeal_ad_news.view.*
 
 object AdsUtilsAppOdeal {
     const val RECENT_BANNER = "recent_banner"
@@ -53,7 +55,7 @@ fun MutableList<RecentObject>.implAdsRecentAppOdeal() {
                 }
                 else -> {
                     adIndex = 0
-                    AdsUtilsAppOdeal.RECENT_BANNER2
+                    AdsUtilsAppOdeal.RECENT_BANNER
                 }
             }
             add(index, AdRecentObject(adID))
@@ -74,7 +76,7 @@ fun MutableList<FavoriteObject>.implAdsFavoriteAppOdeal() {
                     }
                     else -> {
                         adIndex = 0
-                        AdsUtilsAppOdeal.FAVORITE_BANNER2
+                        AdsUtilsAppOdeal.FAVORITE_BANNER
                     }
                 }
                 this@implAdsFavoriteAppOdeal.add(index, AdFavoriteObject(adID))
@@ -156,15 +158,48 @@ fun ViewGroup.implBannerAppOdeal(unitID: AdsType, isSmart: Boolean = false) {
 fun ViewGroup.implBannerAppOdeal(unitID: String, isSmart: Boolean = false) {
     if (PrefsUtil.isAdsEnabled)
         doOnUI {
-            val adView = inflate(context, R.layout.appodeal_ad)
-            if (this is BannerContainerView) {
-                show(adView)
+            if (Appodeal.getAvailableNativeAdsCount() > 0) {
+                val nativeAd = Appodeal.getNativeAds(1)[0]
+                val adView = when (unitID) {
+                    AdsUtilsAppOdeal.RECENT_BANNER, AdsUtilsAppOdeal.FAVORITE_BANNER -> {
+                        inflate(context, R.layout.appodeal_ad_card).apply {
+                            appodealNativeFeed.setNativeAd(nativeAd)
+                        }
+                    }
+                    AdsUtilsAppOdeal.NEWS_BANNER -> {
+                        inflate(context, R.layout.appodeal_ad_news).apply {
+                            appodealNativeWall.setNativeAd(nativeAd)
+                        }
+                    }
+                    AdsUtilsAppOdeal.ACHIEVEMENT_BANNER -> {
+                        inflate(context, R.layout.appodeal_ad_plain).apply {
+                            appodealNativeFeed.setNativeAd(nativeAd)
+                        }
+                    }
+                    AdsUtilsAppOdeal.CAST_BANNER -> {
+                        inflate(context, R.layout.appodeal_ad_alone).apply {
+                            appodealNativeWall.setNativeAd(nativeAd)
+                        }
+                    }
+                    else -> return@doOnUI
+                }
+                if (this is BannerContainerView) {
+                    show(adView)
+                } else {
+                    removeAllViews()
+                    addView(adView)
+                }
             } else {
-                removeAllViews()
-                addView(adView)
+                val adView = inflate(context, R.layout.appodeal_ad)
+                if (this is BannerContainerView) {
+                    show(adView)
+                } else {
+                    removeAllViews()
+                    addView(adView)
+                }
+                Appodeal.setBannerViewId(R.id.appodealAd)
+                context.findActivity()?.let { Appodeal.show(it, Appodeal.BANNER_VIEW) }
             }
-            Appodeal.setBannerViewId(R.id.appodealAd)
-            context.findActivity()?.let { Appodeal.show(it, Appodeal.BANNER_VIEW) }
         }
 }
 

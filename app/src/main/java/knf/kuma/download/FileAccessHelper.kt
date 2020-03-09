@@ -14,6 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import knf.kuma.App
 import knf.kuma.commons.*
+import knf.kuma.explorer.creator.Creator
+import knf.kuma.explorer.creator.DocumentFileCreator
+import knf.kuma.explorer.creator.SimpleFileCreator
+import knf.kuma.explorer.creator.SubFile
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.*
@@ -36,6 +40,21 @@ object FileAccessHelper {
                 Environment.getDataDirectory()
             }
 
+        }
+
+    val downloadExplorerCreator: Creator
+        get() {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                DocumentFileCreator(treeUri?.let { find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads", false) })
+            } else {
+                SimpleFileCreator(
+                        if (PrefsUtil.downloadType == "0") {
+                            File(Environment.getExternalStorageDirectory(), "UKIKU/downloads")
+                        } else {
+                            File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads")
+                        }
+                )
+            }
         }
 
     val internalRoot: File get() = Environment.getExternalStorageDirectory()
@@ -206,6 +225,29 @@ object FileAccessHelper {
         } catch (e: Exception) {
             e.printStackTrace()
             Environment.getDataDirectory()
+        }
+
+    }
+
+    fun getDownloadsDirectoryFiles(file_name: String): List<SubFile> {
+        return try {
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+                    treeUri?.let { find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads/$file_name", false) }?.listFiles()?.map {
+                        SubFile(it.name ?: "", it.uri.toString())
+                    }?.filter { it.name.endsWith(".mp4") } ?: emptyList()
+                PrefsUtil.downloadType == "0" -> {
+                    File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/$file_name").listFiles()?.map { SubFile(it.name, Uri.fromFile(it).toString()) }?.filter { it.name.endsWith(".mp4") }
+                            ?: emptyList()
+                }
+                else -> {
+                    File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/$file_name").listFiles()?.map { SubFile(it.name, Uri.fromFile(it).toString()) }?.filter { it.name.endsWith(".mp4") }
+                            ?: emptyList()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
         }
 
     }
@@ -447,7 +489,7 @@ object FileAccessHelper {
     }
 
     @Throws(Exception::class)
-    private fun find(root: DocumentFile?, path: String, create: Boolean = true): DocumentFile? {
+    fun find(root: DocumentFile?, path: String, create: Boolean = true): DocumentFile? {
         var fRoot = root
         for (name in path.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
             val file = fRoot?.findFile(name)

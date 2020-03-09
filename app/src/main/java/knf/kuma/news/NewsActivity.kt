@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import knf.kuma.R
+import knf.kuma.ads.preload
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.asPx
 import knf.kuma.custom.GenericActivity
@@ -35,6 +36,7 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
                 error.visibility = View.VISIBLE
             else {
                 error.visibility = View.GONE
+                preload(it)
                 adapter.update(it)
                 recycler.scheduleLayoutAnimation()
             }

@@ -13,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.crashlytics.android.Crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.ads.preload
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
@@ -29,9 +30,10 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(RecentsViewModel::class.java)
-        viewModel?.dbLiveData?.observe(this@RecentFragment, Observer { objects ->
+        viewModel?.dbLiveData?.observe(viewLifecycleOwner, Observer { objects ->
             holder?.setError(objects.isEmpty())
             holder?.setRefreshing(false)
+            requireActivity().preload(objects)
             adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
             scrollByKey(objects)
         })

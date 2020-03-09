@@ -13,7 +13,7 @@ interface ExplorerDAO {
     fun getItem(file: String): LiveData<ExplorerObject>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(list: MutableList<ExplorerObject>)
+    fun insert(list: List<ExplorerObject>)
 
     @Update
     fun update(explorerObject: ExplorerObject)

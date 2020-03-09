@@ -3,6 +3,7 @@ package knf.kuma.ads
 import android.app.Activity
 import android.util.Log
 import android.view.ViewGroup
+import com.appodeal.ads.Appodeal
 import com.google.android.gms.ads.AdSize
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
@@ -40,13 +41,35 @@ enum class AdsType {
 
 object AdsUtils {
     val remoteConfigs = FirebaseRemoteConfig.getInstance().apply {
-        setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().build())
-        setDefaultsAsync(mapOf("admob_enabled" to false, "appbrains_enabled" to false, "startapp_enabled" to true, "admob_percent" to 90.0, "appbrains_percent" to 10.0, "startapp_percent" to 100.0, "appodeal_percent" to 0.0, "admob_fullscreen_percent" to 0.0, "appbrains_fullscreen_percent" to 0.0, "startappp_fullscreen_percent" to 0.0, "appodeal_fullscreen_percent" to 0.0, "rewarded_percent" to 90.0, "interstitial_percent" to 10.0))
-                .addOnSuccessListener {
-                    fetchAndActivate().addOnSuccessListener {
-                        Log.e("Remote config", "Updated: $it")
-                    }
-                }
+        setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().apply { fetchTimeoutInSeconds = 5 }.build())
+        setDefaultsAsync(mapOf(
+                "admob_enabled" to false,
+                "appbrains_enabled" to false,
+                "startapp_enabled" to false,
+                "appodeal_enabled" to true,
+                "admob_percent" to 90.0,
+                "appodeal_percent" to 100.0,
+                "appbrains_percent" to 10.0,
+                "startapp_percent" to 100.0,
+                "appodeal_percent" to 100.0,
+                "appodeal_fullscreen_percent" to 100.0,
+                "admob_fullscreen_percent" to 0.0,
+                "appbrains_fullscreen_percent" to 0.0,
+                "startappp_fullscreen_percent" to 0.0,
+                "appodeal_fullscreen_percent" to 0.0,
+                "rewarded_percent" to 90.0,
+                "interstitial_percent" to 10.0)
+        )
+        fetchAndActivate().addOnSuccessListener {
+            Log.e("Remote config", "Updated: $it")
+        }
+    }
+}
+
+fun Activity.preload(list: List<*>) {
+    if (PrefsUtil.isAdsEnabled && list.isNotEmpty()) {
+        if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
+            Appodeal.cache(this, Appodeal.NATIVE, list.size / 5)
     }
 }
 

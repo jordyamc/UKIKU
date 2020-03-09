@@ -2,7 +2,9 @@ package knf.kuma.explorer
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
+import android.os.Build
 import android.provider.MediaStore.Video.Thumbnails.MINI_KIND
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.card.MaterialCardView
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
@@ -140,7 +143,12 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
         } else {
             doAsync {
                 try {
-                    val bitmap = ThumbnailUtils.createVideoThumbnail(fileDownObj.path, MINI_KIND)
+                    val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        MediaMetadataRetriever().apply {
+                            setDataSource(App.context, fileDownObj.file.getFileUri())
+                        }.frameAtTime
+                    else
+                        ThumbnailUtils.createVideoThumbnail(File(fileDownObj.file.getFileUri().path).absolutePath, MINI_KIND)
                     if (bitmap == null) {
                         throw IllegalStateException("Null bitmap")
                     } else {

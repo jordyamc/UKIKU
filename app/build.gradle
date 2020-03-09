@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 139
-        versionName "4.3.23"
+        versionCode 140
+        versionName "4.3.24"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -234,17 +234,14 @@ dependencies {
     implementation 'com.github.rubensousa:previewseekbar:2.0.0'
     implementation 'com.github.rubensousa:previewseekbar-exoplayer:2.8.1.0'
     implementation 'com.github.bumptech.glide:glide:4.10.0'
-    implementation 'com.github.jordyamc:kprobability:1.0.4'
+    implementation 'com.github.jordyamc:kprobability:1.0.5'
     implementation 'com.github.Jamshid-M:ExactRatingBar:1.0.0'
     kapt 'com.github.bumptech.glide:compiler:4.10.0'
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
     implementation 'fr.bmartel:jspeedtest:1.32.1'
     implementation 'com.github.simbiose:Encryption:2.0.1'
     implementation 'com.appbrain:appbrain-sdk:+@aar'
-    implementation ('com.appodeal.ads:sdk:2.6.2.0'){
-        exclude group: 'com.appodeal.ads.sdk.networks', module: 'appodeal'
-        exclude group: 'com.appodeal.ads.sdk.networks', module: 'nast'
-    }
+    implementation 'com.appodeal.ads:sdk:2.6.2.+'
     implementation 'com.github.marlonlom:timeago:4.0.1'
     implementation 'com.scottyab:secure-preferences-lib:0.1.7'
     implementation 'com.github.florent37:expansionpanel:1.2.2'
