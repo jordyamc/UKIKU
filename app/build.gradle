@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 140
-        versionName "4.3.24"
+        versionCode 141
+        versionName "4.3.25"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -241,7 +241,9 @@ dependencies {
     implementation 'fr.bmartel:jspeedtest:1.32.1'
     implementation 'com.github.simbiose:Encryption:2.0.1'
     implementation 'com.appbrain:appbrain-sdk:+@aar'
-    implementation 'com.appodeal.ads:sdk:2.6.2.+'
+    implementation ('com.appodeal.ads:sdk:2.6.2.+'){
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'startapp'
+    }
     implementation 'com.github.marlonlom:timeago:4.0.1'
     implementation 'com.scottyab:secure-preferences-lib:0.1.7'
     implementation 'com.github.florent37:expansionpanel:1.2.2'
