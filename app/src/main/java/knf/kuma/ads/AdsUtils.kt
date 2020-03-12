@@ -8,6 +8,7 @@ import com.google.android.gms.ads.AdSize
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import knf.kuma.App
+import knf.kuma.BuildConfig
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
@@ -41,7 +42,8 @@ enum class AdsType {
 
 object AdsUtils {
     val remoteConfigs = FirebaseRemoteConfig.getInstance().apply {
-        setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().apply { fetchTimeoutInSeconds = 5 }.build())
+        if (BuildConfig.DEBUG)
+            setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().apply { fetchTimeoutInSeconds = 5 }.build())
         setDefaultsAsync(mapOf(
                 "admob_enabled" to false,
                 "appbrains_enabled" to false,
@@ -58,7 +60,8 @@ object AdsUtils {
                 "startappp_fullscreen_percent" to 0.0,
                 "appodeal_fullscreen_percent" to 0.0,
                 "rewarded_percent" to 90.0,
-                "interstitial_percent" to 10.0)
+                "interstitial_percent" to 10.0,
+                "samsung_disable_foreground" to false)
         )
         fetchAndActivate().addOnSuccessListener {
             Log.e("Remote config", "Updated: $it")
@@ -76,12 +79,8 @@ fun Activity.preload(list: List<*>) {
 fun MutableList<RecentObject>.implAdsRecent() {
     if (PrefsUtil.isAdsEnabled)
         probabilityOf({ implAdsRecentBrains() }) {
-            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                item({ implAdsRecentMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
                 item({ implAdsRecentBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-            if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-                item({ implAdsRecentStartApp() }, AdsUtils.remoteConfigs.getDouble("startapp_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
                 item({ implAdsRecentAppOdeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
         }.random()()
@@ -89,12 +88,8 @@ fun MutableList<RecentObject>.implAdsRecent() {
 
 fun MutableList<FavoriteObject>.implAdsFavorite() {
     probabilityOf({ implAdsFavoriteBrains() }) {
-        if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-            item({ implAdsFavoriteMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
             item({ implAdsFavoriteBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-        if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-            item({ implAdsFavoriteStartApp() }, AdsUtils.remoteConfigs.getDouble("startapp_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
             item({ implAdsFavoriteAppOdeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
     }.random()()
@@ -102,12 +97,8 @@ fun MutableList<FavoriteObject>.implAdsFavorite() {
 
 fun MutableList<NewsObject>.implAdsNews() {
     probabilityOf({ implAdsNewsBrain() }) {
-        if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-            item({ implAdsNewsMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
             item({ implAdsNewsBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-        if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-            item({ implAdsNewsStartApp() }, AdsUtils.remoteConfigs.getDouble("startapp_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
             item({ implAdsNewsAppOdeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
     }.random()()
@@ -115,12 +106,8 @@ fun MutableList<NewsObject>.implAdsNews() {
 
 fun MutableList<Achievement>.implAdsAchievement() {
     probabilityOf({ implAdsAchievementBrain() }) {
-        if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-            item({ implAdsAchievementMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
             item({ implAdsAchievementBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-        if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-            item({ implAdsAchievementStartApp() }, AdsUtils.remoteConfigs.getDouble("startapp_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
             item({ implAdsAchievementAppOdeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
     }.random()()
@@ -128,61 +115,41 @@ fun MutableList<Achievement>.implAdsAchievement() {
 
 fun ViewGroup.implBannerCast() {
     probabilityOf({ implBannerCastBrains() }) {
-        if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-            item({ implBannerCastMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
             item({ implBannerCastBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-        if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-            item({ implBannerCastStartApp() }, AdsUtils.remoteConfigs.getDouble("startapp_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
-            item({ implBannerCastAppOdeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
+            item({ implBannerCastAppOdeal(context) }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
     }.random()()
 }
 
 fun ViewGroup.implBanner(unitID: String, isSmart: Boolean = false) {
     probabilityOf({ implBannerBrains(unitID, isSmart) }) {
-        if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-            item({ implBannerMob(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
             item({ implBannerBrains(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-        if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-            item({ implBannerStartApp(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("startapp_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
-            item({ implBannerAppOdeal(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
+            item({ implBannerAppOdeal(context, unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
     }.random()()
 }
 
 fun ViewGroup.implBanner(unitID: AdsType, isSmart: Boolean = false) {
     probabilityOf({ implBannerBrains(unitID, isSmart) }) {
-        if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-            item({ implBannerMob(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
             item({ implBannerBrains(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-        if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-            item({ implBannerStartApp(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("startapp_percent"))
         if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
-            item({ implBannerAppOdeal(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
+            item({ implBannerAppOdeal(context, unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
     }.random()()
 }
 
 fun getFAdLoaderRewarded(context: Activity, onUpdate: () -> Unit = {}): FullscreenAdLoader =
         probabilityOf({ getFAdLoaderBrains(context, onUpdate) }) {
-            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                item({ getFAdLoaderRewardedMob(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("admob_fullscreen_percent"))
-            if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-                item({ getFAdLoaderRewardedStartApp(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("startapp_fullscreen_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
                 item({ getFAdLoaderRewardedAppOdeal(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("appodeal_fullscreen_percent"))
         }.random()()
 
 fun getFAdLoaderInterstitial(context: Activity, onUpdate: () -> Unit = {}): FullscreenAdLoader =
         probabilityOf({ getFAdLoaderBrains(context, onUpdate) }) {
-            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                item({ getFAdLoaderInterstitialMob(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("admob_fullscreen_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
                 item({ getFAdLoaderBrains(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("appbrains_fullscreen_percent"))
-            if (AdsUtils.remoteConfigs.getBoolean("startapp_enabled"))
-                item({ getFAdLoaderInterstitialStartApp(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("startapp_fullscreen_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appodeal_enabled"))
                 item({ getFAdLoaderInterstitialAppOdeal(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("appodeal_fullscreen_percent"))
         }.random()()

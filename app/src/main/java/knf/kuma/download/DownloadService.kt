@@ -52,10 +52,16 @@ class DownloadService : IntentService("Download service") {
 
     override fun onCreate() {
         super.onCreate()
-        startForeground(DOWNLOADING_ID, startNotification)
+        foreground(DOWNLOADING_ID, startNotification)
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        foreground(DOWNLOADING_ID, startNotification)
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onHandleIntent(intent: Intent?) {
+        foreground(DOWNLOADING_ID, startNotification)
         val currentEid = intent?.getStringExtra("eid") ?: return
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         current = downloadsDAO.getByEid(currentEid)

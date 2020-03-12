@@ -125,11 +125,11 @@ fun MutableList<Achievement>.implAdsAchievementAppOdeal() {
     }
 }
 
-fun ViewGroup.implBannerCastAppOdeal() {
-    this.implBannerAppOdeal(AdsUtilsAppOdeal.CAST_BANNER)
+fun ViewGroup.implBannerCastAppOdeal(context: Context) {
+    this.implBannerAppOdeal(context, AdsUtilsAppOdeal.CAST_BANNER)
 }
 
-fun ViewGroup.implBannerAppOdeal(unitID: AdsType, isSmart: Boolean = false) {
+fun ViewGroup.implBannerAppOdeal(context: Context, unitID: AdsType, isSmart: Boolean = false) {
     val id = when (unitID) {
         AdsType.RECENT_BANNER -> AdsUtilsAppOdeal.RECENT_BANNER
         AdsType.RECENT_BANNER2 -> AdsUtilsAppOdeal.RECENT_BANNER2
@@ -152,13 +152,21 @@ fun ViewGroup.implBannerAppOdeal(unitID: AdsType, isSmart: Boolean = false) {
         AdsType.REWARDED -> AdsUtilsAppOdeal.REWARDED
         AdsType.INTERSTITIAL -> AdsUtilsAppOdeal.INTERSTITIAL
     }
-    implBannerAppOdeal(id, isSmart)
+    implBannerAppOdeal(context, id, isSmart)
 }
 
-fun ViewGroup.implBannerAppOdeal(unitID: String, isSmart: Boolean = false) {
+fun ViewGroup.implBannerAppOdeal(context: Context, unitID: String, isSmart: Boolean = false, isRetry: Boolean = false) {
     if (PrefsUtil.isAdsEnabled)
         doOnUI {
-            if (Appodeal.getAvailableNativeAdsCount() > 0) {
+            val needsNative = when (unitID) {
+                AdsUtilsAppOdeal.RECENT_BANNER,
+                AdsUtilsAppOdeal.FAVORITE_BANNER,
+                AdsUtilsAppOdeal.NEWS_BANNER,
+                AdsUtilsAppOdeal.ACHIEVEMENT_BANNER,
+                AdsUtilsAppOdeal.CAST_BANNER -> true
+                else -> false
+            } && this !is BannerContainerView
+            if (Appodeal.getAvailableNativeAdsCount() > 0 && needsNative) {
                 val nativeAd = Appodeal.getNativeAds(1)[0]
                 val adView = when (unitID) {
                     AdsUtilsAppOdeal.RECENT_BANNER, AdsUtilsAppOdeal.FAVORITE_BANNER -> {
@@ -190,15 +198,38 @@ fun ViewGroup.implBannerAppOdeal(unitID: String, isSmart: Boolean = false) {
                     addView(adView)
                 }
             } else {
-                val adView = inflate(context, R.layout.appodeal_ad)
-                if (this is BannerContainerView) {
-                    show(adView)
-                } else {
-                    removeAllViews()
-                    addView(adView)
-                }
-                Appodeal.setBannerViewId(R.id.appodealAd)
-                context.findActivity()?.let { Appodeal.show(it, Appodeal.BANNER_VIEW) }
+                context.findActivity()?.let {
+                    if (isRetry || this is BannerContainerView)
+                        return@let null
+                    Appodeal.cache(it, Appodeal.NATIVE)
+                    Appodeal.setNativeCallbacks(object : AbstractNativeCallbacks() {
+                        override fun onNativeLoaded() {
+                            implBannerAppOdeal(context, unitID, isRetry = true)
+                        }
+
+                        override fun onNativeFailedToLoad() {
+                            val adView = inflate(context, R.layout.appodeal_ad)
+                            if (this@implBannerAppOdeal is BannerContainerView) {
+                                show(adView)
+                            } else {
+                                removeAllViews()
+                                addView(adView)
+                            }
+                            Appodeal.setBannerViewId(R.id.appodealAd)
+                            context.findActivity()?.let { Appodeal.show(it, Appodeal.BANNER_VIEW) }
+                        }
+                    })
+                } ?: {
+                    val adView = inflate(context, R.layout.appodeal_ad)
+                    if (this is BannerContainerView) {
+                        show(adView)
+                    } else {
+                        removeAllViews()
+                        addView(adView)
+                    }
+                    Appodeal.setBannerViewId(R.id.appodealAd)
+                    context.findActivity()?.let { Appodeal.show(it, Appodeal.BANNER_VIEW) }
+                }()
             }
         }
 }

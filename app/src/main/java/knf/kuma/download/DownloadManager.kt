@@ -43,13 +43,14 @@ class DownloadManager : Service() {
         if (intent != null && intent.action != null && intent.action == "stop.foreground") {
             stopForeground(true)
             stopSelf()
-        }
+        } else
+            foreground(23498, foregroundGroupNotification())
         return START_STICKY
     }
 
     override fun onCreate() {
         super.onCreate()
-        startForeground(23498, foregroundGroupNotification())
+        foreground(23498, foregroundGroupNotification())
         //notificationManager?.notify(22498, foregroundGroupNotification())
     }
 
@@ -161,7 +162,7 @@ class DownloadManager : Service() {
                         downloadDao.update(downloadObject)
                         updateNotification(downloadObject, false)
                     }
-                    ContextCompat.startForegroundService(context, Intent(context, DownloadManager::class.java))
+                    context.service(Intent(context, DownloadManager::class.java))
                 }
 
                 override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
@@ -396,7 +397,7 @@ class DownloadManager : Service() {
 
         private fun stopIfNeeded() {
             if (downloadDao.countActive() == 0) {
-                ContextCompat.startForegroundService(context, Intent(context, DownloadManager::class.java).setAction("stop.foreground"))
+                context.service(Intent(context, DownloadManager::class.java).setAction("stop.foreground"))
                 notificationManager.cancel(22498)
             }
         }

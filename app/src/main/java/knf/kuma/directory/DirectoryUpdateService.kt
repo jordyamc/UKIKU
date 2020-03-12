@@ -12,6 +12,7 @@ import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
+import knf.kuma.download.foreground
 import knf.kuma.pojos.DirectoryPage
 import org.jsoup.HttpStatusException
 import pl.droidsonroids.jspoon.Jspoon
@@ -36,17 +37,17 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
         }
 
     override fun onCreate() {
-        startForeground(NOT_CODE, startNotification)
+        foreground(NOT_CODE, startNotification)
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOT_CODE, startNotification)
+        foreground(NOT_CODE, startNotification)
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onHandleIntent(intent: Intent?) {
-        startForeground(NOT_CODE, startNotification)
+        foreground(NOT_CODE, startNotification)
         if (!Network.isConnected || BypassUtil.isNeeded()) {
             stopSelf()
             cancelForeground()

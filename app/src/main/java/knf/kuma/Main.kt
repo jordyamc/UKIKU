@@ -117,6 +117,7 @@ class Main : GenericActivity(),
             return
         }
         Appodeal.initialize(this, BuildConfig.APPODEAL_KEY, Appodeal.BANNER or Appodeal.NATIVE or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
+
         try {
             setContentView(R.layout.activity_main_drawer)
         } catch (e: Exception) {

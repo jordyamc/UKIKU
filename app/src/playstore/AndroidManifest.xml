@@ -259,7 +259,10 @@
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5390653757953587~3921949479" />
+            android:value="ca-app-pub-5390653757953587~9838518341" />
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true" />
 
         <activity android:name=".queue.QueueActivity" />
         <activity

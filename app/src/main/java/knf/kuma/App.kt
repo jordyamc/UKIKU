@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.core.CrashlyticsCore
-import com.google.android.gms.ads.MobileAds
 import es.munix.multidisplaycast.CastManager
 import io.branch.referral.Branch
 import io.fabric.sdk.android.Fabric
@@ -58,9 +57,6 @@ class App : Application() {
         BackUpWork.checkInit()
         CastManager.register(this)
         AchievementManager.init(this)
-        MobileAds.initialize(this)
-        //StartAppSDK.init(this, "210290575", false)
-        //StartAppSDK.setUserConsent(this, "pas", System.currentTimeMillis(), true)
         initAppCoins()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels()

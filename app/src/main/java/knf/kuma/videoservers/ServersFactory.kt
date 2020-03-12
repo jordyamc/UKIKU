@@ -8,7 +8,6 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
@@ -25,10 +24,7 @@ import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
-import knf.kuma.download.DownloadManager
-import knf.kuma.download.DownloadService
-import knf.kuma.download.FileAccessHelper
-import knf.kuma.download.MultipleDownloadManager
+import knf.kuma.download.*
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
@@ -313,7 +309,7 @@ class ServersFactory {
         downloadObject.headers = option.headers
         if (PrefsUtil.downloaderType == 0) {
             CacheDB.INSTANCE.downloadsDAO().insert(downloadObject)
-            ContextCompat.startForegroundService(App.context, Intent(App.context, DownloadService::class.java).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)))
+            context.service(Intent(App.context, DownloadService::class.java).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)))
             callOnFinish(true, true)
         } else
             callOnFinish(true, DownloadManager.start(downloadObject))

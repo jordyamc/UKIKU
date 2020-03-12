@@ -18,6 +18,8 @@ import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
+import knf.kuma.download.foreground
+import knf.kuma.download.service
 import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DirectoryPage
@@ -53,17 +55,17 @@ class DirectoryService : IntentService("Directory update") {
         }
 
     override fun onCreate() {
-        startForeground(NOT_CODE, startNotification)
+        foreground(NOT_CODE, startNotification)
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOT_CODE, startNotification)
+        foreground(NOT_CODE, startNotification)
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onHandleIntent(intent: Intent?) {
-        startForeground(NOT_CODE, startNotification)
+        foreground(NOT_CODE, startNotification)
         if (!Network.isConnected || BypassUtil.isNeeded()) {
             cancelForeground()
             stopSelf()
@@ -282,7 +284,7 @@ class DirectoryService : IntentService("Directory update") {
         fun run(context: Context?) {
             if (context == null) return
             if (!isRunning)
-                ContextCompat.startForegroundService(context, Intent(context, DirectoryService::class.java))
+                context.service(Intent(context, DirectoryService::class.java))
         }
 
         fun getLiveStatus(): LiveData<Int> {

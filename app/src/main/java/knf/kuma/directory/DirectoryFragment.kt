@@ -29,14 +29,14 @@ class DirectoryFragment : BottomFragment() {
         ViewModelProviders.of(this).get(DirectoryViewModel::class.java)
         if (!PrefsUtil.isDirectoryFinished) {
             snackbar = activity?.findViewById<View>(R.id.root)?.showSnackbar("Creando directorio...", Snackbar.LENGTH_INDEFINITE)
-            CacheDB.INSTANCE.animeDAO().countLive.observe(this@DirectoryFragment, Observer {
+            CacheDB.INSTANCE.animeDAO().countLive.observe(viewLifecycleOwner, Observer {
                 try {
                     snackbar?.setText("Agregados... $it")
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             })
-            DirectoryService.getLiveStatus().observe(this@DirectoryFragment, Observer {
+            DirectoryService.getLiveStatus().observe(viewLifecycleOwner, Observer {
                 when (it) {
                     DirectoryService.STATE_VERIFYING ->
                         snackbar?.setText("Verificando directorio...")

@@ -9,12 +9,13 @@ import android.os.Build
 import android.os.IBinder
 import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import fi.iki.elonen.NanoHTTPD
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.FileAccessHelper
+import knf.kuma.download.foreground
+import knf.kuma.download.service
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
@@ -30,13 +31,14 @@ class SelfServer : Service() {
             CastUtil.get().stop()
             stopForeground(true)
             stopSelf()
-        }
+        } else
+            foreground(64587, foregroundNotification())
         return START_STICKY
     }
 
     override fun onCreate() {
         super.onCreate()
-        startForeground(64587, foregroundNotification())
+        foreground(64587, foregroundNotification())
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -69,7 +71,7 @@ class SelfServer : Service() {
         fun start(data: String, isFile: Boolean = true): String? {
             return try {
                 stop(true)
-                ContextCompat.startForegroundService(App.context, Intent(App.context, SelfServer::class.java))
+                App.context.service(Intent(App.context, SelfServer::class.java))
                 INSTANCE = Server(data, isFile)
                 "http://" + Network.ipAddress + ":" + HTTP_PORT
             } catch (e: Exception) {
@@ -84,7 +86,7 @@ class SelfServer : Service() {
             if (INSTANCE?.isAlive == true)
                 INSTANCE?.stop()
             if (!isRestart)
-                ContextCompat.startForegroundService(App.context, Intent(App.context, SelfServer::class.java).setAction("stop.foreground"))
+                App.context.service(Intent(App.context, SelfServer::class.java).setAction("stop.foreground"))
         }
     }
 
