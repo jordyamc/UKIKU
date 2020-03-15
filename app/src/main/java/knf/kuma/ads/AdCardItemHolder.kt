@@ -22,5 +22,6 @@ class AdCardItemHolder(parent: ViewGroup, @LayoutRes type: Int = TYPE_NORMAL) : 
         const val TYPE_NORMAL = R.layout.item_ad
         const val TYPE_FAV = R.layout.item_ad_fav
         const val TYPE_ACHIEVEMENT = R.layout.item_ad_achievements
+        const val TYPE_NEWS = R.layout.item_ad_news
     }
 }

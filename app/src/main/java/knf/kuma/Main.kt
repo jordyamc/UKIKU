@@ -31,6 +31,7 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.appodeal.ads.Appodeal
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -116,8 +117,8 @@ class Main : GenericActivity(),
             finish()
             return
         }
+        MobileAds.initialize(this)
         Appodeal.initialize(this, BuildConfig.APPODEAL_KEY, Appodeal.BANNER or Appodeal.NATIVE or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
-
         try {
             setContentView(R.layout.activity_main_drawer)
         } catch (e: Exception) {

@@ -24,7 +24,7 @@ class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<Recycl
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == 1)
-            return AdCardItemHolder(parent, AdCardItemHolder.TYPE_FAV)
+            return AdCardItemHolder(parent, AdCardItemHolder.TYPE_NEWS)
         return NewsHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_news, parent, false))
     }
 

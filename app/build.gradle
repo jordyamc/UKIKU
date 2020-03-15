@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 142
-        versionName "4.3.26"
+        versionCode 143
+        versionName "4.3.27"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -169,7 +169,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:19.0.0'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
     implementation 'com.google.firebase:firebase-firestore-ktx:21.4.1'
-    implementation 'com.google.firebase:firebase-auth:19.2.0'
+    implementation 'com.google.firebase:firebase-auth:19.3.0'
     implementation 'com.google.firebase:firebase-config:19.1.2'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
     implementation 'com.twitter.sdk.android:twitter-core:3.1.1'
@@ -184,6 +184,7 @@ dependencies {
     implementation 'androidx.slice:slice-builders:1.0.0'
     implementation 'androidx.work:work-runtime-ktx:2.3.3'
     implementation 'androidx.room:room-runtime:2.2.4'
+    implementation 'com.google.firebase:firebase-ads:19.0.0'
     kapt 'androidx.room:room-compiler:2.2.4'
     androidTestImplementation 'androidx.room:room-testing:2.2.4'
     implementation 'com.google.dagger:dagger-android-support:2.24'
@@ -241,7 +242,7 @@ dependencies {
     implementation 'fr.bmartel:jspeedtest:1.32.1'
     implementation 'com.github.simbiose:Encryption:2.0.1'
     implementation 'com.appbrain:appbrain-sdk:+@aar'
-    implementation ('com.appodeal.ads:sdk:2.6.2.+'){
+    implementation('com.appodeal.ads:sdk:2.6.2.+') {
         exclude group: 'com.appodeal.ads.sdk.networks', module: 'facebook'
         exclude group: 'com.appodeal.ads.sdk.networks', module: 'startapp'
     }
