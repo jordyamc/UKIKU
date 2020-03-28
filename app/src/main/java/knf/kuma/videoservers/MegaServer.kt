@@ -6,8 +6,8 @@ import knf.kuma.videoservers.VideoServer.Names.MEGA
 import java.net.URLDecoder
 
 class MegaServer(context: Context, baseLink: String) : Server(context, baseLink) {
-    private val DOWNLOAD = "1"
-    private val STREAM = "2"
+    private val DOWNLOAD = "D"
+    private val STREAM = "S"
 
     override val isValid: Boolean
         get() = baseLink.contains("mega.nz")

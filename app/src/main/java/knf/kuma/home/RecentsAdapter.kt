@@ -11,13 +11,11 @@ import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
-import knf.kuma.directory.DirectoryService
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.SeenObject
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
-import xdroid.toaster.Toaster
 
 class RecentsAdapter(val fragment: HomeFragment, private val isLarge: Boolean = true, private val showSeen: Boolean = true) : UpdateableAdapter<RecentsAdapter.RecentViewHolder>() {
 
@@ -48,8 +46,7 @@ class RecentsAdapter(val fragment: HomeFragment, private val isLarge: Boolean = 
                 if (animeObject != null) {
                     ActivityAnime.open(fragment, animeObject, holder.img)
                 } else {
-                    Toaster.toast("Aún no esta en directorio!")
-                    DirectoryService.run(fragment.context)
+                    ActivityAnime.open(fragment, item, holder.img)
                 }
             }
         }

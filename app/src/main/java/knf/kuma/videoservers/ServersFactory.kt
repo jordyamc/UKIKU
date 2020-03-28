@@ -5,9 +5,11 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.view.View
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
@@ -32,6 +34,7 @@ import knf.kuma.queue.QueueManager
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import xdroid.toaster.Toaster
+import java.net.URLDecoder
 import java.util.*
 
 
@@ -97,8 +100,14 @@ class ServersFactory {
                 } else {
                     saveLastServer(text)
                     when (text.toLowerCase()) {
-                        "mega 1", "mega 2" -> {
-                            this@ServersFactory.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(server.option.url)))
+                        "mega d", "mega s" -> {
+                            try {
+                                CustomTabsIntent.Builder()
+                                        .setToolbarColor(Color.parseColor("#DA252D"))
+                                        .setShowTitle(true).build().launchUrl(context, Uri.parse(server.option.url))
+                            } catch (e: Exception) {
+                                this@ServersFactory.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(server.option.url)))
+                            }
                             callOnFinish(false, false)
                         }
                         else ->
@@ -243,7 +252,7 @@ class ServersFactory {
                 val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
                 for (e in downloads) {
                     var z = e.attr("href")
-                    z = z.substring(z.lastIndexOf("http"))
+                    z = URLDecoder.decode(z.substring(z.lastIndexOf("http")), "utf-8")
                     val server = Server.check(context, z)
                     if (server != null)
                         servers.add(server)

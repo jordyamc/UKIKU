@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="144" version="4.3.28">
+        <change type="fix">Error al abrir animes con modo Home</change>
+    </release>
     <release code="143" version="4.3.27">
         <change type="fix">Errores generales</change>
     </release>
