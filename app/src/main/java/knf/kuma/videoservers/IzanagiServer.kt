@@ -18,9 +18,12 @@ class IzanagiServer(context: Context, baseLink: String) : Server(context, baseLi
         get() {
             val downLink = PatternUtil.extractLink(baseLink)
             return try {
-                var link = JSONObject(jsoupCookies(downLink.replace("embed", "check")).get().body().text()).getString("file").replace("\\", "")
-                link = link.replace("/".toRegex(), "//").replace(":////", "://")
-                VideoServer(IZANAGI, Option(name, null, link))
+                val link = JSONObject(jsoupCookies(downLink.replace("embed", "check")).get().body().text()).getString("file").replace("\\", "")
+                VideoServer(IZANAGI,
+                        mutableListOf(
+                                Option(name, null, link),
+                                Option(name, null, link.replace("/".toRegex(), "//").replace(":////", "://"))
+                        ))
             } catch (e: Exception) {
                 null
             }

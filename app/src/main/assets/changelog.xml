@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="145" version="4.3.29">
+        <change type="fix">Error al reproducir izanagi en ALGUNOS episodios</change>
+    </release>
     <release code="144" version="4.3.28">
         <change type="fix">Error al abrir animes con modo Home</change>
     </release>
