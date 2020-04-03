@@ -24,8 +24,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 145
-        versionName "4.3.29"
+        versionCode 146
+        versionName "4.3.30"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -250,6 +250,7 @@ dependencies {
     implementation 'com.github.marlonlom:timeago:4.0.1'
     implementation 'com.scottyab:secure-preferences-lib:0.1.7'
     implementation 'com.github.florent37:expansionpanel:1.2.2'
+    implementation 'com.github.evgenyneu:js-evaluator-for-android:v5.0.0'
     testImplementation 'junit:junit:4.13'
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

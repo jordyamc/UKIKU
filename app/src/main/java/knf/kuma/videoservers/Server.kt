@@ -74,6 +74,7 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                     MegaServer(context, base),
                     OkruServer(context, base),
                     RVServer(context, base),
+                    ZippyServer(context, base),
                     YUServer(context, base),
                     MP4UploadServer(context, base)
             )

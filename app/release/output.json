@@ -6,8 +6,8 @@
     "apkData": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 145,
-      "versionName": "4.3.29",
+      "versionCode": 146,
+      "versionName": "4.3.30",
       "enabled": true,
       "outputFile": "app-release.apk",
       "fullName": "release",
