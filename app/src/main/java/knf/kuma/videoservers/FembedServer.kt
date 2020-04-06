@@ -11,7 +11,7 @@ import org.json.JSONObject
 class FembedServer internal constructor(context: Context, baseLink: String) : Server(context, baseLink) {
 
     override val isValid: Boolean
-        get() = baseLink.contains("embedsito.com")
+        get() = baseLink.contains("fembed")
 
     override val name: String
         get() = FEMBED
@@ -20,7 +20,8 @@ class FembedServer internal constructor(context: Context, baseLink: String) : Se
         get() {
             return try {
                 val downLink = PatternUtil.extractLink(baseLink)
-                val json = JSONObject(okHttpCookies(downLink.replace("/v/", "/api/source/"), "POST").execute().body()?.string())
+                val fLink = "https://embedsito.com/v/${downLink.substring(downLink.lastIndexOf("=") + 1)}"
+                val json = JSONObject(okHttpCookies(fLink.replace("/v/", "/api/source/"), "POST").execute().body()?.string())
                 check(json.getBoolean("success")) { "Request was not succeeded" }
                 val array = json.getJSONArray("data")
                 val options = mutableListOf<Option>()
