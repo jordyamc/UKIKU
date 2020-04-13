@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
-    <release code="146" version="4.3.30">
+    <release code="148" version="4.3.32">
+        <change type="fix">Errores generales</change>
+    </release>
+    <release code="147" version="4.3.31">
         <change type="change">Servidor Fembed revivido</change>
     </release>
     <release code="146" version="4.3.30">
