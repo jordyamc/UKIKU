@@ -13,7 +13,7 @@
         <knf.kuma.custom.AppWebView
             android:id="@+id/webview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
     </androidx.core.widget.NestedScrollView>
 
     <ProgressBar

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -28,20 +27,14 @@ class CommentariesDialog : BottomSheetDialogFragment(), LifecycleObserver {
         val rootView = inflater.inflate(R.layout.lay_comments, container, false)
         doOnUI {
             rootView.webview.apply {
+                setInitialScale(1)
+                settings.useWideViewPort = true
+                settings.loadWithOverviewMode = true
                 settings.javaScriptEnabled = true
                 webViewClient = object : WebViewClient() {
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
                         rootView.loading.visibility = View.GONE
-                    }
-
-                    override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                        view?.loadUrl(url)
-                        return true
-                    }
-
-                    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                        return shouldOverrideUrlLoading(view, request?.url?.toString())
                     }
                 }
                 loadUrl(link)

@@ -34,6 +34,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
+import knf.kuma.ads.AdsUtils;
 import knf.kuma.animeinfo.AnimeInfo;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PrefsUtil;
@@ -396,7 +397,8 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             public String commentariesLink() {
                 try {
-                    return "https://www.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FXBwzv5Yrm_1.js%3Fversion%3D42%23cb%3Df29a45da9909%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff388549d580a978%26relation%3Dparent.parent&href=" + URLEncoder.encode(link, "UTF-8") + "&locale=es_LA&numposts=100&sdk=joey&version=v2.9&width=100%25";
+                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(link, "UTF-8") + "&s_o=default#version=" + AdsUtils.INSTANCE.getRemoteConfigs().getString("disqus_version");
+                    //return "https://www.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FXBwzv5Yrm_1.js%3Fversion%3D42%23cb%3Df29a45da9909%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff388549d580a978%26relation%3Dparent.parent&href=" + URLEncoder.encode(link, "UTF-8") + "&locale=es_LA&numposts=100&sdk=joey&version=v2.9&width=100%25";
                     //return "http://ukiku-comments.epizy.com/comments.php?title=" + getEpTitle() + "&url=" + URLEncoder.encode(link, "UTF-8");
                     /*return "https://web.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FlY4eZXm_YWu.js%3Fversion%3D42%23cb%3Df3448d0a8b0514c%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff304e603e6a096%26relation%3Dparent.parent&href=" +
                             URLEncoder.encode(link, "UTF-8") +

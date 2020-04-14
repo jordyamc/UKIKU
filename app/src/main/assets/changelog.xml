@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="149" version="4.3.33">
+        <change type="change">Comentarios por Disqus</change>
+        <change type="fix">Fembed revivido</change>
+    </release>
     <release code="148" version="4.3.32">
         <change type="fix">Errores generales</change>
     </release>
