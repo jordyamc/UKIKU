@@ -97,6 +97,21 @@ object FileAccessHelper {
 
     }
 
+    fun findFile(file_name: String?): File {
+        return try {
+            if (file_name.isNullOrEmpty()) throw IllegalStateException("Name can't be null!")
+            if (PrefsUtil.downloadType == "0") {
+                File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }!![0]
+            } else {
+                File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }!![0]
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            File(Environment.getDataDirectory(), "test.txt")
+        }
+
+    }
+
     fun getFileUri(file_name: String?): Uri? {
         if (file_name.isNullOrEmpty()) throw IllegalStateException("Name can't be null!")
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
@@ -284,6 +299,13 @@ object FileAccessHelper {
             delete(file_name)
     }
 
+    fun deletePath(file_name: String?, async: Boolean = true) {
+        if (async)
+            doAsync { deletePath(file_name) }
+        else
+            deletePath(file_name)
+    }
+
     private fun delete(file_name: String?) {
         if (file_name.isNull())
             return
@@ -299,6 +321,40 @@ object FileAccessHelper {
                     val documentFile = DocumentFile.fromTreeUri(App.context, it)
                     if (documentFile != null && documentFile.exists()) {
                         val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        file?.delete()
+                        val dir = file?.parentFile
+                        if (dir != null && dir.listFiles().isEmpty())
+                            dir.delete()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun deletePath(file_name: String?) {
+        if (file_name == null)
+            return
+        try {
+            if (PrefsUtil.downloadType == "0") {
+                val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }!![0]
+                file.delete()
+                val dir = file.parentFile
+                if (dir?.listFiles() == null || dir.listFiles()?.isEmpty() == true)
+                    dir?.delete()
+            } else {
+                treeUri?.let {
+                    val documentFile = DocumentFile.fromTreeUri(App.context, it)
+                    if (documentFile != null && documentFile.exists()) {
+                        val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name))?.listFiles()?.let {
+                            var tFile: DocumentFile? = null
+                            it.forEach {
+                                if (it.name?.contains(file_name) == true)
+                                    tFile = it
+                            }
+                            tFile
+                        }
                         file?.delete()
                         val dir = file?.parentFile
                         if (dir != null && dir.listFiles().isEmpty())

@@ -333,12 +333,12 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                     String full = element.select("a").first().text();
                     this.number = "Episodio " + extract(full, "^.* (\\d+\\.?\\d*):?.*$");
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
-                    this.eid = extract(link, "^.*/(.*)$");
+                    this.eid = String.valueOf((aid + number).hashCode());
                 } else {
                     this.chapterType = ChapterType.NEW;
                     this.number = element.select("p").first().ownText();
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
-                    this.eid = extract(link, "^.*/(.*)$");
+                    this.eid = String.valueOf((aid + number).hashCode());
                     this.img = element.select("img.lazy").first().attr("src");
                 }
                 this.aid = aid;
@@ -349,11 +349,11 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             public AnimeChapter(AnimeInfo info, String num, String sid) {
                 this.name = info.getTitle();
                 this.chapterType = ChapterType.NEW;
+                this.aid = info.getAid();
                 this.number = "Episodio " + num;
                 this.link = "https://animeflv.net/ver/" + sid + "/" + info.getSid() + "-" + num;
-                this.eid = sid;
+                this.eid = String.valueOf((aid + number).hashCode());
                 this.img = "https://cdn.animeflv.net/screenshots/" + info.getAid() + "/" + num + "/th_3.jpg";
-                this.aid = info.getAid();
                 this.key = (aid + number).hashCode();
             }
 

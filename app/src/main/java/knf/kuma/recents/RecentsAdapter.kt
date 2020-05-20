@@ -88,7 +88,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 } else {
                     recentObject.isDownloading = downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING || downloadObject.state == DownloadObject.PAUSED
                     recentObject.downloadState = downloadObject.state
-                    val file = FileAccessHelper.getFile(recentObject.fileName)
+                    val file = FileAccessHelper.findFile(recentObject.filePath)
                     recentObject.isChapterDownloaded = file.exists()
                     if (downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING)
                         holder.downIcon.setImageResource(R.drawable.ic_download)
@@ -108,7 +108,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                             MaterialDialog(context).safeShow {
                                 message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase(Locale.ENGLISH)} de ${recentObject.name}?")
                                 positiveButton(text = "CONFIRMAR") {
-                                    FileAccessHelper.delete(recentObject.fileName, true)
+                                    FileAccessHelper.deletePath(recentObject.filePath, true)
                                     DownloadManager.cancel(recentObject.eid)
                                     QueueManager.remove(recentObject.eid)
                                     recentObject.isChapterDownloaded = false

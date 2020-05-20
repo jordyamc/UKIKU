@@ -91,6 +91,13 @@ public class RecentObject {
             return eid + "$" + aid + "-" + chapter.substring(chapter.lastIndexOf(" ") + 1) + ".mp4";
     }
 
+    public String getFilePath() {
+        if (PrefsUtil.INSTANCE.getSaveWithName())
+            return "$" + PatternUtil.INSTANCE.getFileName(url);
+        else
+            return "$" + aid + "-" + chapter.substring(chapter.lastIndexOf(" ") + 1) + ".mp4";
+    }
+
     public String getEpTitle() {
         return name + chapter.substring(chapter.lastIndexOf(" "));
     }
@@ -110,14 +117,14 @@ public class RecentObject {
     private void populate(WebInfo webInfo) {
         this.key = (webInfo.aid + webInfo.chapter).hashCode();
         this.aid = webInfo.aid;
-        this.eid = webInfo.eid;
-        this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
         this.chapter = webInfo.chapter.trim();
+        this.eid = String.valueOf((aid + chapter).hashCode());
+        this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
         this.url = "https://animeflv.net" + webInfo.url;
         this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");
         this.isNew = chapter.matches("^.* [10]$");
         this.anime = PatternUtil.INSTANCE.getAnimeUrl(this.url, this.aid);
-        File file = FileAccessHelper.INSTANCE.getFile(getFileName());
+        File file = FileAccessHelper.INSTANCE.findFile(getFilePath());
         DownloadObject downloadObject = CacheDBWrap.INSTANCE.downloadsDAO().getByEid(eid);
         this.isChapterDownloaded = file.exists();
         this.isDownloading = downloadObject != null && downloadObject.state == DownloadObject.DOWNLOADING;

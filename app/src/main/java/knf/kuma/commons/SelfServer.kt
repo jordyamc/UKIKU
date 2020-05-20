@@ -99,9 +99,12 @@ class SelfServer : Service() {
 
         override fun serve(session: IHTTPSession): Response? {
             return if (isFile)
-                if (URLUtil.isFileUrl(data))
-                    serveFile(session.headers, File(Uri.parse(data).path))
-                else
+                if (URLUtil.isFileUrl(data)) {
+                    var file = File(Uri.parse(data).path)
+                    if (!file.exists())
+                        file = file.parentFile?.listFiles { f -> f.name.contains(Uri.parse(data).path!!.substringAfterLast("$")) }!![0]
+                    serveFile(session.headers, file)
+                } else
                     serveFile(session.headers, data)
             else
                 serveWeb(session.headers, data)
