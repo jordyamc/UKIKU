@@ -10,7 +10,6 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.util.Log
 import android.webkit.URLUtil
 import androidx.media.AudioAttributesCompat
-import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -22,6 +21,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
@@ -162,7 +162,7 @@ class PlayerHolder(private val context: Context,
                 }
                 if (exception != null) {
                     Toaster.toast("Error al reproducir: " + exception.message?.replace("%", "%%"))
-                    Crashlytics.logException(exception)
+                    FirebaseCrashlytics.getInstance().recordException(exception)
                 } else {
                     Toaster.toast("Error desconocido al reproducir")
                 }

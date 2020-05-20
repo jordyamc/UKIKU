@@ -6,12 +6,15 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import android.view.View
-import android.webkit.*
+import android.webkit.CookieManager
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.crashlytics.android.Crashlytics
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.*
@@ -59,7 +62,7 @@ open class GenericActivity : AppCompatActivity() {
         BypassUtil.isChecking = true
         doAsync(exceptionHandler = {
             it.also {
-                Crashlytics.logException(it)
+                FirebaseCrashlytics.getInstance().recordException(it)
                 logText("Error: ${it.message}")
             }.message?.toastLong()
         }) {

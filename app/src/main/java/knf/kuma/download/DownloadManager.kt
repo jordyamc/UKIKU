@@ -13,7 +13,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Func
@@ -140,8 +140,10 @@ class DownloadManager : Service() {
 
                 override fun onError(download: Download, error: Error, throwable: Throwable?) {
                     Log.e("Download", "Error downloader")
-                    throwable?.printStackTrace()
-                    Crashlytics.logException(throwable)
+                    if (throwable != null) {
+                        throwable.printStackTrace()
+                        FirebaseCrashlytics.getInstance().recordException(throwable)
+                    }
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null) {
                         errorNotification(downloadObject)

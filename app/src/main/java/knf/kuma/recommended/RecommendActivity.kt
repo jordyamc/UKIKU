@@ -14,7 +14,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import knf.kuma.R
 import knf.kuma.ads.AdsType
@@ -140,7 +140,7 @@ class RecommendActivity : GenericActivity() {
                     }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Crashlytics.logException(e)
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Toaster.toast("Error al cargar recomendados")
                 runOnUiThread {
                     loading.visibility = View.GONE

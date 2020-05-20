@@ -12,10 +12,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.preference.PreferenceManager
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.LevelEndEvent
-import com.crashlytics.android.answers.LevelStartEvent
-import com.crashlytics.android.answers.PurchaseEvent
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -39,7 +35,6 @@ import moe.feng.common.stepperview.IStepperAdapter
 import moe.feng.common.stepperview.VerticalStepperItemView
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
-import java.math.BigDecimal
 import java.util.*
 
 object EAHelper {
@@ -99,8 +94,6 @@ object EAHelper {
     fun checkStart(query: String) {
         if (phase == 0 && query == BuildConfig.EASTER_SEARCH) {
             Toaster.toastLong(CODE1)
-            Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg"))
-            Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg Phase 1"))
             setUnlocked(0)
         }
     }
@@ -121,8 +114,6 @@ object EAHelper {
                 setUnlocked(1)
                 Toaster.toastLong("LMMJVSD \u2192 US \u2192 $CODE2")
                 clear1()
-                Answers.getInstance().logLevelEnd(LevelEndEvent().putLevelName("Easter Egg Phase 1").putScore(0))
-                Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg Phase 2"))
             } else if (!CODE1.startsWith(CURRENT_1)) {
                 clear1()
                 CURRENT_1 += part
@@ -141,8 +132,6 @@ object EAHelper {
                 setUnlocked(2)
                 Toaster.toastLong("El tesoro esta en Akihabara")
                 clear2()
-                Answers.getInstance().logLevelEnd(LevelEndEvent().putLevelName("Easter Egg Phase 2").putScore(0))
-                Answers.getInstance().logLevelStart(LevelStartEvent().putLevelName("Easter Egg Phase 3"))
             } else if (!CODE2.startsWith(CURRENT_2)) {
                 clear2()
                 CURRENT_2 += part
@@ -157,8 +146,6 @@ object EAHelper {
     internal fun enter3() {
         if (isPart2Unlocked && phase == 3) {
             setUnlocked(3)
-            Answers.getInstance().logLevelEnd(LevelEndEvent().putLevelName("Easter Egg Phase 3").putScore(0))
-            Answers.getInstance().logLevelEnd(LevelEndEvent().putLevelName("Easter Egg").putScore(0))
         }
     }
 
@@ -509,22 +496,18 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
     private fun unlock(sku: String?) {
         when (sku) {
             "ee_2" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 2").putItemPrice(BigDecimal.valueOf(7L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(1)
                 vertical_stepper_view.nextStep()
             }
             "ee_3" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 3").putItemPrice(BigDecimal.valueOf(13L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(2)
                 vertical_stepper_view.nextStep()
             }
             "ee_4" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg 4").putItemPrice(BigDecimal.valueOf(5L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(3)
                 vertical_stepper_view.nextStep()
             }
             "ee_all" -> {
-                Answers.getInstance().logPurchase(PurchaseEvent().putItemId(sku).putItemName("Easter egg complete").putItemPrice(BigDecimal.valueOf(20L)).putCurrency(Currency.getInstance("USD")))
                 EAHelper.setUnlocked(1)
                 EAHelper.setUnlocked(2)
                 EAHelper.setUnlocked(3)

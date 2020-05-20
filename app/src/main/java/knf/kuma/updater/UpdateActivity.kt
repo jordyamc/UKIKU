@@ -15,7 +15,7 @@ import android.view.ViewAnimationUtils
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import androidx.core.content.FileProvider
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.thin.downloadmanager.DownloadRequest
 import com.thin.downloadmanager.DownloadStatusListenerV1
 import com.thin.downloadmanager.ThinDownloadManager
@@ -101,7 +101,7 @@ class UpdateActivity : GenericActivity() {
                     override fun onDownloadFailed(downloadRequest: DownloadRequest?, errorCode: Int, errorMessage: String?) {
                         Log.e("Update Error", "Code: $errorCode Message: $errorMessage")
                         Toaster.toast("Error al actualizar: $errorMessage")
-                        Crashlytics.logException(IllegalStateException("Update failed\nCode: $errorCode Message: $errorMessage"))
+                        FirebaseCrashlytics.getInstance().recordException(IllegalStateException("Update failed\nCode: $errorCode Message: $errorMessage"))
                         finish()
                     }
 

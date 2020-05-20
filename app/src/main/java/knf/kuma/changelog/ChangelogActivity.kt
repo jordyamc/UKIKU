@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.R
 import knf.kuma.changelog.objects.Changelog
 import knf.kuma.commons.EAHelper
@@ -69,7 +69,7 @@ class ChangelogActivity : GenericActivity() {
                 progress.post { progress.visibility = View.GONE }
                 recycler.post { recycler.adapter = ReleaseAdapter(changelog) }
             } catch (e: Exception) {
-                Crashlytics.logException(e)
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Toaster.toast("Error al cargar changelog")
                 finish()
             }

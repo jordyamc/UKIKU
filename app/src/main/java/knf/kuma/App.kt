@@ -11,12 +11,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.core.CrashlyticsCore
 import es.munix.multidisplaycast.CastManager
-import io.branch.referral.Branch
-import io.fabric.sdk.android.Fabric
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.directory.DirectoryService
@@ -27,7 +22,6 @@ import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.widgets.emision.WEmissionService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.jetbrains.anko.doAsync
 import kotlin.contracts.ExperimentalContracts
 
 class App : Application() {
@@ -60,13 +54,6 @@ class App : Application() {
         initAppCoins()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels()
-        doAsync {
-            Fabric.with(context,
-                    Crashlytics.Builder().core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build(),
-                    Answers()
-            )
-            Branch.getAutoInstance(context)
-        }
     }
 
     private fun initAppCoins() {

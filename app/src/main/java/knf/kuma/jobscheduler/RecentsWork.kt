@@ -14,7 +14,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
@@ -66,7 +66,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
             return Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
-            Crashlytics.logException(e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             return Result.failure()
         }
     }
@@ -90,7 +90,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
     @Throws(Exception::class)
     private fun notifyRecent(recentObject: RecentObject) {
         val animeObject = getAnime(recentObject)
-        val obj = NotificationObj(Integer.parseInt(recentObject.eid), NotificationObj.RECENT)
+        val obj = NotificationObj("${recentObject.aid}${recentObject.chapter}".hashCode(), NotificationObj.RECENT)
         val notification = NotificationCompat.Builder(context, CHANNEL_RECENTS).create {
             setSmallIcon(R.drawable.ic_new_recent)
             color = ContextCompat.getColor(context, R.color.colorAccent)

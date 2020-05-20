@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.crashlytics.android.Crashlytics
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
 import knf.kuma.R
@@ -52,7 +51,6 @@ class DirectoryFragment : BottomFragment() {
         val view = inflater.inflate(R.layout.fragment_directory, container, false)
         fragmentHolder = DirMainFragmentHolder(view, childFragmentManager)
         EAHelper.enter1("D")
-        Crashlytics.setString("screen", "Directory")
         return view
     }
 

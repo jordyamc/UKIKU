@@ -2,6 +2,18 @@ package knf.kuma.pojos;
 
 import android.text.TextUtils;
 
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.IconCompat;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -23,17 +35,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.annotation.Keep;
-import androidx.annotation.NonNull;
-import androidx.core.graphics.drawable.IconCompat;
-import androidx.room.ColumnInfo;
-import androidx.room.Embedded;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
-import androidx.room.TypeConverter;
-import androidx.room.TypeConverters;
 import knf.kuma.ads.AdsUtils;
 import knf.kuma.animeinfo.AnimeInfo;
 import knf.kuma.commons.PatternUtil;
@@ -147,7 +148,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     }
 
     private String extract(String link) {
-        return PatternUtil.INSTANCE.getLinkNumber(link);
+        return link.substring(link.lastIndexOf("/") + 1);
     }
 
     private String getType(String className) {
@@ -332,16 +333,16 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                     String full = element.select("a").first().text();
                     this.number = "Episodio " + extract(full, "^.* (\\d+\\.?\\d*):?.*$");
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
-                    this.eid = extract(link, "^.*/(\\d+)/.*$");
+                    this.eid = extract(link, "^.*/(.*)$");
                 } else {
                     this.chapterType = ChapterType.NEW;
                     this.number = element.select("p").first().ownText();
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
-                    this.eid = extract(link, "^.*/(\\d+)/.*$");
+                    this.eid = extract(link, "^.*/(.*)$");
                     this.img = element.select("img.lazy").first().attr("src");
                 }
-                this.key = Integer.parseInt(eid);
                 this.aid = aid;
+                this.key = (aid + number).hashCode();
             }
 
             @Ignore
@@ -352,18 +353,18 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.link = "https://animeflv.net/ver/" + sid + "/" + info.getSid() + "-" + num;
                 this.eid = sid;
                 this.img = "https://cdn.animeflv.net/screenshots/" + info.getAid() + "/" + num + "/th_3.jpg";
-                this.key = Integer.parseInt(eid);
                 this.aid = info.getAid();
+                this.key = (aid + number).hashCode();
             }
 
             @Ignore
             public static AnimeChapter fromRecent(RecentObject object) {
-                return new AnimeChapter(Integer.parseInt(object.eid), object.chapter, object.eid, object.url, object.name, object.aid);
+                return new AnimeChapter((object.aid + object.chapter).hashCode(), object.chapter, object.eid, object.url, object.name, object.aid);
             }
 
             @Ignore
             public static AnimeChapter fromDownloaded(ExplorerObject.FileDownObj object) {
-                return new AnimeChapter(Integer.parseInt(object.eid), "Episodio " + object.chapter, object.eid, object.link, object.title, object.aid);
+                return new AnimeChapter((object.aid + "Episodio " + object.chapter).hashCode(), "Episodio " + object.chapter, object.eid, object.link, object.title, object.aid);
             }
 
             public static List<AnimeChapter> create(String name, String aid, List<Element> elements) {

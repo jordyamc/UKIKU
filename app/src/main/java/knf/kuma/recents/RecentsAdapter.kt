@@ -77,9 +77,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             PicassoSingle.get().load(PatternUtil.getCover(recentObject.aid)).into(holder.imageView)
             holder.setNew(recentObject.isNew)
             holder.setFav(dao.isFav(Integer.parseInt(recentObject.aid)))
-            holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.eid))
+            holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter))
             dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
-            holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.eid).distinct, fragment, Observer { chapter -> holder.setSeen(chapter != null) })
+            holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.aid, recentObject.chapter).distinct, fragment, Observer { chapter -> holder.setSeen(chapter != null) })
             holder.setDownloadObserver(downloadsDAO.getLiveByEid(recentObject.eid).distinct, fragment, Observer { downloadObject ->
                 holder.setDownloadState(downloadObject)
                 if (downloadObject == null) {
@@ -183,7 +183,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 }
             }
             holder.cardView.setOnLongClickListener {
-                if (!chaptersDAO.chapterIsSeen(recentObject.eid)) {
+                if (!chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter)) {
                     chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
                     holder.animeOverlay.setSeen(seen = true, animate = true)
                 } else {

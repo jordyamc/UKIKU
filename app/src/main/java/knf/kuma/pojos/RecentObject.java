@@ -1,14 +1,15 @@
 package knf.kuma.pojos;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDBWrap;
@@ -107,7 +108,7 @@ public class RecentObject {
     }
 
     private void populate(WebInfo webInfo) {
-        this.key = Integer.parseInt(webInfo.eid);
+        this.key = (webInfo.aid + webInfo.chapter).hashCode();
         this.aid = webInfo.aid;
         this.eid = webInfo.eid;
         this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
@@ -129,8 +130,8 @@ public class RecentObject {
     }
 
     private void populate(AnimeDAO dao, WebInfo webInfo) {
-        if (isNotNumeric(webInfo.aid) || isNotNumeric(webInfo.eid))
-            throw new IllegalStateException("Aid and Eid must be numbers");
+        if (isNotNumeric(webInfo.aid))
+            throw new IllegalStateException("Aid must be number");
         populate(webInfo);
         this.animeObject = dao.getSOByAid(aid);
     }
@@ -148,7 +149,7 @@ public class RecentObject {
     public static class WebInfo {
         @Selector(value = "img[src]", attr = "src", format = "/(\\d+)\\.\\w+")
         public String aid;
-        @Selector(value = "a", attr = "href", format = "/(\\d+)/")
+        @Selector(value = "a", attr = "href", format = "/(.*)$")
         public String eid;
         @Selector(value = "img", attr = "alt")
         public String name;

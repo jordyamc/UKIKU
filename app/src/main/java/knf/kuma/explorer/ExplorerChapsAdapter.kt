@@ -59,8 +59,9 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
     override fun onBindViewHolder(holder: ChapItem, position: Int) {
         val chapObject = explorerObject.chapters[position]
         loadThumb(chapObject, holder.imageView)
-        holder.seenOverlay.setSeen(chaptersDAO.chapterIsSeen(chapObject.eid), false)
-        holder.chapter.text = String.format(Locale.getDefault(), "Episodio %s", chapObject.chapter)
+        val chapterNum = String.format(Locale.getDefault(), "Episodio %s", chapObject.chapter)
+        holder.seenOverlay.setSeen(chaptersDAO.chapterIsSeen(chapObject.aid, chapterNum), false)
+        holder.chapter.text = chapterNum
         holder.time.text = chapObject.time
         holder.cardView.setOnClickListener {
             chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject))
@@ -77,7 +78,7 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
             }
         }
         holder.cardView.setOnLongClickListener {
-            if (!chaptersDAO.chapterIsSeen(chapObject.eid)) {
+            if (!chaptersDAO.chapterIsSeen(chapObject.aid, chapterNum)) {
                 chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject))
                 holder.seenOverlay.setSeen(true, true)
             } else {

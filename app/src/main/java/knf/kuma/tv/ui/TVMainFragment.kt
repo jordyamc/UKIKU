@@ -10,8 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.*
 import androidx.lifecycle.Observer
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.LoginEvent
 import com.dropbox.core.android.Auth
 import knf.kuma.App
 import knf.kuma.Diagnostic
@@ -250,7 +248,6 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
             val token = Auth.getOAuth2Token()
             if (service is DropBoxService && service?.logIn(token) == true) {
                 Backups.type = Backups.Type.DROPBOX
-                Answers.getInstance().logLogin(LoginEvent().putMethod("Dropbox"))
             }
             onLogin()
         }

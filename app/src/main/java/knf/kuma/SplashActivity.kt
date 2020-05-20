@@ -6,15 +6,15 @@ import android.os.Bundle
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
+import com.afollestad.materialdialogs.input.input
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
+import java.util.*
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalCoroutinesApi
@@ -31,21 +31,19 @@ class SplashActivity : GenericActivity() {
             }
             BuildConfig.BUILD_TYPE == "playstore" && !PrefsUtil.isPSWarned -> MaterialDialog(this).safeShow {
                 title(text = "Aviso")
-                message(text = "Usted esta usando la version de Google Play, esta version tiene las descargas y streaming deshabilitados debido al copyright, para una experiencia completa por favor use la version de la pagina oficial")
-                positiveButton(text = "Descargar") {
+                message(text = "Usted esta usando la version de Google Play, esta version tiene las descargas y streaming deshabilitados debido al copyright, para una experiencia completa por favor use la version de la pagina oficial\nEscriba \"confirmar\" para continuar.")
+                input(hint = "Respuesta...", waitForPositiveButton = false) { _, text ->
+                    getActionButton(WhichButton.POSITIVE).isEnabled = text.toString().toLowerCase(Locale.getDefault()) == "confirmar"
+                }
+                negativeButton(text = "Descargar") {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.ga")))
                 }
-                negativeButton(text = "Continuar") {
+                positiveButton(text = "Continuar") {
                     PrefsUtil.isPSWarned = true
                     startActivity(Intent(this@SplashActivity, Main::class.java))
                     finish()
                 }
-                getActionButton(WhichButton.NEGATIVE).isEnabled = false
                 cancelOnTouchOutside(false)
-                doOnUI {
-                    delay(3000)
-                    getActionButton(WhichButton.NEGATIVE).isEnabled = true
-                }
             }
             else -> {
                 startActivity(Intent(this, Main::class.java))

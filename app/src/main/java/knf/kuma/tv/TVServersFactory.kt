@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.leanback.widget.Presenter
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.iterator
@@ -131,7 +129,6 @@ class TVServersFactory private constructor(private val activity: Activity, priva
             history()
             seen()
         }
-        Answers.getInstance().logCustom(CustomEvent("Streaming").putCustomAttribute("Server", option.server))
         activity.startActivity(Intent(activity, TVPlayer::class.java).apply {
             putExtra("url", option.url)
             putExtra("title", downloadObject.name)

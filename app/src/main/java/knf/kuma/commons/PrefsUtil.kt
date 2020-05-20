@@ -247,8 +247,8 @@ object PrefsUtil {
         set(value) = SecurePreferences(context).edit().putString("subscription_token", value).apply()
 
     var isPSWarned: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isPSWarned", false)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isPSWarned", value).apply()
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isPSWarned1", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isPSWarned1", value).apply()
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)

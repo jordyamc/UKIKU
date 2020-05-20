@@ -7,6 +7,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.doAsync
+import xdroid.toaster.Toaster
 import java.util.*
 
 object ExplorerCreator {
@@ -21,6 +22,12 @@ object ExplorerCreator {
     fun start(listener: EmptyListener) {
         IS_CREATED = true
         val explorerDAO = CacheDB.INSTANCE.explorerDAO()
+        if (!FileAccessHelper.isStoragePermissionEnabled()) {
+            Toaster.toastLong("Permiso de almacenamiento no concedido")
+            listener.onEmpty()
+            postState(null)
+            return
+        }
         postState("Iniciando busqueda")
         doAsync {
             val creator = FileAccessHelper.downloadExplorerCreator

@@ -8,16 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
@@ -28,6 +18,17 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
+
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.CacheDBWrap;
 import knf.kuma.download.FileAccessHelper;
@@ -50,7 +51,7 @@ public class ExplorerObject {
     public String path;
     public List<FileDownObj> chapters = new ArrayList<>();
     @Ignore
-    private MutableLiveData<List<FileDownObj>> liveData = new MutableLiveData<>();
+    private final MutableLiveData<List<FileDownObj>> liveData = new MutableLiveData<>();
     @Ignore
     private boolean isProcessed = false;
     @Ignore
@@ -112,7 +113,7 @@ public class ExplorerObject {
                 CacheDBWrap.INSTANCE.explorerDAO().update(this);
             } catch (Exception e) {
                 e.printStackTrace();
-                Crashlytics.logException(e);
+                FirebaseCrashlytics.getInstance().recordException(e);
                 Toaster.toast("Error al obtener lista de episodios");
                 isProcessed = true;
                 isProcessing = false;
@@ -153,7 +154,7 @@ public class ExplorerObject {
             this.time = getTime(context, file);
             if (time.equals(""))
                 throw new IllegalStateException("No duration");
-            this.link = "https://animeflv.net/ver/" + fileName.replace("$", "/").replace(".mp4", "");
+            this.link = "https://animeflv.net/ver/" + fileName.substring(fileName.indexOf("$") + 1).replace(".mp4", "");
         }
 
         public static String[] getTitles(List<FileDownObj> list) {

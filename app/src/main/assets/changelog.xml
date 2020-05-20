@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="150" version="4.3.34">
+        <change type="fix">Mensajes de error al otorgar permiso de almacenamiento</change>
+        <change type="fix">Errores por cambio en Animeflv</change>
+    </release>
     <release code="149" version="4.3.33">
         <change type="change">Comentarios por Disqus</change>
         <change type="fix">Fembed revivido</change>

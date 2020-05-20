@@ -10,7 +10,7 @@ import android.provider.DocumentsContract
 import android.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.download.FileAccessHelper
 import org.jetbrains.anko.doAsync
 import java.io.File
@@ -185,7 +185,7 @@ object FileUtil {
                 doOnUI { liveData.setValue(Pair(100, true)) }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Crashlytics.logException(e)
+                FirebaseCrashlytics.getInstance().recordException(e)
                 doOnUI { liveData.setValue(Pair(-1, true)) }
             }
         }

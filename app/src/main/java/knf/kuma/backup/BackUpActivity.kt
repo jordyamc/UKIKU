@@ -13,9 +13,9 @@ import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.LoginEvent
 import com.dropbox.core.android.Auth
+import com.google.firebase.analytics.FirebaseAnalytics
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.backup.firestore.FirestoreManager
@@ -259,7 +259,7 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             val token = Auth.getOAuth2Token()
             if (service is DropBoxService && service?.logIn(token) == true) {
                 Backups.type = Backups.Type.DROPBOX
-                Answers.getInstance().logLogin(LoginEvent().putMethod("Dropbox"))
+                FirebaseAnalytics.getInstance(App.context).logEvent(FirebaseAnalytics.Event.LOGIN, Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "Dropbox") })
             }
             onLogin()
         }

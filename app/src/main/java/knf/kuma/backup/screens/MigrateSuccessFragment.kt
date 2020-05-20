@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.crashlytics.android.Crashlytics
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
@@ -76,7 +76,7 @@ class MigrateSuccessFragment : Fragment() {
                 } ?: throw IllegalStateException("Data or IS is null!")
             } catch (e: Exception) {
                 e.printStackTrace()
-                Crashlytics.logException(e)
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Toaster.toast("Error al migrar datos")
             }
             snackbar.safeDismiss()

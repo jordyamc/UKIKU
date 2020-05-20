@@ -51,9 +51,9 @@ class RecentsAdapter(val fragment: HomeFragment, private val isLarge: Boolean = 
             }
         }
         if (showSeen) {
-            holder.seenOverlay.setSeen(CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.eid), false)
+            holder.seenOverlay.setSeen(CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.aid, item.chapter), false)
             holder.root.onLongClick(returnValue = true) {
-                if (CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.eid)) {
+                if (CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.aid, item.chapter)) {
                     CacheDB.INSTANCE.seenDAO().deleteChapter(SeenObject.fromRecent(item))
                     holder.seenOverlay.setSeen(seen = false, animate = true)
                 } else {

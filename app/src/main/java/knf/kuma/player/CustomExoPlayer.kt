@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.preference.PreferenceManager
-import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
@@ -23,6 +22,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.R
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.EAHelper
@@ -254,7 +254,7 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
                     }
             if (exception != null) {
                 Toaster.toast("Error al reproducir: " + exception.message?.replace("%", "%%"), emptyArray<Any>())
-                Crashlytics.logException(exception)
+                FirebaseCrashlytics.getInstance().recordException(exception)
             } else
                 Toaster.toast("Error desconocido al reproducir")
         }

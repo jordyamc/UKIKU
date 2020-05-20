@@ -9,8 +9,6 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.SearchEvent
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import knf.kuma.BottomFragment
 import knf.kuma.BuildConfig
@@ -124,7 +122,6 @@ class SearchFragment : BottomFragment() {
             searchAdapterCompact?.submitList(Repository().getSearchCompact("") {
                 if (it) {
                     errorView.visibility = if (it) View.VISIBLE else View.GONE
-                    Answers.getInstance().logSearch(SearchEvent().putQuery(query))
                 }
                 if (isFirst) {
                     progressBar.visibility = View.GONE
@@ -185,7 +182,6 @@ class SearchFragment : BottomFragment() {
         this.query = q.trim()
         searchAdapterCompact?.submitList(Repository().getSearchCompact(q) {
             errorView.visibility = if (it) View.VISIBLE else View.GONE
-            Answers.getInstance().logSearch(SearchEvent().putQuery(query))
             if (isFirst) {
                 progressBar.visibility = View.GONE
                 isFirst = false
@@ -201,9 +197,6 @@ class SearchFragment : BottomFragment() {
             if (animeObjects != null) {
                 searchAdapter?.submitList(animeObjects)
                 errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
-                Answers.getInstance().logSearch(SearchEvent().putQuery(query))
-                if (genresString != "")
-                    Answers.getInstance().logSearch(SearchEvent().putQuery(genresString))
             }
             if (isFirst) {
                 progressBar.visibility = View.GONE

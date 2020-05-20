@@ -1,13 +1,16 @@
 package knf.kuma.download
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -70,6 +73,14 @@ object FileAccessHelper {
             }
 
         }
+
+    fun isStoragePermissionEnabled(): Boolean {
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && treeUri != null -> true
+            ContextCompat.checkSelfPermission(App.context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> true
+            else -> false
+        }
+    }
 
     fun getFile(file_name: String?): File {
         return try {
@@ -534,7 +545,7 @@ object FileAccessHelper {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private fun isSDCardRoot(uri: Uri, uriValidation: UriValidation): Boolean {
-        return isExternalStorageDocument(uri, uriValidation) && isRootUri(uri, uriValidation) && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || !isInternalStorage(uri, uriValidation))
+        return isRootUri(uri, uriValidation) && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || isExternalStorageDocument(uri, uriValidation))
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

@@ -1,10 +1,11 @@
 package knf.kuma.ads
 
 import android.content.Context
+import android.os.Bundle
 import android.view.ViewGroup
 import com.appbrain.*
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
+import com.google.firebase.analytics.FirebaseAnalytics
+import knf.kuma.App
 import knf.kuma.commons.Economy
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
@@ -159,7 +160,7 @@ fun ViewGroup.implBannerBrains(unitID: String, isSmart: Boolean = false) {
             val adView = AppBrainBanner(context)
             adView.bannerListener = object : BannerListener {
                 override fun onClick() {
-                    Answers.getInstance().logCustom(CustomEvent("Ad clicked"))
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
                 }
 
                 override fun onAdRequestDone(p0: Boolean) {
@@ -184,12 +185,12 @@ class FAdLoaderBrains(private val context: Context, onUpdate: () -> Unit) : Full
             setOnDoneCallback { builder.preload(context) }
             listener = object : InterstitialListener {
                 override fun onClick() {
-                    Answers.getInstance().logCustom(CustomEvent("Interstitial Ad clicked"))
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_clicked", Bundle())
                     isAdClicked = true
                 }
 
                 override fun onDismissed(p0: Boolean) {
-                    Answers.getInstance().logCustom(CustomEvent("Interstitial Ad watched"))
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
                     Economy.reward(isAdClicked)
                     onUpdate()
                 }

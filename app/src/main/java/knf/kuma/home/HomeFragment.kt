@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.crashlytics.android.Crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
@@ -33,7 +32,7 @@ class HomeFragment : BottomFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.dbLiveData.observe(this, Observer { list ->
+        viewModel.dbLiveData.observe(viewLifecycleOwner, Observer { list ->
             doAsync {
                 listNew.updateList(filterNew(list.filter { it.isNew }))
                 val favFiltered = list.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }
@@ -50,19 +49,19 @@ class HomeFragment : BottomFragment() {
                 }
             }
         })
-        CacheDB.INSTANCE.favsDAO().countLive.observe(this, Observer {
+        CacheDB.INSTANCE.favsDAO().countLive.observe(viewLifecycleOwner, Observer {
             doAsync { listFavUpdated.updateList(CacheDB.INSTANCE.recentsDAO().all.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }) }
             RecommendHelper.createRecommended {
                 listRecommended.updateList(it)
             }
         })
-        CacheDB.INSTANCE.animeDAO().emissionVotesLimited.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().emissionVotesLimited.observe(viewLifecycleOwner, Observer {
             listBestEmission.updateList(it)
         })
-        CacheDB.INSTANCE.queueDAO().all.observe(this, Observer {
+        CacheDB.INSTANCE.queueDAO().all.observe(viewLifecycleOwner, Observer {
             doAsync { listPending.updateList(QueueObject.takeOne(it)) }
         })
-        CacheDB.INSTANCE.seeingDAO().getAllWState(SeeingObject.STATE_CONSIDERING, SeeingObject.STATE_PAUSED).observe(this, Observer {
+        CacheDB.INSTANCE.seeingDAO().getAllWState(SeeingObject.STATE_CONSIDERING, SeeingObject.STATE_PAUSED).observe(viewLifecycleOwner, Observer {
             listWaiting.updateList(it)
         })
         StaffRecommendations.createList {
@@ -73,7 +72,6 @@ class HomeFragment : BottomFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         EAHelper.enter1("R")
-        Crashlytics.setString("screen", "Home")
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 

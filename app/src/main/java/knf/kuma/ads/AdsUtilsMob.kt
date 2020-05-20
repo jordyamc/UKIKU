@@ -1,15 +1,16 @@
 package knf.kuma.ads
 
 import android.app.Activity
+import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.firebase.analytics.FirebaseAnalytics
+import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.*
@@ -210,7 +211,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                                 adView.adUnitId = unitID
                                 adView.adListener = object : AbsAdListener() {
                                     override fun onAdClicked() {
-                                        Answers.getInstance().logCustom(CustomEvent("Ad clicked"))
+                                        FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
                                     }
                                 }
                                 if (this@implBannerMob is BannerContainerView) {
@@ -230,7 +231,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                 adView.adUnitId = unitID
                 adView.adListener = object : AbsAdListener() {
                     override fun onAdClicked() {
-                        Answers.getInstance().logCustom(CustomEvent("Ad clicked"))
+                        FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
                     }
                 }
                 show(adView)
@@ -261,7 +262,7 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
         rewardedAd.show(context, object : RewardedAdCallback() {
 
             override fun onUserEarnedReward(item: RewardItem) {
-                Answers.getInstance().logCustom(CustomEvent("Rewarded Ad watched"))
+                FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
                 Economy.reward()
                 onUpdate()
             }
@@ -293,7 +294,7 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
             adUnitId = AdsUtilsMob.INTERSTITIAL
             adListener = object : AdListener() {
                 override fun onAdClosed() {
-                    Answers.getInstance().logCustom(CustomEvent("Interstitial Ad watched"))
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
                     interstitialAd.loadAd(AdsUtilsMob.adRequest)
                     Economy.reward(isAdClicked)
                     onUpdate()
@@ -301,7 +302,7 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
 
                 override fun onAdClicked() {
                     isAdClicked = true
-                    Answers.getInstance().logCustom(CustomEvent("Interstitial Ad clicked"))
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_clicked", Bundle())
                 }
             }
         }

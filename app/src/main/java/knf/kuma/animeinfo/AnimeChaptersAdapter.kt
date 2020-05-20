@@ -136,7 +136,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             else
                 holder.setDownloaded(isPlayAvailable(dFile, downloadObject.get()), chapter.eid == s)
         })
-        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.eid)) EAHelper.getThemeColor() else R.color.textPrimary))
+        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.aid, chapter.number)) EAHelper.getThemeColor() else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
         holder.chapter.text = chapter.number
         if (BuildConfig.BUILD_TYPE == "playstore")
@@ -321,7 +321,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                 menu.show()
             }
         holder.cardView.setOnClickListener {
-            if (chaptersDAO.chapterIsSeen(chapter.eid)) {
+            if (chaptersDAO.chapterIsSeen(chapter.aid, chapter.number)) {
                 chaptersDAO.deleteChapter(SeenObject.fromChapter(chapter))
                 holder.chapter.setTextColor(ContextCompat.getColor(context, R.color.textPrimary))
             } else {

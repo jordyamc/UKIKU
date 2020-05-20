@@ -169,9 +169,6 @@ interface AnimeDAO {
     @Query("SELECT `key`,name,link,aid,genres FROM AnimeObject WHERE name LIKE :name ORDER BY name COLLATE NOCASE LIMIT 5")
     fun getByName(name: String): MutableList<AnimeSliceObject>
 
-    @Query("SELECT count(*) FROM AnimeObject WHERE sid LIKE :sid")
-    fun existSid(sid: String): Boolean
-
     @Query("SELECT count(*) FROM AnimeObject WHERE link LIKE :link")
     fun existLink(link: String): Boolean
 
@@ -183,6 +180,9 @@ interface AnimeDAO {
 
     @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE sid = :sid")
     fun getBySid(sid: String): SearchObject?
+
+    @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE link = :link")
+    fun getByLink(link: String): SearchObject?
 
     @Query("SELECT `key`,name,link,aid,img,type FROM AnimeObject WHERE aid LIKE :aid")
     fun getByAid(aid: String): SearchAdvObject?

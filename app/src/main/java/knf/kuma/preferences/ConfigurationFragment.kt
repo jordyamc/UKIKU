@@ -26,7 +26,7 @@ import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
@@ -150,7 +150,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         }
                                         preferenceScreen.findPreference<Preference>(keyAutoBackup)?.isEnabled = true
                                     } catch (e: Exception) {
-                                        Crashlytics.logException(e)
+                                        FirebaseCrashlytics.getInstance().recordException(e)
                                         preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "Error al buscar archivo: ${e.message}"
                                         preferenceScreen.findPreference<Preference>(keyAutoBackup)?.isEnabled = true
                                     }
@@ -180,7 +180,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     preferenceDownloads?.summary = PrefsUtil.storageType
                     preferenceDownloads?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                         FileAccessHelper.openTreeChooser(this@ConfigurationFragment)
-                        Toaster.toast("Por favor selecciona la raiz del almacenamiento")
+                        Toaster.toastLong("Por favor selecciona la raiz del almacenamiento")
                         true
                     }
                 } else {

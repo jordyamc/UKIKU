@@ -6,12 +6,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
+import com.google.firebase.analytics.FirebaseAnalytics
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.Backups
 import knf.kuma.commons.*
@@ -224,7 +225,7 @@ object AchievementManager {
                     if (!achievementsDAO.isUnlocked(it) && !isTV) {
                         val achievement = achievementsDAO.find(it)
                         if (achievement != null) {
-                            Answers.getInstance().logCustom(CustomEvent("Achievement").putCustomAttribute("code", it))
+                            FirebaseAnalytics.getInstance(App.context).logEvent("Achievement", Bundle().apply { putInt("code", it) })
                             list.add(achievement.apply {
                                 isUnlocked = true
                                 time = System.currentTimeMillis()

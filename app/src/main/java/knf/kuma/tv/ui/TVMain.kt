@@ -4,13 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.webkit.*
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
@@ -54,7 +51,6 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             RecentsNotReceiver.removeAll(this)
             UpdateChecker.check(this, this)
             checkBypass()
-            Answers.getInstance().logCustom(CustomEvent("TV UI"))
         }
     }
 

@@ -2,12 +2,13 @@ package knf.kuma.ads
 
 import android.app.Activity
 import android.content.Context
+import android.os.Bundle
 import android.view.ViewGroup
 import com.appodeal.ads.Appodeal
 import com.appodeal.ads.InterstitialCallbacks
 import com.appodeal.ads.RewardedVideoCallbacks
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
+import com.google.firebase.analytics.FirebaseAnalytics
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.custom.BannerContainerView
@@ -243,7 +244,7 @@ class FAdLoaderRewardedAppOdeal(private val context: Context, val onUpdate: () -
     init {
         Appodeal.setRewardedVideoCallbacks(object : RewardedVideoCallbacks {
             override fun onRewardedVideoFinished(p0: Double, p1: String?) {
-                Answers.getInstance().logCustom(CustomEvent("Rewarded Ad watched"))
+                FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
                 Economy.reward(isAdClicked)
                 onUpdate()
             }
@@ -258,7 +259,7 @@ class FAdLoaderRewardedAppOdeal(private val context: Context, val onUpdate: () -
             }
 
             override fun onRewardedVideoClicked() {
-                Answers.getInstance().logCustom(CustomEvent("Rewarded Ad clicked"))
+                FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_clicked", Bundle())
                 isAdClicked = true
             }
 
@@ -288,7 +289,7 @@ class FAdLoaderInterstitialAppOdeal(private val context: Context, val onUpdate: 
     init {
         Appodeal.setInterstitialCallbacks(object : InterstitialCallbacks {
             override fun onInterstitialClicked() {
-                Answers.getInstance().logCustom(CustomEvent("Interstitial Ad clicked"))
+                FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_clicked", Bundle())
                 isAdClicked = true
             }
 
@@ -305,7 +306,7 @@ class FAdLoaderInterstitialAppOdeal(private val context: Context, val onUpdate: 
             }
 
             override fun onInterstitialClosed() {
-                Answers.getInstance().logCustom(CustomEvent("Interstitial Ad watched"))
+                FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
                 Economy.reward(isAdClicked)
                 onUpdate()
             }

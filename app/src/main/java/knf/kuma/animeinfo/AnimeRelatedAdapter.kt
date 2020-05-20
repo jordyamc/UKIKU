@@ -24,7 +24,7 @@ internal class AnimeRelatedAdapter(private val fragment: Fragment, private val l
 
     override fun onBindViewHolder(holder: RelatedHolder, position: Int) {
         val related = list[position]
-        val animeObject = dao.getBySid(related.aid ?: "0")
+        val animeObject = dao.getBySid(related.link)
         holder.textView.text = related.name
         holder.relation.text = related.relation
         if (animeObject != null) {

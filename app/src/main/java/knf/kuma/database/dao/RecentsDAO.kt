@@ -9,10 +9,10 @@ import knf.kuma.pojos.RecentObject
 
 @Dao
 interface RecentsDAO {
-    @get:Query("SELECT * FROM recentobject ORDER BY eid DESC")
+    @get:Query("SELECT * FROM recentobject ORDER BY `key`")
     val objects: LiveData<MutableList<RecentObject>>
 
-    @get:Query("SELECT * FROM recentobject ORDER BY eid DESC")
+    @get:Query("SELECT * FROM recentobject ORDER BY `key`")
     val all: MutableList<RecentObject>
 
     @Query("DELETE FROM recentobject")

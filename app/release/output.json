@@ -1,20 +1,18 @@
-[
-  {
-    "outputType": {
-      "type": "APK"
-    },
-    "apkData": {
-      "type": "MAIN",
-      "splits": [],
-      "versionCode": 149,
-      "versionName": "4.3.33",
-      "enabled": true,
-      "outputFile": "app-release.apk",
-      "fullName": "release",
-      "baseName": "release",
-      "dirName": ""
-    },
-    "path": "app-release.apk",
-    "properties": {}
-  }
-]
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "knf.kuma",
+  "variantName": "processReleaseResources",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 150,
+      "versionName": "4.3.34",
+      "outputFile": "app-release.apk"
+    }
+  ]
+}

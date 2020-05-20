@@ -1,13 +1,14 @@
 package knf.kuma.commons
 
+import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.firestore.FirestoreManager
@@ -26,13 +27,13 @@ object Economy {
     val rewardedVideoLiveData = MutableLiveData(PrefsUtil.userRewardedVideoCount)
 
     fun reward(isAdClicked: Boolean = false) {
-        doOnUIException(onLog = { Crashlytics.logException(it);toast("Error al obtener loli-coins\n${it.message}") }) {
+        doOnUIException(onLog = { FirebaseCrashlytics.getInstance().recordException(it);toast("Error al obtener loli-coins\n${it.message}") }) {
             val reward = probabilityOf<Int> {
                 item(1, if (isAdClicked) 80.0 else 90.0)
                 item(2, if (isAdClicked) 15.0 else 8.0)
                 item(3, if (isAdClicked) 5.0 else 2.0)
             }.random()
-            doAsync { repeat(reward) { Answers.getInstance().logCustom(CustomEvent("Coins generated")) } }
+            doAsync { repeat(reward) { FirebaseAnalytics.getInstance(App.context).logEvent("Coins_generated", Bundle()) } }
             PrefsUtil.userCoins = (PrefsUtil.userCoins + reward).also { coinsLiveData.value = it }
             PrefsUtil.userRewardedVideoCount = (PrefsUtil.userRewardedVideoCount + 1).also { rewardedVideoLiveData.value = it }
             FirestoreManager.updateTop()
@@ -45,7 +46,7 @@ object Economy {
         val total = PrefsUtil.userCoins
         return if (total >= price) {
             PrefsUtil.userCoins = (total - price).also { doOnUI { coinsLiveData.value = it } }
-            doAsync { repeat(price) { Answers.getInstance().logCustom(CustomEvent("Coins used")) } }
+            doAsync { repeat(price) { FirebaseAnalytics.getInstance(App.context).logEvent("Coins_used", Bundle()) } }
             true
         } else false
     }

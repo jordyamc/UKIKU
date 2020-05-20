@@ -15,8 +15,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.App
 import knf.kuma.BuildConfig
@@ -278,7 +276,6 @@ class ServersFactory {
         if (chapter != null && downloadObject.addQueue) {
             QueueManager.add(Uri.parse(option.url), false, chapter)
         } else {
-            Answers.getInstance().logCustom(CustomEvent("Streaming").putCustomAttribute("Server", option.server))
             AchievementManager.onPlayChapter()
             try {
                 if (PreferenceManager.getDefaultSharedPreferences(App.context).getString("player_type", "0") == "0") {
@@ -313,7 +310,6 @@ class ServersFactory {
                     ?: "null")), true, chapter))
             syncData { queue() }
         }
-        Answers.getInstance().logCustom(CustomEvent("Download").putCustomAttribute("Server", option.server))
         downloadObject.link = option.url
         downloadObject.headers = option.headers
         if (PrefsUtil.downloaderType == 0) {

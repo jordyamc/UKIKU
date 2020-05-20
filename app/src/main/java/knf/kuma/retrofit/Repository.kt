@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.commons.*
 import knf.kuma.custom.BackgroundExecutor
@@ -44,8 +44,7 @@ class Repository {
                             val objects = RecentObject.create(response.body()?.list ?: listOf())
                             for ((i, recentObject) in objects.withIndex())
                                 recentObject.key = i
-                            val dao = CacheDB.INSTANCE.recentsDAO()
-                            dao.setCache(objects)
+                            CacheDB.INSTANCE.recentsDAO().setCache(objects)
                         } else
                             onFailure(call, Exception("HTTP " + response.code()))
                     } catch (e: Exception) {
@@ -59,7 +58,7 @@ class Repository {
                     if (t.message?.contains("503") == false)
                         Toaster.toast("Error al obtener - " + t.message)
                     t.printStackTrace()
-                    Crashlytics.logException(t)
+                    FirebaseCrashlytics.getInstance().recordException(t)
                 }
             })
         }

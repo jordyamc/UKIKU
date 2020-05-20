@@ -36,6 +36,7 @@ class DirectoryPage {
                             updateInterface.onAdd()
                         } else check(response.code() < 400) { "Response code: ${response.code()}" }
                     } catch (e: Exception) {
+                        e.printStackTrace()
                         Log.e("Directory Getter", "Error adding: https://animeflv.net" + link + "\nCause: " + e.message)
                         updateInterface.onError()
                     }

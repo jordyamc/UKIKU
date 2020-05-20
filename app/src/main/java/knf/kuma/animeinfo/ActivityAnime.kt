@@ -15,10 +15,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.ContentViewEvent
-import com.crashlytics.android.answers.ShareEvent
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
@@ -78,8 +74,6 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         viewModel.liveData.observe(this, Observer { animeObject ->
             if (animeObject != null) {
                 doOnUI {
-                    Crashlytics.setString("screen", "Anime: " + animeObject.name)
-                    Answers.getInstance().logContentView(ContentViewEvent().putContentName(animeObject.name).putContentType(animeObject.type).putContentId(animeObject.aid))
                     chapters = animeObject.chapters ?: mutableListOf()
                     genres = animeObject.genres ?: mutableListOf()
                     if (PrefsUtil.isFamilyFriendly && genres.map { it.toLowerCase() }.contains("ecchi")) {
@@ -190,7 +184,6 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
                     .setType("text/plain")
                     .putExtra(Intent.EXTRA_TEXT, favoriteObject?.name + "\n" + favoriteObject?.link), "Compartir"))
-            Answers.getInstance().logShare(ShareEvent().putContentName(favoriteObject?.name).putContentId(favoriteObject?.aid))
             AchievementManager.onShare()
         } catch (e: ActivityNotFoundException) {
             Toaster.toast("No se encontraron aplicaciones para enviar")

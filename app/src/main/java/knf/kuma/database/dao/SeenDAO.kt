@@ -17,11 +17,11 @@ interface SeenDAO {
     @get:Query("SELECT count(*) FROM seenobject")
     val count: Int
 
-    @Query("SELECT * FROM seenobject WHERE eid = :eid LIMIT 1")
-    fun chapterSeen(eid: String): LiveData<SeenObject>
+    @Query("SELECT * FROM seenobject WHERE aid = :aid AND number = :number LIMIT 1")
+    fun chapterSeen(aid: String, number: String): LiveData<SeenObject>
 
-    @Query("SELECT count(*) FROM seenobject WHERE eid = :eid")
-    fun chapterIsSeen(eid: String): Boolean
+    @Query("SELECT count(*) FROM seenobject WHERE aid = :aid AND number = :number")
+    fun chapterIsSeen(aid: String, number: String): Boolean
 
     @Query("SELECT * FROM seenobject WHERE eid IN (:eids) ORDER BY eid+0 DESC LIMIT 1")
     fun getLast(eids: MutableList<String>): SeenObject?
