@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="152" version="4.3.36">
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="151" version="4.3.35">
         <change type="fix">Error al detectar capitulos descargados</change>
     </release>

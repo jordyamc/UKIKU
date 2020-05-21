@@ -105,7 +105,7 @@ object PatternUtil {
     }
 
     fun getEidFromFile(file: String): String {
-        val matcher = Pattern.compile("^(\\d+)\\$.*$").matcher(file)
+        val matcher = Pattern.compile("^(-?\\d+)\\$.*$").matcher(file)
         matcher.find()
         return matcher.group(1)
     }

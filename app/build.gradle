@@ -10,8 +10,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 151
-        versionName "4.3.35"
+        versionCode 152
+        versionName "4.3.36"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -174,6 +174,7 @@ dependencies {
     implementation 'androidx.work:work-runtime-ktx:2.3.4'
     implementation 'androidx.room:room-runtime:2.2.5'
     implementation 'com.google.firebase:firebase-ads:19.1.0'
+    implementation 'androidx.room:room-ktx:2.2.5'
     kapt 'androidx.room:room-compiler:2.2.5'
     androidTestImplementation 'androidx.room:room-testing:2.2.5'
     implementation 'com.google.dagger:dagger-android-support:2.24'

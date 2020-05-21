@@ -41,6 +41,12 @@ interface FavsDAO {
     @Query("SELECT count(*) FROM favoriteobject WHERE `key` = :key")
     fun isFav(key: Int): Boolean
 
+    @Query("SELECT count(*) FROM favoriteobject WHERE aid = :aid")
+    fun isFavAid(aid: String): Boolean
+
+    @Query("SELECT count(*) FROM favoriteobject WHERE name = :name")
+    fun isFavName(name: String): Boolean
+
     @Query("SELECT count(*) FROM favoriteobject WHERE `key` = :key")
     fun isFavLive(key: Int): LiveData<Boolean>
 
