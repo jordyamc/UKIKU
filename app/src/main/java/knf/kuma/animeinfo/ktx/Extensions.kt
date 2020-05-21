@@ -11,3 +11,9 @@ val AnimeObject.WebInfo.AnimeChapter.fileName: String
         eid + "$" + PatternUtil.getFileName(link)
     else
         eid + "$" + aid + "-" + number.substring(number.lastIndexOf(" ") + 1) + ".mp4"
+
+val AnimeObject.WebInfo.AnimeChapter.filePath: String
+    get() = if (PrefsUtil.saveWithName)
+        "$" + PatternUtil.getFileName(link)
+    else
+        "$" + aid + "-" + number.substring(number.lastIndexOf(" ") + 1) + ".mp4"

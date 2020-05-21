@@ -33,6 +33,7 @@ import knf.kuma.R
 import knf.kuma.animeinfo.fragments.ChaptersFragment
 import knf.kuma.animeinfo.ktx.epTitle
 import knf.kuma.animeinfo.ktx.fileName
+import knf.kuma.animeinfo.ktx.filePath
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
 import knf.kuma.commons.*
@@ -94,7 +95,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         if (context == null) return
         val chapter = chapters[position]
         val downloadObject = AtomicReference(downloadsDAO.getByEid(chapter.eid))
-        val dFile = FileAccessHelper.getFile(chapter.fileName)
+        val dFile = FileAccessHelper.findFile(chapter.filePath)
         if (selection.contains(position))
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight()))
         else
@@ -194,7 +195,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 downloadObject.get()?.state = -8
                                 chapter.isDownloaded = false
                                 holder.setDownloaded(false, false)
-                                FileAccessHelper.delete(chapter.fileName, false)
+                                FileAccessHelper.deletePath(chapter.filePath, false)
                                 DownloadManager.cancel(chapter.eid)
                                 QueueManager.remove(chapter.eid)
                             }

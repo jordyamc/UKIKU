@@ -39,6 +39,7 @@ import knf.kuma.ads.AdsUtils;
 import knf.kuma.animeinfo.AnimeInfo;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PrefsUtil;
+import knf.kuma.database.CacheDB;
 import pl.droidsonroids.jspoon.ElementConverter;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
@@ -269,7 +270,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         public Day emisionDay;
         @Selector("nav.Nvgnrs a[href]")
         public List<String> genres = new ArrayList<>();
-        @Selector("ul.ListAnmRel li:has(a[href~=^\\/[a-z]+\\/\\d+\\/.+$])")
+        @Selector("ul.ListAnmRel li:has(a[href~=^\\/[a-z]+\\/.+$])")
         public List<AnimeRelated> related = new ArrayList<>();
         @Ignore
         @Selector("script:not([src])")
@@ -280,12 +281,28 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         public static class AnimeRelated {
             @Selector(value = "a", attr = "href")
             public String link;
-            @Selector(value = "a", attr = "href", format = "/(\\d+)/")
+            @Selector(value = "a", converter = AidGetter.class)
             public String aid;
             @Selector("a")
             public String name;
             @Selector(value = "li", format = "\\((.*)\\)")
             public String relation;
+
+            public static class AidGetter implements ElementConverter<String> {
+                @Keep
+                public AidGetter() {
+
+                }
+
+                @Override
+                public String convert(@NotNull Element node, @NotNull Selector selector) {
+                    String aid = CacheDB.Companion.getINSTANCE().animeDAO().findAidByName(node.text());
+                    if (aid != null)
+                        return aid;
+                    else
+                        return "null";
+                }
+            }
         }
 
         @Entity

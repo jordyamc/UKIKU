@@ -106,7 +106,6 @@ object FileAccessHelper {
                 File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }!![0]
             }
         } catch (e: Exception) {
-            e.printStackTrace()
             File(Environment.getDataDirectory(), "test.txt")
         }
 

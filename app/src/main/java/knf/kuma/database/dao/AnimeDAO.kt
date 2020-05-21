@@ -49,6 +49,12 @@ interface AnimeDAO {
     @Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY RANDOM()")
     fun animesDirWithIDRandomNL(aids: List<String>): LiveData<List<DirObject>>
 
+    @Query("SELECT aid FROM animeobject WHERE link = :link")
+    fun findAid(link: String): String?
+
+    @Query("SELECT aid FROM animeobject WHERE name = :name")
+    fun findAidByName(name: String): String?
+
     @get:Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE type LIKE 'Anime' ORDER BY `key` ASC")
     val animeDirID: DataSource.Factory<Int, DirObject>
 
@@ -180,6 +186,9 @@ interface AnimeDAO {
 
     @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE sid = :sid")
     fun getBySid(sid: String): SearchObject?
+
+    @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE name = :name")
+    fun getObjByName(name: String): SearchObject?
 
     @Query("SELECT `key`,name,link,aid FROM AnimeObject WHERE link = :link")
     fun getByLink(link: String): SearchObject?
