@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.browser.customtabs.CustomTabsIntent
@@ -29,6 +30,9 @@ import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
 import knf.kuma.queue.QueueManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import xdroid.toaster.Toaster
@@ -379,10 +383,26 @@ class ServersFactory {
                 serversInterface: ServersInterface
         ) {
             if (!isRunning())
-                if (isStream || MultipleDownloadManager.isSpaceAvailable(1))
-                    INSTANCE = ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
-                else
-                    serversInterface.getView()?.showSnackbar("Sin espacio suficiente")
+                GlobalScope.launch(Dispatchers.Main) {
+                    INSTANCE = if (isStream)
+                        ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
+                    else {
+                        if (!FileAccessHelper.isStoragePermissionEnabledAsync()) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                                FileAccessHelper.openTreeChooser(context)
+                            else
+                                Toaster.toastLong("¡Se necesita permiso de almacenamiento!")
+                            serversInterface.onFinish(false, false)
+                            return@launch
+                        }
+                        if (!MultipleDownloadManager.isSpaceAvailable(1)) {
+                            serversInterface.getView()?.showSnackbar("Sin espacio suficiente")
+                            serversInterface.onFinish(false, false)
+                            return@launch
+                        }
+                        ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
+                    }
+                }
             else {
                 serversInterface.onFinish(false, false)
                 Toaster.toast("Solo una petición a la vez")
@@ -397,10 +417,26 @@ class ServersFactory {
                 serversInterface: ServersInterface
         ) {
             if (!isRunning())
-                if (isStream || MultipleDownloadManager.isSpaceAvailable(1))
-                    INSTANCE = ServersFactory(context, url, downloadObject, isStream, serversInterface).also { doAsync { it.start() } }
-                else
-                    serversInterface.getView()?.showSnackbar("Sin espacio suficiente")
+                GlobalScope.launch(Dispatchers.Main) {
+                    INSTANCE = if (isStream)
+                        ServersFactory(context, url, downloadObject, isStream, serversInterface).also { doAsync { it.start() } }
+                    else {
+                        if (!FileAccessHelper.isStoragePermissionEnabledAsync()) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                                FileAccessHelper.openTreeChooser(context)
+                            else
+                                Toaster.toastLong("¡Se necesita permiso de almacenamiento!")
+                            serversInterface.onFinish(false, false)
+                            return@launch
+                        }
+                        if (!MultipleDownloadManager.isSpaceAvailable(1)) {
+                            serversInterface.getView()?.showSnackbar("Sin espacio suficiente")
+                            serversInterface.onFinish(false, false)
+                            return@launch
+                        }
+                        ServersFactory(context, url, downloadObject, isStream, serversInterface).also { doAsync { it.start() } }
+                    }
+                }
             else {
                 serversInterface.onFinish(false, false)
                 Toaster.toast("Solo una petición a la vez")

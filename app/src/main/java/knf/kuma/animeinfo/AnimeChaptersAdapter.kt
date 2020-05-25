@@ -168,7 +168,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             recordsDAO.add(RecordObject.fromChapter(chapter))
                             updateSeeing(chapter.number)
                             holder.setSeen(true)
-                            ServersFactory.startPlay(context, chapter.epTitle, chapter.fileName)
+                            ServersFactory.startPlay(context, chapter.epTitle, chapter.filePath)
                             syncData {
                                 history()
                                 seen()
@@ -323,7 +323,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             }
         holder.cardView.setOnClickListener {
             if (chaptersDAO.chapterIsSeen(chapter.aid, chapter.number)) {
-                chaptersDAO.deleteChapter(SeenObject.fromChapter(chapter))
+                chaptersDAO.deleteChapter(chapter.aid, chapter.number)
                 holder.chapter.setTextColor(ContextCompat.getColor(context, R.color.textPrimary))
             } else {
                 chaptersDAO.addChapter(SeenObject.fromChapter(chapter))

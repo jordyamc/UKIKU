@@ -4,7 +4,7 @@ import android.net.Uri
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.common.images.WebImage
-import knf.kuma.animeinfo.ktx.fileName
+import knf.kuma.animeinfo.ktx.filePath
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.SelfServer
 import knf.kuma.pojos.AnimeObject
@@ -27,7 +27,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 addImage(WebImage(Uri.parse(if (chapter.img.isNullOrBlank()) "https://animeflv.net/uploads/animes/thumbs/${chapter.aid}.jpg" else chapter.img)))
             }
             val fUrl = when {
-                url.isNullOrBlank() -> SelfServer.start(chapter.fileName, true)
+                url.isNullOrBlank() -> SelfServer.start(chapter.filePath, true)
                 PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
                 else -> url
             }
@@ -47,7 +47,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 addImage(WebImage(Uri.parse("https://animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
             }
             val fUrl = when {
-                url.isNullOrBlank() -> SelfServer.start(recent.fileName, true)
+                url.isNullOrBlank() -> SelfServer.start(recent.filePath, true)
                 PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
                 else -> url
             }
@@ -66,7 +66,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 putString(MediaMetadata.KEY_SUBTITLE, "Episodio ${fileDownObj.chapter}")
                 addImage(WebImage(Uri.parse(fileDownObj.chapPreviewLink)))
             }
-            val url = SelfServer.start(fileDownObj.fileName, true)
+            val url = SelfServer.start(fileDownObj.fileName.substring(fileDownObj.fileName.indexOf("$")), true)
             val mediaInfo = MediaInfo.Builder(url).apply {
                 setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 setContentType("video/mp4")

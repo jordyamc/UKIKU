@@ -82,7 +82,7 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
                 chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject))
                 holder.seenOverlay.setSeen(true, true)
             } else {
-                chaptersDAO.deleteChapter(SeenObject.fromDownloaded(chapObject))
+                chaptersDAO.deleteChapter(chapObject.aid, chapterNum)
                 holder.seenOverlay.setSeen(false, true)
             }
             syncData { seen() }

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="153" version="4.3.37">
+        <change type="change">Barra de estado con aviso para creacion de directorio</change>
+        <change type="change">Avisos mas claros cuando falta permiso de almacenamiento</change>
+        <change type="fix">Error al reproducir animes descargados en reproductor interno</change>
+        <change type="fix">Error al marcar como visto desde explorador</change>
+        <change type="fix">Error al desmarcar como visto en algunas secciones</change>
+    </release>
     <release code="152" version="4.3.36">
         <change type="fix">Errores generales</change>
     </release>

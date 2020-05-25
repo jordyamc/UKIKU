@@ -2,6 +2,7 @@ package knf.kuma.download
 
 import android.Manifest
 import android.annotation.TargetApi
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -21,6 +22,8 @@ import knf.kuma.explorer.creator.Creator
 import knf.kuma.explorer.creator.DocumentFileCreator
 import knf.kuma.explorer.creator.SimpleFileCreator
 import knf.kuma.explorer.creator.SubFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.*
@@ -76,9 +79,19 @@ object FileAccessHelper {
 
     fun isStoragePermissionEnabled(): Boolean {
         return when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && treeUri != null -> true
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && treeUri != null && DocumentFile.fromTreeUri(App.context, treeUri!!)?.canWrite() == true -> true
             ContextCompat.checkSelfPermission(App.context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> true
             else -> false
+        }
+    }
+
+    suspend fun isStoragePermissionEnabledAsync(): Boolean {
+        return withContext(Dispatchers.IO) {
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && treeUri != null && DocumentFile.fromTreeUri(App.context, treeUri!!)?.canWrite() == true -> true
+                ContextCompat.checkSelfPermission(App.context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> true
+                else -> false
+            }
         }
     }
 
@@ -116,10 +129,14 @@ object FileAccessHelper {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
             Uri.fromFile(
                     try {
-                        if (PrefsUtil.downloadType == "0") {
-                            File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        if (file_name.startsWith("$")) {
+                            findFile(file_name)
                         } else {
-                            File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                            if (PrefsUtil.downloadType == "0") {
+                                File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                            } else {
+                                File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                            }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -536,7 +553,7 @@ object FileAccessHelper {
     fun getDataUri(file_name: String): Uri? {
         try {
             return if (PrefsUtil.downloadType == "0") {
-                FileProvider.getUriForFile(App.context, "${getPackage()}.fileprovider", File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
+                FileProvider.getUriForFile(App.context, "${getPackage()}.fileprovider", if (file_name.startsWith("$")) findFile(file_name) else File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
             } else {
                 treeUri?.let {
                     val documentFile = DocumentFile.fromTreeUri(App.context, it)
@@ -592,6 +609,16 @@ object FileAccessHelper {
         try {
             fragment.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
             Log.e("FileAccess", "On open drocument tree")
+        } catch (e: Exception) {
+            Toaster.toast("Error al buscar SD")
+        }
+
+    }
+
+    fun openTreeChooser(context: Context) {
+        try {
+            context.startActivity(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
+            Toaster.toastLong("Por favor selecciona la raiz del almacenamiento")
         } catch (e: Exception) {
             Toaster.toast("Error al buscar SD")
         }

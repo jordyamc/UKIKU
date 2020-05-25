@@ -67,8 +67,10 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
         hideUI()
         player.resizeMode = resizeMode
         player.requestFocus()
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             currentPosition = savedInstanceState.getLong("position", C.TIME_UNSET)
+            listPosition = savedInstanceState.getInt("listPosition", 0)
+        }
         checkPlaylist(intent)
         initPlayer(intent)
     }
@@ -76,6 +78,8 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong("position", currentPosition)
+        if (listPosition != 0)
+            outState.putInt("listPosition", listPosition)
     }
 
     private fun hideUI() {
@@ -90,8 +94,7 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
     private fun initPlayer(intent: Intent) {
         if (exoPlayer == null) {
             video_title.text = intent.getStringExtra("title")
-            val bandwidthMeter = DefaultBandwidthMeter()
-            val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter)
+            val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
             val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
             val source: MediaSource
             if (intent.getBooleanExtra("isPlayList", false)) {
@@ -104,13 +107,12 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
                 source = ConcatenatingMediaSource(*sourceList.toTypedArray())
             } else
                 source = ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this, BypassUtil.userAgent, null)).createMediaSource(intent.data)
-            exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
+            exoPlayer = ExoPlayerFactory.newSimpleInstance(this, DefaultRenderersFactory(this), trackSelector, DefaultLoadControl(), null, DefaultBandwidthMeter.Builder(this).build())
             player.player = exoPlayer
             exoPlayer?.addListener(this)
-
             val canResume = currentPosition != C.TIME_UNSET
             if (canResume)
-                exoPlayer?.seekTo(currentPosition)
+                exoPlayer?.seekTo(listPosition, currentPosition)
             exoPlayer?.prepare(source, !canResume, false)
             exoPlayer?.playWhenReady = true
 

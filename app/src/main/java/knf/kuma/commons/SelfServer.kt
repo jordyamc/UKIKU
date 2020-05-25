@@ -153,7 +153,7 @@ class SelfServer : Service() {
         private fun serveFile(header: Map<String, String>, file_name: String): Response? {
             var res: Response?
             val mime = "video/mp4"
-            val file = FileAccessHelper.getFile(file_name)
+            val file = FileAccessHelper.findFile(file_name)
             try {
                 // Calculate etag
                 val etag = Integer.toHexString((file.absolutePath +

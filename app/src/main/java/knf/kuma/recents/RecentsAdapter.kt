@@ -187,7 +187,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                     chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
                     holder.animeOverlay.setSeen(seen = true, animate = true)
                 } else {
-                    chaptersDAO.deleteChapter(SeenObject.fromRecent(recentObject))
+                    chaptersDAO.deleteChapter(recentObject.aid, recentObject.chapter)
                     holder.animeOverlay.setSeen(seen = false, animate = true)
                 }
                 syncData { seen() }
@@ -235,7 +235,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                         seen()
                     }
                     holder.setSeen(true)
-                    ServersFactory.startPlay(context, recentObject.epTitle, recentObject.fileName)
+                    ServersFactory.startPlay(context, recentObject.epTitle, recentObject.filePath)
                 } else {
                     toast("Aun no se está descargando")
                 }

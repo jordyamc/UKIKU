@@ -11,7 +11,7 @@ import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor
 import knf.kuma.animeinfo.AnimeChaptersAdapter
 import knf.kuma.animeinfo.BottomActionsDialog
-import knf.kuma.animeinfo.ktx.fileName
+import knf.kuma.animeinfo.ktx.filePath
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.CenterLayoutManager
@@ -82,7 +82,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 val dao = CacheDB.INSTANCE.seenDAO()
                                                 for (i12 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
-                                                    dao.deleteChapter(SeenObject.fromChapter(chapters[i12]))
+                                                    dao.deleteChapter(chapters[i12].aid, chapters[i12].number)
                                                 }
                                                 syncData { seen() }
                                                 val seeingDAO = CacheDB.INSTANCE.seeingDAO()
@@ -106,7 +106,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.getFile(chapter.fileName)
+                                                    val file = FileAccessHelper.findFile(chapter.filePath)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
                                                     if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
@@ -126,7 +126,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.getFile(chapter.fileName)
+                                                    val file = FileAccessHelper.findFile(chapter.filePath)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
                                                     if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
@@ -146,7 +146,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.getFile(chapter.fileName)
+                                                    val file = FileAccessHelper.findFile(chapter.filePath)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
                                                     if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)

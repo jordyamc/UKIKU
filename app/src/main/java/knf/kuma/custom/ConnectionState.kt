@@ -8,14 +8,15 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import knf.kuma.App
 import knf.kuma.Diagnostic
 import knf.kuma.R
-import knf.kuma.commons.BypassUtil
-import knf.kuma.commons.Network
-import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.*
+import knf.kuma.database.CacheDB
+import knf.kuma.directory.DirectoryService
 import kotlinx.android.synthetic.main.lay_status_bar.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
@@ -73,8 +74,12 @@ class ConnectionState : LinearLayout {
         }) {
             -2 -> networkTimeoutState(owner, onShowDialog)
             200 -> {
-                okState()
-                dismiss()
+                if (!PrefsUtil.isDirectoryFinished)
+                    directoryListenState()
+                else {
+                    okState()
+                    dismiss()
+                }
             }
             403 -> {
                 errorBlockedState(onShowDialog)
@@ -247,6 +252,43 @@ class ConnectionState : LinearLayout {
         message.textColor = Color.WHITE
         container.setOnClickListener(null)
         container.setOnLongClickListener(null)
+    }
+
+    private suspend fun directoryListenState() {
+        (context.findActivity() as? AppCompatActivity)?.let { owner ->
+            container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
+            progress.visibility = View.GONE
+            icon.setImageResource(R.drawable.ic_warning)
+            icon.visibility = View.VISIBLE
+            message.textColor = Color.WHITE
+            container.setOnClickListener(null)
+            container.setOnLongClickListener(null)
+            var maxPages = "3200~"
+            CacheDB.INSTANCE.animeDAO().countLive.distinct.observe(owner, Observer {
+                message.text = "Creando directorio: $it/$maxPages"
+            })
+            DirectoryService.getLiveStatus().observe(owner, Observer {
+                if (it == DirectoryService.STATE_FINISHED) {
+                    owner.lifecycleScope.launch(Dispatchers.Main) {
+                        okState()
+                        dismiss()
+                    }
+                }
+            })
+            maxPages = withContext(Dispatchers.IO) {
+                noCrashLet("3200~") {
+                    val main = jsoupCookies("https://animeflv.net/browse").get()
+                    val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
+                    val last = jsoupCookies("https://animeflv.net/browse?page=$lastPage").get()
+                    ((24 * (lastPage - 1)) + last.select("article").size).toString()
+                }
+            }
+        } ?: {
+            okState()
+            GlobalScope.launch(Dispatchers.Main) {
+                dismiss()
+            }
+        }()
     }
 
     private fun okState() {

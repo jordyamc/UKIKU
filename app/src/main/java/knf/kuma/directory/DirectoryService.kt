@@ -167,7 +167,7 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     private fun doFullSearch(jspoon: Jspoon, animeDAO: AnimeDAO) {
-        page = 0
+        page = 1
         var finished = false
         val strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet(keyFailedPages, LinkedHashSet())
         while (!finished) {

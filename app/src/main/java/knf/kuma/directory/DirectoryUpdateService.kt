@@ -72,7 +72,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     }
 
     private fun doFullSearch(jspoon: Jspoon, animeDAO: AnimeDAO) {
-        page = 0
+        page = 1
         var finished = false
         while (!finished) {
             if (!Network.isConnected) {

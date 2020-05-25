@@ -10,8 +10,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 152
-        versionName "4.3.36"
+        versionCode 153
+        versionName "4.3.37"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -166,6 +166,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0-alpha02'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     api 'com.google.guava:guava:27.0.1-android'
     implementation 'androidx.annotation:annotation:1.1.0'

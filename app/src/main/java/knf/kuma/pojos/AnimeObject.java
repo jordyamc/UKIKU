@@ -368,7 +368,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.chapterType = ChapterType.NEW;
                 this.aid = info.getAid();
                 this.number = "Episodio " + num;
-                this.link = "https://animeflv.net/ver/" + sid + "/" + info.getSid() + "-" + num;
+                this.link = "https://animeflv.net/ver/" + info.getSid() + "-" + num;
                 this.eid = String.valueOf((aid + number).hashCode());
                 this.img = "https://cdn.animeflv.net/screenshots/" + info.getAid() + "/" + num + "/th_3.jpg";
                 this.key = (aid + number).hashCode();

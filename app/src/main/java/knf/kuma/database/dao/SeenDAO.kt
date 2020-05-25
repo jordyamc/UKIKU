@@ -41,8 +41,8 @@ interface SeenDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAll(list: List<SeenObject>)
 
-    @Delete
-    fun deleteChapter(chapter: SeenObject)
+    @Query("DELETE FROM seenobject WHERE aid = :aid AND number = :number")
+    fun deleteChapter(aid: String, number: String)
 
     @Query("DELETE FROM seenobject")
     fun clear()
