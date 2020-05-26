@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import knf.kuma.App
 import knf.kuma.BottomFragment
 import knf.kuma.R
@@ -24,6 +25,9 @@ import knf.kuma.download.FileAccessHelper
 import knf.kuma.download.MultipleDownloadManager
 import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.pojos.AnimeObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
 import java.util.*
 import java.util.regex.Pattern
@@ -36,21 +40,28 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activity?.let {
-            ViewModelProvider(it).get(AnimeViewModel::class.java).liveData.observe(viewLifecycleOwner, Observer { animeObject ->
+        activity?.let { activity ->
+            ViewModelProvider(activity).get(AnimeViewModel::class.java).liveData.observe(viewLifecycleOwner, Observer { animeObject ->
                 if (animeObject != null) {
                     val chapters = animeObject.chapters
                     chapters?.let {
-                        if (checkIntegrity(chapters)) {
-                            if (PrefsUtil.isChapsAsc)
-                                chapters.reverse()
-                            holder?.setAdapter(this@ChaptersFragment, chapters)
-                            holder?.goToChapter()
-                        } else if (Network.isConnected) {
-                            DirUpdateWork.runNow()
-                            "Integridad de directorio comprometida, actualizando directorio...".toast()
+                        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                            when {
+                                checkIntegrity(chapters) -> {
+                                    withContext(Dispatchers.IO) {
+                                        it.forEach { it.fileWrapper() }
+                                    }
+                                    if (PrefsUtil.isChapsAsc)
+                                        chapters.reverse()
+                                    holder?.setAdapter(this@ChaptersFragment, chapters)
+                                    holder?.goToChapter()
+                                }
+                                Network.isConnected -> {
+                                    DirUpdateWork.runNow()
+                                    "Integridad de directorio comprometida, actualizando directorio...".toast()
+                                }
+                            }
                         }
-                        null
                     }
                 }
             })

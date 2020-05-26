@@ -67,7 +67,7 @@ object FileAccessHelper {
 
     val externalRoot: File? get() = FileUtil.getFullPathFromTreeUri(treeUri, App.context)?.let { File(it) }
 
-    private val treeUri: Uri?
+    val treeUri: Uri?
         get() {
             return try {
                 Uri.parse(PreferenceManager.getDefaultSharedPreferences(App.context).getString("tree_uri", null))
@@ -119,9 +119,25 @@ object FileAccessHelper {
                 File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }!![0]
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             File(Environment.getDataDirectory(), "test.txt")
         }
 
+    }
+
+    fun fileFindExist(file_name: String?): Boolean {
+        return try {
+            if (file_name.isNullOrEmpty()) throw IllegalStateException("Name can't be null!")
+            if (PrefsUtil.downloadType == "0") {
+                !File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }.isNullOrEmpty()
+            } else {
+                !find(DocumentFile.fromTreeUri(App.context, treeUri!!), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name), false)?.listFiles()?.mapNotNull { it.name?.contains(file_name) }.isNullOrEmpty()
+
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     fun getFileUri(file_name: String?): Uri? {

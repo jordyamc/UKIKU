@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="154" version="4.3.38">
+        <change type="fix">Error al detectar capitulos descargados en Android 10</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="153" version="4.3.37">
         <change type="change">Barra de estado con aviso para creacion de directorio</change>
         <change type="change">Avisos mas claros cuando falta permiso de almacenamiento</change>

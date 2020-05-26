@@ -6,15 +6,14 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import knf.kuma.commons.FileWrapper;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDBWrap;
 import knf.kuma.database.dao.AnimeDAO;
-import knf.kuma.download.FileAccessHelper;
 import knf.kuma.search.SearchObject;
 import pl.droidsonroids.jspoon.annotation.Selector;
 
@@ -48,7 +47,7 @@ public class RecentObject {
     @Ignore
     public boolean isDownloading;
     @Ignore
-    public boolean isChapterDownloaded;
+    public FileWrapper fileWrapper;
     @Ignore
     public int downloadState;
     @Ignore
@@ -124,9 +123,9 @@ public class RecentObject {
         this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");
         this.isNew = chapter.matches("^.* [10]$");
         this.anime = PatternUtil.INSTANCE.getAnimeUrl(this.url, this.aid);
-        File file = FileAccessHelper.INSTANCE.findFile(getFilePath());
+        //File file = FileAccessHelper.INSTANCE.findFile(getFilePath());
         DownloadObject downloadObject = CacheDBWrap.INSTANCE.downloadsDAO().getByEid(eid);
-        this.isChapterDownloaded = file.exists();
+        this.fileWrapper = FileWrapper.Companion.create(getFilePath());
         this.isDownloading = downloadObject != null && downloadObject.state == DownloadObject.DOWNLOADING;
         if (downloadObject != null) {
             this.downloadState = downloadObject.state;

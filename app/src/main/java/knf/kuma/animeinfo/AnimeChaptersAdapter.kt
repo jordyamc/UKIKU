@@ -45,7 +45,6 @@ import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
@@ -101,9 +100,8 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         else
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardview_background))
         holder.setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.eid), fragment, Observer {
-            holder.setQueue(it, isPlayAvailable(dFile, downloadObject.get()))
+            holder.setQueue(it, isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
         })
-        chapter.isDownloaded = canPlay(dFile)
         if (processingPosition == holder.adapterPosition) {
             holder.progressBar.isIndeterminate = true
             holder.progressBarRoot.visibility = View.VISIBLE
@@ -114,9 +112,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             val casting = CastUtil.get().casting.value
             val isCasting = casting != null && casting == chapter.eid
             if (!isCasting)
-                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(dFile, downloadObject1))
+                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject1))
             else
-                holder.setDownloaded(isPlayAvailable(dFile, downloadObject1), true)
+                holder.setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject1), true)
             downloadObject.set(downloadObject1)
         })
         if (!Network.isConnected || chapter.img == null)
@@ -133,9 +131,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             })
         holder.setCastingObserver(fragment, Observer { s ->
             if (chapter.eid != s)
-                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(dFile, downloadObject.get()))
+                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
             else
-                holder.setDownloaded(isPlayAvailable(dFile, downloadObject.get()), chapter.eid == s)
+                holder.setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject.get()), chapter.eid == s)
         })
         holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.aid, chapter.number)) EAHelper.getThemeColor() else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
@@ -147,9 +145,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                 val menu = PopupMenu(context, view)
                 if (CastUtil.get().casting.value == chapter.eid) {
                     menu.inflate(R.menu.chapter_casting_menu)
-                    if (canPlay(dFile))
+                    if (canPlay(chapter.fileWrapper()))
                         menu.menu.findItem(R.id.download).isVisible = false
-                } else if (isPlayAvailable(dFile, downloadObject.get())) {
+                } else if (isPlayAvailable(chapter.fileWrapper(), downloadObject.get())) {
                     menu.inflate(R.menu.chapter_downloaded_menu)
                     if (!CastUtil.get().connected())
                         menu.menu.findItem(R.id.cast).isVisible = false
@@ -163,12 +161,12 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                     menu.menu.findItem(R.id.import_file).isVisible = false
                 menu.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
-                        R.id.play -> if (canPlay(dFile)) {
+                        R.id.play -> if (canPlay(chapter.fileWrapper())) {
                             chaptersDAO.addChapter(SeenObject.fromChapter(chapter))
                             recordsDAO.add(RecordObject.fromChapter(chapter))
                             updateSeeing(chapter.number)
                             holder.setSeen(true)
-                            ServersFactory.startPlay(context, chapter.epTitle, chapter.filePath)
+                            ServersFactory.startPlay(context, chapter.epTitle, chapter.fileWrapper().name())
                             syncData {
                                 history()
                                 seen()
@@ -176,7 +174,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         } else {
                             Toaster.toast("Aun no se está descargando")
                         }
-                        R.id.cast -> if (canPlay(dFile)) {
+                        R.id.cast -> if (canPlay(chapter.fileWrapper())) {
                             //CastUtil.get().play(fragment.activity as Activity, recyclerView, chapter.eid, SelfServer.start(chapter.fileName, true), chapter.name, chapter.number, if (chapter.img == null) chapter.aid else chapter.img, chapter.img == null)
                             CastUtil.get().play(recyclerView, CastMedia.create(chapter))
                             chaptersDAO.addChapter(SeenObject.fromChapter(chapter))
@@ -193,7 +191,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             message(text = "¿Eliminar el ${chapter.number.toLowerCase()}?")
                             positiveButton(text = "CONFIRMAR") {
                                 downloadObject.get()?.state = -8
-                                chapter.isDownloaded = false
+                                chapter.fileWrapper().exist = false
                                 holder.setDownloaded(false, false)
                                 FileAccessHelper.deletePath(chapter.filePath, false)
                                 DownloadManager.cancel(chapter.eid)
@@ -207,7 +205,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 override fun onFinish(started: Boolean, success: Boolean) {
                                     if (started) {
                                         holder.setQueue(CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid), true)
-                                        chapter.isDownloaded = true
+                                        chapter.fileWrapper().exist = true
                                     }
                                     setOrientation(false)
                                 }
@@ -269,7 +267,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 }
                             })
                         }
-                        R.id.queue -> if (isPlayAvailable(dFile, downloadObject.get())) {
+                        R.id.queue -> if (isPlayAvailable(chapter.fileWrapper(), downloadObject.get())) {
                             QueueManager.add(Uri.fromFile(dFile), true, chapter)
                             holder.setQueue(true, true)
                         } else {
@@ -361,12 +359,12 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         }
     }
 
-    private fun isPlayAvailable(file: File?, downloadObject: DownloadObject?): Boolean {
-        return file != null && file.exists() || downloadObject != null && downloadObject.isDownloading
+    private fun isPlayAvailable(fileWrapper: FileWrapper<*>, downloadObject: DownloadObject?): Boolean {
+        return fileWrapper.exist || downloadObject != null && downloadObject.isDownloading
     }
 
-    private fun canPlay(file: File?): Boolean {
-        return file != null && file.exists()
+    private fun canPlay(fileWrapper: FileWrapper<*>): Boolean {
+        return fileWrapper.exist
     }
 
     override fun getItemViewType(position: Int): Int {

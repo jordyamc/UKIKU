@@ -37,6 +37,8 @@ import java.util.regex.Pattern;
 
 import knf.kuma.ads.AdsUtils;
 import knf.kuma.animeinfo.AnimeInfo;
+import knf.kuma.animeinfo.ktx.ExtensionsKt;
+import knf.kuma.commons.FileWrapper;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
@@ -328,7 +330,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             public transient ChapterType chapterType;
             @SerializedName("chapter_ isDownloaded")
             @Ignore
-            public transient boolean isDownloaded = false;
+            private transient FileWrapper fileWrapper;
 
             public AnimeChapter() {
             }
@@ -340,6 +342,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.link = link;
                 this.name = name;
                 this.aid = aid;
+                this.fileWrapper = FileWrapper.Companion.create(ExtensionsKt.getFilePath(this));
             }
 
             @Ignore
@@ -360,6 +363,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 }
                 this.aid = aid;
                 this.key = (aid + number).hashCode();
+                this.fileWrapper = FileWrapper.Companion.create(ExtensionsKt.getFilePath(this));
             }
 
             @Ignore
@@ -372,6 +376,13 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.eid = String.valueOf((aid + number).hashCode());
                 this.img = "https://cdn.animeflv.net/screenshots/" + info.getAid() + "/" + num + "/th_3.jpg";
                 this.key = (aid + number).hashCode();
+                this.fileWrapper = FileWrapper.Companion.create(ExtensionsKt.getFilePath(this));
+            }
+
+            public FileWrapper fileWrapper() {
+                if (fileWrapper == null)
+                    this.fileWrapper = FileWrapper.Companion.create(ExtensionsKt.getFilePath(this));
+                return fileWrapper;
             }
 
             @Ignore
