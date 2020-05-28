@@ -6,12 +6,16 @@ import androidx.documentfile.provider.DocumentFile
 import knf.kuma.App
 import knf.kuma.download.FileAccessHelper
 import java.io.File
+import java.io.InputStream
 
 abstract class FileWrapper<T>(val path: String) {
 
     abstract var exist: Boolean
     abstract fun file(): File?
     abstract fun name(): String
+    abstract fun length(): Long?
+    abstract fun lastModified(): Long?
+    abstract fun inputStream(): InputStream?
     abstract fun generate(): T
     abstract fun reset()
 
@@ -32,6 +36,9 @@ class NormalFileWrapper(path: String) : FileWrapper<File?>(path) {
     override var exist = mFile?.exists() == true
     override fun file(): File? = mFile
     override fun name(): String = mFile?.name ?: path
+    override fun length(): Long? = mFile?.length()
+    override fun lastModified(): Long? = mFile?.lastModified()
+    override fun inputStream(): InputStream? = mFile?.inputStream()
     override fun generate(): File? = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(path)).listFiles { file -> file.name.contains(path) }?.let {
         if (it.isNotEmpty())
             it[0]
@@ -50,6 +57,9 @@ class NormalPreQFileWrapper(path: String) : FileWrapper<File?>(path) {
     override var exist = mFile?.exists() == true
     override fun file(): File? = mFile
     override fun name(): String = mFile?.name ?: path
+    override fun length(): Long? = mFile?.length()
+    override fun lastModified(): Long? = mFile?.lastModified()
+    override fun inputStream(): InputStream? = mFile?.inputStream()
     override fun generate(): File? = File(FileUtil.getFullPathFromTreeUri(FileAccessHelper.treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(path)).listFiles { file -> file.name.contains(path) }?.let {
         if (it.isNotEmpty())
             it[0]
@@ -68,6 +78,9 @@ class DocumentFileWrapper(path: String) : FileWrapper<DocumentFile?>(path) {
     override var exist = document?.exists() == true
     override fun file(): File = File(FileUtil.getFullPathFromTreeUri(document?.uri, App.context)!!)
     override fun name(): String = document?.name ?: path
+    override fun length(): Long? = document?.length()
+    override fun lastModified(): Long? = document?.lastModified()
+    override fun inputStream(): InputStream? = document?.let { App.context.contentResolver.openInputStream(it.uri) }
     override fun generate(): DocumentFile? = FileAccessHelper.treeUri?.let { uri ->
         FileAccessHelper.find(DocumentFile.fromTreeUri(App.context, uri), "UKIKU/downloads/" + PatternUtil.getNameFromFile(path), false)?.listFiles()?.let { list ->
             var file: DocumentFile? = null

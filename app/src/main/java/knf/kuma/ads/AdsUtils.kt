@@ -63,7 +63,7 @@ object AdsUtils {
                 "appodeal_fullscreen_percent" to 0.0,
                 "rewarded_percent" to 90.0,
                 "interstitial_percent" to 10.0,
-                "disqus_version" to "f6dea15c01ce4184f7c793c0abe86ffe",
+                "disqus_version" to "9e3da5ae8d7caf8389087c4c35a6ca1b",
                 "samsung_disable_foreground" to false)
         )
         fetchAndActivate().addOnSuccessListener {

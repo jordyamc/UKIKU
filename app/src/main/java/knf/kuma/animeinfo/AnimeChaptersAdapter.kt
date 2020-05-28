@@ -17,9 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -43,6 +41,7 @@ import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.*
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
+import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.util.*
@@ -94,29 +93,15 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         if (context == null) return
         val chapter = chapters[position]
         val downloadObject = AtomicReference(downloadsDAO.getByEid(chapter.eid))
-        val dFile = FileAccessHelper.findFile(chapter.filePath)
         if (selection.contains(position))
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight()))
         else
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardview_background))
-        holder.setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.eid), fragment, Observer {
-            holder.setQueue(it, isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
-        })
         if (processingPosition == holder.adapterPosition) {
             holder.progressBar.isIndeterminate = true
             holder.progressBarRoot.visibility = View.VISIBLE
         } else
             holder.progressBarRoot.visibility = View.GONE
-        holder.setDownloadObserver(downloadsDAO.getLiveByEid(chapter.eid).distinct, fragment, Observer { downloadObject1 ->
-            holder.setDownloadState(downloadObject1)
-            val casting = CastUtil.get().casting.value
-            val isCasting = casting != null && casting == chapter.eid
-            if (!isCasting)
-                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject1))
-            else
-                holder.setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject1), true)
-            downloadObject.set(downloadObject1)
-        })
         if (!Network.isConnected || chapter.img == null)
             holder.imageView.visibility = View.GONE
         if (chapter.img != null)
@@ -129,12 +114,35 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
 
                 }
             })
-        holder.setCastingObserver(fragment, Observer { s ->
-            if (chapter.eid != s)
-                holder.setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
-            else
-                holder.setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject.get()), chapter.eid == s)
-        })
+        holder.apply {
+            fileWrapperJob?.cancel()
+            fileWrapperJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
+                    chapter.fileWrapper()
+                }
+                if (!isActive)
+                    return@launch
+                setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.eid), fragment, Observer {
+                    setQueue(it, isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
+                })
+                setDownloadObserver(downloadsDAO.getLiveByEid(chapter.eid).distinct, fragment, Observer { downloadObject1 ->
+                    setDownloadState(downloadObject1)
+                    val casting = CastUtil.get().casting.value
+                    val isCasting = casting != null && casting == chapter.eid
+                    if (!isCasting)
+                        setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject1))
+                    else
+                        setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject1), true)
+                    downloadObject.set(downloadObject1)
+                })
+                setCastingObserver(fragment, Observer { s ->
+                    if (chapter.eid != s)
+                        setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
+                    else
+                        setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject.get()), chapter.eid == s)
+                })
+            }
+        }
         holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.aid, chapter.number)) EAHelper.getThemeColor() else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
         holder.chapter.text = chapter.number
@@ -268,7 +276,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             })
                         }
                         R.id.queue -> if (isPlayAvailable(chapter.fileWrapper(), downloadObject.get())) {
-                            QueueManager.add(Uri.fromFile(dFile), true, chapter)
+                            QueueManager.add(Uri.fromFile(chapter.fileWrapper().file()), true, chapter)
                             holder.setQueue(true, true)
                         } else {
                             setOrientation(true)
@@ -303,12 +311,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                         R.id.import_file -> (fragment as ChaptersFragment).onMove(chapter.fileName)
                         R.id.commentaries -> {
                             try {
-                                /*val tabIntent = CustomTabsIntent.Builder().apply {
-                                    setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                                    setShowTitle(true)
-                                    enableUrlBarHiding()
-                                }.build()
-                                tabIntent.launchUrl(context, Uri.parse(chapter.commentariesLink))*/
                                 CommentariesDialog.show(fragment, chapter.commentariesLink())
                             } catch (e: ActivityNotFoundException) {
                                 noCrash { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(chapter.commentariesLink()))) }
@@ -426,6 +428,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
         private var downloadObserver: Observer<DownloadObject>? = null
         private var castingObserver: Observer<String>? = null
         private var queueObserver: Observer<Boolean>? = null
+        var fileWrapperJob: Job? = null
 
         fun setDownloadObserver(downloadLiveData: LiveData<DownloadObject>, owner: LifecycleOwner?, observer: Observer<DownloadObject>) {
             if (owner == null) return

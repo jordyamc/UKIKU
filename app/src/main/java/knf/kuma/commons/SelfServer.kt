@@ -13,7 +13,6 @@ import fi.iki.elonen.NanoHTTPD
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.download.DownloadManager
-import knf.kuma.download.FileAccessHelper
 import knf.kuma.download.foreground
 import knf.kuma.download.service
 import okhttp3.OkHttpClient
@@ -153,11 +152,13 @@ class SelfServer : Service() {
         private fun serveFile(header: Map<String, String>, file_name: String): Response? {
             var res: Response?
             val mime = "video/mp4"
-            val file = FileAccessHelper.findFile(file_name)
+            val fileWrapper = FileWrapper.create(file_name)
             try {
+                if (!fileWrapper.exist)
+                    throw IllegalAccessException()
                 // Calculate etag
-                val etag = Integer.toHexString((file.absolutePath +
-                        file.lastModified() + "" + file.length()).hashCode())
+                val etag = Integer.toHexString((fileWrapper.file()?.absolutePath +
+                        fileWrapper.lastModified() + "" + fileWrapper.length()).hashCode())
 
                 // Support (simple) skipping:
                 var startFrom: Long = 0
@@ -179,7 +180,7 @@ class SelfServer : Service() {
                 }
 
                 // Change return code and add Content-Range header when skipping is requested
-                val fileLen = file.length()
+                val fileLen = fileWrapper.length() ?: 0
                 if (range != null && startFrom >= 0) {
                     if (startFrom >= fileLen) {
                         res = createResponse(Response.Status.RANGE_NOT_SATISFIABLE, MIME_PLAINTEXT, "")
@@ -195,7 +196,7 @@ class SelfServer : Service() {
                         }
 
                         val dataLen = newLen
-                        val fis = FileAccessHelper.getInputStream(file_name)
+                        val fis = fileWrapper.inputStream()
                         fis?.skip(startFrom)
 
                         res = createResponse(Response.Status.PARTIAL_CONTENT, mime, fis, dataLen)
@@ -208,7 +209,7 @@ class SelfServer : Service() {
                     if (etag == header["if-none-match"])
                         res = createResponse(Response.Status.NOT_MODIFIED, mime, "")
                     else {
-                        res = createResponse(Response.Status.OK, mime, FileAccessHelper.getInputStream(file_name), fileLen)
+                        res = createResponse(Response.Status.OK, mime, fileWrapper.inputStream(), fileLen)
                         res.addHeader("Content-Length", "" + fileLen)
                         res.addHeader("ETag", etag)
                     }

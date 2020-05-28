@@ -16,7 +16,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import knf.kuma.R
-import knf.kuma.commons.doOnUI
 import kotlinx.android.synthetic.main.lay_comments.view.*
 
 class CommentariesDialog : BottomSheetDialogFragment(), LifecycleObserver {
@@ -25,20 +24,18 @@ class CommentariesDialog : BottomSheetDialogFragment(), LifecycleObserver {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.lay_comments, container, false)
-        doOnUI {
-            rootView.webview.apply {
-                setInitialScale(1)
-                settings.useWideViewPort = true
-                settings.loadWithOverviewMode = true
-                settings.javaScriptEnabled = true
-                webViewClient = object : WebViewClient() {
-                    override fun onPageFinished(view: WebView?, url: String?) {
-                        super.onPageFinished(view, url)
-                        rootView.loading.visibility = View.GONE
-                    }
+        rootView.webview.apply {
+            setInitialScale(1)
+            settings.useWideViewPort = true
+            settings.loadWithOverviewMode = true
+            settings.javaScriptEnabled = true
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    rootView.loading.visibility = View.GONE
                 }
-                loadUrl(link)
             }
+            loadUrl(link)
         }
         return rootView
     }

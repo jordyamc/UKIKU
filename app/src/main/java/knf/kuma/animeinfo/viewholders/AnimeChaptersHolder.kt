@@ -11,12 +11,10 @@ import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor
 import knf.kuma.animeinfo.AnimeChaptersAdapter
 import knf.kuma.animeinfo.BottomActionsDialog
-import knf.kuma.animeinfo.ktx.filePath
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.CenterLayoutManager
 import knf.kuma.database.CacheDB
-import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
@@ -106,9 +104,8 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.findFile(chapter.filePath)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
-                                                    if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
+                                                    if (!chapter.fileWrapper().exist && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
                                                 }
                                                 callback.onImportMultiple(cChapters)
@@ -126,9 +123,8 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.findFile(chapter.filePath)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
-                                                    if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
+                                                    if (!chapter.fileWrapper().exist && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
@@ -146,12 +142,11 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val file = FileAccessHelper.findFile(chapter.filePath)
                                                     val downloadObject = downloadsDAO.getByEid(chapter.eid)
-                                                    if (!file.exists() && (downloadObject == null || !downloadObject.isDownloading))
+                                                    if (!chapter.fileWrapper().exist && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
-                                                    else if (file.exists() || downloadObject?.isDownloading == true)
-                                                        QueueManager.add(Uri.fromFile(file), true, chapter)
+                                                    else if (chapter.fileWrapper().exist || downloadObject?.isDownloading == true)
+                                                        QueueManager.add(Uri.fromFile(chapter.fileWrapper().file()), true, chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
                                                 snackbar.safeDismiss()

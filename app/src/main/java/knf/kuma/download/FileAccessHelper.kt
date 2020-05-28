@@ -115,9 +115,8 @@ object FileAccessHelper {
             if (file_name.isNullOrEmpty()) throw IllegalStateException("Name can't be null!")
             if (PrefsUtil.downloadType == "0") {
                 File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }!![0]
-            } else {
+            } else
                 File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)).listFiles { file -> file.name.contains(file_name) }!![0]
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             File(Environment.getDataDirectory(), "test.txt")

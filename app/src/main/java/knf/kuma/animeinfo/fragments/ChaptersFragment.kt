@@ -27,7 +27,6 @@ import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.pojos.AnimeObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
 import java.util.*
 import java.util.regex.Pattern
@@ -48,9 +47,6 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                             when {
                                 checkIntegrity(chapters) -> {
-                                    withContext(Dispatchers.IO) {
-                                        it.forEach { it.fileWrapper() }
-                                    }
                                     if (PrefsUtil.isChapsAsc)
                                         chapters.reverse()
                                     holder?.setAdapter(this@ChaptersFragment, chapters)

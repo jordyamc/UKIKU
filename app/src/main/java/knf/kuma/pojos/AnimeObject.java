@@ -379,6 +379,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.fileWrapper = FileWrapper.Companion.create(ExtensionsKt.getFilePath(this));
             }
 
+            @NonNull
             public FileWrapper fileWrapper() {
                 if (fileWrapper == null)
                     this.fileWrapper = FileWrapper.Companion.create(ExtensionsKt.getFilePath(this));

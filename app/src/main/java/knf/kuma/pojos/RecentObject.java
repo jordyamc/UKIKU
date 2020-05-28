@@ -47,7 +47,7 @@ public class RecentObject {
     @Ignore
     public boolean isDownloading;
     @Ignore
-    public FileWrapper fileWrapper;
+    private FileWrapper fileWrapper;
     @Ignore
     public int downloadState;
     @Ignore
@@ -101,6 +101,12 @@ public class RecentObject {
         return name + chapter.substring(chapter.lastIndexOf(" "));
     }
 
+    public FileWrapper fileWrapper() {
+        if (fileWrapper == null)
+            fileWrapper = FileWrapper.Companion.create(getFilePath());
+        return fileWrapper;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof RecentObject && (
@@ -125,7 +131,6 @@ public class RecentObject {
         this.anime = PatternUtil.INSTANCE.getAnimeUrl(this.url, this.aid);
         //File file = FileAccessHelper.INSTANCE.findFile(getFilePath());
         DownloadObject downloadObject = CacheDBWrap.INSTANCE.downloadsDAO().getByEid(eid);
-        this.fileWrapper = FileWrapper.Companion.create(getFilePath());
         this.isDownloading = downloadObject != null && downloadObject.state == DownloadObject.DOWNLOADING;
         if (downloadObject != null) {
             this.downloadState = downloadObject.state;
