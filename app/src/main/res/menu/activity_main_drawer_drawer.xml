@@ -6,6 +6,7 @@
     <item
         android:id="@+id/drawer_explorer"
         android:icon="@drawable/ic_files"
+        android:visible="@bool/showUncensored"
         android:title="Explorador"/>
     <item
         android:id="@+id/drawer_emision"
@@ -21,6 +22,7 @@
         android:id="@+id/drawer_queue"
         android:icon="@drawable/ic_clock"
         android:title="Pendientes"
+        android:visible="@bool/showUncensored"
         app:actionViewClass="android.widget.TextView"/>
     <item
         android:id="@+id/drawer_suggestions"
@@ -33,6 +35,7 @@
     <item
         android:id="@+id/drawer_records"
         android:icon="@drawable/ic_record"
+        android:visible="@bool/showUncensored"
         android:title="Historial"/>
     <item
         android:id="@+id/drawer_random"

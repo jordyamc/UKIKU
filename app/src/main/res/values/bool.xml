@@ -6,4 +6,5 @@
     <bool name="isTv">false</bool>
     <bool name="isTablet">false</bool>
     <string name="layType">0</string>
+    <bool name="showUncensored">true</bool>
 </resources>
