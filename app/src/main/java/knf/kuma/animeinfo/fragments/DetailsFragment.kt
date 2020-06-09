@@ -5,23 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
 import knf.kuma.animeinfo.viewholders.AnimeDetailsHolder
 
 class DetailsFragment : Fragment() {
     private var holder: AnimeDetailsHolder? = null
+    private val viewModel: AnimeViewModel by activityViewModels()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activity?.let {
-            ViewModelProviders.of(it).get(AnimeViewModel::class.java).liveData.observe(this, Observer { animeObject ->
-                if (animeObject != null)
-                    holder?.populate(this@DetailsFragment, animeObject)
-            })
-        }
+        viewModel.liveData.observe(viewLifecycleOwner, Observer { animeObject ->
+            if (animeObject != null)
+                holder?.populate(this@DetailsFragment, animeObject)
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

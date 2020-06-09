@@ -3,4 +3,5 @@
     <integer name="span_count">3</integer>
     <integer name="span_count_large">2</integer>
     <dimen name="num_picker">22sp</dimen>
+    <dimen name="margin_login_card">20dp</dimen>
 </resources>

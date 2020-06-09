@@ -14,9 +14,9 @@ object ExplorerCreator {
     var IS_CREATED = false
     var IS_FILES = true
     var FILES_NAME: ExplorerObject? = null
-    private val STATE_LISTENER = MutableLiveData<String>()
+    private val STATE_LISTENER = MutableLiveData<String?>()
 
-    internal val stateListener: LiveData<String>
+    internal val stateListener: LiveData<String?>
         get() = STATE_LISTENER
 
     fun start(listener: EmptyListener) {

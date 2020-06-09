@@ -66,200 +66,202 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (context == null || list.isEmpty()) return
-        if (holder is AdCardItemHolder)
-            noCrash { holder.loadAd(list[position] as? AdCallback) }
-        else if (holder is ItemHolder) {
-            holder.unsetObservers()
-            val recentObject = noCrashLet { list[position] } ?: return
-            PicassoSingle.get().load(PatternUtil.getCover(recentObject.aid)).into(holder.imageView)
-            holder.setNew(recentObject.isNew)
-            holder.setFav(dao.isFav(Integer.parseInt(recentObject.aid)))
-            holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter))
-            dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
-            holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.aid, recentObject.chapter).distinct, fragment, Observer { chapter -> holder.setSeen(chapter != null) })
-            holder.setState(isNetworkAvailable, recentObject.isDownloading)
-            holder.apply {
-                fileWrapperJob?.cancel()
-                fileWrapperJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
-                    withContext(Dispatchers.IO) {
-                        recentObject.fileWrapper()
-                    }
-                    if (!isActive)
-                        return@launch
-                    holder.setState(isNetworkAvailable, recentObject.fileWrapper().exist || recentObject.isDownloading)
-                    holder.setDownloadObserver(downloadsDAO.getLiveByEid(recentObject.eid).distinct, fragment, Observer { downloadObject ->
-                        fragment.lifecycleScope.launch(Dispatchers.Main) {
-                            holder.setDownloadState(downloadObject)
-                            if (downloadObject == null) {
-                                recentObject.downloadState = -8
-                                recentObject.isDownloading = false
-                            } else {
-                                recentObject.isDownloading = downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING || downloadObject.state == DownloadObject.PAUSED
-                                recentObject.downloadState = downloadObject.state
-                                if (downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING)
-                                    holder.downIcon.setImageResource(R.drawable.ic_download)
-                                else if (downloadObject.state == DownloadObject.PAUSED)
-                                    holder.downIcon.setImageResource(R.drawable.ic_pause_normal)
-                                withContext(Dispatchers.IO) { recentObject.fileWrapper().reset() }
-                            }
-                            holder.setState(isNetworkAvailable, recentObject.fileWrapper().exist || recentObject.isDownloading)
+        noCrash {
+            if (context == null || list.isEmpty()) return@noCrash
+            if (holder is AdCardItemHolder)
+                noCrash { holder.loadAd(list[position] as? AdCallback) }
+            else if (holder is ItemHolder) {
+                holder.unsetObservers()
+                val recentObject = noCrashLet { list[position] } ?: return@noCrash
+                PicassoSingle.get().load(PatternUtil.getCover(recentObject.aid)).into(holder.imageView)
+                holder.setNew(recentObject.isNew)
+                holder.setFav(dao.isFav(Integer.parseInt(recentObject.aid)))
+                holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter))
+                dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
+                holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.aid, recentObject.chapter).distinct, fragment, Observer { chapter -> holder.setSeen(chapter != null) })
+                holder.setState(isNetworkAvailable, recentObject.isDownloading)
+                holder.apply {
+                    fileWrapperJob?.cancel()
+                    fileWrapperJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
+                        withContext(Dispatchers.IO) {
+                            recentObject.fileWrapper()
                         }
-                    })
-                    holder.setCastingObserver(fragment, Observer { s ->
-                        if (recentObject.eid == s) {
-                            holder.setCasting(true, recentObject.fileWrapper())
-                            holder.streaming.setOnClickListener { CastUtil.get().openControls() }
-                        } else {
-                            holder.setCasting(false, recentObject.fileWrapper())
-                            holder.streaming.setOnClickListener {
-                                if (recentObject.fileWrapper().exist || recentObject.isDownloading) {
-                                    MaterialDialog(context).safeShow {
-                                        message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase(Locale.ENGLISH)} de ${recentObject.name}?")
-                                        positiveButton(text = "CONFIRMAR") {
-                                            FileAccessHelper.deletePath(recentObject.filePath, true)
-                                            DownloadManager.cancel(recentObject.eid)
-                                            QueueManager.remove(recentObject.eid)
-                                            recentObject.fileWrapper().exist = false
-                                            holder.setState(isNetworkAvailable, false)
-                                        }
-                                        negativeButton(text = "CANCELAR")
-                                    }
+                        if (!isActive)
+                            return@launch
+                        holder.setState(isNetworkAvailable, recentObject.fileWrapper().exist || recentObject.isDownloading)
+                        holder.setDownloadObserver(downloadsDAO.getLiveByEid(recentObject.eid).distinct, fragment, Observer { downloadObject ->
+                            fragment.lifecycleScope.launch(Dispatchers.Main) {
+                                holder.setDownloadState(downloadObject)
+                                if (downloadObject == null) {
+                                    recentObject.downloadState = -8
+                                    recentObject.isDownloading = false
                                 } else {
-                                    holder.setLocked(true)
-                                    ServersFactory.start(context, recentObject.url, DownloadObject.fromRecent(recentObject), true, object : ServersFactory.ServersInterface {
-                                        override fun onFinish(started: Boolean, success: Boolean) {
-                                            if (!started && success) {
+                                    recentObject.isDownloading = downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING || downloadObject.state == DownloadObject.PAUSED
+                                    recentObject.downloadState = downloadObject.state
+                                    if (downloadObject.state == DownloadObject.DOWNLOADING || downloadObject.state == DownloadObject.PENDING)
+                                        holder.downIcon.setImageResource(R.drawable.ic_download)
+                                    else if (downloadObject.state == DownloadObject.PAUSED)
+                                        holder.downIcon.setImageResource(R.drawable.ic_pause_normal)
+                                    withContext(Dispatchers.IO) { recentObject.fileWrapper().reset() }
+                                }
+                                holder.setState(isNetworkAvailable, recentObject.fileWrapper().exist || recentObject.isDownloading)
+                            }
+                        })
+                        holder.setCastingObserver(fragment, Observer { s ->
+                            if (recentObject.eid == s) {
+                                holder.setCasting(true, recentObject.fileWrapper())
+                                holder.streaming.setOnClickListener { CastUtil.get().openControls() }
+                            } else {
+                                holder.setCasting(false, recentObject.fileWrapper())
+                                holder.streaming.setOnClickListener {
+                                    if (recentObject.fileWrapper().exist || recentObject.isDownloading) {
+                                        MaterialDialog(context).safeShow {
+                                            message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase(Locale.ENGLISH)} de ${recentObject.name}?")
+                                            positiveButton(text = "CONFIRMAR") {
+                                                FileAccessHelper.deletePath(recentObject.filePath, true)
+                                                DownloadManager.cancel(recentObject.eid)
+                                                QueueManager.remove(recentObject.eid)
+                                                recentObject.fileWrapper().exist = false
+                                                holder.setState(isNetworkAvailable, false)
+                                            }
+                                            negativeButton(text = "CANCELAR")
+                                        }
+                                    } else {
+                                        holder.setLocked(true)
+                                        ServersFactory.start(context, recentObject.url, DownloadObject.fromRecent(recentObject), true, object : ServersFactory.ServersInterface {
+                                            override fun onFinish(started: Boolean, success: Boolean) {
+                                                if (!started && success) {
+                                                    chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                                                    recordsDAO.add(RecordObject.fromRecent(recentObject))
+                                                    syncData {
+                                                        history()
+                                                        seen()
+                                                    }
+                                                }
+                                                holder.setLocked(false)
+                                            }
+
+                                            override fun onCast(url: String?) {
+                                                CastUtil.get().play(view, CastMedia.create(recentObject, url))
                                                 chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
                                                 recordsDAO.add(RecordObject.fromRecent(recentObject))
                                                 syncData {
                                                     history()
                                                     seen()
                                                 }
+                                                holder.setSeen(true)
+                                                holder.setLocked(false)
                                             }
-                                            holder.setLocked(false)
-                                        }
 
-                                        override fun onCast(url: String?) {
-                                            CastUtil.get().play(view, CastMedia.create(recentObject, url))
-                                            chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
-                                            recordsDAO.add(RecordObject.fromRecent(recentObject))
-                                            syncData {
-                                                history()
-                                                seen()
+                                            override fun onProgressIndicator(boolean: Boolean) {
+                                                doOnUI {
+                                                    if (boolean) {
+                                                        holder.progressBar.isIndeterminate = true
+                                                        holder.progressBarRoot.visibility = View.VISIBLE
+                                                    } else
+                                                        holder.progressBarRoot.visibility = View.GONE
+                                                }
                                             }
-                                            holder.setSeen(true)
-                                            holder.setLocked(false)
-                                        }
 
-                                        override fun onProgressIndicator(boolean: Boolean) {
-                                            doOnUI {
-                                                if (boolean) {
-                                                    holder.progressBar.isIndeterminate = true
-                                                    holder.progressBarRoot.visibility = View.VISIBLE
-                                                } else
-                                                    holder.progressBarRoot.visibility = View.GONE
+                                            override fun getView(): View? {
+                                                return view
                                             }
-                                        }
-
-                                        override fun getView(): View? {
-                                            return view
-                                        }
-                                    })
+                                        })
+                                    }
                                 }
                             }
-                        }
-                    })
+                        })
+                    }
                 }
-            }
-            holder.title.text = recentObject.name
-            holder.chapter.text = recentObject.chapter
-            if (BuildConfig.BUILD_TYPE == "playstore") holder.layButtons.visibility = View.INVISIBLE
-            holder.cardView.setOnClickListener {
-                if (recentObject.animeObject != null) {
-                    ActivityAnime.open(fragment, recentObject.animeObject, holder.imageView)
-                } else {
-                    if (BuildConfig.BUILD_TYPE == "playstore" && PrefsUtil.isDirectoryFinished) {
-                        toast("Anime deshabilitado para esta version")
-                    } else if (PrefsUtil.isFamilyFriendly && PrefsUtil.isDirectoryFinished) {
-                        toast("Anime no familiar")
+                holder.title.text = recentObject.name
+                holder.chapter.text = recentObject.chapter
+                if (BuildConfig.BUILD_TYPE == "playstore") holder.layButtons.visibility = View.INVISIBLE
+                holder.cardView.setOnClickListener {
+                    if (recentObject.animeObject != null) {
+                        ActivityAnime.open(fragment, recentObject.animeObject, holder.imageView)
                     } else {
-                        val animeObject = animeDAO.getByAid(recentObject.aid)
-                        if (animeObject != null) {
-                            ActivityAnime.open(fragment, animeObject, holder.imageView)
+                        if (BuildConfig.BUILD_TYPE == "playstore" && PrefsUtil.isDirectoryFinished) {
+                            toast("Anime deshabilitado para esta version")
+                        } else if (PrefsUtil.isFamilyFriendly && PrefsUtil.isDirectoryFinished) {
+                            toast("Anime no familiar")
                         } else {
-                            ActivityAnime.open(fragment, recentObject, holder.imageView)
+                            val animeObject = animeDAO.getByAid(recentObject.aid)
+                            if (animeObject != null) {
+                                ActivityAnime.open(fragment, animeObject, holder.imageView)
+                            } else {
+                                ActivityAnime.open(fragment, recentObject, holder.imageView)
+                            }
                         }
                     }
                 }
-            }
-            holder.cardView.setOnLongClickListener {
-                if (!chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter)) {
-                    chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
-                    holder.animeOverlay.setSeen(seen = true, animate = true)
-                } else {
-                    chaptersDAO.deleteChapter(recentObject.aid, recentObject.chapter)
-                    holder.animeOverlay.setSeen(seen = false, animate = true)
-                }
-                syncData { seen() }
-                true
-            }
-            holder.download.setOnClickListener {
-                val obj = downloadsDAO.getByEid(recentObject.eid)
-                if (FileAccessHelper.canDownload(fragment) &&
-                        !recentObject.fileWrapper().exist &&
-                        !recentObject.isDownloading &&
-                        recentObject.downloadState != DownloadObject.PENDING) {
-                    holder.setLocked(true)
-                    ServersFactory.start(context, recentObject.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), isStream = false, addQueue = false, serversInterface = object : ServersFactory.ServersInterface {
-                        override fun onFinish(started: Boolean, success: Boolean) {
-                            if (started) {
-                                recentObject.fileWrapper().exist = true
-                                holder.setState(isNetworkAvailable, true)
-                            }
-                            holder.setLocked(false)
-                        }
-
-                        override fun onCast(url: String?) {
-
-                        }
-
-                        override fun onProgressIndicator(boolean: Boolean) {
-                            doOnUI {
-                                if (boolean) {
-                                    holder.progressBar.isIndeterminate = true
-                                    holder.progressBarRoot.visibility = View.VISIBLE
-                                } else
-                                    holder.progressBarRoot.visibility = View.GONE
-                            }
-                        }
-
-                        override fun getView(): View? {
-                            return view
-                        }
-                    })
-                } else if (recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.DOWNLOADING || obj.state == DownloadObject.COMPLETED)) {
-                    chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
-                    recordsDAO.add(RecordObject.fromRecent(recentObject))
-                    syncData {
-                        history()
-                        seen()
+                holder.cardView.setOnLongClickListener {
+                    if (!chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter)) {
+                        chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                        holder.animeOverlay.setSeen(seen = true, animate = true)
+                    } else {
+                        chaptersDAO.deleteChapter(recentObject.aid, recentObject.chapter)
+                        holder.animeOverlay.setSeen(seen = false, animate = true)
                     }
-                    holder.setSeen(true)
-                    ServersFactory.startPlay(context, recentObject.epTitle, recentObject.fileWrapper().name())
-                } else {
-                    toast("Aun no se está descargando")
-                }
-            }
-            holder.download.setOnLongClickListener {
-                val obj = downloadsDAO.getByEid(recentObject.eid)
-                if (CastUtil.get().connected() &&
-                        recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.COMPLETED)) {
-                    chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
                     syncData { seen() }
-                    CastUtil.get().play(view, CastMedia.create(recentObject))
+                    true
                 }
-                true
+                holder.download.setOnClickListener {
+                    val obj = downloadsDAO.getByEid(recentObject.eid)
+                    if (FileAccessHelper.canDownload(fragment) &&
+                            !recentObject.fileWrapper().exist &&
+                            !recentObject.isDownloading &&
+                            recentObject.downloadState != DownloadObject.PENDING) {
+                        holder.setLocked(true)
+                        ServersFactory.start(context, recentObject.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), isStream = false, addQueue = false, serversInterface = object : ServersFactory.ServersInterface {
+                            override fun onFinish(started: Boolean, success: Boolean) {
+                                if (started) {
+                                    recentObject.fileWrapper().exist = true
+                                    holder.setState(isNetworkAvailable, true)
+                                }
+                                holder.setLocked(false)
+                            }
+
+                            override fun onCast(url: String?) {
+
+                            }
+
+                            override fun onProgressIndicator(boolean: Boolean) {
+                                doOnUI {
+                                    if (boolean) {
+                                        holder.progressBar.isIndeterminate = true
+                                        holder.progressBarRoot.visibility = View.VISIBLE
+                                    } else
+                                        holder.progressBarRoot.visibility = View.GONE
+                                }
+                            }
+
+                            override fun getView(): View? {
+                                return view
+                            }
+                        })
+                    } else if (recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.DOWNLOADING || obj.state == DownloadObject.COMPLETED)) {
+                        chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                        recordsDAO.add(RecordObject.fromRecent(recentObject))
+                        syncData {
+                            history()
+                            seen()
+                        }
+                        holder.setSeen(true)
+                        ServersFactory.startPlay(context, recentObject.epTitle, recentObject.fileWrapper().name())
+                    } else {
+                        toast("Aun no se está descargando")
+                    }
+                }
+                holder.download.setOnLongClickListener {
+                    val obj = downloadsDAO.getByEid(recentObject.eid)
+                    if (CastUtil.get().connected() &&
+                            recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.COMPLETED)) {
+                        chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                        syncData { seen() }
+                        CastUtil.get().play(view, CastMedia.create(recentObject))
+                    }
+                    true
+                }
             }
         }
     }

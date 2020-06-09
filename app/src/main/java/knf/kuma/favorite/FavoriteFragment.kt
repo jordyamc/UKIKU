@@ -8,9 +8,9 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -45,7 +45,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     private var adapter: FavsSectionAdapter? = null
     private var isFirst = true
 
-    private lateinit var model: FavoriteViewModel
+    private val model: FavoriteViewModel by activityViewModels()
     private lateinit var liveData: LiveData<MutableList<FavoriteObject>>
     private lateinit var observer: Observer<MutableList<FavoriteObject>>
 
@@ -130,7 +130,6 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         isFirst = true
         if (::liveData.isInitialized && ::observer.isInitialized)
             liveData.removeObserver(observer)
-        if (!::model.isInitialized) model = ViewModelProviders.of(activity).get(FavoriteViewModel::class.java)
         liveData = model.getData()
         observer = obs
         liveData.observe(viewLifecycleOwner, observer)

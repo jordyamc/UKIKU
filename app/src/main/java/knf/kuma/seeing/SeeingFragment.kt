@@ -8,6 +8,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.Config
+import androidx.paging.PagedList
+import androidx.paging.toLiveData
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
@@ -15,6 +19,8 @@ import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
 import kotlinx.android.synthetic.main.fragment_seeing.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
 class SeeingFragment : Fragment() {
@@ -25,10 +31,10 @@ class SeeingFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        liveData.observe(this, Observer {
+        liveData.observe(viewLifecycleOwner, Observer {
             progress.visibility = View.GONE
-            error.visibility = if (it?.isEmpty() == true) View.VISIBLE else View.GONE
-            adapter?.update(it)
+            error.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+            adapter?.submitList(it)
         })
     }
 
@@ -67,12 +73,13 @@ class SeeingFragment : Fragment() {
         recycler.adapter = adapter
     }
 
-    val liveData: LiveData<List<SeeingObject>>
+    val liveData: LiveData<PagedList<SeeingObject>>
         get() {
-            return if (arguments?.getInt("state", 0) ?: 0 == 0)
-                CacheDB.INSTANCE.seeingDAO().all
+            return (if (arguments?.getInt("state", 0) ?: 0 == 0)
+                CacheDB.INSTANCE.seeingDAO().allPaging
             else
-                CacheDB.INSTANCE.seeingDAO().getLiveByState(arguments?.getInt("state", 0) ?: 0)
+                CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(arguments?.getInt("state", 0)
+                        ?: 0)).toLiveData(Config(15, enablePlaceholders = false))
         }
 
     val title: String
@@ -89,8 +96,13 @@ class SeeingFragment : Fragment() {
 
     fun onSelected() {
         clickCount++
-        if (clickCount == 3 && adapter?.list?.isNotEmpty() == true) {
-            Toaster.toast("${adapter?.list?.size} anime" + adapter?.let { if (it.list.size > 1) "s" else "" })
+        if (clickCount == 3) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                val num = CacheDB.INSTANCE.seeingDAO().countByState(arguments?.getInt("state", 0)
+                        ?: 0)
+                if (num > 0)
+                    Toaster.toast("$num anime" + adapter?.let { if (num > 1) "s" else "" })
+            }
             clickCount = 0
         }
     }

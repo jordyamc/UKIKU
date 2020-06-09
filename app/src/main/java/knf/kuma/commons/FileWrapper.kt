@@ -28,6 +28,9 @@ abstract class FileWrapper<T>(val path: String) {
                 else -> NormalPreQFileWrapper(file_name)
             }
         }
+
+        fun fromFileName(file_name: String): File =
+                File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
     }
 }
 

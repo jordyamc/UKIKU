@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import knf.kuma.BottomFragment
@@ -28,7 +28,7 @@ class SearchFragment : BottomFragment() {
     lateinit var progressBar: ProgressBar
     private lateinit var errorView: View
 
-    private var model: SearchViewModel? = null
+    private val model: SearchViewModel by activityViewModels()
     private var searchAdapter: SearchAdapter? = null
     private var searchAdapterCompact: SearchAdapterCompact? = null
     private var manager: RecyclerView.LayoutManager? = null
@@ -78,17 +78,15 @@ class SearchFragment : BottomFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (!needOnlineSearch)
-            model = activity?.let { ViewModelProviders.of(it).get(SearchViewModel::class.java) }?.also {
-                it.setSearch(query, "", this, Observer { animeObjects ->
-                    searchAdapter?.submitList(animeObjects)
-                    errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
-                    if (isFirst) {
-                        progressBar.visibility = View.GONE
-                        isFirst = false
-                        recyclerView.scheduleLayoutAnimation()
-                    }
-                })
-            }
+            model.setSearch(query, "", this, Observer { animeObjects ->
+                searchAdapter?.submitList(animeObjects)
+                errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
+                if (isFirst) {
+                    progressBar.visibility = View.GONE
+                    isFirst = false
+                    recyclerView.scheduleLayoutAnimation()
+                }
+            })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -193,7 +191,7 @@ class SearchFragment : BottomFragment() {
     private fun setSearchNormal(q: String) {
         waitingScroll = true
         this.query = q.trim()
-        model?.setSearch(q.trim(), genresString, this, Observer { animeObjects ->
+        model.setSearch(q.trim(), genresString, this, Observer { animeObjects ->
             if (animeObjects != null) {
                 searchAdapter?.submitList(animeObjects)
                 errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE

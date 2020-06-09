@@ -1,11 +1,14 @@
 package knf.kuma.pojos;
 
-import com.google.gson.annotations.SerializedName;
-
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import com.google.gson.annotations.SerializedName;
+
 import knf.kuma.database.CacheDBWrap;
 import knf.kuma.seeing.FavToSeeing;
 
@@ -46,6 +49,18 @@ public class SeeingObject {
     @SerializedName("lastChapter")
     @Ignore
     public SeenObject lastChapter;
+    @Ignore
+    public static DiffUtil.ItemCallback<SeeingObject> diffCallback = new DiffUtil.ItemCallback<SeeingObject>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull SeeingObject oldItem, @NonNull SeeingObject newItem) {
+            return oldItem.aid.equals(newItem.aid) && oldItem.key == newItem.key;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull SeeingObject oldItem, @NonNull SeeingObject newItem) {
+            return oldItem.state == newItem.state && oldItem.chapter.equals(newItem.chapter);
+        }
+    };
 
     public SeeingObject(int key, String img, String link, String aid, String title, String chapter, int state) {
         this.key = key;

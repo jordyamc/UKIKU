@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.backup.firestore.syncData
+import knf.kuma.commons.FileWrapper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
@@ -24,6 +25,15 @@ object QueueManager {
     fun add(uri: Uri, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter?) {
         if (chapter == null) return
         CacheDB.INSTANCE.queueDAO().add(QueueObject(uri, isFile, chapter))
+        syncData { queue() }
+        Toaster.toast("Episodio añadido a cola")
+    }
+
+    fun add(wrapper: FileWrapper<*>, dobject: DownloadObject?, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter?) {
+        if (chapter == null) return
+        val file = wrapper.file() ?: wrapper.let { it.reset(); it.file() }
+        ?: dobject?.let { FileWrapper.fromFileName(it.file) } ?: return
+        CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(file), isFile, chapter))
         syncData { queue() }
         Toaster.toast("Episodio añadido a cola")
     }

@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
 import knf.kuma.R
@@ -25,7 +24,6 @@ class DirectoryFragment : BottomFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        ViewModelProviders.of(this).get(DirectoryViewModel::class.java)
         if (!PrefsUtil.isDirectoryFinished) {
             snackbar = activity?.findViewById<View>(R.id.root)?.showSnackbar("Creando directorio...", Snackbar.LENGTH_INDEFINITE)
             CacheDB.INSTANCE.animeDAO().countLive.observe(viewLifecycleOwner, Observer {

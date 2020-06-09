@@ -99,7 +99,7 @@ object PatternUtil {
     }
 
     fun getNumFromFile(file: String): String {
-        val matcher = Pattern.compile("^.*\\$[a-z-0-9]*-(\\d+\\.?\\d*)\\.mp4$").matcher(file)
+        val matcher = Pattern.compile("^.*\\$\\w+-(\\d+\\.?\\d*)\\.mp4$").matcher(file)
         matcher.find()
         return matcher.group(1)
     }

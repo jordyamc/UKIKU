@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
@@ -27,7 +27,7 @@ import org.jetbrains.anko.doAsync
 
 class HomeFragment : BottomFragment() {
 
-    private val viewModel: RecentsViewModel by lazy { ViewModelProviders.of(this).get(RecentsViewModel::class.java) }
+    private val viewModel: RecentsViewModel by viewModels()
     private var lastNew: String = "0"
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

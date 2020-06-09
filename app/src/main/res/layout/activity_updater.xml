@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rel_back"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,8 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_margin="20dp"
-        android:visibility="invisible"
+        android:layout_marginStart="@dimen/margin_login_card"
+        android:layout_marginEnd="@dimen/margin_login_card"
         app:cardCornerRadius="2dp"
         app:cardElevation="8dp">
 
@@ -31,14 +32,14 @@
                 android:gravity="center_horizontal"
                 android:text="Descargando actualización"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
 
             <ProgressBar
                 android:id="@+id/progress"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"/>
+                android:layout_margin="8dp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -55,17 +56,17 @@
                     android:text="0%"
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textSize="20sp"/>
+                    android:textSize="20sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/download"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="?colorSecondary"
-                    android:textColor="@android:color/primary_text_dark"
                     android:text="INSTALAR"
-                    android:visibility="invisible"/>
+                    android:textColor="?colorSecondary"
+                    android:visibility="invisible"
+                    tools:visibility="visible" />
             </RelativeLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

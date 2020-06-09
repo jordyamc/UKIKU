@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
@@ -19,11 +19,9 @@ import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
 import org.jetbrains.anko.doAsync
-import java.util.*
 
-internal class SeeingAdapter(private val activity: Activity, private val isFullList: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
+internal class SeeingAdapter(private val activity: Activity, private val isFullList: Boolean) : PagedListAdapter<SeeingObject, RecyclerView.ViewHolder>(SeeingObject.diffCallback), FastScrollRecyclerView.SectionedAdapter {
 
-    var list: List<SeeingObject> = ArrayList()
     private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -37,12 +35,12 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         if (payloads.isEmpty())
             super.onBindViewHolder(holder, position, payloads)
         else if (holder is SeeingItem) {
-            holder.chapter.text = getCardText(list[position])
+            holder.chapter.text = getCardText(getItem(position)!!)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val seeingObject = list[position]
+        val seeingObject = getItem(position) ?: return
         if (holder is SeeingItem)
             holder.chapter.text = getCardText(seeingObject)
         (holder as? SeeingItemNormal)?.apply {
@@ -83,7 +81,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
     }
 
     override fun getSectionName(position: Int): String {
-        return list[position].title.substring(0, 1)
+        return getItem(position)?.title?.substring(0, 1) ?: ""
     }
 
     private fun getCardText(seeingObject: SeeingObject): String {
@@ -112,30 +110,10 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
     }
 
     override fun getItemViewType(position: Int): Int {
-        val seeingObject = list[position]
+        val seeingObject = getItem(position) ?: return 0
         return when {
             isFullList || seeingObject.state in 0..1 -> 0
             else -> 1
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
-    fun update(newList: List<SeeingObject>) {
-        if (this.list notSameContent newList) {
-            doAsync {
-                val result = DiffUtil.calculateDiff(SeeingDiff(list, newList))
-                doOnUI {
-                    list = newList
-                    try {
-                        result.dispatchUpdatesTo(this@SeeingAdapter)
-                    } catch (e: Exception) {
-                        notifyDataSetChanged()
-                    }
-                }
-            }
         }
     }
 
@@ -148,35 +126,5 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         val imageView: ImageView by itemView.bind(R.id.img)
         val progressView: ProgressBar? by itemView.optionalBind(R.id.progress)
         val title: TextView by itemView.bind(R.id.title)
-    }
-
-    internal inner class SeeingDiff(private val oldList: List<SeeingObject>, private val newList: List<SeeingObject>) : DiffUtil.Callback() {
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].aid == newList[newItemPosition].aid
-        }
-
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
-
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
-
-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-            return if (isFullList) {
-                getStateText(newList[newItemPosition].state)
-            } else {
-                newList[newItemPosition].chapter
-            }
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return when {
-                isFullList -> oldList[oldItemPosition].state == newList[newItemPosition].state
-                oldList[oldItemPosition].state == 1 -> oldList[oldItemPosition].chapter == newList[newItemPosition].chapter
-                else -> true
-            }
-        }
     }
 }

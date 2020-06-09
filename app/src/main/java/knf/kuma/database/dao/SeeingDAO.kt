@@ -1,6 +1,7 @@
 package knf.kuma.database.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.*
 import knf.kuma.database.BaseConverter
 import knf.kuma.pojos.SeeingObject
@@ -13,6 +14,9 @@ interface SeeingDAO {
     val all: LiveData<List<SeeingObject>>
 
     @get:Query("SELECT * FROM seeingobject ORDER BY title")
+    val allPaging: DataSource.Factory<Int, SeeingObject>
+
+    @get:Query("SELECT * FROM seeingobject ORDER BY title")
     val allRaw: MutableList<SeeingObject>
 
     @get:Query("SELECT aid FROM seeingobject")
@@ -20,6 +24,12 @@ interface SeeingDAO {
 
     @Query("SELECT * FROM seeingobject WHERE state=:state ORDER BY title")
     fun getLiveByState(state: Int): LiveData<List<SeeingObject>>
+
+    @Query("SELECT count(*) FROM seeingobject WHERE state=:state")
+    suspend fun countByState(state: Int): Int
+
+    @Query("SELECT * FROM seeingobject WHERE state=:state ORDER BY title")
+    fun getLiveByStatePaging(state: Int): DataSource.Factory<Int, SeeingObject>
 
     @get:Query("SELECT count(*) FROM seeingobject")
     val countLive: LiveData<Int>

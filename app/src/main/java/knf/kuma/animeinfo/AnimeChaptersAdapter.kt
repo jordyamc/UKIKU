@@ -276,7 +276,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             })
                         }
                         R.id.queue -> if (isPlayAvailable(chapter.fileWrapper(), downloadObject.get())) {
-                            QueueManager.add(Uri.fromFile(chapter.fileWrapper().file()), true, chapter)
+                            QueueManager.add(chapter.fileWrapper(), downloadObject.get(), true, chapter)
                             holder.setQueue(true, true)
                         } else {
                             setOrientation(true)

@@ -11,10 +11,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.viewModels
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
@@ -40,7 +40,7 @@ import java.util.*
 
 class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
     private var isEdited = false
-    private val viewModel: AnimeViewModel by lazy { ViewModelProviders.of(this).get(AnimeViewModel::class.java) }
+    private val viewModel: AnimeViewModel by viewModels()
     private val holder: AnimeActivityHolder by lazy { AnimeActivityHolder(this) }
     private var favoriteObject: FavoriteObject? = null
     private val dao = CacheDB.INSTANCE.favsDAO()
