@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="157" version="4.3.41">
+        <change type="fix">Error al detectar episodios en explorador</change>
+    </release>
     <release code="156" version="4.3.40">
         <change type="fix">Errores generales</change>
     </release>
