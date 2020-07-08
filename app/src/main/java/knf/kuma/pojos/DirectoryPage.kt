@@ -3,6 +3,7 @@ package knf.kuma.pojos
 import android.util.Log
 import knf.kuma.BuildConfig
 import knf.kuma.commons.*
+import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import pl.droidsonroids.jspoon.Jspoon
 import pl.droidsonroids.jspoon.annotation.Selector
@@ -34,6 +35,8 @@ class DirectoryPage {
                                 }
                             }
                             updateInterface.onAdd()
+                        } else if (response.code() == 404) {
+                            CacheDB.INSTANCE.animeDAO().allLinksInEmission
                         } else check(response.code() < 400) { "Response code: ${response.code()}" }
                     } catch (e: Exception) {
                         e.printStackTrace()

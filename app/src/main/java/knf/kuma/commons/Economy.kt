@@ -12,8 +12,6 @@ import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.firestore.FirestoreManager
-import knf.tools.kprobability.item
-import knf.tools.kprobability.probabilityOf
 import kotlinx.android.synthetic.main.dialog_wallet.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -28,11 +26,11 @@ object Economy {
 
     fun reward(isAdClicked: Boolean = false) {
         doOnUIException(onLog = { FirebaseCrashlytics.getInstance().recordException(it);toast("Error al obtener loli-coins\n${it.message}") }) {
-            val reward = probabilityOf<Int> {
-                item(1, if (isAdClicked) 80.0 else 90.0)
-                item(2, if (isAdClicked) 15.0 else 8.0)
-                item(3, if (isAdClicked) 5.0 else 2.0)
-            }.random()
+            val reward = diceOf<Int> {
+                put(1, if (isAdClicked) 80.0 else 90.0)
+                put(2, if (isAdClicked) 15.0 else 8.0)
+                put(3, if (isAdClicked) 5.0 else 2.0)
+            }
             doAsync { repeat(reward) { FirebaseAnalytics.getInstance(App.context).logEvent("Coins_generated", Bundle()) } }
             PrefsUtil.userCoins = (PrefsUtil.userCoins + reward).also { coinsLiveData.value = it }
             PrefsUtil.userRewardedVideoCount = (PrefsUtil.userRewardedVideoCount + 1).also { rewardedVideoLiveData.value = it }

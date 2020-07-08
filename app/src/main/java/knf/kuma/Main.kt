@@ -31,10 +31,10 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.appodeal.ads.Appodeal
-import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.BackUpActivity
@@ -117,8 +117,11 @@ class Main : GenericActivity(),
             finish()
             return
         }
-        MobileAds.initialize(this)
+        //MobileAds.initialize(this)
+        //Appodeal.setLogLevel(Log.LogLevel.debug)
         Appodeal.initialize(this, BuildConfig.APPODEAL_KEY, Appodeal.BANNER or Appodeal.NATIVE or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
+        Appodeal.setAutoCache(Appodeal.NATIVE or Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
+        FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled", PrefsUtil.isAdsEnabled.toString())
         try {
             setContentView(R.layout.activity_main_drawer)
         } catch (e: Exception) {

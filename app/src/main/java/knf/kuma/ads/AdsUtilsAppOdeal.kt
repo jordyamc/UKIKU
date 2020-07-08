@@ -3,6 +3,7 @@ package knf.kuma.ads
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import com.appodeal.ads.Appodeal
 import com.appodeal.ads.InterstitialCallbacks
@@ -167,7 +168,9 @@ fun ViewGroup.implBannerAppOdeal(context: Context, unitID: String, isSmart: Bool
                 AdsUtilsAppOdeal.CAST_BANNER -> true
                 else -> false
             } && this !is BannerContainerView
+            Log.e("Appodeal", "On try native")
             if (Appodeal.getAvailableNativeAdsCount() > 0 && needsNative) {
+                Log.e("Appodeal", "On native available")
                 val nativeAd = Appodeal.getNativeAds(1)[0]
                 val adView = when (unitID) {
                     AdsUtilsAppOdeal.RECENT_BANNER, AdsUtilsAppOdeal.FAVORITE_BANNER -> {
@@ -198,17 +201,22 @@ fun ViewGroup.implBannerAppOdeal(context: Context, unitID: String, isSmart: Bool
                     removeAllViews()
                     addView(adView)
                 }
+                Log.e("Appodeal", "On native loaded")
             } else {
+                Log.e("Appodeal", "On native unavailable")
                 context.findActivity()?.let {
                     if (isRetry || this is BannerContainerView)
                         return@let null
+                    Log.e("Appodeal", "On wait native")
                     Appodeal.cache(it, Appodeal.NATIVE)
                     Appodeal.setNativeCallbacks(object : AbstractNativeCallbacks() {
                         override fun onNativeLoaded() {
+                            Log.e("Appodeal", "On native loaded")
                             implBannerAppOdeal(context, unitID, isRetry = true)
                         }
 
                         override fun onNativeFailedToLoad() {
+                            Log.e("Appodeal", "On native failed")
                             val adView = inflate(context, R.layout.appodeal_ad)
                             if (this@implBannerAppOdeal is BannerContainerView) {
                                 show(adView)

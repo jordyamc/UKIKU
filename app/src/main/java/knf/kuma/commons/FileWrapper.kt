@@ -79,7 +79,7 @@ class NormalPreQFileWrapper(path: String) : FileWrapper<File?>(path) {
 class DocumentFileWrapper(path: String) : FileWrapper<DocumentFile?>(path) {
     private var document = generate()
     override var exist = document?.exists() == true
-    override fun file(): File = File(FileUtil.getFullPathFromTreeUri(document?.uri, App.context)!!)
+    override fun file(): File? = FileUtil.getFullPathFromTreeUri(document?.uri, App.context)?.let { File(it) }
     override fun name(): String = document?.name ?: path
     override fun length(): Long? = document?.length()
     override fun lastModified(): Long? = document?.lastModified()

@@ -46,6 +46,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import org.nield.kotlinstatistics.WeightedDice
 import xdroid.toaster.Toaster
 import java.io.File
 
@@ -155,6 +156,12 @@ fun gridColumns(size: Int = 115): Int {
 
 fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
     return Snackbar.make(this, text, duration).also { doOnUI { it.show() } }
+}
+
+fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT, button: String, onAction: (View) -> Unit): Snackbar {
+    return Snackbar.make(this, text, duration).apply {
+        setAction(button, onAction)
+    }.also { doOnUI { it.show() } }
 }
 
 fun SnackProgressBarManager.showProgressSnackbar(text: String, duration: Int = SnackProgressBarManager.LENGTH_SHORT) {
@@ -487,4 +494,11 @@ private fun isVideoHostName(hostName: String): Boolean {
                 hostName.contains("fvs.io") -> true
         else -> false
     }
+}
+
+fun <T> diceOf(default: T? = null, mapCreator: MutableMap<T, Double>.() -> Unit): T {
+    val map = mutableMapOf<T, Double>()
+    mapCreator(map)
+    if (default != null && map.isEmpty()) map[default] = 100.0
+    return WeightedDice(map).roll()
 }

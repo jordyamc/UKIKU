@@ -27,8 +27,6 @@ import knf.kuma.iap.IAPWrapper
 import knf.kuma.iap.Inventory
 import knf.kuma.iap.PayloadHelper
 import knf.kuma.pojos.EAObject
-import knf.tools.kprobability.item
-import knf.tools.kprobability.probabilityOf
 import kotlinx.android.synthetic.main.activity_ea.*
 import kotlinx.android.synthetic.main.item_ea_step.view.*
 import moe.feng.common.stepperview.IStepperAdapter
@@ -384,10 +382,10 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
     }
 
     private fun showAd() {
-        probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
-            item({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
-        }.random()()
+        diceOf<() -> Unit> {
+            put({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
+            put({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
+        }()
     }
 
     private fun checkPurchases(): Int {

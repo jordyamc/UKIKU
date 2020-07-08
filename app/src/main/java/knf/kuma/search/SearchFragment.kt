@@ -15,6 +15,7 @@ import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.noCrash
 import knf.kuma.commons.verifyManager
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
@@ -77,16 +78,18 @@ class SearchFragment : BottomFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (!needOnlineSearch)
-            model.setSearch(query, "", this, Observer { animeObjects ->
-                searchAdapter?.submitList(animeObjects)
-                errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
-                if (isFirst) {
-                    progressBar.visibility = View.GONE
-                    isFirst = false
-                    recyclerView.scheduleLayoutAnimation()
-                }
-            })
+        noCrash {
+            if (!needOnlineSearch)
+                model.setSearch(query, "", this, Observer { animeObjects ->
+                    searchAdapter?.submitList(animeObjects)
+                    errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
+                    if (isFirst) {
+                        progressBar.visibility = View.GONE
+                        isFirst = false
+                        recyclerView.scheduleLayoutAnimation()
+                    }
+                })
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

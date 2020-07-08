@@ -35,7 +35,6 @@ class DownloadDialogActivity : GenericActivity() {
                 val document = jsoupCookies(intent.dataString).get()
                 val name = PatternUtil.fromHtml(document.select("nav.Brdcrmb.fa-home a[href^=/anime/]").first().text())
                 lateinit var aid: String
-                val eid = extract(intent.dataString, "^.*/(\\d+)/.*$")
                 lateinit var num: String
                 val matcher = Pattern.compile("var (.*) = (\\d+);").matcher(document.html())
                 while (matcher.find()) {
@@ -44,6 +43,7 @@ class DownloadDialogActivity : GenericActivity() {
                         "episode_number" -> num = matcher.group(2)
                     }
                 }
+                val eid = "${aid}Episodio $num".hashCode().toString()
                 val chapter = AnimeObject.WebInfo.AnimeChapter(Integer.parseInt(aid), "Episodio $num", eid, intent.dataString
                         ?: "", name, aid)
                 downloadObject = DownloadObject.fromChapter(chapter, false)

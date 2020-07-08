@@ -2,6 +2,7 @@ package knf.kuma.custom
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
@@ -16,6 +17,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
+import knf.kuma.Diagnostic
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
@@ -74,7 +76,11 @@ open class GenericActivity : AppCompatActivity() {
                 if (flag == 1 || forceCreation()) {
                     logText("Starting creation")
                     BypassUtil.isLoading = true
-                    val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE)
+                    val snack = getSnackbarAnchor()?.showSnackbar("Creando bypass...", Snackbar.LENGTH_INDEFINITE, "Manual") {
+                        BypassUtil.isChecking = false
+                        BypassUtil.isLoading = false
+                        startActivity(Intent(this@GenericActivity, Diagnostic.FullBypass::class.java))
+                    }
                     bypassLive.postValue(Pair(true, true))
                     Log.e("CloudflareBypass", "is needed")
                     runWebView(snack)
@@ -116,7 +122,6 @@ open class GenericActivity : AppCompatActivity() {
                     }
 
                     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                        Log.e("CloudflareBypass", "Override $url")
                         logText("Override: $url")
                         logText("Waiting for resolve...")
                         //view?.loadUrl(url)

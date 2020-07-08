@@ -23,8 +23,6 @@ import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.data.TopData
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
-import knf.tools.kprobability.item
-import knf.tools.kprobability.probabilityOf
 import kotlinx.android.synthetic.main.recycler_loader.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
@@ -45,10 +43,10 @@ class TopActivity : GenericActivity() {
     private var topList: List<TopData> = emptyList()
 
     private fun showAd() {
-        probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
-            item({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
-        }.random()()
+        diceOf<() -> Unit> {
+            put({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
+            put({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
+        }()
     }
 
     @ExperimentalContracts

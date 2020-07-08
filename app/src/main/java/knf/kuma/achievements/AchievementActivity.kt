@@ -36,8 +36,6 @@ import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
-import knf.tools.kprobability.item
-import knf.tools.kprobability.probabilityOf
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.toast
@@ -184,10 +182,10 @@ class AchievementActivity : GenericActivity() {
     }
 
     private fun showAd() {
-        probabilityOf<() -> Unit> {
-            item({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
-            item({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
-        }.random()()
+        diceOf<() -> Unit> {
+            put({ rewardedAd.show() }, AdsUtils.remoteConfigs.getDouble("rewarded_percent"))
+            put({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
+        }()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

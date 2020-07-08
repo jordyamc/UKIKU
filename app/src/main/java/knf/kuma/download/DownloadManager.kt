@@ -61,27 +61,36 @@ class DownloadManager : Service() {
         internal const val ACTION_CANCEL = 2
         private const val CHANNEL = "service.Downloads"
         private const val CHANNEL_ONGOING = "service.Downloads.Ongoing"
+
         @SuppressLint("StaticFieldLeak")
         private val context: Context = App.context
         private var fetch: Fetch? = null
-        private val downloadDao = CacheDB.INSTANCE.downloadsDAO()
-        private val notificationManager: NotificationManager by lazy { context.notificationManager }
-
-        fun setParallelDownloads(newValue: String?) {
-            if (newValue.isNullOrEmpty()) return
-            fetch?.setDownloadConcurrentLimit(Integer.parseInt(newValue))
-        }
-
-        init {
-            val configuration = FetchConfiguration.Builder(context)
+        private val fetchConfiguration: FetchConfiguration.Builder by lazy {
+            FetchConfiguration.Builder(context)
                     .setDownloadConcurrentLimit(PrefsUtil.maxParallelDownloads)
                     .enableLogging(BuildConfig.DEBUG)
                     .enableRetryOnNetworkGain(true)
                     .setAutoRetryMaxAttempts(3)
                     .createDownloadFileOnEnqueue(false)
                     .setHttpDownloader(OkHttpDownloader(OkHttpClient.Builder().followRedirects(true).followSslRedirects(true).build()))
-                    .build()
-            fetch = Fetch.getInstance(configuration).addListener(object : FetchListener {
+        }
+        private val downloadDao = CacheDB.INSTANCE.downloadsDAO()
+        private val notificationManager: NotificationManager by lazy { context.notificationManager }
+
+        fun setParallelDownloads(newValue: String?) {
+            if (newValue.isNullOrEmpty()) return
+            fetch?.pauseAll()
+            fetchConfiguration.setDownloadConcurrentLimit(Integer.parseInt(newValue))
+            fetch = Fetch.getInstance(fetchConfiguration.build()).apply {
+                fetch?.getListenerSet()?.forEach {
+                    addListener(it, autoStart = true)
+                }
+            }
+            fetch?.resumeAll()
+        }
+
+        init {
+            fetch = Fetch.getInstance(fetchConfiguration.build()).addListener(object : FetchListener {
                 override fun onAdded(download: Download) {
                     val downloadObject = downloadDao.getByDid(download.id)
                     if (downloadObject != null) {
@@ -222,7 +231,7 @@ class DownloadManager : Service() {
                         notificationManager.cancel(downloadObject.getDid())
                     stopIfNeeded()
                 }
-            })
+            }, autoStart = true)
         }
 
         fun start(downloadObject: DownloadObject): Boolean {
@@ -242,6 +251,7 @@ class DownloadManager : Service() {
                         it.throwable?.printStackTrace()
                         downloadDao.delete(downloadObject)
                     })
+                    fetch?.resumeAll()
                 } ?: return false
                 return true
             } catch (e: Exception) {
