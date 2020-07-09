@@ -125,8 +125,8 @@ fun MaterialDialog.safeDismiss() {
 fun Snackbar.safeDismiss() {
     try {
         dismiss()
-    } finally {
-        //
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
 }
 
@@ -499,6 +499,6 @@ private fun isVideoHostName(hostName: String): Boolean {
 fun <T> diceOf(default: T? = null, mapCreator: MutableMap<T, Double>.() -> Unit): T {
     val map = mutableMapOf<T, Double>()
     mapCreator(map)
-    if (default != null && map.isEmpty()) map[default] = 100.0
+    if (default != null && map.isEmpty()) return default
     return WeightedDice(map).roll()
 }

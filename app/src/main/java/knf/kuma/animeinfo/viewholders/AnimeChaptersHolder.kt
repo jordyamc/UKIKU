@@ -73,7 +73,7 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 syncData { seeing() }
                                             }
                                             recyclerView.post { adapter?.deselectAll() }
-                                            snackbar.safeDismiss()
+                                            doOnUI { snackbar.safeDismiss() }
                                         }
                                         BottomActionsDialog.STATE_UNSEEN -> doAsync {
                                             try {
@@ -91,10 +91,10 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                     syncData { seeing() }
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                         BottomActionsDialog.STATE_IMPORT_MULTIPLE -> doAsync {
@@ -110,10 +110,10 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                 }
                                                 callback.onImportMultiple(cChapters)
                                                 recyclerView.post { adapter?.deselectAll() }
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                         BottomActionsDialog.STATE_DOWNLOAD_MULTIPLE -> doAsync {
@@ -128,11 +128,11 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                         cChapters.add(chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                                 callback.onDownloadMultiple(false, cChapters)
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                         BottomActionsDialog.STATE_QUEUE_MULTIPLE -> doAsync {
@@ -149,11 +149,11 @@ class AnimeChaptersHolder(view: View, private val fragmentManager: FragmentManag
                                                         QueueManager.add(Uri.fromFile(chapter.fileWrapper().file()), true, chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                                 callback.onDownloadMultiple(true, cChapters)
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                snackbar.safeDismiss()
+                                                doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                     }
