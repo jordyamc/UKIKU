@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -35,6 +36,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.iid.FirebaseInstanceId
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.BackUpActivity
@@ -122,6 +124,10 @@ class Main : GenericActivity(),
         Appodeal.initialize(this, BuildConfig.APPODEAL_KEY, Appodeal.BANNER or Appodeal.NATIVE or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
         Appodeal.setAutoCache(Appodeal.NATIVE or Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
         FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled", PrefsUtil.isAdsEnabled.toString())
+        FirebaseInstanceId.getInstance().instanceId
+                .addOnSuccessListener { result ->
+                    Log.e("IID_TOKEN", result.token)
+                }
         try {
             setContentView(R.layout.activity_main_drawer)
         } catch (e: Exception) {

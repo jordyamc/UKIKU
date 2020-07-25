@@ -66,10 +66,8 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             noCrash {
                 seeingObject = seeingDAO.getByAid(chapters[0].aid)
                 doAsync {
-                    doAsync {
-                        if (CacheDB.INSTANCE.animeDAO().isCompleted(chapters[0].aid))
-                            DownloadedObserver.observe(chapters.size, chapters[0].fileName)
-                    }
+                    if (CacheDB.INSTANCE.animeDAO().isCompleted(chapters[0].aid))
+                        DownloadedObserver.observe(fragment.lifecycleScope, chapters.size, chapters[0].fileWrapper())
                 }
             }
         }

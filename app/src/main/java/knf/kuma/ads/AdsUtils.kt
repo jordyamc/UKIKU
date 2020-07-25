@@ -50,6 +50,7 @@ object AdsUtils {
                 "appbrains_enabled" to false,
                 "startapp_enabled" to false,
                 "appodeal_enabled" to false,
+                "ads_forced" to false,
                 "admob_percent" to 100.0,
                 "appodeal_percent" to 0.0,
                 "appbrains_percent" to 0.0,

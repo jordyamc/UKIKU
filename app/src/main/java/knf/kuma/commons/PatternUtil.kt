@@ -111,7 +111,7 @@ object PatternUtil {
     }
 
     fun extractLink(html: String): String {
-        val matcher = Pattern.compile("https?://[a-zA-Z0-9.=?/&\\-]+").matcher(html)
+        val matcher = Pattern.compile("https?://[a-zA-Z0-9.=?/&#_\\-]+").matcher(html)
         matcher.find()
         return matcher.group(0)
     }

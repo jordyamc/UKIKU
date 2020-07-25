@@ -240,7 +240,19 @@ class ServersFactory {
                                 for (baseLink in jsonArray) {
                                     val server = Server.check(context, baseLink.optString("code"))
                                     if (server != null)
-                                        servers.add(server)
+                                        try {
+                                            var skip = false
+                                            servers.forEach {
+                                                if (it.name == server.name) {
+                                                    skip = true
+                                                    return@forEach
+                                                }
+                                            }
+                                            if (!skip)
+                                                servers.add(server)
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                        }
                                 }
                                 servers.sort()
                                 this@ServersFactory.servers = servers
@@ -263,7 +275,19 @@ class ServersFactory {
                 for (baseLink in jsonArray) {
                     val server = Server.check(context, baseLink.optString("code"))
                     if (server != null)
-                        servers.add(server)
+                        try {
+                            var skip = false
+                            servers.forEach {
+                                if (it.name == server.name) {
+                                    skip = true
+                                    return@forEach
+                                }
+                            }
+                            if (!skip)
+                                servers.add(server)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                 }
                 servers.sort()
                 this@ServersFactory.servers = servers

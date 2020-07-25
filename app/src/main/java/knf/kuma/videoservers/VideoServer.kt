@@ -71,10 +71,12 @@ open class VideoServer : Parcelable {
         const val MP4UPLOAD = "Mp4Upload"
         const val YOURUPLOAD = "YourUpload"
         const val ZIPPYSHARE = "Zippyshare"
+        const val GOCDN = "GoCDN"
+        const val STAPE = "Stape"
         const val MEGA = "Mega"
 
         internal val downloadServers: Array<String>
-            get() = arrayOf(IZANAGI, HYPERION, OKRU, FEMBED, FIRE, NATSUKI, VERYSTREAM, FENIX, RV, YOURUPLOAD, ZIPPYSHARE, MEGA, MP4UPLOAD)
+            get() = arrayOf(IZANAGI, HYPERION, OKRU, FEMBED, FIRE, NATSUKI, GOCDN, STAPE, VERYSTREAM, FENIX, RV, YOURUPLOAD, ZIPPYSHARE, MEGA, MP4UPLOAD)
     }
 
     companion object {

@@ -16,6 +16,7 @@ abstract class FileWrapper<T>(val path: String) {
     abstract fun length(): Long?
     abstract fun lastModified(): Long?
     abstract fun inputStream(): InputStream?
+    abstract fun parentSize(): Int
     abstract fun generate(): T
     abstract fun reset()
 
@@ -42,6 +43,7 @@ class NormalFileWrapper(path: String) : FileWrapper<File?>(path) {
     override fun length(): Long? = mFile?.length()
     override fun lastModified(): Long? = mFile?.lastModified()
     override fun inputStream(): InputStream? = mFile?.inputStream()
+    override fun parentSize(): Int = mFile?.parentFile?.list()?.size ?: 0
     override fun generate(): File? = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(path)).listFiles { file -> file.name.contains(path) }?.let {
         if (it.isNotEmpty())
             it[0]
@@ -63,6 +65,7 @@ class NormalPreQFileWrapper(path: String) : FileWrapper<File?>(path) {
     override fun length(): Long? = mFile?.length()
     override fun lastModified(): Long? = mFile?.lastModified()
     override fun inputStream(): InputStream? = mFile?.inputStream()
+    override fun parentSize(): Int = mFile?.parentFile?.list()?.size ?: 0
     override fun generate(): File? = File(FileUtil.getFullPathFromTreeUri(FileAccessHelper.treeUri, App.context), "UKIKU/downloads/" + PatternUtil.getNameFromFile(path)).listFiles { file -> file.name.contains(path) }?.let {
         if (it.isNotEmpty())
             it[0]
@@ -84,6 +87,7 @@ class DocumentFileWrapper(path: String) : FileWrapper<DocumentFile?>(path) {
     override fun length(): Long? = document?.length()
     override fun lastModified(): Long? = document?.lastModified()
     override fun inputStream(): InputStream? = document?.let { App.context.contentResolver.openInputStream(it.uri) }
+    override fun parentSize(): Int = document?.parentFile?.listFiles()?.size ?: 0
     override fun generate(): DocumentFile? = FileAccessHelper.treeUri?.let { uri ->
         FileAccessHelper.find(DocumentFile.fromTreeUri(App.context, uri), "UKIKU/downloads/" + PatternUtil.getNameFromFile(path), false)?.listFiles()?.let { list ->
             var file: DocumentFile? = null

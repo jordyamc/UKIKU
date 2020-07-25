@@ -43,7 +43,7 @@ object AdsUtilsMob {
     val ACHIEVEMENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/4233626428"
     val EXPLORER_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/1041869769"
     val CAST_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5535283585"
-    val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/2247696110" else "ca-app-pub-5390653757953587/5447863415"
+    val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1044960115" else "ca-app-pub-5390653757953587/5447863415"
     const val REWARDED = "ca-app-pub-5390653757953587/5420761189"
     const val INTERSTITIAL = "ca-app-pub-5390653757953587/5880297311"
     val adRequest: AdRequest
@@ -173,6 +173,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
             AdLoader.Builder(context, AdsUtilsMob.LIST_NATIVE)
                     .forUnifiedNativeAd {
                         doOnUI {
+                            Log.e("Admob", "Native load")
                             val adView = when (unitID) {
                                 AdsUtilsMob.RECENT_BANNER, AdsUtilsMob.FAVORITE_BANNER -> {
                                     inflate(context, R.layout.admob_ad_card).apply {
@@ -206,6 +207,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                     }.withAdListener(object : AbsAdListener() {
                         override fun onAdFailedToLoad(p0: Int) {
                             doOnUI {
+                                Log.e("Admob", "Native failed: $p0")
                                 val adView = AdView(context)
                                 adView.adSize = getAdSize(width.toFloat())
                                 adView.adUnitId = unitID
@@ -226,6 +228,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                     }).build().loadAd(AdsUtilsMob.adRequest)
         } else
             doOnUI {
+                Log.e("Admob", "Banner load")
                 val adView = AdView(context)
                 adView.adSize = getAdSize(width.toFloat())
                 adView.adUnitId = unitID

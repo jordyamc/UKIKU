@@ -31,6 +31,7 @@ import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.Main
 import knf.kuma.R
+import knf.kuma.ads.AdsUtils
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.commons.*
@@ -65,6 +66,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
         private const val keyBufferSize = "buffer_size"
         private const val keyThemeColor = "theme_color"
         private const val keyArchievementsPermissions = "achievements_permissions"
+        private const val keyAdsEnabled = "ads_enabled"
     }
 
     private var uaChangeListener: UAChangeListener? = null
@@ -454,6 +456,12 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             true
                         }
                     }
+                }
+                preferenceScreen.findPreference<SwitchPreference>(keyAdsEnabled)?.apply {
+                    isChecked = PrefsUtil.isAdsEnabled
+                    isEnabled = PrefsUtil.isSubscriptionEnabled || !AdsUtils.remoteConfigs.getBoolean("ads_forced")
+                    if (!isEnabled)
+                        summary = "Estas en una prueba temporal!"
                 }
                 if (BuildConfig.DEBUG) {
                     preferenceScreen.findPreference<Preference>("reset_recents")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {

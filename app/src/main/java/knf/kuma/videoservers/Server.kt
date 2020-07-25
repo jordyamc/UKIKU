@@ -65,6 +65,8 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
             return listOf(
                     FireServer(context, base),
                     NatsukiServer(context, base),
+                    GoCDNServer(context, base),
+                    StapeServer(context, base),
                     VeryStreamServer(context, base),
                     FembedServer(context, base),
                     FenixServer(context, base),
