@@ -13,7 +13,10 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
-import knf.kuma.commons.*
+import knf.kuma.commons.Economy
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.asyncInflate
 import knf.kuma.custom.BannerContainerView
 import knf.kuma.news.AdNewsObject
 import knf.kuma.news.NewsObject
@@ -22,6 +25,10 @@ import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
 import kotlinx.android.synthetic.main.admob_ad.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachReversedWithIndex
 import xdroid.toaster.Toaster.toast
 
 object AdsUtilsMob {
@@ -58,7 +65,7 @@ object AdsUtilsMob {
 fun MutableList<RecentObject>.implAdsRecentMob() {
     if (!PrefsUtil.isAdsEnabled || isEmpty()) return
     var adIndex = 0
-    ArrayList(this).forEachIndexed { index, _ ->
+    forEachReversedWithIndex { index, _ ->
         if (index % 5 == 0 && index > 0) {
             val adID: String = when (adIndex) {
                 0 -> {
@@ -73,34 +80,34 @@ fun MutableList<RecentObject>.implAdsRecentMob() {
             add(index, AdRecentObject(adID))
         }
     }
+    add(0, AdRecentObject(AdsUtilsMob.RECENT_BANNER))
 }
 
 fun MutableList<FavoriteObject>.implAdsFavoriteMob() {
     if (!PrefsUtil.isAdsEnabled || isEmpty()) return
     var adIndex = 0
-    ArrayList(this).apply {
-        forEachIndexed { index, _ ->
-            if (index % 8 == 0 && index > 0 && !this[index - 1].isSection) {
-                val adID: String = when (adIndex) {
-                    0 -> {
-                        adIndex = 1
-                        AdsUtilsMob.FAVORITE_BANNER
-                    }
-                    else -> {
-                        adIndex = 0
-                        AdsUtilsMob.FAVORITE_BANNER
-                    }
+    forEachReversedWithIndex { index, _ ->
+        if (index % 8 == 0 && index > 0 && !this[index - 1].isSection) {
+            val adID: String = when (adIndex) {
+                0 -> {
+                    adIndex = 1
+                    AdsUtilsMob.FAVORITE_BANNER
                 }
-                this@implAdsFavoriteMob.add(index, AdFavoriteObject(adID))
+                else -> {
+                    adIndex = 0
+                    AdsUtilsMob.FAVORITE_BANNER
+                }
             }
+            this@implAdsFavoriteMob.add(index, AdFavoriteObject(adID))
         }
     }
+    this@implAdsFavoriteMob.add(0, AdFavoriteObject(AdsUtilsMob.FAVORITE_BANNER))
 }
 
 fun MutableList<NewsObject>.implAdsNewsMob() {
     if (!PrefsUtil.isAdsEnabled || isEmpty()) return
     var adIndex = 0
-    ArrayList(this).forEachIndexed { index, _ ->
+    forEachReversedWithIndex { index, _ ->
         if (index % 5 == 0 && index > 0) {
             val adID: String = when (adIndex) {
                 0 -> {
@@ -115,12 +122,13 @@ fun MutableList<NewsObject>.implAdsNewsMob() {
             add(index, AdNewsObject(adID))
         }
     }
+    add(0, AdNewsObject(AdsUtilsMob.NEWS_BANNER))
 }
 
 fun MutableList<Achievement>.implAdsAchievementMob() {
     if (!PrefsUtil.isAdsEnabled || isEmpty()) return
     var adIndex = 0
-    ArrayList(this).forEachIndexed { index, _ ->
+    forEachReversedWithIndex { index, _ ->
         if (index % 8 == 0 && index > 0) {
             val adID: String = when (adIndex) {
                 0 -> {
@@ -135,6 +143,7 @@ fun MutableList<Achievement>.implAdsAchievementMob() {
             add(index, AchievementAd(adID))
         }
     }
+    add(0, AchievementAd(AdsUtilsMob.ACHIEVEMENT_BANNER))
 }
 
 fun ViewGroup.implBannerCastMob() {
@@ -169,66 +178,61 @@ fun ViewGroup.implBannerMob(unitID: AdsType, isSmart: Boolean = false) {
 
 fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
     if (PrefsUtil.isAdsEnabled) {
-        if (this !is BannerContainerView) {
-            AdLoader.Builder(context, AdsUtilsMob.LIST_NATIVE)
-                    .forUnifiedNativeAd {
-                        doOnUI {
-                            Log.e("Admob", "Native load")
-                            val adView = when (unitID) {
-                                AdsUtilsMob.RECENT_BANNER, AdsUtilsMob.FAVORITE_BANNER -> {
-                                    inflate(context, R.layout.admob_ad_card).apply {
-                                        admobAd.setNativeAd(it)
+        GlobalScope.launch g@{
+            if (this@implBannerMob.tag == "AdView added")
+                return@g
+            if (this@implBannerMob !is BannerContainerView) {
+                AdLoader.Builder(context, AdsUtilsMob.LIST_NATIVE)
+                        .forUnifiedNativeAd {
+                            GlobalScope.launch {
+                                val adView = when (unitID) {
+                                    AdsUtilsMob.RECENT_BANNER, AdsUtilsMob.FAVORITE_BANNER -> {
+                                        asyncInflate(context, R.layout.admob_ad_card).apply {
+                                            admobAd.setNativeAd(it)
+                                        }
                                     }
-                                }
-                                AdsUtilsMob.NEWS_BANNER -> {
-                                    inflate(context, R.layout.admob_ad_news).apply {
-                                        admobAd.setNativeAd(it)
+                                    AdsUtilsMob.NEWS_BANNER -> {
+                                        asyncInflate(context, R.layout.admob_ad_news).apply {
+                                            admobAd.setNativeAd(it)
+                                        }
                                     }
-                                }
-                                AdsUtilsMob.ACHIEVEMENT_BANNER -> {
-                                    inflate(context, R.layout.admob_ad_plain).apply {
-                                        admobAd.setNativeAd(it)
+                                    AdsUtilsMob.ACHIEVEMENT_BANNER -> {
+                                        asyncInflate(context, R.layout.admob_ad_plain).apply {
+                                            admobAd.setNativeAd(it)
+                                        }
                                     }
-                                }
-                                AdsUtilsMob.CAST_BANNER -> {
-                                    inflate(context, R.layout.admob_ad_alone).apply {
-                                        admobAd.setNativeAd(it)
+                                    AdsUtilsMob.CAST_BANNER -> {
+                                        asyncInflate(context, R.layout.admob_ad_alone).apply {
+                                            admobAd.setNativeAd(it)
+                                        }
                                     }
+                                    else -> return@launch
                                 }
-                                else -> return@doOnUI
-                            }
-                            if (this is BannerContainerView) {
-                                show(adView)
-                            } else {
-                                removeAllViews()
-                                addView(adView)
-                            }
-                        }
-                    }.withAdListener(object : AbsAdListener() {
-                        override fun onAdFailedToLoad(p0: Int) {
-                            doOnUI {
-                                Log.e("Admob", "Native failed: $p0")
-                                val adView = AdView(context)
-                                adView.adSize = getAdSize(width.toFloat())
-                                adView.adUnitId = unitID
-                                adView.adListener = object : AbsAdListener() {
-                                    override fun onAdClicked() {
-                                        FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
-                                    }
-                                }
-                                if (this@implBannerMob is BannerContainerView) {
-                                    show(adView)
-                                } else {
-                                    removeAllViews()
+                                launch(Dispatchers.Main) {
                                     addView(adView)
+                                    this@implBannerMob.tag = "AdView added"
                                 }
-                                adView.loadAd(AdsUtilsMob.adRequest)
                             }
-                        }
-                    }).build().loadAd(AdsUtilsMob.adRequest)
-        } else
-            doOnUI {
-                Log.e("Admob", "Banner load")
+                        }.withAdListener(object : AbsAdListener() {
+                            override fun onAdFailedToLoad(p0: Int) {
+                                GlobalScope.launch {
+                                    val adView = AdView(context)
+                                    adView.adSize = getAdSize(width.toFloat())
+                                    adView.adUnitId = unitID
+                                    adView.adListener = object : AbsAdListener() {
+                                        override fun onAdClicked() {
+                                            FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
+                                        }
+                                    }
+                                    launch(Dispatchers.Main) {
+                                        addView(adView)
+                                        this@implBannerMob.tag = "AdView added"
+                                        adView.loadAd(AdsUtilsMob.adRequest)
+                                    }
+                                }
+                            }
+                        }).build().loadAd(AdsUtilsMob.adRequest)
+            } else {
                 val adView = AdView(context)
                 adView.adSize = getAdSize(width.toFloat())
                 adView.adUnitId = unitID
@@ -237,9 +241,13 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                         FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
                     }
                 }
-                show(adView)
-                adView.loadAd(AdsUtilsMob.adRequest)
+                launch(Dispatchers.Main) {
+                    show(adView)
+                    adView.loadAd(AdsUtilsMob.adRequest)
+                    this@implBannerMob.tag = "AdView added"
+                }
             }
+        }
     }
 }
 

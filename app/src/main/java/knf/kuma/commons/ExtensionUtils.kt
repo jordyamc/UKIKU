@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -41,6 +42,7 @@ import knf.kuma.database.CacheDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -49,6 +51,8 @@ import org.jsoup.Jsoup
 import org.nield.kotlinstatistics.WeightedDice
 import xdroid.toaster.Toaster
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 fun Toolbar.changeToolbarFont() {
     for (i in 0 until childCount) {
@@ -354,6 +358,14 @@ fun NotificationCompat.Builder.create(func: NotificationCompat.Builder.() -> Uni
 fun ViewGroup.inflate(@LayoutRes layout: Int, attachToRoot: Boolean = false): View = LayoutInflater.from(context).inflate(layout, this, attachToRoot)
 
 fun inflate(context: Context, @LayoutRes layout: Int, attachToRoot: Boolean = false): View = LayoutInflater.from(context).inflate(layout, null, attachToRoot)
+
+suspend fun asyncInflate(context: Context, @LayoutRes layout: Int, attachToRoot: Boolean = false): View = withContext(Dispatchers.Main) {
+    suspendCoroutine<View> {
+        AsyncLayoutInflater(context).inflate(layout, null) { view, _, _ ->
+            it.resume(view)
+        }
+    }
+}
 
 fun File.safeDelete(log: Boolean = false) {
     try {

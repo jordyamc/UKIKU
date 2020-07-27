@@ -20,10 +20,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.BuildConfig
 import knf.kuma.R
-import knf.kuma.ads.AdCallback
-import knf.kuma.ads.AdCardItemHolder
-import knf.kuma.ads.AdRecentObject
-import knf.kuma.ads.implAdsRecent
+import knf.kuma.ads.*
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
@@ -51,13 +48,13 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
     private var isNetworkAvailable: Boolean = Network.isConnected
 
-    init {
-        setHasStableIds(true)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == 1)
-            return AdCardItemHolder(parent)
+            return AdCardItemHolder(parent).also {
+                it.loadAd(object : AdCallback {
+                    override fun getID(): String = AdsUtilsMob.RECENT_BANNER
+                })
+            }
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_recents, parent, false))
     }
 
@@ -68,9 +65,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         noCrash {
             if (context == null || list.isEmpty()) return@noCrash
-            if (holder is AdCardItemHolder)
-                noCrash { holder.loadAd(list[position] as? AdCallback) }
-            else if (holder is ItemHolder) {
+            if (holder is ItemHolder) {
                 holder.unsetObservers()
                 val recentObject = noCrashLet { list[position] } ?: return@noCrash
                 PicassoSingle.get().load(PatternUtil.getCover(recentObject.aid)).into(holder.imageView)
@@ -296,9 +291,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             }
     }
 
-    override fun getItemId(position: Int): Long {
+    /*override fun getItemId(position: Int): Long {
         return noCrashLet { list[position].key.toLong() } ?: 0
-    }
+    }*/
 
     override fun getItemCount(): Int {
         return list.size

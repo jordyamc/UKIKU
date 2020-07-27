@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.ads.AdCallback
 import knf.kuma.ads.AdCardItemHolder
+import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.ads.implAdsAchievement
 import knf.kuma.commons.bind
 import knf.kuma.commons.noCrash
@@ -25,7 +26,11 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == 1)
-            return AdCardItemHolder(parent, AdCardItemHolder.TYPE_ACHIEVEMENT)
+            return AdCardItemHolder(parent, AdCardItemHolder.TYPE_ACHIEVEMENT).also {
+                it.loadAd(object : AdCallback {
+                    override fun getID(): String = AdsUtilsMob.ACHIEVEMENT_BANNER
+                })
+            }
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_achievements, parent, false))
     }
 
@@ -40,9 +45,7 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val achievement = list[position]
-        if (holder is AdCardItemHolder) {
-            holder.loadAd(achievement as? AdCallback)
-        } else if (holder is ItemHolder) {
+        if (holder is ItemHolder) {
             holder.icon.setImageResource(achievement.usableIcon())
             holder.name.text = achievement.usableName()
             holder.state.text = achievement.getState()
