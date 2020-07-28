@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
 import knf.kuma.R
@@ -17,6 +18,9 @@ import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.viewholders.DirMainFragmentHolder
 import kotlinx.android.synthetic.main.fragment_directory.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class DirectoryFragment : BottomFragment() {
     private var fragmentHolder: DirMainFragmentHolder? = null
@@ -55,7 +59,10 @@ class DirectoryFragment : BottomFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (PrefsUtil.isDirectoryFinished)
-            adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
+            lifecycleScope.launch(Dispatchers.IO) {
+                delay(1000)
+                adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
+            }
     }
 
     override fun onDestroyView() {

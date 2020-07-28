@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
@@ -23,6 +24,9 @@ import knf.kuma.recommended.RecommendActivity
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.seeing.SeeingActivity
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 
 class HomeFragment : BottomFragment() {
@@ -102,8 +106,12 @@ class HomeFragment : BottomFragment() {
             setViewAllClass(RecommendActivity::class.java)
         }
         listRecommendedStaff.setAdapter(SearchAdapter(this))
-        adContainer.implBanner(AdsType.HOME_BANNER, true)
-        adContainer2.implBanner(AdsType.HOME_BANNER2, true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000)
+            adContainer.implBanner(AdsType.HOME_BANNER, true)
+            delay(500)
+            adContainer2.implBanner(AdsType.HOME_BANNER2, true)
+        }
     }
 
     private fun filterNew(list: List<RecentObject>): List<RecentObject> {

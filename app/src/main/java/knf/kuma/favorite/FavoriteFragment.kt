@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -32,6 +33,9 @@ import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.FavSection
 import knf.kuma.pojos.FavoriteObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
@@ -99,7 +103,10 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         recyclerView.verifyManager()
         errorLayout = view.find(R.id.error)
         if (PrefsUtil.layType == "1")
-            view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.FAVORITE_BANNER, true)
+            lifecycleScope.launch(Dispatchers.IO) {
+                delay(1000)
+                view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.FAVORITE_BANNER, true)
+            }
         return view
     }
 
