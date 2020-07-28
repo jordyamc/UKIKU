@@ -51,9 +51,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == 1)
             return AdCardItemHolder(parent).also {
-                it.loadAd(object : AdCallback {
+                it.loadAd(fragment.lifecycleScope, object : AdCallback {
                     override fun getID(): String = AdsUtilsMob.RECENT_BANNER
-                })
+                }, 500)
             }
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_recents, parent, false))
     }
@@ -281,14 +281,16 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     internal fun updateList(list: MutableList<RecentObject>, updateListener: UpdateListener) {
         this.isNetworkAvailable = Network.isConnected
         val wasEmpty = this.list.isEmpty()
-        this.list = list.distinctBy { it.eid } as MutableList<RecentObject>
-        this.list.implAdsRecent()
-        if (this.list.isNotEmpty())
-            view.post {
-                notifyDataSetChanged()
-                if (wasEmpty)
-                    updateListener.invoke()
-            }
+        fragment.lifecycleScope.launch(Dispatchers.IO) {
+            this@RecentsAdapter.list = list.distinctBy { it.eid } as MutableList<RecentObject>
+            this@RecentsAdapter.list.implAdsRecent()
+            if (this@RecentsAdapter.list.isNotEmpty())
+                launch(Dispatchers.Main) {
+                    notifyDataSetChanged()
+                    if (wasEmpty)
+                        updateListener.invoke()
+                }
+        }
     }
 
     /*override fun getItemId(position: Int): Long {

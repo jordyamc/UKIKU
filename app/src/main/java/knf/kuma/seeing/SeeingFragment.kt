@@ -20,6 +20,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
 import kotlinx.android.synthetic.main.fragment_seeing.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
@@ -45,7 +46,10 @@ class SeeingFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adContainer.implBanner(AdsType.SEEING_BANNER, true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000)
+            adContainer.implBanner(AdsType.SEEING_BANNER, true)
+        }
         when (arguments?.getInt("state", 0)) {
             1 -> {
                 error_text.text = "No estas viendo ningún anime"

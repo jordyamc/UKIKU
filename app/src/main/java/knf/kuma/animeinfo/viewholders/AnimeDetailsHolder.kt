@@ -6,6 +6,7 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -62,7 +63,7 @@ class AnimeDetailsHolder(val view: View) {
 
     @SuppressLint("SetTextI18n")
     fun populate(fragment: Fragment, animeObject: AnimeObject) {
-        doOnUI {
+        fragment.lifecycleScope.launch(Dispatchers.Main) {
             title.text = animeObject.name
             noCrash {
                 cardViews[0].setOnLongClickListener {
@@ -96,7 +97,6 @@ class AnimeDetailsHolder(val view: View) {
             noCrash {
                 if (PrefsUtil.isAdsEnabled) {
                     showCard(cardViews[2])
-                    view.adContainer.implBanner(AdsType.INFO_BANNER, true)
                 }
             }
             noCrash {
@@ -155,6 +155,13 @@ class AnimeDetailsHolder(val view: View) {
                 }
             }
             needAnimation = false
+            if (PrefsUtil.isAdsEnabled) {
+                fragment.lifecycleScope.launch(Dispatchers.IO) {
+                    retard += 300
+                    delay(retard.toLong())
+                    view.adContainer.implBanner(AdsType.INFO_BANNER, true)
+                }
+            }
         }
     }
 

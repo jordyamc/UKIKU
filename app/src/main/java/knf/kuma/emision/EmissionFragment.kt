@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
@@ -18,6 +19,9 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.search.SearchObject
 import kotlinx.android.synthetic.main.recycler_emision.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 class EmissionFragment : Fragment(), RemoveListener {
@@ -39,7 +43,10 @@ class EmissionFragment : Fragment(), RemoveListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adContainer.implBanner(AdsType.EMISSION_BANNER, true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000)
+            adContainer.implBanner(AdsType.EMISSION_BANNER, true)
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

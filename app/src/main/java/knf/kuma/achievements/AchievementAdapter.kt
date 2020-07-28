@@ -17,6 +17,9 @@ import knf.kuma.commons.noCrash
 import knf.kuma.commons.noCrashLet
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.*
 
@@ -27,9 +30,9 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == 1)
             return AdCardItemHolder(parent, AdCardItemHolder.TYPE_ACHIEVEMENT).also {
-                it.loadAd(object : AdCallback {
+                it.loadAd(GlobalScope, object : AdCallback {
                     override fun getID(): String = AdsUtilsMob.ACHIEVEMENT_BANNER
-                })
+                }, 500)
             }
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_achievements, parent, false))
     }
@@ -55,9 +58,13 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
     }
 
     fun setAchievements(list: MutableList<Achievement>) {
-        this.list = list
-        this.list.implAdsAchievement()
-        notifyDataSetChanged()
+        GlobalScope.launch(Dispatchers.IO) {
+            this@AchievementAdapter.list = list
+            this@AchievementAdapter.list.implAdsAchievement()
+            launch(Dispatchers.Main) {
+                notifyDataSetChanged()
+            }
+        }
     }
 
     class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -13,8 +13,10 @@ import android.view.animation.AnimationUtils
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
+import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.commons.getUpdateDir
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.download.DownloadManager
 import kotlinx.android.synthetic.main.activity_updater.*
@@ -24,6 +26,7 @@ class UpdateActivity : GenericActivity() {
 
     private val updaterViewModel: UpdaterViewModel by viewModels()
     private val update: File by lazy { File(filesDir, "update.apk") }
+    private var isUpdateDownloaded = false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +54,7 @@ class UpdateActivity : GenericActivity() {
                             finish()
                         }
                         UpdaterType.TYPE_COMPLETED -> {
+                            isUpdateDownloaded = true
                             progress.progress = 100
                             progress_text.text = "100%"
                             prepareForInstall()
@@ -105,6 +109,18 @@ class UpdateActivity : GenericActivity() {
                 startAnimation(fadein)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isUpdateDownloaded)
+            MaterialDialog(this).safeShow {
+                title(text = "¿Error al actualizar?")
+                message(text = "Puedes descargar la actualizacion desde la pagina web oficial!")
+                positiveButton(text = "Descargar") {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.ga")))
+                }
+            }
     }
 
     companion object {

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="162" version="4.3.46">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Optimizacion para anuncios generales</change>
+    </release>
     <release code="161" version="4.3.45">
         <change type="fix">Errores generales</change>
         <change type="fix">Optimizacion para anuncios en listas</change>

@@ -6,6 +6,10 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
 
 
@@ -16,6 +20,14 @@ class AdCardItemHolder(parent: ViewGroup, @LayoutRes type: Int = TYPE_NORMAL) : 
     fun loadAd(ad: AdCallback?) {
         if (ad == null) return
         container.implBanner(ad.getID(), true)
+    }
+
+    fun loadAd(scope: CoroutineScope, ad: AdCallback?, delayed: Long = 0) {
+        if (ad == null) return
+        scope.launch(Dispatchers.IO) {
+            delay(delayed)
+            container.implBanner(ad.getID(), true)
+        }
     }
 
     companion object {

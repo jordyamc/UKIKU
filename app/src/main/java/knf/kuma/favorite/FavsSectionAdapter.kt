@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
@@ -21,6 +22,8 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.favorite.objects.InfoContainer
 import knf.kuma.pojos.FavoriteObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class FavsSectionAdapter(private val fragment: Fragment, private val recyclerView: FastScrollRecyclerView, private val showSections: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
@@ -50,9 +53,9 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
             TYPE_HEADER -> HeaderHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_fav_header, parent, false))
             TYPE_ITEM -> ItemHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false))
             TYPE_AD -> AdCardItemHolder(parent, AdCardItemHolder.TYPE_FAV).also {
-                it.loadAd(object : AdCallback {
+                it.loadAd(fragment.lifecycleScope, object : AdCallback {
                     override fun getID(): String = AdsUtilsMob.FAVORITE_BANNER
-                })
+                }, 500)
             }
             else -> HeaderHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_fav_header, parent, false))
         }
@@ -108,10 +111,12 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     }
 
     fun updateList(list: MutableList<FavoriteObject>) {
-        this.list = list
-        if (PrefsUtil.layType == "0")
-            this.list.implAdsFavorite()
-        recyclerView.post { this.notifyDataSetChanged() }
+        fragment.lifecycleScope.launch(Dispatchers.IO) {
+            this@FavsSectionAdapter.list = list
+            if (PrefsUtil.layType == "0")
+                this@FavsSectionAdapter.list.implAdsFavorite()
+            recyclerView.post { this@FavsSectionAdapter.notifyDataSetChanged() }
+        }
     }
 
     internal interface OnMoveListener {

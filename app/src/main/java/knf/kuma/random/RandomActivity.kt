@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.MaterialDialog
@@ -21,6 +22,9 @@ import knf.kuma.ads.implBanner
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 
@@ -48,7 +52,6 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
-        find<FrameLayout>(R.id.adContainer).implBanner(AdsType.RANDOM_BANNER, true)
         refreshLayout.setOnRefreshListener(this)
         adapter = RandomAdapter(this)
         recyclerView.verifyManager()
@@ -56,6 +59,10 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         refreshLayout.isRefreshing = true
         refreshLayout.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
         refreshList()
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000)
+            find<FrameLayout>(R.id.adContainer).implBanner(AdsType.RANDOM_BANNER, true)
+        }
     }
 
     private fun refreshList() {
