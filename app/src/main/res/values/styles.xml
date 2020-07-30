@@ -187,4 +187,10 @@
         <item name="android:textSize">30sp</item>
     </style>
 
+    <style name="titleTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/textSecondaryTitle</item>
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">@font/open_sans</item>
+    </style>
+
 </resources>

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="163" version="4.3.47">
+        <change type="fix">Error al crear directorio</change>
+    </release>
     <release code="162" version="4.3.46">
         <change type="fix">Errores generales</change>
         <change type="fix">Optimizacion para anuncios generales</change>

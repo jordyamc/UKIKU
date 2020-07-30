@@ -281,6 +281,9 @@
         <meta-data
             android:name="com.google.android.gms.ads.AD_MANAGER_APP"
             android:value="true" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".queue.QueueActivity" />
         <activity
@@ -341,6 +344,7 @@
         <activity android:name=".Diagnostic$FullBypass" />
         <activity android:name=".profile.TopActivity" />
         <activity android:name=".faq.FaqActivity" />
+        <activity android:name=".news.MaterialNewsActivity" />
 
         <provider
             android:name=".slices.AnimeSlice"

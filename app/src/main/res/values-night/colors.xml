@@ -6,8 +6,10 @@
     <color name="colorPrimary">#282828</color>
     <color name="colorPrimaryDark">#1b1b1b</color>
     <color name="divider">#fff</color>
+    <color name="separator">#1Affffff</color>
     <color name="textPrimary">#fff</color>
     <color name="textSecondaryAlpha">#B2FFFFFF</color>
+    <color name="textSecondaryTitle">#80FFFFFF</color>
     <color name="textSecondary">#BEBEBE</color>
 
     <color name="cardview_background">#222222</color>

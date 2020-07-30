@@ -19,7 +19,7 @@ class DirectoryPage {
             if (Network.isConnected) {
                 if (!animeDAO.existLink("https://animeflv.net$link"))
                     try {
-                        val response = okHttpCookies("https://animeflv.net$link").execute(followRedirects = false)
+                        val response = okHttpCookies("https://animeflv.net$link").execute(followRedirects = true)
                         val body = response.body()?.string()
                         if (response.code() == 200 && body != null) {
                             val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)

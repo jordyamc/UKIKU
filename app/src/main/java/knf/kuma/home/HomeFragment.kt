@@ -108,9 +108,9 @@ class HomeFragment : BottomFragment() {
         listRecommendedStaff.setAdapter(SearchAdapter(this))
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
-            adContainer.implBanner(AdsType.HOME_BANNER, true)
+            adContainer.implBanner(AdsType.RECENT_BANNER, true)
             delay(500)
-            adContainer2.implBanner(AdsType.HOME_BANNER2, true)
+            adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
         }
     }
 

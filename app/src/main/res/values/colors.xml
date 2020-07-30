@@ -58,8 +58,10 @@
     <color name="cardview_background">#FFFFFF</color>
 
     <color name="divider">#000000</color>
+    <color name="separator">#1A000000</color>
     <color name="textPrimary">#000</color>
     <color name="textSecondaryAlpha">#8A000000</color>
+    <color name="textSecondaryTitle">#80000000</color>
     <color name="textSecondary">#323232</color>
 
     <color name="colorSplash">#333333</color>

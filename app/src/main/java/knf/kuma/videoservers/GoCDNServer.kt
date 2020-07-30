@@ -15,8 +15,8 @@ class GoCDNServer(context: Context, baseLink: String) : Server(context, baseLink
 
     override val videoServer: VideoServer?
         get() {
-            val downLink = PatternUtil.extractLink(baseLink)
             return try {
+                val downLink = PatternUtil.extractLink(baseLink)
                 val link = "https://s1.streamium.xyz/gocdn.php?v=${downLink.substringAfterLast("#")}"
                 Log.e("GoCDN", link)
                 VideoServer(GOCDN, Option(GOCDN, null, link))

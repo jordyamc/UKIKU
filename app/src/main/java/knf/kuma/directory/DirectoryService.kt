@@ -208,6 +208,7 @@ class DirectoryService : IntentService("Directory update") {
                     setStatus(STATE_FINISHED)
                 }
             } catch (e: HttpStatusException) {
+                e.printStackTrace()
                 finished = true
                 setStatus(STATE_INTERRUPTED)
             } catch (e: Exception) {

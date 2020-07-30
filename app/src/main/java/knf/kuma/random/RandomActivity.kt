@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -20,6 +19,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.*
+import knf.kuma.custom.BannerContainerView
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import kotlinx.coroutines.Dispatchers
@@ -61,7 +61,7 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         refreshList()
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
-            find<FrameLayout>(R.id.adContainer).implBanner(AdsType.RANDOM_BANNER, true)
+            find<BannerContainerView>(R.id.adContainer).implBanner(AdsType.RANDOM_BANNER, true)
         }
     }
 
