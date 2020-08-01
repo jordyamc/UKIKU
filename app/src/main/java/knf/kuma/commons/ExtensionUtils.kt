@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.*
@@ -22,6 +23,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.PagedList
@@ -66,6 +68,7 @@ fun Toolbar.changeToolbarFont() {
 
 val <T>LiveData<T>.distinct: LiveData<T>
     get() = Transformations.distinctUntilChanged(this)
+
 
 fun getPackage(): String {
     return if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "release" || BuildConfig.BUILD_TYPE == "playstore") "knf.kuma" else "knf.kuma.${BuildConfig.BUILD_TYPE}"
@@ -514,3 +517,10 @@ fun <T> diceOf(default: T? = null, mapCreator: MutableMap<T, Double>.() -> Unit)
     if (default != null && map.isEmpty()) return default
     return WeightedDice(map).roll()
 }
+
+inline var View.isVisibleAnimate: Boolean
+    get() = isVisible
+    set(value) {
+        isVisible = value
+        startAnimation(AnimationUtils.loadAnimation(context, if (value) R.anim.fadein else R.anim.fadeout))
+    }

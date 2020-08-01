@@ -4,6 +4,8 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
@@ -27,6 +29,7 @@ import knf.kuma.pojos.RecentObject
 import kotlinx.android.synthetic.main.admob_ad.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.collections.forEachReversedWithIndex
 import xdroid.toaster.Toaster.toast
@@ -51,15 +54,15 @@ object AdsUtilsMob {
     val EXPLORER_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/1041869769"
     val CAST_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5535283585"
     val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1044960115" else "ca-app-pub-5390653757953587/5447863415"
-    const val REWARDED = "ca-app-pub-5390653757953587/5420761189"
-    const val INTERSTITIAL = "ca-app-pub-5390653757953587/5880297311"
-    val adRequest: AdRequest
-        get() = AdRequest.Builder().apply {
-            if (BuildConfig.DEBUG) {
-                addTestDevice("13973677C2742599D2DE55DC380C9A99")
-                addTestDevice("C0D57A3687415A6ED689296FCD543DB9")
-            }
-        }.build()
+    val REWARDED get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/5224354917" else "ca-app-pub-5390653757953587/5420761189"
+    val INTERSTITIAL get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-5390653757953587/5880297311"
+    val adRequest: AdRequest get() = AdRequest.Builder().build()
+
+    fun setUp() {
+        if (!BuildConfig.DEBUG) return
+        val builder = RequestConfiguration.Builder().setTestDeviceIds(listOf("E3C4128C4939EAEB2AEB3AB373256828"))
+        MobileAds.setRequestConfiguration(builder.build())
+    }
 }
 
 fun MutableList<RecentObject>.implAdsRecentMob() {
@@ -274,7 +277,7 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
 
             override fun onUserEarnedReward(item: RewardItem) {
                 FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
-                Economy.reward()
+                Economy.reward(baseReward = 2)
                 onUpdate()
             }
 
@@ -328,6 +331,48 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
             interstitialAd.isLoaded -> interstitialAd.show()
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
             else -> toast("Anuncio aún cargando...")
+        }
+    }
+}
+
+class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenAdLoader {
+    var isAdClicked = false
+    private val interstitialAd: InterstitialAd by lazy {
+        InterstitialAd(context).apply {
+            adUnitId = AdsUtilsMob.INTERSTITIAL
+            adListener = object : AdListener() {
+                override fun onAdClosed() {
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
+                    interstitialAd.loadAd(AdsUtilsMob.adRequest)
+                    Economy.reward(isAdClicked)
+                }
+
+                override fun onAdClicked() {
+                    isAdClicked = true
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_clicked", Bundle())
+                }
+            }
+        }
+    }
+
+    init {
+        load()
+    }
+
+    override fun load() {
+        if (!interstitialAd.isLoaded) interstitialAd.loadAd(AdsUtilsMob.adRequest)
+    }
+
+    override fun show() {
+        when {
+            interstitialAd.isLoaded -> interstitialAd.show()
+            Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
+            else -> context.lifecycleScope.launch(Dispatchers.Main) {
+                while (!interstitialAd.isLoaded) {
+                    delay(250)
+                }
+                show()
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ import knf.kuma.directory.DirObjectCompact
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.Recents
+import knf.kuma.recents.RecentsPage
 import knf.kuma.search.SearchCompactDataSource
 import knf.kuma.search.SearchObject
 import org.jetbrains.anko.doAsync
@@ -55,6 +56,37 @@ class Repository {
                 }
 
                 override fun onFailure(call: Call<Recents>, t: Throwable) {
+                    if (t.message?.contains("503") == false)
+                        Toaster.toast("Error al obtener - " + t.message)
+                    t.printStackTrace()
+                    FirebaseCrashlytics.getInstance().recordException(t)
+                }
+            })
+        }
+    }
+
+    fun reloadRecentModels() {
+        if (Network.isConnected) {
+            getFactoryBack("https://animeflv.net/").getRecentModels(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(object : Callback<RecentsPage> {
+                override fun onResponse(call: Call<RecentsPage>, response: Response<RecentsPage>) {
+                    try {
+                        if (response.isSuccessful) {
+                            val list = response.body()?.list?.apply {
+                                forEachIndexed { index, model ->
+                                    model.key = index
+                                }
+                            } ?: emptyList()
+                            CacheDB.INSTANCE.recentModelsDAO().setCache(list)
+                        } else
+                            onFailure(call, Exception("HTTP " + response.code()))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        onFailure(call, e)
+                    }
+
+                }
+
+                override fun onFailure(call: Call<RecentsPage>, t: Throwable) {
                     if (t.message?.contains("503") == false)
                         Toaster.toast("Error al obtener - " + t.message)
                     t.printStackTrace()

@@ -113,7 +113,7 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     fun updateList(list: MutableList<FavoriteObject>) {
         fragment.lifecycleScope.launch(Dispatchers.IO) {
             this@FavsSectionAdapter.list = list
-            if (PrefsUtil.layType == "0")
+            if (PrefsUtil.layType == "0" && PrefsUtil.isNativeAdsEnabled)
                 this@FavsSectionAdapter.list.implAdsFavorite()
             recyclerView.post { this@FavsSectionAdapter.notifyDataSetChanged() }
         }

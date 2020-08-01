@@ -39,6 +39,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
 import knf.kuma.backup.MigrationActivity
@@ -123,7 +124,8 @@ class Main : GenericActivity(),
         //Appodeal.setLogLevel(Log.LogLevel.debug)
         Appodeal.initialize(this, BuildConfig.APPODEAL_KEY, Appodeal.BANNER or Appodeal.NATIVE or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
         Appodeal.setAutoCache(Appodeal.NATIVE or Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
-        FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled", PrefsUtil.isAdsEnabled.toString())
+        AdsUtilsMob.setUp()
+        FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
         FirebaseInstanceId.getInstance().instanceId
                 .addOnSuccessListener { result ->
                     Log.e("IID_TOKEN", result.token)

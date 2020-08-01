@@ -12,6 +12,7 @@ import knf.kuma.ads.AdCallback
 import knf.kuma.ads.AdCardItemHolder
 import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.ads.implAdsAchievement
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.noCrashLet
@@ -60,7 +61,8 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
     fun setAchievements(list: MutableList<Achievement>) {
         GlobalScope.launch(Dispatchers.IO) {
             this@AchievementAdapter.list = list
-            this@AchievementAdapter.list.implAdsAchievement()
+            if (PrefsUtil.isNativeAdsEnabled)
+                this@AchievementAdapter.list.implAdsAchievement()
             launch(Dispatchers.Main) {
                 notifyDataSetChanged()
             }

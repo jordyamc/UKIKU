@@ -18,6 +18,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="10dp"
+            android:layout_above="@+id/adContainer"
             tools:listitem="@layout/item_recents"/>
 
         <LinearLayout
@@ -43,8 +44,14 @@
                 android:text="Sin recientes"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="?android:textColorSecondary"
-                android:textSize="24sp"/>
+                android:textSize="24sp" />
         </LinearLayout>
+
+        <knf.kuma.custom.BannerContainerView
+            android:id="@+id/adContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true" />
     </RelativeLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

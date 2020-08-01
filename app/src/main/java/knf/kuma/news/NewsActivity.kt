@@ -8,8 +8,11 @@ import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.ads.preload
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.asPx
 import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_news.*
@@ -42,6 +45,8 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
             }
             refresh.isRefreshing = false
         })
+        if (!PrefsUtil.isNativeAdsEnabled)
+            adContainer.implBanner(AdsType.NEWS_BANNER)
     }
 
     override fun onRefresh() {

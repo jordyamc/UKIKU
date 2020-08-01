@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import knf.kuma.commons.noCrashLetNullable
 import knf.kuma.database.CacheDB
+import knf.kuma.recents.RecentModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ data class SeenObject(@PrimaryKey val eid: String = "", val aid: String = "", va
     companion object {
         fun fromChapter(chapter: AnimeObject.WebInfo.AnimeChapter): SeenObject = SeenObject(chapter.eid, chapter.aid, chapter.number)
         fun fromRecent(recent: RecentObject): SeenObject = SeenObject(recent.eid, recent.aid, recent.chapter)
+        fun fromRecentModel(recent: RecentModel): SeenObject = SeenObject(recent.extras.eid, recent.aid, recent.chapter)
         fun fromDownloaded(download: ExplorerObject.FileDownObj) = SeenObject(download.eid, download.aid, String.format(Locale.getDefault(), "Episodio %s", download.chapter))
     }
 }

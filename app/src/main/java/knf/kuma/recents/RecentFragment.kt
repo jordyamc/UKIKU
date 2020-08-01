@@ -12,6 +12,8 @@ import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import knf.kuma.BottomFragment
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.implBanner
 import knf.kuma.ads.preload
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
@@ -20,6 +22,7 @@ import knf.kuma.home.HomeFragment
 import knf.kuma.pojos.RecentObject
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.ServersFactory
+import kotlinx.android.synthetic.main.recycler_refresh_fragment.*
 
 class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: RecentsViewModel by viewModels()
@@ -36,6 +39,8 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
             scrollByKey(objects)
         })
         updateList()
+        if (!PrefsUtil.isNativeAdsEnabled)
+            adContainer.implBanner(AdsType.RECENT_BANNER)
     }
 
     private fun scrollByKey(list: List<RecentObject>) {

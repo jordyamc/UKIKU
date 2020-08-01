@@ -25,10 +25,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import knf.kuma.R
-import knf.kuma.ads.AdsUtils
-import knf.kuma.ads.FullscreenAdLoader
-import knf.kuma.ads.getFAdLoaderInterstitial
-import knf.kuma.ads.getFAdLoaderRewarded
+import knf.kuma.ads.*
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
@@ -36,6 +33,7 @@ import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
+import kotlinx.android.synthetic.main.activity_news.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.toast
@@ -89,6 +87,8 @@ class AchievementActivity : GenericActivity() {
         tabs.setupWithViewPager(pager)
         rewardedAd.load()
         interstitial.load()
+        if (!PrefsUtil.isNativeAdsEnabled)
+            adContainer.implBanner(AdsType.ACHIEVEMENT_BANNER)
     }
 
     override fun onAttachedToWindow() {

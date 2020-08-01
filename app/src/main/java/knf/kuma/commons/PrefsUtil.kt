@@ -53,8 +53,8 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val isAdsEnabled: Boolean
-        get() = (!isSubscriptionEnabled && AdsUtils.remoteConfigs.getBoolean("ads_forced")) ||
-                PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled", BuildConfig.BUILD_TYPE == "playstore" || App.context.resources.getBoolean(R.bool.isTv))
+        get() = (!BuildConfig.DEBUG && !isSubscriptionEnabled && AdsUtils.remoteConfigs.getBoolean("ads_forced")) ||
+                PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled_new", true)
 
     val downloaderType: Int
         get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
@@ -251,6 +251,18 @@ object PrefsUtil {
     var isPSWarned: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isPSWarned1", false)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isPSWarned1", value).apply()
+
+    var isNativeAdsEnabled: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isNativeAdsEnabled", true)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isNativeAdsEnabled", value).apply()
+
+    var isFullAdsEnabled: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isFullAdsEnabled", true)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isFullAdsEnabled", value).apply()
+
+    var fullAdsProbability: Float
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getFloat("fullAdsProbability", 50.0f)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat("fullAdsProbability", value).apply()
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)

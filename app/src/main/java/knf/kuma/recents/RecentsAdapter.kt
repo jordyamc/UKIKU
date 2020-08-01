@@ -283,7 +283,8 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
         val wasEmpty = this.list.isEmpty()
         fragment.lifecycleScope.launch(Dispatchers.IO) {
             this@RecentsAdapter.list = list.distinctBy { it.eid } as MutableList<RecentObject>
-            this@RecentsAdapter.list.implAdsRecent()
+            if (PrefsUtil.isNativeAdsEnabled)
+                this@RecentsAdapter.list.implAdsRecent()
             if (this@RecentsAdapter.list.isNotEmpty())
                 launch(Dispatchers.Main) {
                     notifyDataSetChanged()

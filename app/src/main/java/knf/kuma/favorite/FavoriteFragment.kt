@@ -102,7 +102,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         recyclerView = view.find(R.id.recycler)
         recyclerView.verifyManager()
         errorLayout = view.find(R.id.error)
-        if (PrefsUtil.layType == "1")
+        if (PrefsUtil.layType == "1" || !PrefsUtil.isNativeAdsEnabled)
             lifecycleScope.launch(Dispatchers.IO) {
                 delay(1000)
                 view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.FAVORITE_BANNER, true)

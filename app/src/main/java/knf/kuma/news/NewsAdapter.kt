@@ -14,6 +14,7 @@ import knf.kuma.ads.AdCallback
 import knf.kuma.ads.AdCardItemHolder
 import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.ads.implAdsNews
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.isSameContent
 import knf.kuma.commons.noCrashLet
 import kotlinx.android.synthetic.main.item_news.view.*
@@ -58,7 +59,8 @@ class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<Recycl
 
     fun update(list: MutableList<NewsObject>) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
-            list.implAdsNews()
+            if (PrefsUtil.isNativeAdsEnabled)
+                list.implAdsNews()
             if (this@NewsAdapter.list isSameContent list)
                 return@launch
             this@NewsAdapter.list = list

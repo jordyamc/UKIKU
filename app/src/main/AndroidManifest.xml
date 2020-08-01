@@ -71,6 +71,9 @@
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="knf.kuma.cast.CastOptionsProvider" />
 
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
+            android:value="true" />
 
         <activity
             android:name=".commons.EAMapActivity"
@@ -345,6 +348,7 @@
         <activity android:name=".profile.TopActivity" />
         <activity android:name=".faq.FaqActivity" />
         <activity android:name=".news.MaterialNewsActivity" />
+        <activity android:name=".preferences.AdsPreferenceActivity" />
 
         <provider
             android:name=".slices.AnimeSlice"

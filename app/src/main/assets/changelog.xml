@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="164" version="4.4.0">
+        <change type="fix">Errores generales</change>
+        <change type="change">Anuncios activados por defecto</change>
+        <change type="change">Cambios en personalización de anuncios</change>
+    </release>
     <release code="163" version="4.3.47">
         <change type="fix">Error al crear directorio</change>
     </release>

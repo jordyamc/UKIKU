@@ -20,6 +20,9 @@ interface SeenDAO {
     @Query("SELECT * FROM seenobject WHERE aid = :aid AND number = :number LIMIT 1")
     fun chapterSeen(aid: String, number: String): LiveData<SeenObject>
 
+    @Query("SELECT count(*) FROM seenobject WHERE aid = :aid AND number = :number LIMIT 1")
+    fun chapterIsSeenLive(aid: String, number: String): LiveData<Int>
+
     @Query("SELECT count(*) FROM seenobject WHERE aid = :aid AND number = :number")
     fun chapterIsSeen(aid: String, number: String): Boolean
 

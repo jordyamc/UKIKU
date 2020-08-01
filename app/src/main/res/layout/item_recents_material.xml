@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="101dp"
+    android:baselineAligned="false"
+    android:clickable="true"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:foreground="?selectableItemBackground"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="11dp"
+    android:paddingBottom="8dp">
+
+    <RelativeLayout
+        android:layout_width="85dp"
+        android:layout_height="85dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image"
+            android:layout_width="85dp"
+            android:layout_height="85dp"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/roundedCorners"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <RelativeLayout
+            android:id="@+id/seenIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/circular_shade"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="4dp"
+                android:tint="@color/material_red_500"
+                app:srcCompat="@drawable/ic_seen" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layDownloading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.material.progressindicator.ProgressIndicator
+                android:id="@+id/progressIndicator"
+                style="@style/Widget.MaterialComponents.ProgressIndicator.Circular.Determinate"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                android:indeterminate="true"
+                android:max="100" />
+
+            <ImageView
+                android:id="@+id/actionCancel"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/background_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_close" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="85dp"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lines="1"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
+                android:textColor="?colorAccentLight"
+                tools:text="Episodio ##" />
+
+            <ImageView
+                android:id="@+id/newIndicator"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="4dp"
+                android:tint="#FDD835"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_error"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="top|center_vertical"
+            android:maxLines="2"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+            tools:text="Anime long long long long long long long title" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/downloadedChip"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_gravity="bottom"
+                android:clickable="false"
+                android:text="Descargado"
+                android:textColor="@android:color/white"
+                android:visibility="gone"
+                app:chipBackgroundColor="?colorAccent"
+                app:chipMinTouchTargetSize="0dp"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/actionMenu"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/background_ripple"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="4dp"
+            app:srcCompat="@drawable/action_chapter" />
+
+        <ImageView
+            android:id="@+id/favIndicator"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="3dp"
+            android:tint="@color/material_red_500"
+            android:visibility="gone"
+            app:srcCompat="@drawable/heart_full"
+            tools:visibility="visible" />
+    </FrameLayout>
+
+</LinearLayout>

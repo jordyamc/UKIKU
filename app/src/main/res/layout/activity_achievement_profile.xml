@@ -1,122 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="?colorSurface"
-        android:theme="@style/AppTheme.AppBarOverlay.Simple.NoBackground">
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:contentScrim="@color/colorPrimary"
-            app:expandedTitleTextAppearance="@style/NoTitleStyle"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@id/toolbar">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="?actionBarSize"
-                android:orientation="vertical">
-
-                <RelativeLayout
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_margin="16dp">
-
-                    <com.mikhaellopez.circularprogressbar.CircularProgressBar
-                        android:id="@+id/progress"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:cpb_background_progressbar_color="@color/color_bottom_line_disabled"
-                        app:cpb_background_progressbar_width="4dp"
-                        app:cpb_progressbar_color="?colorPrimary"
-                        app:cpb_progressbar_width="5dp" />
-
-                    <TextView
-                        android:id="@+id/level"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:textColor="@color/textPrimary"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        tools:text="99" />
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/countdown"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="?colorAccent"
-                        android:textSize="14sp"
-                        tools:text="10,000 XP" />
-
-                    <TextView
-                        android:id="@+id/progress_ind_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" para siguiente nivel"
-                        android:textColor="@color/textPrimary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?actionBarSize"
-                android:layout_gravity="top"
-                android:layout_marginBottom="48dp"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs"
-                style="@style/Widget.MaterialComponents.TabLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:background="@android:color/transparent"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:tabBackground="@android:color/transparent">
-
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="DESBLOQUEADOS" />
-
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BLOQUEADOS" />
-            </com.google.android.material.tabs.TabLayout>
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/pager"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:orientation="vertical">
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="?colorSurface"
+                android:theme="@style/AppTheme.AppBarOverlay.Simple.NoBackground">
+
+                <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:contentScrim="@color/colorPrimary"
+                    app:expandedTitleTextAppearance="@style/NoTitleStyle"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:toolbarId="@id/toolbar">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="?actionBarSize"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_margin="16dp">
+
+                            <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                                android:id="@+id/progress"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:cpb_background_progressbar_color="@color/color_bottom_line_disabled"
+                                app:cpb_background_progressbar_width="4dp"
+                                app:cpb_progressbar_color="?colorPrimary"
+                                app:cpb_progressbar_width="5dp" />
+
+                            <TextView
+                                android:id="@+id/level"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:textColor="@color/textPrimary"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                tools:text="99" />
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/countdown"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?colorAccent"
+                                android:textSize="14sp"
+                                tools:text="10,000 XP" />
+
+                            <TextView
+                                android:id="@+id/progress_ind_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" para siguiente nivel"
+                                android:textColor="@color/textPrimary"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?actionBarSize"
+                        android:layout_gravity="top"
+                        android:layout_marginBottom="48dp"
+                        app:layout_collapseMode="pin"
+                        app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tabs"
+                        style="@style/Widget.MaterialComponents.TabLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:background="@android:color/transparent"
+                        app:layout_scrollFlags="scroll|enterAlways"
+                        app:tabBackground="@android:color/transparent">
+
+                        <com.google.android.material.tabs.TabItem
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DESBLOQUEADOS" />
+
+                        <com.google.android.material.tabs.TabItem
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BLOQUEADOS" />
+                    </com.google.android.material.tabs.TabLayout>
+                </com.google.android.material.appbar.CollapsingToolbarLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <knf.kuma.custom.BannerContainerView
+            android:id="@+id/adContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/sheet"

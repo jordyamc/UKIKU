@@ -3,6 +3,7 @@ package knf.kuma.ads
 import android.app.Activity
 import android.util.Log
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.appodeal.ads.Appodeal
 import com.google.android.gms.ads.AdSize
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -197,6 +198,17 @@ fun getFAdLoaderInterstitial(context: Activity, onUpdate: () -> Unit = {}): Full
                     put({ getFAdLoaderInterstitialAppOdeal(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("appodeal_fullscreen_percent"))
             }()
         }
+
+fun showRandomInterstitial(context: AppCompatActivity) {
+    if (PrefsUtil.isAdsEnabled && PrefsUtil.isFullAdsEnabled) {
+        val probShow = PrefsUtil.fullAdsProbability
+        val probDefault = 100f - probShow
+        diceOf<() -> Unit> {
+            put({ FAdLoaderInterstitialLazyMob(context).show() }, probShow.toDouble())
+            put({}, probDefault.toDouble())
+        }()
+    }
+}
 
 fun getAdSize(width: Float): AdSize {
     val metrics = App.context.resources.displayMetrics

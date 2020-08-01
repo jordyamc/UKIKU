@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.animeinfo.img.ActivityImgFull
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
 import knf.kuma.backup.firestore.syncData
@@ -68,6 +69,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
         load()
         checkBypass()
+        showRandomInterstitial(this)
     }
 
     private fun load() {

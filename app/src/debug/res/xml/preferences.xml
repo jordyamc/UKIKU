@@ -224,11 +224,15 @@
             android:key="list_placeholder"
             android:title="Usar placeholder en listas" />
         <SwitchPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:icon="@drawable/ic_cash"
-            android:key="ads_enabled"
+            android:key="ads_enabled_new"
             android:summary="Mostrar anuncios para ayudar al programador"
-            android:title="Mostrar anuncios"/>
+            android:title="Mostrar anuncios" />
+        <Preference
+            android:icon="@drawable/ic_cash"
+            android:key="ads_settings"
+            android:title="Configuracion de anuncios" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="category_design"

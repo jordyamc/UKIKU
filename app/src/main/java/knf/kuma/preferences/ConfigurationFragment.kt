@@ -66,7 +66,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
         private const val keyBufferSize = "buffer_size"
         private const val keyThemeColor = "theme_color"
         private const val keyArchievementsPermissions = "achievements_permissions"
-        private const val keyAdsEnabled = "ads_enabled"
+        private const val keyAdsEnabled = "ads_enabled_new"
     }
 
     private var uaChangeListener: UAChangeListener? = null
@@ -226,7 +226,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     activity?.recreate()
                     true
                 }
-                preferenceScreen.findPreference<SwitchPreference>("ads_enabled")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                preferenceScreen.findPreference<SwitchPreference>("ads_enabled_new")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                     if (BuildConfig.DEBUG || PrefsUtil.isSubscriptionEnabled) return@OnPreferenceChangeListener true
                     if (newValue == false) {
                         context?.let { FirestoreManager.doSignOut(it) }
@@ -462,6 +462,17 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     isEnabled = PrefsUtil.isSubscriptionEnabled || !AdsUtils.remoteConfigs.getBoolean("ads_forced")
                     if (!isEnabled)
                         summary = "Estas en una prueba temporal!"
+                    setOnPreferenceChangeListener { _, newValue ->
+                        preferenceScreen.findPreference<Preference>("ads_settings")?.isEnabled = newValue == true
+                        true
+                    }
+                }
+                preferenceScreen.findPreference<Preference>("ads_settings")?.apply {
+                    isEnabled = PrefsUtil.isAdsEnabled
+                    setOnPreferenceClickListener {
+                        startActivity(Intent(requireContext(), AdsPreferenceActivity::class.java))
+                        true
+                    }
                 }
                 if (BuildConfig.DEBUG) {
                     preferenceScreen.findPreference<Preference>("reset_recents")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
