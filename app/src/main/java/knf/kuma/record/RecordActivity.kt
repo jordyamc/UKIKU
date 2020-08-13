@@ -18,6 +18,7 @@ import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
+import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
@@ -78,6 +79,7 @@ class RecordActivity : GenericActivity() {
                 error.visibility = View.GONE
             progressBar.visibility = View.GONE
         })
+        showRandomInterstitial(this,PrefsUtil.fullAdsExtraProbability)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

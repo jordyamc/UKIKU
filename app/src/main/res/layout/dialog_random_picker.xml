@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:orientation="vertical">
+
+
+    <biz.kasual.materialnumberpicker.MaterialNumberPicker
+        android:id="@+id/picker"
+        android:layout_width="match_parent"
+        android:layout_height="164dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:minHeight="164dp"
+        app:npBackgroundColor="@android:color/transparent"
+        app:npMaxValue="100"
+        app:npMinValue="5"
+        app:npTextColor="@color/textPrimary"
+        app:npTextSize="18sp" />
+
+</LinearLayout>

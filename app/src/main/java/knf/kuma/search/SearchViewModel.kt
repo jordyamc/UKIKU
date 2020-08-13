@@ -10,6 +10,14 @@ class SearchViewModel : ViewModel() {
     private var liveData: LiveData<PagedList<SearchObject>> = MutableLiveData()
     private var observer: Observer<PagedList<SearchObject>>? = null
 
+    private var queryLive = MutableLiveData<String?>(null)
+
+    fun sendQuery(query: String?) {
+        queryLive.value = query
+    }
+
+    val queryListener: LiveData<String?> get() = queryLive
+
     fun setSearch(query: String, genres: String, owner: LifecycleOwner, observer: Observer<PagedList<SearchObject>>) {
         this.observer?.let { liveData.removeObserver(it) }
         this.observer = observer

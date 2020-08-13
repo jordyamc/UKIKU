@@ -7,6 +7,8 @@
 
     <!-- general -->
 
+    <dimen name="separator_size">1.5dp</dimen>
+
     <!-- snackProgressBar -->
     <dimen name="snackProgressBar_height_single">48dp</dimen>
     <dimen name="snackProgressBar_height_multi">80dp</dimen>

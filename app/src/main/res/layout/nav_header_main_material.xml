@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/img"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/side_nav_bar"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="false"
+    android:gravity="top"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="40dp"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <LinearLayout
+        android:id="@+id/optionsBar"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="12dp"
+        android:gravity="bottom|end"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/action_migrate"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/background_ripple"
+            android:padding="5dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_umaru"/>
+
+        <ImageButton
+            android:id="@+id/action_share"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/background_ripple"
+            android:padding="5dp"
+            android:tint="@android:color/white"
+            app:srcCompat="@drawable/ic_achievement_share" />
+
+        <ImageButton
+            android:id="@+id/action_info"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/background_ripple"
+            android:padding="5dp"
+            app:srcCompat="@drawable/ic_info_white"/>
+
+        <ImageButton
+            android:id="@+id/action_trophy"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/background_ripple"
+            android:padding="5dp"
+            app:srcCompat="@drawable/ic_trophy"/>
+
+        <ImageButton
+            android:id="@+id/action_login"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/background_ripple"
+            android:padding="5dp"
+            app:srcCompat="@drawable/ic_sync"/>
+
+        <ImageButton
+            android:id="@+id/action_map"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/background_ripple"
+            android:padding="5dp"
+            android:visibility="visible"
+            app:srcCompat="@drawable/ic_map"/>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:srcCompat="@mipmap/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/backupLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="4dp"
+        android:tag=":aesthetic_ignore"
+        android:text="Almacenamiento local"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+</LinearLayout>

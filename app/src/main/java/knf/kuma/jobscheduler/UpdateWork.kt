@@ -11,8 +11,8 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import knf.kuma.BuildConfig
-import knf.kuma.Main
 import knf.kuma.R
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.Network
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.notificationManager
@@ -45,7 +45,7 @@ class UpdateWork(val context: Context, workerParameters: WorkerParameters) : Wor
                 setSmallIcon(R.drawable.ic_not_update)
                 setContentTitle("UKIKU")
                 setContentText("Nueva versión disponible")
-                setContentIntent(PendingIntent.getActivity(context, 5598, Intent(context, Main::class.java), PendingIntent.FLAG_UPDATE_CURRENT))
+                setContentIntent(PendingIntent.getActivity(context, 5598, Intent(context, DesignUtils.mainClass), PendingIntent.FLAG_UPDATE_CURRENT))
                 color = ContextCompat.getColor(context, R.color.colorAccent)
             }.build()
             context.notificationManager.notify(954857, notification)

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="AdTemplateView">
+        <attr name="at_layout" format="reference"/>
+    </declare-styleable>
     <declare-styleable name="ExpandableTextView">
         <attr name="tvea_expandLines" format="integer"/>
         <attr name="tvea_shrinkBitmap" format="reference"/>
@@ -23,6 +26,12 @@
     </declare-styleable>
     <declare-styleable name="StateView">
         <attr name="sv_title" format="string"/>
+    </declare-styleable>
+    <declare-styleable name="StateViewMaterial">
+        <attr name="svm_title" format="string"/>
+    </declare-styleable>
+    <declare-styleable name="ConnectionState">
+        <attr name="cs_bg_color" format="color"/>
     </declare-styleable>
     <declare-styleable name="HomeList">
         <attr name="hm_showViewAll" format="boolean"/>

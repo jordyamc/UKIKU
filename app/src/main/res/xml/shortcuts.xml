@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
-        android:enabled="true"
         android:icon="@drawable/ic_shortcut_fav"
         android:shortcutId="favs"
         android:shortcutLongLabel="@string/shortcut_fav_long"
         android:shortcutShortLabel="@string/shortcut_fav_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="knf.kuma.Main"
+            android:targetClass="knf.kuma.shortcuts.DummyMainActivity"
             android:targetPackage="knf.kuma">
             <extra
                 android:name="start_position"
@@ -16,14 +15,13 @@
         </intent>
     </shortcut>
     <shortcut
-        android:enabled="true"
         android:icon="@drawable/ic_shortcut_dir"
         android:shortcutId="dir"
         android:shortcutLongLabel="@string/shortcut_dir_long"
         android:shortcutShortLabel="@string/shortcut_dir_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="knf.kuma.Main"
+            android:targetClass="knf.kuma.shortcuts.DummyMainActivity"
             android:targetPackage="knf.kuma">
             <extra
                 android:name="start_position"
@@ -31,25 +29,23 @@
         </intent>
     </shortcut>
     <shortcut
-        android:enabled="true"
         android:icon="@drawable/ic_shortcut_explorer"
         android:shortcutId="explorer"
         android:shortcutLongLabel="@string/shortcut_explorer_long"
         android:shortcutShortLabel="@string/shortcut_explorer_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="knf.kuma.explorer.ExplorerActivity"
+            android:targetClass="knf.kuma.shortcuts.DummyExplorerActivity"
             android:targetPackage="knf.kuma"/>
     </shortcut>
     <shortcut
-        android:enabled="true"
         android:icon="@drawable/ic_shortcut_emision"
         android:shortcutId="emission"
         android:shortcutLongLabel="@string/shortcut_emision_long"
         android:shortcutShortLabel="@string/shortcut_emision_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="knf.kuma.emision.EmisionActivity"
+            android:targetClass="knf.kuma.shortcuts.DummyEmissionActivity"
             android:targetPackage="knf.kuma"/>
     </shortcut>
 </shortcuts>

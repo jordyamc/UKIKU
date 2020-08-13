@@ -186,7 +186,7 @@
             android:theme="@style/AppTheme.FullScreen" />
         <activity android:name=".record.RecordActivity" />
         <activity android:name=".seeing.SeeingActivity" />
-        <activity android:name=".emision.EmisionActivity" />
+        <activity android:name=".emision.EmissionActivity" />
         <activity android:name=".explorer.ExplorerActivity" />
         <activity
             android:name=".updater.UpdateActivity"
@@ -213,9 +213,6 @@
         <activity
             android:name=".backup.MigrationActivity"
             android:theme="@style/AppTheme.Translucent" />
-        <activity
-            android:name=".AppInfo"
-            android:theme="@style/AppTheme.AppInfo" />
         <activity android:name=".recommended.RecommendActivity" />
         <activity android:name=".recommended.RankingActivity" />
         <activity android:name=".search.GenreActivity" />

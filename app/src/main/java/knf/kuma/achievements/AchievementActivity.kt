@@ -89,6 +89,7 @@ class AchievementActivity : GenericActivity() {
         interstitial.load()
         if (!PrefsUtil.isNativeAdsEnabled)
             adContainer.implBanner(AdsType.ACHIEVEMENT_BANNER)
+        showRandomInterstitial(this,PrefsUtil.fullAdsExtraProbability)
     }
 
     override fun onAttachedToWindow() {

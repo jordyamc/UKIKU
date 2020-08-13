@@ -8,14 +8,16 @@ import android.view.Menu
 import android.view.MenuItem
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
+import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_emision.*
 import java.util.*
 
-class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
-    private var pagerAdapter: EmissionPagerAdapter? = null
+class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListener {
+    private var pagerAdapter: EmissionPagerAdapterMaterial? = null
 
     private val currentDay: Int
         get() {
@@ -30,19 +32,21 @@ class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_emision)
+        setSurfaceBars()
+        setContentView(R.layout.activity_emision_material)
         toolbar.title = "Emisión"
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         pager.offscreenPageLimit = 7
-        pagerAdapter = EmissionPagerAdapter(supportFragmentManager)
+        pagerAdapter = EmissionPagerAdapterMaterial(supportFragmentManager)
         pager.adapter = pagerAdapter
         tabs.setupWithViewPager(pager)
         tabs.addOnTabSelectedListener(this)
         pager.setCurrentItem(currentDay - 1, true)
         EAHelper.clear2()
+        showRandomInterstitial(this,PrefsUtil.fullAdsExtraProbability)
     }
 
     override fun onResume() {
@@ -91,7 +95,7 @@ class EmisionActivity : GenericActivity(), TabLayout.OnTabSelectedListener {
     companion object {
 
         fun open(context: Activity) {
-            context.startActivityForResult(Intent(context, EmisionActivity::class.java), 4987)
+            context.startActivityForResult(Intent(context, EmissionActivityMaterial::class.java), 4987)
         }
     }
 }

@@ -1,6 +1,7 @@
 package knf.kuma.widgets;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -8,8 +9,10 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.ads.formats.NativeAd.Image;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
@@ -17,7 +20,6 @@ import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 
 import org.jetbrains.annotations.NotNull;
 
-import androidx.annotation.Nullable;
 import knf.kuma.R;
 
 /**
@@ -31,7 +33,6 @@ public class AdTemplateView extends FrameLayout {
     private UnifiedNativeAdView nativeAdView;
     private TextView primaryView;
     private TextView secondaryView;
-    private RatingBar ratingBar;
     private ImageView iconView;
     private Button callToActionView;
 
@@ -41,17 +42,17 @@ public class AdTemplateView extends FrameLayout {
 
     public AdTemplateView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initView(context);
+        initView(context,attrs);
     }
 
     public AdTemplateView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initView(context);
+        initView(context,attrs);
     }
 
     public AdTemplateView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        initView(context);
+        initView(context,attrs);
     }
 
     public void setStyles(NativeTemplateStyle styles) {
@@ -106,13 +107,13 @@ public class AdTemplateView extends FrameLayout {
     }
 
     public void setNativeAd(@NotNull UnifiedNativeAd nativeAd) {
+        if (this.nativeAd != null) return;
         this.nativeAd = nativeAd;
 
         String store = nativeAd.getStore();
         String advertiser = nativeAd.getAdvertiser();
         String headline = nativeAd.getHeadline();
         String cta = nativeAd.getCallToAction();
-        Double starRating = nativeAd.getStarRating();
         Image icon = nativeAd.getIcon();
 
         String secondaryText;
@@ -133,17 +134,8 @@ public class AdTemplateView extends FrameLayout {
         primaryView.setText(headline);
         callToActionView.setText(cta);
 
-        //  Set the secondary view to be the star rating if available.
-        if (starRating != null && starRating > 0) {
-            secondaryView.setVisibility(GONE);
-            ratingBar.setVisibility(VISIBLE);
-            ratingBar.setMax(5);
-            nativeAdView.setStarRatingView(ratingBar);
-        } else {
-            secondaryView.setText(secondaryText);
-            secondaryView.setVisibility(VISIBLE);
-            ratingBar.setVisibility(GONE);
-        }
+        secondaryView.setText(secondaryText);
+        secondaryView.setVisibility(VISIBLE);
 
         if (icon != null) {
             iconView.setVisibility(VISIBLE);
@@ -168,10 +160,13 @@ public class AdTemplateView extends FrameLayout {
         return SMALL_TEMPLATE;
     }
 
-    private void initView(Context context) {
+    private void initView(Context context, AttributeSet attrs) {
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.AdTemplateView);
+        @LayoutRes int lay =  array.getResourceId(R.styleable.AdTemplateView_at_layout,R.layout.item_native_small);
+        array.recycle();
         LayoutInflater inflater =
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.item_native_small, this);
+        inflater.inflate(lay, this);
     }
 
     @Override
@@ -180,9 +175,6 @@ public class AdTemplateView extends FrameLayout {
         nativeAdView = findViewById(R.id.native_ad_view);
         primaryView = findViewById(R.id.primary);
         secondaryView = findViewById(R.id.secondary);
-
-        ratingBar = findViewById(R.id.rating_bar);
-        ratingBar.setEnabled(false);
 
         callToActionView = findViewById(R.id.cta);
         iconView = findViewById(R.id.icon);

@@ -9,16 +9,22 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import knf.kuma.BottomFragment
 import knf.kuma.R
-import knf.kuma.ads.preload
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.NativeManager
+import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.home.HomeFragment
+import knf.kuma.home.HomeFragmentMaterial
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.ServersFactory
+import kotlinx.android.synthetic.main.fragment_recent_material.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: RecentModelsViewModel by viewModels()
@@ -32,11 +38,13 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
             holder.setError(objects.isEmpty())
             holder.setRefreshing(false)
             if (adapter.itemCount == 0 || objects.isNotEmpty() && objects[0].hashCode().toLong() != adapter.getItemId(0)) {
-                requireActivity().preload(objects)
                 adapter.updateList(objects) {
+                    loadAds(objects)
                     if (isFirstLoad) {
                         holder.recyclerView.scheduleLayoutAnimation()
                         isFirstLoad = false
+                    }else{
+                        holder.scrollToTop()
                     }
                 }
                 scrollByKey(objects)
@@ -54,7 +62,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.recycler_refresh_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_recent_material, container, false)
         holder = RecyclerRefreshHolder(view).also {
             it.refreshLayout.setOnRefreshListener(this@RecentModelsFragment)
             it.recyclerView.adapter = adapter
@@ -62,6 +70,25 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
         }
         EAHelper.enter1("R")
         return view
+    }
+
+    private fun loadAds(list: List<RecentModel>) {
+        if (PrefsUtil.isAdsEnabled) {
+            if (PrefsUtil.isNativeAdsEnabled && !adapter.hasAds())
+                lifecycleScope.launch(Dispatchers.Main) {
+                    NativeManager.take(this,3){
+                        if (it.isEmpty())
+                            adContainer.implBanner(AdsType.RECENT_BANNER, true)
+                        else {
+                            adapter.updateList(list, it.mapIndexed { index, unifiedNativeAd -> RecentModelAd(index, unifiedNativeAd) }) {
+                                holder.scrollToTop()
+                            }
+                        }
+                    }
+                }
+            else if (!adapter.hasAds())
+                adContainer.implBanner(AdsType.RECENT_BANNER, true)
+        }
     }
 
     override fun onRefresh() {
@@ -99,7 +126,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
 
         fun get(): BottomFragment {
             return if (PrefsUtil.useHome)
-                HomeFragment()
+                HomeFragmentMaterial()
             else
                 RecentModelsFragment()
         }

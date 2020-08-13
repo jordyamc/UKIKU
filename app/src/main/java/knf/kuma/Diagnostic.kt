@@ -107,7 +107,7 @@ class Diagnostic : GenericActivity() {
     private fun runBypassTest() {
         doAsync {
             try {
-                Jsoup.connect("https://animeflv.net/").timeout(0).execute()
+                Jsoup.connect("https://animeflv.net/").followRedirects(true).timeout(0).execute()
                 bypassState.load("No se necesita")
                 doOnUI { bypassRecreate.visibility = View.GONE }
             } catch (e: HttpStatusException) {

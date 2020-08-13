@@ -1,5 +1,7 @@
 package knf.kuma.custom
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -10,6 +12,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.use
 import androidx.lifecycle.*
 import knf.kuma.App
 import knf.kuma.Diagnostic
@@ -35,17 +38,27 @@ class ConnectionState : LinearLayout {
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        inflate(context)
+        inflate(context,attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        inflate(context)
+        inflate(context,attrs)
     }
 
-    private fun inflate(context: Context) {
+    private var bgColor = Color.TRANSPARENT
+
+    private fun inflate(context: Context, attrs: AttributeSet? = null) {
+        context.obtainStyledAttributes(attrs,R.styleable.ConnectionState).use {
+            bgColor = it.getColor(R.styleable.ConnectionState_cs_bg_color,ContextCompat.getColor(context, R.color.colorPrimary))
+        }
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.lay_status_bar, this)
+    }
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        container.setBackgroundColor(bgColor)
     }
 
     private var isInitialized = false
@@ -54,7 +67,7 @@ class ConnectionState : LinearLayout {
         if (!isInitialized || visibility == View.VISIBLE)
             GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
                 normalState()
-                visibility = View.VISIBLE
+                show()
                 delay(1000)
                 if (!Network.isConnected) {
                     noNetworkState()
@@ -169,7 +182,7 @@ class ConnectionState : LinearLayout {
     }
 
     private fun normalState() {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+        container.setBackgroundColor(bgColor)
         progress.visibility = View.VISIBLE
         icon.visibility = View.GONE
         message.text = "Comprobando..."
@@ -179,7 +192,7 @@ class ConnectionState : LinearLayout {
     }
 
     private fun noNetworkState() {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+        container.setBackgroundColor(bgColor)
         progress.visibility = View.GONE
         icon.setImageResource(R.drawable.ic_no_network)
         icon.visibility = View.VISIBLE
@@ -277,9 +290,9 @@ class ConnectionState : LinearLayout {
             })
             maxPages = withContext(Dispatchers.IO) {
                 noCrashLet("3200~") {
-                    val main = jsoupCookies("https://animeflv.net/browse").get()
+                    val main = okHttpDocument("https://animeflv.net/browse")
                     val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
-                    val last = jsoupCookies("https://animeflv.net/browse?page=$lastPage").get()
+                    val last = okHttpDocument("https://animeflv.net/browse?page=$lastPage")
                     ((24 * (lastPage - 1)) + last.select("article").size).toString()
                 }
             }
@@ -302,9 +315,53 @@ class ConnectionState : LinearLayout {
         container.setOnLongClickListener(null)
     }
 
+    private fun show() {
+        val height = 24.asPx
+        layoutParams = layoutParams.apply {
+            this.height = 0
+        }
+        visibility = View.VISIBLE
+        ValueAnimator.ofInt(0,height).apply {
+            addUpdateListener {
+                layoutParams = layoutParams.apply {
+                    this.height = it.animatedValue as Int
+                }
+            }
+            duration = 350
+        }.start()
+    }
+
     private suspend fun dismiss() {
         delay(1000)
-        visibility = View.GONE
+        val height = 24.asPx
+        ValueAnimator.ofInt(height,0).apply {
+            addUpdateListener {
+                layoutParams = layoutParams.apply {
+                    this.height = it.animatedValue as Int
+                }
+            }
+            addListener(object : Animator.AnimatorListener{
+                override fun onAnimationRepeat(animation: Animator?) {
+
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    visibility = View.GONE
+                    layoutParams = layoutParams.apply {
+                        this.height = height
+                    }
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+
+                }
+
+                override fun onAnimationStart(animation: Animator?) {
+
+                }
+            })
+            duration = 350
+        }.start()
     }
 
 }

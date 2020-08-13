@@ -10,7 +10,6 @@ import android.view.View
 import android.webkit.*
 import knf.kuma.App
 import knf.kuma.BuildConfig
-import knf.kuma.Main
 import knf.kuma.commons.*
 import knf.kuma.directory.DirectoryService
 import knf.kuma.jobscheduler.DirUpdateWork
@@ -38,7 +37,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
         super.onCreate(savedInstanceState)
         if (BuildConfig.BUILD_TYPE == "playstore") {
             finish()
-            startActivity(Intent(this, Main::class.java))
+            startActivity(Intent(this, DesignUtils.mainClass))
             return
         }
         if (savedInstanceState == null) {
@@ -106,6 +105,8 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                         webView.settings.domStorageEnabled = true
                         webView.settings.loadWithOverviewMode = true
                         webView.settings.useWideViewPort = true
+                        webView.settings?.cacheMode = WebSettings.LOAD_NO_CACHE
+                        webView.settings?.setAppCacheEnabled(false)
                         webView.webChromeClient = WebChromeClient()
                         webView.webViewClient = object : WebViewClient() {
 

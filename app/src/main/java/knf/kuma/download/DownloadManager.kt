@@ -27,6 +27,9 @@ import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.videoservers.ServersFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.notificationManager
@@ -40,11 +43,11 @@ class DownloadManager : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        foreground(23498, foregroundGroupNotification())
         if (intent != null && intent.action != null && intent.action == "stop.foreground") {
             stopForeground(true)
             stopSelf()
-        } else
-            foreground(23498, foregroundGroupNotification())
+        }
         return START_STICKY
     }
 
@@ -408,9 +411,13 @@ class DownloadManager : Service() {
         }
 
         private fun stopIfNeeded() {
-            if (downloadDao.countActive() == 0) {
-                context.service(Intent(context, DownloadManager::class.java).setAction("stop.foreground"))
-                notificationManager.cancel(22498)
+            GlobalScope.launch(Dispatchers.IO){
+                if (downloadDao.countActive() == 0 && context.isServiceRunning(DownloadManager::class.java)) {
+                    launch(Dispatchers.Main){
+                        context.service(Intent(context, DownloadManager::class.java).setAction("stop.foreground"))
+                    }
+                    notificationManager.cancel(22498)
+                }
             }
         }
     }

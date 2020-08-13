@@ -79,7 +79,7 @@ object FileAccessHelper {
 
     fun isStoragePermissionEnabled(): Boolean {
         return when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && treeUri != null && DocumentFile.fromTreeUri(App.context, treeUri!!)?.canWrite() == true -> true
+            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || PrefsUtil.downloadType == "1") -> treeUri != null && DocumentFile.fromTreeUri(App.context, treeUri!!)?.let { it.exists() && it.canWrite() } == true
             ContextCompat.checkSelfPermission(App.context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> true
             else -> false
         }
@@ -88,7 +88,7 @@ object FileAccessHelper {
     suspend fun isStoragePermissionEnabledAsync(): Boolean {
         return withContext(Dispatchers.IO) {
             when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && treeUri != null && DocumentFile.fromTreeUri(App.context, treeUri!!)?.canWrite() == true -> true
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || PrefsUtil.downloadType == "1") -> treeUri != null && DocumentFile.fromTreeUri(App.context, treeUri!!)?.let { it.exists() && it.canWrite() } == true
                 ContextCompat.checkSelfPermission(App.context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> true
                 else -> false
             }
@@ -632,7 +632,7 @@ object FileAccessHelper {
 
     fun openTreeChooser(context: Context) {
         try {
-            context.startActivity(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
+            context.findActivity()?.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
             Toaster.toastLong("Por favor selecciona la raiz del almacenamiento")
         } catch (e: Exception) {
             Toaster.toast("Error al buscar SD")

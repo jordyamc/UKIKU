@@ -15,6 +15,10 @@
     <color name="stateWarning">#fdd835</color>
     <color name="stateError">#e53935</color>
 
+    <color name="release_new">#d4b621</color>
+    <color name="release_change">#107307</color>
+    <color name="release_error">#ae1315</color>
+
     <color name="colorAccentPink">#C2185B</color>
     <color name="colorAccentPurple">#7B1FA2</color>
     <color name="colorAccentDeepPurple">#512DA8</color>
@@ -58,11 +62,12 @@
     <color name="cardview_background">#FFFFFF</color>
 
     <color name="divider">#000000</color>
-    <color name="separator">#1A000000</color>
+    <color name="separator">#26000000</color>
     <color name="textPrimary">#000</color>
     <color name="textSecondaryAlpha">#8A000000</color>
     <color name="textSecondaryTitle">#80000000</color>
     <color name="textSecondary">#323232</color>
+    <color name="textSecondaryDark">#DAFFFFFF</color>
 
     <color name="colorSplash">#333333</color>
 
@@ -72,4 +77,5 @@
     <color name="text_disable">#42000000</color>
 
     <color name="color_bottom_line_disabled">#AAAAAA</color>
+
 </resources>

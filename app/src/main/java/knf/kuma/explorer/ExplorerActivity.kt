@@ -7,8 +7,10 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.lifecycleScope
 import knf.kuma.R
+import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.custom.GenericActivity
 import knf.kuma.download.FileAccessHelper
 import kotlinx.android.synthetic.main.activity_explorer.*
@@ -38,6 +40,7 @@ class ExplorerActivity : GenericActivity(), OnFileStateChange {
             if (!FileAccessHelper.isStoragePermissionEnabledAsync())
                 Toaster.toastLong("¡Se necesita el permiso de almacenamiento!")
         }
+        showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -16,7 +16,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
-import com.google.android.material.snackbar.Snackbar
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
@@ -48,9 +47,7 @@ class ServersFactory {
     private var isStream: Boolean = false
     private var isCasting: Boolean = false
     private var serversInterface: ServersInterface
-    private var snackbar: Snackbar? = null
     private var snackBarManager: SnackProgressBarManager? = null
-    private var isSnackShowing = false
     private var servers: MutableList<Server> = ArrayList()
     private var selected = 0
 
@@ -412,7 +409,7 @@ class ServersFactory {
                         ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
                     else {
                         if (!FileAccessHelper.isStoragePermissionEnabledAsync()) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || PrefsUtil.downloadType == "1")
                                 FileAccessHelper.openTreeChooser(context)
                             else
                                 Toaster.toastLong("¡Se necesita permiso de almacenamiento!")
@@ -446,7 +443,7 @@ class ServersFactory {
                         ServersFactory(context, url, downloadObject, isStream, serversInterface).also { doAsync { it.start() } }
                     else {
                         if (!FileAccessHelper.isStoragePermissionEnabledAsync()) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || PrefsUtil.downloadType == "1")
                                 FileAccessHelper.openTreeChooser(context)
                             else
                                 Toaster.toastLong("¡Se necesita permiso de almacenamiento!")

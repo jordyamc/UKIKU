@@ -19,6 +19,11 @@ object UpdateChecker {
                     if (nCode > oCode) {
                         listener.onNeedUpdate(oCode.toString(), nCode.toString())
                     } else {
+                        context.filesDir.listFiles()
+                                ?.filter { !it.isDirectory && it.name.startsWith("update") && it.name.endsWith(".apk") }
+                                ?.forEach {
+                                    it.delete()
+                                }
                         Log.e("Version", "Up to date: $oCode")
                     }
                 } catch (e: Exception) {

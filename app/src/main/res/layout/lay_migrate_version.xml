@@ -24,7 +24,7 @@
             android:layout_marginEnd="25dp"
             android:text="Parece que tienes una versión no compatible de Animeflv App, actualiza para continuar con la migracion de datos"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
-            android:textColor="@color/mal_text_secondary_dark"/>
+            android:textColor="@color/textSecondaryDark"/>
 
         <LinearLayout
             android:layout_width="match_parent"

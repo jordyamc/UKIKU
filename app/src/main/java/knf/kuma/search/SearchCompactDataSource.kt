@@ -14,6 +14,7 @@ class SearchCompactDataSource(val factory: knf.kuma.retrofit.Factory, val query:
         val call = factory.getSearch(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, query, 1)
         val clb = object : Callback<DirectoryPageCompact> {
             override fun onFailure(call: Call<DirectoryPageCompact>, t: Throwable) {
+                t.printStackTrace()
                 onInit(true)
             }
 

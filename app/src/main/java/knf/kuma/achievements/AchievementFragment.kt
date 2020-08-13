@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
-import knf.kuma.ads.preload
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
 import kotlinx.android.synthetic.main.fragment_achievements.*
@@ -39,7 +38,6 @@ class AchievementFragment : Fragment() {
         CacheDB.INSTANCE.achievementsDAO().achievementList(arguments?.getInt(isUnlockedKey, 0) ?: 0)
                 .observe(viewLifecycleOwner, Observer {
                     isListEmpty = it.isEmpty()
-                    requireActivity().preload(it)
                     adapter.setAchievements(it)
                     error.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
                     if (isFirst) {

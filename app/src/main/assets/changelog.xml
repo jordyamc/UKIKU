@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="165" version="5.0.0">
+        <change type="new">Nuevo diseño de la app</change>
+        <change type="change">Agregada opcion para cambiar a diseño clasico</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="164" version="4.4.0">
         <change type="fix">Errores generales</change>
         <change type="change">Anuncios activados por defecto</change>

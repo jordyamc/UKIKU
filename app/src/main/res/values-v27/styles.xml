@@ -12,18 +12,14 @@
         <item name="colorAccentLight">@color/colorAccentLight</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowLightStatusBar">@bool/isNotDark</item>
         <item name="android:windowLightNavigationBar">@bool/isNotDark</item>
     </style>
 
-    <style name="AppTheme.AppInfo" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppTheme.AppInfo" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">?attr/colorSurface</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="mal_toolbarTheme">@style/Theme.Mal.Toolbar.Light</item>
-        <item name="mal_toolbarPopupTheme">@style/Theme.Mal.Toolbar.Light</item>
-        <item name="mal_color_primary">@color/mal_text_primary</item>
-        <item name="mal_color_secondary">@color/mal_text_secondary</item>
-        <item name="mal_card_background">?attr/colorSurface</item>
         <item name="md_color_button_text">?attr/colorSecondary</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>
         <item name="android:windowLightNavigationBar">@bool/isNotDark</item>

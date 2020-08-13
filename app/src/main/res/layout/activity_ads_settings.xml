@@ -117,18 +117,6 @@
                         android:textAppearance="?attr/textAppearanceListItem"
                         android:textColor="?android:textColorPrimary" />
 
-                    <TextView
-                        android:id="@android:id/summary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@android:id/title"
-                        android:layout_alignStart="@android:id/title"
-                        android:maxLines="10"
-                        android:text="Anuncio al abrir informacion de un anime"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="?android:textColorSecondary"
-                        android:typeface="sans" />
-
                 </RelativeLayout>
 
                 <LinearLayout
@@ -169,7 +157,7 @@
                         android:layout_marginStart="6dp"
                         android:ellipsize="marquee"
                         android:singleLine="true"
-                        android:text="Probabilidad de anuncios a pantalla completa"
+                        android:text="Probabilidad de anuncios en información"
                         android:textAppearance="?attr/textAppearanceListItem"
                         android:textColor="?android:textColorPrimary" />
 
@@ -192,6 +180,62 @@
 
                         <TextView
                             android:id="@+id/probabilityFull"
+                            android:layout_width="42dp"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="textEnd"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                            tools:text="0%" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:minHeight="?android:attr/listPreferredItemHeight"
+                android:paddingStart="10dp"
+                android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/preferenceFullTextExtra"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:text="Probabilidad de anuncios en otras pantallas"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:textColor="?android:textColorPrimary" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/preferenceFullTextExtra"
+                        android:layout_marginEnd="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/sliderFullExtra"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:stepSize="10.0"
+                            android:valueFrom="0.0"
+                            android:valueTo="100.0" />
+
+                        <TextView
+                            android:id="@+id/probabilityFullExtra"
                             android:layout_width="42dp"
                             android:layout_height="wrap_content"
                             android:textAlignment="textEnd"

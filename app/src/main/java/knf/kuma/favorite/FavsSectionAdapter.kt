@@ -44,8 +44,6 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     init {
         this.listener = fragment as OnMoveListener
         this.context = fragment.context
-        if (showSections)
-            recyclerView.setFastScrollEnabled(false)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -90,16 +88,19 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
 
     override fun getSectionName(position: Int): String {
         return try {
-            when (orderType) {
-                0 -> {
-                    val name = list[position].name
-                    if (name.isNotEmpty())
-                        name.substring(0, 1).toUpperCase()
-                    else
-                        name
+            if (showSections)
+                ""
+            else
+                when (orderType) {
+                    0 -> {
+                        val name = list[position].name
+                        if (name.isNotEmpty())
+                            name.substring(0, 1).toUpperCase()
+                        else
+                            name
+                    }
+                    else -> list[position].aid
                 }
-                else -> list[position].aid
-            }
         } catch (e: IllegalStateException) {
             ""
         }

@@ -1,17 +1,19 @@
 package knf.kuma.pojos;
 
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
+
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 import knf.kuma.animeinfo.ktx.ExtensionsKt;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.BaseConverter;
+import knf.kuma.recents.RecentModel;
 import knf.kuma.videoservers.Headers;
 
 @Entity
@@ -93,12 +95,21 @@ public class DownloadObject {
     }
 
     @NonNull
+    public static DownloadObject fromRecentModel(RecentModel object) {
+        return new DownloadObject(object.extras.getEid(), object.extras.getFileName(), PatternUtil.INSTANCE.fromHtml(object.name), object.chapter, false);
+    }
+
+    @NonNull
     public static DownloadObject fromChapter(AnimeObject.WebInfo.AnimeChapter chapter, boolean addQueue) {
         return new DownloadObject(chapter.eid, ExtensionsKt.getFileName(chapter), PatternUtil.INSTANCE.fromHtml(chapter.name), chapter.number, addQueue);
     }
 
     public boolean isDownloading() {
-        return state == DOWNLOADING || state == PENDING;
+        return state == DOWNLOADING || state == PENDING ;
+    }
+
+    public boolean isDownloadingOrPaused() {
+        return state == DOWNLOADING || state == PAUSED || state == PENDING ;
     }
 
     public int getDid() {

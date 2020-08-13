@@ -7,6 +7,8 @@ import android.widget.RemoteViewsService
 import androidx.preference.PreferenceManager
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
+import knf.kuma.animeinfo.ActivityAnimeMaterial
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
 import java.util.*
@@ -64,7 +66,10 @@ class WEListProvider internal constructor(private val context: Context) : Remote
             val listItem = items[position]
             remoteView.setTextViewText(R.id.heading, listItem.title)
             remoteView.setTextColor(R.id.heading, getColor(true))
-            val clickIntent = ActivityAnime.getSimpleIntent(context, listItem)
+            val clickIntent = if (DesignUtils.isFlat)
+                ActivityAnimeMaterial.getSimpleIntent(context, listItem)
+            else
+                ActivityAnime.getSimpleIntent(context, listItem)
             remoteView.setOnClickFillInIntent(R.id.linear, clickIntent)
             remoteView.setInt(R.id.linear, "setBackgroundColor", getColor(false))
         } catch (e: Exception) {

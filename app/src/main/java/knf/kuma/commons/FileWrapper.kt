@@ -11,6 +11,7 @@ import java.io.InputStream
 abstract class FileWrapper<T>(val path: String) {
 
     abstract var exist: Boolean
+    abstract fun existForced(): Boolean
     abstract fun file(): File?
     abstract fun name(): String
     abstract fun length(): Long?
@@ -38,6 +39,10 @@ abstract class FileWrapper<T>(val path: String) {
 class NormalFileWrapper(path: String) : FileWrapper<File?>(path) {
     private var mFile = generate()
     override var exist = mFile?.exists() == true
+    override fun existForced(): Boolean {
+        reset()
+        return exist
+    }
     override fun file(): File? = mFile
     override fun name(): String = mFile?.name ?: path
     override fun length(): Long? = mFile?.length()
@@ -60,6 +65,10 @@ class NormalFileWrapper(path: String) : FileWrapper<File?>(path) {
 class NormalPreQFileWrapper(path: String) : FileWrapper<File?>(path) {
     private var mFile = generate()
     override var exist = mFile?.exists() == true
+    override fun existForced(): Boolean {
+        reset()
+        return exist
+    }
     override fun file(): File? = mFile
     override fun name(): String = mFile?.name ?: path
     override fun length(): Long? = mFile?.length()
@@ -82,6 +91,10 @@ class NormalPreQFileWrapper(path: String) : FileWrapper<File?>(path) {
 class DocumentFileWrapper(path: String) : FileWrapper<DocumentFile?>(path) {
     private var document = generate()
     override var exist = document?.exists() == true
+    override fun existForced(): Boolean {
+        reset()
+        return exist
+    }
     override fun file(): File? = FileUtil.getFullPathFromTreeUri(document?.uri, App.context)?.let { File(it) }
     override fun name(): String = document?.name ?: path
     override fun length(): Long? = document?.length()

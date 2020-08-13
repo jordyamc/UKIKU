@@ -8,8 +8,10 @@ import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
+import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
@@ -36,6 +38,7 @@ class RankingActivity : GenericActivity() {
             adapter = RankingAdapter()
         }
         setResult(1234)
+        showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -1,10 +1,8 @@
 package knf.kuma.preferences
 
-import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -13,13 +11,9 @@ import android.provider.Settings
 import android.view.View
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
-import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceManager
-import androidx.preference.SwitchPreference
+import androidx.preference.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.input.getInputField
@@ -59,7 +53,6 @@ import java.io.FileOutputStream
 class ConfigurationFragment : PreferenceFragmentCompat() {
 
     companion object {
-        private const val keyDaynigthPermission = "daynigth_permission"
         private const val keyCustomTone = "custom_tone"
         private const val keyAutoBackup = "auto_backup"
         private const val keyMaxParallelDownloads = "max_parallel_downloads"
@@ -80,24 +73,12 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
         if (activity != null && context != null)
             doOnUI {
                 addPreferencesFromResource(R.xml.preferences)
-                preferenceManager.sharedPreferences.edit().putBoolean(keyDaynigthPermission, Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED).apply()
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                    preferenceScreen.findPreference<Preference>(keyDaynigthPermission)?.isEnabled = false
-                preferenceScreen.findPreference<Preference>(keyDaynigthPermission)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                    val check = newValue as? Boolean
-                    if (check == true && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                        if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 5587)
-                        } else if (ContextCompat.checkSelfPermission(safeContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                            preferenceManager.sharedPreferences.edit().putBoolean(keyDaynigthPermission, true).apply()
-                            preferenceScreen.findPreference<Preference>(keyDaynigthPermission)?.isEnabled = false
-                        }
-                    true
-                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Abrir configuración"
                 else if (FileAccessHelper.toneFile.exists())
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Personalizado"
+                if (!DesignUtils.isFlat)
+                    preferenceScreen.findPreference<ListPreference>("recentActionType")?.isVisible = false
                 preferenceScreen.findPreference<Preference>(keyCustomTone)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         noCrash {
@@ -383,14 +364,14 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
 
                     false
                 }
-                when {
-                    EAHelper.phase == 4 ->
+                when (EAHelper.phase) {
+                    4 ->
                         preferenceScreen.findPreference<Preference>(keyThemeColor)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                             startActivity(Intent(activity, Main::class.java).putExtra("start_position", 3))
                             activity?.finish()
                             true
                         }
-                    EAHelper.phase == 0 -> {
+                    0 -> {
                         val category = preferenceScreen.findPreference("category_design") as? PreferenceCategory
                         category?.removePreference(preferenceScreen.findPreference(keyThemeColor))
                         val pref = Preference(activity)
@@ -491,16 +472,6 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
             ViewCompat.setNestedScrollingEnabled(it, true)
         }
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            preferenceScreen.findPreference<Preference>(keyDaynigthPermission)?.isEnabled = false
-        } else {
-            preferenceManager.sharedPreferences.edit().putBoolean(keyDaynigthPermission, false).apply()
-            (preferenceScreen.findPreference(keyDaynigthPermission) as? SwitchPreference)?.isChecked = false
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/separator_size"
+        android:background="@color/separator" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/frame"
+        android:name="knf.kuma.preferences.ConfigurationFragmentMaterial"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="fragment_preferences"/>
+</LinearLayout>

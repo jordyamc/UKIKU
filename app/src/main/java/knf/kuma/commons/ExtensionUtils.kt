@@ -1,5 +1,6 @@
 package knf.kuma.commons
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -9,7 +10,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -17,6 +20,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -24,6 +29,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.PagedList
@@ -35,6 +41,7 @@ import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
+import com.zhkrb.cloudflare_scrape_webview.util.ConvertUtil
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -46,21 +53,23 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.nield.kotlinstatistics.WeightedDice
 import xdroid.toaster.Toaster
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-fun Toolbar.changeToolbarFont() {
+fun Toolbar.changeToolbarFont(@FontRes res: Int) {
     for (i in 0 until childCount) {
         val view = getChildAt(i)
         if (view is TextView && view.text == title) {
-            view.typeface = ResourcesCompat.getFont(context, R.font.audiowide)
+            view.typeface = ResourcesCompat.getFont(context, res)
             break
         }
     }
@@ -358,7 +367,7 @@ fun NotificationCompat.Builder.create(func: NotificationCompat.Builder.() -> Uni
     return this
 }
 
-fun ViewGroup.inflate(@LayoutRes layout: Int, attachToRoot: Boolean = false): View = LayoutInflater.from(context).inflate(layout, this, attachToRoot)
+fun ViewGroup.inflate(@LayoutRes layout: Int, attachToRoot: Boolean = false, context: Context = this.context): View = LayoutInflater.from(context).inflate(layout, this, attachToRoot)
 
 fun inflate(context: Context, @LayoutRes layout: Int, attachToRoot: Boolean = false): View = LayoutInflater.from(context).inflate(layout, null, attachToRoot)
 
@@ -426,7 +435,28 @@ fun pagedConfig(size: Int): PagedList.Config = PagedList.Config.Builder()
         .setEnablePlaceholders(PrefsUtil.usePlaceholders)
         .build()
 
-fun jsoupCookies(url: String?): Connection = Jsoup.connect(url).cookies(BypassUtil.getMapCookie(App.context)).userAgent(BypassUtil.userAgent).timeout(PrefsUtil.timeoutTime.toInt() * 1000)
+fun jsoupCookies(url: String?, followRedirects: Boolean = true): Connection =
+        Jsoup.connect(url)
+                .cookies(BypassUtil.getMapCookie(App.context))
+                .userAgent(BypassUtil.userAgent)
+                .timeout(PrefsUtil.timeoutTime.toInt() * 1000)
+                .followRedirects(followRedirects)
+
+fun jsoupCookiesDir(url: String?, useCookies: Boolean): Connection =
+        Jsoup.connect(url).apply {
+            if (useCookies)
+                if (PrefsUtil.useDefaultUserAgent){
+                    cookies(ConvertUtil.List2Map(PrefsUtil.dirCookies))
+                }else{
+                    cookies(BypassUtil.getMapCookie(App.context))
+                }
+            if (PrefsUtil.useDefaultUserAgent)
+                userAgent(PrefsUtil.userAgentDir)
+            else
+                userAgent(PrefsUtil.userAgent)
+            timeout(PrefsUtil.timeoutTime.toInt() * 1000)
+            followRedirects(true)
+        }
 
 fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builder().apply {
     url(url)
@@ -434,6 +464,13 @@ fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builde
     header("User-Agent", BypassUtil.userAgent)
     header("Cookie", BypassUtil.getStringCookie(App.context))
 }.build()
+
+fun okHttpDocument(url: String): Document = Jsoup.parse(okHttpCookies(url).execute(true).use {
+    if (it.isSuccessful)
+        it.body()?.string()
+    else
+        throw IllegalStateException("Response error Url: ${it.request().url()}, code: ${it.code()}")
+})
 
 fun isHostValid(hostName: String): Boolean {
     if (validateAds(hostName)) return true
@@ -524,3 +561,48 @@ inline var View.isVisibleAnimate: Boolean
         isVisible = value
         startAnimation(AnimationUtils.loadAnimation(context, if (value) R.anim.fadein else R.anim.fadeout))
     }
+
+fun View.onClickMenu(
+        @MenuRes menu: Int, showIcons: Boolean = true,
+        hideItems: () -> List<Int> = { emptyList() },
+        onItemClicked: (item: MenuItem) -> Unit = {}
+) = this.onClick { popUpMenu(this@onClickMenu, menu, showIcons, hideItems, onItemClicked) }
+
+@SuppressLint("RestrictedApi")
+fun popUpMenu(
+        view: View,
+        @MenuRes menu: Int, showIcons: Boolean = true,
+        hideItems: () -> List<Int> = { emptyList() },
+        onItemClicked: (item: MenuItem) -> Unit = {}
+) = doOnUI {
+    PopupMenu(view.context, view).apply {
+        inflate(menu)
+        setOnMenuItemClickListener {
+            onItemClicked.invoke(it)
+            true
+        }
+        hideItems().forEach {
+            getMenu().findItem(it).isVisible = false
+        }
+        if (getMenu() is MenuBuilder)
+            (getMenu() as MenuBuilder).setOptionalIconsVisible(showIcons)
+    }.show()
+}
+
+fun AppCompatActivity.setSurfaceBars() {
+    val surfaceColor = getSurfaceColor()
+    window.apply {
+        statusBarColor = surfaceColor
+        navigationBarColor = surfaceColor
+    }
+}
+
+fun AppCompatActivity.getSurfaceColor(): Int {
+    return TypedValue().apply {
+        theme.resolveAttribute(R.attr.colorSurface, this, true)
+    }.data
+}
+
+fun Fragment.getSurfaceColor(): Int {
+    return (requireActivity() as AppCompatActivity).getSurfaceColor()
+}

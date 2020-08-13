@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.securepreferences.SecurePreferences
+import com.zhkrb.cloudflare_scrape_webview.util.ConvertUtil
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -14,6 +15,7 @@ import knf.kuma.ads.AdsUtils
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
 import knf.kuma.uagen.randomUA
+import java.net.HttpCookie
 import java.util.*
 import kotlin.collections.LinkedHashSet
 
@@ -153,6 +155,10 @@ object PrefsUtil {
                 ?: randomUA()
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("user_agent", value).apply()
 
+    var userAgentDir: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("user_agent_dir", randomUA()) ?: randomUA()
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("user_agent_dir", value).apply()
+
     var randomLimit: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("random_limit", 25)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("random_limit", value).apply()
@@ -264,6 +270,22 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getFloat("fullAdsProbability", 50.0f)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat("fullAdsProbability", value).apply()
 
+    var fullAdsExtraProbability: Float
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getFloat("fullAdsExtraProbability", 20.0f)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat("fullAdsExtraProbability", value).apply()
+
+    val designStyle: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("designStyleType", "0")
+                ?: "0"
+
+    val recentActionType: String
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("recentActionType", "0")
+                ?: "0"
+
+    var dirCookies: List<HttpCookie>
+        get() = ConvertUtil.String2List(PreferenceManager.getDefaultSharedPreferences(context).getString("dirCookies", ""))
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("dirCookies", ConvertUtil.listToString(value)).apply()
+
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
     }
@@ -294,6 +316,10 @@ object PrefsUtil {
 
     fun getLiveShowFavIndicator(): LiveData<Boolean> {
         return PreferenceManager.getDefaultSharedPreferences(context).booleanLiveData("show_fav_count", true)
+    }
+
+    fun getLiveDesignType(): LiveData<String> {
+        return PreferenceManager.getDefaultSharedPreferences(context).stringLiveData("designStyleType", "0").distinct
     }
 
     val isSubscriptionEnabled: Boolean get() = subscriptionToken != null

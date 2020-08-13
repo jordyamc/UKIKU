@@ -41,7 +41,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -73,7 +72,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
-            android:value="true" />
+            android:value="false" />
 
         <activity
             android:name=".commons.EAMapActivity"
@@ -120,6 +119,7 @@
         </activity>
         <activity
             android:name=".Main"
+            android:enabled="false"
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -147,6 +147,7 @@
         <activity
             android:name=".animeinfo.ActivityAnime"
             android:theme="@style/AppTheme.NoActionBar"
+            android:enabled="false"
             android:windowSoftInputMode="stateHidden">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
@@ -207,7 +208,7 @@
             android:theme="@style/AppTheme.FullScreen" />
         <activity android:name=".record.RecordActivity" />
         <activity android:name=".seeing.SeeingActivity" />
-        <activity android:name=".emision.EmisionActivity" />
+        <activity android:name=".emision.EmissionActivity" />
         <activity android:name=".explorer.ExplorerActivity" />
         <activity
             android:name=".updater.UpdateActivity"
@@ -234,21 +235,18 @@
         <activity
             android:name=".backup.MigrationActivity"
             android:theme="@style/AppTheme.Translucent" />
-        <activity
-            android:name=".AppInfo"
-            android:theme="@style/AppTheme.AppInfo" />
         <activity android:name=".recommended.RecommendActivity" />
         <activity android:name=".recommended.RankingActivity" />
         <activity android:name=".search.GenreActivity" />
 
-        <service android:name=".directory.DirectoryService" />
-        <service android:name=".directory.DirectoryUpdateService" />
-        <service android:name=".download.DownloadService" />
+        <service android:name=".directory.DirectoryService" android:foregroundServiceType="dataSync" />
+        <service android:name=".directory.DirectoryUpdateService" android:foregroundServiceType="dataSync" />
+        <service android:name=".download.DownloadService" android:foregroundServiceType="dataSync" />
         <service
             android:name=".widgets.emision.WEmissionService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
-        <service android:name=".download.DownloadManager" />
-        <service android:name=".commons.SelfServer" />
+        <service android:name=".download.DownloadManager" android:foregroundServiceType="dataSync" />
+        <service android:name=".commons.SelfServer" android:foregroundServiceType="mediaPlayback" />
 
         <receiver
             android:name=".widgets.emision.WEmisionProvider"
@@ -349,6 +347,56 @@
         <activity android:name=".faq.FaqActivity" />
         <activity android:name=".news.MaterialNewsActivity" />
         <activity android:name=".preferences.AdsPreferenceActivity" />
+        <activity android:name=".MainMaterial"  android:label="@string/title_activity_main">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <data
+                android:host="ukiku.ga"
+                android:pathPrefix="/search"
+                android:scheme="https" />
+        </intent-filter>
+        </activity>
+        <activity android:name=".recents.RecentsModelActivity" />
+        <activity android:name=".search.SearchActivity" />
+        <activity android:name=".explorer.ExplorerActivityMaterial" />
+        <activity android:name=".emision.EmissionActivityMaterial" />
+        <activity android:name=".seeing.SeeingActivityMaterial" />
+        <activity android:name=".queue.QueueActivityMaterial" />
+        <activity android:name=".recommended.RecommendActivityMaterial" />
+        <activity android:name=".recommended.RankingActivityMaterial" />
+        <activity android:name=".record.RecordActivityMaterial" />
+        <activity android:name=".random.RandomActivityMaterial" />
+        <activity android:name=".faq.FaqActivityMaterial" />
+        <activity android:name=".achievements.AchievementActivityMaterial" />
+        <activity android:name=".AppInfoActivityMaterial" />
+        <activity android:name=".AppInfoActivity" />
+        <activity android:name=".animeinfo.ActivityAnimeMaterial"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/anime/"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".search.GenreActivityMaterial" />
+        <activity android:name=".DiagnosticMaterial" />
+        <activity android:name=".changelog.ChangelogActivityMaterial" />
+        <activity android:name=".DiagnosticMaterial$FullBypass" />
+        <activity android:name=".shortcuts.DummyMainActivity" />
+        <activity android:name=".shortcuts.DummyExplorerActivity" />
+        <activity android:name=".shortcuts.DummyEmissionActivity" />
+        <activity android:name=".profile.TopActivityMaterial" />
 
         <provider
             android:name=".slices.AnimeSlice"

@@ -21,7 +21,7 @@
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="180dp"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/roundedCorners"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
@@ -47,7 +47,6 @@
         android:layout_height="match_parent"
         android:layout_marginTop="4dp"
         android:ellipsize="end"
-        android:gravity="center_vertical"
         android:lines="2"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
         tools:text="Article\ntitle" />

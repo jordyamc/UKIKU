@@ -12,8 +12,10 @@ import android.widget.RemoteViews
 import androidx.preference.PreferenceManager
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
+import knf.kuma.commons.DesignUtils
 import knf.kuma.database.CacheDB
-import knf.kuma.emision.EmisionActivity
+import knf.kuma.emision.EmissionActivity
+import knf.kuma.emision.EmissionActivityMaterial
 import java.util.*
 
 class WEmisionProvider : AppWidgetProvider() {
@@ -63,7 +65,7 @@ class WEmisionProvider : AppWidgetProvider() {
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         svcIntent.data = Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(R.id.words, svcIntent)
-        val clickIntent = Intent(context, EmisionActivity::class.java)
+        val clickIntent = if (DesignUtils.isFlat) Intent(context, EmissionActivityMaterial::class.java) else Intent(context, EmissionActivity::class.java)
         remoteViews.setTextViewText(R.id.title_day, actualDay)
         remoteViews.setTextColor(R.id.title_day, getColor(context, true))
         remoteViews.setTextViewText(R.id.title_count, CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)).size.toString())

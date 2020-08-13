@@ -14,7 +14,6 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
-import knf.kuma.ads.preload
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
@@ -34,7 +33,6 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
         viewModel.dbLiveData.observe(viewLifecycleOwner, Observer { objects ->
             holder?.setError(objects.isEmpty())
             holder?.setRefreshing(false)
-            requireActivity().preload(objects)
             adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
             scrollByKey(objects)
         })

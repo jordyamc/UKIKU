@@ -10,7 +10,6 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
-import knf.kuma.ads.preload
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.asPx
@@ -39,7 +38,7 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
                 error.visibility = View.VISIBLE
             else {
                 error.visibility = View.GONE
-                preload(it)
+
                 adapter.update(it)
                 recycler.scheduleLayoutAnimation()
             }

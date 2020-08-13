@@ -3,6 +3,7 @@ package knf.kuma.commons
 import android.content.Context
 import android.webkit.CookieManager
 import android.webkit.WebSettings
+import android.webkit.WebView
 import androidx.preference.PreferenceManager
 import knf.kuma.App
 import knf.kuma.uagen.UAGenerator
@@ -30,6 +31,11 @@ class BypassUtil {
         private const val keyCfClearance = "cf_clearance"
         private const val keyCfDuid = "__cfduid"
         private const val defaultValue = ""
+
+        fun clearCookiesIfNeeded(){
+            if (!isNeeded())
+                clearCookies(null)
+        }
 
         fun saveCookies(context: Context): Boolean =
                 noCrashLet(false) {
@@ -67,9 +73,18 @@ class BypassUtil {
             PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
         }
 
-        fun isNeeded(): Boolean {
+        fun clearCookies(webView: WebView?) {
+            val cookieManager = CookieManager.getInstance()
+            cookieManager.removeAllCookies(null)
+            webView?.clearCache(true)
+            setCFDuid(App.context)
+            setClearance(App.context)
+            PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
+        }
+
+        fun isNeeded(url: String = "https://animeflv.net/"): Boolean {
             return try {
-                val response = jsoupCookies("https://animeflv.net/").execute()
+                val response = jsoupCookies(url).execute()
                 response.statusCode().let { it == 503 || it == 403 }
             } catch (e: HttpStatusException) {
                 e.statusCode.let { it == 503 || it == 403 }

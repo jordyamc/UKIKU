@@ -27,7 +27,6 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
-import knf.kuma.ads.preload
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
@@ -75,7 +74,6 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                     errorLayout.visibility = View.GONE
                     val container = FavSectionHelper.getInfoContainer(edited)
                     if (container.needReload) {
-                        requireActivity().preload(favoriteObjects)
                         adapter?.updateList(favoriteObjects)
                         if (isFirst) {
                             isFirst = false
@@ -85,7 +83,6 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                         adapter?.updatePosition(container)
                 } else {
                     errorLayout.visibility = View.GONE
-                    requireActivity().preload(favoriteObjects)
                     adapter?.updateList(favoriteObjects)
                     if (isFirst) {
                         isFirst = false
@@ -149,7 +146,6 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                     adapter?.updateList(ArrayList())
                     errorLayout.post { errorLayout.visibility = View.VISIBLE }
                 } else {
-                    it.preload(favoriteObjects)
                     adapter?.updateList(favoriteObjects)
                     if (isFirst) {
                         isFirst = false

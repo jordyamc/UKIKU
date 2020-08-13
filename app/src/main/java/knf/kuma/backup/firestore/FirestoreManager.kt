@@ -223,7 +223,7 @@ object FirestoreManager {
                 doAsync {
                     if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                         documentSnapshot.toObject<TopData>()?.let {
-                            if (it.isForced) {
+                            if (it.forced) {
                                 user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(it.name).build())
                                         ?: { PrefsUtil.instanceName = it.name }()
                             }
@@ -451,13 +451,26 @@ object FirestoreManager {
                 }
             }
 
+    fun updateTopSync() =
+            noCrash {
+                firestoreDB.document("top/${uid
+                        ?: PrefsUtil.instanceUuid}").set(TopData.create())
+                Log.e("Firestore", "Top upload success")
+            }
+
     @ExperimentalContracts
-    fun listenTop(callback: (list: List<TopData>) -> Unit) =
-            firestoreDB.collection("top").addSnapshotListener { querySnapshot, exception ->
-                exception?.let { Log.e("Firestore", "Top Query Error", it) }
+    fun listenTop(callback: (list: List<TopData>) -> Unit): ListenerRegistration {
+        var lastUpdate = 0L
+        return firestoreDB.collection("top").addSnapshotListener { querySnapshot, exception ->
+            exception?.let { Log.e("Firestore", "Top Query Error", it) }
+            if (System.currentTimeMillis() >= lastUpdate + 5000) {
+                lastUpdate = System.currentTimeMillis()
                 Log.e("Firestore", "On tops update")
                 querySnapshot?.let { callback(it.documents.mapNotNull { document -> document.toObject<TopData>() }) }
             }
+        }
+    }
+
 
     fun doLogin(activity: Activity) {
         if (isLoggedIn) {

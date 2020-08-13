@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/resume"
+        android:icon="@drawable/ic_play_queue"
+        android:title="Reanudar" />
+    <item
+        android:id="@+id/pause"
+        android:icon="@drawable/ic_pause_normal"
+        android:title="Pausar" />
+    <item
+        android:id="@+id/cancel"
+        android:icon="@drawable/ic_action_close"
+        android:title="Cancelar" />
+</menu>

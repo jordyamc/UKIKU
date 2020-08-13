@@ -12,9 +12,8 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.slice.Slice
 import androidx.slice.SliceProvider
 import androidx.slice.builders.*
-import knf.kuma.Main
 import knf.kuma.R
-import knf.kuma.animeinfo.ActivityAnime
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PatternUtil
 import knf.kuma.pojos.AnimeObject
@@ -129,7 +128,7 @@ class AnimeSlice : SliceProvider() {
                 SliceAction.create(
                         PendingIntent.getActivity(
                                 context, 0,
-                                Intent(context, Main::class.java)
+                                Intent(context, DesignUtils.mainClass)
                                         .putExtra("start_position", 4)
                                         .putExtra("search_query", query), PendingIntent.FLAG_CANCEL_CURRENT
                         ),
@@ -140,7 +139,7 @@ class AnimeSlice : SliceProvider() {
             } else {
                 SliceAction.create(
                         PendingIntent.getActivity(
-                                context, 0, Intent(context, Main::class.java), 0
+                                context, 0, Intent(context, DesignUtils.mainClass), 0
                         ),
                         launcherIcon,
                         ListBuilder.SMALL_IMAGE,
@@ -150,7 +149,7 @@ class AnimeSlice : SliceProvider() {
         else
             SliceAction.create(
                     PendingIntent.getActivity(
-                            context, animeObject.key, Intent(context, ActivityAnime::class.java)
+                            context, animeObject.key, Intent(context, DesignUtils.infoClass)
                             .setData(Uri.parse(animeObject.link))
                             .putExtra("title", animeObject.name)
                             .putExtra("aid", animeObject.aid)
@@ -165,7 +164,7 @@ class AnimeSlice : SliceProvider() {
     private fun createOpenAnimeAction(animeObject: AnimeSliceObject?): SliceAction {
         return SliceAction.create(
                 PendingIntent.getActivity(
-                        context, animeObject?.key ?: 0, Intent(context, ActivityAnime::class.java)
+                        context, animeObject?.key ?: 0, Intent(context, DesignUtils.infoClass)
                         .setData(Uri.parse(animeObject?.link ?: ""))
                         .putExtra("title", animeObject?.name ?: "")
                         .putExtra("aid", animeObject?.aid ?: "")

@@ -1,7 +1,6 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import android.util.Log
 import knf.kuma.commons.PatternUtil
 import knf.kuma.videoservers.VideoServer.Names.GOCDN
 
@@ -18,7 +17,6 @@ class GoCDNServer(context: Context, baseLink: String) : Server(context, baseLink
             return try {
                 val downLink = PatternUtil.extractLink(baseLink)
                 val link = "https://s1.streamium.xyz/gocdn.php?v=${downLink.substringAfterLast("#")}"
-                Log.e("GoCDN", link)
                 VideoServer(GOCDN, Option(GOCDN, null, link))
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -17,7 +17,6 @@ import androidx.work.*
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
-import knf.kuma.Main
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
@@ -176,7 +175,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
                 .setGroupSummary(true)
                 .setGroup(RECENTS_GROUP)
                 .setAutoCancel(true)
-                .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, Main::class.java), PendingIntent.FLAG_CANCEL_CURRENT))
+                .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, DesignUtils.mainClass), PendingIntent.FLAG_CANCEL_CURRENT))
                 .setDeleteIntent(PendingIntent.getBroadcast(context, System.currentTimeMillis().toInt(), summaryBroadcast, PendingIntent.FLAG_UPDATE_CURRENT))
                 .build()
         if (PrefsUtil.isGroupingEnabled)

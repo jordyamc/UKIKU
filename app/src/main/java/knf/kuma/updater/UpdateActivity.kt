@@ -25,7 +25,7 @@ import java.io.File
 class UpdateActivity : GenericActivity() {
 
     private val updaterViewModel: UpdaterViewModel by viewModels()
-    private val update: File by lazy { File(filesDir, "update.apk") }
+    private val update: File by lazy { File.createTempFile("update",".apk",filesDir) }
     private var isUpdateDownloaded = false
 
     @SuppressLint("SetTextI18n")

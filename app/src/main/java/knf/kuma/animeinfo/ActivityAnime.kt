@@ -222,30 +222,6 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         private const val keyNotification = "notification"
         private const val sharedImg = "img"
 
-        fun open(fragment: Fragment, recentObject: RecentObject, view: ImageView, position: Int) {
-            val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnime::class.java)
-            intent.data = Uri.parse(recentObject.anime)
-            intent.putExtra(keyTitle, recentObject.name)
-            intent.putExtra(keyAid, recentObject.aid)
-            intent.putExtra(keyImg, PatternUtil.getCover(recentObject.aid))
-            intent.putExtra(keyPosition, position)
-            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
-        }
-
-        @JvmOverloads
-        fun open(fragment: Fragment, animeObject: AnimeObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
-            val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnime::class.java)
-            intent.data = Uri.parse(animeObject.link)
-            intent.putExtra(keyTitle, animeObject.name)
-            intent.putExtra(keyAid, animeObject.aid)
-            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
-            intent.putExtra(keyPersist, persist)
-            intent.putExtra(keyNoTransition, !animate)
-            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
-        }
-
         fun open(fragment: Fragment, animeObject: SearchObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, ActivityAnime::class.java)
@@ -298,17 +274,6 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             }
         }
 
-        fun open(activity: Activity, animeObject: AnimeObject, view: ImageView, persist: Boolean, animate: Boolean) {
-            val intent = Intent(activity, ActivityAnime::class.java)
-            intent.data = Uri.parse(animeObject.link)
-            intent.putExtra(keyTitle, animeObject.name)
-            intent.putExtra(keyAid, animeObject.aid)
-            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
-            intent.putExtra(keyPersist, persist)
-            intent.putExtra(keyNoTransition, !animate)
-            activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
-        }
-
         fun open(activity: Activity, animeObject: SearchObject, view: ImageView, persist: Boolean, animate: Boolean) {
             val intent = Intent(activity, ActivityAnime::class.java)
             intent.data = Uri.parse(animeObject.link)
@@ -352,7 +317,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
-        fun open(activity: Activity?, seeingObject: SeeingObject, view: ImageView) {
+        fun open(activity: Activity?, seeingObject: SeeingObject, view: ImageView,enableTransition: Boolean = true) {
             activity ?: return
             val intent = Intent(activity, ActivityAnime::class.java)
             intent.data = Uri.parse(seeingObject.link)
@@ -362,7 +327,10 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             intent.putExtra(keyPersist, true)
             intent.putExtra(keyNoTransition, true)
             intent.putExtra(keyIsRecord, true)
-            activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+            if (enableTransition)
+                activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+            else
+                activity.startActivity(intent)
         }
 
         fun open(context: Context, animeObject: SearchObject) {

@@ -53,9 +53,9 @@ class NewsPage {
     var newsList: List<NewsItem> = emptyList()
 }
 
-class NewsDataSource(private val newsFactory: NewsFactory, val onInit: (isEmpty: Boolean) -> Unit) : PageKeyedDataSource<Int, NewsItem>() {
+class NewsDataSource(private val newsFactory: NewsFactory, val category: String, val onInit: (isEmpty: Boolean) -> Unit) : PageKeyedDataSource<Int, NewsItem>() {
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, NewsItem>) {
-        newsFactory.getNewsPage(1).enqueue(object : Callback<NewsPage> {
+        newsFactory.getNewsPage(category, 1).enqueue(object : Callback<NewsPage> {
             override fun onFailure(call: Call<NewsPage>, t: Throwable) {
                 onInit(true)
             }
@@ -70,7 +70,7 @@ class NewsDataSource(private val newsFactory: NewsFactory, val onInit: (isEmpty:
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, NewsItem>) {
-        newsFactory.getNewsPage(params.key).enqueue(object : Callback<NewsPage> {
+        newsFactory.getNewsPage(category, params.key).enqueue(object : Callback<NewsPage> {
             override fun onFailure(call: Call<NewsPage>, t: Throwable) {
             }
 
@@ -88,13 +88,13 @@ class NewsDataSource(private val newsFactory: NewsFactory, val onInit: (isEmpty:
 }
 
 interface NewsFactory {
-    @GET("listado-noticias/page/{page}/")
-    fun getNewsPage(@Path("page") page: Int): Call<NewsPage>
+    @GET("{category}/page/{page}/")
+    fun getNewsPage(@Path("category") category: String, @Path("page") page: Int): Call<NewsPage>
 }
 
 object NewsRepository {
-    fun getNews(onInit: (isEmpty: Boolean) -> Unit): PagedList<NewsItem> {
-        return PagedList.Builder<Int, NewsItem>(NewsDataSource(getFactory(), onInit), 12).apply {
+    fun getNews(category: String, onInit: (isEmpty: Boolean) -> Unit): PagedList<NewsItem> {
+        return PagedList.Builder<Int, NewsItem>(NewsDataSource(getFactory(), category, onInit), 12).apply {
             setFetchExecutor(BackgroundExecutor())
             setNotifyExecutor(MainExecutor())
         }.build()

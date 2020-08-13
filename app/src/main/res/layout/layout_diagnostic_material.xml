@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separator_size"
+                android:background="@color/separator"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Animeflv.net"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:textColor="?colorAccent"/>
+
+                    <ImageButton
+                        android:id="@+id/info"
+                        style="@style/Base.Widget.AppCompat.Button.Borderless"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/background_ripple"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_info"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+                </LinearLayout>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/generalState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Estado general"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/codeState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Código http"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/timeoutState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Tiempo de respuesta"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separator_size"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/separator"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Bypass"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:textColor="?colorAccent"/>
+
+                    <ImageButton
+                        android:id="@+id/bypassRecreate"
+                        style="@style/Base.Widget.AppCompat.Button.Borderless"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/background_ripple"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_settings_reload"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+                </LinearLayout>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/bypassState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Estado general"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/ipState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:svm_title="IP"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/clearanceState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:svm_title="cf_clearance"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/cfduidState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:svm_title="__cfduid"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/userAgentState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:svm_title="User agent"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separator_size"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/separator"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Internet"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="?colorAccent"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/downState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Bajada"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/upState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Subida"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separator_size"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/separator"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Directorio"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="?colorAccent"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/dirState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Estado general"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/dirTotalState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Animes en directorio"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separator_size"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/separator"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Memoria libre"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="?colorAccent"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/internalState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Interna"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/externalState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:svm_title="Tarjeta SD"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separator_size"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/separator"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Respaldos"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="?colorAccent"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="UUID"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2" />
+
+                    <TextView
+                        android:id="@+id/uuid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
+                </LinearLayout>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/subscriptionState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Suscripción" />
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/backupState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:svm_title="Configurado"/>
+
+                <knf.kuma.custom.StateViewMaterial
+                    android:id="@+id/lastBackupState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:svm_title="Último respaldo"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

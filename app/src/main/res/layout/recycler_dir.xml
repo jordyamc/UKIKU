@@ -15,13 +15,13 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        app:layoutManager="LinearLayoutManager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:fastScrollPopupBgColor="?colorSecondary"
         app:fastScrollPopupTextColor="@android:color/white"
         app:fastScrollThumbColor="?colorSecondary"
         app:fastScrollThumbInactiveColor="?colorSecondaryVariant"
-        tools:listitem="@layout/item_dir"/>
+        app:layoutManager="LinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_dir" />
 
     <ProgressBar
         android:id="@+id/progress"

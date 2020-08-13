@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@drawable/ic_filter"
+        android:orderInCategory="100"
+        android:title="Item"
+        app:showAsAction="always">
+        <menu>
+            <group
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/by_name_dir"
+                    android:title="Nombre"/>
+                <item
+                    android:id="@+id/by_votes"
+                    android:title="Puntuación"/>
+                <item
+                    android:id="@+id/by_followers"
+                    android:title="Seguidores"/>
+                <item
+                    android:id="@+id/by_id_dir"
+                    android:title="ID"/>
+                <item
+                    android:id="@+id/by_added_dir"
+                    android:title="Ú. añadidos"/>
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/castMenu"
+        android:orderInCategory="2"
+        android:title="Connect"
+        app:showAsAction="always"/>
+</menu>

@@ -16,6 +16,7 @@ import knf.kuma.download.foreground
 import knf.kuma.pojos.DirectoryPage
 import org.jsoup.HttpStatusException
 import pl.droidsonroids.jspoon.Jspoon
+import kotlin.properties.Delegates
 
 class DirectoryUpdateService : IntentService("Directory re-update") {
     private val CURRENT_TIME = System.currentTimeMillis()
@@ -23,6 +24,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     private var count = 0
     private var page = 0
     private var maxAnimes = 0
+    private var needCookies by Delegates.notNull<Boolean>()
 
     private val startNotification: Notification
         get() {
@@ -56,6 +58,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
         isRunning = true
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
+        needCookies = BypassUtil.isNeeded()
         val jspoon = Jspoon.create()
         calculateMax()
         doFullSearch(jspoon, animeDAO)
@@ -64,10 +67,11 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
 
     private fun calculateMax() {
         noCrash {
-            val main = jsoupCookies("https://animeflv.net/browse").get()
+            val main = jsoupCookiesDir("https://animeflv.net/browse",needCookies).get()
             val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
-            val last = jsoupCookies("https://animeflv.net/browse?page=$lastPage").get()
+            val last = jsoupCookiesDir("https://animeflv.net/browse?page=$lastPage",needCookies).get()
             maxAnimes = (24 * (lastPage - 1)) + last.select("article").size
+            Log.e("Updatedir","Max pages = $maxAnimes")
         }
     }
 
@@ -82,7 +86,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                 return
             }
             try {
-                val document = jsoupCookies("https://animeflv.net/browse?order=added&page=$page").get()
+                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page",needCookies).get()
                 if (document.select("article").size != 0) {
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimesRecreate(jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {

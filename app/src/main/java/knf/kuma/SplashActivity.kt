@@ -9,6 +9,7 @@ import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.input.input
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.SubscriptionReceiver
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
@@ -40,15 +41,19 @@ class SplashActivity : GenericActivity() {
                 }
                 positiveButton(text = "Continuar") {
                     PrefsUtil.isPSWarned = true
-                    startActivity(Intent(this@SplashActivity, Main::class.java))
-                    finish()
+                    startApp()
                 }
                 cancelOnTouchOutside(false)
             }
             else -> {
-                startActivity(Intent(this, Main::class.java))
-                finish()
+                startApp()
             }
         }
+    }
+
+    private fun startApp(){
+        DesignUtils.change(this, start = false)
+        startActivity(Intent(this@SplashActivity, DesignUtils.mainClass))
+        finish()
     }
 }

@@ -1,13 +1,20 @@
 package knf.kuma.recents
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import knf.kuma.R
+import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.FileWrapper
+import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PatternUtil.getAnimeUrl
 import knf.kuma.commons.PatternUtil.getFileName
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.PrefsUtil.saveWithName
 import knf.kuma.commons.distinct
 import knf.kuma.database.CacheDB
@@ -23,7 +30,7 @@ import pl.droidsonroids.jspoon.ElementConverter
 import pl.droidsonroids.jspoon.annotation.Selector
 
 @Entity
-class RecentModel {
+open class RecentModel {
     @PrimaryKey
     var key: Int = -1
 
@@ -49,8 +56,10 @@ class RecentModel {
     lateinit var state: RecentState
 
     fun prepare() {
-        extras = RecentExtras(this)
-        state = RecentState(this)
+        if (!::extras.isInitialized)
+            extras = RecentExtras(this)
+        if (!::state.isInitialized)
+            state = RecentState(this)
     }
 
     override fun equals(other: Any?): Boolean = other is RecentModel && other.chapter == chapter && other.name == name && other.aid == aid && other.key == key
@@ -59,10 +68,14 @@ class RecentModel {
     companion object {
         val DIFF = object : DiffUtil.ItemCallback<RecentModel>() {
             override fun areItemsTheSame(oldItem: RecentModel, newItem: RecentModel): Boolean =
-                    oldItem.extras.eid == newItem.extras.eid
+                    oldItem::class == newItem::class &&
+                            if (oldItem is RecentModelAd)
+                                oldItem.id == (newItem as RecentModelAd).id
+                            else
+                                oldItem.extras.eid == newItem.extras.eid
 
             override fun areContentsTheSame(oldItem: RecentModel, newItem: RecentModel): Boolean =
-                    oldItem == newItem
+                    if (oldItem !is RecentModelAd) oldItem == newItem else true
         }
     }
 }
@@ -85,8 +98,15 @@ class RecentState(val model: RecentModel) {
     var isSeen = CacheDB.INSTANCE.seenDAO().chapterIsSeen(model.aid, model.chapter)
     val seenLive = CacheDB.INSTANCE.seenDAO().chapterIsSeenLive(model.aid, model.chapter).distinct
     var downloadObject: DownloadObject? = CacheDBWrap.INSTANCE.downloadsDAO().getByEid(model.extras.eid)
+    var isDeleting = false
     val downloadLive = CacheDB.INSTANCE.downloadsDAO().getLiveByEid(model.extras.eid)
-    val isDownloaded: Boolean get() = model.extras.fileWrapper.exist
+    var isDownloaded: Boolean
+        get() = model.extras.fileWrapper.exist
+        set(value) {
+            model.extras.fileWrapper.exist = value
+        }
+    val checkIsDownloaded: Boolean get() = model.extras.fileWrapper.existForced()
+    val canPlay: Boolean get() = downloadObject?.isDownloadingOrPaused == false && checkIsDownloaded
 }
 
 class RecentsPage {
@@ -114,4 +134,22 @@ fun RecentModel.toggleSeen(scope: CoroutineScope, seenDAO: SeenDAO) {
             seenDAO.deleteChapter(aid, chapter)
         syncData { seen() }
     }
+}
+
+val RecentModel.menuHideList: List<Int>
+    get() = mutableListOf<Int>().apply {
+        if (PrefsUtil.recentActionType == "0")
+            add(R.id.streaming)
+        if (PrefsUtil.recentActionType == "1" || state.downloadObject?.isDownloadingOrPaused == true || state.canPlay)
+            add(R.id.download)
+        if (state.isDeleting || !state.canPlay)
+            add(R.id.delete)
+    }
+
+fun RecentModel.openInfo(context: Context) {
+    context.startActivity(Intent(context, ActivityAnimeMaterial::class.java).apply {
+        data = Uri.parse(this@openInfo.extras.animeUrl)
+        putExtra("title", name)
+        putExtra("img", PatternUtil.getCover(aid))
+    })
 }

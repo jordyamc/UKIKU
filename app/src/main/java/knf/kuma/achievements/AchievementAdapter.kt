@@ -32,7 +32,7 @@ class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit
         if (viewType == 1)
             return AdCardItemHolder(parent, AdCardItemHolder.TYPE_ACHIEVEMENT).also {
                 it.loadAd(GlobalScope, object : AdCallback {
-                    override fun getID(): String = AdsUtilsMob.ACHIEVEMENT_BANNER
+                    override fun getID(): String = AdsUtilsMob.ACHIEVEMENT_NATIVE
                 }, 500)
             }
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_achievements, parent, false))

@@ -2,8 +2,8 @@ package knf.kuma.commons
 
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -49,7 +49,7 @@ object Economy {
         } else false
     }
 
-    fun showWallet(activity: AppCompatActivity, themed: Boolean = false, onShow: () -> Unit) {
+    fun showWallet(activity: FragmentActivity, themed: Boolean = false, onShow: () -> Unit) {
         doOnUI {
             val view = activity.layoutInflater.inflate(R.layout.dialog_wallet, null)
             if (themed) {

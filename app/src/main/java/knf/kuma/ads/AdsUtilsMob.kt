@@ -53,10 +53,12 @@ object AdsUtilsMob {
     val ACHIEVEMENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/4233626428"
     val EXPLORER_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/1041869769"
     val CAST_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5535283585"
-    val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1044960115" else "ca-app-pub-5390653757953587/5447863415"
+    val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-5390653757953587/5447863415" else "ca-app-pub-5390653757953587/5447863415"
+    val RECENT_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-5390653757953587/6356037160" else "ca-app-pub-5390653757953587/6356037160"
     val REWARDED get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/5224354917" else "ca-app-pub-5390653757953587/5420761189"
     val INTERSTITIAL get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-5390653757953587/5880297311"
     val adRequest: AdRequest get() = AdRequest.Builder().build()
+    val ACHIEVEMENT_NATIVE = "achievement_native"
 
     fun setUp() {
         if (!BuildConfig.DEBUG) return
@@ -185,56 +187,58 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
             if (this@implBannerMob.tag == "AdView added")
                 return@g
             if (this@implBannerMob !is BannerContainerView) {
-                AdLoader.Builder(context, AdsUtilsMob.LIST_NATIVE)
-                        .forUnifiedNativeAd {
-                            GlobalScope.launch {
-                                val adView = when (unitID) {
-                                    AdsUtilsMob.RECENT_BANNER, AdsUtilsMob.FAVORITE_BANNER -> {
-                                        asyncInflate(context, R.layout.admob_ad_card).apply {
-                                            admobAd.setNativeAd(it)
-                                        }
-                                    }
-                                    AdsUtilsMob.NEWS_BANNER -> {
-                                        asyncInflate(context, R.layout.admob_ad_news).apply {
-                                            admobAd.setNativeAd(it)
-                                        }
-                                    }
-                                    AdsUtilsMob.ACHIEVEMENT_BANNER -> {
-                                        asyncInflate(context, R.layout.admob_ad_plain).apply {
-                                            admobAd.setNativeAd(it)
-                                        }
-                                    }
-                                    AdsUtilsMob.CAST_BANNER -> {
-                                        asyncInflate(context, R.layout.admob_ad_alone).apply {
-                                            admobAd.setNativeAd(it)
-                                        }
-                                    }
-                                    else -> return@launch
-                                }
-                                launch(Dispatchers.Main) {
-                                    addView(adView)
-                                    this@implBannerMob.tag = "AdView added"
+                NativeManager.take(GlobalScope, 1) {
+                    if (it.isEmpty())
+                        GlobalScope.launch {
+                            val adView = AdView(context)
+                            adView.adSize = getAdSize(width.toFloat())
+                            adView.adUnitId = unitID
+                            adView.adListener = object : AbsAdListener() {
+                                override fun onAdClicked() {
+                                    FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
                                 }
                             }
-                        }.withAdListener(object : AbsAdListener() {
-                            override fun onAdFailedToLoad(p0: Int) {
-                                GlobalScope.launch {
-                                    val adView = AdView(context)
-                                    adView.adSize = getAdSize(width.toFloat())
-                                    adView.adUnitId = unitID
-                                    adView.adListener = object : AbsAdListener() {
-                                        override fun onAdClicked() {
-                                            FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
-                                        }
-                                    }
-                                    launch(Dispatchers.Main) {
-                                        addView(adView)
-                                        this@implBannerMob.tag = "AdView added"
-                                        adView.loadAd(AdsUtilsMob.adRequest)
+                            launch(Dispatchers.Main) {
+                                addView(adView)
+                                this@implBannerMob.tag = "AdView added"
+                                adView.loadAd(AdsUtilsMob.adRequest)
+                            }
+                        }
+                    else
+                        GlobalScope.launch {
+                            val adView = when (unitID) {
+                                AdsUtilsMob.RECENT_BANNER, AdsUtilsMob.FAVORITE_BANNER -> {
+                                    asyncInflate(context, R.layout.admob_ad_card).apply {
+                                        Log.e("Ad", "On recent")
+                                        admobAd.setNativeAd(it[0])
                                     }
                                 }
+                                AdsUtilsMob.NEWS_BANNER -> {
+                                    asyncInflate(context, R.layout.admob_ad_news).apply {
+                                        Log.e("Ad", "On news")
+                                        admobAd.setNativeAd(it[0])
+                                    }
+                                }
+                                AdsUtilsMob.ACHIEVEMENT_BANNER, AdsUtilsMob.ACHIEVEMENT_NATIVE -> {
+                                    asyncInflate(context, R.layout.admob_ad_plain).apply {
+                                        Log.e("Ad", "On Achievement")
+                                        admobAd.setNativeAd(it[0])
+                                    }
+                                }
+                                AdsUtilsMob.CAST_BANNER -> {
+                                    asyncInflate(context, R.layout.admob_ad_alone).apply {
+                                        Log.e("Ad", "On Cast")
+                                        admobAd.setNativeAd(it[0])
+                                    }
+                                }
+                                else -> return@launch
                             }
-                        }).build().loadAd(AdsUtilsMob.adRequest)
+                            launch(Dispatchers.Main) {
+                                addView(adView)
+                                this@implBannerMob.tag = "AdView added"
+                            }
+                        }
+                }
             } else {
                 val adView = AdView(context)
                 adView.adSize = getAdSize(width.toFloat())
@@ -368,10 +372,13 @@ class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenA
             interstitialAd.isLoaded -> interstitialAd.show()
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
             else -> context.lifecycleScope.launch(Dispatchers.Main) {
-                while (!interstitialAd.isLoaded) {
+                var tryCount = 11
+                while (!interstitialAd.isLoaded && tryCount > 0) {
                     delay(250)
+                    tryCount--
                 }
-                show()
+                if (interstitialAd.isLoaded)
+                    show()
             }
         }
     }

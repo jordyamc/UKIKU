@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.gms.ads.formats.UnifiedNativeAdView
@@ -21,61 +22,64 @@
 
                 <ImageView
                     android:id="@+id/icon"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
                     android:layout_gravity="center"
-                    android:adjustViewBounds="true" />
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
                 <LinearLayout
                     android:id="@+id/content"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="85dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginEnd="10dp"
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:id="@+id/headline"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/primary"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:lines="1"
-                            android:textSize="@dimen/gnt_text_size_large"
-                            android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/secondary"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="top"
-                            android:lines="1"
-                            android:textSize="@dimen/gnt_text_size_small" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/row_two"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:orientation="horizontal">
+                        <LinearLayout
+                            android:id="@+id/headline"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/primary"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:lines="1"
+                                android:textSize="@dimen/gnt_text_size_large"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:text="Primary" />
+
+                            <TextView
+                                android:id="@+id/secondary"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="top"
+                                android:lines="1"
+                                android:textSize="@dimen/gnt_text_size_small"
+                                tools:text="Secondary" />
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/ad_notification_view"
-                            android:layout_width="@dimen/gnt_ad_indicator_width"
-                            android:layout_height="@dimen/gnt_ad_indicator_height"
-                            android:layout_marginStart="0dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginTop="@dimen/gnt_ad_indicator_top_margin"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginBottom="10dp"
+                            android:layout_marginEnd="16dp"
                             android:gravity="center"
                             android:text="Ad"
                             android:textColor="#FFCA28"
@@ -84,37 +88,15 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-
-                        <RatingBar
-                            android:id="@+id/rating_bar"
-                            style="@style/Widget.AppCompat.RatingBar.Indicator"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:lines="1"
-                            android:layout_gravity="center_horizontal"
-                            android:textSize="@dimen/gnt_text_size_small"
-                            android:numStars="5"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@id/ad_notification_view"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                        </RatingBar>
-
                     </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:alpha="0.12"
-                        android:background="@color/divider" />
 
                     <Button
                         android:id="@+id/cta"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:lines="1" />
+                        android:lines="1"
+                        tools:text="Abrir" />
 
 
                 </LinearLayout>

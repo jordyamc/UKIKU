@@ -1,12 +1,14 @@
 package knf.kuma.pojos;
 
-import com.google.gson.annotations.SerializedName;
-
 import androidx.annotation.Keep;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import com.google.gson.annotations.SerializedName;
+
 import knf.kuma.database.CacheDBWrap;
+import knf.kuma.recents.RecentModel;
 import knf.kuma.search.SearchObject;
 
 @Keep
@@ -51,6 +53,18 @@ public class RecordObject {
         object.chapter = recentObject.chapter;
         object.aid = recentObject.aid;
         object.eid = recentObject.eid;
+        object.date = System.currentTimeMillis();
+        return object;
+    }
+
+    @Ignore
+    public static RecordObject fromRecentModel(RecentModel recentObject) {
+        RecordObject object = new RecordObject();
+        object.key = Integer.parseInt(recentObject.aid);
+        object.name = recentObject.name;
+        object.chapter = recentObject.chapter;
+        object.aid = recentObject.aid;
+        object.eid = recentObject.extras.getEid();
         object.date = System.currentTimeMillis();
         return object;
     }

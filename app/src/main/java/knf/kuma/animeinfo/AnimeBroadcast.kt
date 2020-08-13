@@ -10,6 +10,6 @@ class AnimeBroadcast : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(intent.getStringExtra("aid"))
         if (animeObject != null)
-            ActivityAnime.open(context, animeObject)
+            ActivityAnimeMaterial.open(context, animeObject)
     }
 }

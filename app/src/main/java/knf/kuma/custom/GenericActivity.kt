@@ -3,16 +3,16 @@ package knf.kuma.custom
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.view.View
-import android.webkit.CookieManager
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -26,6 +26,7 @@ import knf.kuma.uagen.UAGenerator
 import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.findOptional
+import xdroid.toaster.Toaster
 
 
 open class GenericActivity : AppCompatActivity() {
@@ -97,18 +98,21 @@ open class GenericActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun runWebView(snack: Snackbar?) {
-        logText("Clearing cookies")
-        BypassUtil.clearCookies()
         doOnUI(onLog = { logText("Error: $it") }) {
             logText("Searching webview")
             val webView = noCrashLet {
                 findOptional<WrapWebView>(R.id.webview).also { if (it != null) logText("Use layout webview") }
                 //?: AppWebView(App.context).also { logText("Use Application webview, not visible mode") }
             }
+            printWebviewVersion(snack)
             if (webView != null) {
+                logText("Clearing cookies")
+                BypassUtil.clearCookies(webView)
                 logText("Applying settings for webview")
                 webView.settings?.javaScriptEnabled = true
                 webView.settings?.domStorageEnabled = true
+                webView.settings?.cacheMode = WebSettings.LOAD_NO_CACHE
+                webView.settings?.setAppCacheEnabled(false)
                 webView.webViewClient = object : WebViewClient() {
 
                     override fun onPageFinished(view: WebView?, url: String?) {
@@ -179,6 +183,51 @@ open class GenericActivity : AppCompatActivity() {
                 getSnackbarAnchor()?.showSnackbar("Error al iniciar WebView")
                 onBypassUpdated()
             }
+        }
+    }
+
+    private fun printWebviewVersion(snack: Snackbar?) {
+        try {
+            val info = App.context.packageManager.getPackageInfo("com.google.android.webview", 0)
+            val name = info.versionName
+            val version = PackageInfoCompat.getLongVersionCode(info)
+            logText("Installed webview: $name($version)")
+            if ("70.0.0.0" isVersionGreater name)
+                if (forceCreation()) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview")))
+                    Toaster.toastLong("Se necesita tener actualizado el webview para crear bypass")
+                } else {
+                    snack?.dismiss()
+                    getSnackbarAnchor()?.showSnackbar("Error en bypass, Webview desactualizado", Snackbar.LENGTH_INDEFINITE, "Actualizar") {
+                        BypassUtil.isChecking = false
+                        BypassUtil.isLoading = false
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview")))
+                    }
+                }
+        } catch (e: PackageManager.NameNotFoundException) {
+            logText("System Webview not found!")
+            if (forceCreation()) {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview")))
+                Toaster.toastLong("Se necesita tener instalado el webview para crear bypass")
+            } else {
+                snack?.dismiss()
+                getSnackbarAnchor()?.showSnackbar("Error en bypass, Webview desactualizado", Snackbar.LENGTH_INDEFINITE, "Actualizar") {
+                    BypassUtil.isChecking = false
+                    BypassUtil.isLoading = false
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview")))
+                }
+            }
+        }
+    }
+
+    private infix fun String.isVersionGreater(compare: String): Boolean {
+        val array1 = split(".")
+        val array2 = compare.split(".")
+        return noCrashLet(false) {
+            for (i in array1.indices)
+                if (array1[i].toInt() > array2[i].toInt())
+                    return@noCrashLet true
+            false
         }
     }
 

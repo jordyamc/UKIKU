@@ -3,6 +3,7 @@ package knf.kuma
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -31,7 +32,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.appodeal.ads.Appodeal
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -52,7 +53,8 @@ import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryFragment
 import knf.kuma.directory.DirectoryService
-import knf.kuma.emision.EmisionActivity
+import knf.kuma.download.FileAccessHelper
+import knf.kuma.emision.EmissionActivity
 import knf.kuma.explorer.ExplorerActivity
 import knf.kuma.faq.FaqActivity
 import knf.kuma.favorite.FavoriteFragment
@@ -120,10 +122,7 @@ class Main : GenericActivity(),
             finish()
             return
         }
-        //MobileAds.initialize(this)
-        //Appodeal.setLogLevel(Log.LogLevel.debug)
-        Appodeal.initialize(this, BuildConfig.APPODEAL_KEY, Appodeal.BANNER or Appodeal.NATIVE or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
-        Appodeal.setAutoCache(Appodeal.NATIVE or Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO, true)
+        MobileAds.initialize(this)
         AdsUtilsMob.setUp()
         FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
         FirebaseInstanceId.getInstance().instanceId
@@ -141,7 +140,7 @@ class Main : GenericActivity(),
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer.addDrawerListener(toggle)
         toggle.syncState()
-        toolbar.changeToolbarFont()
+        toolbar.changeToolbarFont(R.font.audiowide)
         setNavigationButtons()
         navigationView.setNavigationItemSelectedListener(this)
         bottomNavigationView.setOnNavigationItemSelectedListener(this)
@@ -155,6 +154,7 @@ class Main : GenericActivity(),
         checkBypass()
         migrateSeen()
         FirestoreManager.start()
+        DesignUtils.listenDesignChange(this)
     }
 
     private fun checkServices() {
@@ -201,7 +201,7 @@ class Main : GenericActivity(),
                             "Descárgala gratis desde https://ukiku.ga/")
                 }, "Compartir UKIKU"))
             }
-            actionInfo.onClick { AppInfo.open(this@Main) }
+            actionInfo.onClick { AppInfoActivity.open(this@Main) }
             actionTrophy.onClick { AchievementActivity.open(this@Main) }
             actionLogin.onClick { BackUpActivity.start(this@Main) }
             actionMigrate.onClick { MigrationActivity.start(this@Main) }
@@ -477,7 +477,7 @@ class Main : GenericActivity(),
             R.id.action_bottom_directory -> setFragment(DirectoryFragment.get())
             R.id.action_bottom_settings -> setFragment(BottomPreferencesFragment.get())
             R.id.drawer_explorer -> ExplorerActivity.open(this)
-            R.id.drawer_emision -> EmisionActivity.open(this)
+            R.id.drawer_emision -> EmissionActivity.open(this)
             R.id.drawer_queue -> QueueActivity.open(this)
             R.id.drawer_suggestions -> RecommendActivity.open(this)
             R.id.drawer_news -> NewsActivity.open(this)
@@ -644,6 +644,15 @@ class Main : GenericActivity(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        noCrash {
+            if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
+                val validation = FileAccessHelper.isUriValid(data?.data)
+                if (!validation.isValid) {
+                    Toaster.toast("Directorio invalido: $validation")
+                    FileAccessHelper.openTreeChooser(this)
+                }
+            }
+        }
         setNavigationButtons()
     }
 

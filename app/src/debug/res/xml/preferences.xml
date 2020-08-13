@@ -165,6 +165,14 @@
             android:key="recents_design"
             android:summary="%s"
             android:title="Diseño de recientes"/>
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/recents_action_options"
+            android:entryValues="@array/design_values"
+            android:icon="@drawable/ic_cloud_download"
+            android:key="recentActionType"
+            android:summary="%s"
+            android:title="Accion de click en recientes"/>
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_setting_asc_list"
@@ -238,6 +246,14 @@
         android:key="category_design"
         android:title="Personalización">
         <ListPreference
+            android:defaultValue="@string/theme_default"
+            android:entries="@array/design_options"
+            android:entryValues="@array/design_values"
+            android:icon="@drawable/ic_design_ab"
+            android:key="designStyleType"
+            android:summary="%s"
+            android:title="Diseño de UI"/>
+        <ListPreference
             android:defaultValue="0"
             android:entries="@array/theme_options"
             android:entryValues="@array/theme_values"
@@ -276,11 +292,6 @@
             android:summaryOff="Se usará agente al azar en bypass"
             android:summaryOn="Se usará agente por defecto en bypass"
             android:title="Usar agente del dispositivo"/>
-        <SwitchPreference
-            android:defaultValue="false"
-            android:icon="@drawable/ic_setting_gps"
-            android:key="daynigth_permission"
-            android:title="Tema dia/noche preciso"/>
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_trophy_normal"

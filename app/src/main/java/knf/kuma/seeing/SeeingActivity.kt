@@ -9,7 +9,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
+import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.custom.GenericActivity
 
@@ -56,6 +58,7 @@ class SeeingActivity : GenericActivity() {
                 ((pager.adapter as? SeeingPagerAdapter)?.fragmentList)?.let { it[position].clickCount = 0 }
             }
         })
+        showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

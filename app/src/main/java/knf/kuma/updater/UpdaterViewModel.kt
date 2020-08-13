@@ -23,8 +23,6 @@ class UpdaterViewModel : ViewModel() {
     fun start(file: File, link: String): LiveData<Pair<UpdaterType, Any?>> {
         if (isStarted) return liveData
         isStarted = true
-        if (file.exists())
-            file.delete()
         manager.add(DownloadRequest(Uri.parse(link))
                 .setDestinationURI(Uri.fromFile(file))
                 .setDownloadResumable(false)
