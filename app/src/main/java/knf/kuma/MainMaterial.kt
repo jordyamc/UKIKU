@@ -183,19 +183,21 @@ class MainMaterial : GenericActivity(),
                 PrefsUtil.userAgentDir = randomUA
                 suspendCoroutine<Boolean> {
                     lifecycleScope.launch(Dispatchers.Main){
-                        Cloudflare(this@MainMaterial, "https://animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
-                            setCfCallback(object : CfCallback {
-                                override fun onSuccess(cookieList: MutableList<HttpCookie>?, hasNewUrl: Boolean, newUrl: String?) {
-                                    PrefsUtil.dirCookies = cookieList ?: emptyList()
-                                    it.resume(true)
-                                }
+                        noCrash {
+                            Cloudflare(this@MainMaterial, "https://animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
+                                setCfCallback(object : CfCallback {
+                                    override fun onSuccess(cookieList: MutableList<HttpCookie>?, hasNewUrl: Boolean, newUrl: String?) {
+                                        PrefsUtil.dirCookies = cookieList ?: emptyList()
+                                        noCrash { it.resume(true) }
+                                    }
 
-                                override fun onFail(code: Int, msg: String?) {
-                                    Log.e("Dir cookies", "On error, code $code, msg: $msg")
-                                    it.resume(false)
-                                }
-                            })
-                        }.getCookies()
+                                    override fun onFail(code: Int, msg: String?) {
+                                        Log.e("Dir cookies", "On error, code $code, msg: $msg")
+                                        noCrash { it.resume(false) }
+                                    }
+                                })
+                            }.getCookies()
+                        }
                     }
                 }
             }

@@ -19,6 +19,7 @@ import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.noCrash
 import knf.kuma.home.HomeFragmentMaterial
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.ServersFactory
@@ -28,7 +29,13 @@ import kotlinx.coroutines.launch
 
 class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: RecentModelsViewModel by viewModels()
-    private lateinit var holder: RecyclerRefreshHolder
+    private val holder: RecyclerRefreshHolder by lazy {
+        RecyclerRefreshHolder(requireView()).also {
+            it.refreshLayout.setOnRefreshListener(this@RecentModelsFragment)
+            it.recyclerView.adapter = adapter
+            it.setRefreshing(true)
+        }
+    }
     private val adapter: RecentModelsAdapter by lazy { RecentModelsAdapter(this) }
     private var isFirstLoad = true
 
@@ -63,11 +70,6 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_recent_material, container, false)
-        holder = RecyclerRefreshHolder(view).also {
-            it.refreshLayout.setOnRefreshListener(this@RecentModelsFragment)
-            it.recyclerView.adapter = adapter
-            it.setRefreshing(true)
-        }
         EAHelper.enter1("R")
         return view
     }
@@ -105,7 +107,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onReselect() {
         EAHelper.enter1("R")
-        holder.scrollToTop()
+        noCrash { holder.scrollToTop() }
     }
 
 
