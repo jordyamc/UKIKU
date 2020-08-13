@@ -36,8 +36,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
-import com.zhkrb.cloudflare_scrape_webview.CfCallback
-import com.zhkrb.cloudflare_scrape_webview.Cloudflare
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.ads.NativeManager
@@ -78,6 +76,8 @@ import knf.kuma.seeing.SeeingActivityMaterial
 import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
+import knh.kuma.commons.cloudflarebypass.CfCallback
+import knh.kuma.commons.cloudflarebypass.Cloudflare
 import kotlinx.android.synthetic.main.activity_main_material.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers

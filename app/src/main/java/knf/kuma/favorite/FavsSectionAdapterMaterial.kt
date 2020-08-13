@@ -59,6 +59,7 @@ class FavsSectionAdapterMaterial(private val fragment: Fragment, private val rec
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (list.size == 0) return
         val favoriteObject = list[position]
         if (holder is HeaderHolder) {
             holder.header.text = favoriteObject.name

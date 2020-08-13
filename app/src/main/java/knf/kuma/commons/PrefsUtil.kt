@@ -7,7 +7,6 @@ import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.securepreferences.SecurePreferences
-import com.zhkrb.cloudflare_scrape_webview.util.ConvertUtil
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -15,6 +14,7 @@ import knf.kuma.ads.AdsUtils
 import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
 import knf.kuma.uagen.randomUA
+import knh.kuma.commons.cloudflarebypass.util.ConvertUtil
 import java.net.HttpCookie
 import java.util.*
 import kotlin.collections.LinkedHashSet
