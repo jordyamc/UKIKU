@@ -167,7 +167,7 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("recents_design", "0") == "1"
 
     val useDefaultUserAgent: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("device_useragent", true)
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_device_useragent", false)
 
     val usePlaceholders: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("list_placeholder", false)
@@ -283,7 +283,8 @@ object PrefsUtil {
                 ?: "0"
 
     var dirCookies: List<HttpCookie>
-        get() = ConvertUtil.String2List(PreferenceManager.getDefaultSharedPreferences(context).getString("dirCookies", ""))
+        get() = ConvertUtil.String2List(PreferenceManager.getDefaultSharedPreferences(context).getString("dirCookies", "")
+                ?: "")
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("dirCookies", ConvertUtil.listToString(value)).apply()
 
     fun showProgress(): Boolean {

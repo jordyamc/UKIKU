@@ -137,9 +137,9 @@ object FileActions {
             val actionRequest = ActionRequest(context, owner, type, url, item, downloadObject, callback)
             isExecuting = true
             snackBarManager = getSnackManager(anchorView)
-            try {
-                snackBarManager.showSnack("Obteniendo servidores...")
-                launch(Dispatchers.IO) {
+            snackBarManager.showSnack("Obteniendo servidores...")
+            launch(Dispatchers.IO) {
+                try {
                     val main = jsoupCookies(url).get()
                     val servers = ArrayList<Server>()
                     val sScript = main.select("script")
@@ -237,11 +237,12 @@ object FileActions {
                         this@FileActions.servers = servers
                         showServerList(actionRequest)
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    reset()
+                    callback.call(CallbackState.UNEXPECTED_ERROR)
+                    Toaster.toast("Error al obtener servidores")
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                reset()
-                callback.call(CallbackState.UNEXPECTED_ERROR)
             }
         }
     }

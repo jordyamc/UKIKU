@@ -10,8 +10,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 166
-        versionName "5.0.1"
+        versionCode 167
+        versionName "5.0.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -234,7 +234,7 @@ dependencies {
     implementation 'com.github.jordyamc:kprobability:1.0.5'
     implementation 'org.nield:kotlin-statistics:1.2.1'
     implementation 'com.github.Jamshid-M:ExactRatingBar:1.0.0'
-    implementation 'com.github.jordyamc:CloudflareBypassWebview:1.0.2'
+    implementation 'com.github.jordyamc:CloudflareBypassWebview:1.0.4'
     kapt 'com.github.bumptech.glide:compiler:4.10.0'
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
     implementation 'fr.bmartel:jspeedtest:1.32.1'

@@ -211,7 +211,6 @@ class ConnectionState : LinearLayout {
         message.textColor = Color.WHITE
         container.onClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
         container.setOnLongClickListener(null)
-        //container.onLongClick { onShowDialog("Tu proveedor de internet bloquea la conexion entre UKIKU y Animeflv") }
     }
 
     private fun networkErrorState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {

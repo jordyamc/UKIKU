@@ -17,7 +17,7 @@ class DirectoryPage {
         val animeObjects = ArrayList<AnimeObject>()
         for (link in links) {
             if (Network.isConnected) {
-                if (!animeDAO.existLink("https://animeflv.net$link"))
+                if (!animeDAO.existLink("%animeflv.net$link"))
                     try {
                         val response = okHttpCookies("https://animeflv.net$link").execute(followRedirects = true)
                         val body = response.body()?.string()

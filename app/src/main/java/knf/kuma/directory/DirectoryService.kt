@@ -80,7 +80,7 @@ class DirectoryService : IntentService("Directory update") {
         if (!PrefsUtil.isDirectoryFinished)
             count = animeDAO.count
         SSLSkipper.skip()
-        needCookies = BypassUtil.isNeeded()
+        needCookies = BypassUtil.isCloudflareActive()
         val jspoon = Jspoon.create()
         calculateMax()
         setStatus(STATE_PARTIAL)
@@ -197,7 +197,7 @@ class DirectoryService : IntentService("Directory update") {
                     })
                     if (animeObjects.isNotEmpty()) {
                         animeDAO.insertAll(animeObjects)
-                    } else if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("directory_finished", false)) {
+                    } else if (PrefsUtil.isDirectoryFinished) {
                         Log.e(TAG, "Stop searching at page $page")
                         cancelForeground()
                         break
@@ -211,9 +211,13 @@ class DirectoryService : IntentService("Directory update") {
                     setStatus(STATE_FINISHED)
                 }
             } catch (e: HttpStatusException) {
-                e.printStackTrace()
-                finished = true
-                setStatus(STATE_INTERRUPTED)
+                if (e.statusCode == 403 || e.statusCode == 503) {
+                    e.printStackTrace()
+                    finished = true
+                    setStatus(STATE_INTERRUPTED)
+                    stopSelf()
+                    cancelForeground()
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Page error: $page | ${e.message}")
                 if (strings?.contains(page.toString()) == false)

@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager
 import knf.kuma.App
 import knf.kuma.uagen.UAGenerator
 import org.jsoup.HttpStatusException
+import org.jsoup.Jsoup
 import java.util.*
 
 /**
@@ -85,6 +86,18 @@ class BypassUtil {
         fun isNeeded(url: String = "https://animeflv.net/"): Boolean {
             return try {
                 val response = jsoupCookies(url).execute()
+                response.statusCode().let { it == 503 || it == 403 }
+            } catch (e: HttpStatusException) {
+                e.statusCode.let { it == 503 || it == 403 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+
+        fun isCloudflareActive(url: String = "https://animeflv.net/"): Boolean {
+            return try {
+                val response = Jsoup.connect(url).followRedirects(true).execute()
                 response.statusCode().let { it == 503 || it == 403 }
             } catch (e: HttpStatusException) {
                 e.statusCode.let { it == 503 || it == 403 }

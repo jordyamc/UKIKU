@@ -175,7 +175,7 @@ class MainMaterial : GenericActivity(),
     private suspend fun checkDirectoryState() {
         if (PrefsUtil.useDefaultUserAgent){
             val isBrowserOk = noCrashLet(false) {
-                jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5",BypassUtil.isNeeded()).execute()
+                jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
                 true
             }
             if (!isBrowserOk) {

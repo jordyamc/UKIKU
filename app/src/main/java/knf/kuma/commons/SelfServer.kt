@@ -26,12 +26,12 @@ import java.net.URL
 class SelfServer : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        foreground(64587, foregroundNotification())
         if (intent != null && intent.action != null && intent.action == "stop.foreground") {
             CastUtil.get().stop()
             stopForeground(true)
             stopSelf()
-        } else
-            foreground(64587, foregroundNotification())
+        }
         return START_STICKY
     }
 

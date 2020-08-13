@@ -23,7 +23,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     private var manager: NotificationManager? = null
     private var count = 0
     private var page = 0
-    private var maxAnimes = 0
+    private var maxAnimes = 3200
     private var needCookies by Delegates.notNull<Boolean>()
 
     private val startNotification: Notification
@@ -58,7 +58,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
         isRunning = true
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
-        needCookies = BypassUtil.isNeeded()
+        needCookies = BypassUtil.isCloudflareActive()
         val jspoon = Jspoon.create()
         calculateMax()
         doFullSearch(jspoon, animeDAO)

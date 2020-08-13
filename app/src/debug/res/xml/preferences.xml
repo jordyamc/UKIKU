@@ -286,9 +286,9 @@
             android:summary="%s"
             android:title="Espera de conexión"/>
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:icon="@drawable/ic_incognito"
-            android:key="device_useragent"
+            android:key="use_device_useragent"
             android:summaryOff="Se usará agente al azar en bypass"
             android:summaryOn="Se usará agente por defecto en bypass"
             android:title="Usar agente del dispositivo"/>
