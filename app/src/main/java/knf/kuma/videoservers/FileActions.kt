@@ -239,9 +239,11 @@ object FileActions {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    reset()
-                    callback.call(CallbackState.UNEXPECTED_ERROR)
-                    Toaster.toast("Error al obtener servidores")
+                    launch(Dispatchers.Main) {
+                        reset()
+                        callback.call(CallbackState.UNEXPECTED_ERROR)
+                        Toaster.toast("Error al obtener servidores")
+                    }
                 }
             }
         }

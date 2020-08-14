@@ -43,8 +43,8 @@
             android:layout_height="200dp"
             android:layout_gravity="center_horizontal"
             android:adjustViewBounds="false"
-            android:tint="?android:textColorSecondary"
-            app:srcCompat="@drawable/ic_no_emision"/>
+            app:srcCompat="@drawable/ic_no_emision"
+            app:tint="?android:textColorSecondary" />
 
         <TextView
             android:layout_width="wrap_content"

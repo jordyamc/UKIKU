@@ -117,7 +117,7 @@ class EmissionAdapterMaterial internal constructor(private val fragment: Fragmen
         val cardView: View = itemView.card
         val imageView: ImageView = itemView.img
         val hiddenOverlay: HiddenOverlay = itemView.hidden
-        val heart: ImageView = itemView.heart
+        val heart: View = itemView.heart
         val title: TextView = itemView.title
 
         private lateinit var liveData: LiveData<Boolean>

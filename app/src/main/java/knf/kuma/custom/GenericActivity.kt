@@ -176,7 +176,7 @@ open class GenericActivity : AppCompatActivity() {
                     webView.settings.userAgentString
                 } else UAGenerator.getRandomUserAgent()).also { PrefsUtil.userAgent = it }
                 logText("Open animeflv.net")
-                webView.loadUrl("https://animeflv.net/")
+                webView.loadUrl("https://animeflv.net/browse?page=50")
             } else {
                 logText("Error finding suitable webview")
                 snack?.safeDismiss()
@@ -206,15 +206,24 @@ open class GenericActivity : AppCompatActivity() {
                 }
         } catch (e: PackageManager.NameNotFoundException) {
             logText("System Webview not found!")
-            if (forceCreation()) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview")))
-                Toaster.toastLong("Se necesita tener instalado el webview para crear bypass")
-            } else {
-                snack?.dismiss()
-                getSnackbarAnchor()?.showSnackbar("Error en bypass, Webview desactualizado", Snackbar.LENGTH_INDEFINITE, "Actualizar") {
-                    BypassUtil.isChecking = false
-                    BypassUtil.isLoading = false
+            try {
+                try {
+                    App.context.packageManager.getPackageInfo("com.android.chrome", 0)
+                } catch (e: Exception) {
+                    App.context.packageManager.getPackageInfo("com.chrome.beta", 0)
+                }
+                logText("Chrome detected")
+            } catch (e: Exception) {
+                if (forceCreation()) {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview")))
+                    Toaster.toastLong("Se necesita tener instalado el webview para crear bypass")
+                } else {
+                    snack?.dismiss()
+                    getSnackbarAnchor()?.showSnackbar("Error en bypass, Webview desactualizado", Snackbar.LENGTH_INDEFINITE, "Actualizar") {
+                        BypassUtil.isChecking = false
+                        BypassUtil.isLoading = false
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview")))
+                    }
                 }
             }
         }

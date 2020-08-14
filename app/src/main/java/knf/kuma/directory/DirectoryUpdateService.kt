@@ -50,7 +50,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
 
     override fun onHandleIntent(intent: Intent?) {
         foreground(NOT_CODE, startNotification)
-        if (!Network.isConnected || BypassUtil.isNeeded()) {
+        if (!Network.isConnected) {
             stopSelf()
             cancelForeground()
             return
@@ -86,7 +86,11 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                 return
             }
             try {
-                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page",needCookies).get()
+                if (needCookies)
+                    Thread.sleep(6000)
+                else
+                    Thread.sleep(1000)
+                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page", needCookies).get()
                 if (document.select("article").size != 0) {
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimesRecreate(jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
@@ -97,7 +101,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                         override fun onError() {
                             Log.e("Directory Getter", "At page: $page")
                         }
-                    })
+                    }, needCookies)
                     if (animeObjects.isNotEmpty())
                         animeDAO.insertAll(animeObjects)
                     page++

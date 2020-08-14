@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -30,19 +31,26 @@
             android:layout_height="149dp"
             android:visibility="gone"/>
 
-        <ImageView
+        <RelativeLayout
             android:id="@+id/heart"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="4dp"
-            android:tint="?colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="149dp"
+            android:background="@drawable/circular_shade"
             android:visibility="gone"
-            app:srcCompat="@drawable/heart_full"/>
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                app:srcCompat="@drawable/heart_full"
+                app:tint="?colorAccent" />
+        </RelativeLayout>
     </RelativeLayout>
 
     <TextView

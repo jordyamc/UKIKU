@@ -1,6 +1,7 @@
 package knf.kuma.directory
 
 import androidx.annotation.Keep
+import androidx.recyclerview.widget.DiffUtil
 import org.jsoup.nodes.Element
 import pl.droidsonroids.jspoon.ElementConverter
 import pl.droidsonroids.jspoon.annotation.Selector
@@ -37,6 +38,16 @@ class DirObjectCompact {
                 }
             }
             return "/(\\d+)\\.".toRegex().find(img)?.destructured?.component1() ?: "0"
+        }
+    }
+
+    companion object {
+        val DIFF = object : DiffUtil.ItemCallback<DirObjectCompact>() {
+            override fun areItemsTheSame(oldItem: DirObjectCompact, newItem: DirObjectCompact): Boolean =
+                    oldItem.aid == newItem.aid
+
+            override fun areContentsTheSame(oldItem: DirObjectCompact, newItem: DirObjectCompact): Boolean =
+                    oldItem == newItem
         }
     }
 }

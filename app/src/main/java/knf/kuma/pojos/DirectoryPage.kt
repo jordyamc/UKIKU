@@ -13,11 +13,11 @@ class DirectoryPage {
     @Selector(value = "article.Anime.alt.B a.Button.Vrnmlk", attr = "href")
     var links: List<String> = listOf()
 
-    fun getAnimes(animeDAO: AnimeDAO, jspoon: Jspoon, updateInterface: UpdateInterface): List<AnimeObject> {
+    fun getAnimes(animeDAO: AnimeDAO, jspoon: Jspoon, updateInterface: UpdateInterface, isCloudflareActive: Boolean): List<AnimeObject> {
         val animeObjects = ArrayList<AnimeObject>()
         for (link in links) {
             if (Network.isConnected) {
-                if (!animeDAO.existLink("%animeflv.net$link"))
+                if (!animeDAO.existLink("%animeflv.net$link")) {
                     try {
                         val response = okHttpCookies("https://animeflv.net$link").execute(followRedirects = true)
                         val body = response.body()?.string()
@@ -43,7 +43,9 @@ class DirectoryPage {
                         Log.e("Directory Getter", "Error adding: https://animeflv.net" + link + "\nCause: " + e.message)
                         updateInterface.onError()
                     }
-
+                    if (isCloudflareActive)
+                        Thread.sleep(5000)
+                }
             } else {
                 Log.e("Directory Getter", "Abort: No internet")
                 break
@@ -52,7 +54,7 @@ class DirectoryPage {
         return animeObjects
     }
 
-    fun getAnimesRecreate(jspoon: Jspoon, updateInterface: UpdateInterface): List<AnimeObject> {
+    fun getAnimesRecreate(jspoon: Jspoon, updateInterface: UpdateInterface, isCloudflareActive: Boolean): List<AnimeObject> {
         val animeObjects = ArrayList<AnimeObject>()
         for (link in links) {
             if (Network.isConnected) {
@@ -71,10 +73,12 @@ class DirectoryPage {
                     }
                     updateInterface.onAdd()
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     Log.e("Directory Getter", "Error replacing: https://animeflv.net" + link + "\nCause: " + e.message)
                     updateInterface.onError()
                 }
-
+                if (isCloudflareActive)
+                    Thread.sleep(5000)
             } else {
                 Log.e("Directory Getter", "Abort: No internet")
                 break

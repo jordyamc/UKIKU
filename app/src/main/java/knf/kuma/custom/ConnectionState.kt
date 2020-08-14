@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
 import androidx.lifecycle.*
+import it.sephiroth.android.library.xtooltip.ClosePolicy
+import it.sephiroth.android.library.xtooltip.Tooltip
 import knf.kuma.App
 import knf.kuma.Diagnostic
 import knf.kuma.R
@@ -38,18 +40,18 @@ class ConnectionState : LinearLayout {
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        inflate(context,attrs)
+        inflate(context, attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        inflate(context,attrs)
+        inflate(context, attrs)
     }
 
     private var bgColor = Color.TRANSPARENT
 
     private fun inflate(context: Context, attrs: AttributeSet? = null) {
-        context.obtainStyledAttributes(attrs,R.styleable.ConnectionState).use {
-            bgColor = it.getColor(R.styleable.ConnectionState_cs_bg_color,ContextCompat.getColor(context, R.color.colorPrimary))
+        context.obtainStyledAttributes(attrs, R.styleable.ConnectionState).use {
+            bgColor = it.getColor(R.styleable.ConnectionState_cs_bg_color, ContextCompat.getColor(context, R.color.colorPrimary))
         }
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -87,7 +89,7 @@ class ConnectionState : LinearLayout {
         }) {
             -2 -> networkTimeoutState(owner, onShowDialog)
             200 -> {
-                if (!PrefsUtil.isDirectoryFinished)
+                if (false && !PrefsUtil.isDirectoryFinished && !withContext(Dispatchers.IO) { BypassUtil.isCloudflareActive() })
                     directoryListenState()
                 else {
                     okState()
@@ -102,6 +104,7 @@ class ConnectionState : LinearLayout {
                             warningCreatingState()
                         } else if (it.first && !it.second) {
                             okState()
+                            delay(1000)
                             dismiss()
                         }
                     }
@@ -209,8 +212,21 @@ class ConnectionState : LinearLayout {
         icon.visibility = View.VISIBLE
         message.text = "Error HTTP 403!"
         message.textColor = Color.WHITE
-        container.onClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
+        container.onClick {
+            PrefsUtil.isForbiddenTipShown = true
+            context.startActivity(Intent(context, Diagnostic.FullBypass::class.java))
+        }
         container.setOnLongClickListener(null)
+        if (!PrefsUtil.isForbiddenTipShown) {
+            Tooltip.Builder(context).apply {
+                arrow(true)
+                text("Haz click en la barra roja para resolver el captcha!")
+                overlay(true)
+                styleId(R.style.ToolTipAltStyle)
+                anchor(this@ConnectionState)
+                closePolicy(ClosePolicy.TOUCH_ANYWHERE_CONSUME)
+            }.create().show(this, Tooltip.Gravity.TOP)
+        }
     }
 
     private fun networkErrorState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
@@ -289,9 +305,9 @@ class ConnectionState : LinearLayout {
             })
             maxPages = withContext(Dispatchers.IO) {
                 noCrashLet("3200~") {
-                    val main = okHttpDocument("https://animeflv.net/browse")
+                    val main = jsoupCookies("https://animeflv.net/browse").get()
                     val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
-                    val last = okHttpDocument("https://animeflv.net/browse?page=$lastPage")
+                    val last = jsoupCookies("https://animeflv.net/browse?page=$lastPage").get()
                     ((24 * (lastPage - 1)) + last.select("article").size).toString()
                 }
             }
@@ -320,7 +336,7 @@ class ConnectionState : LinearLayout {
             this.height = 0
         }
         visibility = View.VISIBLE
-        ValueAnimator.ofInt(0,height).apply {
+        ValueAnimator.ofInt(0, height).apply {
             addUpdateListener {
                 layoutParams = layoutParams.apply {
                     this.height = it.animatedValue as Int
@@ -333,13 +349,13 @@ class ConnectionState : LinearLayout {
     private suspend fun dismiss() {
         delay(1000)
         val height = 24.asPx
-        ValueAnimator.ofInt(height,0).apply {
+        ValueAnimator.ofInt(height, 0).apply {
             addUpdateListener {
                 layoutParams = layoutParams.apply {
                     this.height = it.animatedValue as Int
                 }
             }
-            addListener(object : Animator.AnimatorListener{
+            addListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(animation: Animator?) {
 
                 }

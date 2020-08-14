@@ -65,7 +65,7 @@ class DiagnosticMaterial : GenericActivity() {
         doAsync {
             val startTime = System.currentTimeMillis()
             val responseCode = try {
-                val response = Jsoup.connect("https://animeflv.net/").timeout(0).execute()
+                val response = Jsoup.connect("https://animeflv.net/browse?page=50").timeout(0).execute()
                 response.body()
                 response.statusCode()
             } catch (e: HttpStatusException) {

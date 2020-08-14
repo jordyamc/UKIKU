@@ -22,4 +22,7 @@ interface Factory {
 
     @GET("/browse?order=title")
     fun getSearch(@Header("Cookie") cookies: String, @Header("User-Agent") userAgent: String, @Query("q") query: String, @Query("page") page: Int): Call<DirectoryPageCompact>
+
+    @GET("/browse?order=title")
+    fun getDirectory(@Header("Cookie") cookies: String, @Header("User-Agent") userAgent: String, @Query("type[]") type: String, @Query("page") page: Int): Call<DirectoryPageCompact>
 }

@@ -83,7 +83,7 @@ class BypassUtil {
             PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
         }
 
-        fun isNeeded(url: String = "https://animeflv.net/"): Boolean {
+        fun isNeeded(url: String = "https://animeflv.net/browse?page=50"): Boolean {
             return try {
                 val response = jsoupCookies(url).execute()
                 response.statusCode().let { it == 503 || it == 403 }
@@ -95,7 +95,7 @@ class BypassUtil {
             }
         }
 
-        fun isCloudflareActive(url: String = "https://animeflv.net/"): Boolean {
+        fun isCloudflareActive(url: String = "https://animeflv.net/browse?page=50"): Boolean {
             return try {
                 val response = Jsoup.connect(url).followRedirects(true).execute()
                 response.statusCode().let { it == 503 || it == 403 }
@@ -109,7 +109,7 @@ class BypassUtil {
 
         fun isNeededFlag(): Int {
             return try {
-                val response = jsoupCookies("https://animeflv.net/").execute()
+                val response = jsoupCookies("https://animeflv.net/browse?page=50").execute()
                 when (response.statusCode()) {
                     503 -> 1
                     403 -> 2

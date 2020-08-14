@@ -68,11 +68,12 @@ class DirectoryService : IntentService("Directory update") {
 
     override fun onHandleIntent(intent: Intent?) {
         foreground(NOT_CODE, startNotification)
-        if (!Network.isConnected || BypassUtil.isNeeded()) {
+        if (!Network.isConnected) {
             cancelForeground()
             stopSelf()
             return
         }
+        needCookies = BypassUtil.isCloudflareActive("https://animeflv.net/browse?page=50")
         isRunning = true
         setStatus(STATE_VERIFYING)
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -80,7 +81,6 @@ class DirectoryService : IntentService("Directory update") {
         if (!PrefsUtil.isDirectoryFinished)
             count = animeDAO.count
         SSLSkipper.skip()
-        needCookies = BypassUtil.isCloudflareActive()
         val jspoon = Jspoon.create()
         calculateMax()
         setStatus(STATE_PARTIAL)
@@ -98,6 +98,7 @@ class DirectoryService : IntentService("Directory update") {
             val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
             val last = jsoupCookiesDir("https://animeflv.net/browse?page=$lastPage",needCookies).get()
             maxAnimes = (24 * (lastPage - 1)) + last.select("article").size
+            Log.e(TAG, "Max pages = $maxAnimes")
         }
     }
 
@@ -136,7 +137,11 @@ class DirectoryService : IntentService("Directory update") {
                 return
             }
             try {
-                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$s",needCookies).get()
+                if (needCookies)
+                    Thread.sleep(6000)
+                else
+                    Thread.sleep(1000)
+                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$s", needCookies).get()
                 if (document.select("article").size != 0) {
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
@@ -149,7 +154,7 @@ class DirectoryService : IntentService("Directory update") {
                             if (!newStrings.contains(s))
                                 newStrings.add(s.toString())
                         }
-                    })
+                    }, needCookies)
                     if (animeObjects.isNotEmpty())
                         animeDAO.insertAll(animeObjects)
                 }
@@ -180,7 +185,12 @@ class DirectoryService : IntentService("Directory update") {
                 return
             }
             try {
-                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page",needCookies).get()
+                if (needCookies)
+                    Thread.sleep(6000)
+                else
+                    Thread.sleep(1000)
+                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page", needCookies).get()
+                Log.e(TAG, "Read page $page")
                 if (document.select("article").size != 0) {
                     page++
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
@@ -194,10 +204,11 @@ class DirectoryService : IntentService("Directory update") {
                             if (strings?.contains(page.toString()) == false)
                                 strings.add(page.toString())
                         }
-                    })
+                    }, needCookies)
                     if (animeObjects.isNotEmpty()) {
                         animeDAO.insertAll(animeObjects)
-                    } else if (PrefsUtil.isDirectoryFinished) {
+                    } else if (PrefsUtil.isDirectoryFinished || animeDAO.count in (maxAnimes - 5)..(maxAnimes + 5)) {
+                        PrefsUtil.isDirectoryFinished = animeDAO.count >= maxAnimes
                         Log.e(TAG, "Stop searching at page $page")
                         cancelForeground()
                         break
@@ -205,12 +216,13 @@ class DirectoryService : IntentService("Directory update") {
                 } else {
                     finished = true
                     Log.e(TAG, "Processed $page pages")
-                    PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("directory_finished", true).apply()
+                    PrefsUtil.isDirectoryFinished = animeDAO.count in (maxAnimes - 5)..(maxAnimes + 5)
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet(keyFailedPages, strings).apply()
                     DirUpdateWork.schedule(this)
                     setStatus(STATE_FINISHED)
                 }
             } catch (e: HttpStatusException) {
+                Log.e(TAG, "Page error: $page | Code: ${e.statusCode}")
                 if (e.statusCode == 403 || e.statusCode == 503) {
                     e.printStackTrace()
                     finished = true

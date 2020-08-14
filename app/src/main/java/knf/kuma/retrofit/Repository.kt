@@ -26,7 +26,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import xdroid.toaster.Toaster
 import java.util.concurrent.Executors
 import javax.inject.Singleton
 
@@ -56,8 +55,6 @@ class Repository {
                 }
 
                 override fun onFailure(call: Call<Recents>, t: Throwable) {
-                    if (t.message?.contains("503") == false)
-                        Toaster.toast("Error al obtener - " + t.message)
                     t.printStackTrace()
                     FirebaseCrashlytics.getInstance().recordException(t)
                 }
@@ -87,8 +84,6 @@ class Repository {
                 }
 
                 override fun onFailure(call: Call<RecentsPage>, t: Throwable) {
-                    if (t.message?.contains("503") == false)
-                        Toaster.toast("Error al obtener - " + t.message)
                     t.printStackTrace()
                     FirebaseCrashlytics.getInstance().recordException(t)
                 }
@@ -244,14 +239,16 @@ class Repository {
         }.build()
     }
 
-    private fun getFactory(link: String): Factory {
-        val retrofit = Retrofit.Builder()
-                .baseUrl(link)
-                .client(NoSSLOkHttpClient.get())
-                .addConverterFactory(JspoonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
-        return retrofit.create(Factory::class.java)
+    companion object {
+        fun getFactory(link: String): Factory {
+            val retrofit = Retrofit.Builder()
+                    .baseUrl(link)
+                    .client(NoSSLOkHttpClient.get())
+                    .addConverterFactory(JspoonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+            return retrofit.create(Factory::class.java)
+        }
     }
 
     private fun getFactoryBack(link: String): Factory {

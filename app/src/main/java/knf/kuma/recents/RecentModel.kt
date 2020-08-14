@@ -111,7 +111,7 @@ class RecentState(val model: RecentModel) {
 
 class RecentsPage {
     @Selector("ul.ListEpisodios li:not(article), ul.List-Episodes li:not(article)")
-    lateinit var list: List<RecentModel>
+    var list: List<RecentModel> = emptyList()
 }
 
 class AFixer : ElementConverter<String> {

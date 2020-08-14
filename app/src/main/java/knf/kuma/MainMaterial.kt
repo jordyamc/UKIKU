@@ -395,7 +395,7 @@ class MainMaterial : GenericActivity(),
             }
             if (!PrefsUtil.showFavSections())
                 menu.findItem(R.id.action_new_category).isVisible = false
-        } else if (selectedFragment is DirectoryFragmentMaterial) {
+        } else if (selectedFragment is DirectoryFragmentMaterial && (PrefsUtil.isDirectoryFinished || !Network.isConnected)) {
             menuInflater.inflate(R.menu.dir_menu_material, menu)
             when (PrefsUtil.dirOrder) {
                 0 -> menu.findItem(R.id.by_name_dir).isChecked = true

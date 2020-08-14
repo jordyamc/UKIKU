@@ -287,6 +287,10 @@ object PrefsUtil {
                 ?: "")
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("dirCookies", ConvertUtil.listToString(value)).apply()
 
+    var isForbiddenTipShown: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isForbiddenTipShown", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isForbiddenTipShown", value).apply()
+
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)
     }
