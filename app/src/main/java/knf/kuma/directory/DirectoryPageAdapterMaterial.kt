@@ -41,7 +41,7 @@ class DirectoryPageAdapterMaterial internal constructor(private val fragment: Fr
             holder.imageView.load(PatternUtil.getCover(animeObject.aid))
             holder.progressView.visibility = View.GONE
             holder.textView.text = animeObject.name
-            holder.cardView.setOnClickListener { ActivityAnimeMaterial.open(fragment, animeObject, holder.imageView, persist = false) }
+            holder.cardView.setOnClickListener { ActivityAnimeMaterial.open(fragment, animeObject) }
         } else {
             holder.progressView.visibility = View.VISIBLE
             holder.textView.text = null

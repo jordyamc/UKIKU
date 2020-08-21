@@ -37,6 +37,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
 import knf.kuma.achievements.AchievementActivityMaterial
+import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.ads.NativeManager
 import knf.kuma.backup.BackUpActivity
@@ -83,6 +84,7 @@ import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
@@ -157,10 +159,12 @@ class MainMaterial : GenericActivity(),
         migrateSeen()
         FirestoreManager.start()
         DesignUtils.listenDesignChange(this)
+        //BypassUtil.doConnectionTests()
     }
 
     private fun checkServices() {
         lifecycleScope.launch(Dispatchers.IO) {
+            BypassUtil.clearCookiesIfNeeded()
             checkPermissions()
             checkDirectoryState()
             UpdateWork.schedule()
@@ -275,7 +279,7 @@ class MainMaterial : GenericActivity(),
                 PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean)
-                            badgeView?.badgeNumber = CacheDB.INSTANCE.favsDAO().count
+                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO){ CacheDB.INSTANCE.favsDAO().count } }
                         else
                             badgeView?.hide(false)
                     }
@@ -351,11 +355,17 @@ class MainMaterial : GenericActivity(),
     override fun onNeedUpdate(o_code: String, n_code: String) {
         runOnUiThread {
             try {
-                MaterialDialog(this@MainMaterial).safeShow {
+                MaterialDialog(this).safeShow {
                     title(text = "Actualización")
-                    message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
-                    positiveButton(text = "si") { UpdateActivity.start(this@MainMaterial) }
-                    negativeButton(text = "despues")
+                    if (n_code.toInt() > AdsUtils.remoteConfigs.getLong("min_version").toInt()) {
+                        message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
+                        positiveButton(text = "si") { UpdateActivity.start(this@MainMaterial,true) }
+                        negativeButton(text = "despues")
+                    }else {
+                        message(text = "Parece que la versión $n_code está disponible, es obligatoria")
+                        positiveButton(text = "actualizar") { UpdateActivity.start(this@MainMaterial,false) }
+                        cancelable(false)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

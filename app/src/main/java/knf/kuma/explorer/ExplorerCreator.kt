@@ -21,15 +21,15 @@ object ExplorerCreator {
 
     fun start(listener: EmptyListener) {
         IS_CREATED = true
-        val explorerDAO = CacheDB.INSTANCE.explorerDAO()
-        if (!FileAccessHelper.isStoragePermissionEnabled()) {
-            Toaster.toastLong("Permiso de almacenamiento no concedido")
-            listener.onEmpty()
-            postState(null)
-            return
-        }
-        postState("Iniciando busqueda")
         doAsync {
+            val explorerDAO = CacheDB.INSTANCE.explorerDAO()
+            if (!FileAccessHelper.isStoragePermissionEnabled()) {
+                Toaster.toastLong("Permiso de almacenamiento no concedido")
+                listener.onEmpty()
+                postState(null)
+                return@doAsync
+            }
+            postState("Iniciando busqueda")
             val creator = FileAccessHelper.downloadExplorerCreator
             if (creator.exist()) {
                 postState("Buscando animes")
@@ -54,7 +54,9 @@ object ExplorerCreator {
         IS_CREATED = false
         IS_FILES = true
         FILES_NAME = null
-        CacheDB.INSTANCE.explorerDAO().deleteAll()
+        doAsync {
+            CacheDB.INSTANCE.explorerDAO().deleteAll()
+        }
     }
 
     private fun postState(state: String?) {

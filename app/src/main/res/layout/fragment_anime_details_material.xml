@@ -53,56 +53,62 @@
             android:background="@color/separator" />
 
         <LinearLayout
-            android:id="@+id/lay_description"
+            android:id="@+id/lay_description_separator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical"
-            android:visibility="invisible"
-            tools:visibility="visible">
-
+            android:orientation="vertical">
             <LinearLayout
+                android:id="@+id/lay_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical"
+                android:visibility="invisible"
+                tools:visibility="visible">
 
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Descripción"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                    android:textSize="18sp" />
+                    android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/expand_icon"
-                    style="@style/Base.Widget.AppCompat.Button.Borderless"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/background_ripple"
-                    android:tint="?colorControlNormal"
-                    app:srcCompat="@drawable/action_expand" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Descripción"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:textSize="18sp" />
+
+                    <ImageButton
+                        android:id="@+id/expand_icon"
+                        style="@style/Base.Widget.AppCompat.Button.Borderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/background_ripple"
+                        android:tint="?colorControlNormal"
+                        app:srcCompat="@drawable/action_expand" />
+                </LinearLayout>
+
+                <knf.kuma.custom.ExpandableTV
+                    android:id="@+id/expandable_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:ellipsize="end"
+                    android:text="TEST"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:textColor="@color/textSecondaryAlpha" />
             </LinearLayout>
 
-            <knf.kuma.custom.ExpandableTV
-                android:id="@+id/expandable_desc"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:ellipsize="end"
-                android:text="TEST"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
-                android:textColor="@color/textSecondaryAlpha" />
+                android:layout_height="@dimen/separator_size"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/separator" />
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/separator_size"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@color/separator" />
 
         <LinearLayout
             android:id="@+id/lay_ad"

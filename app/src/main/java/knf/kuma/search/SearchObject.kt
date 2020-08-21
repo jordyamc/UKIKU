@@ -1,5 +1,6 @@
 package knf.kuma.search
 
+import androidx.recyclerview.widget.DiffUtil
 import com.google.gson.annotations.SerializedName
 
 open class SearchObject {
@@ -22,5 +23,15 @@ open class SearchObject {
 
     override fun hashCode(): Int {
         return "$key$aid$name$link".hashCode()
+    }
+
+    companion object{
+        val DIFF = object : DiffUtil.ItemCallback<SearchObject>(){
+            override fun areItemsTheSame(oldItem: SearchObject, newItem: SearchObject): Boolean =
+                    oldItem.key == newItem.key
+
+            override fun areContentsTheSame(oldItem: SearchObject, newItem: SearchObject): Boolean =
+                    oldItem == newItem
+        }
     }
 }

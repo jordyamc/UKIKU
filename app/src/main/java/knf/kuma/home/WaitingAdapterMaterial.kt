@@ -32,7 +32,7 @@ class WaitingAdapterMaterial(val fragment: HomeFragmentMaterial) : UpdateableAda
         val item = list[position]
         holder.img.load(PatternUtil.getCover(item.aid))
         holder.title.text = item.title
-        holder.root.onClick { ActivityAnimeMaterial.open(fragment.activity, item, holder.img,false) }
+        holder.root.onClick { ActivityAnimeMaterial.open(fragment.activity, item) }
     }
 
     class RecentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

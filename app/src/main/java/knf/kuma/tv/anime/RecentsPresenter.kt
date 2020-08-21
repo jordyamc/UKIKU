@@ -7,7 +7,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecentObject
 import knf.kuma.tv.cards.RecentsCardView
 import knf.kuma.tv.details.TVAnimesDetails
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalCoroutinesApi
@@ -21,8 +21,10 @@ class RecentsPresenter : Presenter() {
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
         (viewHolder.view as RecentsCardView).bind(item as RecentObject)
         viewHolder.view.setOnLongClickListener { v ->
-            val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(item.aid)
-            animeObject?.let { TVAnimesDetails.start(v.context, it.link) }
+            GlobalScope.launch(Dispatchers.Main){
+                val animeObject = withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getByAid(item.aid) }
+                animeObject?.let { TVAnimesDetails.start(v.context, it.link) }
+            }
             true
         }
     }

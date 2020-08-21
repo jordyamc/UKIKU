@@ -7,12 +7,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
-import knf.kuma.database.CacheDB
+import knf.kuma.pojos.GenreStatusObject
 import kotlinx.android.synthetic.main.item_ranking.view.*
 
-class RankingAdapterMaterial : RecyclerView.Adapter<RankingAdapterMaterial.RankHolder>() {
-
-    private val list = CacheDB.INSTANCE.genresDAO().ranking
+class RankingAdapterMaterial(val list: List<GenreStatusObject>) : RecyclerView.Adapter<RankingAdapterMaterial.RankHolder>() {
     private var total = 0
 
     init {

@@ -65,7 +65,7 @@ class DiagnosticMaterial : GenericActivity() {
         doAsync {
             val startTime = System.currentTimeMillis()
             val responseCode = try {
-                val response = Jsoup.connect("https://animeflv.net/browse?page=50").timeout(0).execute()
+                val response = Jsoup.connect(BypassUtil.testLink).timeout(0).execute()
                 response.body()
                 response.statusCode()
             } catch (e: HttpStatusException) {
@@ -119,7 +119,7 @@ class DiagnosticMaterial : GenericActivity() {
                     }
                 }
                 try {
-                    jsoupCookies("https://animeflv.net/").timeout(0).get()
+                    jsoupCookies(BypassUtil.testLink).timeout(0).get()
                     bypassState.load("Valido", StateViewMaterial.STATE_OK)
                 } catch (e: HttpStatusException) {
                     when (e.statusCode) {

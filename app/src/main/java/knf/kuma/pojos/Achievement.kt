@@ -9,6 +9,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.gson.annotations.SerializedName
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
@@ -21,6 +22,7 @@ import java.util.*
 @Keep
 @Entity
 @TypeConverters(BaseConverter::class)
+@IgnoreExtraProperties
 open class Achievement(
         @SerializedName("key")
         @PrimaryKey

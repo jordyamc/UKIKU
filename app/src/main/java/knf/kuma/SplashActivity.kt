@@ -3,18 +3,23 @@ package knf.kuma
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.input.input
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.SubscriptionReceiver
+import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 
@@ -51,9 +56,26 @@ class SplashActivity : GenericActivity() {
         }
     }
 
-    private fun startApp(){
-        DesignUtils.change(this, start = false)
-        startActivity(Intent(this@SplashActivity, DesignUtils.mainClass))
-        finish()
+    private fun doBlockTests(): Boolean {
+        var blockCount = 0
+        repeat(3) {
+            if (BypassUtil.isCloudflareActiveRandom())
+                blockCount++
+            if (blockCount >= 2)
+                return true
+        }
+        return blockCount >= 2
+    }
+
+    private fun startApp() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (PrefsUtil.mayUseRandomUA)
+                PrefsUtil.alwaysGenerateUA = !withContext(Dispatchers.IO) { doBlockTests() }
+            else
+                PrefsUtil.alwaysGenerateUA = false
+            DesignUtils.change(this@SplashActivity, start = false)
+            startActivity(Intent(this@SplashActivity, DesignUtils.mainClass))
+            finish()
+        }
     }
 }

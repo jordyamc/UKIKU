@@ -32,7 +32,7 @@ class DirAdapterMaterial(val fragment: HomeFragmentMaterial) : UpdateableAdapter
         holder.img.load(PatternUtil.getCover(item.aid))
         holder.title.text = item.name
         holder.type?.text = "\u2605${item.rate_stars ?: "?.?"}"
-        holder.root.onClick { ActivityAnimeMaterial.open(fragment, item, holder.img, true, true) }
+        holder.root.onClick { ActivityAnimeMaterial.open(fragment, item) }
     }
 
     class RecentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

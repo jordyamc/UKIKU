@@ -36,7 +36,7 @@ class SeeingActivityMaterial : GenericActivity() {
         tabs.setupWithViewPager(pager)
         tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                ((pager.adapter as? SeeingPagerAdapter)?.fragmentList)?.let { it[pager.currentItem].onSelected() }
+                ((pager.adapter as? SeeingPagerAdapterMaterial)?.fragmentList)?.let { it[pager.currentItem].onSelected() }
             }
 
             override fun onTabUnselected(p0: TabLayout.Tab?) {
@@ -68,8 +68,8 @@ class SeeingActivityMaterial : GenericActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.auto -> FavToSeeing.onConfirmation(this)
         }
         return super.onOptionsItemSelected(item)

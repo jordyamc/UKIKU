@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 
 class SeeingPagerAdapterMaterial(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-    private val fragmentList: MutableList<SeeingFragmentMaterial> = mutableListOf()
+    val fragmentList: MutableList<SeeingFragmentMaterial> = mutableListOf()
 
     init {
         for (i in 0..5) {

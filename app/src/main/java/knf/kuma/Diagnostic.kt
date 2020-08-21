@@ -64,7 +64,7 @@ class Diagnostic : GenericActivity() {
         doAsync {
             val startTime = System.currentTimeMillis()
             val responseCode = try {
-                val response = Jsoup.connect("https://animeflv.net/browse?page=50").timeout(0).execute()
+                val response = Jsoup.connect(BypassUtil.testLink).timeout(0).execute()
                 response.body()
                 response.statusCode()
             } catch (e: HttpStatusException) {
@@ -107,7 +107,7 @@ class Diagnostic : GenericActivity() {
     private fun runBypassTest() {
         doAsync {
             try {
-                Jsoup.connect("https://animeflv.net/browse?page=50").followRedirects(true).timeout(0).execute()
+                Jsoup.connect(BypassUtil.testLink).followRedirects(true).timeout(0).execute()
                 bypassState.load("No se necesita")
                 doOnUI { bypassRecreate.visibility = View.GONE }
             } catch (e: HttpStatusException) {
@@ -118,7 +118,7 @@ class Diagnostic : GenericActivity() {
                     }
                 }
                 try {
-                    jsoupCookies("https://animeflv.net/browse?page=50").timeout(0).get()
+                    jsoupCookies(BypassUtil.testLink).timeout(0).get()
                     bypassState.load("Valido", StateView.STATE_OK)
                 } catch (e: HttpStatusException) {
                     when (e.statusCode) {

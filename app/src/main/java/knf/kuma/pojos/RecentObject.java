@@ -47,6 +47,10 @@ public class RecentObject {
     @Ignore
     public boolean isDownloading;
     @Ignore
+    public boolean isFav;
+    @Ignore
+    public boolean isSeen;
+    @Ignore
     private FileWrapper fileWrapper;
     @Ignore
     public int downloadState;
@@ -138,6 +142,8 @@ public class RecentObject {
             this.downloadState = -8;
         }
         this.animeObject = CacheDBWrap.INSTANCE.animeDAO().getSOByAid(aid);
+        this.isFav = CacheDBWrap.INSTANCE.favsDAO().isFav(Integer.parseInt(aid));
+        this.isSeen = CacheDBWrap.INSTANCE.seenDAO().chapterIsSeen(aid, chapter);
     }
 
     private void populate(AnimeDAO dao, WebInfo webInfo) {
@@ -145,6 +151,8 @@ public class RecentObject {
             throw new IllegalStateException("Aid must be number");
         populate(webInfo);
         this.animeObject = dao.getSOByAid(aid);
+        this.isFav = CacheDBWrap.INSTANCE.favsDAO().isFav(Integer.parseInt(aid));
+        this.isSeen = CacheDBWrap.INSTANCE.seenDAO().chapterIsSeen(aid, chapter);
     }
 
     private boolean isNotNumeric(String number) {

@@ -15,6 +15,7 @@ import androidx.activity.viewModels
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
@@ -31,8 +32,13 @@ import knf.kuma.pojos.*
 import knf.kuma.recommended.AnimeShortObject
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
+import knf.kuma.search.SearchAdvObject
 import knf.kuma.search.SearchObject
+import knf.kuma.search.SearchObjectFav
 import knf.kuma.widgets.emision.WEListItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
 import org.jetbrains.anko.toast
@@ -113,8 +119,10 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
                                 .toBundle()
                         )
                     })
-                    holder.setFABState(dao.isFav(favoriteObject?.key ?: 0))
-                    holder.showFAB()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        holder.setFABState(withContext(Dispatchers.IO) { dao.isFav(favoriteObject?.key ?: 0) })
+                        holder.showFAB()
+                    }
                     invalidateOptionsMenu()
                     RecommendHelper.registerAll(genres, RankType.CHECK)
                 }
@@ -130,17 +138,17 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
     }
 
     override fun onFabClicked(actionButton: FloatingActionButton) {
-        doOnUI {
+        lifecycleScope.launch(Dispatchers.Main) {
             setResult()
             favoriteObject?.let {
-                val isFav = dao.isFav(it.key)
+                val isFav = withContext(Dispatchers.IO) { dao.isFav(it.key) }
                 if (isFav) {
                     holder.setFABState(false)
-                    dao.deleteFav(it)
+                    withContext(Dispatchers.IO) { dao.deleteFav(it) }
                     RecommendHelper.registerAll(genres, RankType.UNFAV)
                 } else {
                     holder.setFABState(true)
-                    dao.addFav(it)
+                    withContext(Dispatchers.IO) { dao.addFav(it) }
                     RecommendHelper.registerAll(genres, RankType.FAV)
                     AchievementManager.onFavAdded(it)
                 }
@@ -258,6 +266,42 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
             fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
+        fun open(fragment: Fragment, animeObject: SearchAdvObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
+        fun open(fragment: Fragment, animeObject: SearchObjectFav, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
+        fun open(fragment: Fragment, animeObject: AnimeObject.WebInfo.AnimeRelated, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            intent.data = Uri.parse("https://animeflv.net/" + animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
         fun open(fragment: Fragment, recentObject: RecentObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
@@ -282,20 +326,22 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
             fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
-        fun open(fragment: Fragment, animeObject: DirObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
-            val activity = fragment.activity ?: return
-            try {
-                val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
-                intent.data = Uri.parse(animeObject.link)
-                intent.putExtra(keyTitle, animeObject.name)
-                intent.putExtra(keyAid, animeObject.aid)
-                intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
-                intent.putExtra(keyPersist, persist)
-                intent.putExtra(keyNoTransition, !animate)
-                fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        fun open(fragment: Fragment, animeObject: DirObject, persist: Boolean = false) {
+            fragment.startActivity(Intent(fragment.requireContext(),DesignUtils.infoClass).apply {
+                data = Uri.parse(animeObject.link)
+                putExtra(keyTitle, animeObject.name)
+                putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+                putExtra(keyPersist, persist)
+            })
+        }
+
+        fun open(fragment: Fragment, dirObject: DirObjectCompact, persist: Boolean = false) {
+            fragment.startActivity(Intent(fragment.requireContext(),DesignUtils.infoClass).apply {
+                data = Uri.parse(dirObject.link)
+                putExtra(keyTitle, dirObject.name)
+                putExtra(keyImg, PatternUtil.getCover(dirObject.aid))
+                putExtra(keyPersist, persist)
+            })
         }
 
         fun open(activity: Activity, animeObject: AnimeObject, view: ImageView, persist: Boolean, animate: Boolean) {
@@ -343,7 +389,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(activity: Activity, recordObject: RecordObject, view: ImageView) {
             val intent = Intent(activity, ActivityAnimeMaterial::class.java)
-            intent.data = Uri.parse(recordObject.animeObject.link)
+            intent.data = Uri.parse("https://animeflv.net/" + recordObject.animeObject.link)
             intent.putExtra(keyTitle, recordObject.name)
             intent.putExtra(keyAid, recordObject.aid)
             intent.putExtra(keyImg, PatternUtil.getCover(recordObject.animeObject.aid))
@@ -352,20 +398,17 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
             activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
-        fun open(activity: Activity?, seeingObject: SeeingObject, view: ImageView,enableTransition: Boolean = true) {
+        fun open(activity: Activity?, seeingObject: SeeingObject) {
             activity ?: return
             val intent = Intent(activity, ActivityAnimeMaterial::class.java)
             intent.data = Uri.parse(seeingObject.link)
             intent.putExtra(keyTitle, seeingObject.title)
-            intent.putExtra(keyAid, seeingObject.aid)
+            //intent.putExtra(keyAid, seeingObject.aid)
             intent.putExtra(keyImg, PatternUtil.getCover(seeingObject.aid))
             intent.putExtra(keyPersist, true)
             intent.putExtra(keyNoTransition, true)
             intent.putExtra(keyIsRecord, true)
-            if (enableTransition)
-                activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
-            else
-                activity.startActivity(intent)
+            activity.startActivity(intent)
         }
 
         fun open(context: Context, animeObject: SearchObject) {
@@ -403,6 +446,12 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
             intent.putExtra(keyTitle, animeRelated.name)
             intent.putExtra(keyAid, animeRelated.aid)
             fragment.startActivityForResult(intent, REQUEST_CODE)
+        }
+
+        fun open(context: Context, url: String) {
+            val intent = Intent(context, ActivityAnimeMaterial::class.java)
+            intent.data = Uri.parse(url)
+            context.startActivity(intent)
         }
 
         fun getSimpleIntent(context: Context, item: WEListItem): Intent {

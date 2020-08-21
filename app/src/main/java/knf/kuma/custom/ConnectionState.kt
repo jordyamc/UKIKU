@@ -141,7 +141,7 @@ class ConnectionState : LinearLayout {
     private fun doCookiesTest(): Int {
         return try {
             val timeout = PrefsUtil.timeoutTime.toInt() * 1000
-            val response = Jsoup.connect("https://animeflv.net")
+            val response = Jsoup.connect(BypassUtil.testLink)
                     .cookies(BypassUtil.getMapCookie(App.context))
                     .userAgent(BypassUtil.userAgent)
                     .timeout(if (timeout == 0) 30000 else timeout)
@@ -218,14 +218,16 @@ class ConnectionState : LinearLayout {
         }
         container.setOnLongClickListener(null)
         if (!PrefsUtil.isForbiddenTipShown) {
-            Tooltip.Builder(context).apply {
-                arrow(true)
-                text("Haz click en la barra roja para resolver el captcha!")
-                overlay(true)
-                styleId(R.style.ToolTipAltStyle)
-                anchor(this@ConnectionState)
-                closePolicy(ClosePolicy.TOUCH_ANYWHERE_CONSUME)
-            }.create().show(this, Tooltip.Gravity.TOP)
+            noCrash {
+                Tooltip.Builder(context).apply {
+                    arrow(true)
+                    text("Haz click en la barra roja para resolver el captcha!")
+                    overlay(true)
+                    styleId(R.style.ToolTipAltStyle)
+                    anchor(this@ConnectionState)
+                    closePolicy(ClosePolicy.TOUCH_ANYWHERE_CONSUME)
+                }.create().show(this, Tooltip.Gravity.TOP)
+            }
         }
     }
 

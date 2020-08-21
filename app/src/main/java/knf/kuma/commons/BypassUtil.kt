@@ -1,12 +1,17 @@
 package knf.kuma.commons
 
 import android.content.Context
+import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.preference.PreferenceManager
 import knf.kuma.App
+import knf.kuma.BuildConfig
 import knf.kuma.uagen.UAGenerator
+import knf.kuma.uagen.randomUA
+import kotlinx.coroutines.*
+import okhttp3.Request
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import java.util.*
@@ -23,7 +28,7 @@ class BypassUtil {
 
     companion object {
         val userAgent: String
-            get() = if (PrefsUtil.useDefaultUserAgent) noCrashLet { WebSettings.getDefaultUserAgent(App.context) }
+            get() = if (PrefsUtil.useDefaultUserAgent && !PrefsUtil.alwaysGenerateUA) noCrashLet { WebSettings.getDefaultUserAgent(App.context) }
                     ?: PrefsUtil.userAgent else PrefsUtil.userAgent
         var isLoading = false
         var isChecking = false
@@ -32,15 +37,16 @@ class BypassUtil {
         private const val keyCfClearance = "cf_clearance"
         private const val keyCfDuid = "__cfduid"
         private const val defaultValue = ""
+        const val testLink = "https://animeflv.net/"
 
-        fun clearCookiesIfNeeded(){
-            if (!isNeeded())
+        suspend fun clearCookiesIfNeeded() {
+            if (!withContext(Dispatchers.IO){ isCloudflareActive() })
                 clearCookies(null)
         }
 
         fun saveCookies(context: Context): Boolean =
                 noCrashLet(false) {
-                    val cookies = CookieManager.getInstance().getCookie("https://animeflv.net/")?.trim()
+                    val cookies = CookieManager.getInstance().getCookie(".animeflv.net")?.trim()
                             ?: ""
                     if (cookies.contains(keyCfClearance)) {
                         val parts = cookies.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -83,7 +89,7 @@ class BypassUtil {
             PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
         }
 
-        fun isNeeded(url: String = "https://animeflv.net/browse?page=50"): Boolean {
+        fun isNeeded(url: String = testLink): Boolean {
             return try {
                 val response = jsoupCookies(url).execute()
                 response.statusCode().let { it == 503 || it == 403 }
@@ -95,7 +101,7 @@ class BypassUtil {
             }
         }
 
-        fun isCloudflareActive(url: String = "https://animeflv.net/browse?page=50"): Boolean {
+        fun isCloudflareActive(url: String = testLink): Boolean {
             return try {
                 val response = Jsoup.connect(url).followRedirects(true).execute()
                 response.statusCode().let { it == 503 || it == 403 }
@@ -107,9 +113,21 @@ class BypassUtil {
             }
         }
 
+        fun isCloudflareActiveRandom(url: String = testLink): Boolean {
+            return try {
+                val response = Jsoup.connect(url).followRedirects(true).userAgent(randomUA()).execute()
+                response.statusCode().let { it == 503 || it == 403 }
+            } catch (e: HttpStatusException) {
+                e.statusCode.let { it == 503 || it == 403 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+
         fun isNeededFlag(): Int {
             return try {
-                val response = jsoupCookies("https://animeflv.net/browse?page=50").execute()
+                val response = jsoupCookies(testLink).execute()
                 when (response.statusCode()) {
                     503 -> 1
                     403 -> 2
@@ -142,13 +160,17 @@ class BypassUtil {
         fun getMapCookie(context: Context): Map<String, String> {
             val map = LinkedHashMap<String, String>()
             map["device"] = "computer"
+            map["InstiSession"] = "eyJpZCI6IjRlNGYwNWYxLTg4NDMtNGQwOS05ODlmLWM1OWQ5N2NmNjVlYyIsInJlZmVycmVyIjoiIiwiY2FtcGFpZ24iOnsic291cmNlIjpudWxsLCJtZWRpdW0iOm51bGwsImNhbXBhaWduIjpudWxsLCJ0ZXJtIjpudWxsLCJjb250ZW50IjpudWxsfX0="
             getClearance(context).let { if (it != defaultValue) map[keyCfClearance] = it }
             getCFDuid(context).let { if (it != defaultValue) map[keyCfDuid] = it }
             return map
         }
 
         fun getStringCookie(context: Context): String {
-            return "device=computer;${getClearanceString(context)}${getCFDuidString(context)}".dropLastWhile { it == ' ' || it == ';' }
+            val builder = StringBuilder()
+            for ((key, value) in getMapCookie(context))
+                builder.append("$key=$value;")
+            return builder.toString().dropLastWhile { it == ' ' || it == ';' }
         }
 
         fun getClearance(context: Context): String {
@@ -173,6 +195,46 @@ class BypassUtil {
 
         fun setCFDuid(context: Context, value: String = defaultValue) {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString(keyCfDuid, value).apply()
+        }
+
+        fun doConnectionTests() {
+            if (BuildConfig.DEBUG)
+                GlobalScope.launch(Dispatchers.IO) {
+                    delay(3000)
+                    Log.e("Test", "Using cookie: ${getStringCookie(App.context)}")
+                    noCrash {
+                        Log.e("Test", "Jsoup normal")
+                        Jsoup.connect("https://www3.animeflv.net/ver/kanojo-okarishimasu-6").execute().also {
+                            Log.e("Test Result ${it.statusCode()}", it.body())
+                        }
+                    }
+                    noCrash {
+                        Log.e("Test", "Jsoup cookies")
+                        jsoupCookies("https://www3.animeflv.net/ver/kanojo-okarishimasu-6").execute().also {
+                            Log.e("Result ${it.statusCode()}", it.body())
+                        }
+                    }
+                    noCrash {
+                        Log.e("Test", "okttp normal")
+                        Request.Builder().apply {
+                            url("https://www3.animeflv.net/ver/kanojo-okarishimasu-6")
+                            method("GET", null)
+                            header("User-Agent", userAgent)
+                        }.build().execute().also {
+                            it.use {
+                                Log.e("Test Result", "${it.body()?.string()}")
+                            }
+                        }
+                    }
+                    noCrash {
+                        Log.e("Test Test", "okhttp cookies")
+                        okHttpCookies("https://www3.animeflv.net/ver/kanojo-okarishimasu-6").execute().also {
+                            it.use {
+                                Log.e("Test Result", "${it.body()?.string()}")
+                            }
+                        }
+                    }
+                }
         }
 
         private fun getCFDuidString(context: Context): String {

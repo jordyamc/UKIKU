@@ -107,8 +107,11 @@ class FavsSectionAdapterMaterial(private val fragment: Fragment, private val rec
     }
 
     fun updatePosition(container: InfoContainer) {
-        list = container.updated ?: arrayListOf()
-        recyclerView.post { notifyItemMoved(container.from, container.to) }
+        val nlist = container.updated
+        if (!nlist.isNullOrEmpty() && container.from != -1 && container.to != -1) {
+            list = nlist
+            recyclerView.post { notifyItemMoved(container.from, container.to) }
+        }
     }
 
     fun updateList(list: MutableList<FavoriteObject>) {

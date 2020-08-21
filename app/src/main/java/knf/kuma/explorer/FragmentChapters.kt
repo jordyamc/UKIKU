@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import knf.kuma.R
@@ -21,6 +22,9 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import knf.kuma.pojos.RecordObject
 import knf.kuma.queue.QueueManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
@@ -53,11 +57,20 @@ class FragmentChapters : Fragment() {
     }
 
     private fun playAll(list: List<ExplorerObject.FileDownObj>) {
-        noCrash {
-            CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromDownloaded(list.last()))
-            syncData { history() }
-            adapter?.notifyDataSetChanged()
-            QueueManager.startQueueDownloaded(context, list)
+        lifecycleScope.launch(Dispatchers.Main){
+            noCrashSuspend {
+                withContext(Dispatchers.IO) {
+                    CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromDownloaded(list.last()))
+                    syncData { history() }
+                    QueueManager.startQueueDownloaded(context, list)
+                }
+                adapter?.apply {
+                    explorerObject.fileList.forEach {
+                        it.isSeen = true
+                    }
+                    notifyDataSetChanged()
+                }
+            }
         }
     }
 
@@ -73,20 +86,26 @@ class FragmentChapters : Fragment() {
                     .observe(this@FragmentChapters, Observer { fileDownObjs ->
                         if (fileDownObjs.isEmpty()) {
                             Toaster.toast("Directorio vacio")
-                            CacheDB.INSTANCE.explorerDAO().delete(explorerObject)
-                            clearInterface?.onClear()
+                            lifecycleScope.launch(Dispatchers.IO){
+                                CacheDB.INSTANCE.explorerDAO().delete(explorerObject)
+                                launch(Dispatchers.Main) {
+                                    clearInterface?.onClear()
+                                }
+                            }
                         } else {
                             explorerObject.chapters = fileDownObjs as MutableList<ExplorerObject.FileDownObj>
-                            progressBar.visibility = View.GONE
-                            adapter = ExplorerChapsAdapter(this@FragmentChapters, recyclerView, explorerObject, clearInterface)
-                            recyclerView.adapter = adapter
-                            if (isFirst) {
-                                isFirst = false
-                                recyclerView.scheduleLayoutAnimation()
-                            }
-                            if (!CastUtil.get().connected()) {
-                                fab.show()
-                                fab.onClick { playAll(fileDownObjs) }
+                            lifecycleScope.launch(Dispatchers.Main){
+                                progressBar.visibility = View.GONE
+                                adapter = ExplorerChapsAdapter(this@FragmentChapters, recyclerView, withContext(Dispatchers.IO) { ExplorerObjectWrap(explorerObject) }, clearInterface)
+                                recyclerView.adapter = adapter
+                                if (isFirst) {
+                                    isFirst = false
+                                    recyclerView.scheduleLayoutAnimation()
+                                }
+                                if (!CastUtil.get().connected()) {
+                                    fab.show()
+                                    fab.onClick { playAll(fileDownObjs) }
+                                }
                             }
                         }
                     })

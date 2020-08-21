@@ -17,6 +17,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -34,6 +35,9 @@ import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
 import kotlinx.android.synthetic.main.activity_news.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.toast
@@ -114,9 +118,9 @@ class AchievementActivity : GenericActivity() {
     override fun onResume() {
         super.onResume()
         CacheDB.INSTANCE.achievementsDAO().totalUnlockedPoints.observe(this, Observer {
-            doOnUI {
+            lifecycleScope.launch(Dispatchers.Main) {
                 levelCalculator.calculate(it ?: 0)
-                if (it != CacheDB.INSTANCE.achievementsDAO().totalPoints) {
+                if (it != withContext(Dispatchers.IO){ CacheDB.INSTANCE.achievementsDAO().totalPoints }) {
                     progress.progressMax = levelCalculator.max.toFloat()
                     progress.progress = levelCalculator.progress.toFloat()
                     progressIndText.visibility = View.VISIBLE

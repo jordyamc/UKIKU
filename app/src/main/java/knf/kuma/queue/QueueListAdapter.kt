@@ -12,6 +12,10 @@ import knf.kuma.commons.notSameContent
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import kotlinx.android.synthetic.main.item_queue.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 internal class QueueListAdapter(val callback: () -> Unit) : RecyclerView.Adapter<QueueListAdapter.ListItemHolder>() {
@@ -43,10 +47,12 @@ internal class QueueListAdapter(val callback: () -> Unit) : RecyclerView.Adapter
 
     fun remove(position: Int) {
         if (position != -1) {
-            CacheDB.INSTANCE.queueDAO().remove(list[position])
-            list.removeAt(position)
-            notifyItemRemoved(position)
-            if (list.isEmpty()) callback.invoke()
+            GlobalScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.IO) { CacheDB.INSTANCE.queueDAO().remove(list[position]) }
+                list.removeAt(position)
+                notifyItemRemoved(position)
+                if (list.isEmpty()) callback.invoke()
+            }
         }
     }
 

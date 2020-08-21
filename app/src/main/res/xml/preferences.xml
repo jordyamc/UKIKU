@@ -135,7 +135,7 @@
             android:defaultValue="false"
             android:icon="@drawable/ic_experimental"
             android:key="experimental_player"
-            android:title="Reproductor experimental"/>
+            android:title="Reproductor avanzado"/>
         <SwitchPreference
             android:defaultValue="false"
             android:dependency="experimental_player"
@@ -296,6 +296,13 @@
             android:summaryOff="Se usará agente al azar en bypass"
             android:summaryOn="Se usará agente por defecto en bypass"
             android:title="Usar agente del dispositivo"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_incognito"
+            android:key="may_use_random_useragent"
+            android:summaryOn="Se usará agente al azar cuando sea posible"
+            android:summaryOff="Se usará la configuracion actual"
+            android:title="Usar agente al azar cuando sea posible"/>
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_trophy_normal"

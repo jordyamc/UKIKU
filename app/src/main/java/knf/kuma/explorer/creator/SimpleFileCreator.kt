@@ -10,6 +10,13 @@ class SimpleFileCreator(val base: File) : Creator {
 
     override fun exist(): Boolean = base.exists()
 
+    override fun createLinksList(): List<String> {
+        return if (base.exists())
+            base.listFiles(FileFilter { it.isDirectory })?.map { "https://animeflv.net/anime/${it.name}" }?: emptyList()
+        else
+            emptyList()
+    }
+
     override fun createDirectoryList(progressCallback: (Int, Int) -> Unit): List<ExplorerObject> {
         return if (base.exists()) {
             val list = mutableListOf<ExplorerObject>()

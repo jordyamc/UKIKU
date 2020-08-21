@@ -46,7 +46,7 @@ internal class SeeingAdapterMaterial(private val activity: Activity, private val
             PicassoSingle.get().load(PatternUtil.getCover(seeingObject.aid)).into(imageView)
             title.text = seeingObject.title
             progressView?.visibility = View.GONE
-            cardView.setOnClickListener { ActivityAnimeMaterial.open(activity, seeingObject, imageView) }
+            cardView.setOnClickListener { ActivityAnimeMaterial.open(activity, seeingObject) }
             cardView.setOnLongClickListener { view ->
                 val popupMenu = PopupMenu(activity, view)
                 popupMenu.inflate(R.menu.menu_seeing)

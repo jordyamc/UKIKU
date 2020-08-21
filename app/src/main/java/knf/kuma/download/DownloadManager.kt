@@ -95,18 +95,22 @@ class DownloadManager : Service() {
         init {
             fetch = Fetch.getInstance(fetchConfiguration.build()).addListener(object : FetchListener {
                 override fun onAdded(download: Download) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        downloadObject.state = DownloadObject.PENDING
-                        downloadDao.update(downloadObject)
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            downloadObject.state = DownloadObject.PENDING
+                            downloadDao.update(downloadObject)
+                        }
                     }
                 }
 
                 override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        downloadObject.state = DownloadObject.PENDING
-                        downloadDao.update(downloadObject)
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            downloadObject.state = DownloadObject.PENDING
+                            downloadDao.update(downloadObject)
+                        }
                     }
                 }
 
@@ -115,53 +119,55 @@ class DownloadManager : Service() {
                 }
 
                 override fun onCompleted(download: Download) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        if (FileAccessHelper.isTempFile(download.file)) {
-                            Log.e("Download", "Moving temp")
-                            downloadObject.setEta(-2)
-                            downloadObject.progress = 0
-                            downloadDao.update(downloadObject)
-                            FileUtil.moveFile(downloadObject.file, object : FileUtil.MoveCallback {
-                                override fun onProgress(pair: android.util.Pair<Int, Boolean>) {
-                                    if (!pair.second) {
-                                        downloadObject.progress = pair.first
-                                        updateNotification(downloadObject, false)
-                                        downloadDao.update(downloadObject)
-                                    } else if (pair.first == -1) {
-                                        downloadDao.delete(downloadObject)
-                                        errorNotification(downloadObject)
-                                    } else {
-                                        downloadObject.progress = 100
-                                        downloadObject.state = DownloadObject.COMPLETED
-                                        downloadDao.update(downloadObject)
-                                        notificationManager.cancel(downloadObject.eid.toInt())
-                                        completedNotification(downloadObject)
+                    doAsync { val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            if (FileAccessHelper.isTempFile(download.file)) {
+                                Log.e("Download", "Moving temp")
+                                downloadObject.setEta(-2)
+                                downloadObject.progress = 0
+                                downloadDao.update(downloadObject)
+                                FileUtil.moveFile(downloadObject.file, object : FileUtil.MoveCallback {
+                                    override fun onProgress(pair: android.util.Pair<Int, Boolean>) {
+                                        if (!pair.second) {
+                                            downloadObject.progress = pair.first
+                                            updateNotification(downloadObject, false)
+                                            downloadDao.update(downloadObject)
+                                        } else if (pair.first == -1) {
+                                            downloadDao.delete(downloadObject)
+                                            errorNotification(downloadObject)
+                                        } else {
+                                            downloadObject.progress = 100
+                                            downloadObject.state = DownloadObject.COMPLETED
+                                            downloadDao.update(downloadObject)
+                                            notificationManager.cancel(downloadObject.eid.toInt())
+                                            completedNotification(downloadObject)
+                                        }
+                                        stopIfNeeded()
                                     }
-                                    stopIfNeeded()
-                                }
-                            })
-                        } else {
-                            downloadObject.state = DownloadObject.COMPLETED
-                            downloadDao.update(downloadObject)
-                            completedNotification(downloadObject)
+                                })
+                            } else {
+                                downloadObject.state = DownloadObject.COMPLETED
+                                downloadDao.update(downloadObject)
+                                completedNotification(downloadObject)
+                            }
                         }
-                    }
-                    stopIfNeeded()
+                        stopIfNeeded() }
                 }
 
                 override fun onError(download: Download, error: Error, throwable: Throwable?) {
-                    Log.e("Download", "Error downloader")
-                    if (throwable != null) {
-                        throwable.printStackTrace()
-                        FirebaseCrashlytics.getInstance().recordException(throwable)
-                    }
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        errorNotification(downloadObject)
-                        downloadDao.delete(downloadObject)
-                        fetch?.delete(download.id)
-                        stopIfNeeded()
+                    doAsync {
+                        Log.e("Download", "Error downloader")
+                        if (throwable != null) {
+                            throwable.printStackTrace()
+                            FirebaseCrashlytics.getInstance().recordException(throwable)
+                        }
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            errorNotification(downloadObject)
+                            downloadDao.delete(downloadObject)
+                            fetch?.delete(download.id)
+                            stopIfNeeded()
+                        }
                     }
                 }
 
@@ -170,69 +176,83 @@ class DownloadManager : Service() {
                 }
 
                 override fun onStarted(download: Download, downloadBlocks: List<DownloadBlock>, totalBlocks: Int) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        downloadObject.state = DownloadObject.DOWNLOADING
-                        downloadDao.update(downloadObject)
-                        updateNotification(downloadObject, false)
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            downloadObject.state = DownloadObject.DOWNLOADING
+                            downloadDao.update(downloadObject)
+                            updateNotification(downloadObject, false)
+                        }
+                        context.service(Intent(context, DownloadManager::class.java))
                     }
-                    context.service(Intent(context, DownloadManager::class.java))
                 }
 
                 override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        downloadObject.state = DownloadObject.DOWNLOADING
-                        downloadObject.setEta(etaInMilliSeconds)
-                        downloadObject.setSpeed(downloadedBytesPerSecond)
-                        downloadObject.progress = download.progress
-                        downloadObject.t_bytes = download.total
-                        downloadObject.d_bytes = download.downloaded
-                        downloadDao.update(downloadObject)
-                        updateNotification(downloadObject, false)
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            downloadObject.state = DownloadObject.DOWNLOADING
+                            downloadObject.setEta(etaInMilliSeconds)
+                            downloadObject.setSpeed(downloadedBytesPerSecond)
+                            downloadObject.progress = download.progress
+                            downloadObject.t_bytes = download.total
+                            downloadObject.d_bytes = download.downloaded
+                            downloadDao.update(downloadObject)
+                            updateNotification(downloadObject, false)
+                        }
                     }
                 }
 
                 override fun onPaused(download: Download) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        downloadObject.state = DownloadObject.PAUSED
-                        downloadObject.setEta(-1)
-                        downloadDao.update(downloadObject)
-                        updateNotification(downloadObject, true)
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            downloadObject.state = DownloadObject.PAUSED
+                            downloadObject.setEta(-1)
+                            downloadDao.update(downloadObject)
+                            updateNotification(downloadObject, true)
+                        }
+                        stopIfNeeded()
                     }
-                    stopIfNeeded()
                 }
 
                 override fun onResumed(download: Download) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null) {
-                        downloadObject.state = DownloadObject.PENDING
-                        downloadObject.time = System.currentTimeMillis()
-                        downloadDao.update(downloadObject)
-                        updateNotification(downloadObject, false)
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null) {
+                            downloadObject.state = DownloadObject.PENDING
+                            downloadObject.time = System.currentTimeMillis()
+                            downloadDao.update(downloadObject)
+                            updateNotification(downloadObject, false)
+                        }
                     }
                 }
 
                 override fun onCancelled(download: Download) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null)
-                        notificationManager.cancel(downloadObject.getDid())
-                    stopIfNeeded()
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null)
+                            notificationManager.cancel(downloadObject.getDid())
+                        stopIfNeeded()
+                    }
                 }
 
                 override fun onRemoved(download: Download) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null)
-                        notificationManager.cancel(downloadObject.getDid())
-                    stopIfNeeded()
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null)
+                            notificationManager.cancel(downloadObject.getDid())
+                        stopIfNeeded()
+                    }
                 }
 
                 override fun onDeleted(download: Download) {
-                    val downloadObject = downloadDao.getByDid(download.id)
-                    if (downloadObject != null)
-                        notificationManager.cancel(downloadObject.getDid())
-                    stopIfNeeded()
+                    doAsync {
+                        val downloadObject = downloadDao.getByDid(download.id)
+                        if (downloadObject != null)
+                            notificationManager.cancel(downloadObject.getDid())
+                        stopIfNeeded()
+                    }
                 }
             }, autoStart = true)
         }
@@ -259,33 +279,38 @@ class DownloadManager : Service() {
                 return true
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toaster.toast("Error al iniciar descarga")
+                FirebaseCrashlytics.getInstance().recordException(e)
+                Toaster.toast("Error al iniciar descarga: ${e.message}")
                 return false
             }
 
         }
 
         fun cancel(eid: String) {
-            val downloadObject = downloadDao.getByEid(eid)
+            doAsync {
+                val downloadObject = downloadDao.getByEid(eid)
             if (downloadObject != null) {
                 downloadDao.delete(downloadObject)
                 notificationManager.cancel(downloadObject.eid?.toInt() ?: 0)
                 if (downloadObject.did != null)
                     fetch?.delete(downloadObject.getDid())
             }
+            }
         }
 
         fun cancelAll() {
-            noCrash {
-                val downloads = downloadDao.allRaw
-                val dids = mutableListOf<Int>()
-                downloads.forEach {
-                    dids.add(it.getDid())
-                    notificationManager.cancel(it.eid?.toInt() ?: 0)
+            doAsync {
+                noCrash {
+                    val downloads = downloadDao.allRaw
+                    val dids = mutableListOf<Int>()
+                    downloads.forEach {
+                        dids.add(it.getDid())
+                        notificationManager.cancel(it.eid?.toInt() ?: 0)
+                    }
+                    fetch?.delete(dids)
+                    downloadDao.delete(downloads)
+                    stopIfNeeded()
                 }
-                fetch?.delete(dids)
-                downloadDao.delete(downloads)
-                stopIfNeeded()
             }
         }
 

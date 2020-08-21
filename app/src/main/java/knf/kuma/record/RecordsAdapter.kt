@@ -1,12 +1,13 @@
 package knf.kuma.record
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
@@ -14,10 +15,12 @@ import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecordObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 import java.util.*
 
-class RecordsAdapter(private val activity: Activity) : RecyclerView.Adapter<RecordsAdapter.RecordItem>() {
+class RecordsAdapter(private val activity: AppCompatActivity) : RecyclerView.Adapter<RecordsAdapter.RecordItem>() {
     private var items: MutableList<RecordObject> = ArrayList()
 
     private val dao = CacheDB.INSTANCE.recordsDAO()
@@ -60,9 +63,13 @@ class RecordsAdapter(private val activity: Activity) : RecyclerView.Adapter<Reco
     }
 
     fun remove(position: Int) {
-        dao.delete(items[position])
-        items.removeAt(position)
-        notifyItemRemoved(position)
+        activity.lifecycleScope.launch(Dispatchers.IO){
+            dao.delete(items[position])
+            items.removeAt(position)
+            launch(Dispatchers.Main) {
+                notifyItemRemoved(position)
+            }
+        }
     }
 
     fun update(items: MutableList<RecordObject>) {

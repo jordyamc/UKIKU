@@ -3,7 +3,7 @@ package knf.kuma.animeinfo.viewholders
 import android.net.Uri
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -11,6 +11,7 @@ import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor
 import knf.kuma.animeinfo.AnimeChaptersAdapterMaterial
 import knf.kuma.animeinfo.BottomActionsDialog
+import knf.kuma.animeinfo.ChapterObjWrap
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.CenterLayoutManager
@@ -19,10 +20,12 @@ import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import kotlinx.android.synthetic.main.recycler_chapters.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import java.util.*
 
-class AnimeChaptersMaterialHolder(view: View, private val fragmentManager: FragmentManager, private val callback: ChapHolderCallback) {
+class AnimeChaptersMaterialHolder(view: View, private val fragment: Fragment, private val callback: ChapHolderCallback) {
     val recyclerView: RecyclerView = view.recycler
     private val manager: LinearLayoutManager = CenterLayoutManager(view.context)
     private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
@@ -72,7 +75,16 @@ class AnimeChaptersMaterialHolder(view: View, private val fragmentManager: Fragm
                                                 seeingDAO.update(seeingObject)
                                                 syncData { seeing() }
                                             }
-                                            recyclerView.post { adapter?.deselectAll() }
+                                            doOnUI {
+                                                adapter?.apply {
+                                                    if (selection.isNotEmpty()){
+                                                        selection.forEach {
+                                                            this.chapters[it].isSeen = true
+                                                        }
+                                                        deselectAll()
+                                                    }
+                                                }
+                                            }
                                             doOnUI { snackbar.safeDismiss() }
                                         }
                                         BottomActionsDialog.STATE_UNSEEN -> doAsync {
@@ -90,7 +102,16 @@ class AnimeChaptersMaterialHolder(view: View, private val fragmentManager: Fragm
                                                     seeingDAO.update(seeingObject)
                                                     syncData { seeing() }
                                                 }
-                                                recyclerView.post { adapter?.deselectAll() }
+                                                doOnUI {
+                                                    adapter?.apply {
+                                                        if (selection.isNotEmpty()){
+                                                            selection.forEach {
+                                                                this.chapters[it].isSeen = false
+                                                            }
+                                                            deselectAll()
+                                                        }
+                                                    }
+                                                }
                                                 doOnUI { snackbar.safeDismiss() }
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
@@ -166,7 +187,7 @@ class AnimeChaptersMaterialHolder(view: View, private val fragmentManager: Fragm
                             override fun onDismiss() {
                                 adapter?.deselectAll()
                             }
-                        }).safeShow(fragmentManager, "actions_dialog")
+                        }).safeShow(fragment.childFragmentManager, "actions_dialog")
                     }
                 }).withMode(DragSelectionProcessor.Mode.Simple))
                 .withMaxScrollDistance(32)
@@ -174,11 +195,13 @@ class AnimeChaptersMaterialHolder(view: View, private val fragmentManager: Fragm
 
     fun setAdapter(fragment: Fragment, chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?) {
         if (chapters == null) return
-        this.chapters = chapters
-        this.adapter = AnimeChaptersAdapterMaterial(fragment, recyclerView, chapters, touchListener)
-        recyclerView.post {
-            recyclerView.adapter = adapter
-            recyclerView.addOnItemTouchListener(touchListener)
+        fragment.lifecycleScope.launch(Dispatchers.IO){
+            this@AnimeChaptersMaterialHolder.chapters = chapters
+            this@AnimeChaptersMaterialHolder.adapter = AnimeChaptersAdapterMaterial(fragment, recyclerView, chapters.map { ChapterObjWrap(it) }, touchListener)
+            recyclerView.post {
+                recyclerView.adapter = adapter
+                recyclerView.addOnItemTouchListener(touchListener)
+            }
         }
     }
 
@@ -188,12 +211,16 @@ class AnimeChaptersMaterialHolder(view: View, private val fragmentManager: Fragm
     }
 
     fun goToChapter() {
-        if (chapters.isNotEmpty()) {
-            val chapter = CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters))
-            if (chapter != null) {
-                val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
-                if (position >= 0)
-                    manager.scrollToPositionWithOffset(position, 150)
+        fragment.lifecycleScope.launch(Dispatchers.IO){
+            if (chapters.isNotEmpty()) {
+                val chapter = CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters))
+                if (chapter != null) {
+                    val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
+                    if (position >= 0)
+                        launch(Dispatchers.Main){
+                            manager.scrollToPositionWithOffset(position, 150)
+                        }
+                }
             }
         }
     }

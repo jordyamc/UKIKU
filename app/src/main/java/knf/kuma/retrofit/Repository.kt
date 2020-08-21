@@ -19,6 +19,8 @@ import knf.kuma.pojos.Recents
 import knf.kuma.recents.RecentsPage
 import knf.kuma.search.SearchCompactDataSource
 import knf.kuma.search.SearchObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
 import retrofit2.Call
@@ -97,13 +99,13 @@ class Repository {
 
     fun getAnime(context: Context, link: String, persist: Boolean, data: MutableLiveData<AnimeObject?>): LiveData<AnimeObject?> {
         doAsync {
+            var cacheUsed = false
             try {
                 val base = link.substring(0, link.lastIndexOf("/") + 1)
                 val rest = link.substring(link.lastIndexOf("/") + 1)
                 val dao = CacheDB.INSTANCE.animeDAO()
-                var cacheUsed = false
                 dao.getAnimeRaw(link)?.let {
-                    if (it.checkIntegrity()){
+                    if (it.checkIntegrity()) {
                         cacheUsed = true
                         doOnUI {
                             data.value = it
@@ -132,14 +134,15 @@ class Repository {
 
                         override fun onFailure(call: Call<AnimeObject.WebInfo>, t: Throwable) {
                             t.printStackTrace()
-                            data.value = CacheDB.INSTANCE.animeDAO().getAnimeRaw(link)
+                            doOnUI { data.value = withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getAnimeRaw(link) } }
                         }
                     })
                 else if (!cacheUsed)
                     doOnUI { data.value = null }
             } catch (e: Exception) {
                 e.printStackTrace()
-                doOnUI { data.value = null }
+                if (!cacheUsed)
+                    doOnUI { data.value = null }
             }
         }
         return data

@@ -13,8 +13,12 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.github.rubensousa.previewseekbar.PreviewLoader
+import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
@@ -24,9 +28,15 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.exo_playback_control_view.*
+import knf.kuma.database.CacheDB
+import knf.kuma.pojos.QueueObject
+import kotlinx.android.synthetic.main.exo_playback_youtube_control_view.*
 import kotlinx.android.synthetic.main.player_view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.util.concurrent.Future
 
 /**
@@ -40,10 +50,11 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     private val mediaSessionConnector: MediaSessionConnector by lazy {
         createMediaSessionConnector()
     }
-    private val playerState by lazy { PlayerState() }
+    private lateinit var playerState: PlayerState
     private lateinit var playerHolder: PlayerHolder
     private var previewFuture: Future<Unit>? = null
     private var requestedFrame = 0L
+    var playList: List<QueueObject> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
@@ -52,23 +63,65 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         setContentView(R.layout.player_view)
         window.decorView.setBackgroundColor(Color.BLACK)
         volumeControlStream = AudioManager.STREAM_MUSIC
-        if (savedInstanceState != null) {
-            playerState.position = savedInstanceState.getLong("position", 0)
-            playerState.window = savedInstanceState.getInt("window", 0)
-        }
         hideUI()
         player.resizeMode = getResizeMode()
-        createMediaSession()
-        createPlayer()
-        skip.setOnClickListener { playerHolder.skip() }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isInPictureInPictureMode)
-            player.useController = false
+        exit.onClick { onBackPressed() }
+        lock.onClick { lock() }
+        unlock.onClick { unlock() }
+        youtubeOverlay.performListener(object : YouTubeOverlay.PerformListener{
+            override fun onAnimationEnd() {
+                youtubeOverlay.startAnimation(AnimationUtils.loadAnimation(this@VideoActivity,R.anim.fadeout))
+                youtubeOverlay.isVisible = false
+                exo_ll_controls.isVisible = true
+            }
+
+            override fun onAnimationStart() {
+                youtubeOverlay.isVisible = true
+                youtubeOverlay.startAnimation(AnimationUtils.loadAnimation(this@VideoActivity,R.anim.fadein))
+                exo_ll_controls.isVisible = false
+            }
+        })
+        if (!intent.getBooleanExtra("isPlayList", false)){
+            lay_next.isVisible = false
+            lay_prev.isVisible = false
+        }
+        lifecycleScope.launch(Dispatchers.Main) {
+            playList = withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist") ?: "empty")
+            }
+            playerState = withContext(Dispatchers.IO) { CacheDB.INSTANCE.playerStateDAO().find(intent.getStringExtra("title")?:"???")?:PlayerState() }
+            if (savedInstanceState != null) {
+                playerState.position = savedInstanceState.getLong("position", 0)
+                playerState.window = savedInstanceState.getInt("window", 0)
+                playerState.whenReady = savedInstanceState.getBoolean("playWhenReady",true)
+            }
+            createMediaSession()
+            createPlayer()
+            skip.setOnClickListener { playerHolder.skip() }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isInPictureInPictureMode)
+                player.useController = false
+            playerHolder.start()
+            activateMediaSession()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        if (::playerHolder.isInitialized)
+            playerHolder.saveState()
         outState.putInt("window", playerState.window)
         outState.putLong("position", playerState.position)
+        outState.putBoolean("playWhenReady",playerState.whenReady)
+    }
+
+    private fun lock(){
+        player.hideController()
+        lay_locked.isVisible = true
+    }
+
+    private fun unlock(){
+        player.showController()
+        lay_locked.isVisible = false
     }
 
     private fun hideUI() {
@@ -94,18 +147,34 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     override fun onStart() {
         super.onStart()
         Log.i("Player", "OnStart")
-        startPlayer()
-        activateMediaSession()
+        if (::playerHolder.isInitialized) {
+            startPlayer()
+            activateMediaSession()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (Build.VERSION.SDK_INT >= 24 && isInPictureInPictureMode)
+            resumePlayer()
+        else
+            pausePlayer()
     }
 
     override fun onResume() {
         super.onResume()
         doOnUI { hideUI() }
+        resumePlayer()
     }
 
     override fun onStop() {
         Log.i("Player", "OnStop")
-        playerHolder.saveState()
+        if (::playerHolder.isInitialized)
+            if (!playerState.isFinishing) {
+                playerHolder.saveState()
+                playerState.title = video_title.text.toString()
+                saveState()
+            }
         stopPlayer()
         deactivateMediaSession()
         super.onStop()
@@ -114,12 +183,52 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     override fun onDestroy() {
         super.onDestroy()
         Log.i("Player", "OnDestroy")
+        stopPlayer()
         releasePlayer()
         releaseMediaSession()
     }
 
+    private fun saveState(){
+        doAsync {
+            CacheDB.INSTANCE.playerStateDAO().set(playerState)
+        }
+    }
+
     // MediaSession related functions.
-    private fun createMediaSession(): MediaSessionCompat = MediaSessionCompat(this, packageName)
+    private fun createMediaSession(): MediaSessionCompat = MediaSessionCompat(this, packageName).apply {
+        setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS)
+        setCallback(object : MediaSessionCompat.Callback() {
+            override fun onPlay() {
+                super.onPlay()
+                with(playerHolder.audioFocusPlayer) {
+                    playWhenReady = true
+                }
+            }
+
+            override fun onPause() {
+                super.onPause()
+                with(playerHolder.audioFocusPlayer) {
+                    playWhenReady = false
+                }
+            }
+
+            override fun onSkipToNext() {
+                super.onSkipToNext()
+                with(playerHolder.audioFocusPlayer) {
+                    if (hasNext())
+                        next()
+                }
+            }
+
+            override fun onSkipToPrevious() {
+                super.onSkipToPrevious()
+                with(playerHolder.audioFocusPlayer) {
+                    if (hasPrevious())
+                        previous()
+                }
+            }
+        })
+    }
 
     private fun createMediaSessionConnector(): MediaSessionConnector =
             MediaSessionConnector(mediaSession).apply {
@@ -127,8 +236,8 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
                 // MediaSession actions (and they won't show up in the minimized PIP activity):
                 // [ACTION_SKIP_PREVIOUS], [ACTION_SKIP_NEXT], [ACTION_SKIP_TO_QUEUE_ITEM]
                 setQueueNavigator(object : TimelineQueueNavigator(mediaSession) {
-                    override fun getMediaDescription(player: Player?, windowIndex: Int): MediaDescriptionCompat {
-                        return MediaCatalog(mutableListOf(), intent)[windowIndex]
+                    override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
+                        return MediaCatalog(mutableListOf(), intent, playList)[windowIndex]
                     }
                 })
             }
@@ -153,7 +262,8 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     // ExoPlayer related functions.
     private fun createPlayer() {
-        playerHolder = PlayerHolder(this, playerState, player, intent)
+        playerHolder = PlayerHolder(this, playerState, player, intent, playList)
+        youtubeOverlay.player(playerHolder.audioFocusPlayer)
         if (!intent.getBooleanExtra("isPlayList", false)) {
             exo_next.visibility = View.GONE
             exo_prev.visibility = View.GONE
@@ -162,15 +272,32 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     }
 
     private fun startPlayer() {
-        playerHolder.start()
+        if (::playerHolder.isInitialized)
+            playerHolder.start()
     }
 
     private fun stopPlayer() {
-        playerHolder.stop()
+        if (::playerHolder.isInitialized)
+            playerHolder.stop()
+    }
+
+    private fun resumePlayer() {
+        if (::playerHolder.isInitialized)
+            with(playerHolder.audioFocusPlayer) {
+                playWhenReady = true
+            }
+    }
+
+    private fun pausePlayer() {
+        if (::playerHolder.isInitialized)
+            with(playerHolder.audioFocusPlayer) {
+                playWhenReady = false
+            }
     }
 
     private fun releasePlayer() {
-        playerHolder.release()
+        if (::playerHolder.isInitialized)
+            playerHolder.release()
     }
 
     // Picture in Picture related functions.
@@ -186,8 +313,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         }
     }
 
-    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean,
-                                               newConfig: Configuration?) {
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         playerHolder.saveState()
         player.useController = !isInPictureInPictureMode
     }
@@ -203,7 +329,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     }
 
     override fun onChangeTitle(title: String) {
-        video_title.text = title
+        lifecycleScope.launch(Dispatchers.Main) { video_title.text = title }
     }
 
     override fun onLoadingChange(loading: Boolean) {
@@ -218,7 +344,14 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     }
 
     override fun onFinish() {
-        finish()
+        playerState.apply {
+            title = video_title.text.toString()
+            position = 0
+            isFinishing = true
+        }
+        saveState()
+        unlock()
+        //finish()
     }
 
 

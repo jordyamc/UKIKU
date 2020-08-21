@@ -2,20 +2,19 @@ package knf.kuma.player
 
 import android.content.Intent
 import android.support.v4.media.MediaDescriptionCompat
-import knf.kuma.database.CacheDB
+import knf.kuma.pojos.QueueObject
 
 /**
  * Manages a set of media metadata that is used to create a playlist for [VideoActivity].
  */
 
-open class MediaCatalog(private val list: MutableList<MediaDescriptionCompat>, private val intent: Intent) :
+open class MediaCatalog(private val list: MutableList<MediaDescriptionCompat>, private val intent: Intent, playList: List<QueueObject>) :
         MutableList<MediaDescriptionCompat> by list {
 
-    companion object : MediaCatalog(mutableListOf(), Intent())
+    companion object : MediaCatalog(mutableListOf(), Intent(), emptyList())
 
     init {
         if (intent.getBooleanExtra("isPlayList", false)) {
-            val playList = CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist"))
             var count = 1
             playList.forEach {
                 list.add(

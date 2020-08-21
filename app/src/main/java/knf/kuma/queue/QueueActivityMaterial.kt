@@ -167,8 +167,8 @@ class QueueActivityMaterial : GenericActivity(), QueueAnimesAdapterMaterial.OnAn
     }
 
     private fun clearInterfaces() {
-        if (recyclerView.adapter is QueueAnimesAdapter)
-            (recyclerView.adapter as QueueAnimesAdapter).clear()
+        if (recyclerView.adapter is QueueAnimesAdapterMaterial)
+            (recyclerView.adapter as QueueAnimesAdapterMaterial).clear()
     }
 
     private fun setLayoutManager(isFull: Boolean) {
@@ -252,7 +252,7 @@ class QueueActivityMaterial : GenericActivity(), QueueAnimesAdapterMaterial.OnAn
             }
             R.id.play -> {
                 bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
-                val list = (recyclerView.adapter as? QueueAllAdapter)?.list ?: mutableListOf()
+                val list = (recyclerView.adapter as? QueueAllAdapterMaterial)?.list ?: mutableListOf()
                 if (list.size > 0)
                     QueueManager.startQueue(applicationContext, list)
                 else

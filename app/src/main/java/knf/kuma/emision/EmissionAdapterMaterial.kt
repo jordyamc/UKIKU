@@ -15,7 +15,7 @@ import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.commons.*
 import knf.kuma.custom.HiddenOverlay
 import knf.kuma.database.CacheDB
-import knf.kuma.search.SearchObject
+import knf.kuma.search.SearchObjectFav
 import knf.kuma.widgets.emision.WEmisionProvider
 import kotlinx.android.synthetic.main.item_emision_material.view.*
 import org.jetbrains.anko.doAsync
@@ -24,7 +24,7 @@ import org.jetbrains.anko.doAsync
 class EmissionAdapterMaterial internal constructor(private val fragment: Fragment) : RecyclerView.Adapter<EmissionAdapterMaterial.EmissionItem>() {
 
     val removeListener = fragment as RemoveListener
-    var list: MutableList<SearchObject> = ArrayList()
+    var list: MutableList<SearchObjectFav> = ArrayList()
 
     private var blacklist: MutableSet<String> = PrefsUtil.emissionBlacklist
     private var showHidden: Boolean = PrefsUtil.emissionShowHidden
@@ -40,7 +40,7 @@ class EmissionAdapterMaterial internal constructor(private val fragment: Fragmen
         holder.title.text = animeObject.name
         holder.hiddenOverlay.setHidden(blacklist.contains(animeObject.aid), false)
         holder.heart.visibility = when {
-            showHeart && CacheDB.INSTANCE.favsDAO().isFav(animeObject.aid.toInt()) -> View.VISIBLE
+            showHeart && animeObject.isFav -> View.VISIBLE
             else -> View.GONE
         }
         //holder.observeFav(fragment, animeObject.aid, showHeart)
@@ -66,7 +66,7 @@ class EmissionAdapterMaterial internal constructor(private val fragment: Fragmen
         return list.size
     }
 
-    fun update(newList: MutableList<SearchObject>, animate: Boolean = true, callback: () -> Unit) {
+    fun update(newList: MutableList<SearchObjectFav>, animate: Boolean = true, callback: () -> Unit) {
         if (list notSameContent newList)
             if (PrefsUtil.useSmoothAnimations && newList.isNotEmpty())
                 doAsync {

@@ -25,7 +25,7 @@ import java.io.File
 class UpdateActivity : GenericActivity() {
 
     private val updaterViewModel: UpdaterViewModel by viewModels()
-    private val update: File by lazy { File.createTempFile("update",".apk",filesDir) }
+    private val update: File by lazy { File.createTempFile("update", ".apk", filesDir) }
     private var isUpdateDownloaded = false
 
     @SuppressLint("SetTextI18n")
@@ -123,10 +123,17 @@ class UpdateActivity : GenericActivity() {
             }
     }
 
+    override fun onBackPressed() {
+        if (intent.getBooleanExtra("canExit", true))
+            super.onBackPressed()
+    }
+
     companion object {
 
-        fun start(context: Context) {
-            context.startActivity(Intent(context, UpdateActivity::class.java))
+        fun start(context: Context, canExit: Boolean) {
+            context.startActivity(Intent(context, UpdateActivity::class.java).apply {
+                putExtra("canExit", canExit)
+            })
         }
     }
 }

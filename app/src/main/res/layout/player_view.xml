@@ -5,12 +5,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.exoplayer2.ui.PlayerView
+    <!--<com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true"
         app:controller_layout_id="@layout/exo_playback_control_view"
-        app:resize_mode="fit"/>
+        app:resize_mode="fit"/>-->
+
+    <com.github.vkay94.dtpv.DoubleTapPlayerView
+        android:id="@+id/player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"
+        android:animateLayoutChanges="true"
+        app:controller_layout_id="@layout/exo_playback_youtube_control_view"
+        app:resize_mode="fit"
+        app:dtpv_controller="@+id/youtubeOverlay" />
+
+    <com.github.vkay94.dtpv.youtube.YouTubeOverlay
+        android:id="@+id/youtubeOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:yt_playerView="@+id/player" />
+
+    <RelativeLayout
+        android:id="@+id/lay_locked"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+        <ImageButton
+            android:id="@+id/unlock"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#4D000000"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_unlocked" />
+    </RelativeLayout>
+
+
 
 </FrameLayout>

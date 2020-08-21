@@ -151,12 +151,24 @@ object PrefsUtil {
                 ?: "3")
 
     var userAgent: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("user_agent", randomUA())
-                ?: randomUA()
+        get() =
+            if (alwaysGenerateUA && mayUseRandomUA)
+                randomUA()
+            else
+                PreferenceManager.getDefaultSharedPreferences(context).getString("user_agent", randomUA())
+                        ?: randomUA()
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("user_agent", value).apply()
 
+    val mayUseRandomUA: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("may_use_random_useragent", true)
+
+    var alwaysGenerateUA: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("alwaysGenerateUA", true)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("alwaysGenerateUA", value).apply()
+
     var userAgentDir: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("user_agent_dir", randomUA()) ?: randomUA()
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("user_agent_dir", randomUA())
+                ?: randomUA()
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("user_agent_dir", value).apply()
 
     var randomLimit: Int
@@ -198,11 +210,13 @@ object PrefsUtil {
                 ?: 0
 
     var userCoins: Int
-        get() = SecurePreferences(context).getInt("userCoins", try {
-            coins
-        } catch (e: Exception) {
-            0
-        })
+        get() = noCrashLet(0) {
+            SecurePreferences(context).getInt("userCoins", try {
+                coins
+            } catch (e: Exception) {
+                0
+            })
+        }
         set(value) = SecurePreferences(context).edit().putInt("userCoins", value).apply()
 
     var lsAchievements: Long
@@ -326,6 +340,9 @@ object PrefsUtil {
     fun getLiveDesignType(): LiveData<String> {
         return PreferenceManager.getDefaultSharedPreferences(context).stringLiveData("designStyleType", "0").distinct
     }
+
+    fun getLiveEmissionVisibility(): LiveData<Boolean> =
+            PreferenceManager.getDefaultSharedPreferences(context).booleanLiveData("show_hidden", false)
 
     val isSubscriptionEnabled: Boolean get() = subscriptionToken != null
 

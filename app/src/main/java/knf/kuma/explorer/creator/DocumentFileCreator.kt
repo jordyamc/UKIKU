@@ -9,6 +9,11 @@ class DocumentFileCreator(private val rootDF: DocumentFile?) : Creator {
     override fun exist(): Boolean = rootDF?.exists()
             ?: false
 
+    override fun createLinksList(): List<String> {
+        rootDF ?: return emptyList()
+        return rootDF.listFiles().filter { it.isDirectory }.mapNotNull { "https://animeflv.net/anime/${it.name}" }
+    }
+
     override fun createDirectoryList(progressCallback: (Int, Int) -> Unit): List<ExplorerObject> {
         rootDF ?: return emptyList()
         val directories = rootDF.listFiles().filter { it.isDirectory }

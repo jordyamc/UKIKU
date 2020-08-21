@@ -24,6 +24,7 @@ import knf.kuma.pojos.SeeingObject
 import kotlinx.android.synthetic.main.fragment_anime_details_material.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.clipboardManager
 import org.jetbrains.anko.doAsync
 import uz.jamshid.library.ExactRatingBar
@@ -74,7 +75,7 @@ class AnimeDetailsMaterialHolder(val view: View) {
                 showLayout(layouts[0])
             }
             noCrash {
-                if (animeObject.description != null && animeObject.description?.trim() != "") {
+                if (animeObject.description != null && animeObject.description?.isBlank() == false) {
                     desc.setTextAndIndicator(animeObject.description?.trim() ?: "", expandIcon)
                     desc.setAnimationDuration(300)
                     val onClickListener = View.OnClickListener {
@@ -86,6 +87,8 @@ class AnimeDetailsMaterialHolder(val view: View) {
                     desc.setOnClickListener(onClickListener)
                     expandIcon.setOnClickListener(onClickListener)
                     showLayout(layouts[1])
+                }else{
+                    view.lay_description_separator.isVisible = false
                 }
             }
             noCrash {
@@ -124,21 +127,24 @@ class AnimeDetailsMaterialHolder(val view: View) {
                 }
             }
             noCrash {
-                val seeingObject = CacheDB.INSTANCE.seeingDAO().getByAid(animeObject.aid)
                 spinnerList.adapter = ArrayAdapter<String>(view.context, android.R.layout.simple_spinner_dropdown_item, view.context.resources.getStringArray(R.array.list_states))
-                spinnerList.setSelection(seeingObject?.state ?: 0)
-                spinnerList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                fragment.lifecycleScope.launch(Dispatchers.Main){
+                    spinnerList.setSelection(withContext(Dispatchers.IO){
+                        CacheDB.INSTANCE.seeingDAO().getByAid(animeObject.aid)
+                    }?.state ?: 0)
+                    spinnerList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
 
-                    }
+                        }
 
-                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                        doAsync {
-                            if (position == 0)
-                                CacheDB.INSTANCE.seeingDAO().remove(SeeingObject.fromAnime(animeObject, position))
-                            else
-                                CacheDB.INSTANCE.seeingDAO().add(SeeingObject.fromAnime(animeObject, position))
-                            syncData { seeing() }
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            doAsync {
+                                if (position == 0)
+                                    CacheDB.INSTANCE.seeingDAO().remove(SeeingObject.fromAnime(animeObject, position))
+                                else
+                                    CacheDB.INSTANCE.seeingDAO().add(SeeingObject.fromAnime(animeObject, position))
+                                syncData { seeing() }
+                            }
                         }
                     }
                 }

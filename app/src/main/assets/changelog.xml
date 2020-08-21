@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="169" version="5.1.0">
+        <change type="change">Optimización general</change>
+        <change type="change">Mejoras en reproductor</change>
+        <change type="change">Reproductor Experimental renombrado a Avanzado</change>
+        <change type="change">Intento para sobrepasar bloqueo 403</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="168" version="5.0.3">
         <change type="fix">Errores generales</change>
     </release>

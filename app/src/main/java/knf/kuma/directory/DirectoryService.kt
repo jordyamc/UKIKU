@@ -18,6 +18,7 @@ import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
+import knf.kuma.download.FileAccessHelper
 import knf.kuma.download.foreground
 import knf.kuma.download.service
 import knf.kuma.jobscheduler.DirUpdateWork
@@ -73,7 +74,7 @@ class DirectoryService : IntentService("Directory update") {
             stopSelf()
             return
         }
-        needCookies = BypassUtil.isCloudflareActive("https://animeflv.net/browse?page=50")
+        needCookies = BypassUtil.isCloudflareActive(BypassUtil.testLink)
         isRunning = true
         setStatus(STATE_VERIFYING)
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -87,6 +88,7 @@ class DirectoryService : IntentService("Directory update") {
         doPartialSearch(jspoon, animeDAO)
         setStatus(STATE_FULL)
         doEcchiRemove(animeDAO)
+        checkDownloaded(animeDAO)
         doFullSearch(jspoon, animeDAO)
         doEmissionRefresh(jspoon, animeDAO)
         cancelForeground()
@@ -97,7 +99,7 @@ class DirectoryService : IntentService("Directory update") {
             val main = jsoupCookiesDir("https://animeflv.net/browse",needCookies).get()
             val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
             val last = jsoupCookiesDir("https://animeflv.net/browse?page=$lastPage",needCookies).get()
-            maxAnimes = (24 * (lastPage - 1)) + last.select("article").size
+            maxAnimes = ((24 * (lastPage - 1)) + last.select("article").size) - 1
             Log.e(TAG, "Max pages = $maxAnimes")
         }
     }
@@ -108,17 +110,41 @@ class DirectoryService : IntentService("Directory update") {
         }
     }
 
-    private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
-        animeDAO.allLinksInEmission.forEach {
-            try {
-                val animeObject = AnimeObject(it, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookiesDir(it,needCookies).get().outerHtml()))
-                val current = animeDAO.getAnimeByAid(animeObject.aid)
-                if (current == null || current != animeObject)
-                    animeDAO.updateAnime(animeObject)
-                WEmisionProvider.update(this)
-            } catch (e: Exception) {
-                return@forEach
+    private fun checkDownloaded(animeDAO: AnimeDAO) {
+        val jspoon = Jspoon.create()
+        FileAccessHelper.downloadExplorerCreator.createLinksList().forEach {
+            if (!animeDAO.existLink("%${it.substringAfterLast(".net")}")){
+                try {
+                    val response = okHttpCookies(it).execute(followRedirects = true)
+                    val body = response.body()?.string()
+                    if (response.code() == 200 && body != null) {
+                        val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
+                        animeDAO.insert(AnimeObject(it, webInfo))
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                if (needCookies)
+                    Thread.sleep(5000)
             }
+        }
+    }
+
+    private fun doEmissionRefresh(jspoon: Jspoon, animeDAO: AnimeDAO) {
+        try {
+            animeDAO.allLinksInEmission.forEach {
+                try {
+                    val animeObject = AnimeObject(it, jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookiesDir(it,needCookies).get().outerHtml()))
+                    val current = animeDAO.getAnimeByAid(animeObject.aid)
+                    if (current == null || current != animeObject)
+                        animeDAO.updateAnime(animeObject)
+                    WEmisionProvider.update(this)
+                } catch (e: Exception) {
+                    return@forEach
+                }
+            }
+        }catch (e:Exception){
+            //
         }
     }
 
@@ -187,11 +213,9 @@ class DirectoryService : IntentService("Directory update") {
             try {
                 if (needCookies)
                     Thread.sleep(6000)
-                else
-                    Thread.sleep(1000)
                 val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page", needCookies).get()
                 Log.e(TAG, "Read page $page")
-                if (document.select("article").size != 0) {
+                if (document.select("ul.ListAnimes").isNotEmpty() && document.select("article").isNotEmpty()) {
                     page++
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
@@ -207,7 +231,7 @@ class DirectoryService : IntentService("Directory update") {
                     }, needCookies)
                     if (animeObjects.isNotEmpty()) {
                         animeDAO.insertAll(animeObjects)
-                    } else if (PrefsUtil.isDirectoryFinished || animeDAO.count in (maxAnimes - 5)..(maxAnimes + 5)) {
+                    } else if (PrefsUtil.isDirectoryFinished || animeDAO.count >= maxAnimes) {
                         PrefsUtil.isDirectoryFinished = animeDAO.count >= maxAnimes
                         Log.e(TAG, "Stop searching at page $page")
                         cancelForeground()
@@ -216,7 +240,7 @@ class DirectoryService : IntentService("Directory update") {
                 } else {
                     finished = true
                     Log.e(TAG, "Processed $page pages")
-                    PrefsUtil.isDirectoryFinished = animeDAO.count in (maxAnimes - 5)..(maxAnimes + 5)
+                    PrefsUtil.isDirectoryFinished = animeDAO.count >= maxAnimes
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet(keyFailedPages, strings).apply()
                     DirUpdateWork.schedule(this)
                     setStatus(STATE_FINISHED)

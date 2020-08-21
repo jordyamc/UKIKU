@@ -18,7 +18,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.load
 
-class DirectoryPageAdapterOffline internal constructor(private val fragment: Fragment) : PagedListAdapter<DirObjectCompact, DirectoryPageAdapterOffline.ItemHolder>(DirObjectCompact.DIFF), FastScrollRecyclerView.SectionedAdapter {
+class DirectoryPageAdapterOnline internal constructor(private val fragment: Fragment) : PagedListAdapter<DirObjectCompact, DirectoryPageAdapterOnline.ItemHolder>(DirObjectCompact.DIFF), FastScrollRecyclerView.SectionedAdapter {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
         return ItemHolder(LayoutInflater.from(parent.context).inflate(getLayType(), parent, false))
@@ -40,7 +40,7 @@ class DirectoryPageAdapterOffline internal constructor(private val fragment: Fra
             holder.imageView.load(PatternUtil.getCover(animeObject.aid))
             holder.progressView.visibility = View.GONE
             holder.textView.text = animeObject.name
-            holder.cardView.setOnClickListener { ActivityAnimeMaterial.open(fragment, animeObject, holder.imageView, persist = false) }
+            holder.cardView.setOnClickListener { ActivityAnimeMaterial.open(fragment, animeObject, true) }
         } else {
             holder.progressView.visibility = View.VISIBLE
             holder.textView.text = null

@@ -13,50 +13,66 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
 
 object QueueManager {
-    fun isInQueue(eid: String): Boolean {
-        return CacheDB.INSTANCE.queueDAO().isInQueue(eid)
+    suspend fun isInQueue(eid: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            CacheDB.INSTANCE.queueDAO().isInQueue(eid)
+        }
     }
 
     fun add(uri: Uri, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter?) {
         if (chapter == null) return
-        CacheDB.INSTANCE.queueDAO().add(QueueObject(uri, isFile, chapter))
-        syncData { queue() }
-        Toaster.toast("Episodio añadido a cola")
+        doAsync {
+            CacheDB.INSTANCE.queueDAO().add(QueueObject(uri, isFile, chapter))
+            syncData { queue() }
+            Toaster.toast("Episodio añadido a cola")
+        }
     }
 
     fun add(wrapper: FileWrapper<*>, dobject: DownloadObject?, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter?) {
         if (chapter == null) return
-        val file = wrapper.file() ?: wrapper.let { it.reset(); it.file() }
-        ?: dobject?.let { FileWrapper.fromFileName(it.file) } ?: return
-        CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(file), isFile, chapter))
-        syncData { queue() }
-        Toaster.toast("Episodio añadido a cola")
+        doAsync {
+            val file = wrapper.file() ?: wrapper.let { it.reset(); it.file() }
+            ?: dobject?.let { FileWrapper.fromFileName(it.file) } ?: return@doAsync
+            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(file), isFile, chapter))
+            syncData { queue() }
+            Toaster.toast("Episodio añadido a cola")
+        }
     }
 
     fun remove(queueObject: QueueObject) {
-        CacheDB.INSTANCE.queueDAO().remove(queueObject)
-        syncData { queue() }
+        doAsync {
+            CacheDB.INSTANCE.queueDAO().remove(queueObject)
+            syncData { queue() }
+        }
     }
 
     fun update(vararg objects: QueueObject) {
-        CacheDB.INSTANCE.queueDAO().update(*objects)
-        syncData { queue() }
+        doAsync {
+            CacheDB.INSTANCE.queueDAO().update(*objects)
+            syncData { queue() }
+        }
     }
 
     fun remove(list: MutableList<QueueObject>) {
-        CacheDB.INSTANCE.queueDAO().remove(list)
-        syncData { queue() }
+        doAsync {
+            CacheDB.INSTANCE.queueDAO().remove(list)
+            syncData { queue() }
+        }
     }
 
     fun remove(eid: String?) {
         if (eid == null) return
-        CacheDB.INSTANCE.queueDAO().removeByEID(eid)
-        syncData { queue() }
+        doAsync {
+            CacheDB.INSTANCE.queueDAO().removeByEID(eid)
+            syncData { queue() }
+        }
     }
 
     fun removeAll(aid: String) {
@@ -75,7 +91,7 @@ object QueueManager {
             Toaster.toast("La lista esta vacía")
     }
 
-    internal fun startQueueDownloaded(context: Context?, list: List<ExplorerObject.FileDownObj>) {
+    internal suspend fun startQueueDownloaded(context: Context?, list: List<ExplorerObject.FileDownObj>) {
         if (context == null) return
         if (list.isNotEmpty()) {
             markAllSeenDownloaded(list)
@@ -100,7 +116,7 @@ object QueueManager {
             for (file in list)
                 CacheDB.INSTANCE.queueDAO().add(
                         QueueObject(
-                                Uri.fromFile(FileAccessHelper.getFile(file.fileName)),
+                                FileAccessHelper.getFileUri(file.fileName),
                                 true,
                                 AnimeObject.WebInfo.AnimeChapter.fromDownloaded(file)))
             val intent = PrefsUtil.getPlayerIntent()
@@ -174,15 +190,14 @@ object QueueManager {
             }
     }
 
-    private fun markAllSeenDownloaded(list: List<ExplorerObject.FileDownObj>) {
-        if (list.isNotEmpty())
-            doAsync {
-                CacheDB.INSTANCE.seenDAO().addAll(list.map { SeenObject.fromDownloaded(it) })
-                CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(list.last())))
-                syncData {
-                    history()
-                    seen()
-                }
+    suspend fun markAllSeenDownloaded(list: List<ExplorerObject.FileDownObj>) {
+        if (list.isNotEmpty()){
+            CacheDB.INSTANCE.seenDAO().addAll(list.map { SeenObject.fromDownloaded(it) })
+            CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(list.last())))
+            syncData {
+                history()
+                seen()
             }
+        }
     }
 }

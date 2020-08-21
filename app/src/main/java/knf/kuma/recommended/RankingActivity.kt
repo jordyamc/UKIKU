@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
@@ -16,6 +17,10 @@ import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import kotlinx.android.synthetic.main.recycler_ranking.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jetbrains.anko.doAsync
 
 class RankingActivity : GenericActivity() {
 
@@ -35,7 +40,9 @@ class RankingActivity : GenericActivity() {
         }
         with(recycler) {
             layoutManager = LinearLayoutManager(this@RankingActivity)
-            adapter = RankingAdapter()
+            lifecycleScope.launch(Dispatchers.Main){
+                adapter = RankingAdapterMaterial(withContext(Dispatchers.IO) { CacheDB.INSTANCE.genresDAO().ranking })
+            }
         }
         setResult(1234)
         showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
@@ -53,8 +60,10 @@ class RankingActivity : GenericActivity() {
                     message(text = "¿Deseas reiniciar la puntuación de todos los géneros?")
                     positiveButton(text = "continuar") {
                         setResult(4321)
-                        CacheDB.INSTANCE.genresDAO().reset()
-                        syncData { genres() }
+                        doAsync {
+                            CacheDB.INSTANCE.genresDAO().reset()
+                            syncData { genres() }
+                        }
                         finish()
                     }
                     negativeButton(text = "cancelar")

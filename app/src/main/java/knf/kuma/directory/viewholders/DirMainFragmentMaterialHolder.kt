@@ -9,7 +9,7 @@ import knf.kuma.BottomFragment
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.directory.DirPagerAdapterMaterial
-import knf.kuma.directory.DirPagerAdapterOffline
+import knf.kuma.directory.DirPagerAdapterOnline
 import kotlinx.android.synthetic.main.fragment_directory_material.view.*
 
 class DirMainFragmentMaterialHolder(view: View, manager: FragmentManager) {
@@ -22,7 +22,7 @@ class DirMainFragmentMaterialHolder(view: View, manager: FragmentManager) {
         adapter = if (PrefsUtil.isDirectoryFinished || !Network.isConnected)
             DirPagerAdapterMaterial(manager)
         else
-            DirPagerAdapterOffline(manager)
+            DirPagerAdapterOnline(manager)
         pager.adapter = adapter
         tabLayout.setupWithViewPager(pager)
     }

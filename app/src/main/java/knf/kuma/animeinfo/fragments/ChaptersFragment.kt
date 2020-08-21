@@ -74,7 +74,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.recycler_chapters, container, false)
-        holder = AnimeChaptersHolder(view, childFragmentManager, this).also {
+        holder = AnimeChaptersHolder(view, this, this).also {
             snackManager = SnackProgressBarManager(it.recyclerView)
                     .setProgressBarColor(EAHelper.getThemeColor())
                     .setOverlayLayoutAlpha(0.4f)
@@ -114,10 +114,8 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
     }
 
     override fun onDownloadMultiple(addQueue: Boolean, chapters: List<AnimeObject.WebInfo.AnimeChapter>) {
-        activity?.let {
-            holder?.let { holder ->
-                MultipleDownloadManager.startDownload(it, holder.recyclerView, chapters.sortedBy { noCrashLet(9999) { "(\\d+)".toRegex().findAll(it.number).last().destructured.component1().toInt() } }, addQueue)
-            }
+        holder?.let { holder ->
+            MultipleDownloadManager.startDownload(this, holder.recyclerView, chapters.sortedBy { noCrashLet(9999) { "(\\d+)".toRegex().findAll(it.number).last().destructured.component1().toInt() } }, addQueue)
         }
     }
 

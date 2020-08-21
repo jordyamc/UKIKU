@@ -32,6 +32,7 @@ import knf.kuma.queue.QueueManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import xdroid.toaster.Toaster
@@ -328,21 +329,27 @@ class ServersFactory {
     }
 
     private fun startDownload(option: Option) {
-        if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url)
-        downloadObject.server = option.server ?: ""
-        if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0")) {
-            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(chapter?.fileName
-                    ?: "null")), true, chapter))
-            syncData { queue() }
+        doAsync{
+            if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url)
+            downloadObject.server = option.server ?: ""
+            if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0")) {
+                CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(chapter?.fileName
+                        ?: "null")), true, chapter))
+                syncData { queue() }
+            }
+            downloadObject.link = option.url
+            downloadObject.headers = option.headers
+            if (PrefsUtil.downloaderType == 0) {
+                CacheDB.INSTANCE.downloadsDAO().insert(downloadObject)
+                doOnUI {
+                    context.service(Intent(App.context, DownloadService::class.java).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)))
+                    callOnFinish(true, true)
+                }
+            } else
+                GlobalScope.launch(Dispatchers.Main) {
+                    callOnFinish(true, withContext(Dispatchers.IO) { DownloadManager.start(downloadObject) })
+                }
         }
-        downloadObject.link = option.url
-        downloadObject.headers = option.headers
-        if (PrefsUtil.downloaderType == 0) {
-            CacheDB.INSTANCE.downloadsDAO().insert(downloadObject)
-            context.service(Intent(App.context, DownloadService::class.java).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)))
-            callOnFinish(true, true)
-        } else
-            callOnFinish(true, DownloadManager.start(downloadObject))
     }
 
     private fun callOnFinish(started: Boolean, success: Boolean) {

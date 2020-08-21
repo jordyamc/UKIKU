@@ -135,11 +135,13 @@ class TVServersFactory private constructor(private val activity: Activity, priva
     }
 
     private fun startStreaming(option: Option) {
-        CacheDB.INSTANCE.seenDAO().addChapter(SeenObject.fromChapter(chapter))
-        CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(chapter))
-        syncData {
-            history()
-            seen()
+        doAsync {
+            CacheDB.INSTANCE.seenDAO().addChapter(SeenObject.fromChapter(chapter))
+            CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(chapter))
+            syncData {
+                history()
+                seen()
+            }
         }
         activity.startActivity(Intent(activity, TVPlayer::class.java).apply {
             putExtra("url", option.url)

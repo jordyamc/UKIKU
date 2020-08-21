@@ -34,6 +34,7 @@ import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.android.synthetic.main.item_recents.view.*
 import kotlinx.coroutines.*
+import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster.toast
 import java.util.*
 
@@ -70,9 +71,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 val recentObject = noCrashLet { list[position] } ?: return@noCrash
                 PicassoSingle.get().load(PatternUtil.getCover(recentObject.aid)).into(holder.imageView)
                 holder.setNew(recentObject.isNew)
-                holder.setFav(dao.isFav(Integer.parseInt(recentObject.aid)))
-                holder.setSeen(chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter))
-                dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment, Observer { object1 -> holder.setFav(object1 != null) })
+                holder.setFav(recentObject.isFav)
+                holder.setSeen(recentObject.isSeen)
+                dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment, Observer { object1 -> holder.setFav((object1 != null).also { recentObject.isFav = it }) })
                 holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.aid, recentObject.chapter).distinct, fragment, Observer { chapter -> holder.setSeen(chapter != null) })
                 holder.setState(isNetworkAvailable, recentObject.isDownloading)
                 holder.apply {
@@ -126,6 +127,22 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                         ServersFactory.start(context, recentObject.url, DownloadObject.fromRecent(recentObject), true, object : ServersFactory.ServersInterface {
                                             override fun onFinish(started: Boolean, success: Boolean) {
                                                 if (!started && success) {
+                                                    doAsync {
+                                                        chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                                                        recordsDAO.add(RecordObject.fromRecent(recentObject))
+                                                        syncData {
+                                                            history()
+                                                            seen()
+                                                        }
+                                                    }
+                                                    recentObject.isSeen = true
+                                                }
+                                                holder.setLocked(false)
+                                            }
+
+                                            override fun onCast(url: String?) {
+                                                CastUtil.get().play(view, CastMedia.create(recentObject, url))
+                                                doAsync {
                                                     chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
                                                     recordsDAO.add(RecordObject.fromRecent(recentObject))
                                                     syncData {
@@ -133,17 +150,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                                         seen()
                                                     }
                                                 }
-                                                holder.setLocked(false)
-                                            }
-
-                                            override fun onCast(url: String?) {
-                                                CastUtil.get().play(view, CastMedia.create(recentObject, url))
-                                                chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
-                                                recordsDAO.add(RecordObject.fromRecent(recentObject))
-                                                syncData {
-                                                    history()
-                                                    seen()
-                                                }
+                                                recentObject.isSeen = true
                                                 holder.setSeen(true)
                                                 holder.setLocked(false)
                                             }
@@ -180,80 +187,98 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                         } else if (PrefsUtil.isFamilyFriendly && PrefsUtil.isDirectoryFinished) {
                             toast("Anime no familiar")
                         } else {
-                            val animeObject = animeDAO.getByAid(recentObject.aid)
-                            if (animeObject != null) {
-                                ActivityAnime.open(fragment, animeObject, holder.imageView)
-                            } else {
-                                ActivityAnime.open(fragment, recentObject, holder.imageView)
+                            fragment.lifecycleScope.launch(Dispatchers.Main) {
+                                val animeObject = withContext(Dispatchers.IO) { animeDAO.getByAid(recentObject.aid) }
+                                if (animeObject != null) {
+                                    ActivityAnime.open(fragment, animeObject, holder.imageView)
+                                } else {
+                                    ActivityAnime.open(fragment, recentObject, holder.imageView)
+                                }
                             }
                         }
                     }
                 }
                 holder.cardView.setOnLongClickListener {
-                    if (!chaptersDAO.chapterIsSeen(recentObject.aid, recentObject.chapter)) {
-                        chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                    if (!recentObject.isSeen) {
+                        doAsync {
+                            chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                        }
+                        recentObject.isSeen = true
                         holder.animeOverlay.setSeen(seen = true, animate = true)
                     } else {
-                        chaptersDAO.deleteChapter(recentObject.aid, recentObject.chapter)
+                        doAsync {
+                            chaptersDAO.deleteChapter(recentObject.aid, recentObject.chapter)
+                        }
+                        recentObject.isSeen = false
                         holder.animeOverlay.setSeen(seen = false, animate = true)
                     }
                     syncData { seen() }
                     true
                 }
                 holder.download.setOnClickListener {
-                    val obj = downloadsDAO.getByEid(recentObject.eid)
-                    if (FileAccessHelper.canDownload(fragment) &&
-                            !recentObject.fileWrapper().exist &&
-                            !recentObject.isDownloading &&
-                            recentObject.downloadState != DownloadObject.PENDING) {
-                        holder.setLocked(true)
-                        ServersFactory.start(context, recentObject.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), isStream = false, addQueue = false, serversInterface = object : ServersFactory.ServersInterface {
-                            override fun onFinish(started: Boolean, success: Boolean) {
-                                if (started) {
-                                    recentObject.fileWrapper().exist = true
-                                    holder.setState(isNetworkAvailable, true)
+                    fragment.lifecycleScope.launch(Dispatchers.Main){
+                        val obj = withContext(Dispatchers.IO) { downloadsDAO.getByEid(recentObject.eid) }
+                        if (FileAccessHelper.canDownload(fragment) &&
+                                !recentObject.fileWrapper().exist &&
+                                !recentObject.isDownloading &&
+                                recentObject.downloadState != DownloadObject.PENDING) {
+                            holder.setLocked(true)
+                            ServersFactory.start(context, recentObject.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(recentObject), isStream = false, addQueue = false, serversInterface = object : ServersFactory.ServersInterface {
+                                override fun onFinish(started: Boolean, success: Boolean) {
+                                    if (started) {
+                                        recentObject.fileWrapper().exist = true
+                                        holder.setState(isNetworkAvailable, true)
+                                    }
+                                    holder.setLocked(false)
                                 }
-                                holder.setLocked(false)
-                            }
 
-                            override fun onCast(url: String?) {
+                                override fun onCast(url: String?) {
 
-                            }
+                                }
 
-                            override fun onProgressIndicator(boolean: Boolean) {
-                                doOnUI {
-                                    if (boolean) {
-                                        holder.progressBar.isIndeterminate = true
-                                        holder.progressBarRoot.visibility = View.VISIBLE
-                                    } else
-                                        holder.progressBarRoot.visibility = View.GONE
+                                override fun onProgressIndicator(boolean: Boolean) {
+                                    doOnUI {
+                                        if (boolean) {
+                                            holder.progressBar.isIndeterminate = true
+                                            holder.progressBarRoot.visibility = View.VISIBLE
+                                        } else
+                                            holder.progressBarRoot.visibility = View.GONE
+                                    }
+                                }
+
+                                override fun getView(): View? {
+                                    return view
+                                }
+                            })
+                        } else if (recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.DOWNLOADING || obj.state == DownloadObject.COMPLETED)) {
+                            doAsync {
+                                chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                                recordsDAO.add(RecordObject.fromRecent(recentObject))
+                                syncData {
+                                    history()
+                                    seen()
                                 }
                             }
-
-                            override fun getView(): View? {
-                                return view
-                            }
-                        })
-                    } else if (recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.DOWNLOADING || obj.state == DownloadObject.COMPLETED)) {
-                        chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
-                        recordsDAO.add(RecordObject.fromRecent(recentObject))
-                        syncData {
-                            history()
-                            seen()
+                            recentObject.isSeen = true
+                            holder.setSeen(true)
+                            ServersFactory.startPlay(context, recentObject.epTitle, recentObject.fileWrapper().name())
+                        } else {
+                            toast("Aun no se está descargando")
                         }
-                        holder.setSeen(true)
-                        ServersFactory.startPlay(context, recentObject.epTitle, recentObject.fileWrapper().name())
-                    } else {
-                        toast("Aun no se está descargando")
                     }
                 }
                 holder.download.setOnLongClickListener {
-                    val obj = downloadsDAO.getByEid(recentObject.eid)
-                    if (CastUtil.get().connected() &&
-                            recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.COMPLETED)) {
-                        chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
-                        syncData { seen() }
-                        CastUtil.get().play(view, CastMedia.create(recentObject))
+                    fragment.lifecycleScope.launch(Dispatchers.Main){
+                        val obj = withContext(Dispatchers.IO) { downloadsDAO.getByEid(recentObject.eid) }
+                        if (CastUtil.get().connected() &&
+                                recentObject.fileWrapper().exist && (obj == null || obj.state == DownloadObject.COMPLETED)) {
+                            doAsync {
+                                chaptersDAO.addChapter(SeenObject.fromRecent(recentObject))
+                                syncData { seen() }
+                            }
+                            recentObject.isSeen = true
+                            CastUtil.get().play(view, CastMedia.create(recentObject))
+                        }
                     }
                     true
                 }

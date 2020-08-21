@@ -22,6 +22,7 @@ import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
@@ -37,6 +38,7 @@ import knf.kuma.pojos.QueueObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.recents.RecentModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import xdroid.toaster.Toaster
@@ -127,11 +129,11 @@ object FileActions {
             callback.call(CallbackState.OPERATION_RUNNING)
             return
         }
-        owner.lifecycle.coroutineScope.launch(Dispatchers.Main) {
+        owner.lifecycleScope.launch(Dispatchers.Main) {
             val result = checkPreconditions(context, type == Type.DOWNLOAD)
             if (result != null) {
-                callback.call(result)
                 reset()
+                callback.call(result)
                 return@launch
             }
             val actionRequest = ActionRequest(context, owner, type, url, item, downloadObject, callback)
@@ -152,13 +154,13 @@ object FileActions {
                         }
                     }
                     val jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value
-                            ?: throw IllegalStateException())
+                            ?: throw IllegalStateException("Episodes json not found"))
                     if (jsonObject.length() > 1) {
                         launch(Dispatchers.Main) {
                             MaterialDialog(context).safeShow {
                                 lifecycleOwner(actionRequest.owner)
                                 listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
-                                    launch(Dispatchers.IO) {
+                                    owner.lifecycle.coroutineScope.launch(Dispatchers.IO) {
                                         val downloads = main.select("table.RTbl.Dwnl tr:contains(${if (index == 0) "SUB" else "LAT"}) a.Button.Sm.fa-download")
                                         for (e in downloads) {
                                             var z = e.attr("href")
@@ -196,13 +198,13 @@ object FileActions {
                                 }
                                 onDismiss {
                                     if (isCancelling(actionRequest.owner)) {
-                                        actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
                                         reset()
+                                        actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
                                     }
                                 }
                                 setOnCancelListener {
-                                    callback.call(CallbackState.USER_CANCELLED)
                                     reset()
+                                    callback.call(CallbackState.USER_CANCELLED)
                                 }
                             }
                         }
@@ -239,10 +241,13 @@ object FileActions {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    launch(Dispatchers.Main) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                    owner.lifecycleScope.launch(Dispatchers.Main) {
+                        snackBarManager.dismissSnack()
+                        delay(1000)
                         reset()
                         callback.call(CallbackState.UNEXPECTED_ERROR)
-                        Toaster.toast("Error al obtener servidores")
+                        Toaster.toast("Error al obtener servidores: ${e.message}")
                     }
                 }
             }
@@ -254,8 +259,8 @@ object FileActions {
             try {
                 if (servers.size == 0) {
                     Toaster.toast("Sin servidores disponibles")
-                    actionRequest.callback.call(CallbackState.NO_SERVERS)
                     reset()
+                    actionRequest.callback.call(CallbackState.NO_SERVERS)
                 } else {
                     snackBarManager.dismissSnack()
                     val names = Server.getNames(servers)
@@ -281,18 +286,18 @@ object FileActions {
                             })
                             onDismiss {
                                 if (isCancelling(actionRequest.owner)) {
-                                    actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
                                     reset()
+                                    actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
                                 }
                             }
                             negativeButton(text = "CANCELAR") {
-                                actionRequest.callback.call(CallbackState.USER_CANCELLED)
                                 reset()
+                                actionRequest.callback.call(CallbackState.USER_CANCELLED)
                                 if (PrefsUtil.lastServer.isNull()) PrefsUtil.rememberServer = false
                             }
                             setOnCancelListener {
-                                actionRequest.callback.call(CallbackState.USER_CANCELLED)
                                 reset()
+                                actionRequest.callback.call(CallbackState.USER_CANCELLED)
                                 if (PrefsUtil.lastServer.isNull()) PrefsUtil.rememberServer = false
                             }
                         }
@@ -300,8 +305,8 @@ object FileActions {
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toaster.toast("Error al mostrar lista de servidores")
-                actionRequest.callback.call(CallbackState.UNEXPECTED_ERROR)
                 reset()
+                actionRequest.callback.call(CallbackState.UNEXPECTED_ERROR)
             }
         }
     }
@@ -344,8 +349,8 @@ object FileActions {
                         else ->
                             when (actionRequest.type) {
                                 Type.CAST -> {
-                                    actionRequest.callback.call(CallbackState.START_CAST, server.option.url)
                                     reset()
+                                    actionRequest.callback.call(CallbackState.START_CAST, server.option.url)
                                 }
                                 Type.STREAM -> startStreaming(actionRequest, server.option)
                                 else -> startDownload(actionRequest, server.option)
@@ -372,8 +377,8 @@ object FileActions {
                         saveLastServer(server.name)
                         when (actionRequest.type) {
                             Type.CAST -> {
-                                actionRequest.callback.call(CallbackState.START_CAST, server.options[index].url)
                                 reset()
+                                actionRequest.callback.call(CallbackState.START_CAST, server.options[index].url)
                             }
                             Type.STREAM -> startStreaming(actionRequest, server.options[index])
                             else -> startDownload(actionRequest, server.options[index])
@@ -388,8 +393,8 @@ object FileActions {
                     negativeButton(text = "ATRAS") { showServerList(actionRequest, false) }
                     onDismiss {
                         if (isCancelling(actionRequest.owner)) {
-                            actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
                             reset()
+                            actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
                         }
                     }
                     setOnCancelListener { showServerList(actionRequest, false) }
@@ -437,7 +442,7 @@ object FileActions {
     private fun startDownload(actionRequest: ActionRequest, option: Option) {
         if (BuildConfig.DEBUG) Log.e("Download " + option.server, "${option.url}")
         actionRequest.downloadObject.server = option.server ?: ""
-        if (actionRequest.item is AnimeObject.WebInfo.AnimeChapter && !CacheDB.INSTANCE.queueDAO().isInQueue(actionRequest.item.eid ?: "0")) {
+        if (actionRequest.item is AnimeObject.WebInfo.AnimeChapter && actionRequest.downloadObject.addQueue && !CacheDB.INSTANCE.queueDAO().isInQueue(actionRequest.item.eid ?: "0")) {
             CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(actionRequest.item.fileName)), true, actionRequest.item))
             syncData { queue() }
         }
@@ -446,12 +451,12 @@ object FileActions {
         if (PrefsUtil.downloaderType == 0) {
             CacheDB.INSTANCE.downloadsDAO().insert(actionRequest.downloadObject)
             actionRequest.context.service(Intent(App.context, DownloadService::class.java).putExtra("eid", actionRequest.downloadObject.eid).setData(Uri.parse(option.url)))
-            actionRequest.callback.call(CallbackState.START_DOWNLOAD, true)
             reset()
+            actionRequest.callback.call(CallbackState.START_DOWNLOAD, true)
         } else
             actionRequest.owner.lifecycleScope.launch(Dispatchers.IO) {
-                actionRequest.callback.call(CallbackState.START_DOWNLOAD, DownloadManager.start(actionRequest.downloadObject))
                 reset()
+                actionRequest.callback.call(CallbackState.START_DOWNLOAD, DownloadManager.start(actionRequest.downloadObject))
             }
     }
 
@@ -506,7 +511,7 @@ object FileActions {
 
     private fun isCancelling(owner: LifecycleOwner) = owner.lifecycle.currentState.let { it == Lifecycle.State.DESTROYED }
 
-    private fun reset() {
+    fun reset() {
         isExecuting = false
         selected = 0
         snackBarManager?.dismissAll()

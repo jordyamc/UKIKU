@@ -1,19 +1,22 @@
 package knf.kuma.pojos;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.firestore.IgnoreExtraProperties;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by jordy on 26/03/2018.
  */
 @Keep
 @Entity
+@IgnoreExtraProperties
 public class GenreStatusObject implements Comparable<GenreStatusObject> {
     public String name;
     public int count;

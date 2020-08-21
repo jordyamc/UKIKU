@@ -16,6 +16,10 @@ import knf.kuma.commons.DesignUtils
 import knf.kuma.database.CacheDB
 import knf.kuma.emision.EmissionActivity
 import knf.kuma.emision.EmissionActivityMaterial
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class WEmisionProvider : AppWidgetProvider() {
@@ -49,16 +53,18 @@ class WEmisionProvider : AppWidgetProvider() {
         }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (i in appWidgetIds) {
-            val remoteViews = updateWidgetListView(context,
-                    i)
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.words)
-            appWidgetManager.updateAppWidget(i, remoteViews)
+        GlobalScope.launch(Dispatchers.Main) {
+            for (i in appWidgetIds) {
+                val remoteViews = updateWidgetListView(context,
+                        i)
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.words)
+                appWidgetManager.updateAppWidget(i, remoteViews)
+            }
+            super.onUpdate(context, appWidgetManager, appWidgetIds)
         }
-        super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
-    private fun updateWidgetListView(context: Context, appWidgetId: Int): RemoteViews {
+    private suspend fun updateWidgetListView(context: Context, appWidgetId: Int): RemoteViews {
         val remoteViews = RemoteViews(context.packageName,
                 R.layout.widget_emision)
         val svcIntent = Intent(context, WEmissionService::class.java)
@@ -68,7 +74,7 @@ class WEmisionProvider : AppWidgetProvider() {
         val clickIntent = if (DesignUtils.isFlat) Intent(context, EmissionActivityMaterial::class.java) else Intent(context, EmissionActivity::class.java)
         remoteViews.setTextViewText(R.id.title_day, actualDay)
         remoteViews.setTextColor(R.id.title_day, getColor(context, true))
-        remoteViews.setTextViewText(R.id.title_count, CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)).size.toString())
+        remoteViews.setTextViewText(R.id.title_count, withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)).size.toString() })
         remoteViews.setTextColor(R.id.title_count, getColor(context, true))
         remoteViews.setOnClickPendingIntent(R.id.back_layout, PendingIntent.getActivity(context, 555, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT))
         remoteViews.setInt(R.id.back_layout, "setBackgroundColor", getColor(context, false))

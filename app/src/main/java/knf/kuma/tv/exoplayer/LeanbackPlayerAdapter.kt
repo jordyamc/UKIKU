@@ -11,6 +11,7 @@ import androidx.leanback.media.SurfaceHolderGlueHost
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.DiscontinuityReason
 import com.google.android.exoplayer2.util.ErrorMessageProvider
+import com.google.android.exoplayer2.video.VideoListener
 
 /**
  * Leanback `PlayerAdapter` implementation for [SimpleExoPlayer].
@@ -149,7 +150,7 @@ class LeanbackPlayerAdapter
         }
     }
 
-    private inner class ComponentListener : Player.DefaultEventListener(), SimpleExoPlayer.VideoListener, SurfaceHolder.Callback {
+    private inner class ComponentListener : Player.EventListener, VideoListener, SurfaceHolder.Callback {
 
         // SurfaceHolder.Callback implementation.
 
@@ -171,22 +172,23 @@ class LeanbackPlayerAdapter
             notifyStateChanged()
         }
 
-        override fun onPlayerError(exception: ExoPlaybackException?) {
+        override fun onPlayerError(exception: ExoPlaybackException) {
             val callback = callback
             errorMessageProvider?.let {
                 val errorMessage = it.getErrorMessage(exception)
                 callback.onError(this@LeanbackPlayerAdapter, errorMessage.first, errorMessage.second)
-            } ?: exception?.let {
+            } ?: exception.let {
                 callback.onError(this@LeanbackPlayerAdapter, exception.type, context.getString(
                         R.string.lb_media_player_error, exception.type, exception.rendererIndex))
             }
         }
 
-        override fun onTimelineChanged(timeline: Timeline?, manifest: Any?) {
-            val callback = callback
-            callback.onDurationChanged(this@LeanbackPlayerAdapter)
-            callback.onCurrentPositionChanged(this@LeanbackPlayerAdapter)
-            callback.onBufferedPositionChanged(this@LeanbackPlayerAdapter)
+        override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+            callback.apply {
+                onDurationChanged(this@LeanbackPlayerAdapter)
+                onCurrentPositionChanged(this@LeanbackPlayerAdapter)
+                onBufferedPositionChanged(this@LeanbackPlayerAdapter)
+            }
         }
 
         override fun onPositionDiscontinuity(@DiscontinuityReason reason: Int) {

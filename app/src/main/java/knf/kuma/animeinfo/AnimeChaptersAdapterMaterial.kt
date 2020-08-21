@@ -37,7 +37,10 @@ import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.FileAccessHelper
-import knf.kuma.pojos.*
+import knf.kuma.pojos.DownloadObject
+import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.SeeingObject
+import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.coroutines.*
@@ -46,7 +49,7 @@ import xdroid.toaster.Toaster
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
-class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val recyclerView: RecyclerView, private val chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>, private val touchListener: DragSelectTouchListener) : RecyclerView.Adapter<AnimeChaptersAdapterMaterial.ChapterImgHolder>(), FastScrollRecyclerView.SectionedAdapter {
+class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val recyclerView: RecyclerView, val chapters: List<ChapterObjWrap>, private val touchListener: DragSelectTouchListener) : RecyclerView.Adapter<AnimeChaptersAdapterMaterial.ChapterImgHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     private val context: Context? = fragment.context
     private val chaptersDAO = CacheDB.INSTANCE.seenDAO()
@@ -63,10 +66,10 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
         setHasStableIds(true)
         if (chapters.isNotEmpty()) {
             noCrash {
-                seeingObject = seeingDAO.getByAid(chapters[0].aid)
                 doAsync {
-                    if (CacheDB.INSTANCE.animeDAO().isCompleted(chapters[0].aid))
-                        DownloadedObserver.observe(fragment.lifecycleScope, chapters.size, chapters[0].fileWrapper())
+                    seeingObject = seeingDAO.getByAid(chapters[0].chapter.aid)
+                    if (CacheDB.INSTANCE.animeDAO().isCompleted(chapters[0].chapter.aid))
+                        DownloadedObserver.observe(fragment.lifecycleScope, chapters.size, chapters[0].chapter.fileWrapper())
                 }
             }
         }
@@ -89,7 +92,6 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
     override fun onBindViewHolder(holder: ChapterImgHolder, position: Int) {
         if (context == null) return
         val chapter = chapters[position]
-        val downloadObject = AtomicReference(downloadsDAO.getByEid(chapter.eid))
         if (selection.contains(position))
             holder.cardView.setBackgroundColor(ContextCompat.getColor(context, EAHelper.getThemeColorLight()))
         else
@@ -99,10 +101,10 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
             holder.progressBarRoot.visibility = View.VISIBLE
         } else
             holder.progressBarRoot.visibility = View.GONE
-        if (!Network.isConnected || chapter.img == null)
+        if (!Network.isConnected || chapter.chapter.img == null)
             holder.imageView.visibility = View.GONE
-        if (chapter.img != null)
-            PicassoSingle.get().load(chapter.img).into(holder.imageView, object : Callback {
+        if (chapter.chapter.img != null)
+            PicassoSingle.get().load(chapter.chapter.img).into(holder.imageView, object : Callback {
                 override fun onSuccess() {
                     holder.imageView.visibility = View.VISIBLE
                 }
@@ -111,223 +113,256 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
 
                 }
             })
+        val downloadObject = AtomicReference<DownloadObject>()
         holder.apply {
             fileWrapperJob?.cancel()
             fileWrapperJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
                 withContext(Dispatchers.IO) {
-                    chapter.fileWrapper()
+                    chapter.chapter.fileWrapper()
+                    downloadObject.set(downloadsDAO.getByEid(chapter.chapter.eid))
                 }
+
                 if (!isActive)
                     return@launch
-                setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.eid), fragment, Observer {
-                    setQueue(it, isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
+                setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.chapter.eid), fragment, Observer {
+                    setQueue(it, isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get()))
                 })
-                setDownloadObserver(downloadsDAO.getLiveByEid(chapter.eid).distinct, fragment, Observer { downloadObject1 ->
+                setDownloadObserver(downloadsDAO.getLiveByEid(chapter.chapter.eid).distinct, fragment, Observer { downloadObject1 ->
                     setDownloadState(downloadObject1)
                     val casting = CastUtil.get().casting.value
-                    val isCasting = casting != null && casting == chapter.eid
+                    val isCasting = casting != null && casting == chapter.chapter.eid
                     if (!isCasting)
-                        setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject1))
+                        fragment.lifecycleScope.launch(Dispatchers.IO){
+                            setQueue(QueueManager.isInQueue(chapter.chapter.eid), isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject1))
+                        }
                     else
-                        setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject1), true)
+                        setDownloaded(isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject1), true)
                     downloadObject.set(downloadObject1)
                 })
                 setCastingObserver(fragment, Observer { s ->
-                    if (chapter.eid != s)
-                        setQueue(QueueManager.isInQueue(chapter.eid), isPlayAvailable(chapter.fileWrapper(), downloadObject.get()))
+                    if (chapter.chapter.eid != s)
+                        fragment.lifecycleScope.launch(Dispatchers.IO){
+                            setQueue(QueueManager.isInQueue(chapter.chapter.eid), isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get()))
+                        }
                     else
-                        setDownloaded(isPlayAvailable(chapter.fileWrapper(), downloadObject.get()), chapter.eid == s)
+                        setDownloaded(isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get()), chapter.chapter.eid == s)
                 })
             }
         }
-        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chaptersDAO.chapterIsSeen(chapter.aid, chapter.number)) EAHelper.getThemeColor() else R.color.textPrimary))
+        holder.chapter.setTextColor(ContextCompat.getColor(context, if (chapter.isSeen) EAHelper.getThemeColor() else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
-        holder.chapter.text = chapter.number
+        holder.chapter.text = chapter.chapter.number
         if (BuildConfig.BUILD_TYPE == "playstore")
             holder.actions.visibility = View.GONE
         else
             holder.actions.setOnClickListener { view ->
-                val menu = PopupMenu(context, view)
-                if (CastUtil.get().casting.value == chapter.eid) {
-                    menu.inflate(R.menu.chapter_casting_menu)
-                    if (canPlay(chapter.fileWrapper()))
-                        menu.menu.findItem(R.id.download).isVisible = false
-                } else if (isPlayAvailable(chapter.fileWrapper(), downloadObject.get())) {
-                    menu.inflate(R.menu.chapter_downloaded_menu)
-                    if (!CastUtil.get().connected())
-                        menu.menu.findItem(R.id.cast).isVisible = false
-                } else if (isNetworkAvailable)
-                    menu.inflate(R.menu.chapter_menu)
-                else
-                    menu.inflate(R.menu.chapter_menu_offline)
-                if (QueueManager.isInQueue(chapter.eid) && menu.menu.findItem(R.id.queue) != null)
-                    menu.menu.findItem(R.id.queue).isVisible = false
-                if (!PrefsUtil.showImport() || isImporting)
-                    menu.menu.findItem(R.id.import_file).isVisible = false
-                menu.setOnMenuItemClickListener { item ->
-                    when (item.itemId) {
-                        R.id.play -> if (canPlay(chapter.fileWrapper())) {
-                            chaptersDAO.addChapter(SeenObject.fromChapter(chapter))
-                            recordsDAO.add(RecordObject.fromChapter(chapter))
-                            updateSeeing(chapter.number)
-                            holder.setSeen(true)
-                            ServersFactory.startPlay(context, chapter.epTitle, chapter.fileWrapper().name())
-                            syncData {
-                                history()
-                                seen()
+                fragment.lifecycleScope.launch(Dispatchers.Main){
+                    val menu = PopupMenu(context, view)
+                    if (CastUtil.get().casting.value == chapter.chapter.eid) {
+                        menu.inflate(R.menu.chapter_casting_menu)
+                        if (canPlay(chapter.chapter.fileWrapper()))
+                            menu.menu.findItem(R.id.download).isVisible = false
+                    } else if (isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get())) {
+                        menu.inflate(R.menu.chapter_downloaded_menu)
+                        if (!CastUtil.get().connected())
+                            menu.menu.findItem(R.id.cast).isVisible = false
+                    } else if (isNetworkAvailable)
+                        menu.inflate(R.menu.chapter_menu)
+                    else
+                        menu.inflate(R.menu.chapter_menu_offline)
+                    if (QueueManager.isInQueue(chapter.chapter.eid) && menu.menu.findItem(R.id.queue) != null)
+                        menu.menu.findItem(R.id.queue).isVisible = false
+                    if (!PrefsUtil.showImport() || isImporting)
+                        menu.menu.findItem(R.id.import_file).isVisible = false
+                    menu.setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.play -> if (canPlay(chapter.chapter.fileWrapper())) {
+                                fragment.lifecycleScope.launch(Dispatchers.IO){
+                                    chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
+                                    recordsDAO.add(RecordObject.fromChapter(chapter.chapter))
+                                }
+                                chapter.isSeen = true
+                                updateSeeing(chapter.chapter.number)
+                                holder.setSeen(true)
+                                ServersFactory.startPlay(context, chapter.chapter.epTitle, chapter.chapter.fileWrapper().name())
+                                syncData {
+                                    history()
+                                    seen()
+                                }
+                            } else {
+                                Toaster.toast("Aun no se está descargando")
                             }
-                        } else {
-                            Toaster.toast("Aun no se está descargando")
-                        }
-                        R.id.cast -> if (canPlay(chapter.fileWrapper())) {
-                            //CastUtil.get().play(fragment.activity as Activity, recyclerView, chapter.eid, SelfServer.start(chapter.fileName, true), chapter.name, chapter.number, if (chapter.img == null) chapter.aid else chapter.img, chapter.img == null)
-                            CastUtil.get().play(recyclerView, CastMedia.create(chapter))
-                            chaptersDAO.addChapter(SeenObject.fromChapter(chapter))
-                            recordsDAO.add(RecordObject.fromChapter(chapter))
-                            syncData {
-                                history()
-                                seen()
+                            R.id.cast -> if (canPlay(chapter.chapter.fileWrapper())) {
+                                //CastUtil.get().play(fragment.activity as Activity, recyclerView, chapter.eid, SelfServer.start(chapter.fileName, true), chapter.name, chapter.number, if (chapter.img == null) chapter.aid else chapter.img, chapter.img == null)
+                                CastUtil.get().play(recyclerView, CastMedia.create(chapter.chapter))
+                                fragment.lifecycleScope.launch(Dispatchers.IO){
+                                    chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
+                                    recordsDAO.add(RecordObject.fromChapter(chapter.chapter))
+                                }
+                                chapter.isSeen = true
+                                syncData {
+                                    history()
+                                    seen()
+                                }
+                                updateSeeing(chapter.chapter.number)
+                                holder.setSeen(true)
                             }
-                            updateSeeing(chapter.number)
-                            holder.setSeen(true)
-                        }
-                        R.id.casting -> CastUtil.get().openControls()
-                        R.id.delete -> MaterialDialog(context).safeShow {
-                            message(text = "¿Eliminar el ${chapter.number.toLowerCase()}?")
-                            positiveButton(text = "CONFIRMAR") {
-                                downloadObject.get()?.state = -8
-                                chapter.fileWrapper().exist = false
-                                holder.setDownloaded(false, false)
-                                FileAccessHelper.deletePath(chapter.filePath, false)
-                                DownloadManager.cancel(chapter.eid)
-                                QueueManager.remove(chapter.eid)
-                            }
-                            negativeButton(text = "CANCELAR")
-                        }
-                        R.id.download -> {
-                            setOrientation(true)
-                            ServersFactory.start(context, chapter.link, chapter, false, false, object : ServersFactory.ServersInterface {
-                                override fun onFinish(started: Boolean, success: Boolean) {
-                                    if (started) {
-                                        holder.setQueue(CacheDB.INSTANCE.queueDAO().isInQueue(chapter.eid), true)
-                                        chapter.fileWrapper().exist = true
+                            R.id.casting -> CastUtil.get().openControls()
+                            R.id.delete -> MaterialDialog(context).safeShow {
+                                message(text = "¿Eliminar el ${chapter.chapter.number.toLowerCase()}?")
+                                positiveButton(text = "CONFIRMAR") {
+                                    fragment.lifecycleScope.launch(Dispatchers.Main){
+                                        withContext(Dispatchers.IO) { FileAccessHelper.deletePath(chapter.chapter.filePath,false) }
+                                        downloadObject.get()?.state = -8
+                                        chapter.chapter.fileWrapper().exist = false
+                                        holder.setDownloaded(false, false)
                                     }
-                                    setOrientation(false)
+                                    DownloadManager.cancel(chapter.chapter.eid)
+                                    QueueManager.remove(chapter.chapter.eid)
                                 }
-
-                                override fun onCast(url: String?) {
-
-                                }
-
-                                override fun onProgressIndicator(boolean: Boolean) {
-                                    doOnUI {
-                                        if (boolean) {
-                                            holder.progressBar.isIndeterminate = true
-                                            holder.progressBarRoot.visibility = View.VISIBLE
-                                        } else
-                                            holder.progressBarRoot.visibility = View.GONE
+                                negativeButton(text = "CANCELAR")
+                            }
+                            R.id.download -> {
+                                setOrientation(true)
+                                ServersFactory.start(context, chapter.chapter.link, chapter.chapter, false, false, object : ServersFactory.ServersInterface {
+                                    override fun onFinish(started: Boolean, success: Boolean) {
+                                        fragment.lifecycleScope.launch(Dispatchers.Main) {
+                                            if (started) {
+                                                holder.setQueue(withContext(Dispatchers.IO){ CacheDB.INSTANCE.queueDAO().isInQueue(chapter.chapter.eid) }, true)
+                                                chapter.chapter.fileWrapper().exist = true
+                                            }
+                                            setOrientation(false)
+                                        }
                                     }
-                                }
 
-                                override fun getView(): View? {
-                                    return recyclerView
-                                }
-                            })
-                        }
-                        R.id.streaming -> {
-                            setOrientation(true)
-                            ServersFactory.start(context, chapter.link, chapter, true, false, object : ServersFactory.ServersInterface {
-                                override fun onFinish(started: Boolean, success: Boolean) {
-                                    if (!started && success) {
-                                        chaptersDAO.addChapter(SeenObject.fromChapter(chapter))
-                                        recordsDAO.add(RecordObject.fromChapter(chapter))
+                                    override fun onCast(url: String?) {
+
+                                    }
+
+                                    override fun onProgressIndicator(boolean: Boolean) {
+                                        doOnUI {
+                                            if (boolean) {
+                                                holder.progressBar.isIndeterminate = true
+                                                holder.progressBarRoot.visibility = View.VISIBLE
+                                            } else
+                                                holder.progressBarRoot.visibility = View.GONE
+                                        }
+                                    }
+
+                                    override fun getView(): View? {
+                                        return recyclerView
+                                    }
+                                })
+                            }
+                            R.id.streaming -> {
+                                setOrientation(true)
+                                ServersFactory.start(context, chapter.chapter.link, chapter.chapter, true, false, object : ServersFactory.ServersInterface {
+                                    override fun onFinish(started: Boolean, success: Boolean) {
+                                        if (!started && success) {
+                                            fragment.lifecycleScope.launch(Dispatchers.IO){
+                                                chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
+                                                recordsDAO.add(RecordObject.fromChapter(chapter.chapter))
+                                            }
+                                            chapter.isSeen = true
+                                            syncData {
+                                                history()
+                                                seen()
+                                            }
+                                            updateSeeing(chapter.chapter.number)
+                                            holder.setSeen(true)
+                                        }
+                                        setOrientation(false)
+                                    }
+
+                                    override fun onCast(url: String?) {
+                                        CastUtil.get().play(recyclerView, CastMedia.create(chapter.chapter, url))
+                                        fragment.lifecycleScope.launch(Dispatchers.IO){
+                                            chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
+                                            recordsDAO.add(RecordObject.fromChapter(chapter.chapter))
+                                        }
+                                        chapter.isSeen = true
                                         syncData {
                                             history()
                                             seen()
                                         }
-                                        updateSeeing(chapter.number)
+                                        updateSeeing(chapter.chapter.number)
                                         holder.setSeen(true)
                                     }
-                                    setOrientation(false)
-                                }
 
-                                override fun onCast(url: String?) {
-                                    CastUtil.get().play(recyclerView, CastMedia.create(chapter, url))
-                                    chaptersDAO.addChapter(SeenObject.fromChapter(chapter))
-                                    recordsDAO.add(RecordObject.fromChapter(chapter))
-                                    syncData {
-                                        history()
-                                        seen()
+                                    override fun onProgressIndicator(boolean: Boolean) {
+
                                     }
-                                    updateSeeing(chapter.number)
-                                    holder.setSeen(true)
-                                }
 
-                                override fun onProgressIndicator(boolean: Boolean) {
-
-                                }
-
-                                override fun getView(): View? {
-                                    return recyclerView
-                                }
-                            })
-                        }
-                        R.id.queue -> if (isPlayAvailable(chapter.fileWrapper(), downloadObject.get())) {
-                            QueueManager.add(chapter.fileWrapper(), downloadObject.get(), true, chapter)
-                            holder.setQueue(true, true)
-                        } else {
-                            setOrientation(true)
-                            ServersFactory.start(context, chapter.link, chapter, true, true, object : ServersFactory.ServersInterface {
-                                override fun onFinish(started: Boolean, success: Boolean) {
-                                    if (success) {
-                                        holder.setQueue(true, false)
+                                    override fun getView(): View? {
+                                        return recyclerView
                                     }
-                                    setOrientation(false)
-                                }
+                                })
+                            }
+                            R.id.queue -> if (isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get())) {
+                                QueueManager.add(chapter.chapter.fileWrapper(), downloadObject.get(), true, chapter.chapter)
+                                holder.setQueue(true, true)
+                            } else {
+                                setOrientation(true)
+                                ServersFactory.start(context, chapter.chapter.link, chapter.chapter, true, true, object : ServersFactory.ServersInterface {
+                                    override fun onFinish(started: Boolean, success: Boolean) {
+                                        if (success) {
+                                            holder.setQueue(true, false)
+                                        }
+                                        setOrientation(false)
+                                    }
 
-                                override fun onCast(url: String?) {}
+                                    override fun onCast(url: String?) {}
 
-                                override fun onProgressIndicator(boolean: Boolean) {
-                                    doOnUI {
-                                        if (boolean) {
-                                            holder.progressBar.isIndeterminate = true
-                                            holder.progressBarRoot.visibility = View.VISIBLE
-                                        } else
-                                            holder.progressBarRoot.visibility = View.GONE
+                                    override fun onProgressIndicator(boolean: Boolean) {
+                                        doOnUI {
+                                            if (boolean) {
+                                                holder.progressBar.isIndeterminate = true
+                                                holder.progressBarRoot.visibility = View.VISIBLE
+                                            } else
+                                                holder.progressBarRoot.visibility = View.GONE
+                                        }
+                                    }
+
+                                    override fun getView(): View? {
+                                        return recyclerView
+                                    }
+                                })
+                            }
+                            R.id.share -> fragment.activity?.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
+                                    .setType("text/plain")
+                                    .putExtra(Intent.EXTRA_TEXT, chapter.chapter.epTitle + "\n" + chapter.chapter.link), "Compartir"))
+                            R.id.import_file -> (fragment as ChaptersFragmentMaterial).onMove(chapter.chapter.fileName)
+                            R.id.commentaries -> {
+                                fragment.lifecycleScope.launch(Dispatchers.Main){
+                                    try {
+                                        CommentariesDialog.show(fragment, withContext(Dispatchers.IO){ chapter.chapter.commentariesLink() })
+                                    } catch (e: ActivityNotFoundException) {
+                                        noCrashSuspend { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(withContext(Dispatchers.IO){ chapter.chapter.commentariesLink() }))) }
                                     }
                                 }
-
-                                override fun getView(): View? {
-                                    return recyclerView
-                                }
-                            })
-                        }
-                        R.id.share -> fragment.activity?.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
-                                .setType("text/plain")
-                                .putExtra(Intent.EXTRA_TEXT, chapter.epTitle + "\n" + chapter.link), "Compartir"))
-                        R.id.import_file -> (fragment as ChaptersFragmentMaterial).onMove(chapter.fileName)
-                        R.id.commentaries -> {
-                            try {
-                                CommentariesDialog.show(fragment, chapter.commentariesLink())
-                            } catch (e: ActivityNotFoundException) {
-                                noCrash { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(chapter.commentariesLink()))) }
                             }
                         }
+                        true
                     }
-                    true
+                    menu.show()
                 }
-                menu.show()
             }
         holder.cardView.setOnClickListener {
-            if (chaptersDAO.chapterIsSeen(chapter.aid, chapter.number)) {
-                chaptersDAO.deleteChapter(chapter.aid, chapter.number)
+            if (chapter.isSeen) {
+                fragment.lifecycleScope.launch(Dispatchers.IO){
+                    chaptersDAO.deleteChapter(chapter.chapter.aid, chapter.chapter.number)
+                }
+                chapter.isSeen = false
                 holder.chapter.setTextColor(ContextCompat.getColor(context, R.color.textPrimary))
             } else {
-                chaptersDAO.addChapter(SeenObject.fromChapter(chapter))
+                fragment.lifecycleScope.launch(Dispatchers.IO){
+                    chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
+                }
+                chapter.isSeen = true
                 holder.chapter.setTextColor(ContextCompat.getColor(context, EAHelper.getThemeColor()))
             }
             syncData { seen() }
-            updateSeeing(chapter.number)
+            updateSeeing(chapter.chapter.number)
         }
         holder.cardView.setOnLongClickListener {
             touchListener.startDragSelection(holder.adapterPosition)
@@ -336,14 +371,16 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
     }
 
     override fun getSectionName(position: Int): String {
-        return chapters[position].number.trim().substring(chapters[position].number.trim().lastIndexOf(" ") + 1)
+        return chapters[position].chapter.number.trim().substring(chapters[position].chapter.number.trim().lastIndexOf(" ") + 1)
     }
 
     private fun updateSeeing(chapter: String) {
-        seeingObject?.let {
-            it.chapter = chapter
-            seeingDAO.update(it)
-            syncData { seeing() }
+        fragment.lifecycleScope.launch(Dispatchers.IO){
+            seeingObject?.let {
+                it.chapter = chapter
+                seeingDAO.update(it)
+                syncData { seeing() }
+            }
         }
     }
 
@@ -367,7 +404,7 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
     }
 
     override fun getItemViewType(position: Int): Int {
-        return chapters[position].chapterType?.value ?: 0
+        return chapters[position].chapter.chapterType?.value ?: 0
     }
 
     override fun getItemCount(): Int {

@@ -1,7 +1,6 @@
 package knf.kuma.ads
 
 import android.app.Activity
-import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.AdSize
@@ -63,15 +62,13 @@ object AdsUtils {
                 "rewarded_percent" to 90.0,
                 "interstitial_percent" to 10.0,
                 "disqus_version" to "9e3da5ae8d7caf8389087c4c35a6ca1b",
+                "min_version" to 169L,
                 "samsung_disable_foreground" to false)
         )
         fetch().addOnCompleteListener {
             it.exception?.printStackTrace()
             if (it.isSuccessful) {
-                Log.e("Remote config", "Updated: ${it.isSuccessful}")
-                FirebaseRemoteConfig.getInstance().activate().addOnCompleteListener {
-                    Log.e("Remote config", "Activated: ${it.isSuccessful}")
-                }
+                FirebaseRemoteConfig.getInstance().activate()
             }
         }
     }

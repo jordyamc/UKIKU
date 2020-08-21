@@ -86,7 +86,16 @@ class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
 
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
+    /*override fun onDismiss(dialog: DialogInterface) {
+        try {
+            super.onDismiss(dialog)
+            callback?.onDismiss()
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
+    }*/
+
+    override fun onCancel(dialog: DialogInterface) {
         try {
             super.onDismiss(dialog)
             callback?.onDismiss()

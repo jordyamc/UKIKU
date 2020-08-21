@@ -10,13 +10,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
 import knf.kuma.BuildConfig
 import knf.kuma.R
-import knf.kuma.commons.Network
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.noCrash
-import knf.kuma.commons.verifyManager
+import knf.kuma.commons.*
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.retrofit.Repository
@@ -118,7 +116,6 @@ class SearchFragment : BottomFragment() {
         })
         manager = recyclerView.layoutManager
         if (needOnlineSearch) {
-            fab.hide()
             searchAdapterCompact = SearchAdapterCompact(this)
             searchAdapterCompact?.submitList(Repository().getSearchCompact("") {
                 if (it) {
@@ -162,7 +159,11 @@ class SearchFragment : BottomFragment() {
                 }
             })
             recyclerView.adapter = searchAdapter
-            fab.setOnClickListener {
+        }
+        fab.setOnClickListener {
+            if (needOnlineSearch){
+                recyclerView.showSnackbar("Se necesita el directorio completo para busquedas por genero", Snackbar.LENGTH_LONG, Snackbar.ANIMATION_MODE_SLIDE)
+            }else{
                 val dialog = GenresDialog()
                 dialog.init(genres, selected, object : GenresDialog.MultiChoiceListener {
                     override fun onOkay(selected: MutableList<String>) {

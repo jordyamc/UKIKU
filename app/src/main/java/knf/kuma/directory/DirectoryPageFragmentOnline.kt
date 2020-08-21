@@ -23,15 +23,16 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.showSnackbar
 import knf.kuma.commons.verifyManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
 
-class DirectoryPageFragmentOffline : BottomFragment() {
+class DirectoryPageFragmentOnline : BottomFragment() {
     lateinit var recyclerView: RecyclerView
     lateinit var progress: ProgressBar
     private var manager: RecyclerView.LayoutManager? = null
-    private val adapter: DirectoryPageAdapterOffline by lazy { DirectoryPageAdapterOffline(this) }
+    private val adapter: DirectoryPageAdapterOnline by lazy { DirectoryPageAdapterOnline(this) }
     private var isFirst = true
     private var waitingScroll = false
     private var listUpdated = false
@@ -51,14 +52,21 @@ class DirectoryPageFragmentOffline : BottomFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         adapter.submitList(createDirectoryPagedList(getType()) {
-            var snack: Snackbar? = null
-            snack = recyclerView.showSnackbar("Error al cargar directorio", Snackbar.LENGTH_INDEFINITE, "reintentar") {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    if (withContext(Dispatchers.IO) { BypassUtil.isNeeded("https://animeflv.net/browse?page=50") }) {
-                        startActivity(Intent(requireContext(), DiagnosticMaterial.FullBypass::class.java))
-                        return@launch
+            try {
+                var snack: Snackbar? = null
+                snack = recyclerView.showSnackbar("Error al cargar directorio", Snackbar.LENGTH_INDEFINITE, "reintentar") {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        if (withContext(Dispatchers.IO) { BypassUtil.isNeeded(BypassUtil.testLink) }) {
+                            startActivity(Intent(requireContext(), DiagnosticMaterial.FullBypass::class.java))
+                            return@launch
+                        }
+                        snack?.dismiss()
+                        it()
                     }
-                    snack?.dismiss()
+                }
+            }catch (e:Exception){
+                lifecycleScope.launch {
+                    delay(2000)
                     it()
                 }
             }
@@ -128,10 +136,10 @@ class DirectoryPageFragmentOffline : BottomFragment() {
 
     companion object {
 
-        operator fun get(type: Int): DirectoryPageFragmentOffline {
+        operator fun get(type: Int): DirectoryPageFragmentOnline {
             val bundle = Bundle()
             bundle.putInt("type", type)
-            val fragment = DirectoryPageFragmentOffline()
+            val fragment = DirectoryPageFragmentOnline()
             fragment.arguments = bundle
             return fragment
         }

@@ -6,14 +6,13 @@ import androidx.fragment.app.FragmentPagerAdapter
 import knf.kuma.animeinfo.fragments.ChaptersFragment
 import knf.kuma.animeinfo.fragments.DetailsFragment
 
-class AnimePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class AnimePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     private val detailsFragment = DetailsFragment.get()
     private val chaptersFragment = ChaptersFragment.get()
 
     override fun getPageTitle(position: Int): CharSequence? {
         return when (position) {
-            0 -> "INFO"
             1 -> "EPISODIOS"
             else -> "INFO"
         }
@@ -25,7 +24,6 @@ class AnimePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> detailsFragment
             1 -> chaptersFragment
             else -> detailsFragment
         }

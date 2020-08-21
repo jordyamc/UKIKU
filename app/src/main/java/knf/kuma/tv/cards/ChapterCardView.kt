@@ -9,6 +9,10 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.tv.BindableCardView
 import kotlinx.android.synthetic.main.item_tv_card_chapter_preview.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ChapterCardView(context: Context) : BindableCardView<AnimeObject.WebInfo.AnimeChapter>(context) {
 
@@ -19,7 +23,9 @@ class ChapterCardView(context: Context) : BindableCardView<AnimeObject.WebInfo.A
 
     override fun bind(data: AnimeObject.WebInfo.AnimeChapter) {
         PicassoSingle.get().load(data.img).into(imageView)
-        indicator?.visibility = if (CacheDB.INSTANCE.seenDAO().chapterIsSeen(data.aid, data.number)) View.VISIBLE else View.GONE
+        GlobalScope.launch(Dispatchers.Main) {
+            indicator?.visibility = if (withContext(Dispatchers.IO) { CacheDB.INSTANCE.seenDAO().chapterIsSeen(data.aid, data.number) }) View.VISIBLE else View.GONE
+        }
         chapter?.text = data.number
     }
 }

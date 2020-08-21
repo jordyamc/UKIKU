@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.PagedList
@@ -62,6 +63,7 @@ import org.jsoup.nodes.Document
 import org.nield.kotlinstatistics.WeightedDice
 import xdroid.toaster.Toaster
 import java.io.File
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -91,18 +93,28 @@ val getUpdateDir: String
 
 fun currentTime(): Long = System.currentTimeMillis()
 
-val ffFile: File get() = File(File(Environment.getExternalStorageDirectory(), "UKIKU/backups"), "data.crypt")
-val admFile: File get() = File(File(Environment.getExternalStorageDirectory(), "UKIKU/backups"), BuildConfig.ADM_FILE)
+val ffFile: File get() = File(baseDir, "data.crypt")
+val admFile: File get() = File(baseDir, BuildConfig.ADM_FILE)
+val baseDir: File
+    get() =
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+            File(Environment.getExternalStorageDirectory(), "UKIKU/backups")
+        else
+            App.context.filesDir
 
 fun verifiyFF() {
-    if (PrefsUtil.isFamilyFriendly && !ffFile.exists()) {
-        ffFile.parentFile?.mkdirs()
-        ffFile.createNewFile()
-        ffFile.writeText(PrefsUtil.ffPass)
-    } else if (!PrefsUtil.isFamilyFriendly && ffFile.exists()) {
-        PrefsUtil.isFamilyFriendly = true
-        PrefsUtil.ffPass = ffFile.readText()
-        CacheDB.INSTANCE.animeDAO().nukeEcchi()
+    try {
+        if (PrefsUtil.isFamilyFriendly && !ffFile.exists()) {
+            ffFile.parentFile?.mkdirs()
+            ffFile.createNewFile()
+            ffFile.writeText(PrefsUtil.ffPass)
+        } else if (!PrefsUtil.isFamilyFriendly && ffFile.exists()) {
+            PrefsUtil.isFamilyFriendly = true
+            PrefsUtil.ffPass = ffFile.readText()
+            CacheDB.INSTANCE.animeDAO().nukeEcchi()
+        }
+    } catch (e: Exception) {
+        //
     }
 }
 
@@ -170,12 +182,15 @@ fun gridColumns(size: Int = 115): Int {
     return (dpWidht / size).toInt()
 }
 
-fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
-    return Snackbar.make(this, text, duration).also { doOnUI { it.show() } }
+fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT, animation: Int = Snackbar.ANIMATION_MODE_FADE): Snackbar {
+    return Snackbar.make(this, text, duration).apply {
+        animationMode = animation
+    }.also { doOnUI { it.show() } }
 }
 
 fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT, button: String, onAction: (View) -> Unit): Snackbar {
     return Snackbar.make(this, text, duration).apply {
+        animationMode = Snackbar.ANIMATION_MODE_SLIDE
         setAction(button, onAction)
     }.also { doOnUI { it.show() } }
 }
@@ -230,7 +245,17 @@ fun <T : View> Activity.optionalBind(@IdRes res: Int): Lazy<T?> {
 }
 
 fun Request.execute(followRedirects: Boolean = true): Response {
-    return OkHttpClient().newBuilder().followRedirects(followRedirects).build().newCall(this).execute()
+    return OkHttpClient().newBuilder().apply {
+        followRedirects(followRedirects)
+        connectionSpecs(Collections.singletonList(ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                .tlsVersions(TlsVersion.TLS_1_2, TlsVersion.TLS_1_1, TlsVersion.TLS_1_0)
+                .cipherSuites(
+                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+                        CipherSuite.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA)
+                .build()))
+    }.build().newCall(this).execute()
 }
 
 val safeContext: Context
@@ -414,6 +439,17 @@ fun Context.findActivity(): Activity? {
     return null
 }
 
+fun Context.findLifecycleOwner(): LifecycleOwner? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is LifecycleOwner) {
+            return context
+        }
+        context = context.baseContext
+    }
+    return null
+}
+
 @UiThread
 fun ImageView.setAnimatedResource(@DrawableRes res: Int) {
     setImageResource(res)
@@ -445,9 +481,9 @@ fun jsoupCookies(url: String?, followRedirects: Boolean = true): Connection =
 fun jsoupCookiesDir(url: String?, useCookies: Boolean): Connection =
         Jsoup.connect(url).apply {
             if (useCookies)
-                if (PrefsUtil.useDefaultUserAgent){
+                if (PrefsUtil.useDefaultUserAgent) {
                     cookies(ConvertUtil.List2Map(PrefsUtil.dirCookies))
-                }else{
+                } else {
                     cookies(BypassUtil.getMapCookie(App.context))
                 }
             if (PrefsUtil.useDefaultUserAgent)
@@ -606,3 +642,5 @@ fun AppCompatActivity.getSurfaceColor(): Int {
 fun Fragment.getSurfaceColor(): Int {
     return (requireActivity() as AppCompatActivity).getSurfaceColor()
 }
+
+fun String.resolveRedirection(): String = jsoupCookies(this).execute().url().toString()

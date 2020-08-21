@@ -92,7 +92,7 @@ class RecordActivity : GenericActivity() {
             R.id.action_clear ->
                 MaterialDialog(this@RecordActivity).safeShow {
                     message(text = "¿Limpiar el historial?")
-                    positiveButton(text = "Continuar") { CacheDB.INSTANCE.recordsDAO().clear() }
+                    positiveButton(text = "Continuar") { doAsync { CacheDB.INSTANCE.recordsDAO().clear() } }
                     negativeButton(text = "cancelar")
                 }
             R.id.action_status -> doAsync {

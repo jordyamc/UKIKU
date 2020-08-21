@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.webkit.*
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.commons.*
@@ -21,7 +23,10 @@ import knf.kuma.tv.TVServersFactory
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.tv_activity_main.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import kotlin.contracts.ExperimentalContracts
 
@@ -49,13 +54,30 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             DirUpdateWork.schedule(this)
             RecentsNotReceiver.removeAll(this)
             UpdateChecker.check(this, this)
-            checkBypass()
+            lifecycleScope.launch(Dispatchers.Main) {
+                if (PrefsUtil.mayUseRandomUA)
+                    PrefsUtil.alwaysGenerateUA = !withContext(Dispatchers.IO) { doBlockTests() }
+                else
+                    PrefsUtil.alwaysGenerateUA = false
+                checkBypass()
+            }
         }
+    }
+
+    private fun doBlockTests(): Boolean {
+        var blockCount = 0
+        repeat(3) {
+            if (BypassUtil.isCloudflareActiveRandom())
+                blockCount++
+            if (blockCount >= 2)
+                return true
+        }
+        return blockCount >= 2
     }
 
     override fun onNeedUpdate(o_code: String, n_code: String) {
         runOnUiThread {
-            UpdateActivity.start(this@TVMain)
+            UpdateActivity.start(this@TVMain, true)
         }
     }
 
@@ -87,6 +109,14 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             e.printStackTrace()
         }
 
+    }
+
+    override fun onBackPressed() {
+        if (webview.isVisible) {
+            webview.isVisible = false
+            BypassUtil.isLoading = false
+        }else
+            super.onBackPressed()
     }
 
     @SuppressLint("SetJavaScriptEnabled")

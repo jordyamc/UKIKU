@@ -8,11 +8,12 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import knf.kuma.App
 import knf.kuma.database.dao.*
+import knf.kuma.player.PlayerState
 import knf.kuma.pojos.*
 import knf.kuma.recents.RecentModel
 
-@Database(entities = [RecentObject::class, RecentModel::class, AnimeObject::class, FavoriteObject::class, AnimeObject.WebInfo.AnimeChapter::class, SeenObject::class, NotificationObj::class, DownloadObject::class, RecordObject::class, SeeingObject::class, ExplorerObject::class, GenreStatusObject::class, QueueObject::class, Achievement::class],
-        version = 18)
+@Database(entities = [RecentObject::class, RecentModel::class, PlayerState::class, AnimeObject::class, FavoriteObject::class, AnimeObject.WebInfo.AnimeChapter::class, SeenObject::class, NotificationObj::class, DownloadObject::class, RecordObject::class, SeeingObject::class, ExplorerObject::class, GenreStatusObject::class, QueueObject::class, Achievement::class],
+        version = 19)
 abstract class CacheDB : RoomDatabase() {
 
     abstract fun recentsDAO(): RecentsDAO
@@ -42,6 +43,8 @@ abstract class CacheDB : RoomDatabase() {
     abstract fun genresDAO(): GenresDAO
 
     abstract fun achievementsDAO(): AchievementsDAO
+
+    abstract fun playerStateDAO(): PlayerStateDAO
 
     companion object {
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
@@ -179,17 +182,24 @@ abstract class CacheDB : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_18_19: Migration = object : Migration(18, 19) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE `playerstate` (" +
+                        "`title` TEXT NOT NULL, " +
+                        "`position` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`title`))")
+            }
+        }
+
         val INSTANCE: CacheDB by lazy { init(App.context) }
 
         private fun init(context: Context): CacheDB =
                 Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
-                        .allowMainThreadQueries()
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18).build()
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19).build()
 
         fun createAndGet(context: Context): CacheDB {
             return Room.databaseBuilder(context, CacheDB::class.java, "cache-db")
-                    .allowMainThreadQueries()
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19).build()
         }
     }
 

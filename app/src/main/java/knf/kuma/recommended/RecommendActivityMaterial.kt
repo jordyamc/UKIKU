@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,9 @@ import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.GenreStatusObject
 import knf.kuma.recommended.sections.MultipleSectionMaterial
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
@@ -195,14 +199,16 @@ class RecommendActivityMaterial : GenericActivity() {
     }
 
     private fun showBlacklist() {
-        val blacklist = GenreStatusObject.names(CacheDB.INSTANCE.genresDAO().blacklist)
-        val dialog = BlacklistDialog()
-        dialog.init(blacklist, object : BlacklistDialog.MultiChoiceListener {
-            override fun onOkay(selected: MutableList<String>) {
-                setBlacklist(selected)
-            }
-        })
-        dialog.show(supportFragmentManager, "Blacklist")
+        lifecycleScope.launch(Dispatchers.Main) {
+            val blacklist = withContext(Dispatchers.IO) { GenreStatusObject.names(CacheDB.INSTANCE.genresDAO().blacklist) }
+            val dialog = BlacklistDialog()
+            dialog.init(blacklist, object : BlacklistDialog.MultiChoiceListener {
+                override fun onOkay(selected: MutableList<String>) {
+                    setBlacklist(selected)
+                }
+            })
+            dialog.show(supportFragmentManager, "Blacklist")
+        }
     }
 
     private fun setBlacklist(selected: MutableList<String>) {

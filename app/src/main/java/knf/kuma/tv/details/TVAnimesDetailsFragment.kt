@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.app.DetailsSupportFragment
 import androidx.leanback.widget.*
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
@@ -23,7 +24,10 @@ import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.tv.anime.ChapterPresenter
 import knf.kuma.tv.anime.RelatedPresenter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 
@@ -44,9 +48,9 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
         onItemViewClickedListener = this
     }
 
-    private fun getLastSeen(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?): Int {
+    private suspend fun getLastSeen(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?): Int {
         if (chapters?.isNotEmpty() == true) {
-            val chapter = CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters))
+            val chapter = withContext(Dispatchers.IO) { CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters)) }
             if (chapter != null) {
                 val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
                 if (position >= 0)
@@ -83,22 +87,26 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                 rowPresenter.actionsBackgroundColor = Color.HSVToColor(hsv)
                             }
                             selector.addClassPresenter(DetailsOverviewRow::class.java, rowPresenter)
-                            selector.addClassPresenter(ChaptersListRow::class.java, ChaptersListPresenter(getLastSeen(chapters)))
-                            selector.addClassPresenter(ListRow::class.java, ListRowPresenter())
-                            mRowsAdapter = ArrayObjectAdapter(selector)
+                            lifecycleScope.launch {
+                                selector.addClassPresenter(ChaptersListRow::class.java, ChaptersListPresenter(getLastSeen(chapters)))
+                                selector.addClassPresenter(ListRow::class.java, ListRowPresenter())
+                                mRowsAdapter = ArrayObjectAdapter(selector)
+                            }
                             val detailsOverview = DetailsOverviewRow(animeObject)
 
                             // Add images and action buttons to the details view
                             detailsOverview.setImageBitmap(activity, resource)
                             detailsOverview.isImageScaleUpAllowed = true
                             actionAdapter = SparseArrayObjectAdapter()
-                            if (CacheDB.INSTANCE.favsDAO().isFav(animeObject.key)) {
-                                actionAdapter?.set(1, Action(1, "Quitar favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_full)))
-                            } else {
-                                actionAdapter?.set(1, Action(1, "Añadir favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_empty)))
+                            lifecycleScope.launch {
+                                if (withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().isFav(animeObject.key) }) {
+                                    actionAdapter?.set(1, Action(1, "Quitar favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_full)))
+                                } else {
+                                    actionAdapter?.set(1, Action(1, "Añadir favorito", null, ContextCompat.getDrawable(App.context, R.drawable.heart_empty)))
+                                }
+                                actionAdapter?.set(2, Action(2, "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})", null, ContextCompat.getDrawable(App.context, R.drawable.ic_seeing)))
+                                detailsOverview.actionsAdapter = actionAdapter
                             }
-                            actionAdapter?.set(2, Action(2, "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})", null, ContextCompat.getDrawable(App.context, R.drawable.ic_seeing)))
-                            detailsOverview.actionsAdapter = actionAdapter
                             rowPresenter.onActionClickedListener = this@TVAnimesDetailsFragment
                             mRowsAdapter?.add(detailsOverview)
 
@@ -151,16 +159,22 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
         if (action.id == 1L) {
             actionAdapter?.clear()
             favoriteObject?.let {
-                if (CacheDB.INSTANCE.favsDAO().isFav(it.key)) {
-                    CacheDB.INSTANCE.favsDAO().deleteFav(it)
-                    action.label1 = "Añadir favorito"
-                    action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_empty)
-                } else {
-                    CacheDB.INSTANCE.favsDAO().addFav(it)
-                    action.label1 = "Quitar favorito"
-                    action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    if (CacheDB.INSTANCE.favsDAO().isFav(it.key)) {
+                        CacheDB.INSTANCE.favsDAO().deleteFav(it)
+                        launch(Dispatchers.Main){
+                            action.label1 = "Añadir favorito"
+                            action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_empty)
+                        }
+                    } else {
+                        CacheDB.INSTANCE.favsDAO().addFav(it)
+                        launch(Dispatchers.Main){
+                            action.label1 = "Quitar favorito"
+                            action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
+                        }
+                    }
+                    syncData { favs() }
                 }
-                syncData { favs() }
             }
             actionAdapter?.set(1, action)
         }

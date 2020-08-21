@@ -19,10 +19,12 @@ import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.search.SearchObject
+import knf.kuma.search.forFav
 import kotlinx.android.synthetic.main.recycler_emision.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class EmissionFragmentMaterial : Fragment(), RemoveListener {
@@ -58,14 +60,16 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
         recycler.adapter = adapter
         if (context != null)
             observeList(Observer { animeObjects ->
-                progress.visibility = View.GONE
-                adapter?.update(animeObjects, false) { smoothScroll() }
-                if (isFirst) {
-                    isFirst = false
-                    recycler.scheduleLayoutAnimation()
-                    //checkStates(animeObjects)
+                lifecycleScope.launch(Dispatchers.Main){
+                    progress.visibility = View.GONE
+                    adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }, false) { smoothScroll() }
+                    if (isFirst) {
+                        isFirst = false
+                        recycler.scheduleLayoutAnimation()
+                        //checkStates(animeObjects)
+                    }
+                    error.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
                 }
-                error.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
             })
     }
 
@@ -93,13 +97,15 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
     internal fun reloadList() {
         if (context != null)
             observeList(Observer { animeObjects ->
-                error?.visibility = View.GONE
-                if (animeObjects != null && animeObjects.isNotEmpty())
-                    adapter?.update(animeObjects) { smoothScroll() }
-                else
-                    adapter?.update(ArrayList()) { smoothScroll() }
-                if (animeObjects == null || animeObjects.isEmpty())
-                    error?.visibility = View.VISIBLE
+                lifecycleScope.launch(Dispatchers.Main){
+                    error?.visibility = View.GONE
+                    if (animeObjects != null && animeObjects.isNotEmpty())
+                        adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }) { smoothScroll() }
+                    else
+                        adapter?.update(ArrayList()) { smoothScroll() }
+                    if (animeObjects == null || animeObjects.isEmpty())
+                        error?.visibility = View.VISIBLE
+                }
             })
     }
 

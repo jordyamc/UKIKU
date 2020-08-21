@@ -30,6 +30,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.gms.ads.MobileAds
@@ -40,6 +41,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
+import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
@@ -77,10 +79,12 @@ import knf.kuma.seeing.SeeingActivity
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.nav_header_main.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.cryse.widget.persistentsearch.PersistentSearchView
 import org.cryse.widget.persistentsearch.SearchItem
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.textColor
@@ -158,7 +162,8 @@ class Main : GenericActivity(),
     }
 
     private fun checkServices() {
-        doAsync {
+        lifecycleScope.launch(Dispatchers.IO) {
+            BypassUtil.clearCookiesIfNeeded()
             checkPermissions()
             DirectoryService.run(this@Main)
             UpdateWork.schedule()
@@ -240,7 +245,7 @@ class Main : GenericActivity(),
                 PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean)
-                            badgeView?.badgeNumber = CacheDB.INSTANCE.favsDAO().count
+                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO){ CacheDB.INSTANCE.favsDAO().count } }
                         else
                             badgeView?.hide(false)
                     }
@@ -318,9 +323,15 @@ class Main : GenericActivity(),
             try {
                 MaterialDialog(this@Main).safeShow {
                     title(text = "Actualización")
-                    message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
-                    positiveButton(text = "si") { UpdateActivity.start(this@Main) }
-                    negativeButton(text = "despues")
+                    if (n_code.toInt() > AdsUtils.remoteConfigs.getLong("min_version").toInt()) {
+                        message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
+                        positiveButton(text = "si") { UpdateActivity.start(this@Main,true) }
+                        negativeButton(text = "despues")
+                    }else {
+                        message(text = "Parece que la versión $n_code está disponible, es obligatoria")
+                        positiveButton(text = "actualizar") { UpdateActivity.start(this@Main,false) }
+                        cancelable(false)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

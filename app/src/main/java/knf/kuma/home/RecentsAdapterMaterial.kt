@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnimeMaterial
@@ -13,6 +14,9 @@ import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.SeenObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
@@ -30,10 +34,10 @@ class RecentsAdapterMaterial(val fragment: HomeFragmentMaterial, private val isL
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentViewHolder = RecentViewHolder(parent.inflate(if (isLarge) R.layout.item_fav_grid_card_material else R.layout.item_fav_grid_card_simple_material))
 
-
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: RecentViewHolder, position: Int) {
+        if (list.isEmpty()) return
         val item = list[position]
         holder.img.load(item.img)
         holder.title.text = item.name
@@ -42,22 +46,30 @@ class RecentsAdapterMaterial(val fragment: HomeFragmentMaterial, private val isL
             if (item.animeObject != null) {
                 ActivityAnimeMaterial.open(fragment, item.animeObject, holder.img)
             } else {
-                val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(item.aid)
-                if (animeObject != null) {
-                    ActivityAnimeMaterial.open(fragment, animeObject, holder.img)
-                } else {
-                    ActivityAnimeMaterial.open(fragment, item, holder.img)
+                fragment.lifecycleScope.launch(Dispatchers.Main) {
+                    val animeObject = withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getByAid(item.aid) }
+                    if (animeObject != null) {
+                        ActivityAnimeMaterial.open(fragment, animeObject, holder.img)
+                    } else {
+                        ActivityAnimeMaterial.open(fragment, item, holder.img)
+                    }
                 }
             }
         }
         if (showSeen) {
-            holder.seenOverlay.setSeen(CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.aid, item.chapter), false)
+            holder.seenOverlay.setSeen(item.isSeen, false)
             holder.root.onLongClick(returnValue = true) {
-                if (CacheDB.INSTANCE.seenDAO().chapterIsSeen(item.aid, item.chapter)) {
-                    CacheDB.INSTANCE.seenDAO().deleteChapter(item.aid, item.chapter)
+                if (item.isSeen) {
+                    doAsync {
+                        CacheDB.INSTANCE.seenDAO().deleteChapter(item.aid, item.chapter)
+                    }
+                    item.isSeen = false
                     holder.seenOverlay.setSeen(seen = false, animate = true)
                 } else {
-                    CacheDB.INSTANCE.seenDAO().addChapter(SeenObject.fromRecent(item))
+                    doAsync {
+                        CacheDB.INSTANCE.seenDAO().addChapter(SeenObject.fromRecent(item))
+                    }
+                    item.isSeen = true
                     holder.seenOverlay.setSeen(seen = true, animate = true)
                 }
                 syncData { seen() }

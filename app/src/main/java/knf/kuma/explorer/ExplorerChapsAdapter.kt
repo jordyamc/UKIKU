@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.card.MaterialCardView
@@ -30,13 +31,15 @@ import knf.kuma.pojos.RecordObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
 
-class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val recyclerView: RecyclerView, private val explorerObject: ExplorerObject, private var clearInterface: FragmentChapters.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem>() {
+class ExplorerChapsAdapter internal constructor(val fragment: Fragment, private val recyclerView: RecyclerView, val explorerObject: ExplorerObjectWrap, private var clearInterface: FragmentChapters.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem>() {
     private val context: Context? = fragment.context
 
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
@@ -57,32 +60,41 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
     }
 
     override fun onBindViewHolder(holder: ChapItem, position: Int) {
-        val chapObject = explorerObject.chapters[position]
-        loadThumb(chapObject, holder.imageView)
-        val chapterNum = String.format(Locale.getDefault(), "Episodio %s", chapObject.chapter)
-        holder.seenOverlay.setSeen(chaptersDAO.chapterIsSeen(chapObject.aid, chapterNum), false)
+        val chapObject = explorerObject.fileList[position]
+        loadThumb(chapObject.obj, holder.imageView)
+        val chapterNum = String.format(Locale.getDefault(), "Episodio %s", chapObject.obj.chapter)
+        holder.seenOverlay.setSeen(chapObject.isSeen, false)
         holder.chapter.text = chapterNum
-        holder.time.text = chapObject.time
+        holder.time.text = chapObject.obj.time
         holder.cardView.setOnClickListener {
-            chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject))
-            recordsDAO.add(RecordObject.fromDownloaded(chapObject))
+            fragment.lifecycleScope.launch(Dispatchers.IO) {
+                chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject.obj))
+                recordsDAO.add(RecordObject.fromDownloaded(chapObject.obj))
+            }
+            chapObject.isSeen = true
             syncData {
                 history()
                 seen()
             }
             holder.seenOverlay.setSeen(true, true)
             if (CastUtil.get().connected()) {
-                CastUtil.get().play(recyclerView, CastMedia.create(chapObject))
+                CastUtil.get().play(recyclerView, CastMedia.create(chapObject.obj))
             } else {
-                ServersFactory.startPlay(context, chapObject.chapTitle, chapObject.fileName)
+                ServersFactory.startPlay(context, chapObject.obj.chapTitle, chapObject.obj.fileName)
             }
         }
         holder.cardView.setOnLongClickListener {
-            if (!chaptersDAO.chapterIsSeen(chapObject.aid, chapterNum)) {
-                chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject))
+            if (!chapObject.isSeen) {
+                fragment.lifecycleScope.launch(Dispatchers.IO){
+                    chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject.obj))
+                }
+                chapObject.isSeen = true
                 holder.seenOverlay.setSeen(true, true)
             } else {
-                chaptersDAO.deleteChapter(chapObject.aid, chapterNum)
+                fragment.lifecycleScope.launch(Dispatchers.IO) {
+                    chaptersDAO.deleteChapter(chapObject.obj.aid, chapterNum)
+                }
+                chapObject.isSeen = false
                 holder.seenOverlay.setSeen(false, true)
             }
             syncData { seen() }
@@ -91,9 +103,9 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
         holder.action.setOnClickListener {
             context?.let {
                 MaterialDialog(context).safeShow {
-                    message(text = "¿Eliminar el episodio ${chapObject.chapter} de ${chapObject.title}?")
+                    message(text = "¿Eliminar el episodio ${chapObject.obj.chapter} de ${chapObject.obj.title}?")
                     positiveButton(text = "CONFIRMAR") {
-                        delete(chapObject, holder.adapterPosition)
+                        delete(chapObject.obj, holder.adapterPosition)
                     }
                     negativeButton(text = "CANCELAR")
                 }
@@ -107,37 +119,39 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
 
     private fun delete(obj: ExplorerObject.FileDownObj, position: Int) {
         if (position < 0) return
-        FileAccessHelper.delete(obj.fileName, true)
-        downloadsDAO.deleteByEid(obj.eid)
-        QueueManager.remove(obj.eid)
-        explorerObject.chapters.removeAt(position)
-        doOnUI { notifyItemRemoved(position) }
-        if (explorerObject.chapters.size == 0) {
-            explorerDAO.delete(explorerObject)
-            clearInterface?.onClear()
-        } else {
-            explorerObject.count = explorerObject.chapters.size
-            explorerDAO.update(explorerObject)
+        doAsync {
+            FileAccessHelper.delete(obj.fileName, true)
+            downloadsDAO.deleteByEid(obj.eid)
+            QueueManager.remove(obj.eid)
+            explorerObject.fileList.removeAt(position)
+            doOnUI { notifyItemRemoved(position) }
+            if (explorerObject.fileList.size == 0) {
+                explorerDAO.delete(explorerObject.obj)
+                clearInterface?.onClear()
+            } else {
+                explorerObject.obj.count = explorerObject.fileList.size
+                explorerDAO.update(explorerObject.obj)
+            }
         }
     }
 
     internal fun deleteAll() {
         doAsync {
-            for ((i, obj) in explorerObject.chapters.withIndex()) {
-                FileAccessHelper.delete(obj.fileName, true)
-                downloadsDAO.deleteByEid(obj.eid)
-                QueueManager.remove(obj.eid)
+            for ((i, obj) in explorerObject.fileList.withIndex()) {
+                FileAccessHelper.delete(obj.obj.fileName, true)
+                downloadsDAO.deleteByEid(obj.obj.eid)
+                QueueManager.remove(obj.obj.eid)
                 doOnUI {
                     notifyItemRemoved(i)
                 }
             }
-            explorerDAO.delete(explorerObject)
+            explorerDAO.delete(explorerObject.obj)
             clearInterface?.onClear()
         }
     }
 
     private fun loadThumb(fileDownObj: ExplorerObject.FileDownObj, imageView: ImageView?) {
-        val file = File(context?.cacheDir, explorerObject.fileName + "_" + fileDownObj.chapter.toLowerCase() + ".png")
+        val file = File(context?.cacheDir, explorerObject.obj.fileName + "_" + fileDownObj.chapter.toLowerCase() + ".png")
         if (file.exists()) {
             fileDownObj.thumb = file
             PicassoSingle.get().load(file).into(imageView)
@@ -167,7 +181,7 @@ class ExplorerChapsAdapter internal constructor(fragment: Fragment, private val 
 
     override fun getItemCount(): Int {
         return try {
-            explorerObject.chapters.size
+            explorerObject.fileList.size
         } catch (e: Exception) {
             0
         }

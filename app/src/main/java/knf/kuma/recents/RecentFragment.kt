@@ -20,6 +20,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.home.HomeFragment
 import knf.kuma.pojos.RecentObject
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
+import knf.kuma.videoservers.FileActions
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.android.synthetic.main.recycler_refresh_fragment.*
 
@@ -82,6 +83,7 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onDestroyView() {
         super.onDestroyView()
         ServersFactory.clear()
+        FileActions.reset()
         (activity as? AppCompatActivity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
