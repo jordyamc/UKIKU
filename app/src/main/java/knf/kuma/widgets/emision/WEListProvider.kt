@@ -11,6 +11,9 @@ import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.LinkedHashSet
 
@@ -36,10 +39,12 @@ class WEListProvider internal constructor(private val context: Context) : Remote
     }
 
     private fun populateListItem() {
-        items.clear()
-        val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context))
-        for (obj in list) {
-            items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, PatternUtil.getCover(obj.aid)))
+        GlobalScope.launch(Dispatchers.IO) {
+            items.clear()
+            val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context))
+            for (obj in list) {
+                items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, PatternUtil.getCover(obj.aid)))
+            }
         }
     }
 

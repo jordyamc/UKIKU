@@ -278,6 +278,18 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
             fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }
 
+        fun openGeneric(fragment: Fragment, animeObject: SearchAdvObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
+            intent.data = Uri.parse(animeObject.link)
+            intent.putExtra(keyTitle, animeObject.name)
+            intent.putExtra(keyAid, animeObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
         fun open(fragment: Fragment, animeObject: SearchObjectFav, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
@@ -305,6 +317,18 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         fun open(fragment: Fragment, recentObject: RecentObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            intent.data = Uri.parse(recentObject.url)
+            intent.putExtra(keyTitle, recentObject.name)
+            intent.putExtra(keyAid, recentObject.aid)
+            intent.putExtra(keyImg, PatternUtil.getCover(recentObject.aid))
+            intent.putExtra(keyPersist, persist)
+            intent.putExtra(keyNoTransition, !animate)
+            fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
+        }
+
+        fun openGeneric(fragment: Fragment, recentObject: RecentObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
+            val activity = fragment.activity ?: return
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(recentObject.url)
             intent.putExtra(keyTitle, recentObject.name)
             intent.putExtra(keyAid, recentObject.aid)

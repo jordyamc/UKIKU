@@ -8,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.SeenAnimeOverlay
@@ -50,9 +49,9 @@ class RecentsAdapter(val fragment: HomeFragment, private val isLarge: Boolean = 
                 fragment.lifecycleScope.launch(Dispatchers.Main) {
                     val animeObject = withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getByAid(item.aid) }
                     if (animeObject != null) {
-                        ActivityAnimeMaterial.open(fragment, animeObject, holder.img)
+                        ActivityAnime.open(fragment, animeObject, holder.img)
                     } else {
-                        ActivityAnimeMaterial.open(fragment, item, holder.img)
+                        ActivityAnime.open(fragment, item, holder.img)
                     }
                 }
             }
