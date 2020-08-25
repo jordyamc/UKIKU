@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
+import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.NativeManager
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
@@ -42,7 +42,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.dbLiveData.observe(viewLifecycleOwner, Observer { objects ->
+        viewModel.dbLiveData.observe(viewLifecycleOwner, { objects ->
             holder.setError(objects.isEmpty())
             holder.setRefreshing(false)
             if (adapter.itemCount == 0 || objects.isNotEmpty() && objects[0].hashCode().toLong() != adapter.getItemId(0)) {
@@ -51,7 +51,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
                     if (isFirstLoad) {
                         holder.recyclerView.scheduleLayoutAnimation()
                         isFirstLoad = false
-                    }else{
+                    } else {
                         holder.scrollToTop()
                     }
                 }
@@ -64,7 +64,10 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
     private fun scrollByKey(list: List<RecentModel>) {
         if (list.isEmpty()) return
         val initial = arguments?.getInt("initial", -1) ?: -1
-        if (initial == -1) return
+        if (initial == -1) {
+            noCrash { holder.scrollToTop() }
+            return
+        }
         val find = list.find { it.key == initial } ?: return
         holder.scrollTo(list.indexOf(find))
     }
@@ -77,9 +80,10 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
 
     private fun loadAds(list: List<RecentModel>) {
         if (PrefsUtil.isAdsEnabled) {
-            if (PrefsUtil.isNativeAdsEnabled && !adapter.hasAds())
+            if (AdsUtils.isAdmobEnabled && PrefsUtil.isNativeAdsEnabled) {
+                if (adapter.hasAds()) return
                 lifecycleScope.launch(Dispatchers.Main) {
-                    NativeManager.take(this,3){
+                    NativeManager.take(this, 3) {
                         if (it.isEmpty())
                             adContainer.implBanner(AdsType.RECENT_BANNER, true)
                         else {
@@ -89,7 +93,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
                         }
                     }
                 }
-            else if (!adapter.hasAds())
+            } else
                 adContainer.implBanner(AdsType.RECENT_BANNER, true)
         }
     }

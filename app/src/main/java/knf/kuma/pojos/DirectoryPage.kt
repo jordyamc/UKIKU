@@ -20,8 +20,8 @@ class DirectoryPage {
                 if (!animeDAO.existLink("%animeflv.net$link")) {
                     try {
                         val response = okHttpCookies("https://animeflv.net$link").execute(followRedirects = true)
-                        val body = response.body()?.string()
-                        if (response.code() == 200 && body != null) {
+                        val body = response.body?.string()
+                        if (response.code == 200 && body != null) {
                             val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
                             if (BuildConfig.BUILD_TYPE != "playstore" && !PrefsUtil.isFamilyFriendly) {
                                 animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
@@ -35,9 +35,9 @@ class DirectoryPage {
                                 }
                             }
                             updateInterface.onAdd()
-                        } else if (response.code() == 404) {
+                        } else if (response.code == 404) {
                             CacheDB.INSTANCE.animeDAO().allLinksInEmission
-                        } else check(response.code() < 400) { "Response code: ${response.code()}" }
+                        } else check(response.code < 400) { "Response code: ${response.code}" }
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Log.e("Directory Getter", "Error adding: https://animeflv.net" + link + "\nCause: " + e.message)

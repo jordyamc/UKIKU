@@ -24,7 +24,7 @@ class FembedServer internal constructor(context: Context, baseLink: String) : Se
                     "https://embedsito.com/v/${downLink.substring(downLink.lastIndexOf("=") + 1)}"
                 else
                     downLink
-                val json = JSONObject(okHttpCookies(fLink.replace("/v/", "/api/source/"), "POST").execute().body()?.string())
+                val json = JSONObject(okHttpCookies(fLink.replace("/v/", "/api/source/"), "POST").execute().body?.string())
                 check(json.getBoolean("success")) { "Request was not succeeded" }
                 val array = json.getJSONArray("data")
                 val options = mutableListOf<Option>()

@@ -10,12 +10,16 @@ import android.view.View
 import android.webkit.*
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.commons.*
+import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
 import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
+import knf.kuma.pojos.AnimeObject
 import knf.kuma.recents.RecentsNotReceiver
 import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVBaseActivity
@@ -28,6 +32,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
+import java.net.URL
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -49,7 +54,6 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             fragment = TVMainFragment.get().also {
                 addFragment(it)
             }
-            DirectoryService.run(this)
             RecentsWork.schedule(this)
             DirUpdateWork.schedule(this)
             RecentsNotReceiver.removeAll(this)
@@ -60,6 +64,19 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                 else
                     PrefsUtil.alwaysGenerateUA = false
                 checkBypass()
+            }
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (CacheDB.INSTANCE.animeDAO().count < 3200) {
+                    noCrash {
+                        for (index in 0..6) {
+                            val json = URL("https://ukiku.ga/dirs/directory$index.json").readText()
+                            val list: List<AnimeObject> = Gson().fromJson(json, object : TypeToken<List<AnimeObject>>() {}.type)
+                            CacheDB.INSTANCE.animeDAO().insertAll(list)
+                        }
+                        PrefsUtil.isDirectoryFinished = true
+                    }
+                }
+                DirectoryService.run(this@TVMain)
             }
         }
     }
@@ -174,8 +191,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                             }
                         }
                         //webView.settings.userAgentString = randomUA().also { PrefsUtil.userAgent = it }
-                        webView.settings.userAgentString = null
-                        PrefsUtil.userAgent = webView.settings.userAgentString
+                        webView.settings.userAgentString = PrefsUtil.userAgent
                         webView.loadUrl("https://animeflv.net/")
                         Log.e("CloudflareBypass", "UA: ${PrefsUtil.userAgent}")
                     }

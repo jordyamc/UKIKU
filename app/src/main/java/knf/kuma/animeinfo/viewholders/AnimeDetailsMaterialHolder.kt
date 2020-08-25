@@ -12,7 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import knf.kuma.R
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.NativeManager
+import knf.kuma.ads.implBanner
 import knf.kuma.animeinfo.AnimeRelatedAdapterMaterial
 import knf.kuma.animeinfo.AnimeTagsAdapterMaterial
 import knf.kuma.backup.firestore.syncData
@@ -46,7 +49,6 @@ class AnimeDetailsMaterialHolder(val view: View) {
     private val spinnerList: Spinner = view.spinner_list
     private val recyclerViewRelated: RecyclerView = view.recycler_related
     private val clipboardManager = view.context.applicationContext.clipboardManager
-    private var retard = 0
     private var needAnimation = true
 
     init {
@@ -87,21 +89,26 @@ class AnimeDetailsMaterialHolder(val view: View) {
                     desc.setOnClickListener(onClickListener)
                     expandIcon.setOnClickListener(onClickListener)
                     showLayout(layouts[1])
-                }else{
+                } else {
                     view.lay_description_separator.isVisible = false
                 }
             }
-            noCrash {
-                if (PrefsUtil.isAdsEnabled) {
-                    launch {
-                        NativeManager.take(fragment.lifecycleScope,1){
-                            if (it.isNotEmpty()){
-                                view.adContainer.setNativeAd(it[0])
+            if (PrefsUtil.isAdsEnabled) {
+                launch {
+                    noCrashSuspend {
+                        if (AdsUtils.isAdmobEnabled)
+                            NativeManager.take(fragment.lifecycleScope, 1) {
+                                if (it.isNotEmpty()) {
+                                    view.adContainer.setNativeAd(it[0])
+                                }
                             }
+                        else {
+                            view.adContainer.isVisible = false
+                            view.lay_ad.implBanner(AdsType.INFO_BANNER)
                         }
                     }
-                    showLayout(layouts[2])
                 }
+                showLayout(layouts[2])
             }
             noCrash {
                 type.text = animeObject.type
@@ -111,8 +118,10 @@ class AnimeDetailsMaterialHolder(val view: View) {
                 if (animeObject.rate_stars == null || animeObject.rate_stars == "0.0")
                     layScore.visibility = View.GONE
                 else {
-                    ratingCount.text = "${animeObject.rate_count} (${animeObject.rate_stars
-                            ?: "?.?"})"
+                    ratingCount.text = "${animeObject.rate_count} (${
+                        animeObject.rate_stars
+                                ?: "?.?"
+                    })"
                     ratingBar.setStar(animeObject.rate_stars?.toFloat() ?: 0f)
                 }
                 showLayout(layouts[3])
@@ -127,9 +136,10 @@ class AnimeDetailsMaterialHolder(val view: View) {
                 }
             }
             noCrash {
-                spinnerList.adapter = ArrayAdapter<String>(view.context, android.R.layout.simple_spinner_dropdown_item, view.context.resources.getStringArray(R.array.list_states))
-                fragment.lifecycleScope.launch(Dispatchers.Main){
-                    spinnerList.setSelection(withContext(Dispatchers.IO){
+                spinnerList.adapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, view.context.resources.getStringArray(R.array.list_states))
+                fragment.lifecycleScope.launch(Dispatchers.Main) {
+                    spinnerList.onItemSelectedListener = null
+                    spinnerList.setSelection(withContext(Dispatchers.IO) {
                         CacheDB.INSTANCE.seeingDAO().getByAid(animeObject.aid)
                     }?.state ?: 0)
                     spinnerList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

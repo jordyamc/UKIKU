@@ -116,8 +116,8 @@ class DirectoryService : IntentService("Directory update") {
             if (!animeDAO.existLink("%${it.substringAfterLast(".net")}")){
                 try {
                     val response = okHttpCookies(it).execute(followRedirects = true)
-                    val body = response.body()?.string()
-                    if (response.code() == 200 && body != null) {
+                    val body = response.body?.string()
+                    if (response.code == 200 && body != null) {
                         val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
                         animeDAO.insert(AnimeObject(it, webInfo))
                     }

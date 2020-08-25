@@ -68,32 +68,36 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         exit.onClick { onBackPressed() }
         lock.onClick { lock() }
         unlock.onClick { unlock() }
-        youtubeOverlay.performListener(object : YouTubeOverlay.PerformListener{
+        youtubeOverlay.performListener(object : YouTubeOverlay.PerformListener {
             override fun onAnimationEnd() {
-                youtubeOverlay.startAnimation(AnimationUtils.loadAnimation(this@VideoActivity,R.anim.fadeout))
+                youtubeOverlay.startAnimation(AnimationUtils.loadAnimation(this@VideoActivity, R.anim.fadeout))
                 youtubeOverlay.isVisible = false
                 exo_ll_controls.isVisible = true
             }
 
             override fun onAnimationStart() {
                 youtubeOverlay.isVisible = true
-                youtubeOverlay.startAnimation(AnimationUtils.loadAnimation(this@VideoActivity,R.anim.fadein))
+                youtubeOverlay.startAnimation(AnimationUtils.loadAnimation(this@VideoActivity, R.anim.fadein))
                 exo_ll_controls.isVisible = false
             }
         })
-        if (!intent.getBooleanExtra("isPlayList", false)){
+        if (!intent.getBooleanExtra("isPlayList", false)) {
             lay_next.isVisible = false
             lay_prev.isVisible = false
         }
         lifecycleScope.launch(Dispatchers.Main) {
             playList = withContext(Dispatchers.IO) {
-                CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist") ?: "empty")
+                CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist")
+                        ?: "empty")
             }
-            playerState = withContext(Dispatchers.IO) { CacheDB.INSTANCE.playerStateDAO().find(intent.getStringExtra("title")?:"???")?:PlayerState() }
+            playerState = withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.playerStateDAO().find(intent.getStringExtra("title") ?: "???")
+                        ?: PlayerState()
+            }
             if (savedInstanceState != null) {
                 playerState.position = savedInstanceState.getLong("position", 0)
                 playerState.window = savedInstanceState.getInt("window", 0)
-                playerState.whenReady = savedInstanceState.getBoolean("playWhenReady",true)
+                playerState.whenReady = savedInstanceState.getBoolean("playWhenReady", true)
             }
             createMediaSession()
             createPlayer()
@@ -107,19 +111,20 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (::playerHolder.isInitialized)
+        if (::playerHolder.isInitialized) {
             playerHolder.saveState()
-        outState.putInt("window", playerState.window)
-        outState.putLong("position", playerState.position)
-        outState.putBoolean("playWhenReady",playerState.whenReady)
+            outState.putInt("window", playerState.window)
+            outState.putLong("position", playerState.position)
+            outState.putBoolean("playWhenReady", playerState.whenReady)
+        }
     }
 
-    private fun lock(){
+    private fun lock() {
         player.hideController()
         lay_locked.isVisible = true
     }
 
-    private fun unlock(){
+    private fun unlock() {
         player.showController()
         lay_locked.isVisible = false
     }
@@ -188,7 +193,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         releaseMediaSession()
     }
 
-    private fun saveState(){
+    private fun saveState() {
         doAsync {
             CacheDB.INSTANCE.playerStateDAO().set(playerState)
         }
@@ -302,7 +307,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     // Picture in Picture related functions.
     override fun onUserLeaveHint() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerHolder.audioFocusPlayer.playWhenReady && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && ::playerHolder.isInitialized && playerHolder.audioFocusPlayer.playWhenReady && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             noCrash {
                 enterPictureInPictureMode(
                         with(PictureInPictureParams.Builder()) {
@@ -314,7 +319,8 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
-        playerHolder.saveState()
+        if (::playerHolder.isInitialized)
+            playerHolder.saveState()
         player.useController = !isInPictureInPictureMode
     }
 

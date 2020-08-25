@@ -17,6 +17,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
+import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.BufferedInputStream
@@ -79,14 +80,19 @@ class DownloadService : IntentService("Download service") {
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(10, TimeUnit.SECONDS)
                     .followRedirects(true)
-                    .followSslRedirects(true).build().newCall(request.build()).execute()
-            current?.t_bytes = response.body()?.contentLength() ?: 0
-            val inputStream = BufferedInputStream(response.body()?.byteStream())
+                    .followSslRedirects(true)
+                    .connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                            .allEnabledTlsVersions()
+                            .allEnabledCipherSuites()
+                            .build()))
+                    .build().newCall(request.build()).execute()
+            current?.t_bytes = response.body?.contentLength() ?: 0
+            val inputStream = BufferedInputStream(response.body?.byteStream())
             val outputStream: BufferedOutputStream
-            if (response.code() == 200 || response.code() == 206) {
+            if (response.code == 200 || response.code == 206) {
                 outputStream = BufferedOutputStream(FileAccessHelper.getOutputStream(current?.file), bufferSize * 1024)
             } else {
-                Log.e("Download error", "Code: " + response.code())
+                Log.e("Download error", "Code: " + response.code)
                 errorNotification()
                 current?.let {
                     downloadsDAO.delete(it)

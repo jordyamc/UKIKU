@@ -21,6 +21,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.progressindicator.ProgressIndicator
 import knf.kuma.App
+import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
@@ -77,56 +78,61 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                 seenIndicator.isVisible = item.state.isSeen
                 favIndicator.isVisible = item.state.isFavorite
                 setUp(item)
-                actionMenu.onClickMenu(R.menu.menu_download_info, true, { item.menuHideList }) {
-                    when (it.itemId) {
-                        R.id.download -> {
-                            FileActions.download(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view) { state, _ ->
-                                if (state == FileActions.CallbackState.START_DOWNLOAD)
-                                    item.state.isDownloaded = true
-                            }
-                        }
-                        R.id.streaming -> {
-                            FileActions.stream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view) { state, extra ->
-                                when (state) {
-                                    FileActions.CallbackState.START_STREAM -> {
-                                        setAsSeen(item)
-                                    }
-                                    FileActions.CallbackState.START_CAST -> {
-                                        CastUtil.get().play(fragment.requireView(), CastMedia.create(item, extra as? String))
-                                        setAsSeen(item)
-                                    }
-                                    else -> {
-                                    }
+                if (BuildConfig.BUILD_TYPE != "playstore")
+                    actionMenu.onClickMenu(R.menu.menu_download_info, true, { item.menuHideList }) {
+                        when (it.itemId) {
+                            R.id.download -> {
+                                FileActions.download(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view) { state, _ ->
+                                    if (state == FileActions.CallbackState.START_DOWNLOAD)
+                                        item.state.isDownloaded = true
                                 }
                             }
-                        }
-                        R.id.delete -> {
-                            MaterialDialog(fragment.requireContext()).safeShow {
-                                lifecycleOwner(fragment.viewLifecycleOwner)
-                                message(text = "¿Eliminar el ${item.chapter.toLowerCase(Locale.ENGLISH)} de ${item.name}?")
-                                positiveButton(text = "CONFIRMAR") {
-                                    GlobalScope.launch(Dispatchers.IO) {
-                                        fragment.lifecycleScope.launch(Dispatchers.Main) {
-                                            item.state.isDownloaded = false
-                                            this@apply.downloadedChip.isVisibleAnimate = false
+                            R.id.streaming -> {
+                                FileActions.stream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view) { state, extra ->
+                                    when (state) {
+                                        FileActions.CallbackState.START_STREAM -> {
+                                            setAsSeen(item)
                                         }
-                                        item.state.isDeleting = true
-                                        FileAccessHelper.deletePath(item.extras.filePath, false)
-                                        item.state.isDeleting = false
-                                        item.state.checkIsDownloaded
-                                        DownloadManager.cancel(item.extras.eid)
-                                        QueueManager.remove(item.extras.eid)
+                                        FileActions.CallbackState.START_CAST -> {
+                                            CastUtil.get().play(fragment.requireView(), CastMedia.create(item, extra as? String))
+                                            setAsSeen(item)
+                                        }
+                                        else -> {
+                                        }
                                     }
                                 }
-                                negativeButton(text = "CANCELAR")
                             }
-                        }
-                        R.id.info -> {
-                            item.openInfo(fragment.requireContext())
+                            R.id.delete -> {
+                                MaterialDialog(fragment.requireContext()).safeShow {
+                                    lifecycleOwner(fragment.viewLifecycleOwner)
+                                    message(text = "¿Eliminar el ${item.chapter.toLowerCase(Locale.ENGLISH)} de ${item.name}?")
+                                    positiveButton(text = "CONFIRMAR") {
+                                        GlobalScope.launch(Dispatchers.IO) {
+                                            fragment.lifecycleScope.launch(Dispatchers.Main) {
+                                                item.state.isDownloaded = false
+                                                this@apply.downloadedChip.isVisibleAnimate = false
+                                            }
+                                            item.state.isDeleting = true
+                                            FileAccessHelper.deletePath(item.extras.filePath, false)
+                                            item.state.isDeleting = false
+                                            item.state.checkIsDownloaded
+                                            DownloadManager.cancel(item.extras.eid)
+                                            QueueManager.remove(item.extras.eid)
+                                        }
+                                    }
+                                    negativeButton(text = "CANCELAR")
+                                }
+                            }
+                            R.id.info -> {
+                                item.openInfo(fragment.requireContext())
+                            }
                         }
                     }
-                }
                 root.setOnClickListener {
+                    if (BuildConfig.BUILD_TYPE == "playstore") {
+                        item.openInfo(fragment.requireContext())
+                        return@setOnClickListener
+                    }
                     if (item.state.isDownloaded) {
                         if (CastUtil.get().connected())
                             CastUtil.get().play(fragment.requireView(), CastMedia.create(item))
@@ -151,9 +157,9 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                             }
                         }
                         if (PrefsUtil.recentActionType == "0")
-                            FileActions.stream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view,callback)
+                            FileActions.stream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
                         else
-                            FileActions.download(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view,callback)
+                            FileActions.download(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
                     }
                 }
                 root.setOnLongClickListener {

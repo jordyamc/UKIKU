@@ -35,9 +35,10 @@ internal class QueueAnimesAdapterMaterial internal constructor(private val activ
 
     override fun onBindViewHolder(holder: AnimeHolder, position: Int) {
         val queueObject = list[position]
-        val img = PatternUtil.getCover(queueObject.chapter.aid)
-        PicassoSingle.get().load(img).into(holder.imageView)
-        holder.title.text = PatternUtil.fromHtml(queueObject.chapter.name)
+        noCrash {
+            PicassoSingle.get().load(PatternUtil.getCover(queueObject.chapter.aid)).into(holder.imageView)
+            holder.title.text = PatternUtil.fromHtml(queueObject.chapter.name)
+        }
         holder.type.text = String.format(Locale.getDefault(), if (queueObject.count == 1) "%d episodio" else "%d episodios", queueObject.count)
         holder.cardView.setOnClickListener { listener?.onSelect(queueObject) }
         holder.cardView.setOnLongClickListener {

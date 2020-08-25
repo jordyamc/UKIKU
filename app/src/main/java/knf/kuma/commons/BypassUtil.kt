@@ -222,7 +222,7 @@ class BypassUtil {
                             header("User-Agent", userAgent)
                         }.build().execute().also {
                             it.use {
-                                Log.e("Test Result", "${it.body()?.string()}")
+                                Log.e("Test Result", "${it.body?.string()}")
                             }
                         }
                     }
@@ -230,7 +230,7 @@ class BypassUtil {
                         Log.e("Test Test", "okhttp cookies")
                         okHttpCookies("https://www3.animeflv.net/ver/kanojo-okarishimasu-6").execute().also {
                             it.use {
-                                Log.e("Test Result", "${it.body()?.string()}")
+                                Log.e("Test Result", "${it.body?.string()}")
                             }
                         }
                     }

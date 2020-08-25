@@ -19,6 +19,9 @@ import knf.kuma.tv.search.BasicAnimeObject
 @TypeConverters(BaseConverter::class, AnimeObject.Converter::class)
 interface AnimeDAO {
 
+    @get:Query("SELECT * FROM AnimeObject")
+    val all: List<AnimeObject>
+
     @get:Query("SELECT `key`,aid,name,link FROM AnimeObject ORDER BY name")
     val allSearch: DataSource.Factory<Int, SearchObject>
 
@@ -109,7 +112,7 @@ interface AnimeDAO {
     @Query("SELECT `key`,aid,img,link,name,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY name")
     fun getAnimesByAids(aids: List<String>): List<AnimeShortObject>
 
-    @Query("SELECT * FROM AnimeObject WHERE link = :link")
+    @Query("SELECT * FROM AnimeObject WHERE link LIKE :link")
     fun getAnimeRaw(link: String): AnimeObject?
 
     @Query("SELECT `key`,name,link,aid,type FROM AnimeObject ORDER BY RANDOM() LIMIT :limit")

@@ -20,17 +20,13 @@ import com.tonyodev.fetch2core.Func
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import knf.kuma.App
 import knf.kuma.R
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.FileUtil
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.noCrash
+import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.notificationManager
 import xdroid.toaster.Toaster
@@ -75,7 +71,7 @@ class DownloadManager : Service() {
                     .enableRetryOnNetworkGain(true)
                     .setAutoRetryMaxAttempts(3)
                     .createDownloadFileOnEnqueue(false)
-                    .setHttpDownloader(OkHttpDownloader(OkHttpClient.Builder().followRedirects(true).followSslRedirects(true).build()))
+                    .setHttpDownloader(OkHttpDownloader(NoSSLOkHttpClient.get()))
         }
         private val downloadDao = CacheDB.INSTANCE.downloadsDAO()
         private val notificationManager: NotificationManager by lazy { context.notificationManager }

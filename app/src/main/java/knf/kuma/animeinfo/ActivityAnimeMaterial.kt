@@ -44,6 +44,7 @@ import org.jetbrains.anko.sdk27.coroutines.onLongClick
 import org.jetbrains.anko.toast
 import xdroid.toaster.Toaster
 import java.util.*
+import kotlin.random.Random
 
 class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Interface {
     private var isEdited = false
@@ -449,7 +450,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
             val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
             intent.data = Uri.parse(favoriteObject.link)
             intent.putExtra(keyTitle, favoriteObject.name)
-            intent.putExtra(keyAid, favoriteObject.aid)
+            //intent.putExtra(keyAid, favoriteObject.aid)
             intent.putExtra(keyImg, PatternUtil.getCover(favoriteObject.aid))
             intent.putExtra(keyFromFav, true)
             fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
@@ -481,6 +482,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         fun getSimpleIntent(context: Context, item: WEListItem): Intent {
             val intent = Intent(context, ActivityAnimeMaterial::class.java)
             intent.data = Uri.parse(item.link)
+            intent.action = "${Random.nextInt(1, 9000)}"
             intent.putExtra(keyTitle, item.title)
             intent.putExtra(keyAid, item.aid)
             intent.putExtra(keyImg, PatternUtil.getCover(item.aid))

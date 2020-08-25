@@ -28,7 +28,7 @@ import com.squareup.picasso.Callback
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
-import knf.kuma.animeinfo.fragments.ChaptersFragmentMaterial
+import knf.kuma.animeinfo.fragments.ChaptersFragment
 import knf.kuma.animeinfo.ktx.epTitle
 import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.animeinfo.ktx.filePath
@@ -232,7 +232,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     override fun onFinish(started: Boolean, success: Boolean) {
                                         fragment.lifecycleScope.launch(Dispatchers.Main) {
                                             if (started) {
-                                                holder.setQueue(withContext(Dispatchers.IO){ CacheDB.INSTANCE.queueDAO().isInQueue(chapter.chapter.eid) }, true)
+                                                holder.setQueue(withContext(Dispatchers.IO) { CacheDB.INSTANCE.queueDAO().isInQueue(chapter.chapter.eid) }, true)
                                                 chapter.chapter.fileWrapper().exist = true
                                             }
                                             setOrientation(false)
@@ -335,7 +335,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             R.id.share -> fragment.activity?.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
                                     .setType("text/plain")
                                     .putExtra(Intent.EXTRA_TEXT, chapter.chapter.epTitle + "\n" + chapter.chapter.link), "Compartir"))
-                            R.id.import_file -> (fragment as ChaptersFragmentMaterial).onMove(chapter.chapter.fileName)
+                            R.id.import_file -> (fragment as ChaptersFragment).onMove(chapter.chapter.fileName)
                             R.id.commentaries -> {
                                 fragment.lifecycleScope.launch(Dispatchers.Main) {
                                     try {

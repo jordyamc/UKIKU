@@ -26,6 +26,7 @@
 -keep @interface kotlin.coroutines.jvm.internal.DebugMetadata { *; }
 
 -keep class **$$TypeAdapter { *; }
+-keep class knf.kuma.pojos.AnimeObject.WebInfo.AnimeChapter {*;}
 
 -keepclasseswithmembernames class * {
     @com.tickaroo.tikxml.* <fields>;

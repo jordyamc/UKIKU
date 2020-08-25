@@ -53,7 +53,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.*
+import okhttp3.ConnectionSpec
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.json.JSONArray
 import org.json.JSONObject
@@ -63,7 +68,6 @@ import org.jsoup.nodes.Document
 import org.nield.kotlinstatistics.WeightedDice
 import xdroid.toaster.Toaster
 import java.io.File
-import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -247,13 +251,9 @@ fun <T : View> Activity.optionalBind(@IdRes res: Int): Lazy<T?> {
 fun Request.execute(followRedirects: Boolean = true): Response {
     return OkHttpClient().newBuilder().apply {
         followRedirects(followRedirects)
-        connectionSpecs(Collections.singletonList(ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
-                .tlsVersions(TlsVersion.TLS_1_2, TlsVersion.TLS_1_1, TlsVersion.TLS_1_0)
-                .cipherSuites(
-                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-                        CipherSuite.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA)
+        connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                .allEnabledTlsVersions()
+                .allEnabledCipherSuites()
                 .build()))
     }.build().newCall(this).execute()
 }
@@ -481,12 +481,12 @@ fun jsoupCookies(url: String?, followRedirects: Boolean = true): Connection =
 fun jsoupCookiesDir(url: String?, useCookies: Boolean): Connection =
         Jsoup.connect(url).apply {
             if (useCookies)
-                if (PrefsUtil.useDefaultUserAgent) {
+                if (PrefsUtil.useDefaultUserAgent && !PrefsUtil.alwaysGenerateUA) {
                     cookies(ConvertUtil.List2Map(PrefsUtil.dirCookies))
                 } else {
                     cookies(BypassUtil.getMapCookie(App.context))
                 }
-            if (PrefsUtil.useDefaultUserAgent)
+            if (PrefsUtil.useDefaultUserAgent && !PrefsUtil.alwaysGenerateUA)
                 userAgent(PrefsUtil.userAgentDir)
             else
                 userAgent(PrefsUtil.userAgent)
@@ -496,16 +496,16 @@ fun jsoupCookiesDir(url: String?, useCookies: Boolean): Connection =
 
 fun okHttpCookies(url: String, method: String = "GET"): Request = Request.Builder().apply {
     url(url)
-    method(method, if (method == "POST") RequestBody.create(MediaType.get("text/plain"), "") else null)
+    method(method, if (method == "POST") "".toRequestBody("text/plain".toMediaType()) else null)
     header("User-Agent", BypassUtil.userAgent)
     header("Cookie", BypassUtil.getStringCookie(App.context))
 }.build()
 
 fun okHttpDocument(url: String): Document = Jsoup.parse(okHttpCookies(url).execute(true).use {
     if (it.isSuccessful)
-        it.body()?.string()
+        it.body?.string()
     else
-        throw IllegalStateException("Response error Url: ${it.request().url()}, code: ${it.code()}")
+        throw IllegalStateException("Response error Url: ${it.request.url}, code: ${it.code}")
 })
 
 fun isHostValid(hostName: String): Boolean {

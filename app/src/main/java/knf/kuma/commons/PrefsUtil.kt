@@ -281,11 +281,11 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isFullAdsEnabled", value).apply()
 
     var fullAdsProbability: Float
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getFloat("fullAdsProbability", 50.0f)
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getFloat("fullAdsProbability", 70.0f)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat("fullAdsProbability", value).apply()
 
     var fullAdsExtraProbability: Float
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getFloat("fullAdsExtraProbability", 20.0f)
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getFloat("fullAdsExtraProbability", 50.0f)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat("fullAdsExtraProbability", value).apply()
 
     val designStyle: String

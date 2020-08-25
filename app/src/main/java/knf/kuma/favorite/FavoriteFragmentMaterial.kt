@@ -105,7 +105,9 @@ class FavoriteFragmentMaterial : BottomFragment(), FavsSectionAdapterMaterial.On
         if (PrefsUtil.layType == "1" || !PrefsUtil.isNativeAdsEnabled)
             lifecycleScope.launch(Dispatchers.IO) {
                 delay(1000)
-                view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.FAVORITE_BANNER, true)
+                noCrash {
+                    view.find<FrameLayout>(R.id.adContainer).implBanner(AdsType.FAVORITE_BANNER, true)
+                }
             }
         return view
     }

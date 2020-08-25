@@ -35,28 +35,27 @@ import org.jetbrains.anko.collections.forEachReversedWithIndex
 import xdroid.toaster.Toaster.toast
 
 object AdsUtilsMob {
-    val RECENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/7671520004"
-    val RECENT_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/9263803277"
-    val FAVORITE_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/3484862982"
-    val FAVORITE_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5919454637"
-    val DIRECTORY_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/3243144237"
-    val HOME_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5095281956"
-    val HOME_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/9925964473"
-    val EMISSION_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/8320211094"
-    val SEEING_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/2035387232"
-    val RECOMMEND_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/3304715801"
-    val QUEUE_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/6258182200"
-    val RECORD_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/9869042584"
-    val RANDOM_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/9263803277"
-    val NEWS_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/1562628412"
-    val INFO_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5488026017"
-    val ACHIEVEMENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/4233626428"
-    val EXPLORER_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/1041869769"
-    val CAST_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else "ca-app-pub-5390653757953587/5535283585"
-    val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-5390653757953587/5447863415" else "ca-app-pub-5390653757953587/5447863415"
-    val RECENT_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-5390653757953587/6356037160" else "ca-app-pub-5390653757953587/6356037160"
-    val REWARDED get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/5224354917" else "ca-app-pub-5390653757953587/5420761189"
-    val INTERSTITIAL get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else "ca-app-pub-5390653757953587/5880297311"
+    val RECENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.RECENT_BANNER
+    val RECENT_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.RECENT_BANNER2
+    val FAVORITE_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.FAVORITE_BANNER
+    val FAVORITE_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.FAVORITE_BANNER2
+    val DIRECTORY_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.DIRECTORY_BANNER
+    val HOME_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.HOME_BANNER
+    val HOME_BANNER2 get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.HOME_BANNER2
+    val EMISSION_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.EMISSION_BANNER
+    val SEEING_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.SEEING_BANNER
+    val RECOMMEND_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.RECOMMEND_BANNER
+    val QUEUE_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.QUEUE_BANNER
+    val RECORD_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.RECORD_BANNER
+    val RANDOM_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.RANDOM_BANNER
+    val NEWS_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.NEWS_BANNER
+    val INFO_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.INFO_BANNER
+    val ACHIEVEMENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.ACHIEVEMENT_BANNER
+    val EXPLORER_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.EXPLORER_BANNER
+    val CAST_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.CAST_BANNER
+    val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-5390653757953587/5447863415" else AdmobID.LIST_NATIVE
+    val REWARDED get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/5224354917" else AdmobID.REWARDED
+    val INTERSTITIAL get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else AdmobID.INTERSTITIAL
     val adRequest: AdRequest get() = AdRequest.Builder().build()
     val ACHIEVEMENT_NATIVE = "achievement_native"
 
@@ -385,3 +384,29 @@ class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenA
 }
 
 abstract class AbsAdListener : AdListener()
+
+object AdmobID {
+    private val useFallback = AdsUtils.remoteConfigs.getBoolean("admob_use_fallback")
+    val APP_ID get() = if (useFallback) "ca-app-pub-5390653757953587~3146487686" else "ca-app-pub-5390653757953587~9838518341"
+    val RECENT_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/7671520004"
+    val RECENT_BANNER2 get() = if (useFallback) "ca-app-pub-5390653757953587/1833406019" else "ca-app-pub-5390653757953587/9263803277"
+    val FAVORITE_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/3484862982"
+    val FAVORITE_BANNER2 get() = if (useFallback) "ca-app-pub-5390653757953587/1833406019" else "ca-app-pub-5390653757953587/5919454637"
+    val DIRECTORY_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/3243144237"
+    val HOME_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/5095281956"
+    val HOME_BANNER2 get() = if (useFallback) "ca-app-pub-5390653757953587/1833406019" else "ca-app-pub-5390653757953587/9925964473"
+    val EMISSION_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/8320211094"
+    val SEEING_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/2035387232"
+    val RECOMMEND_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/3304715801"
+    val QUEUE_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/6258182200"
+    val RECORD_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/9869042584"
+    val RANDOM_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/9263803277"
+    val NEWS_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/1562628412"
+    val INFO_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/5488026017"
+    val ACHIEVEMENT_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/4233626428"
+    val EXPLORER_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/1041869769"
+    val CAST_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/5535283585"
+    val LIST_NATIVE get() = if (useFallback) "ca-app-pub-5390653757953587/6115625326" else "ca-app-pub-5390653757953587/5447863415"
+    val REWARDED get() = if (useFallback) "ca-app-pub-5390653757953587/9902649482" else "ca-app-pub-5390653757953587/5420761189"
+    val INTERSTITIAL get() = if (useFallback) "ca-app-pub-5390653757953587/7928041071" else "ca-app-pub-5390653757953587/5880297311"
+}

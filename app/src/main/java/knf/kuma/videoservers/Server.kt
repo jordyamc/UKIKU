@@ -2,6 +2,7 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import android.util.Log
+import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.*
@@ -32,7 +33,12 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .followRedirects(true)
-                .followSslRedirects(true).build()
+                .followSslRedirects(true)
+                .connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .allEnabledTlsVersions()
+                        .allEnabledCipherSuites()
+                        .build()))
+                .build()
         for (option in ArrayList(videoServer.options))
             try {
                 val request = Request.Builder()
@@ -42,10 +48,10 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                         request.addHeader(pair.first, pair.second)
                 val response = client.newCall(request.build()).execute()
                 if (!response.isSuccessful) {
-                    Log.e("Remove Option", "Server: " + option.server + "\nUrl: " + option.url + "\nCode: " + response.code())
+                    Log.e("Remove Option", "Server: " + option.server + "\nUrl: " + option.url + "\nCode: " + response.code)
                     videoServer.options.remove(option)
                 }
-                if (response.body() != null)
+                if (response.body != null)
                     response.close()
             } catch (e: Exception) {
                 e.printStackTrace()

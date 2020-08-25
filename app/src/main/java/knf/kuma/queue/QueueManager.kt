@@ -79,6 +79,15 @@ object QueueManager {
         CacheDB.INSTANCE.queueDAO().removeByID(aid)
     }
 
+    fun nuke() {
+        doAsync {
+            CacheDB.INSTANCE.queueDAO().nuke()
+            syncData {
+                queue()
+            }
+        }
+    }
+
     internal fun startQueue(context: Context, list: List<QueueObject>) {
         if (list.isNotEmpty()) {
             AchievementManager.onPlayQueue(list.size)

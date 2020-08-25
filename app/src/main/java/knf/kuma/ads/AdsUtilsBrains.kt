@@ -3,6 +3,8 @@ package knf.kuma.ads
 import android.content.Context
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.appbrain.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
@@ -17,6 +19,9 @@ import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
 object AdsUtilsBrains {
@@ -216,5 +221,57 @@ class FAdLoaderBrains(private val context: Context, onUpdate: () -> Unit) : Full
             Toaster.toast("Anuncios bloqueados por host")
         else
             builder.show(context)
+    }
+}
+
+class FAdLoaderInterstitialLazyBrains(val context: AppCompatActivity) : FullscreenAdLoader {
+    var isAdClicked = false
+
+    private val builder: InterstitialBuilder by lazy {
+        InterstitialBuilder.create().apply {
+            adId = AdId.DEFAULT
+            setOnDoneCallback { builder.preload(context) }
+            listener = object : InterstitialListener {
+                override fun onClick() {
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_clicked", Bundle())
+                    isAdClicked = true
+                }
+
+                override fun onDismissed(p0: Boolean) {
+                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
+                    Economy.reward(isAdClicked)
+                }
+
+                override fun onAdFailedToLoad(p0: InterstitialListener.InterstitialError?) {
+                }
+
+                override fun onPresented() {
+                }
+
+                override fun onAdLoaded() {
+                }
+            }
+        }
+    }
+
+    init {
+        load()
+    }
+
+    override fun load() {
+        builder.preload(context)
+    }
+
+    override fun show() {
+        if (Network.isAdsBlocked)
+            Toaster.toast("Anuncios bloqueados por host")
+        else
+            context.lifecycleScope.launch(Dispatchers.Main) {
+                var tryCount = 11
+                while (!builder.show(context)) {
+                    delay(250)
+                    tryCount--
+                }
+            }
     }
 }

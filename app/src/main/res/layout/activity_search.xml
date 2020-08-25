@@ -26,7 +26,9 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:hint="Buscar animes"
-                    android:lines="1" />
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true" />
             </androidx.appcompat.widget.Toolbar>
             <View
                 android:layout_width="match_parent"

@@ -1,8 +1,9 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import com.evgenii.jsevaluator.JsEvaluator
-import com.evgenii.jsevaluator.interfaces.JsCallback
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
@@ -22,37 +23,41 @@ class ZippyServer(context: Context, baseLink: String) : Server(context, baseLink
         get() {
             return try {
                 val decoded = URLDecoder.decode(baseLink, "utf-8")
-                val zi = Jsoup.connect(decoded).timeout(TIMEOUT).get()
-                val file = zi.select("meta[property=og:title]").attr("content")
-                val scripts = zi.select("script[type]:not([src],[data-cfasync])")
-                var evalData: String? = null
-                scripts.forEach { element ->
-                    element.dataNodes().forEach {
-                        if (it.wholeData.contains("document.getElementById('dlbutton')"))
-                            evalData = "\\(([\\d %+/\\-*]+)\\)".toRegex().find(it.wholeData)?.destructured?.component1()
-                    }
-                }
-                evalData ?: return null
                 val linkData: String? = runBlocking(Dispatchers.Main) {
-                    suspendCoroutine<String?> {
-                        JsEvaluator(context).evaluate(evalData, object : JsCallback {
-                            override fun onResult(p0: String?) {
-                                it.resume(p0)
+                    suspendCoroutine {
+                        WebView(context).apply {
+                            settings.apply {
+                                javaScriptEnabled = true
                             }
-
-                            override fun onError(p0: String?) {
-                                it.resume(null)
+                            addJavascriptInterface(object : ZippyJSInterface() {
+                                @JavascriptInterface
+                                override fun printHtml(string: String) {
+                                    val result = Jsoup.parse(string).select("a#dlbutton").attr("href")
+                                    it.resume(if (result.isBlank()) null else decoded.substringBefore("/v/") + result)
+                                }
+                            }, "HtmlViewer")
+                            webViewClient = object : WebViewClient() {
+                                override fun onPageFinished(view: WebView?, url: String?) {
+                                    loadUrl("javascript:window.HtmlViewer.printHtml" +
+                                            "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');")
+                                }
                             }
-                        })
+                            loadUrl(decoded)
+                        }
                     }
                 }
                 linkData ?: return null
-                val link = decoded.replace("/v/", "/d/").replace("file.html", "$linkData/$file")
-                VideoServer(name, Option(name, null, link))
+                VideoServer(name, Option(name, null, linkData))
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
             }
 
         }
+
+    abstract class ZippyJSInterface {
+        @JavascriptInterface
+        open fun printHtml(string: String) {
+        }
+    }
 }

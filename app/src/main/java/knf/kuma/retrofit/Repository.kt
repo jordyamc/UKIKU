@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.commons.*
 import knf.kuma.custom.BackgroundExecutor
@@ -19,8 +18,6 @@ import knf.kuma.pojos.Recents
 import knf.kuma.recents.RecentsPage
 import knf.kuma.search.SearchCompactDataSource
 import knf.kuma.search.SearchObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
 import retrofit2.Call
@@ -39,7 +36,8 @@ class Repository {
 
     fun reloadRecents() {
         if (Network.isConnected) {
-            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(object : Callback<Recents> {
+            var tryCount = 0
+            val callback = object : Callback<Recents> {
                 override fun onResponse(call: Call<Recents>, response: Response<Recents>) {
                     try {
                         if (response.isSuccessful) {
@@ -53,20 +51,24 @@ class Repository {
                         e.printStackTrace()
                         onFailure(call, e)
                     }
-
                 }
 
                 override fun onFailure(call: Call<Recents>, t: Throwable) {
                     t.printStackTrace()
-                    FirebaseCrashlytics.getInstance().recordException(t)
+                    if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
+                        tryCount++
+                        getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(this)
+                    }
                 }
-            })
+            }
+            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(callback)
         }
     }
 
     fun reloadRecentModels() {
         if (Network.isConnected) {
-            getFactoryBack("https://animeflv.net/").getRecentModels(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(object : Callback<RecentsPage> {
+            var tryCount = 0
+            val callback = object : Callback<RecentsPage> {
                 override fun onResponse(call: Call<RecentsPage>, response: Response<RecentsPage>) {
                     try {
                         if (response.isSuccessful) {
@@ -87,57 +89,61 @@ class Repository {
 
                 override fun onFailure(call: Call<RecentsPage>, t: Throwable) {
                     t.printStackTrace()
-                    FirebaseCrashlytics.getInstance().recordException(t)
+                    if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
+                        tryCount++
+                        getFactoryBack("https://animeflv.net/").getRecentModels(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(this)
+                    }
                 }
-            })
+            }
+            getFactoryBack("https://animeflv.net/").getRecentModels(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(callback)
         }
     }
 
-    fun getAnime(context: Context, link: String, persist: Boolean): LiveData<AnimeObject?> {
-        return getAnime(context, link, persist, MutableLiveData())
-    }
-
-    fun getAnime(context: Context, link: String, persist: Boolean, data: MutableLiveData<AnimeObject?>): LiveData<AnimeObject?> {
+    fun getAnime(context: Context, link: String, persist: Boolean, data: MutableLiveData<AnimeObject?> = MutableLiveData()): LiveData<AnimeObject?> {
         doAsync {
             var cacheUsed = false
             try {
                 val base = link.substring(0, link.lastIndexOf("/") + 1)
                 val rest = link.substring(link.lastIndexOf("/") + 1)
                 val dao = CacheDB.INSTANCE.animeDAO()
-                dao.getAnimeRaw(link)?.let {
-                    if (it.checkIntegrity()) {
-                        cacheUsed = true
-                        doOnUI {
-                            data.value = it
-                        }
+                val dbLink = "%/${link.substringAfterLast("/")}"
+                dao.getAnimeRaw(dbLink)?.let {
+                    cacheUsed = true
+                    doOnUI {
+                        data.value = it
                     }
                 }
-                if (Network.isConnected)
-                    getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(object : Callback<AnimeObject.WebInfo> {
+                if (Network.isConnected) {
+                    var tryCount = 0
+                    val callback = object : Callback<AnimeObject.WebInfo> {
                         override fun onResponse(call: Call<AnimeObject.WebInfo>, response: Response<AnimeObject.WebInfo>) {
                             try {
                                 if (response.body() == null || response.code() != 200) {
-                                    if (!cacheUsed) data.value = null
-                                    return
-                                }
-                                doAsync {
-                                    val animeObject = AnimeObject(link, response.body())
-                                    if (persist)
-                                        dao.insert(animeObject)
-                                    doOnUI { data.value = animeObject }
-                                }
+                                    onFailure(call, Exception("HTTP " + response.code()))
+                                } else
+                                    doAsync {
+                                        val animeObject = AnimeObject(link, response.body())
+                                        if (persist)
+                                            dao.insert(animeObject)
+                                        doOnUI { data.value = animeObject }
+                                    }
                             } catch (e: Exception) {
                                 e.printStackTrace()
-                                if (!cacheUsed) data.value = null
+                                onFailure(call, e)
                             }
                         }
 
                         override fun onFailure(call: Call<AnimeObject.WebInfo>, t: Throwable) {
                             t.printStackTrace()
-                            doOnUI { data.value = withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getAnimeRaw(link) } }
+                            if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
+                                tryCount++
+                                getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(this)
+                            } else
+                                if (!cacheUsed) data.value = null
                         }
-                    })
-                else if (!cacheUsed)
+                    }
+                    getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(callback)
+                } else if (!cacheUsed)
                     doOnUI { data.value = null }
             } catch (e: Exception) {
                 e.printStackTrace()

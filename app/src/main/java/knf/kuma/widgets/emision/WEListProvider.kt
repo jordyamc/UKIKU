@@ -1,5 +1,6 @@
 package knf.kuma.widgets.emision
 
+import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Color
 import android.widget.RemoteViews
@@ -11,14 +12,12 @@ import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import xdroid.toaster.Toaster
 import java.util.*
 import kotlin.collections.LinkedHashSet
 
 class WEListProvider internal constructor(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
-    private val items = ArrayList<WEListItem>()
+    private val items = mutableListOf<WEListItem>()
 
     private val actualDayCode: Int
         get() {
@@ -34,17 +33,11 @@ class WEListProvider internal constructor(private val context: Context) : Remote
             }
         }
 
-    init {
-        populateListItem()
-    }
-
     private fun populateListItem() {
-        GlobalScope.launch(Dispatchers.IO) {
-            items.clear()
-            val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context))
-            for (obj in list) {
-                items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, PatternUtil.getCover(obj.aid)))
-            }
+        items.clear()
+        val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context))
+        for (obj in list) {
+            items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, PatternUtil.getCover(obj.aid)))
         }
     }
 
@@ -75,10 +68,11 @@ class WEListProvider internal constructor(private val context: Context) : Remote
                 ActivityAnimeMaterial.getSimpleIntent(context, listItem)
             else
                 ActivityAnime.getSimpleIntent(context, listItem)
-            remoteView.setOnClickFillInIntent(R.id.linear, clickIntent)
+            remoteView.setOnClickPendingIntent(R.id.linear, PendingIntent.getActivity(context, 324 + position, clickIntent, 0))
             remoteView.setInt(R.id.linear, "setBackgroundColor", getColor(false))
         } catch (e: Exception) {
             e.printStackTrace()
+            Toaster.toastLong("Error: ${e.message}")
         }
 
         return remoteView

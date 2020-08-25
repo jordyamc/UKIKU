@@ -49,6 +49,7 @@ object AdsUtils {
                 "appbrains_enabled" to false,
                 "startapp_enabled" to false,
                 "appodeal_enabled" to false,
+                "admob_use_fallback" to false,
                 "ads_forced" to false,
                 "admob_percent" to 100.0,
                 "appodeal_percent" to 0.0,
@@ -72,6 +73,8 @@ object AdsUtils {
             }
         }
     }
+
+    val isAdmobEnabled = remoteConfigs.getBoolean("admob_enabled")
 }
 
 fun MutableList<RecentObject>.implAdsRecent() {
@@ -171,7 +174,7 @@ fun getFAdLoaderInterstitial(context: Activity, onUpdate: () -> Unit = {}): Full
         }
 
 fun showRandomInterstitial(context: AppCompatActivity, probability: Float = PrefsUtil.fullAdsProbability) {
-    if (PrefsUtil.isAdsEnabled && PrefsUtil.isFullAdsEnabled && probability > 0) {
+    if (PrefsUtil.isAdsEnabled && AdsUtils.isAdmobEnabled && PrefsUtil.isFullAdsEnabled && probability > 0) {
         val probDefault = 100f - probability
         diceOf<() -> Unit> {
             put({ FAdLoaderInterstitialLazyMob(context).show() }, probability.toDouble())
@@ -189,7 +192,7 @@ fun getAdSize(width: Float): AdSize {
     }
 
     val adWidth = (adWidthPixels / density).toInt()
-    return AdSize.getCurrentOrientationBannerAdSizeWithWidth(App.context, adWidth)
+    return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(App.context, adWidth)
 
 }
 

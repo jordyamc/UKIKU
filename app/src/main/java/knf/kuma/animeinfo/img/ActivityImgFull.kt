@@ -34,9 +34,9 @@ class ActivityImgFull : GenericActivity() {
                     val response = Request.Builder()
                             .url("https://api.jikan.moe/v3/search/anime?q=${URLEncoder.encode(title, "utf-8")}&page=1")
                             .build().execute()
-                    if (response.code() != 200)
-                        throw IllegalStateException("Response code: ${response.code()}")
-                    val results = JSONObject(response.body()?.string()
+                    if (response.code != 200)
+                        throw IllegalStateException("Response code: ${response.code}")
+                    val results = JSONObject(response.body?.string()
                             ?: "{}").getJSONArray("results")
                     response.close()
                     for (i in 0 until results.length()) {
@@ -47,9 +47,9 @@ class ActivityImgFull : GenericActivity() {
                             list.add(json.getString("image_url"))
                             try {
                                 val picturesResponse = Request.Builder().url("https://api.jikan.moe/v3/anime/${json.getString("mal_id")}/pictures").build().execute()
-                                if (picturesResponse.code() != 200)
-                                    throw IllegalStateException("Response code: ${picturesResponse.code()}")
-                                val picturesArray = JSONObject(picturesResponse.body()?.string()
+                                if (picturesResponse.code != 200)
+                                    throw IllegalStateException("Response code: ${picturesResponse.code}")
+                                val picturesArray = JSONObject(picturesResponse.body?.string()
                                         ?: "{}").getJSONArray("pictures")
                                 picturesResponse.close()
                                 for (item in picturesArray) {

@@ -13,6 +13,7 @@ import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.noCrashSuspend
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import knf.kuma.pojos.RecentObject
@@ -107,10 +108,12 @@ class HomeFragmentMaterial : BottomFragment() {
         }
         listRecommendedStaff.setAdapter(SearchAdapterMaterial(this))
         lifecycleScope.launch(Dispatchers.IO) {
-            delay(1000)
-            adContainer.implBanner(AdsType.RECENT_BANNER, true)
-            delay(500)
-            adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
+            noCrashSuspend {
+                delay(1000)
+                adContainer.implBanner(AdsType.RECENT_BANNER, true)
+                delay(500)
+                adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
+            }
         }
     }
 

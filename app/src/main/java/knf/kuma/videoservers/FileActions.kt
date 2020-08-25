@@ -129,6 +129,11 @@ object FileActions {
             callback.call(CallbackState.OPERATION_RUNNING)
             return
         }
+        if (!Network.isConnected) {
+            Toaster.toast("No hay internet")
+            callback.call(CallbackState.UNEXPECTED_ERROR)
+            return
+        }
         owner.lifecycleScope.launch(Dispatchers.Main) {
             val result = checkPreconditions(context, type == Type.DOWNLOAD)
             if (result != null) {
@@ -442,22 +447,24 @@ object FileActions {
     private fun startDownload(actionRequest: ActionRequest, option: Option) {
         if (BuildConfig.DEBUG) Log.e("Download " + option.server, "${option.url}")
         actionRequest.downloadObject.server = option.server ?: ""
-        if (actionRequest.item is AnimeObject.WebInfo.AnimeChapter && actionRequest.downloadObject.addQueue && !CacheDB.INSTANCE.queueDAO().isInQueue(actionRequest.item.eid ?: "0")) {
-            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(actionRequest.item.fileName)), true, actionRequest.item))
-            syncData { queue() }
-        }
-        actionRequest.downloadObject.link = option.url
-        actionRequest.downloadObject.headers = option.headers
-        if (PrefsUtil.downloaderType == 0) {
-            CacheDB.INSTANCE.downloadsDAO().insert(actionRequest.downloadObject)
-            actionRequest.context.service(Intent(App.context, DownloadService::class.java).putExtra("eid", actionRequest.downloadObject.eid).setData(Uri.parse(option.url)))
-            reset()
-            actionRequest.callback.call(CallbackState.START_DOWNLOAD, true)
-        } else
-            actionRequest.owner.lifecycleScope.launch(Dispatchers.IO) {
+        actionRequest.owner.lifecycleScope.launch(Dispatchers.IO) {
+            if (actionRequest.item is AnimeObject.WebInfo.AnimeChapter && actionRequest.downloadObject.addQueue && !CacheDB.INSTANCE.queueDAO().isInQueue(actionRequest.item.eid
+                            ?: "0")) {
+                CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(actionRequest.item.fileName)), true, actionRequest.item))
+                syncData { queue() }
+            }
+            actionRequest.downloadObject.link = option.url
+            actionRequest.downloadObject.headers = option.headers
+            if (PrefsUtil.downloaderType == 0) {
+                CacheDB.INSTANCE.downloadsDAO().insert(actionRequest.downloadObject)
+                actionRequest.context.service(Intent(App.context, DownloadService::class.java).putExtra("eid", actionRequest.downloadObject.eid).setData(Uri.parse(option.url)))
+                reset()
+                actionRequest.callback.call(CallbackState.START_DOWNLOAD, true)
+            } else {
                 reset()
                 actionRequest.callback.call(CallbackState.START_DOWNLOAD, DownloadManager.start(actionRequest.downloadObject))
             }
+        }
     }
 
     fun startPlay(context: Context, title: String, file_name: String) {

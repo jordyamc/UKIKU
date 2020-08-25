@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="171" version="5.1.2">
+        <change type="change">Descargar directorio para aligerar carga</change>
+        <change type="fix">Errores al abrir informacion de anime</change>
+        <change type="fix">Errores generales</change>
+    </release>
     <release code="170" version="5.1.1">
         <change type="fix">Errores generales</change>
     </release>

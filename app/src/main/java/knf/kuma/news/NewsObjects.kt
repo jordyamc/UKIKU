@@ -53,18 +53,18 @@ class NewsPage {
     var newsList: List<NewsItem> = emptyList()
 }
 
-class NewsDataSource(private val newsFactory: NewsFactory, val category: String, val onInit: (isEmpty: Boolean) -> Unit) : PageKeyedDataSource<Int, NewsItem>() {
+class NewsDataSource(private val newsFactory: NewsFactory, val category: String, val onInit: (isEmpty: Boolean, cause: String?) -> Unit) : PageKeyedDataSource<Int, NewsItem>() {
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, NewsItem>) {
         newsFactory.getNewsPage(category, 1).enqueue(object : Callback<NewsPage> {
             override fun onFailure(call: Call<NewsPage>, t: Throwable) {
-                onInit(true)
+                onInit(true, t.message)
             }
 
             override fun onResponse(call: Call<NewsPage>, response: Response<NewsPage>) {
                 response.body()?.let {
                     callback.onResult(it.newsList, null, 2)
-                    onInit(false)
-                } ?: onInit(true)
+                    onInit(false, null)
+                } ?: onInit(true, "Empty body")
             }
         })
     }
@@ -93,8 +93,8 @@ interface NewsFactory {
 }
 
 object NewsRepository {
-    fun getNews(category: String, onInit: (isEmpty: Boolean) -> Unit): PagedList<NewsItem> {
-        return PagedList.Builder<Int, NewsItem>(NewsDataSource(getFactory(), category, onInit), 12).apply {
+    fun getNews(category: String, onInit: (isEmpty: Boolean, cause: String?) -> Unit): PagedList<NewsItem> {
+        return PagedList.Builder(NewsDataSource(getFactory(), category, onInit), 12).apply {
             setFetchExecutor(BackgroundExecutor())
             setNotifyExecutor(MainExecutor())
         }.build()

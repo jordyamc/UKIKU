@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import knf.kuma.BottomFragment
 import knf.kuma.R
@@ -31,7 +30,7 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.dbLiveData.observe(viewLifecycleOwner, Observer { objects ->
+        viewModel.dbLiveData.observe(viewLifecycleOwner, { objects ->
             holder?.setError(objects.isEmpty())
             holder?.setRefreshing(false)
             adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }

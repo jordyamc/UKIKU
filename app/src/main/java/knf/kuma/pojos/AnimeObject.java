@@ -50,36 +50,46 @@ import pl.droidsonroids.jspoon.annotation.Selector;
 @TypeConverters(AnimeObject.Converter.class)
 public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     @PrimaryKey
+    @SerializedName("key")
     public int key;
+    @SerializedName("link")
     public String link;
+    @SerializedName("sid")
     public String sid;
+    @SerializedName("name")
     public String name;
+    @SerializedName("fileName")
     public String fileName;
     @Embedded
+    @SerializedName("webInfo")
     public WebInfo webInfo;
     @Ignore
     @NonNull
-    public String aid = "";
+    public transient String aid = "";
     @Ignore
-    public String img;
+    public transient String img;
     @Ignore
-    public String description;
+    public transient String description;
+    @SerializedName("type")
     public String type;
+    @SerializedName("state")
     public String state;
+    @SerializedName("day")
     public Day day;
     @Ignore
-    public String followers;
+    public transient String followers;
     @Ignore
-    public String rate_stars;
+    public transient String rate_stars;
     @Ignore
-    public String rate_count;
+    public transient String rate_count;
     @Ignore
-    public List<String> genres;
+    public transient List<String> genres;
     @Ignore
-    public List<WebInfo.AnimeRelated> related;
+    public transient List<WebInfo.AnimeRelated> related;
+    @SerializedName("chapters")
     public List<WebInfo.AnimeChapter> chapters;
     @Ignore
-    public IconCompat icon;
+    public transient IconCompat icon;
 
     @Ignore
     public AnimeObject() {
@@ -97,6 +107,19 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         this.state = state;
         this.day = day;
         populate(webInfo);
+    }
+
+    @Ignore
+    public AnimeObject(int key, String link, String sid, String name, String fileName, String type, String state, Day day, List<WebInfo.AnimeChapter> chapters) {
+        this.key = key;
+        this.link = link;
+        this.sid = sid;
+        this.name = name;
+        this.fileName = fileName;
+        this.type = type;
+        this.state = state;
+        this.day = day;
+        this.chapters = chapters;
     }
 
     @Ignore
@@ -249,46 +272,62 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
     public static class WebInfo {
         @Selector(value = "div.Image img[src]", attr = "src", format = "/(\\d+)[/.]")
+        @SerializedName("aid")
         public String aid;
         @Selector(value = "meta[property='og:title']", attr = "content", format = "^ ?V?e?r? ?A?n?i?m?e? ?(.+ ?O?n?l?i?n?e?) Online", defValue = "Error")
         @ColumnInfo(name = "web_name")
+        @SerializedName("web_name")
         public String name;
         @Selector(value = "div.Image img[src]", attr = "src")
+        @SerializedName("img")
         public String img;
         @Selector(value = "div.Description", defValue = "Sin descripcion")
+        @SerializedName("description")
         public String description;
         @Selector(value = "span[class^=Type]", attr = "class", defValue = "Desconocido")
         @ColumnInfo(name = "web_type")
+        @SerializedName("web_type")
         public String type;
         @Selector(value = "aside.SidebarA.BFixed p", attr = "class", defValue = "Desconocido")
         @ColumnInfo(name = "web_state")
+        @SerializedName("web_state")
         public String state;
         @Selector(value = "div.Title:contains(Seguidores) span", defValue = "0")
+        @SerializedName("followers")
         public String followers = "0";
         @Selector(value = "span.vtprmd", defValue = "0.0")
+        @SerializedName("rate_starts")
         public String rate_stars;
         @Selector(value = "span#votes_nmbr", defValue = "0")
+        @SerializedName("rate_count")
         public String rate_count;
         @Selector(value = "span.Date.fa-calendar", converter = DayConverter.class)
+        @SerializedName("emissionDay")
         public Day emisionDay;
         @Selector("nav.Nvgnrs a[href]")
+        @SerializedName("genres")
         public List<String> genres = new ArrayList<>();
         @Selector("ul.ListAnmRel li:has(a[href~=^\\/[a-z]+\\/.+$])")
+        @SerializedName("related")
         public List<AnimeRelated> related = new ArrayList<>();
         @Ignore
         @Selector("script:not([src])")
-        List<Element> scripts;
+        transient List<Element> scripts;
         /*@Selector("ul.ListCaps li,ul.ListEpisodes li,ul#episodeList li")
         public List<Element> chapters = new ArrayList<>();*/
 
         public static class AnimeRelated {
             @Selector(value = "a", attr = "href")
+            @SerializedName("link")
             public String link;
             @Selector(value = "a", converter = AidGetter.class)
+            @SerializedName("aid")
             public String aid;
             @Selector("a")
+            @SerializedName("name")
             public String name;
             @Selector(value = "li", format = "\\((.*)\\)")
+            @SerializedName("relation")
             public String relation;
 
             public static class AidGetter implements ElementConverter<String> {
@@ -309,6 +348,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         }
 
         @Entity
+        @Keep
         public static class AnimeChapter implements Comparable<AnimeChapter>, Serializable {
             @SerializedName("chapter_key")
             @PrimaryKey

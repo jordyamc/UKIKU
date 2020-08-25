@@ -13,45 +13,54 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <RelativeLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/img"
-            android:layout_width="match_parent"
-            android:layout_height="149dp"
-            android:scaleType="centerCrop"
-            android:transitionName="img"
-            app:shapeAppearanceOverlay="@style/roundedCorners"/>
-
-        <knf.kuma.custom.HiddenOverlay
-            android:id="@+id/hidden"
-            android:layout_width="match_parent"
-            android:layout_height="149dp"
-            android:visibility="gone"/>
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        app:cardElevation="0dp"
+        app:shapeAppearanceOverlay="@style/roundedCorners">
 
         <RelativeLayout
-            android:id="@+id/heart"
             android:layout_width="match_parent"
-            android:layout_height="149dp"
-            android:background="@drawable/circular_shade"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:layout_height="149dp">
 
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="4dp"
-                app:srcCompat="@drawable/heart_full"
-                app:tint="?colorAccent" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/img"
+                android:layout_width="match_parent"
+                android:layout_height="149dp"
+                android:scaleType="centerCrop"
+                android:transitionName="img"
+                app:shapeAppearanceOverlay="@style/roundedCorners" />
+
+            <knf.kuma.custom.HiddenOverlay
+                android:id="@+id/hidden"
+                android:layout_width="match_parent"
+                android:layout_height="149dp"
+                android:visibility="gone" />
+
+            <RelativeLayout
+                android:id="@+id/heart"
+                android:layout_width="match_parent"
+                android:layout_height="149dp"
+                android:background="@drawable/circular_shade"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="4dp"
+                    app:srcCompat="@drawable/heart_full"
+                    app:tint="?colorAccent" />
+            </RelativeLayout>
         </RelativeLayout>
-    </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/title"

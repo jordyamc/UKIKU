@@ -36,6 +36,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.AdsUtilsMob
@@ -61,6 +63,7 @@ import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.news.MaterialNewsActivity
+import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.migrateSeen
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.preferences.BottomPreferencesMaterialFragment
@@ -89,7 +92,9 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
+import java.io.File
 import java.net.HttpCookie
+import java.net.URL
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -173,11 +178,35 @@ class MainMaterial : GenericActivity(),
             RecentsNotReceiver.removeAll(this@MainMaterial)
             EAHelper.clear1()
             verifiyFF()
+            //saveDir()
+        }
+    }
+
+    private fun saveDir() {
+        val lists = CacheDB.INSTANCE.animeDAO().all.chunked(500)
+        var number = 0
+        lists.forEach { list ->
+            val file = File(getExternalFilesDir(null), "directory$number.json")
+            if (!file.exists()) {
+                file.createNewFile()
+                file.writeText(Gson().toJson(list))
+            }
+            number++
         }
     }
 
     private suspend fun checkDirectoryState() {
-        if (PrefsUtil.useDefaultUserAgent){
+        if (CacheDB.INSTANCE.animeDAO().count < 3200) {
+            noCrash {
+                for (index in 0..6) {
+                    val json = URL("https://ukiku.ga/dirs/directory$index.json").readText()
+                    val list: List<AnimeObject> = Gson().fromJson(json, object : TypeToken<List<AnimeObject>>() {}.type)
+                    CacheDB.INSTANCE.animeDAO().insertAll(list)
+                }
+                PrefsUtil.isDirectoryFinished = true
+            }
+        }
+        if (PrefsUtil.useDefaultUserAgent) {
             val isBrowserOk = noCrashLet(false) {
                 jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
                 true
@@ -186,7 +215,7 @@ class MainMaterial : GenericActivity(),
                 val randomUA = randomUA()
                 PrefsUtil.userAgentDir = randomUA
                 suspendCoroutine<Boolean> {
-                    lifecycleScope.launch(Dispatchers.Main){
+                    lifecycleScope.launch(Dispatchers.Main) {
                         noCrash {
                             Cloudflare(this@MainMaterial, "https://animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
                                 setCfCallback(object : CfCallback {
@@ -279,7 +308,7 @@ class MainMaterial : GenericActivity(),
                 PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean)
-                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO){ CacheDB.INSTANCE.favsDAO().count } }
+                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().count } }
                         else
                             badgeView?.hide(false)
                     }
@@ -359,11 +388,11 @@ class MainMaterial : GenericActivity(),
                     title(text = "Actualización")
                     if (n_code.toInt() > AdsUtils.remoteConfigs.getLong("min_version").toInt()) {
                         message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
-                        positiveButton(text = "si") { UpdateActivity.start(this@MainMaterial,true) }
+                        positiveButton(text = "si") { UpdateActivity.start(this@MainMaterial, true) }
                         negativeButton(text = "despues")
-                    }else {
+                    } else {
                         message(text = "Parece que la versión $n_code está disponible, es obligatoria")
-                        positiveButton(text = "actualizar") { UpdateActivity.start(this@MainMaterial,false) }
+                        positiveButton(text = "actualizar") { UpdateActivity.start(this@MainMaterial, false) }
                         cancelable(false)
                     }
                 }

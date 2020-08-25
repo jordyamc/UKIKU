@@ -15,16 +15,14 @@ import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import com.google.android.material.snackbar.Snackbar
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.ads.showRandomInterstitial
-import knf.kuma.commons.EAHelper
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.asPx
-import knf.kuma.commons.setSurfaceBars
+import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.activity_news.*
+import kotlinx.android.synthetic.main.activity_news_material.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,6 +30,7 @@ import kotlinx.coroutines.launch
 class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val model: NewsViewModel by viewModels()
     val adapter: MaterialNewsAdapter by lazy { MaterialNewsAdapter(this) }
+    var snack: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
@@ -57,15 +56,23 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
     }
 
     private fun loadList() {
-        adapter.submitList(NewsRepository.getNews(getCategory()) {
-            if (it) {
-                error.visibility = View.VISIBLE
-            } else {
-                error.visibility = View.GONE
-                recycler.scheduleLayoutAnimation()
-            }
-            runOnUiThread { refresh.isRefreshing = false }
-        })
+        snack?.dismiss()
+        if (Network.isConnected)
+            adapter.submitList(NewsRepository.getNews(getCategory()) { isEmpty, cause ->
+                if (isEmpty) {
+                    error.visibility = View.VISIBLE
+                    snack = recycler.showSnackbar("Error al cargar noticias: $cause", Snackbar.LENGTH_INDEFINITE, "reintentar") {
+                        loadList()
+                    }
+                } else {
+                    error.visibility = View.GONE
+                    recycler.scheduleLayoutAnimation()
+                }
+                runOnUiThread { refresh.isRefreshing = false }
+            })
+        else {
+            snack = recycler.showSnackbar("Sin internet", Snackbar.LENGTH_INDEFINITE)
+        }
     }
 
     private fun getCategory(): String {
@@ -92,7 +99,7 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        MaterialDialog(this,BottomSheet(LayoutMode.WRAP_CONTENT)).show {
+        MaterialDialog(this, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             lifecycleOwner(this@MaterialNewsActivity)
             title(text = "Filtros")
             listItemsSingleChoice(items = model.filtersList, initialSelection = model.selectedFilter, waitForPositiveButton = false) { _, index, _ ->

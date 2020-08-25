@@ -1,5 +1,6 @@
 package knf.kuma.commons
 
+import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import java.security.cert.CertificateException
 import java.util.concurrent.TimeUnit
@@ -41,7 +42,11 @@ object NoSSLOkHttpClient {
                 connectTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 readTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-                hostnameVerifier { hostName, _ -> /*isHostValid(hostName)*/ true }
+                hostnameVerifier { _, _ -> /*isHostValid(hostName)*/ true }
+                connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .allEnabledTlsVersions()
+                        .allEnabledCipherSuites()
+                        .build()))
             }
             return builder.build()
         } catch (e: Exception) {

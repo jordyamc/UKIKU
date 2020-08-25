@@ -16,66 +16,75 @@
     android:paddingEnd="11dp"
     android:paddingBottom="8dp">
 
-    <RelativeLayout
-        android:layout_width="85dp"
-        android:layout_height="85dp">
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        app:cardElevation="0dp"
+        app:shapeAppearanceOverlay="@style/roundedCorners">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/image"
+        <RelativeLayout
             android:layout_width="85dp"
-            android:layout_height="85dp"
-            android:scaleType="centerCrop"
-            app:shapeAppearanceOverlay="@style/roundedCorners"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+            android:layout_height="85dp">
 
-        <RelativeLayout
-            android:id="@+id/layDownloading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:visibility="gone"
-            android:background="#59000000"
-            tools:visibility="visible">
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/image"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/roundedCorners"
+                tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-            <com.google.android.material.progressindicator.ProgressIndicator
-                android:id="@+id/progressIndicator"
-                style="@style/Widget.MaterialComponents.ProgressIndicator.Circular.Determinate"
-                android:layout_width="77dp"
-                android:layout_height="77dp"
+            <RelativeLayout
+                android:id="@+id/layDownloading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:max="100" />
+                android:background="#59000000"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-            <ImageView
-                android:id="@+id/actionCancel"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="11dp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/background_ripple"
-                android:scaleType="fitCenter"
-                android:clickable="true"
-                android:focusable="true"
-                app:srcCompat="@drawable/ic_close" />
-        </RelativeLayout>
+                <com.google.android.material.progressindicator.ProgressIndicator
+                    android:id="@+id/progressIndicator"
+                    style="@style/Widget.MaterialComponents.ProgressIndicator.Circular.Determinate"
+                    android:layout_width="77dp"
+                    android:layout_height="77dp"
+                    android:layout_centerInParent="true"
+                    android:max="100" />
 
-        <RelativeLayout
-            android:id="@+id/seenIndicator"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/circular_shade"
-            android:visibility="gone"
-            tools:visibility="visible">
+                <ImageView
+                    android:id="@+id/actionCancel"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/background_ripple"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="11dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_close" />
+            </RelativeLayout>
 
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+            <RelativeLayout
+                android:id="@+id/seenIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
-                android:layout_margin="4dp"
-                android:tint="?colorSecondaryVariant"
-                app:srcCompat="@drawable/ic_seen" />
+                android:background="@drawable/circular_shade"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="4dp"
+                    app:srcCompat="@drawable/ic_seen"
+                    app:tint="?colorSecondaryVariant" />
+            </RelativeLayout>
         </RelativeLayout>
-    </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -103,9 +112,9 @@
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_marginStart="4dp"
-                android:tint="#FDD835"
                 android:visibility="gone"
                 app:srcCompat="@drawable/ic_error"
+                app:tint="#FDD835"
                 tools:visibility="visible" />
             <ImageView
                 android:id="@+id/favIndicator"
@@ -114,9 +123,9 @@
                 android:layout_gravity="center_vertical|end"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="3dp"
-                android:tint="@color/material_red_500"
                 android:visibility="gone"
                 app:srcCompat="@drawable/heart_full"
+                app:tint="@color/material_red_500"
                 tools:visibility="visible" />
         </LinearLayout>
 

@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.DetailsSupportFragment
 import androidx.leanback.widget.*
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
@@ -63,7 +62,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     private fun buildDetails() {
         val activity = activity ?: return
         Repository().getAnime(App.context, arguments?.getString("url")
-                ?: "", true).observe(activity, Observer { animeObject ->
+                ?: "", true).observe(activity, { animeObject ->
             if (animeObject != null) {
                 Glide.with(App.context).asBitmap().load(PatternUtil.getCoverGlide(animeObject.aid)).into(object : SimpleTarget<Bitmap>() {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {

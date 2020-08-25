@@ -26,7 +26,7 @@ object MultipleDownloadManager {
     }
 
     private fun downloadNext(fragment: Fragment, view: View, addQueue: Boolean) {
-        if (index >= chaptersList.size) return
+        if (index >= chaptersList.size || !fragment.isAdded || fragment.context == null) return
         val current = chaptersList[index]
         val callback: (FileActions.CallbackState, Any?) -> Unit = { state, _ ->
             when (state) {

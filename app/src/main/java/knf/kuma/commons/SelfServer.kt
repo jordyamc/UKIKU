@@ -125,7 +125,7 @@ class SelfServer : Service() {
             val okHttpClient = OkHttpClient()
             val request = Request.Builder().url(url)
             val response = okHttpClient.newCall(request.build()).execute()
-            val body = response.body()
+            val body = response.body
             val total = body?.contentLength() ?: 0
             val inputStream = body?.byteStream()
             val pipedIn = PipedInputStream()

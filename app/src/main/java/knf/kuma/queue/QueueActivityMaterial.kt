@@ -23,6 +23,7 @@ import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
@@ -186,20 +187,34 @@ class QueueActivityMaterial : GenericActivity(), QueueAnimesAdapterMaterial.OnAn
             closeSheet()
         } else {
             doOnUI {
-                listToolbar.title = queueObject.chapter.name
-                val liveData = CacheDB.INSTANCE.queueDAO().getByAid(queueObject.chapter.aid)
-                liveData.observe(this, object : Observer<MutableList<QueueObject>> {
-                    override fun onChanged(list: MutableList<QueueObject>?) {
-                        if (list?.isEmpty() == true)
-                            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
-                        else {
-                            listAdapter?.update(queueObject.chapter.aid, list ?: mutableListOf())
-                            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
+                try {
+                    listToolbar.title = queueObject.chapter.name
+                    val liveData = CacheDB.INSTANCE.queueDAO().getByAid(queueObject.chapter.aid)
+                    liveData.observe(this, object : Observer<MutableList<QueueObject>> {
+                        override fun onChanged(list: MutableList<QueueObject>?) {
+                            if (list?.isEmpty() == true)
+                                bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
+                            else {
+                                listAdapter?.update(queueObject.chapter.aid, list
+                                        ?: mutableListOf())
+                                bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
+                            }
+                            current = queueObject
+                            liveData.removeObserver(this)
                         }
-                        current = queueObject
-                        liveData.removeObserver(this)
+                    })
+                } catch (e: Exception) {
+                    doAsync {
+                        CacheDB.INSTANCE.queueDAO().allRaw.forEach {
+                            try {
+                                it.chapter.aid
+                            } catch (e: Exception) {
+                                CacheDB.INSTANCE.queueDAO().remove(it)
+                            }
+                        }
+                        syncData { queue() }
                     }
-                })
+                }
             }
         }
     }
