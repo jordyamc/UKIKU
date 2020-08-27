@@ -79,8 +79,7 @@ class DirectoryService : IntentService("Directory update") {
         setStatus(STATE_VERIFYING)
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
-        if (!PrefsUtil.isDirectoryFinished)
-            count = animeDAO.count
+        count = animeDAO.count
         SSLSkipper.skip()
         val jspoon = Jspoon.create()
         calculateMax()

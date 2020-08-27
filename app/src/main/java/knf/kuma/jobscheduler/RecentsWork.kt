@@ -18,7 +18,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
-import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadDialogActivity
@@ -148,7 +147,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
     }
 
     private fun getAnimeIntent(animeObject: SearchAdvObject, notificationObj: NotificationObj): Intent {
-        return Intent(context, ActivityAnime::class.java)
+        return Intent(context, DesignUtils.infoClass)
                 .setData(Uri.parse(animeObject.link))
                 .putExtras(notificationObj.getBroadcast(context))
                 .putExtra("title", animeObject.name)

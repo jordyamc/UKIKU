@@ -66,27 +66,33 @@ class BypassUtil {
                 }
 
         fun clearCookies() {
-            val cookieManager = CookieManager.getInstance()
-            val cookiestring = cookieManager.getCookie(".animeflv.net")
-            if (cookiestring != null) {
-                val cookies = cookiestring.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                for (cookie in cookies) {
-                    val cookieparts = cookie.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    cookieManager.setCookie(".animeflv.net", cookieparts[0].trim() + "=; Expires=Wed, 31 Dec 2025 23:59:59 GMT")
+            noCrash {
+                val cookieManager = CookieManager.getInstance()
+                val cookiestring = cookieManager.getCookie(".animeflv.net")
+                if (cookiestring != null) {
+                    noCrash {
+                        val cookies = cookiestring.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        for (cookie in cookies) {
+                            val cookieparts = cookie.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                            cookieManager.setCookie(".animeflv.net", cookieparts[0].trim() + "=; Expires=Wed, 31 Dec 2025 23:59:59 GMT")
+                        }
+                    }
                 }
+                setCFDuid(App.context)
+                setClearance(App.context)
+                PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
             }
-            setCFDuid(App.context)
-            setClearance(App.context)
-            PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
         }
 
         fun clearCookies(webView: WebView?) {
-            val cookieManager = CookieManager.getInstance()
-            cookieManager.removeAllCookies(null)
-            webView?.clearCache(true)
-            setCFDuid(App.context)
-            setClearance(App.context)
-            PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
+            noCrash {
+                val cookieManager = CookieManager.getInstance()
+                cookieManager.removeAllCookies(null)
+                webView?.clearCache(true)
+                setCFDuid(App.context)
+                setClearance(App.context)
+                PrefsUtil.userAgent = UAGenerator.getRandomUserAgent()
+            }
         }
 
         fun isNeeded(url: String = testLink): Boolean {

@@ -63,6 +63,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Connection
+import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.nield.kotlinstatistics.WeightedDice
@@ -643,4 +644,12 @@ fun Fragment.getSurfaceColor(): Int {
     return (requireActivity() as AppCompatActivity).getSurfaceColor()
 }
 
-fun String.resolveRedirection(): String = jsoupCookies(this).execute().url().toString()
+fun String.resolveRedirection(tryCount: Int = 0): String =
+        try {
+            jsoupCookies(this).execute().url().toString()
+        } catch (e: HttpStatusException) {
+            if (tryCount >= 3)
+                this
+            else
+                resolveRedirection(tryCount + 1)
+        }

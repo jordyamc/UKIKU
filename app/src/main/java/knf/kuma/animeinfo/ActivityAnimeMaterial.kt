@@ -233,7 +233,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, recentObject: RecentObject, view: ImageView, position: Int) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(recentObject.anime)
             intent.putExtra(keyTitle, recentObject.name)
             intent.putExtra(keyAid, recentObject.aid)
@@ -245,7 +245,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         @JvmOverloads
         fun open(fragment: Fragment, animeObject: AnimeObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -257,7 +257,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, animeObject: SearchObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -269,7 +269,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, animeObject: SearchAdvObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -293,7 +293,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, animeObject: SearchObjectFav, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -305,7 +305,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, animeObject: AnimeObject.WebInfo.AnimeRelated, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse("https://animeflv.net/" + animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -317,7 +317,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, recentObject: RecentObject, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(recentObject.url)
             intent.putExtra(keyTitle, recentObject.name)
             intent.putExtra(keyAid, recentObject.aid)
@@ -341,7 +341,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, animeObject: DirObjectCompact, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -370,7 +370,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(activity: Activity, animeObject: AnimeObject, view: ImageView, persist: Boolean, animate: Boolean) {
-            val intent = Intent(activity, ActivityAnimeMaterial::class.java)
+            val intent = Intent(activity, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -381,7 +381,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(activity: Activity, animeObject: SearchObject, view: ImageView, persist: Boolean, animate: Boolean) {
-            val intent = Intent(activity, ActivityAnimeMaterial::class.java)
+            val intent = Intent(activity, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -392,7 +392,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(activity: Activity?, animeObject: AnimeShortObject, view: ImageView, persist: Boolean, animate: Boolean) {
-            val intent = Intent(activity, ActivityAnimeMaterial::class.java)
+            val intent = Intent(activity, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -404,7 +404,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, explorerObject: ExplorerObject, view: ImageView) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(explorerObject.link)
             intent.putExtra(keyTitle, explorerObject.name)
             intent.putExtra(keyAid, explorerObject.key.toString())
@@ -413,7 +413,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(activity: Activity, recordObject: RecordObject, view: ImageView) {
-            val intent = Intent(activity, ActivityAnimeMaterial::class.java)
+            val intent = Intent(activity, DesignUtils.infoClass)
             intent.data = Uri.parse("https://animeflv.net/" + recordObject.animeObject.link)
             intent.putExtra(keyTitle, recordObject.name)
             intent.putExtra(keyAid, recordObject.aid)
@@ -425,7 +425,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(activity: Activity?, seeingObject: SeeingObject) {
             activity ?: return
-            val intent = Intent(activity, ActivityAnimeMaterial::class.java)
+            val intent = Intent(activity, DesignUtils.infoClass)
             intent.data = Uri.parse(seeingObject.link)
             intent.putExtra(keyTitle, seeingObject.title)
             //intent.putExtra(keyAid, seeingObject.aid)
@@ -437,7 +437,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(context: Context, animeObject: SearchObject) {
-            val intent = Intent(context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(context, DesignUtils.infoClass)
             intent.data = Uri.parse(animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
@@ -447,7 +447,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(fragment: Fragment, favoriteObject: FavoriteObject, view: ImageView) {
             val activity = fragment.activity ?: return
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse(favoriteObject.link)
             intent.putExtra(keyTitle, favoriteObject.name)
             //intent.putExtra(keyAid, favoriteObject.aid)
@@ -457,7 +457,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(activity: Activity, queueObject: QueueObject, view: ImageView) {
-            val intent = Intent(activity, ActivityAnimeMaterial::class.java)
+            val intent = Intent(activity, DesignUtils.infoClass)
             intent.putExtra(keyTitle, queueObject.chapter.name)
             intent.putExtra(keyAid, queueObject.chapter.aid)
             intent.putExtra(keyImg, PatternUtil.getCover(queueObject.chapter.aid))
@@ -466,7 +466,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(fragment: Fragment, animeRelated: AnimeObject.WebInfo.AnimeRelated) {
-            val intent = Intent(fragment.context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(fragment.context, DesignUtils.infoClass)
             intent.data = Uri.parse("https://animeflv.net/" + animeRelated.link)
             intent.putExtra(keyTitle, animeRelated.name)
             intent.putExtra(keyAid, animeRelated.aid)
@@ -474,13 +474,13 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
 
         fun open(context: Context, url: String) {
-            val intent = Intent(context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(context, DesignUtils.infoClass)
             intent.data = Uri.parse(url)
             context.startActivity(intent)
         }
 
         fun getSimpleIntent(context: Context, item: WEListItem): Intent {
-            val intent = Intent(context, ActivityAnimeMaterial::class.java)
+            val intent = Intent(context, DesignUtils.infoClass)
             intent.data = Uri.parse(item.link)
             intent.action = "${Random.nextInt(1, 9000)}"
             intent.putExtra(keyTitle, item.title)

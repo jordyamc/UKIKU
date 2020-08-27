@@ -27,6 +27,7 @@
 
 -keep class **$$TypeAdapter { *; }
 -keep class knf.kuma.pojos.AnimeObject.WebInfo.AnimeChapter {*;}
+-keep class knf.kuma.pojos.AnimeObject.WebInfo.AnimeRelated {*;}
 
 -keepclasseswithmembernames class * {
     @com.tickaroo.tikxml.* <fields>;

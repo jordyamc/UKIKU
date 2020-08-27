@@ -2,11 +2,9 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import android.util.Log
-import okhttp3.ConnectionSpec
-import okhttp3.OkHttpClient
+import knf.kuma.commons.NoSSLOkHttpClient
 import okhttp3.Request
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 abstract class Server(internal var context: Context, internal var baseLink: String) : Comparable<Server> {
     internal var TIMEOUT = 10000
@@ -29,16 +27,6 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
         if (videoServer == null)
             return null
         if (videoServer.skipVerification) return videoServer
-        val client = OkHttpClient().newBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .followRedirects(true)
-                .followSslRedirects(true)
-                .connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                        .allEnabledTlsVersions()
-                        .allEnabledCipherSuites()
-                        .build()))
-                .build()
         for (option in ArrayList(videoServer.options))
             try {
                 val request = Request.Builder()
@@ -46,7 +34,7 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 if (option.headers != null)
                     for (pair in option.headers?.createHeaders() ?: arrayListOf())
                         request.addHeader(pair.first, pair.second)
-                val response = client.newCall(request.build()).execute()
+                val response = NoSSLOkHttpClient.get().newCall(request.build()).execute()
                 if (!response.isSuccessful) {
                     Log.e("Remove Option", "Server: " + option.server + "\nUrl: " + option.url + "\nCode: " + response.code)
                     videoServer.options.remove(option)

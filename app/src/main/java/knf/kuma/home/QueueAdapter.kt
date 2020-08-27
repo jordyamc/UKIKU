@@ -6,7 +6,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
+import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import knf.kuma.queue.QueueActivity
 import org.jetbrains.anko.doAsync
@@ -31,10 +33,27 @@ class QueueAdapter(val fragment: HomeFragment) : UpdateableAdapter<QueueAdapter.
 
     override fun onBindViewHolder(holder: RecentViewHolder, position: Int) {
         val item = list[position]
-        holder.img.load(PatternUtil.getCover(item.chapter.aid))
-        holder.title.text = item.chapter.name
-        holder.type?.text = String.format(Locale.getDefault(), if (item.count == 1) "%d episodio" else "%d episodios", item.count)
-        holder.root.onClick { QueueActivity.open(fragment.context, item.chapter.aid) }
+        noCrash {
+            holder.img.load(PatternUtil.getCover(item.chapter.aid))
+            holder.title.text = item.chapter.name
+            holder.type?.text = String.format(Locale.getDefault(), if (item.count == 1) "%d episodio" else "%d episodios", item.count)
+        }
+        holder.root.onClick {
+            try {
+                QueueActivity.open(fragment.context, item.chapter.aid)
+            } catch (e: Exception) {
+                doAsync {
+                    CacheDB.INSTANCE.queueDAO().allRaw.forEach {
+                        try {
+                            it.chapter.aid
+                        } catch (e: Exception) {
+                            CacheDB.INSTANCE.queueDAO().remove(it)
+                        }
+                    }
+                    syncData { queue() }
+                }
+            }
+        }
     }
 
     class RecentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

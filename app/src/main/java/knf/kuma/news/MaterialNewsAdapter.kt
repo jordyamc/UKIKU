@@ -11,6 +11,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import knf.kuma.R
 import knf.kuma.commons.inflate
 import knf.kuma.commons.load
+import knf.kuma.commons.noCrash
 import kotlinx.android.synthetic.main.item_news_material.view.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
@@ -35,7 +36,7 @@ class MaterialNewsAdapter(val activity: AppCompatActivity) : PagedListAdapter<Ne
                 root.onClick {
                     openNews(activity, item)
                 }
-                image.load(item.image)
+                noCrash { image.load(item.image) }
                 progress.visibility = View.GONE
                 type.text = item.type
                 title.text = item.title

@@ -8,15 +8,11 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import knf.kuma.R
-import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.FileWrapper
-import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.*
 import knf.kuma.commons.PatternUtil.getAnimeUrl
 import knf.kuma.commons.PatternUtil.getFileName
-import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.PrefsUtil.saveWithName
-import knf.kuma.commons.distinct
 import knf.kuma.database.CacheDB
 import knf.kuma.database.CacheDBWrap
 import knf.kuma.database.dao.SeenDAO
@@ -147,7 +143,7 @@ val RecentModel.menuHideList: List<Int>
     }
 
 fun RecentModel.openInfo(context: Context) {
-    context.startActivity(Intent(context, ActivityAnimeMaterial::class.java).apply {
+    context.startActivity(Intent(context, DesignUtils.infoClass).apply {
         data = Uri.parse(this@openInfo.extras.animeUrl)
         putExtra("title", name)
         putExtra("img", PatternUtil.getCover(aid))

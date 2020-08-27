@@ -95,7 +95,7 @@ object PatternUtil {
         if (file.isNull()) return ""
         val matcher = Pattern.compile("^.*\\$(.*)-\\d+\\.?\\d*\\.mp4$").matcher(file)
         matcher.find()
-        return matcher.group(1) + "/"
+        return noCrashLet("null/") { matcher.group(1) + "/" }
     }
 
     fun getNumFromFile(file: String): String {

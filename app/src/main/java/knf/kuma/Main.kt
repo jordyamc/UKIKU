@@ -53,6 +53,7 @@ import knf.kuma.commons.*
 import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
+import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryFragment
 import knf.kuma.directory.DirectoryService
 import knf.kuma.download.FileAccessHelper
@@ -76,8 +77,11 @@ import knf.kuma.record.RecordActivity
 import knf.kuma.search.FiltersSuggestion
 import knf.kuma.search.SearchFragment
 import knf.kuma.seeing.SeeingActivity
+import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
+import knh.kuma.commons.cloudflarebypass.CfCallback
+import knh.kuma.commons.cloudflarebypass.Cloudflare
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -91,7 +95,10 @@ import org.jetbrains.anko.textColor
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
+import java.net.HttpCookie
 import kotlin.contracts.ExperimentalContracts
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class Main : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -165,7 +172,7 @@ class Main : GenericActivity(),
         lifecycleScope.launch(Dispatchers.IO) {
             BypassUtil.clearCookiesIfNeeded()
             checkPermissions()
-            DirectoryService.run(this@Main)
+            checkDirectoryState()
             UpdateWork.schedule()
             RecentsWork.schedule(this@Main)
             DirUpdateWork.schedule(this@Main)
@@ -173,6 +180,40 @@ class Main : GenericActivity(),
             EAHelper.clear1()
             verifiyFF()
         }
+    }
+
+    private suspend fun checkDirectoryState() {
+        DirManager.checkPreDir()
+        if (PrefsUtil.useDefaultUserAgent) {
+            val isBrowserOk = noCrashLet(false) {
+                jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
+                true
+            }
+            if (!isBrowserOk) {
+                val randomUA = randomUA()
+                PrefsUtil.userAgentDir = randomUA
+                suspendCoroutine<Boolean> {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        noCrash {
+                            Cloudflare(this@Main, "https://animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
+                                setCfCallback(object : CfCallback {
+                                    override fun onSuccess(cookieList: MutableList<HttpCookie>?, hasNewUrl: Boolean, newUrl: String?) {
+                                        PrefsUtil.dirCookies = cookieList ?: emptyList()
+                                        noCrash { it.resume(true) }
+                                    }
+
+                                    override fun onFail(code: Int, msg: String?) {
+                                        Log.e("Dir cookies", "On error, code $code, msg: $msg")
+                                        noCrash { it.resume(false) }
+                                    }
+                                })
+                            }.getCookies()
+                        }
+                    }
+                }
+            }
+        }
+        DirectoryService.run(this)
     }
 
     @SuppressLint("SetTextI18n")

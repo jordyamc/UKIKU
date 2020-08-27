@@ -2,11 +2,11 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.execute
 import knf.kuma.commons.iterator
-import knf.kuma.commons.okHttpCookies
 import knf.kuma.videoservers.VideoServer.Names.FEMBED
 import org.json.JSONObject
+import org.jsoup.Connection
+import org.jsoup.Jsoup
 
 class FembedServer internal constructor(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -24,14 +24,14 @@ class FembedServer internal constructor(context: Context, baseLink: String) : Se
                     "https://embedsito.com/v/${downLink.substring(downLink.lastIndexOf("=") + 1)}"
                 else
                     downLink
-                val json = JSONObject(okHttpCookies(fLink.replace("/v/", "/api/source/"), "POST").execute().body?.string())
+                val json = JSONObject(Jsoup.connect(fLink.replace("/v/", "/api/source/")).ignoreContentType(true).method(Connection.Method.POST).execute().body())
                 check(json.getBoolean("success")) { "Request was not succeeded" }
                 val array = json.getJSONArray("data")
                 val options = mutableListOf<Option>()
                 for (item in array) {
                     options.add(Option(name, item.getString("label"), item.getString("file")))
                 }
-                VideoServer(name, options)
+                VideoServer(name, options, true)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null

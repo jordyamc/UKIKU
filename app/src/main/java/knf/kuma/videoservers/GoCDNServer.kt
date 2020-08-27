@@ -3,6 +3,8 @@ package knf.kuma.videoservers
 import android.content.Context
 import knf.kuma.commons.PatternUtil
 import knf.kuma.videoservers.VideoServer.Names.GOCDN
+import org.json.JSONObject
+import java.net.URL
 
 class GoCDNServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -16,8 +18,8 @@ class GoCDNServer(context: Context, baseLink: String) : Server(context, baseLink
         get() {
             return try {
                 val downLink = PatternUtil.extractLink(baseLink)
-                val link = "https://s1.streamium.xyz/gocdn.php?v=${downLink.substringAfterLast("#")}"
-                VideoServer(GOCDN, Option(GOCDN, null, link))
+                val json = JSONObject(URL("https://streamium.xyz/gocdn.php?v=${downLink.substringAfterLast("#")}").readText())
+                VideoServer(GOCDN, Option(GOCDN, null, json.getString("file")))
             } catch (e: Exception) {
                 e.printStackTrace()
                 null

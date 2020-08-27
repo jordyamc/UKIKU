@@ -62,11 +62,15 @@ class ImgFullFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.download -> {
-                val i = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                        .addCategory(Intent.CATEGORY_OPENABLE)
-                        .setType("image/jpg")
-                        .putExtra(Intent.EXTRA_TITLE, arguments?.getString(keyTitle) + ".jpg")
-                startActivityForResult(i, 556)
+                try {
+                    val i = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                            .addCategory(Intent.CATEGORY_OPENABLE)
+                            .setType("image/jpg")
+                            .putExtra(Intent.EXTRA_TITLE, arguments?.getString(keyTitle) + ".jpg")
+                    startActivityForResult(i, 556)
+                } catch (e: Exception) {
+                    Toaster.toast("Error al descargar")
+                }
             }
             R.id.share -> try {
                 val intent = Intent(Intent.ACTION_SEND)

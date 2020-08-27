@@ -267,6 +267,7 @@ object FileUtil {
                 callback.onProgress(Pair(100, true))
             } catch (e: Exception) {
                 e.printStackTrace()
+                FileAccessHelper.getTmpFile(file_name).delete()
                 callback.onProgress(Pair(-1, true))
             }
         }

@@ -31,7 +31,7 @@ class NewsItem {
     @Selector("[data-ttico=date_range]")
     lateinit var date: String
 
-    @Selector("img", attr = "src")
+    @Selector("img", attr = "src", defValue = "")
     lateinit var image: String
 
     @Selector("figure a", attr = "href")

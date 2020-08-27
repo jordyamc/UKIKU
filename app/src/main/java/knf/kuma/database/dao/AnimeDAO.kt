@@ -181,6 +181,9 @@ interface AnimeDAO {
     @Query("SELECT count(*) FROM AnimeObject WHERE link LIKE :link")
     fun existLink(link: String): Boolean
 
+    @Query("SELECT count(*) FROM AnimeObject WHERE aid = :aid")
+    fun existAid(aid: String): Boolean
+
     @Query("SELECT count(*) FROM animeobject WHERE aid = :aid AND genres LIKE :genre")
     fun hasGenre(aid: String, genre: String): Boolean
 
@@ -213,6 +216,11 @@ interface AnimeDAO {
 
     @Query("SELECT count(*) FROM AnimeObject WHERE `key` LIKE :aid")
     fun getCount(aid: Int): Int
+
+    @Transaction
+    fun hasRange(aidF: String, aidL: String): Boolean {
+        return existAid(aidF) && existAid(aidL)
+    }
 
     @Update
     fun updateAnime(animeObject: AnimeObject)

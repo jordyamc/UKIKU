@@ -88,11 +88,15 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
     }
 
     fun onMove(to: String) {
-        this.moveFile = to
-        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT)
-                .addCategory(Intent.CATEGORY_OPENABLE)
-                .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                .setType("video/mp4"), 55698)
+        try {
+            this.moveFile = to
+            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .setType("video/mp4"), 55698)
+        } catch (e: Exception) {
+            Toaster.toast("Error al importar")
+        }
     }
 
     override fun onImportMultiple(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>) {
@@ -103,12 +107,16 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
                 onMove(chapters[0].fileName)
             }
             else -> {
-                this.chapters = chapters
-                startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT)
-                        .addCategory(Intent.CATEGORY_OPENABLE)
-                        .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                        .setType("video/mp4"), 55698)
+                try {
+                    this.chapters = chapters
+                    startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT)
+                            .addCategory(Intent.CATEGORY_OPENABLE)
+                            .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                            .setType("video/mp4"), 55698)
+                } catch (e: Exception) {
+                    Toaster.toast("Error al importar")
+                }
             }
         }
     }

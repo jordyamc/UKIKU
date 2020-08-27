@@ -37,7 +37,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.AdsUtilsMob
@@ -52,6 +51,7 @@ import knf.kuma.commons.*
 import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
+import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryFragmentMaterial
 import knf.kuma.directory.DirectoryService
 import knf.kuma.download.FileAccessHelper
@@ -63,7 +63,6 @@ import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.news.MaterialNewsActivity
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.migrateSeen
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.preferences.BottomPreferencesMaterialFragment
@@ -89,12 +88,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.json.JSONObject
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
 import java.io.File
 import java.net.HttpCookie
-import java.net.URL
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -185,7 +184,13 @@ class MainMaterial : GenericActivity(),
     private fun saveDir() {
         val lists = CacheDB.INSTANCE.animeDAO().all.chunked(500)
         var number = 0
+        val json = JSONObject()
         lists.forEach { list ->
+            val info = JSONObject().apply {
+                put("idF", list.first().aid)
+                put("idL", list.last().aid)
+            }
+            json.put(number.toString(), info)
             val file = File(getExternalFilesDir(null), "directory$number.json")
             if (!file.exists()) {
                 file.createNewFile()
@@ -193,19 +198,15 @@ class MainMaterial : GenericActivity(),
             }
             number++
         }
+        val file = File(getExternalFilesDir(null), "directoryInfo.json")
+        if (!file.exists()) {
+            file.createNewFile()
+            file.writeText(json.toString())
+        }
     }
 
     private suspend fun checkDirectoryState() {
-        if (CacheDB.INSTANCE.animeDAO().count < 3200) {
-            noCrash {
-                for (index in 0..6) {
-                    val json = URL("https://ukiku.ga/dirs/directory$index.json").readText()
-                    val list: List<AnimeObject> = Gson().fromJson(json, object : TypeToken<List<AnimeObject>>() {}.type)
-                    CacheDB.INSTANCE.animeDAO().insertAll(list)
-                }
-                PrefsUtil.isDirectoryFinished = true
-            }
-        }
+        DirManager.checkPreDir()
         if (PrefsUtil.useDefaultUserAgent) {
             val isBrowserOk = noCrashLet(false) {
                 jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()

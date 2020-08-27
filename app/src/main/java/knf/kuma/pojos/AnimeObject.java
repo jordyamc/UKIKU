@@ -316,6 +316,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         /*@Selector("ul.ListCaps li,ul.ListEpisodes li,ul#episodeList li")
         public List<Element> chapters = new ArrayList<>();*/
 
+        @Keep
         public static class AnimeRelated {
             @Selector(value = "a", attr = "href")
             @SerializedName("link")
@@ -468,15 +469,18 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             public String commentariesLink() {
                 try {
-                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(ExtensionUtilsKt.resolveRedirection(link), "UTF-8") + "&s_o=default#version=" + AdsUtils.INSTANCE.getRemoteConfigs().getString("disqus_version");
+                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(ExtensionUtilsKt.resolveRedirection(link, 0), "UTF-8") + "&s_o=default#version=" + AdsUtils.INSTANCE.getRemoteConfigs().getString("disqus_version");
                     //return "https://www.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FXBwzv5Yrm_1.js%3Fversion%3D42%23cb%3Df29a45da9909%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff388549d580a978%26relation%3Dparent.parent&href=" + URLEncoder.encode(link, "UTF-8") + "&locale=es_LA&numposts=100&sdk=joey&version=v2.9&width=100%25";
                     //return "http://ukiku-comments.epizy.com/comments.php?title=" + getEpTitle() + "&url=" + URLEncoder.encode(link, "UTF-8");
                     /*return "https://web.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FlY4eZXm_YWu.js%3Fversion%3D42%23cb%3Df3448d0a8b0514c%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff304e603e6a096%26relation%3Dparent.parent&href=" +
                             URLEncoder.encode(link, "UTF-8") +
                             "&locale=es_LA&numposts=50&sdk=joey&version=v2.3&container_width=100%&height=100%";*/
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    return link;
+                    try {
+                        return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(link, "UTF-8") + "&s_o=default#version=" + AdsUtils.INSTANCE.getRemoteConfigs().getString("disqus_version");
+                    } catch (Exception ex) {
+                        return link;
+                    }
                 }
 
             }

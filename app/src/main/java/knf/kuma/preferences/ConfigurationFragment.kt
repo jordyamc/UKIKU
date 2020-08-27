@@ -31,6 +31,7 @@ import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.commons.*
 import knf.kuma.custom.PreferenceFragmentCompat
 import knf.kuma.database.CacheDB
+import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.download.DownloadManager
@@ -350,6 +351,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         doAsync {
                                             CacheDB.INSTANCE.animeDAO().nuke()
                                             PrefsUtil.isDirectoryFinished = false
+                                            DirManager.checkPreDir()
                                             DirectoryService.run(safeContext)
                                         }
                                     }

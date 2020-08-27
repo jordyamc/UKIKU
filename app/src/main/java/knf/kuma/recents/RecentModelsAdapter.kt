@@ -128,6 +128,8 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                             }
                         }
                     }
+                else
+                    actionMenu.isVisible = false
                 root.setOnClickListener {
                     if (BuildConfig.BUILD_TYPE == "playstore") {
                         item.openInfo(fragment.requireContext())

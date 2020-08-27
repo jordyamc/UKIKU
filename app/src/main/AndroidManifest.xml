@@ -275,9 +275,6 @@
         </provider>
 
         <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="8971b3733a2fd699ebd101e18ce228d80baeab92" />
-        <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-5390653757953587~9838518341" />
         <meta-data
@@ -398,6 +395,7 @@
         <activity android:name=".shortcuts.DummyExplorerActivity" />
         <activity android:name=".shortcuts.DummyEmissionActivity" />
         <activity android:name=".profile.TopActivityMaterial" />
+        <activity android:name="com.appbrain.AppBrainActivity" />
 
         <provider
             android:name=".slices.AnimeSlice"

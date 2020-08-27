@@ -11,7 +11,6 @@ import android.net.Uri
 import android.widget.RemoteViews
 import androidx.preference.PreferenceManager
 import knf.kuma.R
-import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.DesignUtils
 import knf.kuma.database.CacheDB
 import knf.kuma.emision.EmissionActivity
@@ -55,8 +54,7 @@ class WEmisionProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         GlobalScope.launch(Dispatchers.Main) {
             for (i in appWidgetIds) {
-                val remoteViews = updateWidgetListView(context,
-                        i)
+                val remoteViews = updateWidgetListView(context, i)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.words)
                 appWidgetManager.updateAppWidget(i, remoteViews)
             }
@@ -78,7 +76,6 @@ class WEmisionProvider : AppWidgetProvider() {
         remoteViews.setTextColor(R.id.title_count, getColor(context, true))
         remoteViews.setOnClickPendingIntent(R.id.back_layout, PendingIntent.getActivity(context, 555, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT))
         remoteViews.setInt(R.id.back_layout, "setBackgroundColor", getColor(context, false))
-        remoteViews.setPendingIntentTemplate(R.id.words, PendingIntent.getActivity(context, appWidgetId, Intent(context, ActivityAnime::class.java), PendingIntent.FLAG_UPDATE_CURRENT))
         remoteViews.setEmptyView(R.id.words, R.id.empty)
         return remoteViews
     }

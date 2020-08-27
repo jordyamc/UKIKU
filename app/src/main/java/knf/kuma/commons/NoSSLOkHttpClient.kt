@@ -15,7 +15,7 @@ object NoSSLOkHttpClient {
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
                 @Throws(CertificateException::class)
                 override fun checkClientTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {
-                    noCrash {
+                    noCrash(false) {
                         chain.forEach {
                             it.checkValidity()
                         }
@@ -24,7 +24,7 @@ object NoSSLOkHttpClient {
 
                 @Throws(CertificateException::class)
                 override fun checkServerTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {
-                    noCrash {
+                    noCrash(false) {
                         chain.forEach {
                             it.checkValidity()
                         }
