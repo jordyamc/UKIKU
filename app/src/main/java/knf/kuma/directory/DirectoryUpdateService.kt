@@ -23,7 +23,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
     private var manager: NotificationManager? = null
     private var count = 0
     private var page = 0
-    private var maxAnimes = 3200
+    private val maxAnimes = 72
     private var needCookies by Delegates.notNull<Boolean>()
 
     private val startNotification: Notification
@@ -59,20 +59,10 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val animeDAO = CacheDB.INSTANCE.animeDAO()
         needCookies = BypassUtil.isCloudflareActive()
+        DirManager.checkPreDir(true)
         val jspoon = Jspoon.create()
-        calculateMax()
         doFullSearch(jspoon, animeDAO)
         cancelForeground()
-    }
-
-    private fun calculateMax() {
-        noCrash {
-            val main = jsoupCookiesDir("https://animeflv.net/browse",needCookies).get()
-            val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
-            val last = jsoupCookiesDir("https://animeflv.net/browse?page=$lastPage",needCookies).get()
-            maxAnimes = (24 * (lastPage - 1)) + last.select("article").size
-            Log.e("Updatedir","Max pages = $maxAnimes")
-        }
     }
 
     private fun doFullSearch(jspoon: Jspoon, animeDAO: AnimeDAO) {
@@ -105,6 +95,8 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                     if (animeObjects.isNotEmpty())
                         animeDAO.insertAll(animeObjects)
                     page++
+                    if (page >= 4)
+                        finished = true
                 } else {
                     finished = true
                     Log.e("Directory Getter", "Processed ${page - 1} pages")
@@ -117,6 +109,8 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
             } catch (e: Exception) {
                 Log.e("Directory Getter", "Page error: $page | ${e.message}")
                 page++
+                if (page >= 4)
+                    finished = true
             }
 
         }

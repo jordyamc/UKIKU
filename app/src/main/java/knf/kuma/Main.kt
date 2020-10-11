@@ -28,6 +28,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -184,7 +185,7 @@ class Main : GenericActivity(),
 
     private suspend fun checkDirectoryState() {
         DirManager.checkPreDir()
-        if (PrefsUtil.useDefaultUserAgent) {
+        if (PrefsUtil.useDefaultUserAgent && Network.isConnected) {
             val isBrowserOk = noCrashLet(false) {
                 jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
                 true
@@ -226,8 +227,8 @@ class Main : GenericActivity(),
             val header = navigationView.getHeaderView(0).img
             ViewCompat.setOnApplyWindowInsetsListener(header) { v, insets ->
                 v.apply {
-                    if (insets.systemWindowInsetTop > 0)
-                        setPadding(paddingLeft, insets.systemWindowInsetTop, paddingRight, paddingBottom)
+                    if (insets.getInsets(WindowInsetsCompat.Type.systemBars()).top > 0)
+                        setPadding(paddingLeft, insets.getInsets(WindowInsetsCompat.Type.systemBars()).top, paddingRight, paddingBottom)
                 }
                 insets
             }

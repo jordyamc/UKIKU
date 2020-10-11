@@ -8,7 +8,7 @@ import knf.kuma.database.CacheDB
 
 class AnimeBroadcast : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(intent.getStringExtra("aid"))
+        val animeObject = CacheDB.INSTANCE.animeDAO().getByAid(intent.getStringExtra("aid") ?: "")
         if (animeObject != null)
             ActivityAnimeMaterial.open(context, animeObject)
     }

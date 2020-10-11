@@ -11,8 +11,8 @@ import java.net.URL
 
 object DirManager {
 
-    fun checkPreDir() {
-        if (CacheDB.INSTANCE.animeDAO().count < 3200) {
+    fun checkPreDir(forced: Boolean = false) {
+        if (forced || CacheDB.INSTANCE.animeDAO().count < 3200) {
             noCrash {
                 val info = JSONObject(URL("https://ukiku.ga/dirs/directoryInfo.json").readText())
                 for (index in 0..6) {

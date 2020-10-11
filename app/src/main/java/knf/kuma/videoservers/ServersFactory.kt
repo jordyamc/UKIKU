@@ -330,7 +330,7 @@ class ServersFactory {
 
     private fun startDownload(option: Option) {
         doAsync{
-            if (BuildConfig.DEBUG) Log.e("Download " + option.server, option.url)
+            if (BuildConfig.DEBUG) Log.e("Download " + option.server, "${option.url}")
             downloadObject.server = option.server ?: ""
             if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0")) {
                 CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(chapter?.fileName
@@ -503,7 +503,7 @@ class ServersFactory {
             return if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 PendingIntent.getActivity(context, Math.abs(file_name.hashCode()),
                         PrefsUtil.getPlayerIntent()
-                                .setData(Uri.fromFile(file)).putExtra("isFile", true)
+                                .setData(FileAccessHelper.getFileUri(file_name)).putExtra("isFile", true)
                                 .putExtra("title", getEpTitle(title, file_name))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_UPDATE_CURRENT)
             } else {

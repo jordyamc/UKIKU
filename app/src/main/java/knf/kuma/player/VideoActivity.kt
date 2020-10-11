@@ -59,6 +59,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
+        Log.e("Player", "OnCreate")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         setContentView(R.layout.player_view)
         window.decorView.setBackgroundColor(Color.BLACK)
@@ -111,6 +112,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        Log.e("Player", "OnSaveInstance")
         if (::playerHolder.isInitialized) {
             playerHolder.saveState()
             outState.putInt("window", playerState.window)
@@ -151,7 +153,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     override fun onStart() {
         super.onStart()
-        Log.i("Player", "OnStart")
+        Log.e("Player", "OnStart")
         if (::playerHolder.isInitialized) {
             startPlayer()
             activateMediaSession()
@@ -160,6 +162,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     override fun onPause() {
         super.onPause()
+        Log.e("Player", "OnPause")
         if (Build.VERSION.SDK_INT >= 24 && isInPictureInPictureMode)
             resumePlayer()
         else
@@ -168,26 +171,27 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     override fun onResume() {
         super.onResume()
+        Log.e("Player", "OnResume")
         doOnUI { hideUI() }
         resumePlayer()
     }
 
     override fun onStop() {
-        Log.i("Player", "OnStop")
+        Log.e("Player", "OnStop")
         if (::playerHolder.isInitialized)
             if (!playerState.isFinishing) {
                 playerHolder.saveState()
                 playerState.title = video_title.text.toString()
                 saveState()
             }
-        stopPlayer()
+        //stopPlayer()
         deactivateMediaSession()
         super.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i("Player", "OnDestroy")
+        Log.e("Player", "OnDestroy")
         stopPlayer()
         releasePlayer()
         releaseMediaSession()

@@ -207,7 +207,7 @@ class MainMaterial : GenericActivity(),
 
     private suspend fun checkDirectoryState() {
         DirManager.checkPreDir()
-        if (PrefsUtil.useDefaultUserAgent) {
+        if (PrefsUtil.useDefaultUserAgent && Network.isConnected) {
             val isBrowserOk = noCrashLet(false) {
                 jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
                 true

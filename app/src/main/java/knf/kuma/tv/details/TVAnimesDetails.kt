@@ -20,7 +20,7 @@ class TVAnimesDetails : TVBaseActivity(), TVServersFactory.ServersInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragment = TVAnimesDetailsFragment[intent.getStringExtra(keyUrl)]
+        fragment = TVAnimesDetailsFragment[intent.getStringExtra(keyUrl) ?: ""]
         addFragment(fragment as TVAnimesDetailsFragment)
     }
 

@@ -42,7 +42,7 @@ class ActivityImgFull : GenericActivity() {
                     for (i in 0 until results.length()) {
                         val json = results.getJSONObject(i)
                         val name = json.getString(keyTitle).toLowerCase()
-                        if (title.toLowerCase() == name) {
+                        if (title?.toLowerCase() == name) {
                             val list = mutableListOf<String>()
                             list.add(json.getString("image_url"))
                             try {
@@ -59,7 +59,8 @@ class ActivityImgFull : GenericActivity() {
                                 e.printStackTrace()
                             }
                             doOnUI {
-                                pager.adapter = ImgPagerAdapter(supportFragmentManager, intent.getStringExtra(keyTitle), list)
+                                pager.adapter = ImgPagerAdapter(supportFragmentManager, intent.getStringExtra(keyTitle)
+                                        ?: "", list)
                                 indicator.setViewPager(pager)
                             }
                             break

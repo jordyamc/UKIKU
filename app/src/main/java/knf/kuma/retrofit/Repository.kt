@@ -18,6 +18,9 @@ import knf.kuma.pojos.Recents
 import knf.kuma.recents.RecentsPage
 import knf.kuma.search.SearchCompactDataSource
 import knf.kuma.search.SearchObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
 import retrofit2.Call
@@ -39,17 +42,21 @@ class Repository {
             var tryCount = 0
             val callback = object : Callback<Recents> {
                 override fun onResponse(call: Call<Recents>, response: Response<Recents>) {
-                    try {
-                        if (response.isSuccessful) {
-                            val objects = RecentObject.create(response.body()?.list ?: listOf())
-                            for ((i, recentObject) in objects.withIndex())
-                                recentObject.key = i
-                            CacheDB.INSTANCE.recentsDAO().setCache(objects)
-                        } else
-                            onFailure(call, Exception("HTTP " + response.code()))
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        onFailure(call, e)
+                    GlobalScope.launch(Dispatchers.IO) {
+                        try {
+                            if (response.isSuccessful) {
+                                val objects = RecentObject.create(response.body()?.list ?: listOf())
+                                for ((i, recentObject) in objects.withIndex()) {
+                                    recentObject.key = i
+                                    recentObject.fileWrapper()
+                                }
+                                CacheDB.INSTANCE.recentsDAO().setCache(objects)
+                            } else
+                                onFailure(call, Exception("HTTP " + response.code()))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            onFailure(call, e)
+                        }
                     }
                 }
 

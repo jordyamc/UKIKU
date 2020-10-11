@@ -66,8 +66,8 @@ class SeeingActivity : GenericActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.auto -> FavToSeeing.onConfirmation(this)
         }
         return super.onOptionsItemSelected(item)

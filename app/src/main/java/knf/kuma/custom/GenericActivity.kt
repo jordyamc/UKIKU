@@ -110,10 +110,10 @@ open class GenericActivity : AppCompatActivity() {
                 logText("Clearing cookies")
                 BypassUtil.clearCookies(webView)
                 logText("Applying settings for webview")
-                webView.settings?.javaScriptEnabled = true
-                webView.settings?.domStorageEnabled = true
-                webView.settings?.cacheMode = WebSettings.LOAD_NO_CACHE
-                webView.settings?.setAppCacheEnabled(false)
+                webView.settings.javaScriptEnabled = true
+                webView.settings.domStorageEnabled = true
+                webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
+                webView.settings.setAppCacheEnabled(false)
                 webView.webViewClient = object : WebViewClient() {
 
                     override fun onPageFinished(view: WebView?, url: String?) {
@@ -131,7 +131,7 @@ open class GenericActivity : AppCompatActivity() {
                         logText("Waiting for resolve...")
                         //view?.loadUrl(url)
                         logText("Cookies for animeflv:")
-                        logText(noCrashLet { CookieManager.getInstance().getCookie("https://animeflv.net/") }
+                        logText(noCrashLet { CookieManager.getInstance().getCookie("https://animeflv.net") }
                                 ?: "Error!")
                         if (BypassUtil.isLoading && BypassUtil.saveCookies(App.context)) {
                             logText("Cookies saved")
@@ -173,7 +173,7 @@ open class GenericActivity : AppCompatActivity() {
                         return false
                     }
                 }
-                webView.settings?.userAgentString = (if (PrefsUtil.useDefaultUserAgent) {
+                webView.settings.userAgentString = (if (PrefsUtil.useDefaultUserAgent) {
                     webView.settings.userAgentString
                 } else UAGenerator.getRandomUserAgent()).also { PrefsUtil.userAgent = it }
                 logText("Open animeflv.net")

@@ -203,8 +203,8 @@ class AchievementActivityMaterial : GenericActivity() {
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.backup -> {
                 syncButton?.isEnabled = false
                 AchievementManager.backup {

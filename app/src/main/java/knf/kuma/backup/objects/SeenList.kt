@@ -24,7 +24,7 @@ class SeenList {
 
     private fun deserialize() {
         list = ArrayList()
-        Log.e("Seen", vistos)
+        Log.e("Seen", "$vistos")
         val els = vistos?.replace("E", "")?.split(":::".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
         for (el in els ?: emptyArray()) {
             if (el != "") {

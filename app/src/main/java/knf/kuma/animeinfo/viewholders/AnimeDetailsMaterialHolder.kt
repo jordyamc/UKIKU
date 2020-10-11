@@ -135,31 +135,32 @@ class AnimeDetailsMaterialHolder(val view: View) {
                     }
                 }
             }
-            noCrash {
-                spinnerList.adapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, view.context.resources.getStringArray(R.array.list_states))
-                fragment.lifecycleScope.launch(Dispatchers.Main) {
-                    spinnerList.onItemSelectedListener = null
-                    spinnerList.setSelection(withContext(Dispatchers.IO) {
-                        CacheDB.INSTANCE.seeingDAO().getByAid(animeObject.aid)
-                    }?.state ?: 0)
-                    spinnerList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
+            if (!layouts[5].isVisible)
+                noCrash {
+                    spinnerList.adapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, view.context.resources.getStringArray(R.array.list_states))
+                    fragment.lifecycleScope.launch(Dispatchers.Main) {
+                        spinnerList.onItemSelectedListener = null
+                        spinnerList.setSelection(withContext(Dispatchers.IO) {
+                            CacheDB.INSTANCE.seeingDAO().getByAid(animeObject.aid)
+                        }?.state ?: 0)
+                        spinnerList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onNothingSelected(parent: AdapterView<*>?) {
 
-                        }
+                            }
 
-                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                            doAsync {
-                                if (position == 0)
-                                    CacheDB.INSTANCE.seeingDAO().remove(SeeingObject.fromAnime(animeObject, position))
-                                else
-                                    CacheDB.INSTANCE.seeingDAO().add(SeeingObject.fromAnime(animeObject, position))
-                                syncData { seeing() }
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                                doAsync {
+                                    if (position == 0)
+                                        CacheDB.INSTANCE.seeingDAO().remove(SeeingObject.fromAnime(animeObject, position))
+                                    else
+                                        CacheDB.INSTANCE.seeingDAO().add(SeeingObject.fromAnime(animeObject, position))
+                                    syncData { seeing() }
+                                }
                             }
                         }
                     }
+                    showLayout(layouts[5])
                 }
-                showLayout(layouts[5])
-            }
             noCrash {
                 if (animeObject.related?.isNotEmpty() == true) {
                     recyclerViewRelated.removeAllDecorations()

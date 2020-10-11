@@ -311,7 +311,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
             if (PrefsUtil.isNativeAdsEnabled)
                 this@RecentsAdapter.list.implAdsRecent()
             if (this@RecentsAdapter.list.isNotEmpty())
-                launch(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     notifyDataSetChanged()
                     if (wasEmpty)
                         updateListener.invoke()

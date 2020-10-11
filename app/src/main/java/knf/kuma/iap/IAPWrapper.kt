@@ -116,7 +116,7 @@ class IAPWrapper(private val context: Context) : ServiceConnection {
         }
         val purchaseData = data.getStringExtra(RESPONSE_INAPP_PURCHASE_DATA)
         val dataSignature = data.getStringExtra(RESPONSE_INAPP_SIGNATURE)
-        val id = data.getStringExtra(RESPONSE_INAPP_PURCHASE_ID)
+        val id = data.getStringExtra(RESPONSE_INAPP_PURCHASE_ID) ?: ""
         if (resultCode == Activity.RESULT_OK && data.extras?.responseCode == BILLING_RESPONSE_RESULT_OK) {
             if (purchaseData == null || dataSignature == null) {
                 Log.e(NAME, "Data or signature null")

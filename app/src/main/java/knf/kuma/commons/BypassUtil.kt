@@ -46,10 +46,10 @@ class BypassUtil {
 
         fun saveCookies(context: Context): Boolean =
                 noCrashLet(false) {
-                    val cookies = CookieManager.getInstance().getCookie(".animeflv.net")?.trim()
+                    val cookies = CookieManager.getInstance().getCookie("https://animeflv.net")?.trim()
                             ?: ""
                     if (cookies.contains(keyCfClearance)) {
-                        val parts = cookies.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        val parts = cookies.split(";").dropLastWhile { it.isEmpty() }.toTypedArray()
                         for (cookie in parts) {
                             if (cookie.contains(keyCfDuid))
                                 setCFDuid(context, cookie.trim().substring(cookie.trim().indexOf("=") + 1))
