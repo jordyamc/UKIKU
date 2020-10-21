@@ -70,6 +70,9 @@ object PrefsUtil {
     val showFavIndicator: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_fav_count", true)
 
+    val useNewBypass: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("useNewBypass", true)
+
     private val useExperimentalPlayer: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("experimental_player", false)
 
@@ -178,8 +181,9 @@ object PrefsUtil {
     val useHome: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("recents_design", "0") == "1"
 
-    val useDefaultUserAgent: Boolean
+    var useDefaultUserAgent: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_device_useragent", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("use_device_useragent", value).apply()
 
     val usePlaceholders: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("list_placeholder", false)

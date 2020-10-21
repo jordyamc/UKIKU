@@ -106,6 +106,9 @@ class ConnectionState : LinearLayout {
                             okState()
                             delay(1000)
                             dismiss()
+                        } else if (!it.first && !it.second) {
+                            dismiss()
+                            doNetworkTests(owner, onShowDialog)
                         }
                     }
                 })
@@ -119,6 +122,9 @@ class ConnectionState : LinearLayout {
                         } else if (it.first && !it.second) {
                             okState()
                             dismiss()
+                        } else if (!it.first && !it.second) {
+                            dismiss()
+                            doNetworkTests(owner, onShowDialog)
                         }
                     }
                 })

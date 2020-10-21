@@ -25,6 +25,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.download.FileAccessHelper
+import knf.tools.bypass.startBypass
 import kotlinx.android.synthetic.main.layout_diagnostic.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -114,7 +115,12 @@ class Diagnostic : GenericActivity() {
                 doOnUI {
                     bypassRecreate.apply {
                         visibility = View.VISIBLE
-                        onClick { startActivityForResult(Intent(this@Diagnostic, FullBypass::class.java), 5546) }
+                        onClick {
+                            if (PrefsUtil.useNewBypass)
+                                startBypass(5546, BypassUtil.testLink)
+                            else
+                                startActivityForResult(Intent(this@Diagnostic, FullBypass::class.java), 5546)
+                        }
                     }
                 }
                 try {

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="174" version="5.1.5">
+        <change type="fix">Errores generales</change>
+        <change type="change">Nuevo metodo de bypass</change>
+    </release>
     <release code="173" version="5.1.4">
         <change type="fix">Errores generales</change>
     </release>

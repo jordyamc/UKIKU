@@ -19,7 +19,9 @@ class StapeServer(context: Context, baseLink: String) : Server(context, baseLink
             return try {
                 val video = Jsoup.connect(downLink).get().select("#videolink").first()
                 val link = "https:${video.text()}&stream=1"
-                VideoServer(STAPE, Option(name, null, Jsoup.connect(link).ignoreContentType(true).followRedirects(true).execute().url().toString()))
+                val videoLink = Jsoup.connect(link).ignoreContentType(true).followRedirects(true).execute().url().toString()
+                check(!videoLink.contains("streamtape_do_not_delete.mp4"))
+                VideoServer(STAPE, Option(name, null, videoLink))
             } catch (e: Exception) {
                 e.printStackTrace()
                 null

@@ -76,11 +76,8 @@ import knf.kuma.recommended.RecommendActivityMaterial
 import knf.kuma.record.RecordActivityMaterial
 import knf.kuma.search.SearchActivity
 import knf.kuma.seeing.SeeingActivityMaterial
-import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
-import knh.kuma.commons.cloudflarebypass.CfCallback
-import knh.kuma.commons.cloudflarebypass.Cloudflare
 import kotlinx.android.synthetic.main.activity_main_material.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -93,10 +90,7 @@ import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
 import java.io.File
-import java.net.HttpCookie
 import kotlin.contracts.ExperimentalContracts
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class MainMaterial : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -207,35 +201,6 @@ class MainMaterial : GenericActivity(),
 
     private suspend fun checkDirectoryState() {
         DirManager.checkPreDir()
-        if (PrefsUtil.useDefaultUserAgent && Network.isConnected) {
-            val isBrowserOk = noCrashLet(false) {
-                jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
-                true
-            }
-            if (!isBrowserOk) {
-                val randomUA = randomUA()
-                PrefsUtil.userAgentDir = randomUA
-                suspendCoroutine<Boolean> {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        noCrash {
-                            Cloudflare(this@MainMaterial, "https://animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
-                                setCfCallback(object : CfCallback {
-                                    override fun onSuccess(cookieList: MutableList<HttpCookie>?, hasNewUrl: Boolean, newUrl: String?) {
-                                        PrefsUtil.dirCookies = cookieList ?: emptyList()
-                                        noCrash { it.resume(true) }
-                                    }
-
-                                    override fun onFail(code: Int, msg: String?) {
-                                        Log.e("Dir cookies", "On error, code $code, msg: $msg")
-                                        noCrash { it.resume(false) }
-                                    }
-                                })
-                            }.getCookies()
-                        }
-                    }
-                }
-            }
-        }
         DirectoryService.run(this@MainMaterial)
     }
 

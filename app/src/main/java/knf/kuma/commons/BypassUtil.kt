@@ -40,14 +40,19 @@ class BypassUtil {
         const val testLink = "https://animeflv.net/"
 
         suspend fun clearCookiesIfNeeded() {
-            if (!withContext(Dispatchers.IO){ isCloudflareActive() })
+            if (!withContext(Dispatchers.IO) { isCloudflareActive() })
                 clearCookies(null)
         }
 
-        fun saveCookies(context: Context): Boolean =
+        fun saveCookies(context: Context): Boolean {
+            return noCrashLet(false) {
+                saveCookies(context, CookieManager.getInstance().getCookie("https://animeflv.net")?.trim()
+                        ?: "")
+            }
+        }
+
+        fun saveCookies(context: Context, cookies: String): Boolean =
                 noCrashLet(false) {
-                    val cookies = CookieManager.getInstance().getCookie("https://animeflv.net")?.trim()
-                            ?: ""
                     if (cookies.contains(keyCfClearance)) {
                         val parts = cookies.split(";").dropLastWhile { it.isEmpty() }.toTypedArray()
                         for (cookie in parts) {
@@ -68,7 +73,7 @@ class BypassUtil {
         fun clearCookies() {
             noCrash {
                 val cookieManager = CookieManager.getInstance()
-                val cookiestring = cookieManager.getCookie(".animeflv.net")
+                val cookiestring = cookieManager.getCookie("https://animeflv.net")
                 if (cookiestring != null) {
                     noCrash {
                         val cookies = cookiestring.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
