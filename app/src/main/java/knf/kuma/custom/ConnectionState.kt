@@ -98,7 +98,12 @@ class ConnectionState : LinearLayout {
             }
             403 -> {
                 errorBlockedState(onShowDialog)
-                GenericActivity.bypassLive.observe(owner, Observer {
+                var defResult = true
+                val observer = Observer<Pair<Boolean, Boolean>> {
+                    if (defResult) {
+                        defResult = false
+                        return@Observer
+                    }
                     GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
                         if (it.first && it.second) {
                             warningCreatingState()
@@ -106,28 +111,42 @@ class ConnectionState : LinearLayout {
                             okState()
                             delay(1000)
                             dismiss()
-                        } else if (!it.first && !it.second) {
-                            dismiss()
+                            GenericActivity.removeBypassObserver("connectionState")
+                        } /*else if (!it.first && !it.second) {
+                            //dismiss()
+                            GenericActivity.removeBypassObserver("connectionState")
+                            normalState()
                             doNetworkTests(owner, onShowDialog)
-                        }
+                        }*/
                     }
-                })
+                }
+                GenericActivity.addBypassObserver("connectionState", owner, observer)
             }
             503 -> {
                 warningState(onShowDialog)
-                GenericActivity.bypassLive.observe(owner, Observer {
+                var defResult = true
+                val observer = Observer<Pair<Boolean, Boolean>> {
+                    if (defResult) {
+                        defResult = false
+                        return@Observer
+                    }
                     GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
                         if (it.first && it.second) {
                             warningCreatingState()
                         } else if (it.first && !it.second) {
                             okState()
+                            delay(1000)
                             dismiss()
-                        } else if (!it.first && !it.second) {
-                            dismiss()
+                            GenericActivity.removeBypassObserver("connectionState")
+                        } /*else if (!it.first && !it.second) {
+                            //dismiss()
+                            GenericActivity.removeBypassObserver("connectionState")
+                            normalState()
                             doNetworkTests(owner, onShowDialog)
-                        }
+                        }*/
                     }
-                })
+                }
+                GenericActivity.addBypassObserver("connectionState", owner, observer)
             }
             else -> networkErrorState(owner, onShowDialog)
         }

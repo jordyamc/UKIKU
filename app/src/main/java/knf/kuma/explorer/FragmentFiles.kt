@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
@@ -17,11 +18,11 @@ import knf.kuma.ads.implBanner
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.verifyManager
-import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.find
 
 class FragmentFiles : Fragment() {
+    private val model: ExplorerFilesModel by activityViewModels()
     lateinit var recyclerView: RecyclerView
     lateinit var error: View
     lateinit var progressBar: ProgressBar
@@ -40,8 +41,8 @@ class FragmentFiles : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.explorerDAO().all.observe(viewLifecycleOwner, Observer { explorerObjects ->
-            adapter?.update(explorerObjects)
+        model.localFilesData.observe(viewLifecycleOwner, { explorerObjects ->
+            adapter?.update(explorerObjects.toMutableList())
             if (explorerObjects.isNotEmpty()) {
                 progressBar.visibility = View.GONE
                 state.visibility = View.GONE

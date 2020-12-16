@@ -1,6 +1,5 @@
 package knf.kuma.explorer.creator
 
-import android.net.Uri
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import java.io.File
@@ -27,7 +26,7 @@ class SimpleFileCreator(val base: File) : Creator {
                     try {
                         progress++
                         progressCallback(progress, files.size)
-                        list.add(ExplorerObject(animeObject, createSubFilesList(animeObject.getFinalName())))
+                        list.add(ExplorerObject(animeObject))
                     } catch (e: IllegalStateException) {
                         e.printStackTrace()
                     }
@@ -36,8 +35,4 @@ class SimpleFileCreator(val base: File) : Creator {
         } else
             emptyList()
     }
-
-    override fun createSubFilesList(fileName: String): List<SubFile> =
-            File(base, fileName).listFiles()?.filter { it.name.endsWith(".mp4") }?.map { SubFile(it.name, Uri.fromFile(it).toString()) }
-                    ?: emptyList()
 }

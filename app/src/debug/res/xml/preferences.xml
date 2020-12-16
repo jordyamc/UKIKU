@@ -300,9 +300,9 @@
             android:summaryOn="Se usará agente por defecto en bypass"
             android:title="Usar agente del dispositivo" />
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:icon="@drawable/ic_incognito"
-            android:key="may_use_random_useragent"
+            android:key="may_use_random_useragent_1"
             android:summaryOn="Se usará agente al azar cuando sea posible"
             android:summaryOff="Se usará la configuracion actual"
             android:title="Usar agente al azar cuando sea posible"/>

@@ -178,7 +178,7 @@ object FileAccessHelper {
         }
 
     fun getTmpFile(file_name: String): File {
-        return File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+        return File(getDownloadsCacheDir(), PatternUtil.getNameFromFile(file_name) + file_name)
     }
 
     val toneFile: File
@@ -201,7 +201,7 @@ object FileAccessHelper {
                 file
             } else {
                 createTmpIfNotExist()
-                val file = File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/${getPackage()}/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                val file = File(getDownloadsCacheDir(), PatternUtil.getNameFromFile(file_name) + file_name)
                 file.parentFile?.mkdirs()
                 if (!file.exists())
                     file.createNewFile()
@@ -213,6 +213,13 @@ object FileAccessHelper {
             null
         }
 
+    }
+
+    private fun getDownloadsCacheDir(): File {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            App.context.getExternalFilesDirs("downloads").last()
+        else
+            File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/${getPackage()}/files/downloads")
     }
 
     internal fun isTempFile(file: String): Boolean {
@@ -399,13 +406,14 @@ object FileAccessHelper {
     }
 
     private fun createTmpIfNotExist() {
-        if (!File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/${getPackage()}").exists()) {
+        if (!getDownloadsCacheDir().exists()) {
             treeUri?.let {
-                val documentFile = DocumentFile.fromTreeUri(App.context, it)
+                getDownloadsCacheDir().mkdirs()
+                /*val documentFile = DocumentFile.fromTreeUri(App.context, it)
                 if (documentFile != null && documentFile.exists()) {
                     val file = find(documentFile, "Android/data/${getPackage()}/files/downloads/tmp.file")
                     file?.delete()
-                }
+                }*/
             }
         }
     }
@@ -482,7 +490,7 @@ object FileAccessHelper {
 
     fun getTmpInputStream(file_name: String): InputStream? {
         return try {
-            val file = File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "Android/data/knf.kuma/files/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+            val file = File(getDownloadsCacheDir(), PatternUtil.getNameFromFile(file_name) + file_name)
             if (file.parentFile?.exists() == false)
                 file.parentFile?.mkdirs()
             FileInputStream(file)
@@ -633,7 +641,10 @@ object FileAccessHelper {
     fun openTreeChooser(context: Context) {
         try {
             context.findActivity()?.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_REQUEST)
-            Toaster.toastLong("Por favor selecciona la raiz del almacenamiento")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                Toaster.toastLong("Por favor selecciona un directorio para las descargas")
+            else
+                Toaster.toastLong("Por favor selecciona la raiz del almacenamiento")
         } catch (e: Exception) {
             Toaster.toast("Error al buscar SD")
         }
@@ -653,7 +664,7 @@ object FileAccessHelper {
                         Log.e("Storage", "$uri is not root")
                         uriValidation.errorMessage = "No es la raiz!"
                     }
-                }
+                } || Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

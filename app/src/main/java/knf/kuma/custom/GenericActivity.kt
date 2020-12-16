@@ -16,7 +16,9 @@ import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
@@ -82,7 +84,7 @@ open class GenericActivity : AppCompatActivity() {
                 if (PrefsUtil.useNewBypass) {
                     bypassLive.postValue(Pair(true, true))
                     BypassUtil.isLoading = true
-                    startBypass(4157, BypassUtil.testLink)
+                    startBypass(4157, BypassUtil.testLink, isTV)
                 } else {
                     if (flag == 1 || forceCreation()) {
                         logText("Starting creation")
@@ -203,22 +205,19 @@ open class GenericActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 4157 && resultCode == RESULT_OK && data != null) {
-            if (BypassUtil.saveCookies(this, data.getStringExtra("cookies") ?: "null")) {
+        if (requestCode == 4157) {
+            val cookiesUpdated = data?.let {
                 PrefsUtil.useDefaultUserAgent = false
-                PrefsUtil.userAgent = data.getStringExtra("user_agent") ?: randomUA()
-                bypassLive.postValue(Pair(first = true, second = false))
-                Repository().reloadRecents()
-                onBypassUpdated()
-                BypassUtil.isLoading = false
-                PicassoSingle.clear()
-                if (!PrefsUtil.isDirectoryFinished)
-                    DirectoryService.run(this@GenericActivity)
-            }
-        } else if (resultCode == RESULT_CANCELED) {
-            bypassLive.postValue(Pair(first = false, second = false))
-            BypassUtil.isLoading = false
+                PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()
+                BypassUtil.saveCookies(this, it.getStringExtra("cookies") ?: "null")
+            } ?: false
+            bypassLive.postValue(Pair(first = cookiesUpdated, second = false))
+            Repository().reloadRecents()
             onBypassUpdated()
+            BypassUtil.isLoading = false
+            PicassoSingle.clear()
+            if (!PrefsUtil.isDirectoryFinished)
+                DirectoryService.run(this@GenericActivity)
         }
     }
 
@@ -296,6 +295,20 @@ open class GenericActivity : AppCompatActivity() {
     }
 
     companion object {
+        private val observersList = mutableMapOf<String, Observer<Pair<Boolean, Boolean>>>()
         val bypassLive: MutableLiveData<Pair<Boolean, Boolean>> = MutableLiveData()
+
+        fun addBypassObserver(id: String, owner: LifecycleOwner, observer: Observer<Pair<Boolean, Boolean>>) {
+            removeBypassObserver(id)
+            observersList[id] = observer
+            bypassLive.observe(owner, observer)
+        }
+
+        fun removeBypassObserver(id: String) {
+            if (observersList.containsKey(id)) {
+                bypassLive.removeObserver(observersList[id]!!)
+                observersList.remove(id)
+            }
+        }
     }
 }

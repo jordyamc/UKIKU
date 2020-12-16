@@ -117,7 +117,7 @@ class Diagnostic : GenericActivity() {
                         visibility = View.VISIBLE
                         onClick {
                             if (PrefsUtil.useNewBypass)
-                                startBypass(5546, BypassUtil.testLink)
+                                startBypass(5546, BypassUtil.testLink, isTV)
                             else
                                 startActivityForResult(Intent(this@Diagnostic, FullBypass::class.java), 5546)
                         }

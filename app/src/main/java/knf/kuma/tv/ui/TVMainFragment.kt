@@ -135,7 +135,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                 }
                 startEntranceTransition()
             })
-            CacheDB.INSTANCE.recordsDAO().allLive.distinct.observe(it, Observer { recordObjects ->
+            CacheDB.INSTANCE.recordsDAO().allLive.distinct.observe(it, { recordObjects ->
                 mRows?.get(LAST_SEEN)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -145,7 +145,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                 }
                 startEntranceTransition()
             })
-            CacheDB.INSTANCE.favsDAO().all.distinct.observe(it, Observer { favoriteObjects ->
+            CacheDB.INSTANCE.favsDAO().all.distinct.observe(it, { favoriteObjects ->
                 mRows?.get(FAVORITES)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -155,7 +155,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                 }
                 startEntranceTransition()
             })
-            CacheDB.INSTANCE.animeDAO().animesDirWithIDRandomNL(StaffRecommendations.randomIds(15)).distinct.observe(it, Observer { staffObjects ->
+            CacheDB.INSTANCE.animeDAO().animesDirWithIDRandomNL(StaffRecommendations.randomIds(15)).distinct.observe(it, { staffObjects ->
                 mRows?.get(STAFF)?.apply {
                     page = page.plus(1)
                     adapter?.apply {

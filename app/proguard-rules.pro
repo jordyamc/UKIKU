@@ -116,3 +116,6 @@
 -dontwarn io.opencensus.**
 -dontwarn dagger.**
 -dontwarn com.tonyodev.**
+-dontwarn java.lang.instrument.ClassFileTransformer
+-dontwarn com.android.installreferrer.api.InstallReferrerStateListener
+-dontwarn sun.misc.SignalHandler

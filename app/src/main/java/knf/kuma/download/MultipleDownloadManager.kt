@@ -1,6 +1,7 @@
 package knf.kuma.download
 
 import android.content.Context
+import android.os.Build
 import android.os.StatFs
 import android.text.format.Formatter
 import android.util.Log
@@ -67,7 +68,7 @@ object MultipleDownloadManager {
             getAvailable() > size * CHAPTER_SIZE
         } catch (e: Exception) {
             true
-        }
+        } || Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
     private fun getAvailable(): Long {

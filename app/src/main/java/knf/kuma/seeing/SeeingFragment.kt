@@ -102,8 +102,12 @@ class SeeingFragment : Fragment() {
         clickCount++
         if (clickCount == 3) {
             lifecycleScope.launch(Dispatchers.Main) {
-                val num = CacheDB.INSTANCE.seeingDAO().countByState(arguments?.getInt("state", 0)
-                        ?: 0)
+                val state = arguments?.getInt("state", -1) ?: -1
+                if (state == -1) return@launch
+                val num = if (state == 0)
+                    CacheDB.INSTANCE.seeingDAO().countAll
+                else
+                    CacheDB.INSTANCE.seeingDAO().countByState(state)
                 if (num > 0)
                     Toaster.toast("$num anime" + adapter?.let { if (num > 1) "s" else "" })
             }

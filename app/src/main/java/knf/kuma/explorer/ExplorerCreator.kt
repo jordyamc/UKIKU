@@ -3,7 +3,6 @@ package knf.kuma.explorer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import knf.kuma.commons.doOnUI
-import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.doAsync
@@ -19,10 +18,9 @@ object ExplorerCreator {
     internal val stateListener: LiveData<String?>
         get() = STATE_LISTENER
 
-    fun start(listener: EmptyListener) {
+    fun start(model: ExplorerFilesModel, listener: EmptyListener) {
         IS_CREATED = true
         doAsync {
-            val explorerDAO = CacheDB.INSTANCE.explorerDAO()
             if (!FileAccessHelper.isStoragePermissionEnabled()) {
                 Toaster.toastLong("Permiso de almacenamiento no concedido")
                 listener.onEmpty()
@@ -37,13 +35,13 @@ object ExplorerCreator {
                     postState(String.format(Locale.getDefault(), "Procesando animes %d/%d", progress, total))
                 }
                 postState("Creando lista")
-                explorerDAO.insert(list)
+                model.setData(list)
                 if (list.isEmpty()) {
                     listener.onEmpty()
-                    postState(null)
                 }
+                postState(null)
             } else {
-                explorerDAO.deleteAll()
+                model.setData(emptyList())
                 listener.onEmpty()
                 postState(null)
             }
@@ -54,9 +52,6 @@ object ExplorerCreator {
         IS_CREATED = false
         IS_FILES = true
         FILES_NAME = null
-        doAsync {
-            CacheDB.INSTANCE.explorerDAO().deleteAll()
-        }
     }
 
     private fun postState(state: String?) {

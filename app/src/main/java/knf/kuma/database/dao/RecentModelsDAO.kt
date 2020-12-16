@@ -6,11 +6,15 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import knf.kuma.recents.RecentModel
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecentModelsDAO {
     @get:Query("SELECT * FROM recentmodel ORDER BY `key`")
     val allLive: LiveData<List<RecentModel>>
+
+    @get:Query("SELECT * FROM recentmodel ORDER BY `key`")
+    val allFlow: Flow<List<RecentModel>>
 
     @get:Query("SELECT * FROM recentmodel ORDER BY `key`")
     val all: List<RecentModel>

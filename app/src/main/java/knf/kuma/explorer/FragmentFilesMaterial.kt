@@ -9,7 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.ads.AdsType
@@ -17,11 +17,11 @@ import knf.kuma.ads.implBanner
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.verifyManager
-import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.find
 
 class FragmentFilesMaterial : Fragment() {
+    private val model: ExplorerFilesModel by activityViewModels()
     lateinit var recyclerView: RecyclerView
     lateinit var error: View
     lateinit var progressBar: ProgressBar
@@ -40,7 +40,7 @@ class FragmentFilesMaterial : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.explorerDAO().all.observe(viewLifecycleOwner, Observer { explorerObjects ->
+        model.localFilesData.observe(viewLifecycleOwner, { explorerObjects ->
             adapter?.update(explorerObjects)
             if (explorerObjects.isNotEmpty()) {
                 progressBar.visibility = View.GONE
@@ -51,7 +51,7 @@ class FragmentFilesMaterial : Fragment() {
                 }
             }
         })
-        ExplorerCreator.stateListener.observe(viewLifecycleOwner, Observer { s ->
+        ExplorerCreator.stateListener.observe(viewLifecycleOwner, { s ->
             state.text = s
             state.visibility = if (s == null) View.GONE else View.VISIBLE
         })

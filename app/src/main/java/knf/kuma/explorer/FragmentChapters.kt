@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -31,6 +32,7 @@ import xdroid.toaster.Toaster
 
 
 class FragmentChapters : Fragment() {
+    private val model: ExplorerFilesModel by activityViewModels()
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressBar
     lateinit var fab: FloatingActionButton
@@ -86,17 +88,17 @@ class FragmentChapters : Fragment() {
                     .observe(this@FragmentChapters, Observer { fileDownObjs ->
                         if (fileDownObjs.isEmpty()) {
                             Toaster.toast("Directorio vacio")
-                            lifecycleScope.launch(Dispatchers.IO){
-                                CacheDB.INSTANCE.explorerDAO().delete(explorerObject)
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                model.remove(explorerObject)
                                 launch(Dispatchers.Main) {
                                     clearInterface?.onClear()
                                 }
                             }
                         } else {
                             explorerObject.chapters = fileDownObjs as MutableList<ExplorerObject.FileDownObj>
-                            lifecycleScope.launch(Dispatchers.Main){
+                            lifecycleScope.launch(Dispatchers.Main) {
                                 progressBar.visibility = View.GONE
-                                adapter = ExplorerChapsAdapter(this@FragmentChapters, recyclerView, withContext(Dispatchers.IO) { ExplorerObjectWrap(explorerObject) }, clearInterface)
+                                adapter = ExplorerChapsAdapter(this@FragmentChapters, recyclerView, withContext(Dispatchers.IO) { ExplorerObjectWrap(explorerObject) }, model, clearInterface)
                                 recyclerView.adapter = adapter
                                 if (isFirst) {
                                     isFirst = false

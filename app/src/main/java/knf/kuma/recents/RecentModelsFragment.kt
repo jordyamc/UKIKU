@@ -26,6 +26,7 @@ import knf.kuma.videoservers.FileActions
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.android.synthetic.main.fragment_recent_material.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -34,7 +35,6 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
         RecyclerRefreshHolder(requireView()).also {
             it.refreshLayout.setOnRefreshListener(this@RecentModelsFragment)
             it.recyclerView.adapter = adapter
-            it.setRefreshing(true)
         }
     }
     private val adapter: RecentModelsAdapter by lazy { RecentModelsAdapter(this) }
@@ -42,22 +42,24 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.dbLiveData.observe(viewLifecycleOwner, { objects ->
-            holder.setError(objects.isEmpty())
-            holder.setRefreshing(false)
-            if (adapter.itemCount == 0 || objects.isNotEmpty() && objects[0].hashCode().toLong() != adapter.getItemId(0)) {
-                adapter.updateList(objects) {
-                    loadAds(objects)
-                    if (isFirstLoad) {
-                        holder.recyclerView.scheduleLayoutAnimation()
-                        isFirstLoad = false
-                    } else {
-                        holder.scrollToTop()
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewModel.dbLiveData.collectLatest { objects ->
+                holder.setError(objects.isEmpty())
+                holder.setRefreshing(false)
+                if (adapter.itemCount == 0 || objects.isNotEmpty() && objects[0].hashCode().toLong() != adapter.getItemId(0)) {
+                    adapter.updateList(objects) {
+                        loadAds(objects)
+                        if (isFirstLoad) {
+                            holder.recyclerView.scheduleLayoutAnimation()
+                            isFirstLoad = false
+                        } else {
+                            holder.scrollToTop()
+                        }
                     }
+                    scrollByKey(objects)
                 }
-                scrollByKey(objects)
             }
-        })
+        }
         updateList()
     }
 
@@ -76,6 +78,11 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
         val view = inflater.inflate(R.layout.fragment_recent_material, container, false)
         EAHelper.enter1("R")
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        holder.setRefreshing(true)
     }
 
     private fun loadAds(list: List<RecentModel>) {

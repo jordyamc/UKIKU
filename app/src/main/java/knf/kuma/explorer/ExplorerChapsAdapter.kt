@@ -39,13 +39,12 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class ExplorerChapsAdapter internal constructor(val fragment: Fragment, private val recyclerView: RecyclerView, val explorerObject: ExplorerObjectWrap, private var clearInterface: FragmentChapters.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem>() {
+class ExplorerChapsAdapter internal constructor(val fragment: Fragment, private val recyclerView: RecyclerView, val explorerObject: ExplorerObjectWrap, private val model: ExplorerFilesModel, private var clearInterface: FragmentChapters.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapter.ChapItem>() {
     private val context: Context? = fragment.context
 
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
     private val chaptersDAO = CacheDB.INSTANCE.seenDAO()
     private val recordsDAO = CacheDB.INSTANCE.recordsDAO()
-    private val explorerDAO = CacheDB.INSTANCE.explorerDAO()
 
     private val layout: Int
         @LayoutRes
@@ -126,11 +125,10 @@ class ExplorerChapsAdapter internal constructor(val fragment: Fragment, private 
             explorerObject.fileList.removeAt(position)
             doOnUI { notifyItemRemoved(position) }
             if (explorerObject.fileList.size == 0) {
-                explorerDAO.delete(explorerObject.obj)
+                model.remove(explorerObject.obj)
                 clearInterface?.onClear()
             } else {
-                explorerObject.obj.count = explorerObject.fileList.size
-                explorerDAO.update(explorerObject.obj)
+                model.removeOne(explorerObject.obj)
             }
         }
     }
@@ -145,7 +143,7 @@ class ExplorerChapsAdapter internal constructor(val fragment: Fragment, private 
                     notifyItemRemoved(i)
                 }
             }
-            explorerDAO.delete(explorerObject.obj)
+            model.remove(explorerObject.obj)
             clearInterface?.onClear()
         }
     }

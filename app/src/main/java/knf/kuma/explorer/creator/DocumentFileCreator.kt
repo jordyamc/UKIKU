@@ -23,18 +23,11 @@ class DocumentFileCreator(private val rootDF: DocumentFile?) : Creator {
             try {
                 progress++
                 progressCallback(progress, directories.size)
-                list.add(ExplorerObject(it, createSubFilesList(it.getFinalName())))
+                list.add(ExplorerObject(it))
             } catch (e: IllegalStateException) {
                 e.printStackTrace()
             }
         }
         return list
-    }
-
-    override fun createSubFilesList(fileName: String): List<SubFile> {
-        rootDF ?: return emptyList()
-        return rootDF.findFile(fileName)?.listFiles()?.filter { it.name?.endsWith(".mp4") == true }?.map {
-            SubFile(it.name ?: "", it.uri.toString())
-        } ?: emptyList()
     }
 }

@@ -39,7 +39,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.iid.FirebaseInstanceId
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsUtils
@@ -137,10 +136,6 @@ class Main : GenericActivity(),
         MobileAds.initialize(this)
         AdsUtilsMob.setUp()
         FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
-        FirebaseInstanceId.getInstance().instanceId
-                .addOnSuccessListener { result ->
-                    Log.e("IID_TOKEN", result.token)
-                }
         try {
             setContentView(R.layout.activity_main_drawer)
         } catch (e: Exception) {

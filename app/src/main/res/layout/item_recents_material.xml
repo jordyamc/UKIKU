@@ -45,9 +45,9 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <com.google.android.material.progressindicator.ProgressIndicator
+                <com.google.android.material.progressindicator.CircularProgressIndicator
                     android:id="@+id/progressIndicator"
-                    style="@style/Widget.MaterialComponents.ProgressIndicator.Circular.Determinate"
+                    style="@style/Widget.MaterialComponents.CircularProgressIndicator"
                     android:layout_width="77dp"
                     android:layout_height="77dp"
                     android:layout_centerInParent="true"

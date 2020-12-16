@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.commons.safeShow
@@ -13,6 +14,7 @@ import xdroid.toaster.Toaster
 
 class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.SelectedListener, FragmentChaptersMaterial.ClearInterface, ExplorerCreator.EmptyListener {
 
+    private val model: ExplorerFilesModel by activityViewModels()
     private var files: FragmentFilesMaterial = FragmentFilesMaterial[this]
     private val chapters: FragmentChaptersMaterial = FragmentChaptersMaterial[this]
     private var isFiles = true
@@ -65,7 +67,7 @@ class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.Selected
         }
         setFragment(ExplorerCreator.IS_FILES, ExplorerCreator.FILES_NAME)
         if (!ExplorerCreator.IS_CREATED)
-            ExplorerCreator.start(this)
+            ExplorerCreator.start(model, this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

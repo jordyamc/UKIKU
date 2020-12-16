@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -35,7 +34,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.Gson
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
@@ -126,10 +124,6 @@ class MainMaterial : GenericActivity(),
         NativeManager
         AdsUtilsMob.setUp()
         FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
-        FirebaseInstanceId.getInstance().instanceId
-                .addOnSuccessListener { result ->
-                    Log.e("IID_TOKEN", result.token)
-                }
         try {
             setContentView(R.layout.activity_main_material)
         } catch (e: Exception) {

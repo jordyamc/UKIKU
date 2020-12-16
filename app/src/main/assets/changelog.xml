@@ -2,6 +2,13 @@
 <changelog>
     <release code="174" version="5.1.5">
         <change type="fix">Errores generales</change>
+        <change type="fix">Seleccion de carpeta para descargas en Android 11</change>
+        <change type="change">Mejora en creacion de bypass</change>
+        <change type="change">Mejora al cargar recientes</change>
+        <change type="change">Mejoras en explorador</change>
+    </release>
+    <release code="174" version="5.1.5">
+        <change type="fix">Errores generales</change>
         <change type="change">Nuevo metodo de bypass</change>
     </release>
     <release code="173" version="5.1.4">

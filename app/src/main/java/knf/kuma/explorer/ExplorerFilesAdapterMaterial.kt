@@ -47,7 +47,7 @@ class ExplorerFilesAdapterMaterial internal constructor(private val fragment: Fr
         }
     }
 
-    fun update(list: MutableList<ExplorerObject>) {
+    fun update(list: List<ExplorerObject>) {
         submitList(list)
     }
 

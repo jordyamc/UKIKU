@@ -3,6 +3,7 @@ package knf.kuma.recents
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.text.isDigitsOnly
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -27,23 +28,30 @@ import pl.droidsonroids.jspoon.annotation.Selector
 
 @Entity
 open class RecentModel {
+
+    @JvmField
     @PrimaryKey
     var key: Int = -1
 
+    @JvmField
     @Selector(value = "img[src]", attr = "src", format = "/(\\d+)\\.\\w+")
-    lateinit var aid: String
+    var aid: String = "0"
 
+    @JvmField
     @Selector(value = "img", attr = "alt")
-    lateinit var name: String
+    var name: String = ""
 
+    @JvmField
     @Selector(".Capi")
-    lateinit var chapter: String
+    var chapter: String = ""
 
+    @JvmField
     @Selector(value = "a", converter = AFixer::class)
-    lateinit var chapterUrl: String
+    var chapterUrl: String = ""
 
+    @JvmField
     @Selector(value = "img[src]", converter = ImageFixer::class)
-    lateinit var img: String
+    var img: String = ""
 
     @Ignore
     lateinit var extras: RecentExtras
@@ -52,6 +60,8 @@ open class RecentModel {
     lateinit var state: RecentState
 
     fun prepare() {
+        if (!aid.isDigitsOnly())
+            aid = "0"
         if (!::extras.isInitialized)
             extras = RecentExtras(this)
         if (!::state.isInitialized)

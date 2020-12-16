@@ -163,7 +163,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("user_agent", value).apply()
 
     val mayUseRandomUA: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("may_use_random_useragent", true)
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("may_use_random_useragent_1", false)
 
     var alwaysGenerateUA: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("alwaysGenerateUA", true)

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Config
 import androidx.paging.PagedList
@@ -22,6 +21,7 @@ import kotlinx.android.synthetic.main.fragment_seeing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
 
 class SeeingFragmentMaterial : Fragment() {
@@ -32,7 +32,7 @@ class SeeingFragmentMaterial : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        liveData.observe(viewLifecycleOwner, Observer {
+        liveData.observe(viewLifecycleOwner, {
             progress.visibility = View.GONE
             error.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
             adapter?.submitList(it)
@@ -102,8 +102,14 @@ class SeeingFragmentMaterial : Fragment() {
         clickCount++
         if (clickCount == 3) {
             lifecycleScope.launch(Dispatchers.Main) {
-                val num = CacheDB.INSTANCE.seeingDAO().countByState(arguments?.getInt("state", 0)
-                        ?: 0)
+                val state = arguments?.getInt("state", -1) ?: -1
+                if (state == -1) return@launch
+                val num = withContext(Dispatchers.IO) {
+                    if (state == 0)
+                        CacheDB.INSTANCE.seeingDAO().countAll
+                    else
+                        CacheDB.INSTANCE.seeingDAO().countByState(state)
+                }
                 if (num > 0)
                     Toaster.toast("$num anime" + adapter?.let { if (num > 1) "s" else "" })
             }

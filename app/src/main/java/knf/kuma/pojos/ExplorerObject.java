@@ -73,7 +73,21 @@ public class ExplorerObject {
     }
 
     @Ignore
-    public ExplorerObject(@Nullable AnimeSubObject object, List<SubFile> subFiles) throws IllegalStateException {
+    public ExplorerObject(ExplorerObject item) {
+        this.key = item.key;
+        this.img = item.img;
+        this.link = item.link;
+        this.fileName = item.fileName;
+        this.name = item.name;
+        this.aid = item.aid;
+        this.count = item.count;
+        this.path = item.path;
+        this.file_list = FileAccessHelper.INSTANCE.getDownloadsDirectoryFiles(fileName);
+        this.chapters = item.chapters;
+    }
+
+    @Ignore
+    public ExplorerObject(@Nullable AnimeSubObject object) throws IllegalStateException {
         if (object == null)
             throw new IllegalStateException("Anime not found!!!");
         this.key = object.getKey();

@@ -34,6 +34,9 @@ interface SeeingDAO {
     @get:Query("SELECT count(*) FROM seeingobject")
     val countLive: LiveData<Int>
 
+    @get:Query("SELECT count(*) FROM seeingobject")
+    val countAll: Int
+
     @get:Query("SELECT count(*) FROM seeingobject WHERE state=1")
     val countWatchingLive: LiveData<Int>
 

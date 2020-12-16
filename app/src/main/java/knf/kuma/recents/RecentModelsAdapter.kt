@@ -19,7 +19,7 @@ import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.gms.ads.formats.UnifiedNativeAdView
 import com.google.android.material.chip.Chip
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.progressindicator.ProgressIndicator
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -223,10 +223,11 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
         val actionMenu: View = itemView.actionMenu
         val downloadedChip: Chip = itemView.downloadedChip
         private val layDownloading: View = itemView.layDownloading
-        private val progressIndicator: ProgressIndicator = itemView.progressIndicator
+        private val progressIndicator: CircularProgressIndicator = itemView.progressIndicator
         private val actionCancel: View = itemView.actionCancel
 
         private lateinit var state: RecentState
+        private var checkJob: Job? = null
         private val favoriteObserver = Observer<Boolean> {
             if (state.isFavorite == it) return@Observer
             state.isFavorite = it
@@ -291,45 +292,52 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
         }
 
         private fun setUpDownloadIndicators(item: RecentModel) {
-            when {
-                state.downloadObject?.isDownloadingOrPaused == true -> {
-                    layDownloading.isVisible = true
-                    downloadedChip.isVisible = false
-                    state.downloadObject?.let {
-                        when (it.state) {
-                            DownloadObject.DOWNLOADING, DownloadObject.PAUSED -> {
-                                progressIndicator.isVisible = false
-                                progressIndicator.isIndeterminate = false
-                                progressIndicator.isVisible = true
-                                if (it.getEta() == -2L || PrefsUtil.downloaderType == 0) {
-                                    var progress = it.progress
-                                    if (it.getEta() == -2L && PrefsUtil.downloaderType != 0) {
-                                        progressIndicator.max = 200
-                                        progress += 100
+            checkJob = GlobalScope.launch(Dispatchers.Main) {
+                layDownloading.isVisible = false
+                downloadedChip.isVisible = false
+                when {
+                    state.downloadObject?.isDownloadingOrPaused == true -> {
+                        if (!isActive) return@launch
+                        layDownloading.isVisible = true
+                        downloadedChip.isVisible = false
+                        state.downloadObject?.let {
+                            when (it.state) {
+                                DownloadObject.DOWNLOADING, DownloadObject.PAUSED -> {
+                                    progressIndicator.isVisible = false
+                                    progressIndicator.isIndeterminate = false
+                                    progressIndicator.isVisible = true
+                                    if (it.getEta() == -2L || PrefsUtil.downloaderType == 0) {
+                                        var progress = it.progress
+                                        if (it.getEta() == -2L && PrefsUtil.downloaderType != 0) {
+                                            progressIndicator.max = 200
+                                            progress += 100
+                                        } else {
+                                            progressIndicator.max = 100
+                                        }
+                                        progressIndicator.setProgressCompat(progress, true)
                                     } else {
-                                        progressIndicator.max = 100
+                                        progressIndicator.max = 200
+                                        progressIndicator.setProgressCompat(it.progress, true)
                                     }
-                                    progressIndicator.setProgressCompat(progress, true)
-                                } else {
-                                    progressIndicator.max = 200
-                                    progressIndicator.setProgressCompat(it.progress, true)
                                 }
-                            }
-                            DownloadObject.PENDING -> {
-                                progressIndicator.isVisible = false
-                                progressIndicator.isIndeterminate = true
-                                progressIndicator.isVisible = true
+                                DownloadObject.PENDING -> {
+                                    progressIndicator.isVisible = false
+                                    progressIndicator.isIndeterminate = true
+                                    progressIndicator.isVisible = true
+                                }
                             }
                         }
                     }
-                }
-                state.isDownloaded -> {
-                    layDownloading.isVisible = false
-                    downloadedChip.isVisible = true
-                }
-                else -> {
-                    layDownloading.isVisible = false
-                    downloadedChip.isVisible = false
+                    withContext(Dispatchers.IO) { state.isDownloaded } -> {
+                        if (!isActive) return@launch
+                        layDownloading.isVisible = false
+                        downloadedChip.isVisible = true
+                    }
+                    else -> {
+                        if (!isActive) return@launch
+                        layDownloading.isVisible = false
+                        downloadedChip.isVisible = false
+                    }
                 }
             }
             actionCancel.onClick {
@@ -351,6 +359,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
         }
 
         fun recycle() {
+            checkJob?.cancel()
             if (!::state.isInitialized) return
             state.favoriteLive.removeObserver(favoriteObserver)
             state.seenLive.removeObserver(seenObserver)
