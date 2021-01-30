@@ -13,11 +13,7 @@ import android.view.View
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
-import androidx.lifecycle.Observer
-import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceManager
-import androidx.preference.SwitchPreference
+import androidx.preference.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.input.getInputField
@@ -53,6 +49,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.support.v4.toast
 import xdroid.toaster.Toaster
 import java.io.FileOutputStream
+import kotlin.contracts.ExperimentalContracts
 
 
 class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
@@ -74,6 +71,7 @@ class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
         super.onAttach(activity)
     }
 
+    @ExperimentalContracts
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         if (activity != null && context != null)
             doOnUI {
@@ -82,6 +80,8 @@ class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Abrir configuración"
                 else if (FileAccessHelper.toneFile.exists())
                     preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Personalizado"
+                if (!DesignUtils.isFlat)
+                    preferenceScreen.findPreference<ListPreference>("recentActionType")?.isVisible = false
                 preferenceScreen.findPreference<Preference>(keyCustomTone)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         noCrash {
@@ -328,6 +328,10 @@ class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
                     DirUpdateWork.reSchedule(newValue.toString().toInt() * 15)
                     true
                 }
+                preferenceScreen.findPreference<Preference>("security_blocking_firestore")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    FirestoreManager.start()
+                    true
+                }
                 preferenceScreen.findPreference<Preference>("dir_update")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
@@ -493,7 +497,7 @@ class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
                         safeContext.contentResolver,
                         data?.data,
                         FileOutputStream(FileAccessHelper.toneFile), false)
-                        .observe(this, Observer {
+                        .observe(this, {
                             try {
                                 if (it != null) {
                                     if (it.second) {

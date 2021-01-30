@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import knf.kuma.App
 import knf.kuma.Main
 import knf.kuma.MainMaterial
@@ -65,10 +64,12 @@ object DesignUtils {
     }
 
     fun listenDesignChange(activity: FragmentActivity){
-        PrefsUtil.getLiveDesignType().observe(activity, Observer {
-            if (it != lastPref) {
-                lastPref = it
-                change(activity, it)
+        PrefsUtil.getLiveDesignType().observe(activity, {
+            noCrash {
+                if (it != lastPref && it.toInt() >= 0) {
+                    lastPref = it
+                    change(activity, it)
+                }
             }
         })
     }

@@ -22,6 +22,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
+import knf.kuma.custom.exceptions.EJNFException
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
 import knf.kuma.download.*
@@ -216,7 +217,8 @@ class ServersFactory {
                     break
                 }
             }
-            val jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value)
+            val jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value
+                    ?: throw EJNFException())
             if (jsonObject.length() > 1) {
                 doOnUI {
                     MaterialDialog(context).safeShow {
@@ -291,6 +293,11 @@ class ServersFactory {
                 this@ServersFactory.servers = servers
                 showServerList()
             }
+        } catch (e: EJNFException) {
+            e.printStackTrace()
+            this@ServersFactory.servers = ArrayList()
+            Toaster.toast("Sin json de capitulos")
+            callOnFinish(false, false)
         } catch (e: Exception) {
             e.printStackTrace()
             this@ServersFactory.servers = ArrayList()

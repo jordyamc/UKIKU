@@ -506,22 +506,26 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
         }
 
         fun setDownloaded(downloaded: Boolean, isCasting: Boolean) {
-            inDown.post {
-                if (downloaded)
-                    inDown.setImageResource(R.drawable.ic_chap_down)
-                if (isCasting)
-                    inDown.setImageResource(R.drawable.ic_casting)
-                inDown.visibility = if (downloaded || isCasting) View.VISIBLE else View.GONE
+            noCrash {
+                inDown.post {
+                    if (downloaded)
+                        inDown.setImageResource(R.drawable.ic_chap_down)
+                    if (isCasting)
+                        inDown.setImageResource(R.drawable.ic_casting)
+                    inDown.visibility = if (downloaded || isCasting) View.VISIBLE else View.GONE
+                }
             }
         }
 
         fun setQueue(isInQueue: Boolean, isDownloaded: Boolean) {
-            inDown.post {
-                if (!isInQueue)
-                    setDownloaded(isDownloaded, false)
-                else {
-                    inDown.setImageResource(if (isDownloaded) R.drawable.ic_queue_file else R.drawable.ic_queue_normal)
-                    inDown.visibility = View.VISIBLE
+            noCrash {
+                inDown.post {
+                    if (!isInQueue)
+                        setDownloaded(isDownloaded, false)
+                    else {
+                        inDown.setImageResource(if (isDownloaded) R.drawable.ic_queue_file else R.drawable.ic_queue_normal)
+                        inDown.visibility = View.VISIBLE
+                    }
                 }
             }
         }

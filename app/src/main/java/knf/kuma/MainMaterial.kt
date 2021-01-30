@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -34,6 +35,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
@@ -194,6 +196,7 @@ class MainMaterial : GenericActivity(),
     }
 
     private suspend fun checkDirectoryState() {
+        Log.e("Predir", "Check")
         DirManager.checkPreDir()
         DirectoryService.run(this@MainMaterial)
     }
@@ -226,7 +229,7 @@ class MainMaterial : GenericActivity(),
                             "\n" +
                             "UKIKU es una aplicación rápida y simple que uso para ver mis animes favoritos.\n" +
                             "\n" +
-                            "Descárgala gratis desde https://ukiku.ga/")
+                            "Descárgala gratis desde https://ukiku.app/")
                 }, "Compartir UKIKU"))
             }
             actionInfo.onClick { AppInfoActivityMaterial.open(this@MainMaterial) }
@@ -493,6 +496,8 @@ class MainMaterial : GenericActivity(),
                 invalidateOptionsMenu()
             } catch (e: Exception) {
                 e.printStackTrace()
+                FirebaseCrashlytics.getInstance().recordException(e)
+                Toaster.toastLong("Error en fragmento: ${e.message}")
             }
         }
     }

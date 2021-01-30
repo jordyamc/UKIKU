@@ -8,18 +8,20 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.input.input
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
+import com.google.android.gms.security.ProviderInstaller
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.SubscriptionReceiver
-import knf.kuma.commons.BypassUtil
-import knf.kuma.commons.DesignUtils
-import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.safeShow
+import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import xdroid.toaster.Toaster
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 
@@ -42,7 +44,9 @@ class SplashActivity : GenericActivity() {
                     getActionButton(WhichButton.POSITIVE).isEnabled = text.toString().toLowerCase(Locale.getDefault()) == "confirmar"
                 }
                 negativeButton(text = "Descargar") {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.ga")))
+                    noCrash {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.app")))
+                    }
                 }
                 positiveButton(text = "Continuar") {
                     PrefsUtil.isPSWarned = true
@@ -67,12 +71,42 @@ class SplashActivity : GenericActivity() {
         return blockCount >= 2
     }
 
+    private suspend fun installSecurityProvider() {
+        withContext(Dispatchers.IO) {
+            try {
+                ProviderInstaller.installIfNeeded(this@SplashActivity)
+                PrefsUtil.isSecurityUpdated = true
+                PrefsUtil.spErrorType = null
+            } catch (e: GooglePlayServicesRepairableException) {
+                PrefsUtil.isSecurityUpdated = false
+                PrefsUtil.spErrorType = "Gplay services deshabilitado o desactualizado"
+                FirebaseCrashlytics.getInstance().recordException(e)
+                e.printStackTrace()
+            } catch (e: GooglePlayServicesNotAvailableException) {
+                PrefsUtil.isSecurityUpdated = false
+                PrefsUtil.spErrorType = "GPlay services no esta disponible"
+                FirebaseCrashlytics.getInstance().recordException(e)
+                e.printStackTrace()
+            } catch (e: Exception) {
+                PrefsUtil.isSecurityUpdated = false
+                Toaster.toastLong("SProvider: Unknown error, ${e.message}")
+                PrefsUtil.spErrorType = "Error desconocido: ${e.message}"
+                e.printStackTrace()
+            }
+            if (!PrefsUtil.isSecurityUpdated && FirebaseCrashlytics.getInstance().didCrashOnPreviousExecution()) {
+                PrefsUtil.spProtectionEnabled = true
+                Toaster.toastLong("Proteccion de SP reactivada")
+            }
+        }
+    }
+
     private fun startApp() {
         lifecycleScope.launch(Dispatchers.Main) {
             if (PrefsUtil.mayUseRandomUA)
                 PrefsUtil.alwaysGenerateUA = !withContext(Dispatchers.IO) { doBlockTests() }
             else
                 PrefsUtil.alwaysGenerateUA = false
+            installSecurityProvider()
             DesignUtils.change(this@SplashActivity, start = false)
             startActivity(Intent(this@SplashActivity, DesignUtils.mainClass))
             finish()

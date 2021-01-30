@@ -118,7 +118,7 @@ class UpdateActivity : GenericActivity() {
                 title(text = "¿Error al actualizar?")
                 message(text = "Puedes descargar la actualizacion desde la pagina web oficial!")
                 positiveButton(text = "Descargar") {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.ga")))
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.app")))
                 }
             }
     }

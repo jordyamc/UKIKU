@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory
-        android:title="Actualizaciones">
+    <PreferenceCategory android:title="Actualizaciones">
 
         <ListPreference
             android:defaultValue="1"
@@ -175,7 +174,8 @@
             android:icon="@drawable/ic_cloud_download"
             android:key="recentActionType"
             android:summary="%s"
-            android:title="Accion de click en recientes"/>
+            android:title="Accion de click en recientes"
+            app:useSimpleSummaryProvider="true" />
 
         <SwitchPreference
             android:defaultValue="false"
@@ -256,7 +256,7 @@
             android:icon="@drawable/ic_design_ab"
             android:key="designStyleType"
             android:summary="%s"
-            android:title="Diseño de UI"/>
+            android:title="Diseño de UI" />
         <ListPreference
             android:defaultValue="@string/theme_default"
             android:entries="@array/theme_options"
@@ -309,12 +309,19 @@
             android:key="may_use_random_useragent_1"
             android:summaryOn="Se usará agente al azar cuando sea posible"
             android:summaryOff="Se usará la configuracion actual"
-            android:title="Usar agente al azar cuando sea posible"/>
+            android:title="Usar agente al azar cuando sea posible" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_bug"
+            android:key="security_blocking_firestore"
+            android:summaryOff="Desactivada"
+            android:summaryOn="Activada"
+            android:title="Protección contra SP " />
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_trophy_normal"
             android:key="achievements_permissions"
-            android:title="Habilitar logros"/>
+            android:title="Habilitar logros" />
         <SwitchPreference
             android:defaultValue="true"
             android:icon="@drawable/ic_changelog_get"

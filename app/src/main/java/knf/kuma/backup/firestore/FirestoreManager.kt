@@ -3,6 +3,7 @@ package knf.kuma.backup.firestore
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.afollestad.materialdialogs.MaterialDialog
@@ -57,11 +58,14 @@ object FirestoreManager {
     val seeingLiveData = MutableLiveData(State.IDLE)
 
     private var isUpdateBlocked = false
+    var isFirestoreEnabled = false
 
     @ExperimentalContracts
     @ExperimentalCoroutinesApi
     fun start() {
+        if (!isGPlayServicesEnabled() || isFirestoreEnabled) return
         if (isLoggedIn && ((PrefsUtil.isAdsEnabled && !Network.isAdsBlocked) || BuildConfig.DEBUG || admFile.exists() || PrefsUtil.isSubscriptionEnabled)) {
+            isFirestoreEnabled = true
             QueueManager.open()
             doAsync {
                 firestoreDB.document("users/$uid/backups/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
@@ -244,6 +248,7 @@ object FirestoreManager {
     @ExperimentalCoroutinesApi
     @ExperimentalContracts
     private fun uploadAllData(checkForFiles: Boolean, activity: Activity) {
+        if (!isFirestoreEnabled) return
         if (checkForFiles)
             firestoreDB.collection("users/$uid/backups").get()
                     .addOnSuccessListener {
@@ -309,6 +314,7 @@ object FirestoreManager {
     }
 
     private fun setDefaultDevice() {
+        if (!isFirestoreEnabled) return
         firestoreDB.document("users/$uid/backups/info").set(mapOf("uuid" to PrefsUtil.instanceUuid))
     }
 
@@ -515,6 +521,10 @@ object FirestoreManager {
         }
     }
 
+    private fun isGPlayServicesEnabled(): Boolean =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.R ||
+                    PrefsUtil.isSecurityUpdated || !PrefsUtil.spProtectionEnabled
+
 }
 
 @ExperimentalContracts
@@ -549,6 +559,7 @@ class SyncRequest(private val collection: CollectionReference) {
 }
 
 fun syncData(uploads: SyncRequest.() -> Unit) {
+    if (!FirestoreManager.isFirestoreEnabled) return
     val syncRequest = SyncRequest(FirestoreManager.firestoreDB.collection("users/${FirestoreManager.uid}/backups"))
     uploads(syncRequest)
     syncRequest.sync()

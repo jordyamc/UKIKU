@@ -89,7 +89,7 @@ class ConnectionState : LinearLayout {
         }) {
             -2 -> networkTimeoutState(owner, onShowDialog)
             200 -> {
-                if (false && !PrefsUtil.isDirectoryFinished && !withContext(Dispatchers.IO) { BypassUtil.isCloudflareActive() })
+                if (!PrefsUtil.isDirectoryFinished && !withContext(Dispatchers.IO) { BypassUtil.isCloudflareActive() })
                     directoryListenState()
                 else {
                     okState()
@@ -319,14 +319,23 @@ class ConnectionState : LinearLayout {
             container.setOnClickListener(null)
             container.setOnLongClickListener(null)
             var maxPages = "3200~"
+            var msg = "Calculando"
             CacheDB.INSTANCE.animeDAO().countLive.distinct.observe(owner, Observer {
-                message.text = "Creando directorio: $it/$maxPages"
+                message.text = "$msg: $it/$maxPages"
             })
             DirectoryService.getLiveStatus().observe(owner, Observer {
-                if (it == DirectoryService.STATE_FINISHED) {
-                    owner.lifecycleScope.launch(Dispatchers.Main) {
-                        okState()
-                        dismiss()
+                when (it) {
+                    DirectoryService.STATE_CACHED -> {
+                        msg = "Descargando directorio"
+                    }
+                    in DirectoryService.STATE_PARTIAL..DirectoryService.STATE_FULL -> {
+                        msg = "Actualizando directorio"
+                    }
+                    DirectoryService.STATE_FINISHED -> {
+                        owner.lifecycleScope.launch(Dispatchers.Main) {
+                            okState()
+                            dismiss()
+                        }
                     }
                 }
             })

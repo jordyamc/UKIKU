@@ -201,6 +201,7 @@ class DirectoryService : IntentService("Directory update") {
 
     private fun doFullSearch(jspoon: Jspoon, animeDAO: AnimeDAO) {
         page = 1
+        var skipCount = 0
         var finished = false
         val strings = PreferenceManager.getDefaultSharedPreferences(this).getStringSet(keyFailedPages, LinkedHashSet())
         while (!finished) {
@@ -230,16 +231,19 @@ class DirectoryService : IntentService("Directory update") {
                     }, needCookies)
                     if (animeObjects.isNotEmpty()) {
                         animeDAO.insertAll(animeObjects)
-                    } else if (PrefsUtil.isDirectoryFinished || animeDAO.count >= maxAnimes) {
-                        PrefsUtil.isDirectoryFinished = animeDAO.count >= maxAnimes
+                    } else if (PrefsUtil.isDirectoryFinished || animeDAO.count >= maxAnimes || skipCount >= 3) {
+                        PrefsUtil.isDirectoryFinished = (animeDAO.count in (maxAnimes - 5)..(maxAnimes + 5))
                         Log.e(TAG, "Stop searching at page $page")
+                        setStatus(STATE_FINISHED)
                         cancelForeground()
                         break
+                    } else {
+                        skipCount++
                     }
                 } else {
                     finished = true
                     Log.e(TAG, "Processed $page pages")
-                    PrefsUtil.isDirectoryFinished = animeDAO.count >= maxAnimes
+                    PrefsUtil.isDirectoryFinished = animeDAO.count in (maxAnimes - 5)..(maxAnimes + 5)
                     PreferenceManager.getDefaultSharedPreferences(this).edit().putStringSet(keyFailedPages, strings).apply()
                     DirUpdateWork.schedule(this)
                     setStatus(STATE_FINISHED)
@@ -294,10 +298,6 @@ class DirectoryService : IntentService("Directory update") {
         notShow(NOT_CODE, notification.build())
     }
 
-    private fun setStatus(status: Int) {
-        doOnUI { liveStatus.setValue(status) }
-    }
-
     private fun notShow(code: Int, notification: Notification) {
         manager?.notify(code, notification)
     }
@@ -316,11 +316,12 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     companion object {
-        const val STATE_PARTIAL = 0
-        const val STATE_FULL = 1
-        const val STATE_FINISHED = 2
-        const val STATE_INTERRUPTED = 3
-        const val STATE_VERIFYING = 4
+        const val STATE_CACHED = 0
+        const val STATE_PARTIAL = 1
+        const val STATE_FULL = 2
+        const val STATE_FINISHED = 3
+        const val STATE_INTERRUPTED = 4
+        const val STATE_VERIFYING = 5
         var NOT_CODE = 5598
         var CHANNEL = "directory_update"
         var isRunning = false
@@ -331,6 +332,10 @@ class DirectoryService : IntentService("Directory update") {
             if (context == null) return
             if (!isRunning)
                 context.service(Intent(context, DirectoryService::class.java))
+        }
+
+        fun setStatus(status: Int) {
+            doOnUI { liveStatus.setValue(status) }
         }
 
         fun getLiveStatus(): LiveData<Int> {

@@ -49,6 +49,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.support.v4.toast
 import xdroid.toaster.Toaster
 import java.io.FileOutputStream
+import kotlin.contracts.ExperimentalContracts
 
 
 class ConfigurationFragment : PreferenceFragmentCompat() {
@@ -59,7 +60,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
         private const val keyMaxParallelDownloads = "max_parallel_downloads"
         private const val keyBufferSize = "buffer_size"
         private const val keyThemeColor = "theme_color"
-        private const val keyArchievementsPermissions = "achievements_permissions"
+        private const val keyAchievementsPermissions = "achievements_permissions"
         private const val keyAdsEnabled = "ads_enabled_new"
     }
 
@@ -70,6 +71,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
         super.onAttach(activity)
     }
 
+    @ExperimentalContracts
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         if (activity != null && context != null)
             doOnUI {
@@ -327,6 +329,10 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     DirUpdateWork.reSchedule(newValue.toString().toInt() * 15)
                     true
                 }
+                preferenceScreen.findPreference<Preference>("security_blocking_firestore")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                    FirestoreManager.start()
+                    true
+                }
                 preferenceScreen.findPreference<Preference>("dir_update")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
@@ -392,17 +398,17 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     }
                 }
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this@ConfigurationFragment.context))
-                    (preferenceScreen.findPreference(keyArchievementsPermissions) as? SwitchPreference)?.apply {
+                    (preferenceScreen.findPreference(keyAchievementsPermissions) as? SwitchPreference)?.apply {
                         isChecked = true
                         isEnabled = false
                     }
                 else if (!Settings.canDrawOverlays(this@ConfigurationFragment.context)) {
-                    (preferenceScreen.findPreference(keyArchievementsPermissions) as? SwitchPreference)?.apply {
+                    (preferenceScreen.findPreference(keyAchievementsPermissions) as? SwitchPreference)?.apply {
                         isChecked = false
                         isEnabled = true
                     }
                 }
-                preferenceScreen.findPreference<Preference>(keyArchievementsPermissions)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
+                preferenceScreen.findPreference<Preference>(keyAchievementsPermissions)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)

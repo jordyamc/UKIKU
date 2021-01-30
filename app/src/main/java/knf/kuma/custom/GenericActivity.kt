@@ -19,12 +19,14 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.Diagnostic
 import knf.kuma.R
 import knf.kuma.commons.*
+import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryService
 import knf.kuma.retrofit.Repository
 import knf.kuma.uagen.UAGenerator
@@ -32,6 +34,8 @@ import knf.kuma.uagen.randomUA
 import knf.kuma.videoservers.FileActions
 import knf.kuma.videoservers.ServersFactory
 import knf.tools.bypass.startBypass
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.findOptional
 import xdroid.toaster.Toaster
@@ -172,12 +176,16 @@ open class GenericActivity : AppCompatActivity() {
                                         snack?.safeDismiss()
                                         getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
                                         bypassLive.postValue(Pair(first = true, second = false))
-                                        Repository().reloadRecents()
+                                        Repository().reloadAllRecents()
                                         onBypassUpdated()
                                         BypassUtil.isLoading = false
                                         PicassoSingle.clear()
-                                        if (!PrefsUtil.isDirectoryFinished)
-                                            DirectoryService.run(this@GenericActivity)
+                                        if (!PrefsUtil.isDirectoryFinished) {
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                DirManager.checkPreDir()
+                                                DirectoryService.run(this@GenericActivity)
+                                            }
+                                        }
                                     }
                             }
                         } else if (BypassUtil.isLoading) {
@@ -212,12 +220,16 @@ open class GenericActivity : AppCompatActivity() {
                 BypassUtil.saveCookies(this, it.getStringExtra("cookies") ?: "null")
             } ?: false
             bypassLive.postValue(Pair(first = cookiesUpdated, second = false))
-            Repository().reloadRecents()
+            Repository().reloadAllRecents()
             onBypassUpdated()
             BypassUtil.isLoading = false
             PicassoSingle.clear()
-            if (!PrefsUtil.isDirectoryFinished)
-                DirectoryService.run(this@GenericActivity)
+            if (!PrefsUtil.isDirectoryFinished) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    DirManager.checkPreDir()
+                    DirectoryService.run(this@GenericActivity)
+                }
+            }
         }
     }
 

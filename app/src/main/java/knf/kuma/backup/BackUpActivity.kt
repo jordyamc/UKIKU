@@ -63,6 +63,10 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             login_firestore.isEnabled = false
             ads_required.text = "Anuncios bloqueados por host"
             ads_required.visibility = View.VISIBLE
+        } else if (!FirestoreManager.isFirestoreEnabled && PrefsUtil.spProtectionEnabled) {
+            login_firestore.isEnabled = false
+            ads_required.text = "Proveedor de seguridad no pudo ser actualizado (${PrefsUtil.spErrorType})"
+            ads_required.visibility = View.VISIBLE
         }
         login_firestore.setOnClickListener { onFirestoreLogin() }
         login_local.setOnClickListener { onLocalLogin() }

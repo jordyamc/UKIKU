@@ -246,7 +246,7 @@
         android:key="category_design"
         android:title="Personalización">
         <ListPreference
-            android:defaultValue="@string/theme_default"
+            android:defaultValue="0"
             android:entries="@array/design_options"
             android:entryValues="@array/design_values"
             android:icon="@drawable/ic_design_ab"
@@ -254,7 +254,7 @@
             android:summary="%s"
             android:title="Diseño de UI"/>
         <ListPreference
-            android:defaultValue="0"
+            android:defaultValue="@string/theme_default"
             android:entries="@array/theme_options"
             android:entryValues="@array/theme_values"
             android:icon="@drawable/ic_theme"
@@ -305,12 +305,19 @@
             android:key="may_use_random_useragent_1"
             android:summaryOn="Se usará agente al azar cuando sea posible"
             android:summaryOff="Se usará la configuracion actual"
-            android:title="Usar agente al azar cuando sea posible"/>
+            android:title="Usar agente al azar cuando sea posible" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_bug"
+            android:key="security_blocking_firestore"
+            android:summaryOff="Desactivada"
+            android:summaryOn="Activada"
+            android:title="Protección contra SP " />
         <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_trophy_normal"
             android:key="achievements_permissions"
-            android:title="Habilitar logros"/>
+            android:title="Habilitar logros" />
         <SwitchPreference
             android:defaultValue="true"
             android:icon="@drawable/ic_changelog_get"

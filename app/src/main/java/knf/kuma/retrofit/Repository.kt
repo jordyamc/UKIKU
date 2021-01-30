@@ -37,6 +37,11 @@ class Repository {
     val search: LiveData<PagedList<SearchObject>>
         get() = getSearch("")
 
+    fun reloadAllRecents() {
+        reloadRecents()
+        reloadRecentModels()
+    }
+
     fun reloadRecents() {
         if (Network.isConnected) {
             var tryCount = 0

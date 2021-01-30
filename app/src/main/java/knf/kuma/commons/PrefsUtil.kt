@@ -73,6 +73,14 @@ object PrefsUtil {
     val useNewBypass: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("useNewBypass", true)
 
+    var spProtectionEnabled: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("security_blocking_firestore", true)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("security_blocking_firestore", value).apply()
+
+    var spErrorType: String?
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("sp_error_type", null)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sp_error_type", value).apply()
+
     private val useExperimentalPlayer: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("experimental_player", false)
 
@@ -97,6 +105,10 @@ object PrefsUtil {
     var isAchievementsOmitted: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("achievements_omited", false)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("achievements_omited", value).apply()
+
+    var isSecurityUpdated: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("securityUpdated", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("securityUpdated", value).apply()
 
     var lastStart: Long
         get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("last_start", System.currentTimeMillis())

@@ -84,11 +84,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
-                    android:host="ukiku.ga"
+                    android:host="ukiku.app"
                     android:pathPrefix="/*"
                     android:scheme="http" />
                 <data
-                    android:host="ukiku.ga"
+                    android:host="ukiku.app"
                     android:pathPrefix="/*"
                     android:scheme="https" />
             </intent-filter>
@@ -117,7 +117,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="ukiku.ga"
+                    android:host="ukiku.app"
                     android:pathPrefix="/search"
                     android:scheme="https" />
             </intent-filter>

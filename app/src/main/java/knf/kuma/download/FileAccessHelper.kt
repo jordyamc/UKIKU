@@ -235,23 +235,25 @@ object FileAccessHelper {
         NOMEDIA_CREATING = true
         doAsync {
             try {
-                val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads")
-                if (!file.exists())
-                    file.mkdirs()
-                val root = File(file, ".nomedia")
-                if (noMediaNeeded && !root.exists())
-                    root.createNewFile()
-                else if (!noMediaNeeded && root.exists())
-                    root.delete()
-                val list = file.listFiles(FileFilter { it.isDirectory })
-                if (list != null && list.isNotEmpty())
-                    for (current in list) {
-                        val inside = File(current, ".nomedia")
-                        if (noMediaNeeded && !inside.exists())
-                            inside.createNewFile()
-                        else if (!noMediaNeeded && inside.exists())
-                            inside.delete()
-                    }
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                    val file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads")
+                    if (!file.exists())
+                        file.mkdirs()
+                    val root = File(file, ".nomedia")
+                    if (noMediaNeeded && !root.exists())
+                        root.createNewFile()
+                    else if (!noMediaNeeded && root.exists())
+                        root.delete()
+                    val list = file.listFiles(FileFilter { it.isDirectory })
+                    if (list != null && list.isNotEmpty())
+                        for (current in list) {
+                            val inside = File(current, ".nomedia")
+                            if (noMediaNeeded && !inside.exists())
+                                inside.createNewFile()
+                            else if (!noMediaNeeded && inside.exists())
+                                inside.delete()
+                        }
+                }
                 treeUri?.let {
                     val documentRoot = find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads")
                     val nomediaRoot = documentRoot?.findFile(".nomedia")

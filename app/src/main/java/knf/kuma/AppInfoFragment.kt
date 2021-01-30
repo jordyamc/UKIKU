@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
-import androidx.lifecycle.Observer
 import com.afollestad.materialdialogs.MaterialDialog
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
@@ -55,7 +54,7 @@ class AppInfoFragment: MaterialAboutFragment() {
     }
 
     private fun setupUpdateCount() {
-        Economy.rewardedVideoLiveData.observe(viewLifecycleOwner, Observer {
+        Economy.rewardedVideoLiveData.observe(viewLifecycleOwner, {
             if (::videoItem.isInitialized) {
                 videoItem.subText = "Vistos: $it"
                 setMaterialAboutList(getMaterialAboutList(requireContext()))
@@ -105,8 +104,8 @@ class AppInfoFragment: MaterialAboutFragment() {
         extraCard.title("Extras")
         extraCard.addItem(MaterialAboutActionItem.Builder().text("Cartera de loli-coins").icon(R.drawable.ic_coin).setOnClickAction { Economy.showWallet(requireActivity(), true) { showAd() } }.build())
         extraCard.addItem(MaterialAboutActionItem.Builder().text("Top videos vistos").icon(R.drawable.ic_podium).setOnClickAction { openTop() }.build())
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_web), "Página web", true, Uri.parse("https://ukiku.ga")))
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_github), "Proyecto en github", true, Uri.parse("https://github.com/jordyamc/UKIKU")))
+        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(), R.drawable.ic_web), "Página web", true, Uri.parse("https://ukiku.app")))
+        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(), R.drawable.ic_github), "Proyecto en github", true, Uri.parse("https://github.com/jordyamc/UKIKU")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_facebook), "Facebook", true, Uri.parse("https://www.facebook.com/ukikuapp")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_facebook_group), "Grupo de Facebook", true, Uri.parse("https://www.facebook.com/groups/ukikugroup")))
         extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_discord), "Discord", false, Uri.parse("https://discord.gg/6hzpua6")))

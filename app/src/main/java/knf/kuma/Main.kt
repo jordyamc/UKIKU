@@ -30,7 +30,6 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
@@ -240,7 +239,7 @@ class Main : GenericActivity(),
                             "\n" +
                             "UKIKU es una aplicación rápida y simple que uso para ver mis animes favoritos.\n" +
                             "\n" +
-                            "Descárgala gratis desde https://ukiku.ga/")
+                            "Descárgala gratis desde https://ukiku.app/")
                 }, "Compartir UKIKU"))
             }
             actionInfo.onClick { AppInfoActivity.open(this@Main) }
@@ -272,23 +271,23 @@ class Main : GenericActivity(),
                         .setShowShadow(false)
                         .setGravityOffset(5f, 5f, true)
                         .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight()))
-                CacheDB.INSTANCE.favsDAO().countLive.observe(this, Observer { integer ->
+                CacheDB.INSTANCE.favsDAO().countLive.observe(this, { integer ->
                     if (badgeView != null && integer != null)
                         if (PrefsUtil.showFavIndicator)
                             badgeView?.badgeNumber = integer
                         else
                             badgeView?.hide(false)
                 })
-                PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
+                PrefsUtil.getLiveShowFavIndicator().observe(this, { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean)
-                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO){ CacheDB.INSTANCE.favsDAO().count } }
+                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().count } }
                         else
                             badgeView?.hide(false)
                     }
                 })
                 PreferenceManager.getDefaultSharedPreferences(this).stringLiveData("theme_color", "0")
-                        .observe(this, Observer {
+                        .observe(this, {
                             (badgeView as? QBadgeView)?.badgeBackgroundColor = ContextCompat.getColor(this, EAHelper.getThemeColorLight(it))
                             badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
                             badgeSeeing.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
@@ -305,17 +304,17 @@ class Main : GenericActivity(),
             badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeQueue.setTypeface(null, Typeface.BOLD)
             badgeQueue.gravity = Gravity.CENTER_VERTICAL
-            PrefsUtil.getLiveEmissionBlackList().observe(this, Observer { strings ->
-                CacheDB.INSTANCE.animeDAO().getInEmission(strings).observe(this, Observer { integer ->
+            PrefsUtil.getLiveEmissionBlackList().observe(this, { strings ->
+                CacheDB.INSTANCE.animeDAO().getInEmission(strings).observe(this, { integer ->
                     badgeEmission.text = integer.toString()
                     badgeEmission.visibility = if (integer == 0) View.GONE else View.VISIBLE
                 })
             })
-            CacheDB.INSTANCE.seeingDAO().countWatchingLive.observe(this, Observer { integer ->
+            CacheDB.INSTANCE.seeingDAO().countWatchingLive.observe(this, { integer ->
                 badgeSeeing.text = integer.toString()
                 badgeSeeing.visibility = if (integer == 0) View.GONE else View.VISIBLE
             })
-            CacheDB.INSTANCE.queueDAO().countLive.observe(this, Observer { integer ->
+            CacheDB.INSTANCE.queueDAO().countLive.observe(this, { integer ->
                 badgeQueue.text = integer.toString()
                 badgeQueue.visibility = if (integer == 0) View.GONE else View.VISIBLE
             })
@@ -592,8 +591,8 @@ class Main : GenericActivity(),
 
     private fun startChange() {
         if (intent.dataString?.let {
-                    return@let if ("ukiku.ga/search/" in it) {
-                        val query = it.substringAfter("ukiku.ga/search/")
+                    return@let if ("ukiku.app/search/" in it) {
+                        val query = it.substringAfter("ukiku.app/search/")
                         selectedFragment = RecentFragment.get()
                         searchView.openSearch()
                         setFragment(SearchFragment[query])
@@ -708,7 +707,7 @@ class Main : GenericActivity(),
         onNeedRecreate()
     }
 
-    override fun getSnackbarAnchor(): View? {
+    override fun getSnackbarAnchor(): View {
         return coordinator
     }
 }

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="176" version="5.1.7">
+        <change type="fix">Errores generales</change>
+        <change type="change">Cambio de pagina Ukiku.app</change>
+    </release>
     <release code="174" version="5.1.5">
         <change type="fix">Errores generales</change>
         <change type="fix">Seleccion de carpeta para descargas en Android 11</change>
