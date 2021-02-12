@@ -37,6 +37,9 @@ interface QueueDAO {
     fun getByAid(aid: String): LiveData<MutableList<QueueObject>>
 
     @Query("SELECT * FROM queueobject WHERE aid = :aid ORDER BY eid+0 ASC")
+    fun getByAidUnique(aid: String): MutableList<QueueObject>
+
+    @Query("SELECT * FROM queueobject WHERE aid = :aid ORDER BY eid+0 ASC")
     fun getAllByAid(aid: String): List<QueueObject>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

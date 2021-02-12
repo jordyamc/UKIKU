@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
-import com.google.android.gms.ads.formats.UnifiedNativeAdView
+import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.material.chip.Chip
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -368,7 +368,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
     }
 
     class AdsViewHolder(private val scope: CoroutineScope, view: View) : RecyclerView.ViewHolder(view) {
-        private val nativeAdView: UnifiedNativeAdView = itemView.nativeAdView
+        private val nativeAdView: NativeAdView = itemView.nativeAdView
         private val iconView: ShapeableImageView = itemView.icon
         private val primary: TextView = itemView.primary
         private val secondary: TextView = itemView.secondary

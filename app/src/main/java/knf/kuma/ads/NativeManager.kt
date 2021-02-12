@@ -3,7 +3,7 @@ package knf.kuma.ads
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.formats.UnifiedNativeAd
+import com.google.android.gms.ads.nativead.NativeAd
 import knf.kuma.App
 import knf.kuma.commons.Network
 import kotlinx.coroutines.*
@@ -14,7 +14,7 @@ import kotlin.coroutines.suspendCoroutine
 object NativeManager {
     private var isLoading = false
     private var internalSize = 0
-    private val adsChannel = Channel<UnifiedNativeAd>(Int.MAX_VALUE)
+    private val adsChannel = Channel<NativeAd>(Int.MAX_VALUE)
 
     init {
         cacheAds()
@@ -27,7 +27,7 @@ object NativeManager {
                     launch(Dispatchers.Main){
                         callback(suspendCoroutine {
                             launch {
-                                val pendingList = mutableListOf<UnifiedNativeAd>()
+                                val pendingList = mutableListOf<NativeAd>()
                                 repeat(size) {
                                     internalSize--
                                     pendingList.add(adsChannel.receive())
@@ -70,7 +70,7 @@ object NativeManager {
             var loader: AdLoader? = null
             var isCallbackCalled = false
             loader = AdLoader.Builder(App.context, AdsUtilsMob.LIST_NATIVE)
-                    .forUnifiedNativeAd {
+                    .forNativeAd {
                         GlobalScope.launch {
                             internalSize++
                             adsChannel.send(it)
@@ -103,4 +103,4 @@ object NativeManager {
 }
 
 typealias PendingCallback = suspend () -> Unit
-typealias TakeCallback = (List<UnifiedNativeAd>) -> Unit
+typealias TakeCallback = (List<NativeAd>) -> Unit

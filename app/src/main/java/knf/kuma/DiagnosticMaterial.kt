@@ -3,7 +3,6 @@ package knf.kuma
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.StatFs
 import android.text.format.Formatter
 import android.text.method.ScrollingMovementMethod
 import android.view.View
@@ -24,7 +23,6 @@ import knf.kuma.custom.StateViewMaterial
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
-import knf.kuma.download.FileAccessHelper
 import kotlinx.android.synthetic.main.layout_diagnostic_material.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -225,13 +223,14 @@ class DiagnosticMaterial : GenericActivity() {
     }
 
     private fun runMemoryTest() {
-        internalState.load(getAvailable(FileAccessHelper.internalRoot.path))
-        FileAccessHelper.externalRoot?.path?.let { externalState.load(getAvailable(it)) }
+        val dirs = getExternalFilesDirs(null)
+        internalState.load(getAvailable(dirs[0].freeSpace))
+        if (dirs.size > 1)
+            externalState.load(getAvailable(dirs[1].freeSpace))
     }
 
-    private fun getAvailable(path: String): String {
-        val stat = StatFs(path)
-        return Formatter.formatFileSize(this, stat.blockSizeLong * stat.availableBlocksLong)
+    private fun getAvailable(size: Long): String {
+        return Formatter.formatFileSize(this, size)
     }
 
     private fun runBackupTest() {

@@ -3,12 +3,10 @@ package knf.kuma
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.StatFs
 import android.text.format.Formatter
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.TextView
-import androidx.lifecycle.Observer
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.bmartel.speedtest.SpeedTestReport
@@ -24,9 +22,30 @@ import knf.kuma.custom.StateView
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
-import knf.kuma.download.FileAccessHelper
 import knf.tools.bypass.startBypass
 import kotlinx.android.synthetic.main.layout_diagnostic.*
+import kotlinx.android.synthetic.main.layout_diagnostic.backupState
+import kotlinx.android.synthetic.main.layout_diagnostic.bypassRecreate
+import kotlinx.android.synthetic.main.layout_diagnostic.bypassState
+import kotlinx.android.synthetic.main.layout_diagnostic.cfduidState
+import kotlinx.android.synthetic.main.layout_diagnostic.clearanceState
+import kotlinx.android.synthetic.main.layout_diagnostic.codeState
+import kotlinx.android.synthetic.main.layout_diagnostic.dirState
+import kotlinx.android.synthetic.main.layout_diagnostic.dirTotalState
+import kotlinx.android.synthetic.main.layout_diagnostic.downState
+import kotlinx.android.synthetic.main.layout_diagnostic.externalState
+import kotlinx.android.synthetic.main.layout_diagnostic.generalState
+import kotlinx.android.synthetic.main.layout_diagnostic.info
+import kotlinx.android.synthetic.main.layout_diagnostic.internalState
+import kotlinx.android.synthetic.main.layout_diagnostic.ipState
+import kotlinx.android.synthetic.main.layout_diagnostic.lastBackupState
+import kotlinx.android.synthetic.main.layout_diagnostic.subscriptionState
+import kotlinx.android.synthetic.main.layout_diagnostic.timeoutState
+import kotlinx.android.synthetic.main.layout_diagnostic.toolbar
+import kotlinx.android.synthetic.main.layout_diagnostic.upState
+import kotlinx.android.synthetic.main.layout_diagnostic.userAgentState
+import kotlinx.android.synthetic.main.layout_diagnostic.uuid
+import kotlinx.android.synthetic.main.layout_diagnostic_material.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -224,19 +243,20 @@ class Diagnostic : GenericActivity() {
             !PrefsUtil.isDirectoryFinished && DirectoryService.isRunning -> "Creando"
             else -> "Incompleto"
         })
-        CacheDB.INSTANCE.animeDAO().countLive.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().countLive.observe(this, {
             dirTotalState.load(it.toString())
         })
     }
 
     private fun runMemoryTest() {
-        internalState.load(getAvailable(FileAccessHelper.internalRoot.path))
-        FileAccessHelper.externalRoot?.path?.let { externalState.load(getAvailable(it)) }
+        val dirs = getExternalFilesDirs(null)
+        internalState.load(getAvailable(dirs[0].freeSpace))
+        if (dirs.size > 1)
+            externalState.load(getAvailable(dirs[1].freeSpace))
     }
 
-    private fun getAvailable(path: String): String {
-        val stat = StatFs(path)
-        return Formatter.formatFileSize(this, stat.blockSizeLong * stat.availableBlocksLong)
+    private fun getAvailable(size: Long): String {
+        return Formatter.formatFileSize(this, size)
     }
 
     private fun runBackupTest() {

@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.*
-import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
@@ -262,76 +262,81 @@ fun getFAdLoaderInterstitialMob(context: Activity, onUpdate: () -> Unit): Fullsc
 
 class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
 
-    private lateinit var rewardedAd: RewardedAd
+    private var rewardedAd: RewardedAd? = null
 
     private fun createAndLoadRewardAd() {
-        rewardedAd = RewardedAd(context, AdsUtilsMob.REWARDED)
-        rewardedAd.loadAd(AdsUtilsMob.adRequest, object : RewardedAdLoadCallback() {
+        rewardedAd = null
+        RewardedAd.load(context, AdsUtilsMob.REWARDED, AdsUtilsMob.adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdLoaded(p0: RewardedAd) {
+                rewardedAd = p0
+            }
 
-            override fun onRewardedAdFailedToLoad(code: Int) {
-                Log.e("Ad", "Ad failed to load, code: $code")
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                Log.e("Ad", "Ad failed to load, code: ${p0.code}")
                 createAndLoadRewardAd()
             }
         })
     }
 
     private fun showRewarded() {
-        rewardedAd.show(context, object : RewardedAdCallback() {
+        rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                createAndLoadRewardAd()
+            }
+        }
+        rewardedAd?.show(context) {
+            FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
+            Economy.reward(baseReward = 2)
+            onUpdate()
+        }
+    }
 
-            override fun onUserEarnedReward(item: RewardItem) {
-                FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
-                Economy.reward(baseReward = 2)
-                onUpdate()
+    override fun load() {
+        if (rewardedAd == null) createAndLoadRewardAd()
+    }
+
+    override fun show() {
+        when {
+            rewardedAd != null -> showRewarded()
+            Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
+            else -> toast("Anuncio aún cargando...")
+        }
+    }
+}
+
+class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
+    private var interstitialAd: InterstitialAd? = null
+
+    private fun createAndLoad() {
+        interstitialAd = null
+        InterstitialAd.load(context, AdsUtilsMob.INTERSTITIAL, AdsUtilsMob.adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdLoaded(p0: InterstitialAd) {
+                interstitialAd = p0
             }
 
-            override fun onRewardedAdClosed() {
-                createAndLoadRewardAd()
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                createAndLoad()
             }
         })
     }
 
     override fun load() {
-        if (!::rewardedAd.isInitialized || !rewardedAd.isLoaded) createAndLoadRewardAd()
-    }
-
-    override fun show() {
-        if (::rewardedAd.isInitialized && rewardedAd.isLoaded)
-            showRewarded()
-        else if (Network.isAdsBlocked)
-            toast("Anuncios bloqueados por host")
-        else
-            toast("Anuncio aún cargando...")
-    }
-}
-
-class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
-    var isAdClicked = false
-    private val interstitialAd: InterstitialAd by lazy {
-        InterstitialAd(context).apply {
-            adUnitId = AdsUtilsMob.INTERSTITIAL
-            adListener = object : AdListener() {
-                override fun onAdClosed() {
-                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
-                    interstitialAd.loadAd(AdsUtilsMob.adRequest)
-                    Economy.reward(isAdClicked)
-                    onUpdate()
-                }
-
-                override fun onAdClicked() {
-                    isAdClicked = true
-                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_clicked", Bundle())
-                }
-            }
-        }
-    }
-
-    override fun load() {
-        if (!interstitialAd.isLoaded) interstitialAd.loadAd(AdsUtilsMob.adRequest)
+        if (interstitialAd == null) createAndLoad()
     }
 
     override fun show() {
         when {
-            interstitialAd.isLoaded -> interstitialAd.show()
+            interstitialAd != null -> {
+                interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
+                        createAndLoad()
+                        Economy.reward(false)
+                        onUpdate()
+                    }
+                }
+                interstitialAd?.show(context)
+            }
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
             else -> toast("Anuncio aún cargando...")
         }
@@ -339,44 +344,49 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
 }
 
 class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenAdLoader {
-    var isAdClicked = false
-    private val interstitialAd: InterstitialAd by lazy {
-        InterstitialAd(context).apply {
-            adUnitId = AdsUtilsMob.INTERSTITIAL
-            adListener = object : AdListener() {
-                override fun onAdClosed() {
-                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
-                    interstitialAd.loadAd(AdsUtilsMob.adRequest)
-                    Economy.reward(isAdClicked)
-                }
-
-                override fun onAdClicked() {
-                    isAdClicked = true
-                    FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_clicked", Bundle())
-                }
-            }
-        }
-    }
+    private var interstitialAd: InterstitialAd? = null
 
     init {
-        load()
+        createAndLoad()
+    }
+
+    private fun createAndLoad() {
+        interstitialAd = null
+        InterstitialAd.load(context, AdsUtilsMob.INTERSTITIAL, AdsUtilsMob.adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdLoaded(p0: InterstitialAd) {
+                interstitialAd = p0
+            }
+
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                createAndLoad()
+            }
+        })
     }
 
     override fun load() {
-        if (!interstitialAd.isLoaded) interstitialAd.loadAd(AdsUtilsMob.adRequest)
+        if (interstitialAd == null) createAndLoad()
     }
 
     override fun show() {
         when {
-            interstitialAd.isLoaded -> interstitialAd.show()
+            interstitialAd != null -> {
+                interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
+                        createAndLoad()
+                        Economy.reward(false)
+                    }
+                }
+                interstitialAd?.show(context)
+            }
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
             else -> context.lifecycleScope.launch(Dispatchers.Main) {
                 var tryCount = 11
-                while (!interstitialAd.isLoaded && tryCount > 0) {
+                while (interstitialAd == null && tryCount > 0) {
                     delay(250)
                     tryCount--
                 }
-                if (interstitialAd.isLoaded)
+                if (interstitialAd != null)
                     show()
             }
         }

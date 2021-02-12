@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.*
 import com.afollestad.materialdialogs.MaterialDialog
@@ -28,6 +29,9 @@ import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
@@ -189,20 +193,25 @@ class QueueActivityMaterial : GenericActivity(), QueueAnimesAdapterMaterial.OnAn
             doOnUI {
                 try {
                     listToolbar.title = queueObject.chapter.name
-                    val liveData = CacheDB.INSTANCE.queueDAO().getByAid(queueObject.chapter.aid)
-                    liveData.observe(this, object : Observer<MutableList<QueueObject>> {
-                        override fun onChanged(list: MutableList<QueueObject>?) {
-                            if (list?.isEmpty() == true)
-                                bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
-                            else {
-                                listAdapter?.update(queueObject.chapter.aid, list
-                                        ?: mutableListOf())
-                                bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
-                            }
-                            current = queueObject
-                            liveData.removeObserver(this)
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        val list = withContext(Dispatchers.IO) { CacheDB.INSTANCE.queueDAO().getByAidUnique(queueObject.chapter.aid) }
+                        if (list.isEmpty())
+                            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
+                        else {
+                            listAdapter?.update(
+                                    queueObject.chapter.aid,
+                                    withContext(Dispatchers.IO) {
+                                        try {
+                                            list.sortedBy { it.chapter.number.substringAfterLast(" ").toInt() }.toMutableList()
+                                        } catch (e: Exception) {
+                                            list
+                                        }
+                                    }
+                            )
+                            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_EXPANDED)
                         }
-                    })
+                        current = queueObject
+                    }
                 } catch (e: Exception) {
                     doAsync {
                         CacheDB.INSTANCE.queueDAO().allRaw.forEach {

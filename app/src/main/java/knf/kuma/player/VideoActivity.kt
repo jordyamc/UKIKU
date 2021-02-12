@@ -33,6 +33,7 @@ import knf.kuma.pojos.QueueObject
 import kotlinx.android.synthetic.main.exo_playback_youtube_control_view.*
 import kotlinx.android.synthetic.main.player_view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
@@ -160,15 +161,6 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        Log.e("Player", "OnPause")
-        if (Build.VERSION.SDK_INT >= 24 && isInPictureInPictureMode)
-            resumePlayer()
-        else
-            pausePlayer()
-    }
-
     override fun onResume() {
         super.onResume()
         Log.e("Player", "OnResume")
@@ -176,15 +168,27 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         resumePlayer()
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.e("Player", "OnPause, isfinishing: $isFinishing")
+        if (Build.VERSION.SDK_INT >= 24 && isInPictureInPictureMode)
+            resumePlayer()
+        else {
+            if (::playerHolder.isInitialized)
+                if (!playerState.isFinishing) {
+                    playerHolder.saveState()
+                    playerState.title = video_title.text.toString()
+                    saveState()
+                }
+            if (!isFinishing)
+                pausePlayer()
+            else
+                stopPlayer()
+        }
+    }
+
     override fun onStop() {
         Log.e("Player", "OnStop")
-        if (::playerHolder.isInitialized)
-            if (!playerState.isFinishing) {
-                playerHolder.saveState()
-                playerState.title = video_title.text.toString()
-                saveState()
-            }
-        //stopPlayer()
         deactivateMediaSession()
         super.onStop()
     }
@@ -198,7 +202,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
     }
 
     private fun saveState() {
-        doAsync {
+        GlobalScope.launch(Dispatchers.IO) {
             CacheDB.INSTANCE.playerStateDAO().set(playerState)
         }
     }

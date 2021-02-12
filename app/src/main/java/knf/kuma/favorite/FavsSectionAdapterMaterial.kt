@@ -83,8 +83,11 @@ class FavsSectionAdapterMaterial(private val fragment: Fragment, private val rec
     }
 
     override fun getItemViewType(position: Int): Int {
-        list[position]
-        return if (list[position] is AdFavoriteObject) TYPE_AD else if (list[position].isSection) TYPE_HEADER else TYPE_ITEM
+        return try {
+            if (list[position] is AdFavoriteObject) TYPE_AD else if (list[position].isSection) TYPE_HEADER else TYPE_ITEM
+        } catch (e: Exception) {
+            TYPE_ITEM
+        }
     }
 
     override fun getSectionName(position: Int): String {

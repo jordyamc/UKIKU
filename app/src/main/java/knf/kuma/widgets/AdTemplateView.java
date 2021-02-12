@@ -14,9 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.ads.formats.NativeAd.Image;
-import com.google.android.gms.ads.formats.UnifiedNativeAd;
-import com.google.android.gms.ads.formats.UnifiedNativeAdView;
+import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,8 +28,8 @@ public class AdTemplateView extends FrameLayout {
 
     private static final String SMALL_TEMPLATE = "small_template";
     private NativeTemplateStyle styles;
-    private UnifiedNativeAd nativeAd;
-    private UnifiedNativeAdView nativeAdView;
+    private NativeAd nativeAd;
+    private NativeAdView nativeAdView;
     private TextView primaryView;
     private TextView secondaryView;
     private ImageView iconView;
@@ -60,7 +59,7 @@ public class AdTemplateView extends FrameLayout {
         this.applyStyles();
     }
 
-    public UnifiedNativeAdView getNativeAdView() {
+    public NativeAdView getNativeAdView() {
         return nativeAdView;
     }
 
@@ -100,13 +99,13 @@ public class AdTemplateView extends FrameLayout {
         requestLayout();
     }
 
-    private boolean adHasOnlyStore(UnifiedNativeAd nativeAd) {
+    private boolean adHasOnlyStore(NativeAd nativeAd) {
         String store = nativeAd.getStore();
         String advertiser = nativeAd.getAdvertiser();
         return !TextUtils.isEmpty(store) && TextUtils.isEmpty(advertiser);
     }
 
-    public void setNativeAd(@NotNull UnifiedNativeAd nativeAd) {
+    public void setNativeAd(@NotNull NativeAd nativeAd) {
         if (this.nativeAd != null) return;
         this.nativeAd = nativeAd;
 
@@ -114,7 +113,7 @@ public class AdTemplateView extends FrameLayout {
         String advertiser = nativeAd.getAdvertiser();
         String headline = nativeAd.getHeadline();
         String cta = nativeAd.getCallToAction();
-        Image icon = nativeAd.getIcon();
+        NativeAd.Image icon = nativeAd.getIcon();
 
         String secondaryText;
 

@@ -162,56 +162,64 @@ object FileActions {
                             ?: throw IllegalStateException("Episodes json not found"))
                     if (jsonObject.length() > 1) {
                         launch(Dispatchers.Main) {
-                            MaterialDialog(context).safeShow {
-                                lifecycleOwner(actionRequest.owner)
-                                listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
-                                    owner.lifecycle.coroutineScope.launch(Dispatchers.IO) {
-                                        val downloads = main.select("table.RTbl.Dwnl tr:contains(${if (index == 0) "SUB" else "LAT"}) a.Button.Sm.fa-download")
-                                        for (e in downloads) {
-                                            var z = e.attr("href")
-                                            z = z.substring(z.lastIndexOf("http"))
-                                            val server = Server.check(context, z)
-                                            if (server != null)
-                                                servers.add(server)
-                                        }
-                                        val jsonArray =
-                                                when (index) {
-                                                    1 -> jsonObject.getJSONArray("LAT")
-                                                    else -> jsonObject.getJSONArray("SUB")
-                                                }
-                                        for (baseLink in jsonArray) {
-                                            val server = Server.check(context, baseLink.optString("code"))
-                                            if (server != null)
-                                                try {
-                                                    var skip = false
-                                                    servers.forEach {
-                                                        if (it.name == server.name) {
-                                                            skip = true
-                                                            return@forEach
-                                                        }
+                            val langSelect: (Int) -> Unit = { index ->
+                                owner.lifecycle.coroutineScope.launch(Dispatchers.IO) {
+                                    val downloads = main.select("table.RTbl.Dwnl tr:contains(${if (index == 0) "SUB" else "LAT"}) a.Button.Sm.fa-download")
+                                    for (e in downloads) {
+                                        var z = e.attr("href")
+                                        z = z.substring(z.lastIndexOf("http"))
+                                        val server = Server.check(context, z)
+                                        if (server != null)
+                                            servers.add(server)
+                                    }
+                                    val jsonArray =
+                                            when (index) {
+                                                1 -> jsonObject.getJSONArray("LAT")
+                                                else -> jsonObject.getJSONArray("SUB")
+                                            }
+                                    for (baseLink in jsonArray) {
+                                        val server = Server.check(context, baseLink.optString("code"))
+                                        if (server != null)
+                                            try {
+                                                var skip = false
+                                                servers.forEach {
+                                                    if (it.name == server.name) {
+                                                        skip = true
+                                                        return@forEach
                                                     }
-                                                    if (!skip)
-                                                        servers.add(server)
-                                                } catch (e: Exception) {
-                                                    e.printStackTrace()
                                                 }
-                                        }
-                                        servers.sort()
-                                        this@FileActions.servers = servers
-                                        showServerList(actionRequest)
+                                                if (!skip)
+                                                    servers.add(server)
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
+                                            }
                                     }
-                                }
-                                onDismiss {
-                                    if (isCancelling(actionRequest.owner)) {
-                                        reset()
-                                        actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
-                                    }
-                                }
-                                setOnCancelListener {
-                                    reset()
-                                    callback.call(CallbackState.USER_CANCELLED)
+                                    servers.sort()
+                                    this@FileActions.servers = servers
+                                    showServerList(actionRequest)
                                 }
                             }
+                            if (!MultipleDownloadManager.isLoading || MultipleDownloadManager.langSelected == -1)
+                                MaterialDialog(context).safeShow {
+                                    lifecycleOwner(actionRequest.owner)
+                                    listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
+                                        langSelect(index)
+                                        if (MultipleDownloadManager.isLoading)
+                                            MultipleDownloadManager.langSelected = index
+                                    }
+                                    onDismiss {
+                                        if (isCancelling(actionRequest.owner)) {
+                                            reset()
+                                            actionRequest.callback.call(CallbackState.LIFECYCLE_EXPIRED)
+                                        }
+                                    }
+                                    setOnCancelListener {
+                                        reset()
+                                        callback.call(CallbackState.USER_CANCELLED)
+                                    }
+                                }
+                            else
+                                langSelect(MultipleDownloadManager.langSelected)
                         }
                     } else {
                         val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
@@ -342,14 +350,19 @@ object FileActions {
                     saveLastServer(text)
                     when (text.toLowerCase(Locale.ENGLISH)) {
                         "mega d", "mega s" -> {
-                            try {
-                                CustomTabsIntent.Builder()
-                                        .setToolbarColor(Color.parseColor("#DA252D"))
-                                        .setShowTitle(true).build().launchUrl(actionRequest.context, Uri.parse(server.option.url))
-                            } catch (e: Exception) {
-                                actionRequest.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(server.option.url)))
+                            if (actionRequest.downloadObject.addQueue) {
+                                Toaster.toast("Servidor no disponible para añadir a cola")
+                                showServerList(actionRequest)
+                            } else {
+                                try {
+                                    CustomTabsIntent.Builder()
+                                            .setToolbarColor(Color.parseColor("#DA252D"))
+                                            .setShowTitle(true).build().launchUrl(actionRequest.context, Uri.parse(server.option.url))
+                                } catch (e: Exception) {
+                                    actionRequest.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(server.option.url)))
+                                }
+                                actionRequest.callback.call(CallbackState.EXTERNAL_LINK)
                             }
-                            actionRequest.callback.call(CallbackState.EXTERNAL_LINK)
                         }
                         else ->
                             when (actionRequest.type) {

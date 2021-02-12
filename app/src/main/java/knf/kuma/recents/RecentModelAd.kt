@@ -1,5 +1,5 @@
 package knf.kuma.recents
 
-import com.google.android.gms.ads.formats.UnifiedNativeAd
+import com.google.android.gms.ads.nativead.NativeAd
 
-data class RecentModelAd(val id: Int, val unifiedNativeAd: UnifiedNativeAd): RecentModel()
+data class RecentModelAd(val id: Int, val unifiedNativeAd: NativeAd) : RecentModel()

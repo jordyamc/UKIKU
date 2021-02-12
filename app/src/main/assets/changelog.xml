@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="177" version="5.1.8">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Error al mostrar algunas secciones en telefonos sin Play Services
+        </change>
+        <change type="fix">Error al mostrar memoria disponible en versiones de Android recientes
+        </change>
+    </release>
     <release code="176" version="5.1.7">
         <change type="fix">Errores generales</change>
         <change type="change">Cambio de pagina Ukiku.app</change>

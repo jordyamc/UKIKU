@@ -15,6 +15,8 @@ object MultipleDownloadManager {
     private const val CHAPTER_SIZE = 160000000L
     private var index = 0
     private var chaptersList: List<AnimeObject.WebInfo.AnimeChapter> = listOf()
+    var isLoading = false
+    var langSelected = -1
 
     fun startDownload(fragment: Fragment, view: View, list: List<AnimeObject.WebInfo.AnimeChapter>, addQueue: Boolean) {
         if (list.isEmpty()) return
@@ -23,11 +25,16 @@ object MultipleDownloadManager {
             return
         }
         clear(list)
+        isLoading = true
         downloadNext(fragment, view, addQueue)
     }
 
     private fun downloadNext(fragment: Fragment, view: View, addQueue: Boolean) {
-        if (index >= chaptersList.size || !fragment.isAdded || fragment.context == null) return
+        if (index >= chaptersList.size || !fragment.isAdded || fragment.context == null) {
+            isLoading = false
+            langSelected = -1
+            return
+        }
         val current = chaptersList[index]
         val callback: (FileActions.CallbackState, Any?) -> Unit = { state, _ ->
             when (state) {
@@ -57,6 +64,8 @@ object MultipleDownloadManager {
     private fun clear(list: List<AnimeObject.WebInfo.AnimeChapter>) {
         index = 0
         chaptersList = list
+        isLoading = false
+        langSelected = -1
     }
 
     private fun minSpaceString(context: Context, size: Int): String {
