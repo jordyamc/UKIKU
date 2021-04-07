@@ -19,3 +19,4 @@ keys.keystore
 .idea
 /web/
 /web/public/thumbs/
+/resizer/

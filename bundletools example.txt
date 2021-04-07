@@ -1,3 +1,0 @@
-java -jar bundletool.jar build-apks --bundle=app.aab --output=app.apks --ks=C:\Users\jordy\Desktop\Proyectos\java\keystore.jks --ks-key-alias=KNF
-
-java -jar bundletool.jar install-apks --apks=app.apks --adb=C:\Users\jordy\AppData\Local\Android\SDK\platform-tools\adb.exe
