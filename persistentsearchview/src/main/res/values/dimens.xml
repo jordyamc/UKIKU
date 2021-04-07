@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="search_card_visible_padding_toolbar_mode">8dp</dimen>
+    <dimen name="search_card_visible_padding_menu_item_mode">4dp</dimen>
+    <dimen name="search_card_default_card_elevation">2dp</dimen>
+    <dimen name="search_card_height">48dp</dimen>
+</resources>

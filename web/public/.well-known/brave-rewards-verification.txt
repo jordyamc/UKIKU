@@ -1,4 +1,0 @@
-This is a Brave Rewards publisher verification file.
-
-Domain: ukiku.ga
-Token: 76cfe014a059db041174be0137743c35c59204214120f8bf9c331924645dd043

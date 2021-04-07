@@ -1,9 +1,0 @@
-google.com, pub-5390653757953587, DIRECT, f08c47fec0942fa0
-yieldmo.com, 2713952348316573872, DIRECT #admob
-contextweb.com, 561118, RESELLER, 89ff185a4c4e857c #yieldmo
-rubiconproject.com, 17070, RESELLER, 0bfd66d529a55807 #yieldmo
-pubnative.net, 1007284, RESELLER, d641df8625486a7b #yieldmodisplay
-pubnative.net, 1007285, RESELLER, d641df8625486a7b #yieldmonative
-pubnative.net, 1007286, RESELLER, d641df8625486a7b #yieldmovideo
-onetag.com, 664e107d9f2b748, RESELLER #yieldmo
-admanmedia.com, 746, RESELLER #yieldmo

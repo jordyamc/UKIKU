@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/search_root"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardview_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        app:cardBackgroundColor="#FFFFFFFF"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
+
+            <org.cryse.widget.persistentsearch.HomeButton
+                android:id="@+id/button_home"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:scaleType="center"/>
+
+            <org.cryse.widget.persistentsearch.LogoView
+                android:id="@+id/logoview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/button_home"
+                android:layout_toEndOf="@+id/button_home"
+                android:layout_toLeftOf="@+id/button_mic"
+                android:layout_toStartOf="@+id/button_mic"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#212121" />
+
+            <EditText
+                android:id="@+id/edittext_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/button_home"
+                android:layout_toEndOf="@+id/button_home"
+                android:layout_toLeftOf="@+id/button_mic"
+                android:layout_toStartOf="@+id/button_mic"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="start|center"
+                android:background="@null"
+                android:ems="10"
+                android:imeOptions="actionSearch|flagNoExtractUi"
+                android:singleLine="true"
+                android:textColor="#212121"
+                android:visibility="gone">
+
+                <requestFocus />
+            </EditText>
+
+            <ImageView
+                android:id="@+id/button_mic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:scaleType="center"
+                android:src="@drawable/ic_action_mic_black"/>
+
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/listview_suggestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:visibility="gone"/>
+    </com.google.android.material.card.MaterialCardView>
+</merge>
