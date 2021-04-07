@@ -49,6 +49,7 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             }
         }
 
+    @ExperimentalContracts
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!resources.getBoolean(R.bool.isTablet))
@@ -63,11 +64,13 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             login_firestore.isEnabled = false
             ads_required.text = "Anuncios bloqueados por host"
             ads_required.visibility = View.VISIBLE
-        } else if (!FirestoreManager.isFirestoreEnabled && PrefsUtil.spProtectionEnabled) {
+        } else if (!PrefsUtil.isSecurityUpdated && PrefsUtil.spProtectionEnabled && PrefsUtil.spErrorType != null) {
             login_firestore.isEnabled = false
-            ads_required.text = "Proveedor de seguridad no pudo ser actualizado (${PrefsUtil.spErrorType})"
+            ads_required.text =
+                "Proveedor de seguridad no pudo ser actualizado (${PrefsUtil.spErrorType})"
             ads_required.visibility = View.VISIBLE
         }
+        FirestoreManager.start()
         login_firestore.setOnClickListener { onFirestoreLogin() }
         login_local.setOnClickListener { onLocalLogin() }
         logOut.setOnClickListener { onLogOut() }

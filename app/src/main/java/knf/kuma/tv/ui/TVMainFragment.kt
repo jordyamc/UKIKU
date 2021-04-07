@@ -9,7 +9,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.*
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.dropbox.core.android.Auth
 import knf.kuma.App
 import knf.kuma.Diagnostic
@@ -40,7 +40,10 @@ import knf.kuma.tv.sections.SectionObject
 import knf.kuma.tv.sync.BypassObject
 import knf.kuma.tv.sync.LogOutObject
 import knf.kuma.tv.sync.SyncObject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 import kotlin.contracts.ExperimentalContracts
 
@@ -125,7 +128,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
     private fun fetchData() {
         Repository().reloadRecents()
         activity?.let {
-            CacheDB.INSTANCE.recentsDAO().objects.distinct.observe(it, Observer { recentObjects ->
+            CacheDB.INSTANCE.recentsDAO().objects.distinct.observe(it, { recentObjects ->
                 mRows?.get(RECENTS)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -155,27 +158,37 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                 }
                 startEntranceTransition()
             })
-            CacheDB.INSTANCE.animeDAO().animesDirWithIDRandomNL(StaffRecommendations.randomIds(15)).distinct.observe(it, { staffObjects ->
-                mRows?.get(STAFF)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, staffObjects)
-                    }
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                var recList = emptyList<DirObject>()
+                while (recList.size < 15) {
+                    delay(100)
+                    recList = CacheDB.INSTANCE.animeDAO()
+                        .animesDirWithIDRandomNL(StaffRecommendations.randomIds(15))
                 }
-                startEntranceTransition()
-            })
-            CacheDB.INSTANCE.animeDAO().emissionVotesLimited.distinct.observe(it, Observer { emissionObjects ->
-                mRows?.get(BEST)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, emissionObjects)
+                launch(Dispatchers.Main) {
+                    mRows?.get(STAFF)?.apply {
+                        page = page.plus(1)
+                        adapter?.apply {
+                            clear()
+                            addAll(0, recList)
+                        }
                     }
+                    startEntranceTransition()
                 }
-                startEntranceTransition()
-            })
-            CacheDB.INSTANCE.animeDAO().allVotesLimited.distinct.observe(it, Observer { emissionObjects ->
+            }
+            CacheDB.INSTANCE.animeDAO().emissionVotesLimited.distinct.observe(
+                it,
+                { emissionObjects ->
+                    mRows?.get(BEST)?.apply {
+                        page = page.plus(1)
+                        adapter?.apply {
+                            clear()
+                            addAll(0, emissionObjects)
+                        }
+                    }
+                    startEntranceTransition()
+                })
+            CacheDB.INSTANCE.animeDAO().allVotesLimited.distinct.observe(it, { emissionObjects ->
                 mRows?.get(BESTGLOBAL)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -217,25 +230,27 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
         } else if (item is SectionObject) {
             item.open(context)
         } else if (item is SyncObject) {
-            if (item is LogOutObject) {
-                service?.logOut()
-                activity?.let { FirestoreManager.doSignOut(it) }
-                Backups.type = Backups.Type.NONE
-                onLogin()
-            } else if (item is BypassObject)
-                startActivity(Intent(context, Diagnostic.FullBypass::class.java))
-            else {
-                when (item.type) {
-                    Backups.Type.DROPBOX -> {
-                        waitingLoginDropbox = true
-                        if (item.type == Backups.Type.DROPBOX)
-                            service = DropBoxService().also { it.logIn() }
-                    }
-                    Backups.Type.FIRESTORE -> {
-                        waitingLoginFirestore = true
-                        activity?.let { FirestoreManager.doLogin(it) }
-                    }
-                    else -> {
+            when (item) {
+                is LogOutObject -> {
+                    service?.logOut()
+                    activity?.let { FirestoreManager.doSignOut(it) }
+                    Backups.type = Backups.Type.NONE
+                    onLogin()
+                }
+                is BypassObject -> startActivity(Intent(context, Diagnostic.FullBypass::class.java))
+                else -> {
+                    when (item.type) {
+                        Backups.Type.DROPBOX -> {
+                            waitingLoginDropbox = true
+                            if (item.type == Backups.Type.DROPBOX)
+                                service = DropBoxService().also { it.logIn() }
+                        }
+                        Backups.Type.FIRESTORE -> {
+                            waitingLoginFirestore = true
+                            activity?.let { FirestoreManager.doLogin(it) }
+                        }
+                        else -> {
+                        }
                     }
                 }
             }
@@ -263,7 +278,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
         activity?.let { FirestoreManager.handleLogin(it, requestCode, resultCode, data) }
     }
 
-    fun onLogin() {
+    private fun onLogin() {
         if (service?.isLoggedIn == false && waitingLoginDropbox) {
             Toaster.toast("Error al iniciar sesión")
         } else {

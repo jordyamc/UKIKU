@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import androidx.tvprovider.media.tv.PreviewChannelHelper
 import androidx.work.*
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
@@ -28,6 +29,7 @@ import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.Recents
 import knf.kuma.recents.RecentsNotReceiver
 import knf.kuma.search.SearchAdvObject
+import knf.kuma.tv.ChannelUtils
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.notificationManager
 import pl.droidsonroids.jspoon.Jspoon
@@ -52,6 +54,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
             val objects = RecentObject.create(recents.list ?: listOf())
             for ((i, recentObject) in objects.withIndex())
                 recentObject.key = i
+            notifyChannel(objects)
             val local = recentsDAO.all
             if (local.isEmpty() && !BuildConfig.DEBUG)
                 return Result.success()
@@ -72,23 +75,53 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
     @Throws(Exception::class)
     private fun notifyAllChaps(local: MutableList<RecentObject>, objects: MutableList<RecentObject>) {
         for (recentObject in objects) {
-            if (!local.contains(recentObject))
+            if (!local.contains(recentObject)) {
                 notifyRecent(recentObject)
+            }
         }
     }
 
     @Throws(Exception::class)
-    private fun notifyFavChaps(local: MutableList<RecentObject>, objects: MutableList<RecentObject>) {
+    private fun notifyFavChaps(
+        local: MutableList<RecentObject>,
+        objects: MutableList<RecentObject>
+    ) {
         for (recentObject in objects) {
-            if (!local.contains(recentObject) && (favsDAO.isFav(Integer.parseInt(recentObject.aid)) || seeingDAO.isSeeing(recentObject.aid)))
+            if (!local.contains(recentObject) && (favsDAO.isFav(Integer.parseInt(recentObject.aid)) || seeingDAO.isSeeing(
+                    recentObject.aid
+                ))
+            ) {
                 notifyRecent(recentObject)
+            }
+        }
+    }
+
+    private fun notifyChannel(objects: List<RecentObject>) {
+        if (!context.resources.getBoolean(R.bool.isTv)) return
+        val lastNotified =
+            objects.indexOf(objects.find { it.eid == PrefsUtil.tvRecentsChannelLastEid })
+        if (lastNotified != 0) {
+            with(PreviewChannelHelper(context)) {
+                PrefsUtil.tvRecentsChannelIds?.forEach {
+                    deletePreviewProgram(it.toLong())
+                }
+            }
+            val newIds = mutableSetOf<String>()
+            objects.forEach {
+                newIds.add(ChannelUtils.addProgram(context, it).toString())
+            }
+            PrefsUtil.tvRecentsChannelIds = newIds
+            PrefsUtil.tvRecentsChannelLastEid = objects.first().eid
         }
     }
 
     @Throws(Exception::class)
     private fun notifyRecent(recentObject: RecentObject) {
         val animeObject = getAnime(recentObject)
-        val obj = NotificationObj("${recentObject.aid}${recentObject.chapter}".hashCode(), NotificationObj.RECENT)
+        val obj = NotificationObj(
+            "${recentObject.aid}${recentObject.chapter}".hashCode(),
+            NotificationObj.RECENT
+        )
         val notification = NotificationCompat.Builder(context, CHANNEL_RECENTS).create {
             setSmallIcon(R.drawable.ic_new_recent)
             color = ContextCompat.getColor(context, R.color.colorAccent)

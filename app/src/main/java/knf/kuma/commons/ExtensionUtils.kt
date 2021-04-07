@@ -82,6 +82,8 @@ fun Toolbar.changeToolbarFont(@FontRes res: Int) {
     }
 }
 
+val String.urlFixed: String get() = if (!contains("animeflv.net")) "https://animeflv.net$this" else this
+
 val <T>LiveData<T>.distinct: LiveData<T>
     get() = Transformations.distinctUntilChanged(this)
 

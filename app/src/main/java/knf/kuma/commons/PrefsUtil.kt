@@ -68,24 +68,62 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("auto_backup", value).apply()
 
     val showFavIndicator: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_fav_count", true)
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("show_fav_count", true)
 
     val useNewBypass: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("useNewBypass", true)
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("useNewBypass", true)
 
     var spProtectionEnabled: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("security_blocking_firestore", true)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("security_blocking_firestore", value).apply()
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("security_blocking_firestore", true)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putBoolean("security_blocking_firestore", value).apply()
+
+    var tvRecentsChannelCreated: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("tv_channel_recents_created", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putBoolean("tv_channel_recents_created", value).apply()
+
+    var tvRecentsPreFilled: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("tv_channel_recents_prefilled", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putBoolean("tv_channel_recents_prefilled", value).apply()
+
+    var tvRecentsChannelId: Long
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getLong("tv_channel_recents_id", -1)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putLong("tv_channel_recents_id", value).apply()
+
+    var tvRecentsChannelLastEid: String?
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString("tv_channel_recents_last_eid", null)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putString("tv_channel_recents_last_eid", value).apply()
+
+    var tvRecentsChannelIds: Set<String>?
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getStringSet("tv_channel_recents_ids", null)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putStringSet("tv_channel_recents_ids", value).apply()
 
     var spErrorType: String?
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("sp_error_type", null)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sp_error_type", value).apply()
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString("sp_error_type", null)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putString("sp_error_type", value).apply()
 
     private val useExperimentalPlayer: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("experimental_player", false)
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("experimental_player", false)
 
     val collapseDirectoryNotification: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("collapse_dir_nots", true)
+        get() = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("collapse_dir_nots", true)
 
     val showRecentImage: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("recent_image", true)

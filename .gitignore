@@ -17,3 +17,5 @@ app/src/main/res/values/styles_colors.xml
 *.pepk
 keys.keystore
 .idea
+/web/
+/web/public/thumbs/

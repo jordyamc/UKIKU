@@ -27,7 +27,7 @@ interface SeenDAO {
     fun chapterIsSeen(aid: String, number: String): Boolean
 
     @Query("SELECT * FROM seenobject WHERE eid IN (:eids) ORDER BY eid+0 DESC LIMIT 1")
-    fun getLast(eids: MutableList<String>): SeenObject?
+    fun getLast(eids: List<String>): SeenObject?
 
     @Query("SELECT * FROM seenobject WHERE aid = :aid ORDER BY eid+0 DESC LIMIT 1")
     fun getLastByAid(aid: String): SeenObject?

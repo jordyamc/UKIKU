@@ -50,7 +50,7 @@ interface AnimeDAO {
     fun animesDirWithIDRandom(aids: List<String>): List<DirObject>
 
     @Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE aid IN (:aids) ORDER BY RANDOM()")
-    fun animesDirWithIDRandomNL(aids: List<String>): LiveData<List<DirObject>>
+    fun animesDirWithIDRandomNL(aids: List<String>): List<DirObject>
 
     @Query("SELECT aid FROM animeobject WHERE link = :link")
     fun findAid(link: String): String?

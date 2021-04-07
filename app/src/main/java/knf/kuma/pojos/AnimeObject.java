@@ -429,6 +429,11 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             }
 
             @Ignore
+            public static AnimeChapter fromData(String aid, String chapter, String eid, String url, String name) {
+                return new AnimeChapter((aid + chapter).hashCode(), chapter, eid, url, name, aid);
+            }
+
+            @Ignore
             public static AnimeChapter fromRecent(RecentObject object) {
                 return new AnimeChapter((object.aid + object.chapter).hashCode(), object.chapter, object.eid, object.url, object.name, object.aid);
             }

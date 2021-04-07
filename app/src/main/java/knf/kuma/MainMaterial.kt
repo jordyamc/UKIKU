@@ -31,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -90,6 +91,7 @@ import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
 import java.io.File
+import java.util.*
 import kotlin.contracts.ExperimentalContracts
 
 class MainMaterial : GenericActivity(),
@@ -122,10 +124,17 @@ class MainMaterial : GenericActivity(),
             finish()
             return
         }
-        MobileAds.initialize(this)
-        NativeManager
+        MobileAds.initialize(this) {
+            NativeManager
+        }
+        MobileAds.setRequestConfiguration(
+            RequestConfiguration.Builder()
+                .setTestDeviceIds(listOf("A7538543A53633612D25FDE0B64A4AEE")).build()
+        )
+        //NativeManager
         AdsUtilsMob.setUp()
-        FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
+        FirebaseAnalytics.getInstance(this)
+            .setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
         try {
             setContentView(R.layout.activity_main_material)
         } catch (e: Exception) {

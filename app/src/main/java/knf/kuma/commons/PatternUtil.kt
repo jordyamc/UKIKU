@@ -135,18 +135,28 @@ object PatternUtil {
     }
 
     fun getAnimeUrl(chapter: String, aid: String): String {
-        return "https://animeflv.net/anime/" + aid + chapter.substring(chapter.lastIndexOf("/"), chapter.lastIndexOf("-"))
+        return "https://animeflv.net/anime/" + aid + chapter.substring(
+            chapter.lastIndexOf("/"),
+            chapter.lastIndexOf("-")
+        )
     }
 
     fun getCover(aid: String?): String {
         return "https://m.animeflv.net/uploads/animes/covers/$aid.jpg"
     }
 
+    fun getThumb(aid: String?): String {
+        return "https://ukiku.app/thumbs/$aid.jpg"
+    }
+
     fun getCoverGlide(aid: String?): GlideUrl {
-        return GlideUrl("https://m.animeflv.net/uploads/animes/covers/$aid.jpg", LazyHeaders.Builder().apply {
-            addHeader("Cookie", BypassUtil.getStringCookie(App.context))
-            addHeader("User-Agent", BypassUtil.userAgent)
-        }.build())
+        return GlideUrl(
+            "https://m.animeflv.net/uploads/animes/covers/$aid.jpg",
+            LazyHeaders.Builder().apply {
+                addHeader("Cookie", BypassUtil.getStringCookie(App.context))
+                addHeader("User-Agent", BypassUtil.userAgent)
+            }.build()
+        )
     }
 
     fun getBanner(aid: String): String {

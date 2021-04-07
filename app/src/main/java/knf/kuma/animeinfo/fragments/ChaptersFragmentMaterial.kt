@@ -26,6 +26,7 @@ import knf.kuma.download.MultipleDownloadManager
 import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.pojos.AnimeObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 import java.util.*
@@ -50,6 +51,7 @@ class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.C
                                     if (PrefsUtil.isChapsAsc)
                                         chapters.reverse()
                                     holder?.setAdapter(this@ChaptersFragmentMaterial, chapters)
+                                    delay(1000)
                                     holder?.goToChapter()
                                 }
                                 Network.isConnected -> {

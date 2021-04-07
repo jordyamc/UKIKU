@@ -224,6 +224,7 @@ open class GenericActivity : AppCompatActivity() {
             onBypassUpdated()
             BypassUtil.isLoading = false
             PicassoSingle.clear()
+            //ThumbsDownloader.start(this)
             if (!PrefsUtil.isDirectoryFinished) {
                 lifecycleScope.launch(Dispatchers.IO) {
                     DirManager.checkPreDir()

@@ -19,9 +19,16 @@ import org.jetbrains.anko.support.v4.toast
 
 class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
     private var callback: ActionsCallback? = null
+    private var listSize: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.lay_bottom_actions, container, false)
+        if (listSize <= 1) {
+            view.action_seen.text = "Marcar como visto"
+            view.action_unseen.text = "Marcar como no visto"
+            view.action_import_all.text = "Importar archivo"
+            view.action_download_all.text = "Descargar"
+        }
         view.action_seen.onClick {
             callback?.onSelect(STATE_SEEN)
             safeDismiss()
@@ -117,9 +124,10 @@ class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
         const val STATE_DOWNLOAD_MULTIPLE = 3
         const val STATE_QUEUE_MULTIPLE = 4
 
-        fun newInstance(callback: ActionsCallback): BottomActionsDialog {
+        fun newInstance(listSize: Int, callback: ActionsCallback): BottomActionsDialog {
             val actionsDialog = BottomActionsDialog()
             actionsDialog.callback = callback
+            actionsDialog.listSize = listSize
             return actionsDialog
         }
     }

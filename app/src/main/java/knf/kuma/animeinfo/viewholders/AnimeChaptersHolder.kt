@@ -56,17 +56,24 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                     }
 
                     override fun onSelectionFinished(i: Int) {
-                        BottomActionsDialog.newInstance(object : BottomActionsDialog.ActionsCallback {
-                            override fun onSelect(state: Int) {
-                                try {
-                                    val snackbar = recyclerView.showSnackbar("Procesando...", duration = Snackbar.LENGTH_INDEFINITE)
-                                    when (state) {
-                                        BottomActionsDialog.STATE_SEEN -> doAsync {
-                                            val dao = CacheDB.INSTANCE.seenDAO()
-                                            for (i13 in ArrayList(adapter?.selection
-                                                    ?: arrayListOf())) {
-                                                dao.addChapter(SeenObject.fromChapter(chapters[i13]))
-                                            }
+                        BottomActionsDialog.newInstance(
+                            adapter?.selection?.size ?: 0,
+                            object : BottomActionsDialog.ActionsCallback {
+                                override fun onSelect(state: Int) {
+                                    try {
+                                        val snackbar = recyclerView.showSnackbar(
+                                            "Procesando...",
+                                            duration = Snackbar.LENGTH_INDEFINITE
+                                        )
+                                        when (state) {
+                                            BottomActionsDialog.STATE_SEEN -> doAsync {
+                                                val dao = CacheDB.INSTANCE.seenDAO()
+                                                for (i13 in ArrayList(
+                                                    adapter?.selection
+                                                        ?: arrayListOf()
+                                                )) {
+                                                    dao.addChapter(SeenObject.fromChapter(chapters[i13]))
+                                                }
                                             syncData { seen() }
                                             val seeingDAO = CacheDB.INSTANCE.seeingDAO()
                                             val seeingObject = seeingDAO.getByAid(chapters[0].aid)
@@ -228,11 +235,23 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
     fun smoothGoToChapter() {
         if (chapters.isNotEmpty()) {
             doOnUI {
-                val chapter = CacheDB.INSTANCE.seenDAO().getAllFrom(PatternUtil.getEids(chapters)).maxBy { noCrashLet(-1.0) { "(\\d+\\.?\\d?)".toRegex().findAll(it.number).last().destructured.component1().toDouble() } }
+                val chapter = CacheDB.INSTANCE.seenDAO().getAllFrom(PatternUtil.getEids(chapters))
+                    .maxByOrNull {
+                        noCrashLet(-1.0) {
+                            "(\\d+\\.?\\d?)".toRegex().findAll(it.number)
+                                .last().destructured.component1().toDouble()
+                        }
+                    }
                 if (chapter != null) {
                     val position = chapters.indexOfFirst { it.eid == chapter.eid }
                     if (position >= 0)
-                        recyclerView.post { manager.smoothScrollToPosition(recyclerView, null, position) }
+                        recyclerView.post {
+                            manager.smoothScrollToPosition(
+                                recyclerView,
+                                null,
+                                position
+                            )
+                        }
                 }
             }
         }

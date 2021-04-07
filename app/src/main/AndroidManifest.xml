@@ -42,14 +42,18 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"
-        android:requiredFeature="android.software.leanback"/>
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO"
+        android:requiredFeature="android.software.leanback" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="com.appcoins.BILLING" />
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+
 
     <application
         android:name=".App"
@@ -144,11 +148,22 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="tv"
+                    android:pathPrefix="/home"
+                    android:scheme="ukiku" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".animeinfo.ActivityAnime"
-            android:theme="@style/AppTheme.NoActionBar"
             android:enabled="false"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
@@ -240,14 +255,24 @@
         <activity android:name=".recommended.RankingActivity" />
         <activity android:name=".search.GenreActivity" />
 
-        <service android:name=".directory.DirectoryService" android:foregroundServiceType="dataSync" />
-        <service android:name=".directory.DirectoryUpdateService" android:foregroundServiceType="dataSync" />
-        <service android:name=".download.DownloadService" android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".directory.DirectoryService"
+            android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".directory.DirectoryUpdateService"
+            android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".download.DownloadService"
+            android:foregroundServiceType="dataSync" />
         <service
             android:name=".widgets.emision.WEmissionService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
-        <service android:name=".download.DownloadManager" android:foregroundServiceType="dataSync" />
-        <service android:name=".commons.SelfServer" android:foregroundServiceType="mediaPlayback" />
+        <service
+            android:name=".download.DownloadManager"
+            android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".commons.SelfServer"
+            android:foregroundServiceType="mediaPlayback" />
 
         <receiver
             android:name=".widgets.emision.WEmisionProvider"
@@ -277,6 +302,9 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-5390653757953587~9838518341" />
+        <!--<meta-data
+            android:name="com.google.android.gms.ads.flag.rtb_enabled"
+            android:value="false"/>-->
         <meta-data
             android:name="com.google.android.gms.ads.AD_MANAGER_APP"
             android:value="true" />
@@ -345,18 +373,20 @@
         <activity android:name=".faq.FaqActivity" />
         <activity android:name=".news.MaterialNewsActivity" />
         <activity android:name=".preferences.AdsPreferenceActivity" />
-        <activity android:name=".MainMaterial"  android:label="@string/title_activity_main">
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
+        <activity
+            android:name=".MainMaterial"
+            android:label="@string/title_activity_main">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-            <data
-                android:host="ukiku.app"
-                android:pathPrefix="/search"
-                android:scheme="https" />
-        </intent-filter>
+                <data
+                    android:host="ukiku.app"
+                    android:pathPrefix="/search"
+                    android:scheme="https" />
+            </intent-filter>
         </activity>
         <activity android:name=".recents.RecentsModelActivity" />
         <activity android:name=".search.SearchActivity" />
@@ -372,7 +402,8 @@
         <activity android:name=".achievements.AchievementActivityMaterial" />
         <activity android:name=".AppInfoActivityMaterial" />
         <activity android:name=".AppInfoActivity" />
-        <activity android:name=".animeinfo.ActivityAnimeMaterial"
+        <activity
+            android:name=".animeinfo.ActivityAnimeMaterial"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden">
             <intent-filter android:label="@string/app_name">
@@ -396,6 +427,21 @@
         <activity android:name=".shortcuts.DummyEmissionActivity" />
         <activity android:name=".profile.TopActivityMaterial" />
         <activity android:name="com.appbrain.AppBrainActivity" />
+        <activity
+            android:name=".tv.streaming.StreamTvActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.Dialog">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="tv"
+                    android:pathPrefix="/chapter"
+                    android:scheme="ukiku" />
+            </intent-filter>
+        </activity>
 
         <provider
             android:name=".slices.AnimeSlice"
