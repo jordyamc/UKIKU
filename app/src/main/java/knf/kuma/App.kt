@@ -11,6 +11,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.work.Configuration
 import es.munix.multidisplaycast.CastManager
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.PrefsUtil
@@ -24,23 +25,66 @@ import knf.kuma.widgets.emision.WEmissionService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.contracts.ExperimentalContracts
 
-class App : Application() {
+class App : Application(), Configuration.Provider {
     //private lateinit var appCoinsAds: AppCoinsAds
 
     @TargetApi(Build.VERSION_CODES.O)
     private fun createChannels() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-        val dirChannel = NotificationChannel(DirectoryService.CHANNEL, getString(R.string.directory_channel_title), NotificationManager.IMPORTANCE_MIN)
-        dirChannel.setSound(null, AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN).setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
+        val dirChannel = NotificationChannel(
+            DirectoryService.CHANNEL,
+            getString(R.string.directory_channel_title),
+            NotificationManager.IMPORTANCE_MIN
+        )
+        dirChannel.setSound(
+            null,
+            AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
+        )
         dirChannel.setShowBadge(false)
         manager?.createNotificationChannel(dirChannel)
-        manager?.createNotificationChannel(NotificationChannel(RecentsWork.CHANNEL_RECENTS, "Capitulos recientes", NotificationManager.IMPORTANCE_HIGH))
-        manager?.createNotificationChannel(NotificationChannel(DownloadService.CHANNEL, "Descargas", NotificationManager.IMPORTANCE_HIGH))
-        manager?.createNotificationChannel(NotificationChannel(DownloadService.CHANNEL_ONGOING, "Descargas en progreso", NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
-        manager?.createNotificationChannel(NotificationChannel(DownloadManager.CHANNEL_FOREGROUND, "Administrador de descargas", NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
-        manager?.createNotificationChannel(NotificationChannel(UpdateWork.CHANNEL, "Actualización de la app", NotificationManager.IMPORTANCE_DEFAULT))
-        manager?.createNotificationChannel(NotificationChannel(WEmissionService.CHANNEL, "Actualizador de widget", NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
+        manager?.createNotificationChannel(
+            NotificationChannel(
+                RecentsWork.CHANNEL_RECENTS,
+                "Capitulos recientes",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+        )
+        manager?.createNotificationChannel(
+            NotificationChannel(
+                DownloadService.CHANNEL,
+                "Descargas",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+        )
+        manager?.createNotificationChannel(
+            NotificationChannel(
+                DownloadService.CHANNEL_ONGOING,
+                "Descargas en progreso",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply { setShowBadge(false) })
+        manager?.createNotificationChannel(
+            NotificationChannel(
+                DownloadManager.CHANNEL_FOREGROUND,
+                "Administrador de descargas",
+                NotificationManager.IMPORTANCE_MIN
+            ).apply { setShowBadge(false) })
+        manager?.createNotificationChannel(
+            NotificationChannel(
+                UpdateWork.CHANNEL,
+                "Actualización de la app",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+        )
+        manager?.createNotificationChannel(
+            NotificationChannel(
+                WEmissionService.CHANNEL,
+                "Actualizador de widget",
+                NotificationManager.IMPORTANCE_MIN
+            ).apply { setShowBadge(false) })
     }
+
+    override fun getWorkManagerConfiguration() = Configuration.Builder().build()
 
     @ExperimentalCoroutinesApi
     @ExperimentalContracts
