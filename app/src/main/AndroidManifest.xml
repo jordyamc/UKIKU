@@ -459,6 +459,13 @@
             </intent-filter>
         </provider>
 
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge"></provider>
+
+
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />

@@ -28,6 +28,7 @@
 -keep class **$$TypeAdapter { *; }
 -keep class knf.kuma.pojos.AnimeObject.WebInfo.AnimeChapter {*;}
 -keep class knf.kuma.pojos.AnimeObject.WebInfo.AnimeRelated {*;}
+-keep class androidx.startup.InitializationProvider {*;}
 
 -keepclasseswithmembernames class * {
     @com.tickaroo.tikxml.* <fields>;

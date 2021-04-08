@@ -22,8 +22,8 @@ object ThumbsDownloader {
                             .load("https://www3.animeflv.net/uploads/animes/thumbs/$id.jpg").get()
                         thumb.createNewFile()
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(thumb))
+                        delay(100)
                     }
-                    delay(100)
                     true
                 } catch (e: Exception) {
                     false

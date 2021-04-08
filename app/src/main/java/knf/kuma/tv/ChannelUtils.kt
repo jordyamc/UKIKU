@@ -24,26 +24,30 @@ object ChannelUtils {
         if (!context.resources.getBoolean(R.bool.isTv)) return
         if (!PrefsUtil.tvRecentsChannelCreated) {
             GlobalScope.launch(Dispatchers.IO) {
-                val channelBuilder = PreviewChannel.Builder()
-                    .setDisplayName("Episodios recientes")
-                    .setAppLinkIntentUri(Uri.parse("ukiku://tv/home"))
-                    .setLogo(
-                        BitmapFactory.decodeResource(
-                            context.resources,
-                            R.drawable.ukiku_logo_plain
+                try {
+                    val channelBuilder = PreviewChannel.Builder()
+                        .setDisplayName("Episodios recientes")
+                        .setAppLinkIntentUri(Uri.parse("ukiku://tv/home"))
+                        .setLogo(
+                            BitmapFactory.decodeResource(
+                                context.resources,
+                                R.drawable.ukiku_logo_plain
+                            )
                         )
-                    )
-                val channelId =
-                    PreviewChannelHelper(context).publishDefaultChannel(channelBuilder.build())
-                PrefsUtil.tvRecentsChannelCreated = true
-                PrefsUtil.tvRecentsChannelId = channelId
+                    val channelId =
+                        PreviewChannelHelper(context).publishDefaultChannel(channelBuilder.build())
+                    PrefsUtil.tvRecentsChannelCreated = true
+                    PrefsUtil.tvRecentsChannelId = channelId
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
         initChannelIfNeeded(context)
     }
 
     fun initChannelIfNeeded(context: Context) {
-        if (!context.resources.getBoolean(R.bool.isTv)) return
+        if (!context.resources.getBoolean(R.bool.isTv) || !PrefsUtil.tvRecentsChannelCreated) return
         if (!PrefsUtil.tvRecentsPreFilled)
             GlobalScope.launch(Dispatchers.IO) {
                 delay(5000)

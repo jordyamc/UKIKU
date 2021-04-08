@@ -97,7 +97,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
     }
 
     private fun notifyChannel(objects: List<RecentObject>) {
-        if (!context.resources.getBoolean(R.bool.isTv)) return
+        if (!context.resources.getBoolean(R.bool.isTv) || !PrefsUtil.tvRecentsChannelCreated) return
         val lastNotified =
             objects.indexOf(objects.find { it.eid == PrefsUtil.tvRecentsChannelLastEid })
         if (lastNotified != 0) {

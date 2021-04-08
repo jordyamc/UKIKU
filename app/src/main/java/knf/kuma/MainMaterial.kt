@@ -163,6 +163,7 @@ class MainMaterial : GenericActivity(),
         FirestoreManager.start()
         DesignUtils.listenDesignChange(this)
         //BypassUtil.doConnectionTests()
+        //ThumbsDownloader.start(this)
     }
 
     private fun checkServices() {
