@@ -79,6 +79,7 @@ import knf.kuma.search.SearchActivity
 import knf.kuma.seeing.SeeingActivityMaterial
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
+import knf.kuma.videoservers.StapeServer
 import kotlinx.android.synthetic.main.activity_main_material.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -164,6 +165,9 @@ class MainMaterial : GenericActivity(),
         DesignUtils.listenDesignChange(this)
         //BypassUtil.doConnectionTests()
         //ThumbsDownloader.start(this)
+        lifecycleScope.launch(Dispatchers.IO) {
+            StapeServer(this@MainMaterial, "https://streamtape.com/v/lW9e90W7b0S7ylb/").videoServer
+        }
     }
 
     private fun checkServices() {

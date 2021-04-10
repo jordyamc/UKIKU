@@ -220,38 +220,42 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
     fun goToChapter() {
         fragment.lifecycleScope.launch(Dispatchers.IO) {
             if (chapters.isNotEmpty()) {
-                val chapter = CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters))
-                if (chapter != null) {
-                    val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
-                    if (position >= 0)
-                        launch(Dispatchers.Main) {
-                            manager.scrollToPositionWithOffset(position, 150)
-                        }
+                val eids =
+                    chapters.sortedBy { it.number.substringAfterLast(" ").toFloat() }.map { it.eid }
+                eids.chunked(50).forEach { list ->
+                    val chapter = CacheDB.INSTANCE.seenDAO().getLast(list)
+                    if (chapter != null) {
+                        val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
+                        if (position >= 0)
+                            launch(Dispatchers.Main) {
+                                manager.scrollToPositionWithOffset(position, 150)
+                            }
+                        return@forEach
+                    }
                 }
             }
         }
     }
 
     fun smoothGoToChapter() {
-        if (chapters.isNotEmpty()) {
-            doOnUI {
-                val chapter = CacheDB.INSTANCE.seenDAO().getAllFrom(PatternUtil.getEids(chapters))
-                    .maxByOrNull {
-                        noCrashLet(-1.0) {
-                            "(\\d+\\.?\\d?)".toRegex().findAll(it.number)
-                                .last().destructured.component1().toDouble()
-                        }
+        fragment.lifecycleScope.launch(Dispatchers.IO) {
+            if (chapters.isNotEmpty()) {
+                val eids =
+                    chapters.sortedBy { it.number.substringAfterLast(" ").toFloat() }.map { it.eid }
+                eids.chunked(50).forEach { list ->
+                    val chapter = CacheDB.INSTANCE.seenDAO().getLast(list)
+                    if (chapter != null) {
+                        val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
+                        if (position >= 0)
+                            recyclerView.post {
+                                manager.smoothScrollToPosition(
+                                    recyclerView,
+                                    null,
+                                    position
+                                )
+                            }
+                        return@forEach
                     }
-                if (chapter != null) {
-                    val position = chapters.indexOfFirst { it.eid == chapter.eid }
-                    if (position >= 0)
-                        recyclerView.post {
-                            manager.smoothScrollToPosition(
-                                recyclerView,
-                                null,
-                                position
-                            )
-                        }
                 }
             }
         }

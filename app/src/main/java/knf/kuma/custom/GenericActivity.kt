@@ -88,7 +88,7 @@ open class GenericActivity : AppCompatActivity() {
                 if (PrefsUtil.useNewBypass) {
                     bypassLive.postValue(Pair(true, true))
                     BypassUtil.isLoading = true
-                    startBypass(4157, BypassUtil.testLink, isTV)
+                    startBypass(4157, BypassUtil.testLink, true)
                 } else {
                     if (flag == 1 || forceCreation()) {
                         logText("Starting creation")

@@ -49,11 +49,16 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
 
     private suspend fun getLastSeen(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?): Int {
         if (chapters?.isNotEmpty() == true) {
-            val chapter = withContext(Dispatchers.IO) { CacheDB.INSTANCE.seenDAO().getLast(PatternUtil.getEids(chapters)) }
-            if (chapter != null) {
-                val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
-                if (position >= 0)
-                    return position
+            val eids =
+                chapters.sortedBy { it.number.substringAfterLast(" ").toFloat() }.map { it.eid }
+            eids.chunked(50).forEach { list ->
+                val chapter =
+                    withContext(Dispatchers.IO) { CacheDB.INSTANCE.seenDAO().getLast(list) }
+                if (chapter != null) {
+                    val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
+                    if (position >= 0)
+                        return position
+                }
             }
         }
         return 0
