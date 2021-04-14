@@ -97,7 +97,7 @@ class ConnectionState : LinearLayout {
                 }
             }
             403 -> {
-                errorBlockedState(onShowDialog)
+                errorBlockedState(403, onShowDialog)
                 var defResult = true
                 val observer = Observer<Pair<Boolean, Boolean>> {
                     if (defResult) {
@@ -105,25 +105,25 @@ class ConnectionState : LinearLayout {
                         return@Observer
                     }
                     GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
-                        if (it.first && it.second) {
+                        if (BypassUtil.isLoading) {
                             warningCreatingState()
                         } else if (it.first && !it.second) {
                             okState()
                             delay(1000)
                             dismiss()
                             GenericActivity.removeBypassObserver("connectionState")
-                        } /*else if (!it.first && !it.second) {
+                        } else if (!it.first && !it.second) {
                             //dismiss()
                             GenericActivity.removeBypassObserver("connectionState")
                             normalState()
                             doNetworkTests(owner, onShowDialog)
-                        }*/
+                        }
                     }
                 }
                 GenericActivity.addBypassObserver("connectionState", owner, observer)
             }
             503 -> {
-                warningState(onShowDialog)
+                errorBlockedState(503, onShowDialog)
                 var defResult = true
                 val observer = Observer<Pair<Boolean, Boolean>> {
                     if (defResult) {
@@ -131,19 +131,19 @@ class ConnectionState : LinearLayout {
                         return@Observer
                     }
                     GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
-                        if (it.first && it.second) {
+                        if (BypassUtil.isLoading) {
                             warningCreatingState()
                         } else if (it.first && !it.second) {
                             okState()
                             delay(1000)
                             dismiss()
                             GenericActivity.removeBypassObserver("connectionState")
-                        } /*else if (!it.first && !it.second) {
+                        } else if (!it.first && !it.second) {
                             //dismiss()
                             GenericActivity.removeBypassObserver("connectionState")
                             normalState()
                             doNetworkTests(owner, onShowDialog)
-                        }*/
+                        }
                     }
                 }
                 GenericActivity.addBypassObserver("connectionState", owner, observer)
@@ -230,12 +230,12 @@ class ConnectionState : LinearLayout {
         container.setOnLongClickListener(null)
     }
 
-    private fun errorBlockedState(onShowDialog: (message: String) -> Unit) {
+    private fun errorBlockedState(errorCode: Int, onShowDialog: (message: String) -> Unit) {
         container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
         progress.visibility = View.GONE
         icon.setImageResource(R.drawable.ic_error)
         icon.visibility = View.VISIBLE
-        message.text = "Error HTTP 403!"
+        message.text = "Error HTTP $errorCode!"
         message.textColor = Color.WHITE
         container.onClick {
             PrefsUtil.isForbiddenTipShown = true

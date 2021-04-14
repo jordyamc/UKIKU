@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="182" version="5.1.13">
+        <change type="fix">Errores generales</change>
+        <change type="fix">Mejoras de bypass para TV</change>
+    </release>
     <release code="181" version="5.1.12">
         <change type="fix">Errores generales</change>
         <change type="fix">Servidor stape</change>

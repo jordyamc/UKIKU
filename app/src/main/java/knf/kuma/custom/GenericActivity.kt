@@ -86,9 +86,11 @@ open class GenericActivity : AppCompatActivity() {
                 BypassUtil.isChecking = false
                 logText("Flag: $flag")
                 if (PrefsUtil.useNewBypass) {
-                    bypassLive.postValue(Pair(true, true))
-                    BypassUtil.isLoading = true
-                    startBypass(4157, BypassUtil.testLink, true)
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        bypassLive.value = Pair(true, true)
+                        BypassUtil.isLoading = true
+                        startBypass(4157, BypassUtil.testLink, showReload = true, useFocus = isTV)
+                    }
                 } else {
                     if (flag == 1 || forceCreation()) {
                         logText("Starting creation")
@@ -175,7 +177,7 @@ open class GenericActivity : AppCompatActivity() {
                                         logText("Connection was successful")
                                         snack?.safeDismiss()
                                         getSnackbarAnchor()?.showSnackbar("Bypass actualizado")
-                                        bypassLive.postValue(Pair(first = true, second = false))
+                                        bypassLive.value = Pair(first = true, second = false)
                                         Repository().reloadAllRecents()
                                         onBypassUpdated()
                                         BypassUtil.isLoading = false
@@ -219,10 +221,10 @@ open class GenericActivity : AppCompatActivity() {
                 PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()
                 BypassUtil.saveCookies(this, it.getStringExtra("cookies") ?: "null")
             } ?: false
-            bypassLive.postValue(Pair(first = cookiesUpdated, second = false))
+            BypassUtil.isLoading = false
+            bypassLive.value = Pair(first = cookiesUpdated, second = false)
             Repository().reloadAllRecents()
             onBypassUpdated()
-            BypassUtil.isLoading = false
             PicassoSingle.clear()
             //ThumbsDownloader.start(this)
             if (!PrefsUtil.isDirectoryFinished) {
@@ -304,7 +306,7 @@ open class GenericActivity : AppCompatActivity() {
         ServersFactory.clear()
         FileActions.reset()
         if (forceCreation())
-            bypassLive.postValue(Pair(false, false))
+            bypassLive.value = Pair(false, false)
     }
 
     companion object {

@@ -56,15 +56,6 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             DirUpdateWork.schedule(this)
             RecentsNotReceiver.removeAll(this)
             UpdateChecker.check(this, this)
-            lifecycleScope.launch(Dispatchers.Main) {
-                if (PrefsUtil.mayUseRandomUA)
-                    PrefsUtil.alwaysGenerateUA = !withContext(Dispatchers.IO) { doBlockTests() }
-                else
-                    PrefsUtil.alwaysGenerateUA = false
-                if (withContext(Dispatchers.IO) { BypassUtil.isNeeded() }) {
-                    startBypass(this@TVMain, 7425, "https://animeflv.net", true)
-                }
-            }
             lifecycleScope.launch(Dispatchers.IO) {
                 DirManager.checkPreDir()
                 DirectoryService.run(this@TVMain)
@@ -87,6 +78,18 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
     override fun onNeedUpdate(o_code: String, n_code: String) {
         runOnUiThread {
             UpdateActivity.start(this@TVMain, true)
+        }
+    }
+
+    override fun onUpdateNotRequired() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (PrefsUtil.mayUseRandomUA)
+                PrefsUtil.alwaysGenerateUA = !withContext(Dispatchers.IO) { doBlockTests() }
+            else
+                PrefsUtil.alwaysGenerateUA = false
+            if (withContext(Dispatchers.IO) { BypassUtil.isNeeded() }) {
+                startBypass(this@TVMain, 7425, "https://animeflv.net", true)
+            }
         }
     }
 

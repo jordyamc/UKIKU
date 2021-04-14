@@ -159,7 +159,7 @@ class MainMaterial : GenericActivity(),
             startChange()
         } else
             returnSelectFragment()
-        checkBypass()
+        //checkBypass()
         migrateSeen()
         FirestoreManager.start()
         DesignUtils.listenDesignChange(this)
@@ -365,11 +365,23 @@ class MainMaterial : GenericActivity(),
                     title(text = "Actualización")
                     if (n_code.toInt() > AdsUtils.remoteConfigs.getLong("min_version").toInt()) {
                         message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
-                        positiveButton(text = "si") { UpdateActivity.start(this@MainMaterial, true) }
-                        negativeButton(text = "despues")
+                        positiveButton(text = "si") {
+                            UpdateActivity.start(
+                                this@MainMaterial,
+                                true
+                            )
+                        }
+                        negativeButton(text = "despues") {
+                            checkBypass()
+                        }
                     } else {
                         message(text = "Parece que la versión $n_code está disponible, es obligatoria")
-                        positiveButton(text = "actualizar") { UpdateActivity.start(this@MainMaterial, false) }
+                        positiveButton(text = "actualizar") {
+                            UpdateActivity.start(
+                                this@MainMaterial,
+                                false
+                            )
+                        }
                         cancelable(false)
                     }
                 }
@@ -377,6 +389,10 @@ class MainMaterial : GenericActivity(),
                 e.printStackTrace()
             }
         }
+    }
+
+    override fun onUpdateNotRequired() {
+        checkBypass()
     }
 
     private fun onStateDialog(message: String) {

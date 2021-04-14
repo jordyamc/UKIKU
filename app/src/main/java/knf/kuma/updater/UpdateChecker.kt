@@ -25,14 +25,19 @@ object UpdateChecker {
                                     it.delete()
                                 }
                         Log.e("Version", "Up to date: $oCode")
+                        listener.onUpdateNotRequired()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    listener.onUpdateNotRequired()
                 }
             }
+        else
+            listener.onUpdateNotRequired()
     }
 
     interface CheckListener {
         fun onNeedUpdate(o_code: String, n_code: String)
+        fun onUpdateNotRequired()
     }
 }
