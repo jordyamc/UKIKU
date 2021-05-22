@@ -11,6 +11,9 @@ import android.webkit.*
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.tvprovider.media.tv.*
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.commons.*
@@ -88,7 +91,16 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             else
                 PrefsUtil.alwaysGenerateUA = false
             if (withContext(Dispatchers.IO) { BypassUtil.isNeeded() }) {
-                startBypass(this@TVMain, 7425, "https://animeflv.net", true)
+                startBypass(
+                    this@TVMain, 7425, BypassUtil.testLink,
+                    showReload = false,
+                    maxTryCount = 3,//AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
+                    reloadOnCaptcha = true,////AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                    clearCookiesAtStart = false,//AdsUtils.remoteConfigs.getBoolean("bypass_clear_cookies"),
+                    useDialog = true,
+                    dialogStyle = 1//AdsUtils.remoteConfigs.getLong("bypass_dialog_style").toInt()
+                )
+                //startBypass(this@TVMain, 7425, "https://animeflv.net", true)
             }
         }
     }
@@ -104,6 +116,12 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 7425) {
+            if (resultCode == Activity.RESULT_OK) {
+                Firebase.analytics.logEvent("bypass_success") {
+                    param("user_agent", data?.getStringExtra("user_agent") ?: "empty")
+                    param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
+                }
+            }
             val cookiesUpdated = data?.let {
                 PrefsUtil.useDefaultUserAgent = false
                 PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()

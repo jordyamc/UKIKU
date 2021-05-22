@@ -3,12 +3,12 @@ package knf.kuma.retrofit
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.DataSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import knf.kuma.App
 import knf.kuma.commons.*
-import knf.kuma.custom.BackgroundExecutor
-import knf.kuma.custom.MainExecutor
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirObject
 import knf.kuma.directory.DirObjectCompact
@@ -20,6 +20,7 @@ import knf.kuma.search.SearchCompactDataSource
 import knf.kuma.search.SearchObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
@@ -34,7 +35,7 @@ import javax.inject.Singleton
 @Singleton
 class Repository {
 
-    val search: LiveData<PagedList<SearchObject>>
+    val search: Flow<PagingData<SearchObject>>
         get() = getSearch("")
 
     fun reloadAllRecents() {
@@ -69,11 +70,19 @@ class Repository {
                     t.printStackTrace()
                     if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
                         tryCount++
-                        getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(this)
+                        getFactoryBack("https://animeflv.net/").getRecents(
+                            BypassUtil.getStringCookie(
+                                App.context
+                            ), BypassUtil.userAgent, "https://animeflv.net"
+                        ).enqueue(this)
                     }
                 }
             }
-            getFactoryBack("https://animeflv.net/").getRecents(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(callback)
+            getFactoryBack("https://animeflv.net/").getRecents(
+                BypassUtil.getStringCookie(App.context),
+                BypassUtil.userAgent,
+                "https://animeflv.net"
+            ).enqueue(callback)
         }
     }
 
@@ -103,15 +112,28 @@ class Repository {
                     t.printStackTrace()
                     if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
                         tryCount++
-                        getFactoryBack("https://animeflv.net/").getRecentModels(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(this)
+                        getFactoryBack("https://animeflv.net/").getRecentModels(
+                            BypassUtil.getStringCookie(
+                                App.context
+                            ), BypassUtil.userAgent, "https://animeflv.net"
+                        ).enqueue(this)
                     }
                 }
             }
-            getFactoryBack("https://animeflv.net/").getRecentModels(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, "https://animeflv.net").enqueue(callback)
+            getFactoryBack("https://animeflv.net/").getRecentModels(
+                BypassUtil.getStringCookie(App.context),
+                BypassUtil.userAgent,
+                "https://animeflv.net"
+            ).enqueue(callback)
         }
     }
 
-    fun getAnime(context: Context, link: String, persist: Boolean, data: MutableLiveData<AnimeObject?> = MutableLiveData()): LiveData<AnimeObject?> {
+    fun getAnime(
+        context: Context,
+        link: String,
+        persist: Boolean,
+        data: MutableLiveData<AnimeObject?> = MutableLiveData()
+    ): LiveData<AnimeObject?> {
         doAsync {
             var cacheUsed = false
             try {
@@ -128,7 +150,10 @@ class Repository {
                 if (Network.isConnected) {
                     var tryCount = 0
                     val callback = object : Callback<AnimeObject.WebInfo> {
-                        override fun onResponse(call: Call<AnimeObject.WebInfo>, response: Response<AnimeObject.WebInfo>) {
+                        override fun onResponse(
+                            call: Call<AnimeObject.WebInfo>,
+                            response: Response<AnimeObject.WebInfo>
+                        ) {
                             try {
                                 if (response.body() == null || response.code() != 200) {
                                     onFailure(call, Exception("HTTP " + response.code()))
@@ -149,12 +174,22 @@ class Repository {
                             t.printStackTrace()
                             if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
                                 tryCount++
-                                getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(this)
+                                getFactory(base).getAnime(
+                                    BypassUtil.getStringCookie(context),
+                                    BypassUtil.userAgent,
+                                    "https://animeflv.net",
+                                    rest
+                                ).enqueue(this)
                             } else
                                 if (!cacheUsed) data.value = null
                         }
                     }
-                    getFactory(base).getAnime(BypassUtil.getStringCookie(context), BypassUtil.userAgent, "https://animeflv.net", rest).enqueue(callback)
+                    getFactory(base).getAnime(
+                        BypassUtil.getStringCookie(context),
+                        BypassUtil.userAgent,
+                        "https://animeflv.net",
+                        rest
+                    ).enqueue(callback)
                 } else if (!cacheUsed)
                     doOnUI { data.value = null }
             } catch (e: Exception) {
@@ -166,120 +201,145 @@ class Repository {
         return data
     }
 
-    fun getAnimeDir(): LiveData<PagedList<DirObject>> {
-        return when (PrefsUtil.dirOrder) {
-            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirVotes, pagedConfig(25)).build()
-            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirID, pagedConfig(25)).build()
-            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirAdded, pagedConfig(25)).build()
-            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDirFollowers, pagedConfig(25)).build()
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().animeDir, pagedConfig(25)).build()
-        }
+    fun getAnimeDir(): Flow<PagingData<DirObject>> {
+        return Pager(
+            PagingConfig(25), 0,
+            when (PrefsUtil.dirOrder) {
+                1 -> CacheDB.INSTANCE.animeDAO().animeDirVotes
+                2 -> CacheDB.INSTANCE.animeDAO().animeDirID
+                3 -> CacheDB.INSTANCE.animeDAO().animeDirAdded
+                4 -> CacheDB.INSTANCE.animeDAO().animeDirFollowers
+                else -> CacheDB.INSTANCE.animeDAO().animeDir
+            }.asPagingSourceFactory(Dispatchers.IO)
+        ).flow
     }
 
-    fun getOvaDir(): LiveData<PagedList<DirObject>> {
-        return when (PrefsUtil.dirOrder) {
-            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirVotes, pagedConfig(25)).build()
-            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirID, pagedConfig(25)).build()
-            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirAdded, pagedConfig(25)).build()
-            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDirFollowers, pagedConfig(25)).build()
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().ovaDir, pagedConfig(25)).build()
-        }
+    fun getOvaDir(): Flow<PagingData<DirObject>> {
+        return Pager(
+            PagingConfig(25), 0,
+            when (PrefsUtil.dirOrder) {
+                1 -> CacheDB.INSTANCE.animeDAO().ovaDirVotes
+                2 -> CacheDB.INSTANCE.animeDAO().ovaDirID
+                3 -> CacheDB.INSTANCE.animeDAO().ovaDirAdded
+                4 -> CacheDB.INSTANCE.animeDAO().ovaDirFollowers
+                else -> CacheDB.INSTANCE.animeDAO().ovaDir
+            }.asPagingSourceFactory(Dispatchers.IO)
+        ).flow
     }
 
-    fun getMovieDir(): LiveData<PagedList<DirObject>> {
-        return when (PrefsUtil.dirOrder) {
-            1 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirVotes, pagedConfig(25)).build()
-            2 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirID, pagedConfig(25)).build()
-            3 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirAdded, pagedConfig(25)).build()
-            4 -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDirFollowers, pagedConfig(25)).build()
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().movieDir, pagedConfig(25)).build()
-        }
+    fun getMovieDir(): Flow<PagingData<DirObject>> {
+        return Pager(
+            PagingConfig(25), 0,
+            when (PrefsUtil.dirOrder) {
+                1 -> CacheDB.INSTANCE.animeDAO().movieDirVotes
+                2 -> CacheDB.INSTANCE.animeDAO().movieDirID
+                3 -> CacheDB.INSTANCE.animeDAO().movieDirAdded
+                4 -> CacheDB.INSTANCE.animeDAO().movieDirFollowers
+                else -> CacheDB.INSTANCE.animeDAO().movieDir
+            }.asPagingSourceFactory(Dispatchers.IO)
+        ).flow
     }
 
-    fun getSearch(query: String): LiveData<PagedList<SearchObject>> {
-        return when {
-            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().allSearch, pagedConfig(25)).setInitialLoadKey(0).build()
-            query.trim { it <= ' ' }.matches("^#\\d+$".toRegex()) -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchID(query.replace("#", "")), pagedConfig(25)).setInitialLoadKey(0).build()
-            PatternUtil.isCustomSearch(query) -> getFiltered(query, null)
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch("%$query%"), pagedConfig(25)).setInitialLoadKey(0).build()
-        }
+    fun getSearch(query: String): Flow<PagingData<SearchObject>> {
+        return Pager(
+            PagingConfig(25), 0,
+            when {
+                query == "" -> CacheDB.INSTANCE.animeDAO().allSearch
+                query.trim().matches("^#\\d+$".toRegex()) -> CacheDB.INSTANCE.animeDAO()
+                    .getSearchID(query.replace("#", ""))
+                PatternUtil.isCustomSearch(query) -> getFiltered(query, null)
+                else -> CacheDB.INSTANCE.animeDAO().getSearch("%$query%")
+            }.asPagingSourceFactory(Dispatchers.IO)
+        ).flow
     }
 
-    private fun getFiltered(query: String, genres: String?): LiveData<PagedList<SearchObject>> {
+    private fun getFiltered(query: String, genres: String?): DataSource.Factory<Int, SearchObject> {
         var tQuery = PatternUtil.getCustomSearch(query).trim { it <= ' ' }
         var fQuery = tQuery
         fQuery = if (fQuery != "") "%$fQuery%" else "%"
         when (PatternUtil.getCustomAttr(query).toLowerCase()) {
             "emision" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "En emisión"), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "En emisión")
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "En emisión", genres), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "En emisión", genres)
             "finalizado" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "Finalizado"), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "Finalizado")
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "Finalizado", genres), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchSG(fQuery, "Finalizado", genres)
             "anime" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Anime"), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Anime")
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Anime", genres), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Anime", genres)
             "ova" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "OVA"), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "OVA")
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "OVA", genres), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "OVA", genres)
             "pelicula" -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Película"), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchTY(fQuery, "Película")
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Película", genres), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchTYG(fQuery, "Película", genres)
             "personalizado" -> {
                 if (tQuery == "")
                     tQuery = "%"
                 return if (genres == null)
-                    LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch(tQuery), pagedConfig(25)).setInitialLoadKey(0).build()
+                    CacheDB.INSTANCE.animeDAO().getSearch(tQuery)
                 else
-                    LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG(tQuery, genres), pagedConfig(25)).setInitialLoadKey(0).build()
+                    CacheDB.INSTANCE.animeDAO().getSearchTG(tQuery, genres)
             }
             else -> return if (genres == null)
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearch(fQuery), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearch(fQuery)
             else
-                LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG(fQuery, genres), pagedConfig(25)).setInitialLoadKey(0).build()
+                CacheDB.INSTANCE.animeDAO().getSearchTG(fQuery, genres)
         }
     }
 
-    fun getSearch(query: String, genres: String): LiveData<PagedList<SearchObject>> {
-        return when {
-            query == "" -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchG(genres), pagedConfig(25)).setInitialLoadKey(0).build()
-            PatternUtil.isCustomSearch(query) -> getFiltered(query, genres)
-            else -> LivePagedListBuilder(CacheDB.INSTANCE.animeDAO().getSearchTG("%$query%", genres), pagedConfig(25)).setInitialLoadKey(0).build()
-        }
+    fun getSearch(query: String, genres: String): Flow<PagingData<SearchObject>> {
+        return Pager(
+            PagingConfig(25), 0,
+            when {
+                query == "" -> CacheDB.INSTANCE.animeDAO().getSearchG(genres)
+                PatternUtil.isCustomSearch(query) -> getFiltered(query, genres)
+                else -> CacheDB.INSTANCE.animeDAO().getSearchTG("%$query%", genres)
+            }.asPagingSourceFactory(Dispatchers.IO)
+        ).flow
     }
 
-    fun getSearchCompact(query: String, onInit: (isEmpty: Boolean) -> Unit): PagedList<DirObjectCompact> {
-        return PagedList.Builder<Int, DirObjectCompact>(SearchCompactDataSource(getFactory("https://animeflv.net"), query, onInit), 24).apply {
-            setFetchExecutor(BackgroundExecutor())
-            setNotifyExecutor(MainExecutor())
-        }.build()
+    fun getSearchCompact(
+        query: String,
+        onInit: (isEmpty: Boolean) -> Unit
+    ): Flow<PagingData<DirObjectCompact>> {
+        return Pager(
+            config = PagingConfig(24),
+            pagingSourceFactory = {
+                SearchCompactDataSource(
+                    getFactory("https://animeflv.net"),
+                    query,
+                    onInit
+                )
+            }
+        ).flow
     }
 
     companion object {
         fun getFactory(link: String): Factory {
             val retrofit = Retrofit.Builder()
-                    .baseUrl(link)
-                    .client(NoSSLOkHttpClient.get())
-                    .addConverterFactory(JspoonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build()
+                .baseUrl(link)
+                .client(NoSSLOkHttpClient.get())
+                .addConverterFactory(JspoonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
             return retrofit.create(Factory::class.java)
         }
     }
 
     private fun getFactoryBack(link: String): Factory {
         val retrofit = Retrofit.Builder()
-                .baseUrl(link)
-                .client(NoSSLOkHttpClient.get())
-                .addConverterFactory(JspoonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .callbackExecutor(Executors.newSingleThreadExecutor())
-                .build()
+            .baseUrl(link)
+            .client(NoSSLOkHttpClient.get())
+            .addConverterFactory(JspoonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .callbackExecutor(Executors.newSingleThreadExecutor())
+            .build()
         return retrofit.create(Factory::class.java)
     }
 }

@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
@@ -18,17 +18,20 @@ import knf.kuma.commons.bind
 import knf.kuma.commons.load
 import knf.kuma.directory.DirObjectCompact
 
-class SearchAdapterCompactMaterial internal constructor(private val fragment: Fragment) : PagedListAdapter<DirObjectCompact, SearchAdapterCompactMaterial.ItemHolder>(DIFF_CALLBACK) {
+class SearchAdapterCompactMaterial internal constructor(private val fragment: Fragment) :
+    PagingDataAdapter<DirObjectCompact, SearchAdapterCompactMaterial.ItemHolder>(DIFF_CALLBACK) {
 
     private val layType = PrefsUtil.layType
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
-        return ItemHolder(LayoutInflater.from(parent.context).inflate(
+        return ItemHolder(
+            LayoutInflater.from(parent.context).inflate(
                 if (layType == "0")
                     R.layout.item_dir_material
                 else
-                    R.layout.item_dir_grid_material
-                , parent, false))
+                    R.layout.item_dir_grid_material, parent, false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: ItemHolder, position: Int) {

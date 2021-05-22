@@ -1,22 +1,22 @@
 package knf.kuma.directory
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
+import androidx.paging.PagingData
 import knf.kuma.retrofit.Repository
+import kotlinx.coroutines.flow.Flow
 
 class DirectoryViewModel : ViewModel() {
     private val repository = Repository()
 
-    fun getAnimes(): LiveData<PagedList<DirObject>> {
+    fun getAnimes(): Flow<PagingData<DirObject>> {
         return repository.getAnimeDir()
     }
 
-    fun getOvas(): LiveData<PagedList<DirObject>> {
+    fun getOvas(): Flow<PagingData<DirObject>> {
         return repository.getOvaDir()
     }
 
-    fun getMovies(): LiveData<PagedList<DirObject>> {
+    fun getMovies(): Flow<PagingData<DirObject>> {
         return repository.getMovieDir()
     }
 }

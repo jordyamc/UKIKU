@@ -1,6 +1,7 @@
 package knf.kuma.custom
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -21,10 +22,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.ktx.Firebase
 import knf.kuma.App
 import knf.kuma.Diagnostic
 import knf.kuma.R
+import knf.kuma.ads.AdsUtils
 import knf.kuma.commons.*
 import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryService
@@ -89,7 +94,18 @@ open class GenericActivity : AppCompatActivity() {
                     lifecycleScope.launch(Dispatchers.Main) {
                         bypassLive.value = Pair(true, true)
                         BypassUtil.isLoading = true
-                        startBypass(4157, BypassUtil.testLink, showReload = true, useFocus = isTV)
+                        startBypass(
+                            4157, BypassUtil.testLink,
+                            showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                            useFocus = isTV,
+                            maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries")
+                                .toInt(),
+                            reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                            clearCookiesAtStart = AdsUtils.remoteConfigs.getBoolean("bypass_clear_cookies"),
+                            useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
+                            dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
+                                .toInt()
+                        )
                     }
                 } else {
                     if (flag == 1 || forceCreation()) {
@@ -216,6 +232,12 @@ open class GenericActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 4157) {
+            if (resultCode == Activity.RESULT_OK) {
+                Firebase.analytics.logEvent("bypass_success") {
+                    param("user_agent", data?.getStringExtra("user_agent") ?: "empty")
+                    param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
+                }
+            }
             val cookiesUpdated = data?.let {
                 PrefsUtil.useDefaultUserAgent = false
                 PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()

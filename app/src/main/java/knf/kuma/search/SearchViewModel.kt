@@ -1,14 +1,19 @@
 package knf.kuma.search
 
-import androidx.lifecycle.*
-import androidx.paging.PagedList
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import knf.kuma.retrofit.Repository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
     private val repository = Repository()
 
-    private var liveData: LiveData<PagedList<SearchObject>> = MutableLiveData()
-    private var observer: Observer<PagedList<SearchObject>>? = null
+    private var searchJob: Job? = null
 
     private var queryLive = MutableLiveData<String?>(null)
 
@@ -18,15 +23,21 @@ class SearchViewModel : ViewModel() {
 
     val queryListener: LiveData<String?> get() = queryLive
 
-    fun setSearch(query: String, genres: String, owner: LifecycleOwner, observer: Observer<PagedList<SearchObject>>) {
-        this.observer?.let { liveData.removeObserver(it) }
-        this.observer = observer
-        liveData = if (query == "" && genres == "")
-            repository.search
-        else if (genres == "")
-            repository.getSearch(query)
-        else
-            repository.getSearch(query, genres)
-        liveData.observe(owner, observer)
+    fun setSearch(
+        query: String,
+        genres: String,
+        callback: suspend (PagingData<SearchObject>) -> Unit
+    ) {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            (if (query == "" && genres == "")
+                repository.search
+            else if (genres == "")
+                repository.getSearch(query)
+            else
+                repository.getSearch(query, genres)).collectLatest {
+                callback(it)
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package knf.kuma
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,10 +10,14 @@ import android.view.View
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
 import fr.bmartel.speedtest.model.SpeedTestError
+import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.FirestoreManager
@@ -92,16 +97,20 @@ class Diagnostic : GenericActivity() {
             }
             val loadingTime = System.currentTimeMillis() - startTime
             doOnUI {
-                codeState.load(responseCode.toString(), when (responseCode) {
-                    200 -> StateView.STATE_OK
-                    503 -> StateView.STATE_WARNING
-                    else -> StateView.STATE_ERROR
-                })
-                timeoutState.load("$loadingTime ms", when {
-                    loadingTime < 10000 -> StateView.STATE_OK
-                    loadingTime < 20000 -> StateView.STATE_WARNING
-                    else -> StateView.STATE_ERROR
-                })
+                codeState.load(
+                    responseCode.toString(), when (responseCode) {
+                        200 -> StateView.STATE_OK
+                        503 -> StateView.STATE_WARNING
+                        else -> StateView.STATE_ERROR
+                    }
+                )
+                timeoutState.load(
+                    "$loadingTime ms", when {
+                        loadingTime < 10000 -> StateView.STATE_OK
+                        loadingTime < 20000 -> StateView.STATE_WARNING
+                        else -> StateView.STATE_ERROR
+                    }
+                )
                 generalState.load(when {
                     responseCode == 200 && loadingTime < 10000 -> "Correcto"
                     responseCode == 503 -> "Cloudflare activado"
@@ -109,8 +118,12 @@ class Diagnostic : GenericActivity() {
                     loadingTime > 10000 -> "Página lenta"
                     else -> "Desconocido"
                 }, when {
-                    responseCode == 200 && loadingTime < 10000 -> StateView.STATE_OK.also { info.visibility = View.GONE }
-                    responseCode == 503 || responseCode == 403 || loadingTime > 10000 -> StateView.STATE_WARNING.also { info.visibility = View.VISIBLE }
+                    responseCode == 200 && loadingTime < 10000 -> StateView.STATE_OK.also {
+                        info.visibility = View.GONE
+                    }
+                    responseCode == 503 || responseCode == 403 || loadingTime > 10000 -> StateView.STATE_WARNING.also {
+                        info.visibility = View.VISIBLE
+                    }
                     else -> StateView.STATE_ERROR.also { info.visibility = View.GONE }
                 })
                 info.setOnClickListener {
@@ -136,9 +149,25 @@ class Diagnostic : GenericActivity() {
                         visibility = View.VISIBLE
                         onClick {
                             if (PrefsUtil.useNewBypass)
-                                startBypass(5546, BypassUtil.testLink, isTV)
+                                startBypass(
+                                    5546, BypassUtil.testLink,
+                                    showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                                    useFocus = isTV,
+                                    maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries")
+                                        .toInt(),
+                                    reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                                    clearCookiesAtStart = AdsUtils.remoteConfigs.getBoolean("bypass_clear_cookies"),
+                                    useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
+                                    dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
+                                        .toInt()
+                                )
                             else
-                                startActivityForResult(Intent(this@Diagnostic, FullBypass::class.java), 5546)
+                                startActivityForResult(
+                                    Intent(
+                                        this@Diagnostic,
+                                        FullBypass::class.java
+                                    ), 5546
+                                )
                         }
                     }
                 }
@@ -148,7 +177,10 @@ class Diagnostic : GenericActivity() {
                 } catch (e: HttpStatusException) {
                     when (e.statusCode) {
                         503 -> bypassState.load("Caducado", StateView.STATE_WARNING)
-                        else -> bypassState.load("Error en página: HTTP ${e.statusCode}", StateView.STATE_ERROR)
+                        else -> bypassState.load(
+                            "Error en página: HTTP ${e.statusCode}",
+                            StateView.STATE_ERROR
+                        )
                     }
                 }
                 loadBypassInfo()
@@ -237,12 +269,14 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun runDirectoryTest() {
-        dirState.load(when {
-            PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning -> "Completo"
-            PrefsUtil.isDirectoryFinished && DirectoryUpdateService.isRunning -> "Actualizando"
-            !PrefsUtil.isDirectoryFinished && DirectoryService.isRunning -> "Creando"
-            else -> "Incompleto"
-        })
+        dirState.load(
+            when {
+                PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning -> "Completo"
+                PrefsUtil.isDirectoryFinished && DirectoryUpdateService.isRunning -> "Actualizando"
+                !PrefsUtil.isDirectoryFinished && DirectoryService.isRunning -> "Creando"
+                else -> "Incompleto"
+            }
+        )
         CacheDB.INSTANCE.animeDAO().countLive.observe(this, {
             dirTotalState.load(it.toString())
         })
@@ -263,8 +297,10 @@ class Diagnostic : GenericActivity() {
         uuid.text = FirestoreManager.uid ?: "Solo firestore"
         GlobalScope.launch(Dispatchers.IO) {
             if (PrefsUtil.isSubscriptionEnabled) {
-                val status = SubscriptionReceiver.checkStatus(PrefsUtil.subscriptionToken
-                        ?: "")
+                val status = SubscriptionReceiver.checkStatus(
+                    PrefsUtil.subscriptionToken
+                        ?: ""
+                )
                 if (status.isActive) {
                     if (status.isActive)
                         subscriptionState.load("Activa")
@@ -275,12 +311,14 @@ class Diagnostic : GenericActivity() {
             } else
                 subscriptionState.load("No suscrito")
         }
-        backupState.load(when (Backups.type) {
-            Backups.Type.DROPBOX -> "Dropbox"
-            Backups.Type.FIRESTORE -> "Firestore"
-            Backups.Type.LOCAL -> "Local"
-            else -> "Sin respaldos"
-        })
+        backupState.load(
+            when (Backups.type) {
+                Backups.Type.DROPBOX -> "Dropbox"
+                Backups.Type.FIRESTORE -> "Firestore"
+                Backups.Type.LOCAL -> "Local"
+                else -> "Sin respaldos"
+            }
+        )
         if (Backups.type != Backups.Type.NONE)
             lastBackupState.load(PrefsUtil.lastBackup)
     }
@@ -308,8 +346,15 @@ class Diagnostic : GenericActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 5546)
+        if (requestCode == 5546) {
+            if (resultCode == Activity.RESULT_OK) {
+                Firebase.analytics.logEvent("bypass_success") {
+                    param("user_agent", data?.getStringExtra("user_agent") ?: "empty")
+                    param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
+                }
+            }
             runBypassTest()
+        }
     }
 
     companion object {

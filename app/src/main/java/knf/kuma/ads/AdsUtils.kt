@@ -43,8 +43,12 @@ enum class AdsType {
 object AdsUtils {
     val remoteConfigs = FirebaseRemoteConfig.getInstance().apply {
         if (BuildConfig.DEBUG)
-            setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().apply { minimumFetchIntervalInSeconds = 0 }.build())
-        setDefaultsAsync(mapOf(
+            setConfigSettingsAsync(
+                FirebaseRemoteConfigSettings.Builder().apply { minimumFetchIntervalInSeconds = 0 }
+                    .build()
+            )
+        setDefaultsAsync(
+            mapOf(
                 "admob_enabled" to true,
                 "appbrains_enabled" to false,
                 "startapp_enabled" to false,
@@ -64,7 +68,14 @@ object AdsUtils {
                 "interstitial_percent" to 10.0,
                 "disqus_version" to "9e3da5ae8d7caf8389087c4c35a6ca1b",
                 "min_version" to 169L,
-                "samsung_disable_foreground" to false)
+                "samsung_disable_foreground" to false,
+                "bypass_show_reload" to false,
+                "bypass_clear_cookies" to false,
+                "bypass_max_tries" to 3L,
+                "bypass_skip_captcha" to true,
+                "bypass_use_dialog" to true,
+                "bypass_dialog_style" to 1L
+            )
         )
         fetch().addOnCompleteListener {
             it.exception?.printStackTrace()
@@ -84,7 +95,10 @@ fun MutableList<RecentObject>.implAdsRecent() {
                 if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
                     put({ implAdsRecentMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
                 if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                    put({ implAdsRecentBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                    put(
+                        { implAdsRecentBrains() },
+                        AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                    )
             }()
         }
 }
@@ -95,7 +109,10 @@ fun MutableList<FavoriteObject>.implAdsFavorite() {
             if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
                 put({ implAdsFavoriteMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implAdsFavoriteBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                put(
+                    { implAdsFavoriteBrains() },
+                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                )
         }()
     }
 }
@@ -117,7 +134,10 @@ fun MutableList<Achievement>.implAdsAchievement() {
             if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
                 put({ implAdsAchievementMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implAdsAchievementBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                put(
+                    { implAdsAchievementBrain() },
+                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                )
         }()
     }
 }
@@ -128,7 +148,10 @@ fun ViewGroup.implBannerCast() {
             if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
                 put({ implBannerCastMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
             if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implBannerCastBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                put(
+                    { implBannerCastBrains() },
+                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                )
         }()
     }
 }
@@ -137,9 +160,15 @@ fun ViewGroup.implBanner(unitID: String, isSmart: Boolean = false) {
     noCrash {
         diceOf({ implBannerBrains(unitID, isSmart) }) {
             if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                put({ implBannerMob(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
+                put(
+                    { implBannerMob(unitID, isSmart) },
+                    AdsUtils.remoteConfigs.getDouble("admob_percent")
+                )
             if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implBannerBrains(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                put(
+                    { implBannerBrains(unitID, isSmart) },
+                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                )
         }()
     }
 }
@@ -148,32 +177,50 @@ fun ViewGroup.implBanner(unitID: AdsType, isSmart: Boolean = false) {
     noCrash {
         diceOf({ implBannerBrains(unitID, isSmart) }) {
             if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                put({ implBannerMob(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
+                put(
+                    { implBannerMob(unitID, isSmart) },
+                    AdsUtils.remoteConfigs.getDouble("admob_percent")
+                )
             if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implBannerBrains(unitID, isSmart) }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                put(
+                    { implBannerBrains(unitID, isSmart) },
+                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                )
         }()
     }
 }
 
 fun getFAdLoaderRewarded(context: Activity, onUpdate: () -> Unit = {}): FullscreenAdLoader =
-        noCrashLet(getFAdLoaderBrains(context, onUpdate)) {
-            diceOf({ getFAdLoaderBrains(context, onUpdate) }) {
-                if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                    put({ getFAdLoaderRewardedMob(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("admob_fullscreen_percent"))
-            }()
-        }
+    noCrashLet(getFAdLoaderBrains(context, onUpdate)) {
+        diceOf({ getFAdLoaderBrains(context, onUpdate) }) {
+            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
+                put(
+                    { getFAdLoaderRewardedMob(context, onUpdate) },
+                    AdsUtils.remoteConfigs.getDouble("admob_fullscreen_percent")
+                )
+        }()
+    }
 
 fun getFAdLoaderInterstitial(context: Activity, onUpdate: () -> Unit = {}): FullscreenAdLoader =
-        noCrashLet(getFAdLoaderBrains(context, onUpdate)) {
-            diceOf({ getFAdLoaderBrains(context, onUpdate) }) {
-                if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                    put({ getFAdLoaderInterstitialMob(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("admob_fullscreen_percent"))
-                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                    put({ getFAdLoaderBrains(context, onUpdate) }, AdsUtils.remoteConfigs.getDouble("appbrains_fullscreen_percent"))
-            }()
-        }
+    noCrashLet(getFAdLoaderBrains(context, onUpdate)) {
+        diceOf({ getFAdLoaderBrains(context, onUpdate) }) {
+            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
+                put(
+                    { getFAdLoaderInterstitialMob(context, onUpdate) },
+                    AdsUtils.remoteConfigs.getDouble("admob_fullscreen_percent")
+                )
+            if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
+                put(
+                    { getFAdLoaderBrains(context, onUpdate) },
+                    AdsUtils.remoteConfigs.getDouble("appbrains_fullscreen_percent")
+                )
+        }()
+    }
 
-fun showRandomInterstitial(context: AppCompatActivity, probability: Float = PrefsUtil.fullAdsProbability) {
+fun showRandomInterstitial(
+    context: AppCompatActivity,
+    probability: Float = PrefsUtil.fullAdsProbability
+) {
     if (PrefsUtil.isAdsEnabled && AdsUtils.isAdmobEnabled && PrefsUtil.isFullAdsEnabled && probability > 0) {
         val probDefault = 100f - probability
         diceOf<() -> Unit> {

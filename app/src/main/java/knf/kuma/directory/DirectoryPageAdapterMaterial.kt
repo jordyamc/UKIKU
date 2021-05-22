@@ -8,7 +8,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
@@ -19,7 +19,9 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.load
 
-class DirectoryPageAdapterMaterial internal constructor(private val fragment: Fragment) : PagedListAdapter<DirObject, DirectoryPageAdapterMaterial.ItemHolder>(DIFF_CALLBACK), FastScrollRecyclerView.SectionedAdapter {
+class DirectoryPageAdapterMaterial internal constructor(private val fragment: Fragment) :
+    PagingDataAdapter<DirObject, DirectoryPageAdapterMaterial.ItemHolder>(DIFF_CALLBACK),
+    FastScrollRecyclerView.SectionedAdapter {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
         return ItemHolder(LayoutInflater.from(parent.context).inflate(getLayType(), parent, false))

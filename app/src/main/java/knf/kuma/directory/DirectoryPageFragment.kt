@@ -8,14 +8,16 @@ import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.annotation.UiThread
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.paging.PagedList
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.verifyManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
 
 class DirectoryPageFragment : BottomFragment() {
@@ -27,9 +29,7 @@ class DirectoryPageFragment : BottomFragment() {
     private var waitingScroll = false
     private var listUpdated = false
     private val model: DirectoryViewModel by viewModels()
-
-    private lateinit var liveData: LiveData<PagedList<DirObject>>
-    private lateinit var observer: Observer<PagedList<DirObject>>
+    private var dataJob: Job? = null
 
     private val layout: Int
         @LayoutRes
@@ -42,36 +42,40 @@ class DirectoryPageFragment : BottomFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            observeLiveData(model, Observer { animeObjects ->
+            getData { animeObjects ->
                 hideProgress()
-                adapter?.submitList(animeObjects)
+                adapter?.submitData(animeObjects)
                 makeAnimation()
-            })
+            }
         }
     }
 
-    private fun observeLiveData(model: DirectoryViewModel, newObserver: Observer<PagedList<DirObject>>) {
-        if (::liveData.isInitialized && ::observer.isInitialized)
-            liveData.removeObserver(observer)
-        liveData = when (arguments?.getInt("type", 0) ?: 0) {
-            1 -> model.getOvas()
-            2 -> model.getMovies()
-            else -> model.getAnimes()
+    private fun getData(callback: suspend (PagingData<DirObject>) -> Unit) {
+        dataJob?.cancel()
+        dataJob = lifecycleScope.launch {
+            when (arguments?.getInt("type", 0) ?: 0) {
+                1 -> model.getOvas()
+                2 -> model.getMovies()
+                else -> model.getAnimes()
+            }.collectLatest {
+                callback(it)
+            }
         }
-        liveData.observe(this, newObserver.also { observer = newObserver })
     }
 
     fun onChangeOrder() {
         activity?.let {
             waitingScroll = true
-            adapter?.submitList(null)
-            showProgress()
-            observeLiveData(model, Observer { animeObjects ->
-                hideProgress()
-                listUpdated = true
-                adapter?.submitList(animeObjects)
-                makeAnimation()
-            })
+            lifecycleScope.launch {
+                adapter?.submitData(PagingData.empty())
+                showProgress()
+                getData { animeObjects ->
+                    hideProgress()
+                    listUpdated = true
+                    adapter?.submitData(animeObjects)
+                    makeAnimation()
+                }
+            }
         }
     }
 

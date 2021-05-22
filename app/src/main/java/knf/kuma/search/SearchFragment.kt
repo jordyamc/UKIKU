@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -18,6 +18,8 @@ import knf.kuma.commons.*
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.retrofit.Repository
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
 import java.util.*
 
@@ -78,15 +80,20 @@ class SearchFragment : BottomFragment() {
         super.onActivityCreated(savedInstanceState)
         noCrash {
             if (!needOnlineSearch)
-                model.setSearch(query, "", this, Observer { animeObjects ->
-                    searchAdapter?.submitList(animeObjects)
-                    errorView.visibility = if (animeObjects.size == 0) View.VISIBLE else View.GONE
+                model.setSearch(query, "") { animeObjects ->
+                    searchAdapter?.submitData(animeObjects)
                     if (isFirst) {
                         progressBar.visibility = View.GONE
                         isFirst = false
                         recyclerView.scheduleLayoutAnimation()
                     }
-                })
+                }
+            searchAdapter?.addLoadStateListener {
+                if (it.append.endOfPaginationReached) {
+                    errorView.visibility =
+                        if (searchAdapter?.itemCount == 0) View.VISIBLE else View.GONE
+                }
+            }
         }
     }
 
@@ -117,17 +124,22 @@ class SearchFragment : BottomFragment() {
         manager = recyclerView.layoutManager
         if (needOnlineSearch) {
             searchAdapterCompact = SearchAdapterCompact(this)
-            searchAdapterCompact?.submitList(Repository().getSearchCompact("") {
-                if (it) {
-                    errorView.visibility = if (it) View.VISIBLE else View.GONE
+            lifecycleScope.launch {
+                Repository().getSearchCompact("") {
+                    if (it) {
+                        errorView.visibility = if (it) View.VISIBLE else View.GONE
+                    }
+                    if (isFirst) {
+                        progressBar.visibility = View.GONE
+                        isFirst = false
+                        recyclerView.scheduleLayoutAnimation()
+                    }
+                }.collect {
+                    searchAdapterCompact?.submitData(it)
                 }
-                if (isFirst) {
-                    progressBar.visibility = View.GONE
-                    isFirst = false
-                    recyclerView.scheduleLayoutAnimation()
-                }
-            })
-            searchAdapterCompact?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            }
+            searchAdapterCompact?.registerAdapterDataObserver(object :
+                RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                     super.onItemRangeMoved(fromPosition, toPosition, itemCount)
                     if (toPosition == 0 && waitingScroll) {
@@ -182,30 +194,32 @@ class SearchFragment : BottomFragment() {
     private fun setSearchCompact(q: String) {
         waitingScroll = true
         this.query = q.trim()
-        searchAdapterCompact?.submitList(Repository().getSearchCompact(q) {
-            errorView.visibility = if (it) View.VISIBLE else View.GONE
-            if (isFirst) {
-                progressBar.visibility = View.GONE
-                isFirst = false
-                recyclerView.scheduleLayoutAnimation()
+        lifecycleScope.launch {
+            Repository().getSearchCompact(q) {
+                errorView.visibility = if (it) View.VISIBLE else View.GONE
+                if (isFirst) {
+                    progressBar.visibility = View.GONE
+                    isFirst = false
+                    recyclerView.scheduleLayoutAnimation()
+                }
+            }.collect {
+                searchAdapterCompact?.submitData(it)
             }
-        })
+        }
     }
 
     private fun setSearchNormal(q: String) {
         waitingScroll = true
         this.query = q.trim()
-        model.setSearch(q.trim(), genresString, this, Observer { animeObjects ->
-            if (animeObjects != null) {
-                searchAdapter?.submitList(animeObjects)
-                errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
-            }
+        model.setSearch(q.trim(), genresString) { animeObjects ->
+            searchAdapter?.submitData(animeObjects)
+            //errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
             if (isFirst) {
                 progressBar.visibility = View.GONE
                 isFirst = false
                 recyclerView.scheduleLayoutAnimation()
             }
-        })
+        }
     }
 
     private fun setFabIcon() {
