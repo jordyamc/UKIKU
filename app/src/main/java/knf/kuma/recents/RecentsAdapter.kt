@@ -112,7 +112,9 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                 holder.streaming.setOnClickListener {
                                     if (recentObject.fileWrapper().exist || recentObject.isDownloading) {
                                         MaterialDialog(context).safeShow {
-                                            message(text = "¿Eliminar el ${recentObject.chapter.toLowerCase(Locale.ENGLISH)} de ${recentObject.name}?")
+                                            message(text = "¿Eliminar el ${recentObject.chapter.lowercase(
+                                                Locale.ENGLISH
+                                            )} de ${recentObject.name}?")
                                             positiveButton(text = "CONFIRMAR") {
                                                 FileAccessHelper.deletePath(recentObject.filePath, true)
                                                 DownloadManager.cancel(recentObject.eid)

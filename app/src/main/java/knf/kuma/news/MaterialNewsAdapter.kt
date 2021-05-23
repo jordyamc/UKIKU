@@ -5,17 +5,18 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.inflate
 import knf.kuma.commons.load
 import knf.kuma.commons.noCrash
 import kotlinx.android.synthetic.main.item_news_material.view.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
-class MaterialNewsAdapter(val activity: AppCompatActivity) : PagedListAdapter<NewsItem, MaterialNewsAdapter.NewsViewHolder>(NewsItem.DIFF) {
+class MaterialNewsAdapter(val activity: AppCompatActivity) : PagingDataAdapter<NewsItem, MaterialNewsAdapter.NewsViewHolder>(NewsItem.DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder =
             NewsViewHolder(parent.inflate(R.layout.item_news_material))
@@ -34,6 +35,7 @@ class MaterialNewsAdapter(val activity: AppCompatActivity) : PagedListAdapter<Ne
         else
             holder.apply {
                 root.onClick {
+                    AchievementManager.onNewsOpened()
                     openNews(activity, item)
                 }
                 noCrash { image.load(item.image) }

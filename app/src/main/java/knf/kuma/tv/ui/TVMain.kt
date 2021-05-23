@@ -1,20 +1,14 @@
 package knf.kuma.tv.ui
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.webkit.*
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.tvprovider.media.tv.*
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
-import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
@@ -33,7 +27,6 @@ import knf.kuma.updater.UpdateChecker
 import knf.tools.bypass.startBypass
 import kotlinx.android.synthetic.main.tv_activity_main.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.doAsync
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -93,6 +86,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             if (withContext(Dispatchers.IO) { BypassUtil.isNeeded() }) {
                 startBypass(
                     this@TVMain, 7425, BypassUtil.testLink,
+                    lastUA = PrefsUtil.userAgent,
                     showReload = false,
                     maxTryCount = 3,//AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
                     reloadOnCaptcha = true,////AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
@@ -164,84 +158,6 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                 e.printStackTrace()
             }
 
-    }
-
-    override fun onBackPressed() {
-        if (webview.isVisible) {
-            webview.isVisible = false
-            BypassUtil.isLoading = false
-        } else
-            super.onBackPressed()
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun checkBypass() {
-        noCrash {
-            val webView = webview
-            doAsync {
-                if (BypassUtil.isNeeded() && !BypassUtil.isLoading) {
-                    "Creando bypass...".toast()
-                    BypassUtil.isLoading = true
-                    Log.e("CloudflareBypass", "is needed")
-                    BypassUtil.clearCookies()
-                    doOnUI {
-                        webView.visibility = View.VISIBLE
-                        webView.settings.javaScriptEnabled = true
-                        webView.settings.domStorageEnabled = true
-                        webView.settings.loadWithOverviewMode = true
-                        webView.settings.useWideViewPort = true
-                        webView.settings.cacheMode = WebSettings.LOAD_NO_CACHE
-                        webView.settings.setAppCacheEnabled(false)
-                        webView.webChromeClient = WebChromeClient()
-                        webView.webViewClient = object : WebViewClient() {
-
-                            override fun onPageStarted(
-                                view: WebView?,
-                                url: String?,
-                                favicon: Bitmap?
-                            ) {
-                                super.onPageStarted(view, url, favicon)
-                                shouldOverrideUrlLoading(view, url)
-                            }
-
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                super.onPageFinished(view, url)
-                                shouldOverrideUrlLoading(view, url)
-                            }
-
-                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                                return shouldOverrideUrlLoading(view, request?.url?.toString())
-                            }
-
-                            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                                Log.e("CloudflareBypass", "Override $url")
-                                Log.e("CloudflareBypass", "Cookies: " + CookieManager.getInstance().getCookie("https://animeflv.net/"))
-                                if (BypassUtil.isLoading && BypassUtil.saveCookies(App.context)) {
-                                    doAsync {
-                                        if (BypassUtil.isNeededFlag() == 0) {
-                                            doOnUI {
-                                                "Bypass actualizado".toast()
-                                                PicassoSingle.clear()
-                                                Repository().reloadRecents()
-                                                BypassUtil.isLoading = false
-                                                webView.visibility = View.GONE
-                                            }
-                                        }
-                                    }
-                                }
-                                return false
-                            }
-                        }
-                        //webView.settings.userAgentString = randomUA().also { PrefsUtil.userAgent = it }
-                        webView.settings.userAgentString = PrefsUtil.userAgent
-                        webView.loadUrl("https://animeflv.net/")
-                        Log.e("CloudflareBypass", "UA: ${PrefsUtil.userAgent}")
-                    }
-                } else {
-                    Log.e("CloudflareBypass", "Not needed")
-                }
-            }
-        }
     }
 
 }

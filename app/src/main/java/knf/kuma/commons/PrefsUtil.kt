@@ -71,10 +71,6 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context)
             .getBoolean("show_fav_count", true)
 
-    val useNewBypass: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context)
-            .getBoolean("useNewBypass", true)
-
     var spProtectionEnabled: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context)
             .getBoolean("security_blocking_firestore", true)
@@ -358,6 +354,10 @@ object PrefsUtil {
     var isForbiddenTipShown: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isForbiddenTipShown", false)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isForbiddenTipShown", value).apply()
+
+    var isBypassWarningShown: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isBypassWarningShown", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isBypassWarningShown", value).apply()
 
     fun showProgress(): Boolean {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_progress", true)

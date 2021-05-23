@@ -25,6 +25,7 @@ import knf.kuma.custom.GenericActivity
 import kotlinx.android.synthetic.main.activity_news_material.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
@@ -58,18 +59,22 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
     private fun loadList() {
         snack?.dismiss()
         if (Network.isConnected)
-            adapter.submitList(NewsRepository.getNews(getCategory()) { isEmpty, cause ->
-                if (isEmpty) {
-                    error.visibility = View.VISIBLE
-                    snack = recycler.showSnackbar("Error al cargar noticias: $cause", Snackbar.LENGTH_INDEFINITE, "reintentar") {
-                        loadList()
+            lifecycleScope.launch {
+                NewsRepository.getNews(getCategory()) { isEmpty, cause ->
+                    if (isEmpty) {
+                        error.visibility = View.VISIBLE
+                        snack = recycler.showSnackbar("Error al cargar noticias: $cause", Snackbar.LENGTH_INDEFINITE, "reintentar") {
+                            loadList()
+                        }
+                    } else {
+                        error.visibility = View.GONE
+                        recycler.scheduleLayoutAnimation()
                     }
-                } else {
-                    error.visibility = View.GONE
-                    recycler.scheduleLayoutAnimation()
+                    runOnUiThread { refresh.isRefreshing = false }
+                }.collect {
+                    adapter.submitData(it)
                 }
-                runOnUiThread { refresh.isRefreshing = false }
-            })
+            }
         else {
             snack = recycler.showSnackbar("Sin internet", Snackbar.LENGTH_INDEFINITE)
         }

@@ -84,7 +84,7 @@ class DiagnosticMaterial : GenericActivity() {
                 generalState.load(when {
                     responseCode == 200 && loadingTime < 10000 -> "Correcto"
                     responseCode == 503 -> "Cloudflare activado"
-                    responseCode == 403 -> "Bloqueado por proveedor"
+                    responseCode == 403 -> "Bloqueado por animeflv"
                     loadingTime > 10000 -> "Página lenta"
                     else -> "Desconocido"
                 }, when {

@@ -347,12 +347,12 @@ class ConnectionState : LinearLayout {
                     ((24 * (lastPage - 1)) + last.select("article").size).toString()
                 }
             }
-        } ?: {
+        } ?: run {
             okState()
             GlobalScope.launch(Dispatchers.Main) {
-                dismiss()
+                this@ConnectionState.dismiss()
             }
-        }()
+        }
     }
 
     private fun okState() {

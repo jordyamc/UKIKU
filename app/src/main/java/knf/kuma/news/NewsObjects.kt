@@ -4,18 +4,16 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import androidx.paging.PageKeyedDataSource
-import androidx.paging.PagedList
+import androidx.paging.*
 import androidx.recyclerview.widget.DiffUtil
 import knf.kuma.commons.NoSSLOkHttpClient
 import knf.kuma.commons.toast
-import knf.kuma.custom.BackgroundExecutor
-import knf.kuma.custom.MainExecutor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import pl.droidsonroids.jspoon.annotation.Selector
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.http.GET
@@ -53,37 +51,36 @@ class NewsPage {
     var newsList: List<NewsItem> = emptyList()
 }
 
-class NewsDataSource(private val newsFactory: NewsFactory, val category: String, val onInit: (isEmpty: Boolean, cause: String?) -> Unit) : PageKeyedDataSource<Int, NewsItem>() {
-    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, NewsItem>) {
-        newsFactory.getNewsPage(category, 1).enqueue(object : Callback<NewsPage> {
-            override fun onFailure(call: Call<NewsPage>, t: Throwable) {
-                onInit(true, t.message)
-            }
+class NewsDataSource(private val newsFactory: NewsFactory, val category: String, val onInit: (isEmpty: Boolean, cause: String?) -> Unit) : PagingSource<Int, NewsItem>() {
 
-            override fun onResponse(call: Call<NewsPage>, response: Response<NewsPage>) {
-                response.body()?.let {
-                    callback.onResult(it.newsList, null, 2)
-                    onInit(false, null)
-                } ?: onInit(true, "Empty body")
-            }
-        })
+    override fun getRefreshKey(state: PagingState<Int, NewsItem>): Int? = state.anchorPosition?.let {
+        state.closestPageToPosition(it)?.prevKey?.plus(1)
+            ?: state.closestPageToPosition(it)?.nextKey?.minus(1)
     }
 
-    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, NewsItem>) {
-        newsFactory.getNewsPage(category, params.key).enqueue(object : Callback<NewsPage> {
-            override fun onFailure(call: Call<NewsPage>, t: Throwable) {
-            }
-
-            override fun onResponse(call: Call<NewsPage>, response: Response<NewsPage>) {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, NewsItem> {
+        val page = params.key?:1
+        try {
+            val response = withContext(Dispatchers.IO) { newsFactory.getNewsPage(category, page).execute() }
+            if (response.isSuccessful){
                 response.body()?.let {
-                    callback.onResult(it.newsList, if (it.newsList.size < 12) null else params.key + 1)
+                    if (page == 1)
+                        onInit(false, null)
+                    return LoadResult.Page(it.newsList, null, if (it.newsList.size < 12) null else page + 1)
+                } ?: run{
+                    if (page == 1)
+                        onInit(true, "Empty body")
                 }
             }
-        })
-    }
-
-    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, NewsItem>) {
-
+            val errorString = withContext(Dispatchers.IO) { response.errorBody()?.toString() }
+            if (page == 1)
+                onInit(true, "$errorString")
+            return LoadResult.Error(IllegalStateException())
+        }catch (e:Exception){
+            if (page == 1)
+                onInit(true, "${e.message}")
+            return LoadResult.Error(e)
+        }
     }
 }
 
@@ -93,11 +90,11 @@ interface NewsFactory {
 }
 
 object NewsRepository {
-    fun getNews(category: String, onInit: (isEmpty: Boolean, cause: String?) -> Unit): PagedList<NewsItem> {
-        return PagedList.Builder(NewsDataSource(getFactory(), category, onInit), 12).apply {
-            setFetchExecutor(BackgroundExecutor())
-            setNotifyExecutor(MainExecutor())
-        }.build()
+    fun getNews(category: String, onInit: (isEmpty: Boolean, cause: String?) -> Unit): Flow<PagingData<NewsItem>> {
+        return Pager(
+            config = PagingConfig(12),
+            pagingSourceFactory = { NewsDataSource(getFactory(), category, onInit) }
+        ).flow
     }
 
     private fun getFactory(): NewsFactory {

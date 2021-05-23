@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
@@ -15,7 +15,7 @@ import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.load
 import kotlinx.android.synthetic.main.item_dir_material.view.*
 
-internal class GenreAdapterMaterial(private val activity: Activity) : PagedListAdapter<SearchObject, GenreAdapterMaterial.ItemHolder>(DIFF_CALLBACK) {
+internal class GenreAdapterMaterial(private val activity: Activity) : PagingDataAdapter<SearchObject, GenreAdapterMaterial.ItemHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
         return ItemHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_dir_material, parent, false))

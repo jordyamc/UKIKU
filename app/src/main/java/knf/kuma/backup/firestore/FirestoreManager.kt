@@ -507,18 +507,20 @@ object FirestoreManager {
 
     @ExperimentalContracts
     @ExperimentalCoroutinesApi
-    fun handleLogin(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleLogin(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == 5548) {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
                 Backups.type = Backups.Type.FIRESTORE
                 uploadAllData(true, activity)
+                return true
             } else if (response != null) {
                 val error = response.error
                 error?.printStackTrace()
                 toast("Error al iniciar sesion: ${error?.message}")
             }
         }
+        return false
     }
 
     private fun isGPlayServicesEnabled(): Boolean =

@@ -114,7 +114,7 @@ class Diagnostic : GenericActivity() {
                 generalState.load(when {
                     responseCode == 200 && loadingTime < 10000 -> "Correcto"
                     responseCode == 503 -> "Cloudflare activado"
-                    responseCode == 403 -> "Bloqueado por proveedor"
+                    responseCode == 403 -> "Bloqueado por animeflv"
                     loadingTime > 10000 -> "Página lenta"
                     else -> "Desconocido"
                 }, when {
@@ -148,26 +148,19 @@ class Diagnostic : GenericActivity() {
                     bypassRecreate.apply {
                         visibility = View.VISIBLE
                         onClick {
-                            if (PrefsUtil.useNewBypass)
-                                startBypass(
-                                    5546, BypassUtil.testLink,
-                                    showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
-                                    useFocus = isTV,
-                                    maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries")
-                                        .toInt(),
-                                    reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
-                                    clearCookiesAtStart = AdsUtils.remoteConfigs.getBoolean("bypass_clear_cookies"),
-                                    useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
-                                    dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
-                                        .toInt()
-                                )
-                            else
-                                startActivityForResult(
-                                    Intent(
-                                        this@Diagnostic,
-                                        FullBypass::class.java
-                                    ), 5546
-                                )
+                            startBypass(
+                                5546, BypassUtil.testLink,
+                                lastUA = PrefsUtil.userAgent,
+                                showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                                useFocus = isTV,
+                                maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries")
+                                    .toInt(),
+                                reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                                clearCookiesAtStart = true,
+                                useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
+                                dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
+                                    .toInt()
+                            )
                         }
                     }
                 }

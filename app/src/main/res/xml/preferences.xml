@@ -290,20 +290,6 @@
             android:summary="%s"
             android:title="Espera de conexión" />
         <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/ic_cloud"
-            android:key="useNewBypass"
-            android:summaryOff="Metodo menos visual"
-            android:summaryOn="Cambio de UserAgent automatico"
-            android:title="Nuevo método de bypass" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:icon="@drawable/ic_incognito"
-            android:key="use_device_useragent"
-            android:summaryOff="Se usará agente al azar en bypass"
-            android:summaryOn="Se usará agente por defecto en bypass"
-            android:title="Usar agente del dispositivo" />
-        <SwitchPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_incognito"
             android:key="may_use_random_useragent_1"

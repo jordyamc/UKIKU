@@ -107,10 +107,4 @@
         app:layout_anchorGravity="bottom|end"
         tools:srcCompat="@drawable/heart_empty"/>
 
-    <knf.kuma.custom.WrapWebView
-        android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

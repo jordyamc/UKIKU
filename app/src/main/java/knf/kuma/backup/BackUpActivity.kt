@@ -18,6 +18,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.framework.DropBoxService
@@ -97,6 +98,7 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     }
 
     private fun initFirestoreSync() {
+        AchievementManager.onBackup()
         staticSyncAchievements.suscribe(this, FirestoreManager.achievementsLiveData)
         staticSyncEA.suscribe(this, FirestoreManager.eaLiveData)
         staticSyncFavs.suscribe(this, FirestoreManager.favsLiveData)
@@ -276,7 +278,9 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        FirestoreManager.handleLogin(this, requestCode, resultCode, data)
+        if (FirestoreManager.handleLogin(this, requestCode, resultCode, data)){
+            initFirestoreSync()
+        }
         onLogin()
     }
 

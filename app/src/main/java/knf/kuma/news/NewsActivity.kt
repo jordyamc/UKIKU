@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
 import knf.kuma.R
@@ -33,7 +32,7 @@ class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
         refresh.isRefreshing = true
         recycler.adapter = adapter
         recycler.addItemDecoration(SpacingItemDecoration(0, 10.asPx))
-        NewsCreator.createNews().observe(this, Observer {
+        NewsCreator.createNews().observe(this, {
             if (it == null || it.isEmpty())
                 error.visibility = View.VISIBLE
             else {

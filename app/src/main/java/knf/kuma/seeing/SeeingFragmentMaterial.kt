@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.Config
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.paging.*
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
@@ -20,6 +18,8 @@ import knf.kuma.pojos.SeeingObject
 import kotlinx.android.synthetic.main.fragment_seeing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
@@ -32,11 +32,15 @@ class SeeingFragmentMaterial : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        liveData.observe(viewLifecycleOwner, {
-            progress.visibility = View.GONE
-            error.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-            adapter?.submitList(it)
-        })
+        lifecycleScope.launch {
+            liveData.collectLatest {
+                progress.visibility = View.GONE
+                adapter?.submitData(it)
+            }
+        }
+        adapter?.addLoadStateListener {
+            error.isVisible = it.append.endOfPaginationReached && adapter?.itemCount == 0
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -77,13 +81,15 @@ class SeeingFragmentMaterial : Fragment() {
         recycler.adapter = adapter
     }
 
-    val liveData: LiveData<PagedList<SeeingObject>>
+    val liveData: Flow<PagingData<SeeingObject>>
         get() {
-            return (if (arguments?.getInt("state", 0) ?: 0 == 0)
-                CacheDB.INSTANCE.seeingDAO().allPaging
-            else
-                CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(arguments?.getInt("state", 0)
-                        ?: 0)).toLiveData(Config(15, enablePlaceholders = false))
+            return Pager(
+                PagingConfig(15), 0,
+                (if (arguments?.getInt("state", 0) ?: 0 == 0)
+                    CacheDB.INSTANCE.seeingDAO().allPaging
+                else
+                    CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(arguments?.getInt("state", 0) ?: 0)).asPagingSourceFactory()
+            ).flow
         }
 
     val title: String

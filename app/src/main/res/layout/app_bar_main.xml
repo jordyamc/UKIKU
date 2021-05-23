@@ -71,10 +71,4 @@
         app:itemTextColor="@drawable/bottom_state"
         app:menu="@menu/bottom_menu"/>
 
-    <knf.kuma.custom.WrapWebView
-        android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
-
 </LinearLayout>

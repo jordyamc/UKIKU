@@ -12,6 +12,7 @@ import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeDismiss
 import knf.kuma.directory.viewholders.DirMainFragmentMaterialHolder
 import kotlinx.android.synthetic.main.fragment_directory_material.*
@@ -35,7 +36,9 @@ class DirectoryFragmentMaterial : BottomFragment() {
         if (PrefsUtil.isDirectoryFinished)
             lifecycleScope.launch(Dispatchers.IO) {
                 delay(1000)
-                adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
+                noCrash {
+                    adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
+                }
             }
     }
 

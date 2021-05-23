@@ -79,7 +79,12 @@ object FavToSeeing {
     }
 
     fun getLast(list: List<SeenObject>): SeenObject? =
-            list.maxBy { noCrashLet(-1.0) { "(\\d+\\.?\\d?)".toRegex().findAll(it.number).last().destructured.component1().toDouble() } }
+        list.maxByOrNull {
+            noCrashLet(-1.0) {
+                "(\\d+\\.?\\d?)".toRegex().findAll(it.number).last().destructured.component1()
+                    .toDouble()
+            }
+        }
 
     private val FavoriteObject.isCompleted: Boolean get() = CacheDB.INSTANCE.animeDAO().isCompleted(aid)
     private val FavoriteObject.isSeeing: Boolean get() = CacheDB.INSTANCE.seeingDAO().isSeeingAll(aid)

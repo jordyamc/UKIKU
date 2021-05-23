@@ -19,21 +19,29 @@ class SearchCompactDataSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DirObjectCompact> {
         val page = params.key ?: 1
-        val response = withContext(Dispatchers.IO) {
-            factory.getSearch(
-                BypassUtil.getStringCookie(App.context),
-                BypassUtil.userAgent,
-                query,
-                page
-            ).execute()
-        }
-        if (response.isSuccessful) {
-            response.body()?.let {
-                onInit(it.list.isEmpty())
-                return LoadResult.Page(it.list, null, if (it.hasNext) page + 1 else null)
+        try {
+            val response = withContext(Dispatchers.IO) {
+                factory.getSearch(
+                    BypassUtil.getStringCookie(App.context),
+                    BypassUtil.userAgent,
+                    query,
+                    page
+                ).execute()
             }
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    if (page == 1)
+                        onInit(it.list.isEmpty())
+                    return LoadResult.Page(it.list, null, if (it.hasNext) page + 1 else null)
+                }
+            }
+            if (page == 1)
+                onInit(true)
+            return LoadResult.Page(emptyList(), null, null)
+        }catch (e:Exception){
+            if (page == 1)
+                onInit(true)
+            return LoadResult.Error(e)
         }
-        onInit(true)
-        return LoadResult.Page(emptyList(), null, null)
     }
 }

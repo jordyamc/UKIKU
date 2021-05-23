@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
@@ -20,7 +20,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
 import org.jetbrains.anko.doAsync
 
-internal class SeeingAdapter(private val activity: Activity, private val isFullList: Boolean) : PagedListAdapter<SeeingObject, RecyclerView.ViewHolder>(SeeingObject.diffCallback), FastScrollRecyclerView.SectionedAdapter {
+internal class SeeingAdapter(private val activity: Activity, private val isFullList: Boolean) : PagingDataAdapter<SeeingObject, RecyclerView.ViewHolder>(SeeingObject.diffCallback), FastScrollRecyclerView.SectionedAdapter {
 
     private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
 

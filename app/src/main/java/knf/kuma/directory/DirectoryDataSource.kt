@@ -1,55 +1,38 @@
 package knf.kuma.directory
 
-import androidx.paging.PageKeyedDataSource
-import androidx.paging.PagedList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import knf.kuma.App
 import knf.kuma.commons.BypassUtil
-import knf.kuma.custom.BackgroundExecutor
-import knf.kuma.custom.MainExecutor
 import knf.kuma.retrofit.Repository
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class DirectoryDataSource(val factory: knf.kuma.retrofit.Factory, val type: String, val retryCallback: (() -> Unit) -> Unit) : PageKeyedDataSource<Int, DirObjectCompact>() {
+class DirectoryDataSource(val factory: knf.kuma.retrofit.Factory, val type: String, val retryCallback: () -> Unit) : PagingSource<Int, DirObjectCompact>() {
 
-    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, DirObjectCompact>) {
-        factory.getDirectory(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, type, 1).enqueue(object : Callback<DirectoryPageCompact> {
-            override fun onFailure(call: Call<DirectoryPageCompact>, t: Throwable) {
-                t.printStackTrace()
-                retryCallback { loadInitial(params, callback) }
-            }
+    override fun getRefreshKey(state: PagingState<Int, DirObjectCompact>): Int? = state.anchorPosition
 
-            override fun onResponse(call: Call<DirectoryPageCompact>, response: Response<DirectoryPageCompact>) {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DirObjectCompact> {
+        val page = params.key?: 1
+        try {
+            val response = withContext(Dispatchers.IO) { factory.getDirectory(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, type, page).execute() }
+            if (response.isSuccessful){
                 response.body()?.let {
-                    callback.onResult(it.list, null, 2)
-                } ?: { retryCallback { loadInitial(params, callback) } }()
+                    return LoadResult.Page(it.list, null, if (it.hasNext) page + 1 else null)
+                }
             }
-        })
-    }
-
-    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, DirObjectCompact>) {
-        factory.getDirectory(BypassUtil.getStringCookie(App.context), BypassUtil.userAgent, type, params.key).enqueue(object : Callback<DirectoryPageCompact> {
-            override fun onFailure(call: Call<DirectoryPageCompact>, t: Throwable) {
-                t.printStackTrace()
-                retryCallback { loadAfter(params, callback) }
-            }
-
-            override fun onResponse(call: Call<DirectoryPageCompact>, response: Response<DirectoryPageCompact>) {
-                response.body()?.let {
-                    callback.onResult(it.list, if (it.hasNext) params.key + 1 else null)
-                } ?: { retryCallback { loadAfter(params, callback) } }()
-            }
-        })
-    }
-
-    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, DirObjectCompact>) {
-
+            retryCallback()
+            return LoadResult.Error(IllegalStateException(withContext(Dispatchers.IO) { response.errorBody()?.string() }))
+        }catch (e:Exception){
+            return LoadResult.Error(e)
+        }
     }
 }
 
-fun createDirectoryPagedList(type: String, retryCallback: (() -> Unit) -> Unit): PagedList<DirObjectCompact> =
-        PagedList.Builder<Int, DirObjectCompact>(DirectoryDataSource(Repository.getFactory("https://animeflv.net"), type, retryCallback), 24).apply {
-            setFetchExecutor(BackgroundExecutor())
-            setNotifyExecutor(MainExecutor())
-        }.build()
+fun createDirectoryPagedList(type: String, retryCallback: () -> Unit) =
+        Pager(
+            config = PagingConfig(24),
+            pagingSourceFactory = { DirectoryDataSource(Repository.getFactory("https://animeflv.net"), type, retryCallback) }
+        ).flow

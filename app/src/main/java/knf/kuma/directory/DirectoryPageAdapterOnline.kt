@@ -8,7 +8,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
@@ -18,7 +18,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.load
 
-class DirectoryPageAdapterOnline internal constructor(private val fragment: Fragment) : PagedListAdapter<DirObjectCompact, DirectoryPageAdapterOnline.ItemHolder>(DirObjectCompact.DIFF), FastScrollRecyclerView.SectionedAdapter {
+class DirectoryPageAdapterOnline(private val fragment: Fragment) : PagingDataAdapter<DirObjectCompact, DirectoryPageAdapterOnline.ItemHolder>(DirObjectCompact.DIFF), FastScrollRecyclerView.SectionedAdapter {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
         return ItemHolder(LayoutInflater.from(parent.context).inflate(getLayType(), parent, false))
@@ -48,7 +48,7 @@ class DirectoryPageAdapterOnline internal constructor(private val fragment: Frag
     }
 
     override fun getSectionName(position: Int): String {
-        return getItem(position)?.name?.first()?.toUpperCase()?.toString() ?: ""
+        return getItem(position)?.name?.first()?.uppercaseChar()?.toString() ?: ""
     }
 
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import androidx.tvprovider.media.tv.PreviewChannelHelper
 import androidx.work.*
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -67,7 +66,6 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
             return Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrashlytics.getInstance().recordException(e)
             return Result.failure()
         }
     }

@@ -8,11 +8,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.annotation.UiThread
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
@@ -24,6 +20,7 @@ import knf.kuma.commons.showSnackbar
 import knf.kuma.commons.verifyManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
@@ -35,11 +32,6 @@ class DirectoryPageFragmentOnline : BottomFragment() {
     private val adapter: DirectoryPageAdapterOnline by lazy { DirectoryPageAdapterOnline(this) }
     private var isFirst = true
     private var waitingScroll = false
-    private var listUpdated = false
-    private val model: DirectoryViewModel by viewModels()
-
-    private lateinit var liveData: LiveData<PagedList<DirObject>>
-    private lateinit var observer: Observer<PagedList<DirObject>>
 
     private val layout: Int
         @LayoutRes
@@ -51,26 +43,31 @@ class DirectoryPageFragmentOnline : BottomFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        adapter.submitList(createDirectoryPagedList(getType()) {
-            try {
-                var snack: Snackbar? = null
-                snack = recyclerView.showSnackbar("Error al cargar directorio", Snackbar.LENGTH_INDEFINITE, "reintentar") {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        if (withContext(Dispatchers.IO) { BypassUtil.isNeeded(BypassUtil.testLink) }) {
-                            startActivity(Intent(requireContext(), DiagnosticMaterial.FullBypass::class.java))
-                            return@launch
+        lifecycleScope.launch {
+            createDirectoryPagedList(getType()) {
+                try {
+                    var snack: Snackbar? = null
+                    snack = recyclerView.showSnackbar("Error al cargar directorio", Snackbar.LENGTH_INDEFINITE, "reintentar") {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            if (withContext(Dispatchers.IO) { BypassUtil.isNeeded(BypassUtil.testLink) }) {
+                                startActivity(Intent(requireContext(), DiagnosticMaterial.FullBypass::class.java))
+                            }else {
+                                snack?.dismiss()
+                                delay(2000)
+                                adapter.retry()
+                            }
                         }
-                        snack?.dismiss()
-                        it()
+                    }
+                }catch (e:Exception){
+                    lifecycleScope.launch {
+                        delay(2000)
+                        adapter.retry()
                     }
                 }
-            }catch (e:Exception){
-                lifecycleScope.launch {
-                    delay(2000)
-                    it()
-                }
+            }.collect {
+                adapter.submitData(it)
             }
-        })
+        }
         progress.post { progress.visibility = View.GONE }
     }
 
