@@ -1,5 +1,6 @@
 package knf.kuma.news
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.bottomsheets.setPeekHeight
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
@@ -83,18 +85,15 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
     private fun getCategory(): String {
         return when (model.selectedFilter) {
             1 -> "categoria/noticias/anime"
-            2 -> "categoria/noticias/cine"
-            3 -> "categoria/noticias/cultura-otaku"
-            4 -> "categoria/noticias/japon"
-            5 -> "categoria/noticias/live-action"
-            6 -> "categoria/noticias/manga"
-            7 -> "categoria/noticias/mercancia-de-anime"
-            8 -> "categoria/noticias/musica"
-            9 -> "categoria/noticias/novelas-ligeras"
-            10 -> "categoria/noticias/videojuegos"
-            11 -> "categoria/resenas"
-            12 -> "categoria/eventos"
-            else -> "listado-noticias"
+            2 -> "categoria/noticias/cultura-otaku"
+            3 -> "categoria/noticias/japon"
+            4 -> "categoria/noticias/live-action"
+            5 -> "categoria/noticias/manga"
+            6 -> "categoria/noticias/mercancia-de-anime"
+            7 -> "categoria/noticias/novelas-ligeras"
+            8 -> "categoria/noticias/videojuegos"
+            9 -> "categoria/resenas"
+            else -> "noticias"
         }
     }
 
@@ -103,11 +102,18 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
         return super.onCreateOptionsMenu(menu)
     }
 
+    @SuppressLint("CheckResult")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         MaterialDialog(this, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
             lifecycleOwner(this@MaterialNewsActivity)
             title(text = "Filtros")
-            listItemsSingleChoice(items = model.filtersList, initialSelection = model.selectedFilter, waitForPositiveButton = false) { _, index, _ ->
+            setPeekHeight(99999999)
+            listItemsSingleChoice(
+                items = model.filtersList,
+                initialSelection = model.selectedFilter,
+                waitForPositiveButton = false
+            ) { _, index, name ->
+                supportActionBar?.title = if (index == 0) "Noticias" else name
                 model.selectedFilter = index
                 loadList()
             }

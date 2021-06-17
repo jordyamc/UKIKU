@@ -82,11 +82,14 @@ class SeeingFragment : Fragment() {
 
     val liveData: Flow<PagingData<SeeingObject>>
         get() {
-            return Pager(PagingConfig(15), 0,
+            return Pager(
+                PagingConfig(15, enablePlaceholders = false), 0,
                 (if (arguments?.getInt("state", 0) ?: 0 == 0)
                     CacheDB.INSTANCE.seeingDAO().allPaging
                 else
-                    CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(arguments?.getInt("state", 0) ?: 0)).asPagingSourceFactory()
+                    CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(
+                        arguments?.getInt("state", 0) ?: 0
+                    )).asPagingSourceFactory()
             ).flow
         }
 

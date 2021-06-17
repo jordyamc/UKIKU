@@ -26,7 +26,7 @@ import xdroid.toaster.Toaster
 
 class SeeingFragmentMaterial : Fragment() {
 
-    var clickCount = 0
+    private var clickCount = 0
 
     private val adapter: SeeingAdapterMaterial? by lazy { activity?.let { SeeingAdapterMaterial(it, arguments?.getInt("state", 0) == 0) } }
 
@@ -84,11 +84,13 @@ class SeeingFragmentMaterial : Fragment() {
     val liveData: Flow<PagingData<SeeingObject>>
         get() {
             return Pager(
-                PagingConfig(15), 0,
+                PagingConfig(15, enablePlaceholders = false), 0,
                 (if (arguments?.getInt("state", 0) ?: 0 == 0)
                     CacheDB.INSTANCE.seeingDAO().allPaging
                 else
-                    CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(arguments?.getInt("state", 0) ?: 0)).asPagingSourceFactory()
+                    CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(
+                        arguments?.getInt("state", 0) ?: 0
+                    )).asPagingSourceFactory()
             ).flow
         }
 

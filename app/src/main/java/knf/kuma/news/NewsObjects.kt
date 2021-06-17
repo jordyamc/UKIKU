@@ -20,19 +20,19 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 class NewsItem {
-    @Selector("h2 a")
+    @Selector("header h2")
     lateinit var title: String
 
-    @Selector("a.cate-link")
+    @Selector("header span.typ")
     lateinit var type: String
 
-    @Selector("[data-ttico=date_range]")
+    @Selector("header span.db.op5")
     lateinit var date: String
 
     @Selector("img", attr = "src", defValue = "")
     lateinit var image: String
 
-    @Selector("figure a", attr = "href")
+    @Selector("a", attr = "href")
     lateinit var link: String
 
     companion object {
@@ -47,7 +47,7 @@ class NewsItem {
 }
 
 class NewsPage {
-    @Selector("article.News.b")
+    @Selector("article:not(.logo)")
     var newsList: List<NewsItem> = emptyList()
 }
 
