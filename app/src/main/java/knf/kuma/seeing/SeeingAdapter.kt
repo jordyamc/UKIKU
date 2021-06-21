@@ -32,10 +32,11 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.isEmpty())
+        val item = getItem(position)
+        if (payloads.isEmpty() || item == null)
             super.onBindViewHolder(holder, position, payloads)
         else if (holder is SeeingItem) {
-            holder.chapter.text = getCardText(getItem(position)!!)
+            holder.chapter.text = getCardText(item)
         }
     }
 

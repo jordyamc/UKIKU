@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -32,7 +31,6 @@ class EAMapActivity : GenericActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
-        Log.e("Google Maps Android API", getString(R.string.google_maps_key))
     }
 
     /**
