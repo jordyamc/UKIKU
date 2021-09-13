@@ -18,7 +18,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.card.MaterialCardView
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.ads.*
 import knf.kuma.animeinfo.ActivityAnime
@@ -179,18 +178,19 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 }
                 holder.title.text = recentObject.name
                 holder.chapter.text = recentObject.chapter
-                if (BuildConfig.BUILD_TYPE == "playstore") holder.layButtons.visibility = View.INVISIBLE
+                if (!isFullMode) holder.layButtons.visibility = View.INVISIBLE
                 holder.cardView.setOnClickListener {
                     if (recentObject.animeObject != null) {
                         ActivityAnime.open(fragment, recentObject.animeObject, holder.imageView)
                     } else {
-                        if (BuildConfig.BUILD_TYPE == "playstore" && PrefsUtil.isDirectoryFinished) {
+                        if (!isFullMode && PrefsUtil.isDirectoryFinished) {
                             toast("Anime deshabilitado para esta version")
                         } else if (PrefsUtil.isFamilyFriendly && PrefsUtil.isDirectoryFinished) {
                             toast("Anime no familiar")
                         } else {
                             fragment.lifecycleScope.launch(Dispatchers.Main) {
-                                val animeObject = withContext(Dispatchers.IO) { animeDAO.getByAid(recentObject.aid) }
+                                val animeObject =
+                                    withContext(Dispatchers.IO) { animeDAO.getByAid(recentObject.aid) }
                                 if (animeObject != null) {
                                     ActivityAnime.open(fragment, animeObject, holder.imageView)
                                 } else {

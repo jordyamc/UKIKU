@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item
+        android:id="@+id/drawer_explorer"
+        android:icon="@drawable/ic_files"
+        android:title="Explorador"
+        android:visible="false" />
+    <item
+        android:id="@+id/drawer_emision"
+        android:icon="@drawable/ic_emision"
+        android:title="Emisión"
+        app:actionViewClass="android.widget.TextView" />
+    <item
+        android:id="@+id/drawer_seeing"
+        android:icon="@drawable/ic_seeing_drawer"
+        android:title="Siguiendo"
+        app:actionViewClass="android.widget.TextView" />
+    <item
+        android:id="@+id/drawer_queue"
+        android:icon="@drawable/ic_clock"
+        android:title="Pendientes"
+        android:visible="false"
+        app:actionViewClass="android.widget.TextView" />
+    <item
+        android:id="@+id/drawer_suggestions"
+        android:icon="@drawable/ic_suggestions"
+        android:title="Sugerencias" />
+    <item
+        android:id="@+id/drawer_news"
+        android:icon="@drawable/ic_news"
+        android:title="Noticias" />
+    <item
+        android:id="@+id/drawer_records"
+        android:icon="@drawable/ic_record"
+        android:title="Historial"
+        android:visible="false" />
+    <item
+        android:id="@+id/drawer_random"
+        android:icon="@drawable/ic_random"
+        android:title="Random" />
+    <item
+        android:id="@+id/drawer_faq"
+        android:icon="@drawable/ic_faq"
+        android:title="FAQ" />
+</menu>

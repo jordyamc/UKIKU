@@ -12,12 +12,13 @@ import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.isFullMode
 import knf.kuma.commons.safeShow
 import xdroid.toaster.Toaster
 
 
 class IAPWrapper(private val context: Context) : ServiceConnection {
-    val isEnabled: Boolean get() = IAPHelper.hasWalletInstalled(context) && BuildConfig.BUILD_TYPE != "playstore"
+    val isEnabled: Boolean get() = IAPHelper.hasWalletInstalled(context) && isFullMode
     private var iapService: IAPService? = null
     var inventory: Inventory? = null
     private var onConnectedListener: ((success: Boolean) -> Unit)? = null

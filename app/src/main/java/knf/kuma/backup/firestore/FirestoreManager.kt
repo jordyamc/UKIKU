@@ -494,9 +494,10 @@ object FirestoreManager {
             )
             activity.startActivityForResult(
                     AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(providers)
-                            .setLogo(R.drawable.ic_launcher_login)
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .setLogo(R.drawable.ic_launcher_login)
+                        .setIsSmartLockEnabled(false)
                             .build()
                     , 5548
             )

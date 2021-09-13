@@ -10,10 +10,10 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.Network
+import knf.kuma.commons.isFullMode
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.notificationManager
 import org.jsoup.Jsoup
@@ -21,17 +21,23 @@ import java.util.concurrent.TimeUnit
 
 class UpdateWork(val context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
     override fun doWork(): Result {
-        if (Network.isConnected && BuildConfig.BUILD_TYPE != "playstore")
+        if (Network.isConnected && isFullMode)
             try {
-                val document = Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num").get()
-                val nCode = Integer.parseInt(document.select("body").first().ownText().trim { it <= ' ' })
-                val sCode = PreferenceManager.getDefaultSharedPreferences(context).getInt("last_notified_update", 0)
+                val document =
+                    Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num")
+                        .get()
+                val nCode =
+                    Integer.parseInt(document.select("body").first().ownText().trim { it <= ' ' })
+                val sCode = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getInt("last_notified_update", 0)
                 if (nCode <= sCode)
                     return Result.success()
-                val oCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+                val oCode =
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionCode
                 if (nCode > oCode) {
                     showNotification()
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("last_notified_update", nCode).apply()
+                    PreferenceManager.getDefaultSharedPreferences(context).edit()
+                        .putInt("last_notified_update", nCode).apply()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

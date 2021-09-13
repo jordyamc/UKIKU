@@ -1,13 +1,11 @@
 package knf.kuma.pojos
 
 import android.util.Log
-import knf.kuma.BuildConfig
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import pl.droidsonroids.jspoon.Jspoon
 import pl.droidsonroids.jspoon.annotation.Selector
-import java.util.*
 
 class DirectoryPage {
     @Selector(value = "article.Anime.alt.B a.Button.Vrnmlk", attr = "href")
@@ -23,14 +21,19 @@ class DirectoryPage {
                         val body = response.body?.string()
                         if (response.code == 200 && body != null) {
                             val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
-                            if (BuildConfig.BUILD_TYPE != "playstore" && !PrefsUtil.isFamilyFriendly) {
+                            if (isFullMode && !PrefsUtil.isFamilyFriendly) {
                                 animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
                                 Log.e("Directory Getter", "Added: https://animeflv.net$link")
                             } else {
                                 if (webInfo.genres.contains("Ecchi"))
                                     Log.e("Directory Getter", "Skip: https://animeflv.net$link")
                                 else {
-                                    animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
+                                    animeObjects.add(
+                                        AnimeObject(
+                                            "https://animeflv.net$link",
+                                            webInfo
+                                        )
+                                    )
                                     Log.e("Directory Getter", "Added: https://animeflv.net$link")
                                 }
                             }
@@ -60,7 +63,7 @@ class DirectoryPage {
             if (Network.isConnected) {
                 try {
                     val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies("https://animeflv.net$link").get().outerHtml())
-                    if (BuildConfig.BUILD_TYPE != "playstore" && !PrefsUtil.isFamilyFriendly) {
+                    if (isFullMode && !PrefsUtil.isFamilyFriendly) {
                         animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
                         Log.e("Directory Getter", "Replaced: https://animeflv.net$link")
                     } else {

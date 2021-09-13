@@ -3,24 +3,35 @@ package knf.kuma.updater
 import android.content.Context
 import android.util.Log
 import androidx.core.content.pm.PackageInfoCompat
-import knf.kuma.BuildConfig
 import knf.kuma.commons.Network
+import knf.kuma.commons.isFullMode
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 
 object UpdateChecker {
     fun check(context: Context, listener: CheckListener) {
-        if (Network.isConnected && BuildConfig.BUILD_TYPE != "playstore")
+        if (Network.isConnected && isFullMode)
             doAsync {
                 try {
-                    val document = Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num").get()
+                    val document =
+                        Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num")
+                            .get()
                     val nCode = Integer.parseInt(document.select("body").first().ownText().trim())
-                    val oCode = PackageInfoCompat.getLongVersionCode(context.packageManager.getPackageInfo(context.packageName, 0)).toInt()
+                    val oCode = PackageInfoCompat.getLongVersionCode(
+                        context.packageManager.getPackageInfo(
+                            context.packageName,
+                            0
+                        )
+                    ).toInt()
                     if (nCode > oCode) {
                         listener.onNeedUpdate(oCode.toString(), nCode.toString())
                     } else {
                         context.filesDir.listFiles()
-                                ?.filter { !it.isDirectory && it.name.startsWith("update") && it.name.endsWith(".apk") }
+                            ?.filter {
+                                !it.isDirectory && it.name.startsWith("update") && it.name.endsWith(
+                                    ".apk"
+                                )
+                            }
                                 ?.forEach {
                                     it.delete()
                                 }

@@ -2,9 +2,13 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import android.util.Log
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import knf.kuma.commons.NoSSLOkHttpClient
 import okhttp3.Request
-import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 abstract class Server(internal var context: Context, internal var baseLink: String) : Comparable<Server> {
     internal var TIMEOUT = 10000
@@ -23,6 +27,31 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
             return server
         }
 
+    protected suspend fun getFinishedHtml(link: String): String {
+        return suspendCoroutine {
+            WebView(context).apply {
+                settings.apply {
+                    javaScriptEnabled = true
+                }
+                addJavascriptInterface(object : ZippyServer.ZippyJSInterface() {
+                    @JavascriptInterface
+                    override fun printHtml(string: String) {
+                        it.resume(string)
+                    }
+                }, "HtmlViewer")
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        loadUrl(
+                            "javascript:window.HtmlViewer.printHtml" +
+                                    "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');"
+                        )
+                    }
+                }
+                loadUrl(link)
+            }
+        }
+    }
+
     private fun verify(videoServer: VideoServer?): VideoServer? {
         if (videoServer == null)
             return null
@@ -30,7 +59,7 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
         for (option in ArrayList(videoServer.options))
             try {
                 val request = Request.Builder()
-                        .url(option.url ?: "")
+                    .url(option.url ?: "")
                 if (option.headers != null)
                     for (pair in option.headers?.createHeaders() ?: arrayListOf())
                         request.addHeader(pair.first, pair.second)

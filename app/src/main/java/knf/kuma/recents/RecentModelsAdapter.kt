@@ -21,7 +21,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import knf.kuma.App
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
@@ -78,17 +77,27 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                 seenIndicator.isVisible = item.state.isSeen
                 favIndicator.isVisible = item.state.isFavorite
                 setUp(item)
-                if (BuildConfig.BUILD_TYPE != "playstore")
+                if (isFullMode)
                     actionMenu.onClickMenu(R.menu.menu_download_info, true, { item.menuHideList }) {
                         when (it.itemId) {
                             R.id.download -> {
-                                FileActions.download(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view) { state, _ ->
+                                FileActions.download(
+                                    fragment.requireContext(),
+                                    fragment.viewLifecycleOwner,
+                                    item,
+                                    fragment.view
+                                ) { state, _ ->
                                     if (state == FileActions.CallbackState.START_DOWNLOAD)
                                         item.state.isDownloaded = true
                                 }
                             }
                             R.id.streaming -> {
-                                FileActions.stream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view) { state, extra ->
+                                FileActions.stream(
+                                    fragment.requireContext(),
+                                    fragment.viewLifecycleOwner,
+                                    item,
+                                    fragment.view
+                                ) { state, extra ->
                                     when (state) {
                                         FileActions.CallbackState.START_STREAM -> {
                                             setAsSeen(item)
@@ -105,7 +114,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                             R.id.delete -> {
                                 MaterialDialog(fragment.requireContext()).safeShow {
                                     lifecycleOwner(fragment.viewLifecycleOwner)
-                                    message(text = "¿Eliminar el ${item.chapter.toLowerCase(Locale.ENGLISH)} de ${item.name}?")
+                                    message(text = "¿Eliminar el ${item.chapter.lowercase(Locale.ENGLISH)} de ${item.name}?")
                                     positiveButton(text = "CONFIRMAR") {
                                         GlobalScope.launch(Dispatchers.IO) {
                                             fragment.lifecycleScope.launch(Dispatchers.Main) {
@@ -131,7 +140,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                 else
                     actionMenu.isVisible = false
                 root.setOnClickListener {
-                    if (BuildConfig.BUILD_TYPE == "playstore") {
+                    if (!isFullMode) {
                         item.openInfo(fragment.requireContext())
                         return@setOnClickListener
                     }
@@ -139,7 +148,11 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                         if (CastUtil.get().connected())
                             CastUtil.get().play(fragment.requireView(), CastMedia.create(item))
                         else
-                            FileActions.startPlay(fragment.requireContext(), item.extras.chapterTitle, item.extras.fileWrapper.name())
+                            FileActions.startPlay(
+                                fragment.requireContext(),
+                                item.extras.chapterTitle,
+                                item.extras.fileWrapper.name()
+                            )
                         setAsSeen(item)
                     } else {
                         val callback: (FileActions.CallbackState, Any?) -> Unit = { state, extra ->
@@ -388,13 +401,21 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
             modelAd.unifiedNativeAd.apply {
                 scope.launch(Dispatchers.Main) {
                     if (icon == null)
-                        iconView.setImageDrawable(ColorDrawable(ContextCompat.getColor(App.context, EAHelper.getThemeColorLight())))
+                        iconView.setImageDrawable(
+                            ColorDrawable(
+                                ContextCompat.getColor(
+                                    App.context,
+                                    EAHelper.getThemeColorLight()
+                                )
+                            )
+                        )
                     else {
                         iconView.setImageDrawable(icon.drawable)
                     }
                     primary.text = headline
                     secondary.text = body
-                    cta.text = callToAction.toLowerCase().capitalize()
+                    cta.text = callToAction.lowercase(Locale.getDefault())
+                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                     nativeAdView.setNativeAd(modelAd.unifiedNativeAd)
                 }
             }

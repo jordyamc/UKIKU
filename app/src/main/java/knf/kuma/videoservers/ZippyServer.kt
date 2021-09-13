@@ -2,14 +2,10 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import android.webkit.JavascriptInterface
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
 import java.net.URLDecoder
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class ZippyServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -24,7 +20,10 @@ class ZippyServer(context: Context, baseLink: String) : Server(context, baseLink
             return try {
                 val decoded = URLDecoder.decode(baseLink, "utf-8")
                 val linkData: String? = runBlocking(Dispatchers.Main) {
-                    suspendCoroutine {
+                    val html = getFinishedHtml(decoded)
+                    val result = Jsoup.parse(html).select("a#dlbutton").attr("href")
+                    if (result.isBlank()) null else decoded.substringBefore("/v/") + result
+                    /*suspendCoroutine {
                         WebView(context).apply {
                             settings.apply {
                                 javaScriptEnabled = true
@@ -44,7 +43,7 @@ class ZippyServer(context: Context, baseLink: String) : Server(context, baseLink
                             }
                             loadUrl(decoded)
                         }
-                    }
+                    }*/
                 }
                 linkData ?: return null
                 VideoServer(name, Option(name, null, linkData))

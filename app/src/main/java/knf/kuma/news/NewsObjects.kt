@@ -29,7 +29,7 @@ class NewsItem {
     @Selector("header span.db.op5")
     lateinit var date: String
 
-    @Selector("img", attr = "src", defValue = "")
+    @Selector("img", attr = "data-src", defValue = "")
     lateinit var image: String
 
     @Selector("a", attr = "href")

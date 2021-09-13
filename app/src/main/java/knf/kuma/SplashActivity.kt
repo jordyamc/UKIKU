@@ -37,7 +37,9 @@ class SplashActivity : GenericActivity() {
                 startActivity(Intent(this, TVMain::class.java))
                 finish()
             }
-            BuildConfig.BUILD_TYPE == "playstore" && !PrefsUtil.isPSWarned -> MaterialDialog(this).safeShow {
+            !isFullMode && BuildConfig.BUILD_TYPE != "amazon" && !PrefsUtil.isPSWarned -> MaterialDialog(
+                this
+            ).safeShow {
                 title(text = "Aviso")
                 message(text = "Usted esta usando la version de Google Play, esta version tiene las descargas y streaming deshabilitados debido al copyright, para una experiencia completa por favor use la version de la pagina oficial\nEscriba \"confirmar\" para continuar.")
                 input(hint = "Respuesta...", waitForPositiveButton = false) { _, text ->

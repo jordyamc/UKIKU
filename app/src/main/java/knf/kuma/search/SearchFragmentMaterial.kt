@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.recommended.RankType
@@ -23,7 +22,6 @@ import knf.kuma.retrofit.Repository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
-import java.util.*
 
 class SearchFragmentMaterial : BottomFragment() {
     lateinit var recyclerView: RecyclerView
@@ -43,7 +41,7 @@ class SearchFragmentMaterial : BottomFragment() {
 
     private var selected: MutableList<String> = ArrayList()
 
-    private val needOnlineSearch: Boolean by lazy { !PrefsUtil.isDirectoryFinished && Network.isConnected && BuildConfig.BUILD_TYPE != "playstore" && !PrefsUtil.isFamilyFriendly }
+    private val needOnlineSearch: Boolean by lazy { !PrefsUtil.isDirectoryFinished && Network.isConnected && isFullMode && !PrefsUtil.isFamilyFriendly }
 
     private val genresString: String
         get() {

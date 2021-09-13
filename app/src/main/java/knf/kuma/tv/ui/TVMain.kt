@@ -3,13 +3,10 @@ package knf.kuma.tv.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.webkit.*
 import androidx.lifecycle.lifecycleScope
-import androidx.tvprovider.media.tv.*
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
-import knf.kuma.BuildConfig
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.directory.DirManager
@@ -25,8 +22,10 @@ import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import knf.tools.bypass.startBypass
-import kotlinx.android.synthetic.main.tv_activity_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -39,7 +38,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (BuildConfig.BUILD_TYPE == "playstore") {
+        if (!isFullMode) {
             finish()
             startActivity(Intent(this, DesignUtils.mainClass))
             return

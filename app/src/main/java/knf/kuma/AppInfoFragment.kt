@@ -54,12 +54,12 @@ class AppInfoFragment: MaterialAboutFragment() {
     }
 
     private fun setupUpdateCount() {
-        Economy.rewardedVideoLiveData.observe(viewLifecycleOwner, {
+        Economy.rewardedVideoLiveData.observe(viewLifecycleOwner) {
             if (::videoItem.isInitialized) {
                 videoItem.subText = "Vistos: $it"
                 setMaterialAboutList(getMaterialAboutList(requireContext()))
             }
-        })
+        }
     }
 
 
@@ -87,36 +87,131 @@ class AppInfoFragment: MaterialAboutFragment() {
         val authorCard = MaterialAboutCard.Builder()
         authorCard.outline(isFlat)
         authorCard.title("Autor")
-        authorCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_author), "Jordy Mendoza", true, Uri.parse("https://t.me/UnbarredStream")))
+        authorCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_author),
+                "Jordy Mendoza",
+                true,
+                Uri.parse("https://t.me/UnbarredStream")
+            )
+        )
         val donateCard = MaterialAboutCard.Builder()
-        donateCard.outline(isFlat)
-        donateCard.title("Donar")
-        donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_paypal), "Paypal", false, paypalUri))
-        donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_patreon), "Patreon", false, Uri.parse("https://www.patreon.com/animeflvapp")))
-        donateCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_cuplogo), "Ko-fi", false, Uri.parse("https://ko-fi.com/unbarredstream")))
-        if (BuildConfig.BUILD_TYPE != "playstore")
-            donateCard.addItem(MaterialAboutActionItem.Builder().text("Ver anuncio").subText("Vistos: ${PrefsUtil.userRewardedVideoCount}").icon(R.drawable.ic_cash).setOnClickAction {
-                showAd()
-            }.build().also { videoItem = it })
-
+        if (isFullMode) {
+            donateCard.outline(isFlat)
+            donateCard.title("Donar")
+            donateCard.addItem(
+                ConvenienceBuilder.createWebsiteActionItem(
+                    requireContext(),
+                    getDrawable(requireContext(), R.drawable.ic_paypal),
+                    "Paypal",
+                    false,
+                    paypalUri
+                )
+            )
+            donateCard.addItem(
+                ConvenienceBuilder.createWebsiteActionItem(
+                    requireContext(),
+                    getDrawable(requireContext(), R.drawable.ic_patreon),
+                    "Patreon",
+                    false,
+                    Uri.parse("https://www.patreon.com/animeflvapp")
+                )
+            )
+            donateCard.addItem(
+                ConvenienceBuilder.createWebsiteActionItem(
+                    requireContext(),
+                    getDrawable(requireContext(), R.drawable.ic_cuplogo),
+                    "Ko-fi",
+                    false,
+                    Uri.parse("https://ko-fi.com/unbarredstream")
+                )
+            )
+            donateCard.addItem(
+                MaterialAboutActionItem.Builder().text("Ver anuncio")
+                    .subText("Vistos: ${PrefsUtil.userRewardedVideoCount}").icon(R.drawable.ic_cash)
+                    .setOnClickAction {
+                        showAd()
+                    }.build().also { videoItem = it })
+        }
         val extraCard = MaterialAboutCard.Builder()
         extraCard.outline(isFlat)
         extraCard.title("Extras")
-        extraCard.addItem(MaterialAboutActionItem.Builder().text("Cartera de loli-coins").icon(R.drawable.ic_coin).setOnClickAction { Economy.showWallet(requireActivity(), true) { showAd() } }.build())
-        extraCard.addItem(MaterialAboutActionItem.Builder().text("Top videos vistos").icon(R.drawable.ic_podium).setOnClickAction { openTop() }.build())
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(), R.drawable.ic_web), "Página web", true, Uri.parse("https://ukiku.app")))
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(), R.drawable.ic_github), "Proyecto en github", true, Uri.parse("https://github.com/jordyamc/UKIKU")))
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_facebook), "Facebook", true, Uri.parse("https://www.facebook.com/ukikuapp")))
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_facebook_group), "Grupo de Facebook", true, Uri.parse("https://www.facebook.com/groups/ukikugroup")))
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_discord), "Discord", false, Uri.parse("https://discord.gg/6hzpua6")))
-        extraCard.addItem(ConvenienceBuilder.createWebsiteActionItem(requireContext(), getDrawable(requireContext(),R.drawable.ic_beta), "Grupo Beta", false, Uri.parse("https://t.me/ukiku_beta")))
-        extraCard.addItem(MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg).setOnClickAction { EAUnlockActivity.start(requireContext()) }.build())
-        return MaterialAboutList.Builder()
-                .addCard(infoCard.build())
-                .addCard(authorCard.build())
-                .addCard(donateCard.build())
-                .addCard(extraCard.build())
+        extraCard.addItem(
+            MaterialAboutActionItem.Builder().text("Cartera de loli-coins").icon(R.drawable.ic_coin)
+                .setOnClickAction { Economy.showWallet(requireActivity(), true) { showAd() } }
                 .build()
+        )
+        extraCard.addItem(
+            MaterialAboutActionItem.Builder().text("Top videos vistos").icon(R.drawable.ic_podium)
+                .setOnClickAction { openTop() }.build()
+        )
+        extraCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_web),
+                "Página web",
+                true,
+                Uri.parse("https://ukiku.app")
+            )
+        )
+        extraCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_github),
+                "Proyecto en github",
+                true,
+                Uri.parse("https://github.com/jordyamc/UKIKU")
+            )
+        )
+        extraCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_facebook),
+                "Facebook",
+                true,
+                Uri.parse("https://www.facebook.com/ukikuapp")
+            )
+        )
+        extraCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_facebook_group),
+                "Grupo de Facebook",
+                true,
+                Uri.parse("https://www.facebook.com/groups/ukikugroup")
+            )
+        )
+        extraCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_discord),
+                "Discord",
+                false,
+                Uri.parse("https://discord.gg/6hzpua6")
+            )
+        )
+        extraCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_beta),
+                "Grupo Beta",
+                false,
+                Uri.parse("https://t.me/ukiku_beta")
+            )
+        )
+        extraCard.addItem(
+            MaterialAboutActionItem.Builder().text("Easter egg").icon(R.drawable.ic_egg)
+                .setOnClickAction { EAUnlockActivity.start(requireContext()) }.build()
+        )
+        return MaterialAboutList.Builder().apply {
+            addCard(infoCard.build())
+            addCard(authorCard.build())
+            donateCard.build().let {
+                if (it.items.isNotEmpty()) addCard(it)
+            }
+            addCard(extraCard.build())
+        }.build()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

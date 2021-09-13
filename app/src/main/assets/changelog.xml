@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="187" version="5.1.18">
+        <change type="fix">Error al mostrar imagenes en noticias</change>
+    </release>
+    <release code="186" version="5.1.17">
+        <change type="fix">Errores en login de Firestore</change>
+    </release>
     <release code="185" version="5.1.16">
         <change type="fix">Errores generales</change>
         <change type="fix">Error al mostrar noticias</change>

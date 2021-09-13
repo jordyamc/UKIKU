@@ -3,6 +3,9 @@ package knf.kuma.videoservers
 import android.content.Context
 import knf.kuma.commons.PatternUtil
 import knf.kuma.videoservers.VideoServer.Names.STAPE
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
 class StapeServer(context: Context, baseLink: String) : Server(context, baseLink) {
@@ -17,7 +20,12 @@ class StapeServer(context: Context, baseLink: String) : Server(context, baseLink
         get() {
             val downLink = PatternUtil.extractLink(baseLink)
             return try {
-                val video =
+                val link = "https:" + runBlocking {
+                    val html = withContext(Dispatchers.Main) { getFinishedHtml(downLink) }
+                    val doc = Jsoup.parse(html)
+                    doc.select("div[id~=[video]{5,}[link]{4,}]").first().textNodes().first().text()
+                }
+                /*val video =
                     Jsoup.connect(downLink).get().body().select("script:not([type],[src]) ").let {
                         it.forEach {
                             for (node in it.dataNodes()) {
@@ -30,7 +38,7 @@ class StapeServer(context: Context, baseLink: String) : Server(context, baseLink
                         }
                         return@let ""
                     }
-                val link = "https:$video"
+                val link = "https:$video"*/
                 val videoLink =
                     Jsoup.connect(link).ignoreContentType(true).followRedirects(true).execute()
                         .url().toString()

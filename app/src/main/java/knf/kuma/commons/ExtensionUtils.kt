@@ -89,7 +89,7 @@ val <T>LiveData<T>.distinct: LiveData<T>
 
 
 fun getPackage(): String {
-    return if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "release" || BuildConfig.BUILD_TYPE == "playstore") "knf.kuma" else "knf.kuma.${BuildConfig.BUILD_TYPE}"
+    return if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "release" || BuildConfig.BUILD_TYPE == "playstore" || BuildConfig.BUILD_TYPE == "amazon") "knf.kuma" else "knf.kuma.${BuildConfig.BUILD_TYPE}"
 }
 
 val getUpdateDir: String
@@ -647,11 +647,13 @@ fun Fragment.getSurfaceColor(): Int {
 }
 
 fun String.resolveRedirection(tryCount: Int = 0): String =
-        try {
-            jsoupCookies(this).execute().url().toString()
-        } catch (e: HttpStatusException) {
-            if (tryCount >= 3)
-                this
-            else
-                resolveRedirection(tryCount + 1)
-        }
+    try {
+        jsoupCookies(this).execute().url().toString()
+    } catch (e: HttpStatusException) {
+        if (tryCount >= 3)
+            this
+        else
+            resolveRedirection(tryCount + 1)
+    }
+
+val isFullMode: Boolean get() = BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "release"

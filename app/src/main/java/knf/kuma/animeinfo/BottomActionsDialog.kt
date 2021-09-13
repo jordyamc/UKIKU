@@ -11,8 +11,8 @@ import androidx.lifecycle.LifecycleObserver
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import knf.kuma.BuildConfig
 import knf.kuma.R
+import knf.kuma.commons.isFullMode
 import kotlinx.android.synthetic.main.lay_bottom_actions.view.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
@@ -42,7 +42,7 @@ class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
             safeDismiss()
         }
         view.action_download_all.onClick {
-            if (BuildConfig.BUILD_TYPE == "playstore") {
+            if (!isFullMode) {
                 toast("Deshabilitado para esta version")
             } else {
                 callback?.onSelect(STATE_DOWNLOAD_MULTIPLE)
@@ -50,7 +50,7 @@ class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
             safeDismiss()
         }
         view.action_queue_all.onClick {
-            if (BuildConfig.BUILD_TYPE == "playstore") {
+            if (!isFullMode) {
                 toast("Deshabilitado para esta version")
             } else {
                 callback?.onSelect(STATE_QUEUE_MULTIPLE)

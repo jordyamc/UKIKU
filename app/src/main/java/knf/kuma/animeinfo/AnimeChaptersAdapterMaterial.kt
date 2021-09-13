@@ -25,7 +25,6 @@ import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.squareup.picasso.Callback
 import knf.kuma.App
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.animeinfo.fragments.ChaptersFragmentMaterial
 import knf.kuma.animeinfo.ktx.epTitle
@@ -152,17 +151,21 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
         holder.chapter.setTextColor(ContextCompat.getColor(context, if (chapter.isSeen) EAHelper.getThemeColor() else R.color.textPrimary))
         holder.separator.visibility = if (position == 0) View.GONE else View.VISIBLE
         holder.chapter.text = chapter.chapter.number
-        if (BuildConfig.BUILD_TYPE == "playstore")
+        if (!isFullMode)
             holder.actions.visibility = View.GONE
         else
             holder.actions.setOnClickListener { view ->
-                fragment.lifecycleScope.launch(Dispatchers.Main){
+                fragment.lifecycleScope.launch(Dispatchers.Main) {
                     val menu = PopupMenu(context, view)
                     if (CastUtil.get().casting.value == chapter.chapter.eid) {
                         menu.inflate(R.menu.chapter_casting_menu)
                         if (canPlay(chapter.chapter.fileWrapper()))
                             menu.menu.findItem(R.id.download).isVisible = false
-                    } else if (isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get())) {
+                    } else if (isPlayAvailable(
+                            chapter.chapter.fileWrapper(),
+                            downloadObject.get()
+                        )
+                    ) {
                         menu.inflate(R.menu.chapter_downloaded_menu)
                         if (!CastUtil.get().connected())
                             menu.menu.findItem(R.id.cast).isVisible = false
@@ -209,10 +212,21 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                             }
                             R.id.casting -> CastUtil.get().openControls()
                             R.id.delete -> MaterialDialog(context).safeShow {
-                                message(text = "¿Eliminar el ${chapter.chapter.number.toLowerCase()}?")
+                                message(
+                                    text = "¿Eliminar el ${
+                                        chapter.chapter.number.lowercase(
+                                            Locale.getDefault()
+                                        )
+                                    }?"
+                                )
                                 positiveButton(text = "CONFIRMAR") {
-                                    fragment.lifecycleScope.launch(Dispatchers.Main){
-                                        withContext(Dispatchers.IO) { FileAccessHelper.deletePath(chapter.chapter.filePath,false) }
+                                    fragment.lifecycleScope.launch(Dispatchers.Main) {
+                                        withContext(Dispatchers.IO) {
+                                            FileAccessHelper.deletePath(
+                                                chapter.chapter.filePath,
+                                                false
+                                            )
+                                        }
                                         downloadObject.get()?.state = -8
                                         chapter.chapter.fileWrapper().exist = false
                                         holder.setDownloaded(false, false)

@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
@@ -27,7 +26,6 @@ import knf.kuma.pojos.DirectoryPage
 import knf.kuma.widgets.emision.WEmisionProvider
 import org.jsoup.HttpStatusException
 import pl.droidsonroids.jspoon.Jspoon
-import java.util.*
 import kotlin.properties.Delegates
 
 class DirectoryService : IntentService("Directory update") {
@@ -104,7 +102,7 @@ class DirectoryService : IntentService("Directory update") {
     }
 
     private fun doEcchiRemove(animeDAO: AnimeDAO) {
-        if (BuildConfig.BUILD_TYPE == "playstore" || PrefsUtil.isFamilyFriendly) {
+        if (!isFullMode || PrefsUtil.isFamilyFriendly) {
             animeDAO.nukeEcchi()
         }
     }
