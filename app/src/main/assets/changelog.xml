@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="188" version="5.1.19">
+        <change type="fix">Arreglo en version de TV</change>
+    </release>
     <release code="187" version="5.1.18">
         <change type="fix">Error al mostrar imagenes en noticias</change>
     </release>

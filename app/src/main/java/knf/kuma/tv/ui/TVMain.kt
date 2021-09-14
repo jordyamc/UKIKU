@@ -38,7 +38,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!isFullMode) {
+        if (!isTV) {
             finish()
             startActivity(Intent(this, DesignUtils.mainClass))
             return
