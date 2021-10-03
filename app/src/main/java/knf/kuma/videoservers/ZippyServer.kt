@@ -4,6 +4,8 @@ import android.content.Context
 import android.webkit.JavascriptInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.jsoup.Jsoup
 import java.net.URLDecoder
 
@@ -19,8 +21,12 @@ class ZippyServer(context: Context, baseLink: String) : Server(context, baseLink
         get() {
             return try {
                 val decoded = URLDecoder.decode(baseLink, "utf-8")
-                val linkData: String? = runBlocking(Dispatchers.Main) {
-                    val html = getFinishedHtml(decoded)
+                val linkData: String? = runBlocking(Dispatchers.IO) {
+                    val html = withContext(Dispatchers.Main) {
+                        withTimeout(TIMEOUT) {
+                            getFinishedHtml(decoded)
+                        }
+                    }
                     val result = Jsoup.parse(html).select("a#dlbutton").attr("href")
                     if (result.isBlank()) null else decoded.substringBefore("/v/") + result
                     /*suspendCoroutine {

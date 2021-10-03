@@ -33,6 +33,7 @@ class YUServer(context: Context, baseLink: String) : Server(context, baseLink) {
                         .build()
                 val response = client.newCall(request).execute()
                 val refVideoLink = response.header("Location")
+                Jsoup.connect(refVideoLink).ignoreContentType(true).timeout(2000).execute()
                 response.close()
                 val headers = Headers()
                 headers.addHeader("Range", "bytes=0-")

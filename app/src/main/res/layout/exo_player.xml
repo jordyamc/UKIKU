@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+    <com.google.android.exoplayer2.ui.StyledPlayerView
         android:id="@+id/player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true"
         app:controller_layout_id="@layout/exo_playback_control_view"
-        app:resize_mode="fit"/>
+        app:resize_mode="fit" />
 
 </FrameLayout>

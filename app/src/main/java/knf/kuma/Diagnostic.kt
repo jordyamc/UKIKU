@@ -8,6 +8,8 @@ import android.text.format.Formatter
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.analytics.ktx.analytics
@@ -29,31 +31,10 @@ import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.tools.bypass.startBypass
 import kotlinx.android.synthetic.main.layout_diagnostic.*
-import kotlinx.android.synthetic.main.layout_diagnostic.backupState
-import kotlinx.android.synthetic.main.layout_diagnostic.bypassRecreate
-import kotlinx.android.synthetic.main.layout_diagnostic.bypassState
-import kotlinx.android.synthetic.main.layout_diagnostic.cfduidState
-import kotlinx.android.synthetic.main.layout_diagnostic.clearanceState
-import kotlinx.android.synthetic.main.layout_diagnostic.codeState
-import kotlinx.android.synthetic.main.layout_diagnostic.dirState
-import kotlinx.android.synthetic.main.layout_diagnostic.dirTotalState
-import kotlinx.android.synthetic.main.layout_diagnostic.downState
-import kotlinx.android.synthetic.main.layout_diagnostic.externalState
-import kotlinx.android.synthetic.main.layout_diagnostic.generalState
-import kotlinx.android.synthetic.main.layout_diagnostic.info
-import kotlinx.android.synthetic.main.layout_diagnostic.internalState
-import kotlinx.android.synthetic.main.layout_diagnostic.ipState
-import kotlinx.android.synthetic.main.layout_diagnostic.lastBackupState
-import kotlinx.android.synthetic.main.layout_diagnostic.subscriptionState
-import kotlinx.android.synthetic.main.layout_diagnostic.timeoutState
-import kotlinx.android.synthetic.main.layout_diagnostic.toolbar
-import kotlinx.android.synthetic.main.layout_diagnostic.upState
-import kotlinx.android.synthetic.main.layout_diagnostic.userAgentState
-import kotlinx.android.synthetic.main.layout_diagnostic.uuid
-import kotlinx.android.synthetic.main.layout_diagnostic_material.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -63,6 +44,8 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 class Diagnostic : GenericActivity() {
+
+    private val networkStatus by lazy { NetworkStatus() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
@@ -77,110 +60,126 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun startTests() {
-        runMainTest()
-        runBypassTest()
+        runNetworkTests()
         runInternetTest()
         runDirectoryTest()
         runMemoryTest()
         runBackupTest()
     }
 
-    private fun runMainTest() {
-        doAsync {
-            val startTime = System.currentTimeMillis()
-            val responseCode = try {
-                val response = Jsoup.connect(BypassUtil.testLink).timeout(0).execute()
-                response.body()
-                response.statusCode()
-            } catch (e: HttpStatusException) {
-                e.statusCode
-            }
-            val loadingTime = System.currentTimeMillis() - startTime
-            doOnUI {
-                codeState.load(
-                    responseCode.toString(), when (responseCode) {
-                        200 -> StateView.STATE_OK
-                        503 -> StateView.STATE_WARNING
-                        else -> StateView.STATE_ERROR
-                    }
-                )
-                timeoutState.load(
-                    "$loadingTime ms", when {
-                        loadingTime < 10000 -> StateView.STATE_OK
-                        loadingTime < 20000 -> StateView.STATE_WARNING
-                        else -> StateView.STATE_ERROR
-                    }
-                )
-                generalState.load(when {
-                    responseCode == 200 && loadingTime < 10000 -> "Correcto"
-                    responseCode == 503 -> "Cloudflare activado"
-                    responseCode == 403 -> "Bloqueado por animeflv"
-                    loadingTime > 10000 -> "Página lenta"
-                    else -> "Desconocido"
-                }, when {
-                    responseCode == 200 && loadingTime < 10000 -> StateView.STATE_OK.also {
-                        info.visibility = View.GONE
-                    }
-                    responseCode == 503 || responseCode == 403 || loadingTime > 10000 -> StateView.STATE_WARNING.also {
-                        info.visibility = View.VISIBLE
-                    }
-                    else -> StateView.STATE_ERROR.also { info.visibility = View.GONE }
-                })
-                info.setOnClickListener {
-                    when {
-                        responseCode == 503 -> show503Info()
-                        responseCode == 403 -> show403Info()
-                        loadingTime > 10000 -> showTimeoutInfo()
-                    }
+    private suspend fun runMainTest() {
+        val startTime = System.currentTimeMillis()
+        val responseCode = try {
+            val response = Jsoup.connect(BypassUtil.testLink).timeout(0).execute()
+            response.body()
+            response.statusCode()
+        } catch (e: HttpStatusException) {
+            e.statusCode
+        }
+        networkStatus.mainResult = responseCode
+        val loadingTime = System.currentTimeMillis() - startTime
+        withContext(Dispatchers.Main) {
+            codeState.load(
+                responseCode.toString(), when (responseCode) {
+                    200 -> StateView.STATE_OK
+                    503 -> StateView.STATE_WARNING
+                    else -> StateView.STATE_ERROR
+                }
+            )
+            timeoutState.load(
+                "$loadingTime ms", when {
+                    loadingTime < 1000 -> StateView.STATE_OK
+                    loadingTime < 2000 -> StateView.STATE_WARNING
+                    else -> StateView.STATE_ERROR
+                }
+            )
+            generalState.load(when {
+                responseCode == 200 && loadingTime < 1000 -> "Correcto"
+                responseCode == 503 -> "Cloudflare activado"
+                responseCode == 403 -> "Bloqueado por animeflv"
+                loadingTime > 1000 -> "Página lenta"
+                else -> "Desconocido"
+            }, when {
+                responseCode == 200 && loadingTime < 1000 -> StateView.STATE_OK.also {
+                    info.visibility = View.GONE
+                }
+                responseCode == 503 || responseCode == 403 || loadingTime > 1000 -> StateView.STATE_WARNING.also {
+                    info.visibility = View.VISIBLE
+                }
+                else -> StateView.STATE_ERROR.also { info.visibility = View.GONE }
+            })
+            info.setOnClickListener {
+                when {
+                    networkStatus.mainResult == 503 -> show503Info()
+                    networkStatus.mainResult == 403 -> show403Info()
+                    loadingTime > 1000 -> showTimeoutInfo()
                 }
             }
         }
+        networkStatus.isMainTestExecuted = true
     }
 
-    private fun runBypassTest() {
-        doAsync {
-            try {
-                Jsoup.connect(BypassUtil.testLink).followRedirects(true).timeout(0).execute()
-                bypassState.load("No se necesita")
-                doOnUI { bypassRecreate.visibility = View.GONE }
-            } catch (e: HttpStatusException) {
-                doOnUI {
-                    bypassRecreate.apply {
-                        visibility = View.VISIBLE
-                        onClick {
-                            startBypass(
-                                5546, BypassUtil.testLink,
-                                lastUA = PrefsUtil.userAgent,
-                                showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
-                                useFocus = isTV,
-                                maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries")
-                                    .toInt(),
-                                reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
-                                clearCookiesAtStart = true,
-                                useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
-                                dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
-                                    .toInt()
-                            )
-                        }
-                    }
-                }
-                try {
-                    jsoupCookies(BypassUtil.testLink).timeout(0).get()
-                    bypassState.load("Valido", StateView.STATE_OK)
-                } catch (e: HttpStatusException) {
-                    when (e.statusCode) {
-                        503 -> bypassState.load("Caducado", StateView.STATE_WARNING)
-                        else -> bypassState.load(
-                            "Error en página: HTTP ${e.statusCode}",
-                            StateView.STATE_ERROR
+    private suspend fun runBypassTest() {
+        try {
+            Jsoup.connect(BypassUtil.testLink).followRedirects(true).timeout(0).execute()
+            bypassState.load("No se necesita")
+            withContext(Dispatchers.Main) { bypassRecreate.visibility = View.GONE }
+        } catch (e: HttpStatusException) {
+            withContext(Dispatchers.Main) {
+                bypassRecreate.apply {
+                    visibility = View.VISIBLE
+                    onClick {
+                        startBypass(
+                            5546, BypassUtil.testLink,
+                            lastUA = PrefsUtil.userAgent,
+                            showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                            useFocus = isTV,
+                            maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries")
+                                .toInt(),
+                            reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                            clearCookiesAtStart = true,
+                            useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
+                            dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
+                                .toInt()
                         )
                     }
                 }
-                loadBypassInfo()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                bypassState.load("Error en página: ${e.message}", StateView.STATE_ERROR)
             }
+            try {
+                jsoupCookies(BypassUtil.testLink).timeout(0).get()
+                bypassState.load("Valido", StateView.STATE_OK)
+                if (networkStatus.isMainTestExecuted && networkStatus.mainResult in listOf(
+                        403,
+                        503
+                    )
+                ) {
+                    withContext(Dispatchers.Main) {
+                        codeState.load("200", StateView.STATE_OK)
+                        generalState.load("Bypass activo", StateView.STATE_OK)
+                        info.isVisible = false
+                    }
+                }
+            } catch (e: HttpStatusException) {
+                when (e.statusCode) {
+                    503 -> bypassState.load("Caducado", StateView.STATE_WARNING)
+                    else -> bypassState.load(
+                        "Error en página: HTTP ${e.statusCode}",
+                        StateView.STATE_ERROR
+                    )
+                }
+            }
+            loadBypassInfo()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            bypassState.load("Error en página: ${e.message}", StateView.STATE_ERROR)
+        }
+        networkStatus.isBypassTestExecuted = true
+    }
+
+    private fun runNetworkTests() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            runMainTest()
+            runBypassTest()
         }
     }
 
@@ -346,7 +345,7 @@ class Diagnostic : GenericActivity() {
                     param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
                 }
             }
-            runBypassTest()
+            runNetworkTests()
         }
     }
 
@@ -355,6 +354,12 @@ class Diagnostic : GenericActivity() {
             context.startActivity(Intent(context, Diagnostic::class.java))
         }
     }
+
+    private data class NetworkStatus(
+        var isMainTestExecuted: Boolean = false,
+        var isBypassTestExecuted: Boolean = false,
+        var mainResult: Int = -1,
+    )
 
     class FullBypass : GenericActivity() {
         private val overlay: View by lazy { find(R.id.overlay) as View }

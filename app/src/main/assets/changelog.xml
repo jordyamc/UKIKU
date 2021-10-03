@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="189" version="5.1.20">
+        <change type="change">Diagnostico reflejara el bypass en estado general</change>
+        <change type="fix">Servidor stape</change>
+    </release>
     <release code="188" version="5.1.19">
         <change type="fix">Arreglo en version de TV</change>
     </release>

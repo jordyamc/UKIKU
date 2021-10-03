@@ -7,25 +7,19 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import knf.kuma.R
 import knf.kuma.commons.BypassUtil
@@ -42,9 +36,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.util.concurrent.TimeUnit
 
-class CustomExoPlayer : GenericActivity(), Player.EventListener {
+class CustomExoPlayer : GenericActivity(), Player.Listener {
     private var exoPlayer: SimpleExoPlayer? = null
     private var currentPosition = C.TIME_UNSET
     private var resumeWindow = C.INDEX_UNSET
@@ -118,33 +111,56 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
         if (exoPlayer == null) {
             lifecycleScope.launch(Dispatchers.Main) {
                 video_title.text = intent.getStringExtra("title")
-                val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
-                val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-                val source: MediaSource
-                if (intent.getBooleanExtra("isPlayList", false)) {
-                    val sourceList = ArrayList<MediaSource>()
-                    playList = withContext(Dispatchers.IO) { CacheDB.INSTANCE.queueDAO().getAllByAid(intent.getStringExtra("playlist")?:"empty") }
-                    noCrash { video_title.text = playList[0].title() }
-                    for (queueObject in playList) {
-                        sourceList.add(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this@CustomExoPlayer, BypassUtil.userAgent, null)).createMediaSource(queueObject.createUri()))
-                    }
-                    source = ConcatenatingMediaSource(*sourceList.toTypedArray())
-                } else
-                    source = ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this@CustomExoPlayer, BypassUtil.userAgent, null)).createMediaSource(intent.data)
-                exoPlayer = ExoPlayerFactory.newSimpleInstance(this@CustomExoPlayer, DefaultRenderersFactory(this@CustomExoPlayer), trackSelector, DefaultLoadControl(), null, DefaultBandwidthMeter.Builder(this@CustomExoPlayer).build())
+                val sources: List<MediaItem> =
+                    if (intent.getBooleanExtra("isPlayList", false)) {
+                        val sourceList = ArrayList<MediaItem>()
+                        playList = withContext(Dispatchers.IO) {
+                            CacheDB.INSTANCE.queueDAO()
+                                .getAllByAid(intent.getStringExtra("playlist") ?: "empty")
+                        }
+                        noCrash { video_title.text = playList[0].title() }
+                        for (queueObject in playList) {
+                            sourceList.add(
+                                ProgressiveMediaSource.Factory(
+                                    DefaultDataSourceFactory(
+                                        this@CustomExoPlayer,
+                                        BypassUtil.userAgent,
+                                        null
+                                    )
+                                )
+                                    .createMediaSource(MediaItem.fromUri(queueObject.createUri())).mediaItem
+                            )
+                        }
+                        sourceList
+                    } else
+                        listOf(
+                            ProgressiveMediaSource.Factory(
+                                DefaultDataSourceFactory(
+                                    this@CustomExoPlayer,
+                                    BypassUtil.userAgent,
+                                    null
+                                )
+                            ).createMediaSource(
+                                MediaItem.fromUri(
+                                    intent.data ?: Uri.parse("")
+                                )
+                            ).mediaItem
+                        )
+                exoPlayer = SimpleExoPlayer.Builder(this@CustomExoPlayer).build()
                 player.player = exoPlayer
                 exoPlayer?.addListener(this@CustomExoPlayer)
                 val canResume = currentPosition != C.TIME_UNSET
                 if (canResume)
                     exoPlayer?.seekTo(listPosition, currentPosition)
-                exoPlayer?.prepare(source, !canResume, false)
+                exoPlayer?.setMediaItems(sources)
+                exoPlayer?.prepare()
                 exoPlayer?.playWhenReady = true
-                disposable = Observable.interval(1, TimeUnit.SECONDS).map { exoPlayer?.currentPosition?:0 }
+                /*disposable = Observable.interval(1, TimeUnit.SECONDS).map { exoPlayer?.currentPosition?:0 }
                         .subscribeOn(AndroidSchedulers.from(exoPlayer?.applicationLooper, false))
                         .subscribe {
                             if (it > 0)
                                 lastPosition = it
-                        }
+                        }*/
             }
         }
     }
@@ -291,23 +307,16 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
 
     }
 
-    override fun onPlayerError(error: ExoPlaybackException) {
-        val exception: Exception? =
-                when (error.type) {
-                    ExoPlaybackException.TYPE_RENDERER -> error.rendererException
-                    ExoPlaybackException.TYPE_UNEXPECTED -> error.unexpectedException
-                    ExoPlaybackException.TYPE_SOURCE -> error.sourceException
-                    else -> null
-                }
-        if (exception != null) {
-            Toaster.toast("Error al reproducir: " + exception.message?.replace("%", "%%"), emptyArray<Any>())
-            FirebaseCrashlytics.getInstance().recordException(exception)
-        } else
-            Toaster.toast("Error desconocido al reproducir")
+    override fun onPlayerError(error: PlaybackException) {
+        Toaster.toast(
+            "Error al reproducir: " + error.message?.replace("%", "%%"),
+            emptyArray<Any>()
+        )
+        FirebaseCrashlytics.getInstance().recordException(error)
         finish()
     }
 
-    override fun onPositionDiscontinuity(reason: Int) {
+    /*override fun onPositionDiscontinuity(reason: Int) {
         try {
             val latestPosition = exoPlayer?.currentWindowIndex ?: 0
             if (latestPosition != listPosition) {
@@ -317,6 +326,33 @@ class CustomExoPlayer : GenericActivity(), Player.EventListener {
                         position = 0
                     } else if (reason in 1..2) {
                         position = lastPosition
+                    }
+                }
+                doAsync {
+                    CacheDB.INSTANCE.playerStateDAO().set(state)
+                }
+                listPosition = latestPosition
+                video_title.text = playList[listPosition].title()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }*/
+
+    override fun onPositionDiscontinuity(
+        oldPosition: Player.PositionInfo,
+        newPosition: Player.PositionInfo,
+        reason: Int
+    ) {
+        try {
+            val latestPosition = newPosition.windowIndex
+            if (latestPosition != listPosition) {
+                val state = PlayerState().apply {
+                    title = playList[listPosition].title()
+                    if (reason == 0) {
+                        position = 0
+                    } else if (reason in 1..2) {
+                        position = oldPosition.positionMs
                     }
                 }
                 doAsync {

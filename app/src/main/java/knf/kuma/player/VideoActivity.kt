@@ -357,6 +357,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
             doOnUI { hideUI() }
     }
 
+
     override fun onFinish() {
         playerState.apply {
             title = video_title.text.toString()

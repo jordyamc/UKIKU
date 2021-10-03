@@ -5,27 +5,18 @@ import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.RemoteException
 import android.support.v4.media.MediaDescriptionCompat
-import android.util.Log
 import android.webkit.URLUtil
 import androidx.media.AudioAttributesCompat
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PrefsUtil
@@ -35,7 +26,6 @@ import knf.kuma.pojos.QueueObject
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.util.concurrent.TimeUnit
 
 @Entity
 data class PlayerState(
@@ -84,12 +74,12 @@ class PlayerHolder(private val context: Context,
                             playerView.player = player
                         }
         )
-        disposable = Observable.interval(1, TimeUnit.SECONDS).map { audioFocusPlayer.currentPosition }
+        /*disposable = Observable.interval(1, TimeUnit.SECONDS).map { audioFocusPlayer.currentPosition }
                 .subscribeOn(AndroidSchedulers.from(audioFocusPlayer.applicationLooper, false))
                 .subscribe {
                     if (it > 0)
                         lastPosition = it
-                }
+                }*/
     }
 
     private fun setUpRetriever(description: MediaDescriptionCompat) {
@@ -103,27 +93,28 @@ class PlayerHolder(private val context: Context,
         }
     }
 
-    private fun buildMediaSource(): MediaSource {
-        val uriList = mutableListOf<MediaSource>()
-        mediaCatalog.forEach {
-            uriList.add(createExtractorMediaSource(it.mediaUri ?: Uri.EMPTY))
-        }
-        return ConcatenatingMediaSource(*uriList.toTypedArray())
+    private fun buildMediaSource(): List<MediaItem> {
+        return mediaCatalog.map { createExtractorMediaSource(it.mediaUri ?: Uri.EMPTY) }
     }
 
-    private fun createExtractorMediaSource(uri: Uri): MediaSource {
+    private fun createExtractorMediaSource(uri: Uri): MediaItem {
         return ProgressiveMediaSource.Factory(
-                if (PrefsUtil.useExperimentalOkHttp)
-                    DefaultDataSourceFactory(context, null, OkHttpDataSourceFactory(OkHttpClient(), BypassUtil.userAgent))
-                else
-                    DefaultDataSourceFactory(context, BypassUtil.userAgent, null)
-        ).createMediaSource(uri)
+            if (PrefsUtil.useExperimentalOkHttp)
+                DefaultDataSourceFactory(
+                    context,
+                    null,
+                    OkHttpDataSourceFactory(OkHttpClient(), BypassUtil.userAgent)
+                )
+            else
+                DefaultDataSourceFactory(context, BypassUtil.userAgent, null)
+        ).createMediaSource(MediaItem.fromUri(uri)).mediaItem
     }
 
     // Prepare playback.
     fun start() {
         // Load media.
-        audioFocusPlayer.prepare(buildMediaSource())
+        audioFocusPlayer.setMediaItems(buildMediaSource())
+        audioFocusPlayer.prepare()
         // Restore state (after onResume()/onStart())
         with(playerState) {
             // Start playback when media has buffered enough
@@ -173,7 +164,7 @@ class PlayerHolder(private val context: Context,
      */
     private fun attachLogging(exoPlayer: ExoPlayer) {
         // Show toasts on state changes.
-        exoPlayer.addListener(object : Player.EventListener {
+        exoPlayer.addListener(object : Player.Listener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 when (playbackState) {
                     Player.STATE_ENDED -> {
@@ -182,21 +173,9 @@ class PlayerHolder(private val context: Context,
                 }
             }
 
-            override fun onPlayerError(error: ExoPlaybackException) {
-                var exception: Throwable? = null
-                when (error.type) {
-                    ExoPlaybackException.TYPE_RENDERER -> exception = error.rendererException
-                    ExoPlaybackException.TYPE_UNEXPECTED -> exception = error.unexpectedException
-                    ExoPlaybackException.TYPE_SOURCE -> exception = error.sourceException
-                    ExoPlaybackException.TYPE_OUT_OF_MEMORY -> exception = error.outOfMemoryError
-                    ExoPlaybackException.TYPE_REMOTE -> exception = RemoteException(error.message)
-                }
-                if (exception != null) {
-                    Toaster.toast("Error al reproducir: " + exception.message?.replace("%", "%%"))
-                    FirebaseCrashlytics.getInstance().recordException(exception)
-                } else {
-                    Toaster.toast("Error desconocido al reproducir")
-                }
+            override fun onPlayerError(error: PlaybackException) {
+                Toaster.toast("Error al reproducir: " + error.message?.replace("%", "%%"))
+                FirebaseCrashlytics.getInstance().recordException(error)
                 playerCallback.onFinish()
             }
 
@@ -204,7 +183,38 @@ class PlayerHolder(private val context: Context,
                 playerCallback.onLoadingChange(isLoading)
             }
 
-            override fun onPositionDiscontinuity(reason: Int) {
+            override fun onPositionDiscontinuity(
+                oldPosition: Player.PositionInfo,
+                newPosition: Player.PositionInfo,
+                reason: Int
+            ) {
+                try {
+                    val latestPosition = newPosition.windowIndex
+                    if (latestPosition != oldPosition.windowIndex) {
+                        playerState.apply {
+                            title = playList[listPosition].title()
+                            if (reason == 0) {
+                                position = 0
+                            } else if (reason in 1..2) {
+                                position = oldPosition.positionMs
+                            }
+                        }
+                        doAsync {
+                            CacheDB.INSTANCE.playerStateDAO().set(playerState)
+                        }
+                        listPosition = latestPosition
+                        playerCallback.onChangeTitle(
+                            (mediaCatalog[listPosition].title
+                                ?: "").toString()
+                        )
+                        setUpRetriever(mediaCatalog[listPosition])
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            /*override fun onPositionDiscontinuity(reason: Int) {
                 try {
                     val latestPosition = audioFocusPlayer.currentWindowIndex
                     if (latestPosition != listPosition) {
@@ -227,17 +237,13 @@ class PlayerHolder(private val context: Context,
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }
+            }*/
         })
         // Write to log on state changes.
-        exoPlayer.addListener(object : Player.EventListener {
+        exoPlayer.addListener(object : Player.Listener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 //Log.i("Player", "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady")
                 playerCallback.onPlayerStateChanged(playbackState, playWhenReady)
-            }
-
-            override fun onPlayerError(error: ExoPlaybackException) {
-                Log.i("Player", "playerError: $error")
             }
 
             fun getStateString(state: Int): String {

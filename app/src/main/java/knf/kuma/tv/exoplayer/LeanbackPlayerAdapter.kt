@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.view.Surface
 import android.view.SurfaceHolder
-import androidx.leanback.R
 import androidx.leanback.media.PlaybackGlueHost
 import androidx.leanback.media.PlayerAdapter
 import androidx.leanback.media.SurfaceHolderGlueHost
@@ -172,15 +171,8 @@ class LeanbackPlayerAdapter
             notifyStateChanged()
         }
 
-        override fun onPlayerError(exception: ExoPlaybackException) {
-            val callback = callback
-            errorMessageProvider?.let {
-                val errorMessage = it.getErrorMessage(exception)
-                callback.onError(this@LeanbackPlayerAdapter, errorMessage.first, errorMessage.second)
-            } ?: exception.let {
-                callback.onError(this@LeanbackPlayerAdapter, exception.type, context.getString(
-                        R.string.lb_media_player_error, exception.type, exception.rendererIndex))
-            }
+        override fun onPlayerError(error: PlaybackException) {
+            callback.onError(this@LeanbackPlayerAdapter, error.errorCode, error.message)
         }
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {

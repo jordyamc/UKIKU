@@ -1,6 +1,8 @@
 package knf.kuma.videoservers
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -11,7 +13,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 abstract class Server(internal var context: Context, internal var baseLink: String) : Comparable<Server> {
-    internal var TIMEOUT = 10000
     private var server: VideoServer? = null
 
     abstract val isValid: Boolean
@@ -39,12 +40,22 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                         it.resume(string)
                     }
                 }, "HtmlViewer")
-                webViewClient = object : WebViewClient() {
-                    override fun onPageFinished(view: WebView?, url: String?) {
+                val handler = Handler(Looper.getMainLooper())
+                var isExecuted = false
+                val runnable = Runnable {
+                    if (!isExecuted) {
+                        isExecuted = true
                         loadUrl(
                             "javascript:window.HtmlViewer.printHtml" +
                                     "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');"
                         )
+                    }
+                }
+                handler.postDelayed(runnable, 5000)
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        handler.removeCallbacks(runnable)
+                        runnable.run()
                     }
                 }
                 loadUrl(link)
@@ -83,6 +94,7 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
     }
 
     companion object {
+        const val TIMEOUT = 10000L
 
         private fun getServers(context: Context, base: String): List<Server> {
             return listOf(

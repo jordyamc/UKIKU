@@ -23,7 +23,7 @@ class StapeServer(context: Context, baseLink: String) : Server(context, baseLink
                 val link = "https:" + runBlocking {
                     val html = withContext(Dispatchers.Main) { getFinishedHtml(downLink) }
                     val doc = Jsoup.parse(html)
-                    doc.select("div[id~=[video]{5,}[link]{4,}]").first().textNodes().first().text()
+                    doc.select("video[id]").first().attr("src")
                 }
                 /*val video =
                     Jsoup.connect(downLink).get().body().select("script:not([type],[src]) ").let {

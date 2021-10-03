@@ -85,6 +85,7 @@
         <activity
             android:name=".SplashActivity"
             android:label="@string/title_activity_main"
+            android:exported="true"
             android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -125,6 +126,7 @@
         <activity
             android:name=".Main"
             android:enabled="false"
+            android:exported="true"
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -141,6 +143,7 @@
         <activity
             android:name=".tv.ui.TVMain"
             android:banner="@drawable/tv_banner"
+            android:exported="true"
             android:theme="@style/AppTheme.TV.Browser">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -164,6 +167,7 @@
             android:name=".animeinfo.ActivityAnime"
             android:enabled="false"
             android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true"
             android:windowSoftInputMode="stateHidden">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
@@ -183,6 +187,7 @@
             android:immersive="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
+            android:exported="true"
             android:supportsPictureInPicture="true">
             <intent-filter android:label="UKIKU">
                 <action android:name="android.intent.action.VIEW" />
@@ -204,6 +209,7 @@
             android:immersive="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
+            android:exported="true"
             android:supportsPictureInPicture="true">
             <intent-filter android:label="UKIKU experimental">
                 <action android:name="android.intent.action.VIEW" />
@@ -238,6 +244,7 @@
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
+            android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <data android:scheme="db-qtjow4hsk06vt19" />
@@ -276,6 +283,7 @@
 
         <receiver
             android:name=".widgets.emision.WEmisionProvider"
+            android:exported="true"
             android:label="Emisión">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -337,6 +345,7 @@
         <activity
             android:name=".download.DownloadDialogActivity"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:theme="@style/Theme.AppCompat.DayNight.Dialog">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
@@ -375,6 +384,7 @@
         <activity android:name=".preferences.AdsPreferenceActivity" />
         <activity
             android:name=".MainMaterial"
+            android:exported="true"
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -405,6 +415,7 @@
         <activity
             android:name=".animeinfo.ActivityAnimeMaterial"
             android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true"
             android:windowSoftInputMode="stateHidden">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
@@ -429,6 +440,7 @@
         <activity android:name="com.appbrain.AppBrainActivity" />
         <activity
             android:name=".tv.streaming.StreamTvActivity"
+            android:exported="true"
             android:theme="@style/Theme.AppCompat.DayNight.Dialog">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
