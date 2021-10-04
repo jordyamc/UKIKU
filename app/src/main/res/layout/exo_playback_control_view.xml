@@ -121,7 +121,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_marginEnd="5dp"
-                        app:srcCompat="@drawable/ic_previous"/>
+                        app:srcCompat="@drawable/ic_previous" />
 
                     <ImageButton
                         android:id="@id/exo_rew"
@@ -129,26 +129,15 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_marginEnd="10dp"
-                        app:srcCompat="@drawable/ic_rewind"/>
+                        app:srcCompat="@drawable/ic_rewind" />
 
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <ImageButton
-                            android:id="@id/exo_play"
-                            style="@style/Base.Widget.AppCompat.Button.Borderless"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            app:srcCompat="@drawable/ic_play"/>
-
-                        <ImageButton
-                            android:id="@id/exo_pause"
-                            style="@style/Base.Widget.AppCompat.Button.Borderless"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            app:srcCompat="@drawable/ic_pause"/>
-                    </RelativeLayout>
+                    <ImageButton
+                        android:id="@id/exo_play_pause"
+                        style="@style/Base.Widget.AppCompat.Button.Borderless"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        app:srcCompat="@drawable/ic_play"
+                        app:tint="?colorAccent" />
 
                     <ImageButton
                         android:id="@id/exo_ffwd"
@@ -156,7 +145,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_marginStart="10dp"
-                        app:srcCompat="@drawable/ic_ffwd"/>
+                        app:srcCompat="@drawable/ic_ffwd" />
 
                     <ImageButton
                         android:id="@id/exo_next"
