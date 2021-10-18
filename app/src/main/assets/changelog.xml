@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="191" version="5.1.22">
+        <change type="fix">Error al guardar progreso en reproductor interno</change>
+    </release>
     <release code="190" version="5.1.21">
         <change type="fix">Botón de pausa en reproductor interno</change>
     </release>

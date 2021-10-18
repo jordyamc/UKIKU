@@ -20,7 +20,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import io.reactivex.rxjava3.disposables.Disposable
 import knf.kuma.R
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.EAHelper
@@ -39,15 +38,9 @@ import xdroid.toaster.Toaster
 
 class CustomExoPlayer : GenericActivity(), Player.Listener {
     private var exoPlayer: SimpleExoPlayer? = null
-    private var currentPosition = C.TIME_UNSET
-    private var resumeWindow = C.INDEX_UNSET
-
+    private lateinit var playerState: PlayerState
     private var isEnding = false
-    private var listPosition = 0
     private var playList: List<QueueObject> = ArrayList()
-
-    private var disposable: Disposable? = null
-    private var lastPosition = 0L
 
     private val resizeMode: Int
         get() {
@@ -73,18 +66,14 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         hideUI()
         player.resizeMode = resizeMode
         player.requestFocus()
-        lifecycleScope.launch(Dispatchers.Main){
+        lifecycleScope.launch(Dispatchers.Main) {
+            playerState = withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.playerStateDAO().find(intent.getStringExtra("title") ?: "???")
+                    ?: PlayerState()
+            }
             if (savedInstanceState != null) {
-                currentPosition = savedInstanceState.getLong("position", C.TIME_UNSET)
-                listPosition = savedInstanceState.getInt("listPosition", 0)
-            }else{
-                intent.getStringExtra("title")?.let {
-                    withContext(Dispatchers.IO){
-                        CacheDB.INSTANCE.playerStateDAO().find(it)?.let {
-                            currentPosition = it.position
-                        }
-                    }
-                }
+                playerState.position = savedInstanceState.getLong("position", C.TIME_UNSET)
+                playerState.window = savedInstanceState.getInt("listPosition", 0)
             }
             checkPlaylist(intent)
             initPlayer(intent)
@@ -93,9 +82,9 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putLong("position", currentPosition)
-        if (listPosition != 0)
-            outState.putInt("listPosition", listPosition)
+        outState.putLong("position", playerState.position)
+        if (playerState.window != 0)
+            outState.putInt("listPosition", playerState.window)
     }
 
     private fun hideUI() {
@@ -149,11 +138,11 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                 exoPlayer = SimpleExoPlayer.Builder(this@CustomExoPlayer).build()
                 player.player = exoPlayer
                 exoPlayer?.addListener(this@CustomExoPlayer)
-                val canResume = currentPosition != C.TIME_UNSET
-                if (canResume)
-                    exoPlayer?.seekTo(listPosition, currentPosition)
                 exoPlayer?.setMediaItems(sources)
                 exoPlayer?.prepare()
+                val canResume = playerState.position != C.TIME_UNSET
+                if (canResume)
+                    exoPlayer?.seekTo(playerState.window, playerState.position)
                 exoPlayer?.playWhenReady = true
                 /*disposable = Observable.interval(1, TimeUnit.SECONDS).map { exoPlayer?.currentPosition?:0 }
                         .subscribeOn(AndroidSchedulers.from(exoPlayer?.applicationLooper, false))
@@ -176,7 +165,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         try {
             if (!isInPictureInPictureMode) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    currentPosition = exoPlayer?.currentPosition ?: 0
+                    playerState.position = exoPlayer?.currentPosition ?: 0
                     val params = PictureInPictureParams.Builder()
                             //.setAspectRatio(Rational(player.width, player.height))
                             .build()
@@ -233,8 +222,8 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     override fun onNewIntent(intent: Intent) {
         setIntent(intent)
         releasePlayer()
-        currentPosition = 0
-        resumeWindow = C.INDEX_UNSET
+        playerState.window = C.INDEX_UNSET
+        playerState.position = 0
         checkPlaylist(intent)
         initPlayer(intent)
         super.onNewIntent(intent)
@@ -250,25 +239,20 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         super.onPause()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
             return
-        exoPlayer?.let {
-            resumeWindow = it.currentWindowIndex
-            currentPosition = it.currentPosition
-            exoPlayer?.playWhenReady = false
-        }
-    }
-
-    override fun onStop() {
-        val state = PlayerState().apply {
+        val state = playerState.apply {
             title = video_title.text.toString()
             position = if (!isEnding) {
-                exoPlayer?.currentPosition?:0
-            }else
+                exoPlayer?.currentPosition ?: 0
+            } else
                 0
         }
         doAsync {
             CacheDB.INSTANCE.playerStateDAO().set(state)
         }
-        super.onStop()
+        if (!isFinishing)
+            exoPlayer?.pause()
+        else
+            exoPlayer?.stop()
     }
 
     override fun onDestroy() {
@@ -346,9 +330,9 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     ) {
         try {
             val latestPosition = newPosition.windowIndex
-            if (latestPosition != listPosition) {
-                val state = PlayerState().apply {
-                    title = playList[listPosition].title()
+            if (latestPosition != playerState.window) {
+                val state = playerState.apply {
+                    title = playList[playerState.window].title()
                     if (reason == 0) {
                         position = 0
                     } else if (reason in 1..2) {
@@ -358,8 +342,8 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                 doAsync {
                     CacheDB.INSTANCE.playerStateDAO().set(state)
                 }
-                listPosition = latestPosition
-                video_title.text = playList[listPosition].title()
+                playerState.window = latestPosition
+                video_title.text = playList[playerState.window].title()
             }
         } catch (e: Exception) {
             e.printStackTrace()
