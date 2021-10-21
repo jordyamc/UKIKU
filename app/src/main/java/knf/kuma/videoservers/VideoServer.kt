@@ -2,7 +2,6 @@ package knf.kuma.videoservers
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.util.*
 
 open class VideoServer : Parcelable {
     var name: String
@@ -73,10 +72,28 @@ open class VideoServer : Parcelable {
         const val ZIPPYSHARE = "Zippyshare"
         const val GOCDN = "GoCDN"
         const val STAPE = "Stape"
+        const val SBVIDEO = "SBVideo"
         const val MEGA = "Mega"
 
         internal val downloadServers: Array<String>
-            get() = arrayOf(IZANAGI, HYPERION, OKRU, FEMBED, FIRE, NATSUKI, GOCDN, STAPE, VERYSTREAM, FENIX, RV, YOURUPLOAD, ZIPPYSHARE, MEGA, MP4UPLOAD)
+            get() = arrayOf(
+                IZANAGI,
+                HYPERION,
+                OKRU,
+                FEMBED,
+                FIRE,
+                NATSUKI,
+                SBVIDEO,
+                GOCDN,
+                STAPE,
+                VERYSTREAM,
+                FENIX,
+                RV,
+                YOURUPLOAD,
+                ZIPPYSHARE,
+                MEGA,
+                MP4UPLOAD
+            )
     }
 
     companion object {

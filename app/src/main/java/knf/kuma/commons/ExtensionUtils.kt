@@ -279,6 +279,18 @@ fun ImageView.load(uri: Uri?, callback: Callback? = null) {
     PicassoSingle.get().load(uri).into(this, callback)
 }
 
+fun <T> retry(numOfRetries: Int, block: () -> T): T {
+    var throwable: Throwable? = null
+    (1..numOfRetries).forEach {
+        try {
+            return block()
+        } catch (e: Throwable) {
+            throwable = e
+        }
+    }
+    throw throwable!!
+}
+
 fun noCrash(enableLog: Boolean = true, func: () -> Unit): String? {
     return try {
         func()
