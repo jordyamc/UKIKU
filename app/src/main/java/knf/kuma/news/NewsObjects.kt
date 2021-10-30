@@ -11,6 +11,8 @@ import knf.kuma.commons.toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import org.jsoup.nodes.Element
+import pl.droidsonroids.jspoon.ElementConverter
 import pl.droidsonroids.jspoon.annotation.Selector
 import pl.droidsonroids.retrofit2.JspoonConverterFactory
 import retrofit2.Call
@@ -29,19 +31,29 @@ class NewsItem {
     @Selector("header span.db.op5")
     lateinit var date: String
 
-    @Selector("img", attr = "data-src", defValue = "")
+    @Selector("img", converter = ImageConverter::class)
     lateinit var image: String
 
     @Selector("a", attr = "href")
     lateinit var link: String
 
+    class ImageConverter : ElementConverter<String> {
+        override fun convert(node: Element, selector: Selector): String {
+            return when {
+                node.hasAttr("data-src") -> node.attr("data-src")
+                node.hasAttr("src") -> node.attr("src")
+                else -> ""
+            }
+        }
+    }
+
     companion object {
         val DIFF = object : DiffUtil.ItemCallback<NewsItem>() {
             override fun areItemsTheSame(oldItem: NewsItem, newItem: NewsItem): Boolean =
-                    oldItem.link == newItem.link
+                oldItem.link == newItem.link
 
             override fun areContentsTheSame(oldItem: NewsItem, newItem: NewsItem): Boolean =
-                    oldItem.title == newItem.title && oldItem.date == newItem.date
+                oldItem.title == newItem.title && oldItem.date == newItem.date
         }
     }
 }

@@ -106,13 +106,13 @@ class TopActivityMaterial : GenericActivity() {
         snackbar = Snackbar.make(recycler, text, duration).also { it.show() }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_top, menu)
         when (PrefsUtil.topCount) {
-            25 -> menu?.findItem(R.id.top25)?.isChecked = true
-            50 -> menu?.findItem(R.id.top50)?.isChecked = true
-            75 -> menu?.findItem(R.id.top75)?.isChecked = true
-            100 -> menu?.findItem(R.id.top100)?.isChecked = true
+            25 -> menu.findItem(R.id.top25)?.isChecked = true
+            50 -> menu.findItem(R.id.top50)?.isChecked = true
+            75 -> menu.findItem(R.id.top75)?.isChecked = true
+            100 -> menu.findItem(R.id.top100)?.isChecked = true
         }
         return super.onCreateOptionsMenu(menu)
     }

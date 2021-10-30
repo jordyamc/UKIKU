@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="193" version="5.1.24">
+        <change type="fix">Imagenes de noticias</change>
+    </release>
     <release code="192" version="5.1.23">
         <change type="new">Servidor SBVideo</change>
     </release>

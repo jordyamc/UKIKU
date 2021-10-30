@@ -531,11 +531,11 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (EAHelper.phase != 4)
             menuInflater.inflate(R.menu.menu_ea, menu)
         if (iapWrapper.isEnabled && !iapWrapper.isAvailable)
-            menu?.findItem(R.id.unlock)?.isEnabled = false
+            menu.findItem(R.id.unlock)?.isEnabled = false
         return super.onCreateOptionsMenu(menu)
     }
 

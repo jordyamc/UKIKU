@@ -192,12 +192,12 @@ class AchievementActivityMaterial : GenericActivity() {
         }()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_achievements, menu)
         if (Backups.type != Backups.Type.NONE && Backups.type != Backups.Type.FIRESTORE) {
-            syncButton = menu?.findItem(R.id.sync)
+            syncButton = menu.findItem(R.id.sync)
         } else
-            menu?.findItem(R.id.sync)?.isVisible = false
+            menu.findItem(R.id.sync)?.isVisible = false
         return super.onCreateOptionsMenu(menu)
 
 
