@@ -381,10 +381,10 @@ class DownloadManager : Service() {
 
         private fun errorNotification(downloadObject: DownloadObject) {
             val notification = NotificationCompat.Builder(context, CHANNEL)
-                    .setColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                    .setSmallIcon(android.R.drawable.stat_notify_error)
-                    .setContentTitle(downloadObject.name)
-                    .setContentText("Error al descargar " + downloadObject.chapter?.toLowerCase(Locale.ENGLISH))
+                .setColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                .setSmallIcon(android.R.drawable.stat_notify_error)
+                .setContentTitle(downloadObject.name)
+                .setContentText("Error al descargar " + downloadObject.chapter.lowercase(Locale.ENGLISH))
                     .setOngoing(false)
                     .setWhen(downloadObject.time)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -422,12 +422,22 @@ class DownloadManager : Service() {
         private fun getPending(downloadObject: DownloadObject, action: Int): PendingIntent {
             return try {
                 val intent = Intent(context, DownloadReceiver::class.java)
-                        .putExtra("did", downloadObject.getDid())
-                        .putExtra("eid", downloadObject.eid)
-                        .putExtra("action", action)
-                PendingIntent.getBroadcast(context, downloadObject.key + action, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+                    .putExtra("did", downloadObject.getDid())
+                    .putExtra("eid", downloadObject.eid)
+                    .putExtra("action", action)
+                PendingIntent.getBroadcast(
+                    context,
+                    downloadObject.key + action,
+                    intent,
+                    PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             } catch (e: IllegalStateException) {
-                PendingIntent.getBroadcast(context, 0, Intent(), PendingIntent.FLAG_CANCEL_CURRENT)
+                PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    Intent(),
+                    PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             }
         }
 

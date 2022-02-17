@@ -254,10 +254,28 @@ fun <T : View> Activity.optionalBind(@IdRes res: Int): Lazy<T?> {
 fun Request.execute(followRedirects: Boolean = true): Response {
     return OkHttpClient().newBuilder().apply {
         followRedirects(followRedirects)
-        connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                .allEnabledTlsVersions()
-                .allEnabledCipherSuites()
-                .build()))
+        connectionSpecs(
+            listOf(
+                ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                    .allEnabledTlsVersions()
+                    .allEnabledCipherSuites()
+                    .build()
+            )
+        )
+    }.build().newCall(this).execute()
+}
+
+fun Request.executeNoSSl(followRedirects: Boolean = true): Response {
+    return NoSSLOkHttpClient.get().newBuilder().apply {
+        followRedirects(followRedirects)
+        connectionSpecs(
+            listOf(
+                ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                    .allEnabledTlsVersions()
+                    .allEnabledCipherSuites()
+                    .build()
+            )
+        )
     }.build().newCall(this).execute()
 }
 

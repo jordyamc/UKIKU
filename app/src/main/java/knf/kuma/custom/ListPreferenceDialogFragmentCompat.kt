@@ -46,23 +46,25 @@ class ListPreferenceDialogFragmentCompat : PreferenceDialogFragmentCompat() {
         outState.putCharSequenceArray(SAVE_STATE_ENTRY_VALUES, mEntryValues)
     }
 
-    override fun onPrepareDialogBuilder(builder: AlertDialog.Builder?) {
+    override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
         super.onPrepareDialogBuilder(builder)
-
-        builder?.setSingleChoiceItems(mEntries, mClickedDialogEntryIndex
+        builder.setSingleChoiceItems(
+            mEntries, mClickedDialogEntryIndex
         ) { dialog, which ->
             mClickedDialogEntryIndex = which
 
             // Clicking on an item simulates the positive button click, and dismisses
             // the dialog.
-            this@ListPreferenceDialogFragmentCompat.onClick(dialog,
-                    DialogInterface.BUTTON_POSITIVE)
+            this@ListPreferenceDialogFragmentCompat.onClick(
+                dialog,
+                DialogInterface.BUTTON_POSITIVE
+            )
             dialog.dismiss()
         }
 
         // The typical interaction for list-based dialogs is to have click-on-an-item dismiss the
         // dialog instead of the user having to press 'Ok'.
-        builder?.setPositiveButton(null, null)
+        builder.setPositiveButton(null, null)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

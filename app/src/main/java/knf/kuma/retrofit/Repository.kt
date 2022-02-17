@@ -29,6 +29,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import java.util.*
 import java.util.concurrent.Executors
 import javax.inject.Singleton
 
@@ -132,7 +133,7 @@ class Repository {
         context: Context,
         link: String,
         persist: Boolean,
-        data: MutableLiveData<AnimeObject?> = MutableLiveData()
+        data: MutableLiveData<AnimeObject?> = MutableLiveData<AnimeObject?>()
     ): LiveData<AnimeObject?> {
         doAsync {
             var cacheUsed = false
@@ -257,7 +258,7 @@ class Repository {
         var tQuery = PatternUtil.getCustomSearch(query).trim { it <= ' ' }
         var fQuery = tQuery
         fQuery = if (fQuery != "") "%$fQuery%" else "%"
-        when (PatternUtil.getCustomAttr(query).toLowerCase()) {
+        when (PatternUtil.getCustomAttr(query).lowercase(Locale.getDefault())) {
             "emision" -> return if (genres == null)
                 CacheDB.INSTANCE.animeDAO().getSearchS(fQuery, "En emisión")
             else

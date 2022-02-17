@@ -2,6 +2,7 @@ package knf.kuma.tv.exoplayer
 
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import android.view.Surface
 import android.view.SurfaceHolder
 import androidx.leanback.media.PlaybackGlueHost
@@ -10,7 +11,7 @@ import androidx.leanback.media.SurfaceHolderGlueHost
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.DiscontinuityReason
 import com.google.android.exoplayer2.util.ErrorMessageProvider
-import com.google.android.exoplayer2.video.VideoListener
+import com.google.android.exoplayer2.video.VideoSize
 
 /**
  * Leanback `PlayerAdapter` implementation for [SimpleExoPlayer].
@@ -25,12 +26,13 @@ class LeanbackPlayerAdapter
  * @param player         Instance of your exoplayer that needs to be configured.
  * @param updatePeriodMs The delay between exoPlayer control updates, in milliseconds.
  */
-(private val context: Context, private val player: SimpleExoPlayer, updatePeriodMs: Int) : PlayerAdapter() {
-    private val handler: Handler = Handler()
+    (private val context: Context, private val player: ExoPlayer, updatePeriodMs: Int) :
+    PlayerAdapter() {
+    private val handler: Handler = Handler(Looper.getMainLooper())
     private val componentListener: ComponentListener
     private val updateProgressRunnable: Runnable
 
-    private var controlDispatcher: ControlDispatcher? = null
+    //private var controlDispatcher: ControlDispatcher? = null
     private var errorMessageProvider: ErrorMessageProvider<in ExoPlaybackException>? = null
     private var surfaceHolderGlueHost: SurfaceHolderGlueHost? = null
     private var hasSurface: Boolean = false
@@ -38,7 +40,7 @@ class LeanbackPlayerAdapter
 
     init {
         componentListener = ComponentListener()
-        controlDispatcher = DefaultControlDispatcher()
+        //controlDispatcher = DefaultControlDispatcher()
         updateProgressRunnable = object : Runnable {
             override fun run() {
                 val callback = callback
@@ -58,12 +60,10 @@ class LeanbackPlayerAdapter
         }
         notifyStateChanged()
         player.addListener(componentListener)
-        player.addVideoListener(componentListener)
     }
 
     override fun onDetachedFromHost() {
         player.removeListener(componentListener)
-        player.removeVideoListener(componentListener)
         surfaceHolderGlueHost?.setSurfaceHolderCallback(null)
         surfaceHolderGlueHost = null
         hasSurface = false
@@ -97,21 +97,25 @@ class LeanbackPlayerAdapter
 
     override fun play() {
         if (player.playbackState == Player.STATE_ENDED) {
-            controlDispatcher?.dispatchSeekTo(player, player.currentWindowIndex, C.TIME_UNSET)
+            player.seekTo(player.currentMediaItemIndex, C.TIME_UNSET)
+            //controlDispatcher?.dispatchSeekTo(player, player.currentWindowIndex, C.TIME_UNSET)
         }
-        if (controlDispatcher?.dispatchSetPlayWhenReady(player, true) == true) {
+        player.play()
+        /*if (player.playWhenReady) {
             callback.onPlayStateChanged(this)
-        }
+        }*/
     }
 
     override fun pause() {
-        if (controlDispatcher?.dispatchSetPlayWhenReady(player, false) == true) {
+        player.pause()
+        /*if (controlDispatcher?.dispatchSetPlayWhenReady(player, false) == true) {
             callback.onPlayStateChanged(this)
-        }
+        }*/
     }
 
     override fun seekTo(positionMs: Long) {
-        controlDispatcher?.dispatchSeekTo(player, player.currentWindowIndex, positionMs)
+        //controlDispatcher?.dispatchSeekTo(player, player.currentWindowIndex, positionMs)
+        player.seekTo(player.currentMediaItemIndex, positionMs)
     }
 
     override fun getBufferedPosition(): Long {
@@ -149,7 +153,7 @@ class LeanbackPlayerAdapter
         }
     }
 
-    private inner class ComponentListener : Player.EventListener, VideoListener, SurfaceHolder.Callback {
+    private inner class ComponentListener : Player.Listener, SurfaceHolder.Callback {
 
         // SurfaceHolder.Callback implementation.
 
@@ -157,7 +161,12 @@ class LeanbackPlayerAdapter
             setVideoSurface(surfaceHolder.surface)
         }
 
-        override fun surfaceChanged(surfaceHolder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        override fun surfaceChanged(
+            surfaceHolder: SurfaceHolder,
+            format: Int,
+            width: Int,
+            height: Int
+        ) {
             // Do nothing.
         }
 
@@ -168,6 +177,7 @@ class LeanbackPlayerAdapter
         // Player.EventListener implementation.
 
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            callback.onPlayStateChanged(this@LeanbackPlayerAdapter)
             notifyStateChanged()
         }
 
@@ -191,9 +201,12 @@ class LeanbackPlayerAdapter
 
         // SimpleExoplayerView.Callback implementation.
 
-        override fun onVideoSizeChanged(width: Int, height: Int, unappliedRotationDegrees: Int,
-                                        pixelWidthHeightRatio: Float) {
-            callback.onVideoSizeChanged(this@LeanbackPlayerAdapter, width, height)
+        override fun onVideoSizeChanged(videoSize: VideoSize) {
+            callback.onVideoSizeChanged(
+                this@LeanbackPlayerAdapter,
+                videoSize.width,
+                videoSize.height
+            )
         }
 
         override fun onRenderedFirstFrame() {

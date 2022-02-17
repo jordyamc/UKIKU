@@ -1,18 +1,13 @@
 package knf.kuma.ads
 
+//import com.appbrain.*
 import android.content.Context
-import android.os.Bundle
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.appbrain.*
-import com.google.firebase.analytics.FirebaseAnalytics
-import knf.kuma.App
-import knf.kuma.commons.Economy
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
-import knf.kuma.custom.BannerContainerView
 import knf.kuma.news.AdNewsObject
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
@@ -20,7 +15,6 @@ import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
@@ -162,7 +156,7 @@ fun ViewGroup.implBannerBrains(unitID: AdsType, isSmart: Boolean = false) {
 fun ViewGroup.implBannerBrains(unitID: String, isSmart: Boolean = false) {
     if (PrefsUtil.isAdsEnabled)
         doOnUI {
-            val adView = AppBrainBanner(context)
+            /*val adView = AppBrainBanner(context)
             adView.bannerListener = object : BannerListener {
                 override fun onClick() {
                     FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
@@ -176,7 +170,7 @@ fun ViewGroup.implBannerBrains(unitID: String, isSmart: Boolean = false) {
             } else {
                 removeAllViews()
                 addView(adView)
-            }
+            }*/
         }
 }
 
@@ -184,7 +178,7 @@ fun getFAdLoaderBrains(context: Context, onUpdate: () -> Unit): FullscreenAdLoad
 
 class FAdLoaderBrains(private val context: Context, onUpdate: () -> Unit) : FullscreenAdLoader {
     var isAdClicked = false
-    private val builder: InterstitialBuilder by lazy {
+    /*private val builder: InterstitialBuilder by lazy {
         InterstitialBuilder.create().apply {
             adId = AdId.DEFAULT
             setOnDoneCallback { builder.preload(context) }
@@ -210,24 +204,24 @@ class FAdLoaderBrains(private val context: Context, onUpdate: () -> Unit) : Full
                 }
             }
         }.also { it.preload(context) }
-    }
+    }*/
 
     override fun load() {
-        builder.preload(context)
+        ///builder.preload(context)
     }
 
     override fun show() {
         if (Network.isAdsBlocked)
             Toaster.toast("Anuncios bloqueados por host")
-        else
-            builder.show(context)
+        /*else
+            builder.show(context)*/
     }
 }
 
 class FAdLoaderInterstitialLazyBrains(val context: AppCompatActivity) : FullscreenAdLoader {
     var isAdClicked = false
 
-    private val builder: InterstitialBuilder by lazy {
+    /*private val builder: InterstitialBuilder by lazy {
         InterstitialBuilder.create().apply {
             adId = AdId.DEFAULT
             setOnDoneCallback { builder.preload(context) }
@@ -252,14 +246,14 @@ class FAdLoaderInterstitialLazyBrains(val context: AppCompatActivity) : Fullscre
                 }
             }
         }
-    }
+    }*/
 
     init {
         load()
     }
 
     override fun load() {
-        builder.preload(context)
+        //builder.preload(context)
     }
 
     override fun show() {
@@ -268,10 +262,10 @@ class FAdLoaderInterstitialLazyBrains(val context: AppCompatActivity) : Fullscre
         else
             context.lifecycleScope.launch(Dispatchers.Main) {
                 var tryCount = 11
-                while (!builder.show(context)) {
+                /*while (!builder.show(context)) {
                     delay(250)
                     tryCount--
-                }
+                }*/
             }
     }
 }

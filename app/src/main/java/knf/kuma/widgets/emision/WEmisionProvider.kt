@@ -64,17 +64,34 @@ class WEmisionProvider : AppWidgetProvider() {
 
     private suspend fun updateWidgetListView(context: Context, appWidgetId: Int): RemoteViews {
         val remoteViews = RemoteViews(context.packageName,
-                R.layout.widget_emision)
+            R.layout.widget_emision
+        )
         val svcIntent = Intent(context, WEmissionService::class.java)
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         svcIntent.data = Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(R.id.words, svcIntent)
-        val clickIntent = if (DesignUtils.isFlat) Intent(context, EmissionActivityMaterial::class.java) else Intent(context, EmissionActivity::class.java)
+        val clickIntent = if (DesignUtils.isFlat) Intent(
+            context,
+            EmissionActivityMaterial::class.java
+        ) else Intent(context, EmissionActivity::class.java)
         remoteViews.setTextViewText(R.id.title_day, actualDay)
         remoteViews.setTextColor(R.id.title_day, getColor(context, true))
-        remoteViews.setTextViewText(R.id.title_count, withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context)).size.toString() })
+        remoteViews.setTextViewText(
+            R.id.title_count,
+            withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.animeDAO()
+                    .getByDayDirect(actualDayCode, getBlacklist(context)).size.toString()
+            })
         remoteViews.setTextColor(R.id.title_count, getColor(context, true))
-        remoteViews.setOnClickPendingIntent(R.id.back_layout, PendingIntent.getActivity(context, 555, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+        remoteViews.setOnClickPendingIntent(
+            R.id.back_layout,
+            PendingIntent.getActivity(
+                context,
+                555,
+                clickIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        )
         remoteViews.setInt(R.id.back_layout, "setBackgroundColor", getColor(context, false))
         remoteViews.setEmptyView(R.id.words, R.id.empty)
         return remoteViews

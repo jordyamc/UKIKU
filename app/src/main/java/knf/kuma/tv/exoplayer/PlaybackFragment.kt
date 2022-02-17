@@ -8,19 +8,20 @@ import android.os.Bundle
 import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
 import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
 
 class PlaybackFragment : VideoSupportFragment() {
     private var mPlayerGlue: VideoPlayerGlue? = null
     private var mPlayerAdapter: LeanbackPlayerAdapter? = null
-    private var mPlayer: SimpleExoPlayer? = null
+    private var mPlayer: ExoPlayer? = null
     private var mTrackSelector: TrackSelector? = null
     private var mVideo: Video? = null
 
@@ -67,10 +68,11 @@ class PlaybackFragment : VideoSupportFragment() {
     private fun initializePlayer() {
         val bandwidthMeter = DefaultBandwidthMeter.Builder(requireContext()).build()
         val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
-        mTrackSelector = DefaultTrackSelector(requireContext(),videoTrackSelectionFactory)
-
-        mPlayer = SimpleExoPlayer.Builder(requireContext(),DefaultRenderersFactory(requireContext())).build()
-        mPlayerAdapter = LeanbackPlayerAdapter(activity as Context, mPlayer as SimpleExoPlayer, UPDATE_DELAY)
+        mTrackSelector = DefaultTrackSelector(requireContext(), videoTrackSelectionFactory)
+        mPlayer =
+            ExoPlayer.Builder(requireContext(), DefaultRenderersFactory(requireContext())).build()
+        mPlayerAdapter =
+            LeanbackPlayerAdapter(activity as Context, mPlayer as ExoPlayer, UPDATE_DELAY)
         mPlayerGlue = VideoPlayerGlue(activity as Context, mPlayerAdapter as LeanbackPlayerAdapter)
         mPlayerGlue?.host = VideoSupportFragmentGlueHost(this)
         mPlayerGlue?.playWhenPrepared()
@@ -97,13 +99,12 @@ class PlaybackFragment : VideoSupportFragment() {
         activity?.let {
             val userAgent = Util.getUserAgent(it, "UKIKU")
             val mediaSource = ProgressiveMediaSource.Factory(
-                    DefaultHttpDataSourceFactory(userAgent, null, 10000, 10000, true).apply {
-                        headers?.forEach { header ->
-                            defaultRequestProperties.set(header.key, header.value)
-                        }
-                    })
-                    .createMediaSource(mediaSourceUri)
-            mPlayer?.prepare(mediaSource)
+                DefaultHttpDataSource.Factory().apply {
+                    setUserAgent(userAgent)
+                    setDefaultRequestProperties(headers ?: emptyMap())
+                }).createMediaSource(MediaItem.fromUri(mediaSourceUri))
+            mPlayer?.setMediaSource(mediaSource)
+            mPlayer?.prepare()
         }
     }
 

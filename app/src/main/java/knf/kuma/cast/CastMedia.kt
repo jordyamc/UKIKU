@@ -14,10 +14,10 @@ import knf.kuma.recents.RecentModel
 
 data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo) {
 
-    val title: String get() = mediaInfo.metadata.getString(MediaMetadata.KEY_TITLE)
-    val subTitle: String get() = mediaInfo.metadata.getString(MediaMetadata.KEY_SUBTITLE)
-    val image: String get() = mediaInfo.metadata.images[0].url.toString()
-    val type: String get() = mediaInfo.contentType
+    val title: String get() = mediaInfo.metadata?.getString(MediaMetadata.KEY_TITLE)!!
+    val subTitle: String get() = mediaInfo.metadata?.getString(MediaMetadata.KEY_SUBTITLE)!!
+    val image: String get() = mediaInfo.metadata?.images!![0].url.toString()
+    val type: String get() = mediaInfo.contentType!!
 
     companion object {
         fun create(chapter: AnimeObject.WebInfo.AnimeChapter?, url: String? = null): CastMedia? {
@@ -32,12 +32,12 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
                 else -> url
             }
-            val mediaInfo = MediaInfo.Builder(fUrl).apply {
+            val mediaInfo = MediaInfo.Builder(fUrl!!).apply {
                 setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 setContentType("video/mp4")
                 setMetadata(metadata)
             }
-            return CastMedia(fUrl ?: "", chapter.eid, mediaInfo.build())
+            return CastMedia(fUrl, chapter.eid, mediaInfo.build())
         }
 
         fun create(recent: RecentObject?, url: String? = null): CastMedia? {
@@ -52,12 +52,12 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
                 else -> url
             }
-            val mediaInfo = MediaInfo.Builder(fUrl).apply {
+            val mediaInfo = MediaInfo.Builder(fUrl!!).apply {
                 setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 setContentType("video/mp4")
                 setMetadata(metadata)
             }
-            return CastMedia(fUrl ?: "", recent.eid, mediaInfo.build())
+            return CastMedia(fUrl, recent.eid, mediaInfo.build())
         }
 
         fun create(recent: RecentModel?, url: String? = null): CastMedia? {
@@ -72,12 +72,12 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
                 else -> url
             }
-            val mediaInfo = MediaInfo.Builder(fUrl).apply {
+            val mediaInfo = MediaInfo.Builder(fUrl!!).apply {
                 setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 setContentType("video/mp4")
                 setMetadata(metadata)
             }
-            return CastMedia(fUrl ?: "", recent.extras.eid, mediaInfo.build())
+            return CastMedia(fUrl, recent.extras.eid, mediaInfo.build())
         }
 
         fun create(fileDownObj: ExplorerObject.FileDownObj?): CastMedia? {
@@ -87,13 +87,16 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 putString(MediaMetadata.KEY_SUBTITLE, "Episodio ${fileDownObj.chapter}")
                 addImage(WebImage(Uri.parse(fileDownObj.chapPreviewLink)))
             }
-            val url = SelfServer.start(fileDownObj.fileName.substring(fileDownObj.fileName.indexOf("$")), true)
-            val mediaInfo = MediaInfo.Builder(url).apply {
+            val url = SelfServer.start(
+                fileDownObj.fileName.substring(fileDownObj.fileName.indexOf("$")),
+                true
+            )
+            val mediaInfo = MediaInfo.Builder(url!!).apply {
                 setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
                 setContentType("video/mp4")
                 setMetadata(metadata)
             }
-            return CastMedia(url ?: "", fileDownObj.eid, mediaInfo.build())
+            return CastMedia(url, fileDownObj.eid, mediaInfo.build())
         }
     }
 

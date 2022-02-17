@@ -1,7 +1,10 @@
 package knf.kuma.pojos
 
 import android.util.Log
-import knf.kuma.commons.*
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.isFullMode
+import knf.kuma.commons.jsoupCookies
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import pl.droidsonroids.jspoon.Jspoon
@@ -17,10 +20,11 @@ class DirectoryPage {
             if (Network.isConnected) {
                 if (!animeDAO.existLink("%animeflv.net$link")) {
                     try {
-                        val response = okHttpCookies("https://animeflv.net$link").execute(followRedirects = true)
-                        val body = response.body?.string()
-                        if (response.code == 200 && body != null) {
-                            val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
+                        val response = jsoupCookies("https://animeflv.net$link", true).execute()
+                        val body = response.body()
+                        if (response.statusCode() == 200 && body != null) {
+                            val webInfo =
+                                jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
                             if (isFullMode && !PrefsUtil.isFamilyFriendly) {
                                 animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
                                 Log.e("Directory Getter", "Added: https://animeflv.net$link")
@@ -38,9 +42,9 @@ class DirectoryPage {
                                 }
                             }
                             updateInterface.onAdd()
-                        } else if (response.code == 404) {
+                        } else if (response.statusCode() == 404) {
                             CacheDB.INSTANCE.animeDAO().allLinksInEmission
-                        } else check(response.code < 400) { "Response code: ${response.code}" }
+                        } else check(response.statusCode() < 400) { "Response code: ${response.statusCode()}" }
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Log.e("Directory Getter", "Error adding: https://animeflv.net" + link + "\nCause: " + e.message)

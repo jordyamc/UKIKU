@@ -9,6 +9,7 @@ import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
+import knf.kuma.custom.SSLManager
 import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryService
 import knf.kuma.jobscheduler.DirUpdateWork
@@ -38,6 +39,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SSLManager.disable()
         if (!isTV) {
             finish()
             startActivity(Intent(this, DesignUtils.mainClass))

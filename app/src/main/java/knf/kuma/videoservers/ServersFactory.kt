@@ -39,6 +39,7 @@ import org.json.JSONObject
 import xdroid.toaster.Toaster
 import java.net.URLDecoder
 import java.util.*
+import kotlin.math.abs
 
 
 class ServersFactory {
@@ -100,14 +101,20 @@ class ServersFactory {
                     showOptions(server, isCasting)
                 } else {
                     saveLastServer(text)
-                    when (text.toLowerCase()) {
+                    when (text.lowercase(Locale.getDefault())) {
                         "mega d", "mega s" -> {
                             try {
                                 CustomTabsIntent.Builder()
-                                        .setToolbarColor(Color.parseColor("#DA252D"))
-                                        .setShowTitle(true).build().launchUrl(context, Uri.parse(server.option.url))
+                                    .setToolbarColor(Color.parseColor("#DA252D"))
+                                    .setShowTitle(true).build()
+                                    .launchUrl(context, Uri.parse(server.option.url))
                             } catch (e: Exception) {
-                                this@ServersFactory.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(server.option.url)))
+                                this@ServersFactory.context.startActivity(
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse(server.option.url)
+                                    )
+                                )
                             }
                             callOnFinish(false, false)
                         }
@@ -508,17 +515,26 @@ class ServersFactory {
         fun getPlayIntent(context: Context, title: String, file_name: String): PendingIntent {
             val file = FileAccessHelper.getFile(file_name)
             return if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
-                PendingIntent.getActivity(context, Math.abs(file_name.hashCode()),
-                        PrefsUtil.getPlayerIntent()
-                                .setData(FileAccessHelper.getFileUri(file_name)).putExtra("isFile", true)
-                                .putExtra("title", getEpTitle(title, file_name))
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_UPDATE_CURRENT)
+                PendingIntent.getActivity(
+                    context,
+                    abs(file_name.hashCode()),
+                    PrefsUtil.getPlayerIntent()
+                        .setData(FileAccessHelper.getFileUri(file_name)).putExtra("isFile", true)
+                        .putExtra("title", getEpTitle(title, file_name))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             } else {
                 val intent = Intent(Intent.ACTION_VIEW, FileAccessHelper.getDataUri(file_name))
-                        .setDataAndType(FileAccessHelper.getDataUri(file_name), "video/mp4")
-                        .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra("title", getEpTitle(title, file_name))
-                PendingIntent.getActivity(context, Math.abs(file_name.hashCode()), intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    .setDataAndType(FileAccessHelper.getDataUri(file_name), "video/mp4")
+                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .putExtra("title", getEpTitle(title, file_name))
+                PendingIntent.getActivity(
+                    context,
+                    abs(file_name.hashCode()),
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             }
         }
     }

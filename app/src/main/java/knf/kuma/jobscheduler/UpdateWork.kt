@@ -51,7 +51,14 @@ class UpdateWork(val context: Context, workerParameters: WorkerParameters) : Wor
                 setSmallIcon(R.drawable.ic_not_update)
                 setContentTitle("UKIKU")
                 setContentText("Nueva versión disponible")
-                setContentIntent(PendingIntent.getActivity(context, 5598, Intent(context, DesignUtils.mainClass), PendingIntent.FLAG_UPDATE_CURRENT))
+                setContentIntent(
+                    PendingIntent.getActivity(
+                        context,
+                        5598,
+                        Intent(context, DesignUtils.mainClass),
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
                 color = ContextCompat.getColor(context, R.color.colorAccent)
             }.build()
             context.notificationManager.notify(954857, notification)

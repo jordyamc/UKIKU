@@ -127,10 +127,12 @@ class AnimeSlice : SliceProvider() {
             if (query != null) {
                 SliceAction.create(
                         PendingIntent.getActivity(
-                                context, 0,
-                                Intent(context, DesignUtils.mainClass)
-                                        .putExtra("start_position", 4)
-                                        .putExtra("search_query", query), PendingIntent.FLAG_CANCEL_CURRENT
+                            context,
+                            0,
+                            Intent(context, DesignUtils.mainClass)
+                                .putExtra("start_position", 4)
+                                .putExtra("search_query", query),
+                            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
                         ),
                         AnimeLoad.searchIcon,
                         ListBuilder.ICON_IMAGE,
@@ -149,11 +151,14 @@ class AnimeSlice : SliceProvider() {
         else
             SliceAction.create(
                     PendingIntent.getActivity(
-                            context, animeObject.key, Intent(context, DesignUtils.infoClass)
+                        context,
+                        animeObject.key,
+                        Intent(context, DesignUtils.infoClass)
                             .setData(Uri.parse(animeObject.link))
                             .putExtra("title", animeObject.name)
                             .putExtra("aid", animeObject.aid)
-                            .putExtra("img", PatternUtil.getCover(animeObject.aid)), PendingIntent.FLAG_CANCEL_CURRENT
+                            .putExtra("img", PatternUtil.getCover(animeObject.aid)),
+                        PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     ),
                     IconCompat.createWithResource(context, R.drawable.ic_open),
                     ListBuilder.ICON_IMAGE,
@@ -164,12 +169,16 @@ class AnimeSlice : SliceProvider() {
     private fun createOpenAnimeAction(animeObject: AnimeSliceObject?): SliceAction {
         return SliceAction.create(
                 PendingIntent.getActivity(
-                        context, animeObject?.key ?: 0, Intent(context, DesignUtils.infoClass)
+                    context, animeObject?.key ?: 0, Intent(context, DesignUtils.infoClass)
                         .setData(Uri.parse(animeObject?.link ?: ""))
                         .putExtra("title", animeObject?.name ?: "")
                         .putExtra("aid", animeObject?.aid ?: "")
-                        .putExtra("img", PatternUtil.getCover(animeObject?.aid
-                                ?: "")), PendingIntent.FLAG_CANCEL_CURRENT
+                        .putExtra(
+                            "img", PatternUtil.getCover(
+                                animeObject?.aid
+                                    ?: ""
+                            )
+                        ), PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 ),
                 AnimeLoad.openIcon,
                 ListBuilder.ICON_IMAGE,

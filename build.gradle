@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.0-beta02'
+        classpath 'com.android.tools.build:gradle:7.1.1'
         classpath 'com.google.gms:google-services:4.3.10'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:$dokka_version"
@@ -31,6 +31,12 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
+        maven {
+            url "https://artifactory.appodeal.com/appodeal"
+        }
+        maven {
+            url 'https://swisscodemonkeys.github.io/appbrain-sdk/maven'
+        }
     }
 }
 

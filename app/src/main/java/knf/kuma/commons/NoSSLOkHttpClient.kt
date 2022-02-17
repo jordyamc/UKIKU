@@ -43,10 +43,15 @@ object NoSSLOkHttpClient {
                 readTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
                 hostnameVerifier { _, _ -> /*isHostValid(hostName)*/ true }
-                connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                        .allEnabledTlsVersions()
-                        .allEnabledCipherSuites()
-                        .build()))
+                connectionSpecs(
+                    listOf(
+                        ConnectionSpec.CLEARTEXT,
+                        ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                            .allEnabledTlsVersions()
+                            .allEnabledCipherSuites()
+                            .build()
+                    )
+                )
             }
             return builder.build()
         } catch (e: Exception) {

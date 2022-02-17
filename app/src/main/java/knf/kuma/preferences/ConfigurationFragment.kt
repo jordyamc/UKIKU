@@ -121,16 +121,29 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                                         val autoBackupObject = it as? AutoBackupObject
                                         if (autoBackupObject != null) {
                                             if (autoBackupObject == AutoBackupObject(activity))
-                                                preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "%s"
+                                                preferenceScreen.findPreference<Preference>(
+                                                    keyAutoBackup
+                                                )?.summary = "%s"
                                             else
-                                                preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "Solo " + autoBackupObject.name
+                                                preferenceScreen.findPreference<Preference>(
+                                                    keyAutoBackup
+                                                )?.summary = "Solo " + autoBackupObject.name
                                             if (autoBackupObject.value == null)
                                                 GlobalScope.launch(Dispatchers.Main) {
-                                                    Backups.createService()?.backup(AutoBackupObject(App.context), Backups.keyAutoBackup)
-                                                    preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "%s"
+                                                    Backups.createService()?.backup(
+                                                        AutoBackupObject(App.context),
+                                                        Backups.keyAutoBackup
+                                                    )
+                                                    preferenceScreen.findPreference<Preference>(
+                                                        keyAutoBackup
+                                                    )?.summary = "%s"
                                                 }
                                             else
-                                                preferenceManager.sharedPreferences.edit().putString(keyAutoBackup, autoBackupObject.value).apply()
+                                                preferenceManager.sharedPreferences?.edit()
+                                                    ?.putString(
+                                                        keyAutoBackup,
+                                                        autoBackupObject.value
+                                                    )?.apply()
                                         } else {
                                             preferenceScreen.findPreference<Preference>(keyAutoBackup)?.summary = "%s (NE)"
                                         }
@@ -172,10 +185,15 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 } else {
                     preferenceScreen.removePreferenceRecursively("download_type_q")
                     preferenceScreen.findPreference<Preference>("download_type")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                        if (newValue == "1" && !FileAccessHelper.canDownload(this@ConfigurationFragment, newValue as? String))
+                        if (newValue == "1" && !FileAccessHelper.canDownload(
+                                this@ConfigurationFragment,
+                                newValue as? String
+                            )
+                        )
                             Toaster.toast("Por favor selecciona la raiz de tu SD")
                         else
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("tree_uri", null).apply()
+                            PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+                                .putString("tree_uri", null).apply()
                         true
                     }
                 }
@@ -346,7 +364,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     false
                 }
                 if (!canGroupNotifications)
-                    preferenceScreen.removePreference(preferenceScreen.findPreference("group_notifications"))
+                    preferenceScreen.removePreference(preferenceScreen.findPreference("group_notifications")!!)
                 preferenceScreen.findPreference<Preference>("dir_destroy")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     try {
                         if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
@@ -380,9 +398,10 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                             true
                         }
                     0 -> {
-                        val category = preferenceScreen.findPreference("category_design") as? PreferenceCategory
-                        category?.removePreference(preferenceScreen.findPreference(keyThemeColor))
-                        val pref = Preference(activity)
+                        val category =
+                            preferenceScreen.findPreference("category_design") as? PreferenceCategory
+                        category?.removePreference(preferenceScreen.findPreference(keyThemeColor)!!)
+                        val pref = Preference(requireContext())
                         pref.title = "Color de tema"
                         pref.summary = "Resuelve el secreto para desbloquear"
                         pref.setIcon(R.drawable.ic_palette)

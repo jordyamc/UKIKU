@@ -129,18 +129,40 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
             val tone = FileAccessHelper.toneFile
             if (tone.exists())
                 setSound(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            val uri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tone)
-                            context.grantUriPermission("com.android.systemui", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            uri
-                        } else
-                            Uri.fromFile(tone)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val uri: Uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            tone
+                        )
+                        context.grantUriPermission(
+                            "com.android.systemui",
+                            uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                        uri
+                    } else
+                        Uri.fromFile(tone)
                 )
             setLargeIcon(getBitmap(recentObject))
             setAutoCancel(true)
             setOnlyAlertOnce(true)
-            setContentIntent(PendingIntent.getActivity(context, System.currentTimeMillis().toInt(), getAnimeIntent(animeObject, obj), PendingIntent.FLAG_UPDATE_CURRENT))
-            setDeleteIntent(PendingIntent.getBroadcast(context, System.currentTimeMillis().toInt(), obj.getBroadcast(context), PendingIntent.FLAG_UPDATE_CURRENT))
+            setContentIntent(
+                PendingIntent.getActivity(
+                    context,
+                    System.currentTimeMillis().toInt(),
+                    getAnimeIntent(animeObject, obj),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    context,
+                    System.currentTimeMillis().toInt(),
+                    obj.getBroadcast(context),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
             if (isFullMode && !PrefsUtil.isFamilyFriendly)
                 addAction(
                     android.R.drawable.stat_sys_download_done,
@@ -149,7 +171,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
                         context,
                         System.currentTimeMillis().toInt(),
                         getChapIntent(recentObject, obj),
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                 )
             setGroup(RECENTS_GROUP)
@@ -207,15 +229,29 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) : Wo
 
     private fun notifySummary() {
         val notification = NotificationCompat.Builder(context, CHANNEL_RECENTS)
-                .setSmallIcon(R.drawable.ic_recents_group)
-                .setColor(ContextCompat.getColor(context, R.color.colorAccent))
-                .setContentTitle("Nuevos capitulos")
-                .setContentText("Hay nuevos capitulos recientes!!")
-                .setGroupSummary(true)
-                .setGroup(RECENTS_GROUP)
-                .setAutoCancel(true)
-                .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, DesignUtils.mainClass), PendingIntent.FLAG_CANCEL_CURRENT))
-                .setDeleteIntent(PendingIntent.getBroadcast(context, System.currentTimeMillis().toInt(), summaryBroadcast, PendingIntent.FLAG_UPDATE_CURRENT))
+            .setSmallIcon(R.drawable.ic_recents_group)
+            .setColor(ContextCompat.getColor(context, R.color.colorAccent))
+            .setContentTitle("Nuevos capitulos")
+            .setContentText("Hay nuevos capitulos recientes!!")
+            .setGroupSummary(true)
+            .setGroup(RECENTS_GROUP)
+            .setAutoCancel(true)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    Intent(context, DesignUtils.mainClass),
+                    PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            .setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    context,
+                    System.currentTimeMillis().toInt(),
+                    summaryBroadcast,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
                 .build()
         if (PrefsUtil.isGroupingEnabled)
             manager.notify(KEY_SUMMARY, notification)
