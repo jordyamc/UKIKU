@@ -82,7 +82,6 @@ import knf.kuma.updater.UpdateChecker
 import kotlinx.android.synthetic.main.activity_main_material.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -113,8 +112,7 @@ class MainMaterial : GenericActivity(),
     private var readyToFinish = false
     private var isFirst = true
 
-    @ExperimentalCoroutinesApi
-    @ExperimentalContracts
+    @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeNA())
         super.onCreate(savedInstanceState)

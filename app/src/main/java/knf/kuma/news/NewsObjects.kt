@@ -1,12 +1,17 @@
 package knf.kuma.news
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
+import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.paging.*
 import androidx.recyclerview.widget.DiffUtil
 import knf.kuma.commons.NoSSLOkHttpClient
+import knf.kuma.commons.safeContext
 import knf.kuma.commons.toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,27 +26,29 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
+@Keep
 class NewsItem {
-    @Selector("header h2")
+    @Selector("header h2", defValue = "")
     lateinit var title: String
 
-    @Selector("header span.typ")
+    @Selector("header span.typ", defValue = "")
     lateinit var type: String
 
-    @Selector("header span.db.op5")
+    @Selector("header span.db.op5", defValue = "")
     lateinit var date: String
 
-    @Selector("img", converter = ImageConverter::class)
+    @Selector(":root", converter = ImageConverter::class)
     lateinit var image: String
 
-    @Selector("a", attr = "href")
+    @Selector("a", attr = "href", defValue = "")
     lateinit var link: String
 
     class ImageConverter : ElementConverter<String> {
         override fun convert(node: Element, selector: Selector): String {
+            val image = node.select("figure img,figure amp-img").ifEmpty { return "" }.first()
             return when {
-                node.hasAttr("data-src") -> node.attr("data-src")
-                node.hasAttr("src") -> node.attr("src")
+                image.hasAttr("data-src") -> image.attr("data-src")
+                image.hasAttr("src") -> image.attr("src")
                 else -> ""
             }
         }
@@ -89,8 +96,12 @@ class NewsDataSource(private val newsFactory: NewsFactory, val category: String,
                 onInit(true, "$errorString")
             return LoadResult.Error(IllegalStateException())
         }catch (e:Exception){
-            if (page == 1)
+            if (page == 1) {
                 onInit(true, "${e.message}")
+                safeContext.getSystemService<ClipboardManager>()?.apply {
+                    setPrimaryClip(ClipData.newPlainText("News", e.stackTraceToString()))
+                }
+            }
             return LoadResult.Error(e)
         }
     }
@@ -123,6 +134,8 @@ object NewsRepository {
 fun openNews(activity: AppCompatActivity, newsItem: NewsItem) {
     try {
         NewsDialog.show(activity, newsItem.link)
+        //CommentariesDialog.show(activity, newsItem.link)
+        //CustomTabsIntent.Builder().build().launchUrl(activity, newsItem.link.toUri())
     } catch (e: ActivityNotFoundException) {
         try {
             activity.startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(newsItem.link)))

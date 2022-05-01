@@ -1,5 +1,7 @@
 package knf.kuma.pojos;
 
+import static java.lang.Math.abs;
+
 import android.text.TextUtils;
 
 import androidx.annotation.Keep;
@@ -35,7 +37,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import knf.kuma.ads.AdsUtils;
 import knf.kuma.animeinfo.AnimeInfo;
 import knf.kuma.animeinfo.ktx.ExtensionsKt;
 import knf.kuma.commons.ExtensionUtilsKt;
@@ -395,12 +396,12 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                     String full = element.select("a").first().text();
                     this.number = "Episodio " + extract(full, "^.* (\\d+\\.?\\d*):?.*$");
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
-                    this.eid = String.valueOf((aid + number).hashCode());
+                    this.eid = String.valueOf(abs((aid + number).hashCode()));
                 } else {
                     this.chapterType = ChapterType.NEW;
                     this.number = element.select("p").first().ownText();
                     this.link = "https://animeflv.net" + element.select("a").first().attr("href");
-                    this.eid = String.valueOf((aid + number).hashCode());
+                    this.eid = String.valueOf(abs((aid + number).hashCode()));
                     this.img = element.select("img.lazy").first().attr("src");
                 }
                 this.aid = aid;
@@ -415,7 +416,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.aid = info.getAid();
                 this.number = "Episodio " + num;
                 this.link = "https://animeflv.net/ver/" + info.getSid() + "-" + num;
-                this.eid = String.valueOf((aid + number).hashCode());
+                this.eid = String.valueOf(abs((aid + number).hashCode()));
                 this.img = "https://cdn.animeflv.net/screenshots/" + info.getAid() + "/" + num + "/th_3.jpg";
                 this.key = (aid + number).hashCode();
                 this.fileWrapper = FileWrapper.Companion.create(ExtensionsKt.getFilePath(this));
@@ -472,12 +473,12 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 return chapters;
             }
 
-            public String commentariesLink() {
+            public String commentariesLink(String version) {
                 try {
-                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(ExtensionUtilsKt.resolveRedirection(link, 0), "UTF-8") + "&s_o=default#version=" + AdsUtils.INSTANCE.getRemoteConfigs().getString("disqus_version");
+                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(ExtensionUtilsKt.resolveRedirection(link, 0), "UTF-8") + "&s_o=default#version=" + version;
                 } catch (Exception e) {
                     try {
-                        return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(link, "UTF-8") + "&s_o=default#version=" + AdsUtils.INSTANCE.getRemoteConfigs().getString("disqus_version");
+                        return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(link, "UTF-8") + "&s_o=default#version=" + version;
                     } catch (Exception ex) {
                         return link;
                     }

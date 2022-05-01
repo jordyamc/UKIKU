@@ -53,7 +53,7 @@ class TopActivityMaterial : GenericActivity() {
         }()
     }
 
-    @ExperimentalContracts
+    @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)

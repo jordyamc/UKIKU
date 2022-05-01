@@ -5,7 +5,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.doOnUI
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.tv.TVBaseActivity
@@ -21,7 +22,6 @@ class StreamTvActivity : TVBaseActivity() {
     private lateinit var downloadObject: DownloadObject
     private var serversFactory: TVServersFactory? = null
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeDialog())
         super.onCreate(savedInstanceState)

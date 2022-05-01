@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -25,7 +26,11 @@ class NewsDialog : BottomSheetDialogFragment(), LifecycleObserver {
         val rootView = inflater.inflate(R.layout.lay_news, container, false)
         doOnUI {
             rootView.webview.apply {
+                setInitialScale(1)
+                settings.useWideViewPort = true
+                settings.loadWithOverviewMode = true
                 settings.javaScriptEnabled = true
+                webViewClient = WebViewClient()
                 loadUrl(link)
             }
         }

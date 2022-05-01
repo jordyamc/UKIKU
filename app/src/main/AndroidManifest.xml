@@ -295,7 +295,6 @@
         </receiver>
         <receiver android:name=".download.DownloadReceiver" />
         <receiver android:name=".recents.RecentsNotReceiver" />
-        <receiver android:name=".slices.AnimeLoad" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -454,22 +453,6 @@
                     android:scheme="ukiku" />
             </intent-filter>
         </activity>
-
-        <provider
-            android:name=".slices.AnimeSlice"
-            android:authorities="${applicationId}.slices"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.app.slice.category.SLICE" />
-
-                <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/anime"
-                    android:scheme="https" />
-            </intent-filter>
-        </provider>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

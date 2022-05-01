@@ -17,7 +17,6 @@ import knf.kuma.uagen.randomUA
 import knh.kuma.commons.cloudflarebypass.util.ConvertUtil
 import java.net.HttpCookie
 import java.util.*
-import kotlin.collections.LinkedHashSet
 
 @SuppressLint("StaticFieldLeak")
 object PrefsUtil {
@@ -59,8 +58,11 @@ object PrefsUtil {
                 PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled_new", true)
 
     val downloaderType: Int
-        get() = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("downloader_type", "1")
-                ?: "1")
+        get() = Integer.parseInt(
+            PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("downloader_type", null)
+                ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isMIUI(safeContext)) "0" else "1"
+        )
 
     var autoBackupTime: String
         get() = PreferenceManager.getDefaultSharedPreferences(context).getString("auto_backup", "0")

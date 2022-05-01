@@ -271,8 +271,6 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
         }
     }
 
-    @ExperimentalCoroutinesApi
-    @ExperimentalContracts
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         activity?.let { FirestoreManager.handleLogin(it, requestCode, resultCode, data) }

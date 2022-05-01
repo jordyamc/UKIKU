@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
@@ -19,6 +20,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.R
 import knf.kuma.commons.BypassUtil
@@ -37,7 +39,7 @@ import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
 class CustomExoPlayer : GenericActivity(), Player.Listener {
-    private var exoPlayer: SimpleExoPlayer? = null
+    private var exoPlayer: ExoPlayer? = null
     private lateinit var playerState: PlayerState
     private var isEnding = false
     private var playList: List<QueueObject> = ArrayList()
@@ -108,6 +110,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                                 .getAllByAid(intent.getStringExtra("playlist") ?: "empty")
                         }
                         noCrash { video_title.text = playList[0].title() }
+                        DefaultHttpDataSource.Factory()
                         for (queueObject in playList) {
                             sourceList.add(
                                 ProgressiveMediaSource.Factory(
@@ -121,21 +124,25 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                             )
                         }
                         sourceList
-                    } else
-                        listOf(
-                            ProgressiveMediaSource.Factory(
-                                DefaultDataSourceFactory(
-                                    this@CustomExoPlayer,
-                                    BypassUtil.userAgent,
-                                    null
-                                )
-                            ).createMediaSource(
-                                MediaItem.fromUri(
-                                    intent.data ?: Uri.parse("")
-                                )
-                            ).mediaItem
-                        )
-                exoPlayer = SimpleExoPlayer.Builder(this@CustomExoPlayer).build()
+                    } else {
+                        if (intent.getBooleanExtra("isFile", false)) {
+                            listOf(MediaItem.fromUri(intent.data ?: Uri.parse("")))
+                        } else {
+                            listOf(
+                                ProgressiveMediaSource.Factory(
+                                    DefaultHttpDataSource.Factory().apply {
+                                        setUserAgent(BypassUtil.userAgent)
+                                        setAllowCrossProtocolRedirects(true)
+                                    }
+                                ).createMediaSource(
+                                    MediaItem.fromUri(
+                                        intent.data ?: Uri.parse("")
+                                    )
+                                ).mediaItem
+                            )
+                        }
+                    }
+                exoPlayer = ExoPlayer.Builder(this@CustomExoPlayer).build()
                 player.player = exoPlayer
                 exoPlayer?.addListener(this@CustomExoPlayer)
                 exoPlayer?.setMediaItems(sources)
@@ -179,11 +186,17 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     }
 
     private fun onSkip() {
-        exoPlayer?.seekTo(exoPlayer?.currentWindowIndex ?: 0, (exoPlayer?.currentPosition
-                ?: 0) + 85000)
+        exoPlayer?.seekTo(
+            exoPlayer?.currentWindowIndex ?: 0, (exoPlayer?.currentPosition
+                ?: 0) + 85000
+        )
     }
 
-    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         if (!isInPictureInPictureMode) {
             runOnUiThread {
@@ -296,6 +309,12 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
             "Error al reproducir: " + error.message?.replace("%", "%%"),
             emptyArray<Any>()
         )
+        /*MaterialDialog(this).show {
+            message(text = error.stackTraceToString().also {
+                (getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.setPrimaryClip(ClipData.newPlainText("stack", it))
+            })
+            positiveButton(text = "OK")
+        }*/
         FirebaseCrashlytics.getInstance().recordException(error)
         finish()
     }

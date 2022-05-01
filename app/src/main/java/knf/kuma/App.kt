@@ -22,8 +22,6 @@ import knf.kuma.jobscheduler.BackUpWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.widgets.emision.WEmissionService
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlin.contracts.ExperimentalContracts
 
 class App : Application(), Configuration.Provider {
     //private lateinit var appCoinsAds: AppCoinsAds
@@ -86,8 +84,6 @@ class App : Application(), Configuration.Provider {
 
     override fun getWorkManagerConfiguration() = Configuration.Builder().build()
 
-    @ExperimentalCoroutinesApi
-    @ExperimentalContracts
     override fun onCreate() {
         super.onCreate()
         context = this

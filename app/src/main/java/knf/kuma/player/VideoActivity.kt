@@ -14,6 +14,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -113,7 +114,6 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.e("Player", "OnSaveInstance")
         if (::playerHolder.isInitialized) {
             playerHolder.saveState()
             outState.putInt("window", playerState.window)
@@ -318,15 +318,20 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && ::playerHolder.isInitialized && playerHolder.audioFocusPlayer.playWhenReady && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             noCrash {
                 enterPictureInPictureMode(
-                        with(PictureInPictureParams.Builder()) {
-                            //setAspectRatio(Rational(16, 9))
-                            build()
-                        })
+                    with(PictureInPictureParams.Builder()) {
+                        //setAspectRatio(Rational(16, 9))
+                        build()
+                    })
             }
         }
     }
 
-    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         if (::playerHolder.isInitialized)
             playerHolder.saveState()
         player.useController = !isInPictureInPictureMode
@@ -336,7 +341,10 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback, PreviewLoa
         previewFuture?.cancel(true)
         previewFuture = doAsync {
             requestedFrame = currentPosition
-            val bitmap = playerHolder.retriever.getFrameAtTime(currentPosition * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+            val bitmap = playerHolder.retriever.getFrameAtTime(
+                currentPosition * 1000,
+                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+            )
             if (requestedFrame == currentPosition || previewFuture?.isCancelled == false)
                 doOnUI(false) { preview.setImageBitmap(bitmap) }
         }

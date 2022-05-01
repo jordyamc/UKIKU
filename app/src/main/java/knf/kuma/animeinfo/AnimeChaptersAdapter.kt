@@ -27,6 +27,7 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.squareup.picasso.Callback
 import knf.kuma.App
 import knf.kuma.R
+import knf.kuma.ads.AdsUtils
 import knf.kuma.animeinfo.fragments.ChaptersFragment
 import knf.kuma.animeinfo.ktx.epTitle
 import knf.kuma.animeinfo.ktx.fileName
@@ -46,6 +47,7 @@ import knf.kuma.videoservers.ServersFactory
 import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
+import java.net.URL
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
@@ -353,9 +355,29 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             R.id.commentaries -> {
                                 fragment.lifecycleScope.launch(Dispatchers.Main) {
                                     try {
-                                        CommentariesDialog.show(fragment, withContext(Dispatchers.IO) { chapter.chapter.commentariesLink() })
+                                        val version = withContext(Dispatchers.IO) {
+                                            Regex("load\\.(\\w+)\\.js").find(URL("https://https-animeflv-net.disqus.com/embed.js").readText())?.destructured?.component1()
+                                        }
+                                        CommentariesDialog.show(
+                                            fragment,
+                                            withContext(Dispatchers.IO) {
+                                                chapter.chapter.commentariesLink(version)
+                                            })
                                     } catch (e: ActivityNotFoundException) {
-                                        noCrashSuspend { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(withContext(Dispatchers.IO) { chapter.chapter.commentariesLink() }))) }
+                                        noCrashSuspend {
+                                            context.startActivity(
+                                                Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    Uri.parse(withContext(Dispatchers.IO) {
+                                                        chapter.chapter.commentariesLink(
+                                                            AdsUtils.remoteConfigs.getString(
+                                                                "disqus_version"
+                                                            )
+                                                        )
+                                                    })
+                                                )
+                                            )
+                                        }
                                     }
                                 }
                             }

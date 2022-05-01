@@ -1,5 +1,7 @@
 package knf.kuma.pojos;
 
+import static java.lang.Math.abs;
+
 import androidx.annotation.NonNull;
 import androidx.room.Embedded;
 import androidx.room.Entity;
@@ -127,7 +129,7 @@ public class RecentObject {
         this.key = (webInfo.aid + webInfo.chapter).hashCode();
         this.aid = webInfo.aid;
         this.chapter = webInfo.chapter.trim();
-        this.eid = String.valueOf((aid + chapter).hashCode());
+        this.eid = String.valueOf(abs((aid + chapter).hashCode()));
         this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
         this.url = "https://animeflv.net" + webInfo.url;
         this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");

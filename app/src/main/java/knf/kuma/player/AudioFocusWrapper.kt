@@ -16,9 +16,11 @@ import com.google.android.exoplayer2.SimpleExoPlayer
  * audio focus using [AudioFocusRequest] on Oreo+ devices, and an
  * [AudioManager.OnAudioFocusChangeListener] on previous versions.
  */
-class AudioFocusWrapper(private val audioAttributes: AudioAttributesCompat,
-                        private val audioManager: AudioManager,
-                        private val player: SimpleExoPlayer) : ExoPlayer by player {
+class AudioFocusWrapper(
+    private val audioAttributes: AudioAttributesCompat,
+    private val audioManager: AudioManager,
+    private val player: ExoPlayer
+) : ExoPlayer by player {
     private var shouldPlayWhenReady = false
 
     private val audioFocusListener = AudioManager.OnAudioFocusChangeListener { focusChange ->

@@ -114,7 +114,6 @@
         </receiver>
         <receiver android:name=".download.DownloadReceiver"/>
         <receiver android:name=".recents.RecentsNotReceiver"/>
-        <receiver android:name=".slices.AnimeLoad"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -191,22 +190,6 @@
         <activity
             android:name=".tv.streaming.TVMultiSelection"
             android:theme="@style/AppTheme.TV.Guided"/>
-
-        <provider
-            android:name=".slices.AnimeSlice"
-            android:authorities="${applicationId}.slices"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.app.slice.category.SLICE"/>
-
-                <data
-                    android:host="knf"
-                    android:pathPrefix="/"
-                    android:scheme="http"/>
-            </intent-filter>
-        </provider>
 
         <uses-library
             android:name="org.apache.http.legacy"

@@ -496,7 +496,7 @@ class ServersFactory {
             AchievementManager.onPlayChapter()
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 context.startActivity(PrefsUtil.getPlayerIntent()
-                        .setData(FileAccessHelper.getFileUri(file_name))
+                    .setData(FileAccessHelper.getDataUri(file_name))
                         .putExtra("isFile", true)
                         .putExtra("title", title))
             } else {

@@ -56,9 +56,25 @@ class SelfServer : Service() {
                 setContentTitle("Servidor activo")
             addAction(R.drawable.ic_stop, "Detener",
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        PendingIntent.getForegroundService(App.context, 4689, Intent(App.context, SelfServer::class.java).setAction("stop.foreground"), PendingIntent.FLAG_UPDATE_CURRENT)
+                        PendingIntent.getForegroundService(
+                            App.context,
+                            4689,
+                            Intent(
+                                App.context,
+                                SelfServer::class.java
+                            ).setAction("stop.foreground"),
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                        )
                     else
-                        PendingIntent.getService(App.context, 4689, Intent(App.context, SelfServer::class.java).setAction("stop.foreground"), PendingIntent.FLAG_UPDATE_CURRENT)
+                        PendingIntent.getService(
+                            App.context,
+                            4689,
+                            Intent(
+                                App.context,
+                                SelfServer::class.java
+                            ).setAction("stop.foreground"),
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                        )
             )
         }.build()
     }

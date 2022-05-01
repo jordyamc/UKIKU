@@ -49,11 +49,11 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             fragment = TVMainFragment.get().also {
                 addFragment(it)
             }
-            RecentsWork.schedule(this)
             DirUpdateWork.schedule(this)
             RecentsNotReceiver.removeAll(this)
             UpdateChecker.check(this, this)
             lifecycleScope.launch(Dispatchers.IO) {
+                RecentsWork.schedule(this@TVMain)
                 DirManager.checkPreDir()
                 DirectoryService.run(this@TVMain)
             }

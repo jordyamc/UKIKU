@@ -71,7 +71,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
         super.onAttach(activity)
     }
 
-    @ExperimentalContracts
+    @OptIn(ExperimentalContracts::class)
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         if (activity != null && context != null)
             doOnUI {

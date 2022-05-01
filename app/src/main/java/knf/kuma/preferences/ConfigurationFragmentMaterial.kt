@@ -71,17 +71,21 @@ class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
         super.onAttach(activity)
     }
 
-    @ExperimentalContracts
+
+    @OptIn(ExperimentalContracts::class)
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         if (activity != null && context != null)
             doOnUI {
                 addPreferencesFromResource(R.xml.preferences)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Abrir configuración"
+                    preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary =
+                        "Abrir configuración"
                 else if (FileAccessHelper.toneFile.exists())
-                    preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary = "Personalizado"
+                    preferenceScreen.findPreference<Preference>(keyCustomTone)?.summary =
+                        "Personalizado"
                 if (!DesignUtils.isFlat)
-                    preferenceScreen.findPreference<ListPreference>("recentActionType")?.isVisible = false
+                    preferenceScreen.findPreference<ListPreference>("recentActionType")?.isVisible =
+                        false
                 preferenceScreen.findPreference<Preference>(keyCustomTone)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         noCrash {

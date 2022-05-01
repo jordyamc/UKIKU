@@ -14,7 +14,6 @@ import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
 import xdroid.toaster.Toaster
 import java.util.*
-import kotlin.collections.LinkedHashSet
 
 class WEListProvider internal constructor(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val items = mutableListOf<WEListItem>()
@@ -68,7 +67,15 @@ class WEListProvider internal constructor(private val context: Context) : Remote
                 ActivityAnimeMaterial.getSimpleIntent(context, listItem)
             else
                 ActivityAnime.getSimpleIntent(context, listItem)
-            remoteView.setOnClickPendingIntent(R.id.linear, PendingIntent.getActivity(context, 324 + position, clickIntent, 0))
+            remoteView.setOnClickPendingIntent(
+                R.id.linear,
+                PendingIntent.getActivity(
+                    context,
+                    324 + position,
+                    clickIntent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            )
             remoteView.setInt(R.id.linear, "setBackgroundColor", getColor(false))
         } catch (e: Exception) {
             e.printStackTrace()

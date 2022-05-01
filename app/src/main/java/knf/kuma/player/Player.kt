@@ -1,5 +1,7 @@
 package knf.kuma.player
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
@@ -11,11 +13,16 @@ import androidx.media.AudioAttributesCompat
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
+import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.reactivex.rxjava3.disposables.Disposable
 import knf.kuma.commons.BypassUtil
@@ -39,11 +46,12 @@ data class PlayerState(
         @Ignore
         var isFinishing: Boolean = false)
 
-class PlayerHolder(private val context: Context,
-                   private val playerState: PlayerState,
-                   private val playerView: PlayerView,
-                   intent: Intent,
-                   private val playList: List<QueueObject>
+class PlayerHolder(
+    private val context: Context,
+    private val playerState: PlayerState,
+    private val playerView: PlayerView,
+    private val intent: Intent,
+    private val playList: List<QueueObject>
 ) {
     val audioFocusPlayer: ExoPlayer
     val playerCallback: PlayerCallback
@@ -69,7 +77,7 @@ class PlayerHolder(private val context: Context,
         audioFocusPlayer = AudioFocusWrapper(
                 audioAttributes,
                 audioManager,
-                SimpleExoPlayer.Builder(context).build()
+            ExoPlayer.Builder(context).build()
                         .also { player ->
                             playerView.player = player
                         }
@@ -98,16 +106,21 @@ class PlayerHolder(private val context: Context,
     }
 
     private fun createExtractorMediaSource(uri: Uri): MediaItem {
+        val item = MediaItem.fromUri(uri)
+        if (intent.getBooleanExtra("isFile", false)) return item
         return ProgressiveMediaSource.Factory(
             if (PrefsUtil.useExperimentalOkHttp)
-                DefaultDataSourceFactory(
+                DefaultDataSource.Factory(
                     context,
-                    null,
-                    OkHttpDataSourceFactory(OkHttpClient(), BypassUtil.userAgent)
+                    OkHttpDataSource.Factory(OkHttpClient()).apply {
+                        setUserAgent(BypassUtil.userAgent)
+                    }
                 )
             else
-                DefaultDataSourceFactory(context, BypassUtil.userAgent, null)
-        ).createMediaSource(MediaItem.fromUri(uri)).mediaItem
+                DefaultHttpDataSource.Factory().apply {
+                    setUserAgent(BypassUtil.userAgent)
+                }
+        ).createMediaSource(item).mediaItem
     }
 
     // Prepare playback.
@@ -175,6 +188,14 @@ class PlayerHolder(private val context: Context,
 
             override fun onPlayerError(error: PlaybackException) {
                 Toaster.toast("Error al reproducir: " + error.message?.replace("%", "%%"))
+                MaterialDialog(this@PlayerHolder.context).show {
+                    message(text = error.stackTraceToString().also {
+                        (this@PlayerHolder.context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.setPrimaryClip(
+                            ClipData.newPlainText("stack", it)
+                        )
+                    })
+                    positiveButton(text = "OK")
+                }
                 FirebaseCrashlytics.getInstance().recordException(error)
                 playerCallback.onFinish()
             }
@@ -189,8 +210,8 @@ class PlayerHolder(private val context: Context,
                 reason: Int
             ) {
                 try {
-                    val latestPosition = newPosition.windowIndex
-                    if (latestPosition != oldPosition.windowIndex) {
+                    val latestPosition = newPosition.mediaItemIndex
+                    if (latestPosition != oldPosition.mediaItemIndex) {
                         playerState.apply {
                             title = playList[listPosition].title()
                             if (reason == 0) {

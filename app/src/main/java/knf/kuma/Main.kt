@@ -83,7 +83,6 @@ import knh.kuma.commons.cloudflarebypass.CfCallback
 import knh.kuma.commons.cloudflarebypass.Cloudflare
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.cryse.widget.persistentsearch.PersistentSearchView
@@ -122,8 +121,7 @@ class Main : GenericActivity(),
     private var readyToFinish = false
     private var isFirst = true
 
-    @ExperimentalCoroutinesApi
-    @ExperimentalContracts
+    @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeNA())
         super.onCreate(savedInstanceState)

@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import org.jsoup.nodes.Element
 import pl.droidsonroids.jspoon.ElementConverter
 import pl.droidsonroids.jspoon.annotation.Selector
+import kotlin.math.abs
 
 @Entity
 open class RecentModel {
@@ -87,7 +88,7 @@ open class RecentModel {
 }
 
 class RecentExtras(model: RecentModel) {
-    val eid: String by lazy { "${model.aid}${model.chapter}".hashCode().toString() }
+    val eid: String by lazy { abs("${model.aid}${model.chapter}".hashCode()).toString() }
     val isNewChapter: Boolean by lazy { model.chapter.matches("^.* [10]$".toRegex()) }
     val animeUrl: String by lazy { getAnimeUrl(model.chapterUrl, model.aid) }
     val filePath: String by lazy {

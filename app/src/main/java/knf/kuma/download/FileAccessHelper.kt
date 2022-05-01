@@ -423,17 +423,29 @@ object FileAccessHelper {
     fun getOutputStream(file_name: String?): OutputStream? {
         if (file_name == null) return null
         try {
-            return if (PrefsUtil.downloadType == "0") {
-                var file = File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name))
+            return if (PrefsUtil.downloadType == "0" && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                var file = File(
+                    Environment.getExternalStorageDirectory(),
+                    "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name)
+                )
                 if (!file.exists())
                     file.mkdirs()
                 file = File(file, file_name)
                 if (!file.exists())
                     file.createNewFile()
-                FileOutputStream(File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name))
+                FileOutputStream(
+                    File(
+                        Environment.getExternalStorageDirectory(),
+                        "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name
+                    )
+                )
             } else {
                 treeUri?.let {
-                    App.context.contentResolver.openOutputStream(find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)?.uri
+                    App.context.contentResolver.openOutputStream(
+                        find(
+                            DocumentFile.fromTreeUri(App.context, it),
+                            "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name
+                        )?.uri
                             ?: Uri.EMPTY, "rw")
                 }
             }

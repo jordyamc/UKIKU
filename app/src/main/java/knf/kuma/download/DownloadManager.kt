@@ -118,16 +118,26 @@ class DownloadManager : Service() {
                     doAsync { val downloadObject = downloadDao.getByDid(download.id)
                         if (downloadObject != null) {
                             if (FileAccessHelper.isTempFile(download.file)) {
+                                if (FileAccessHelper.getTmpFile(downloadObject.file).length() < 5) {
+                                    Log.e("Download", "Damaged tmp file, aborting")
+                                    errorNotification(downloadObject)
+                                    downloadDao.delete(downloadObject)
+                                    fetch?.delete(download.id)
+                                    stopIfNeeded()
+                                    return@doAsync
+                                }
                                 Log.e("Download", "Moving temp")
                                 downloadObject.setEta(-2)
                                 downloadObject.progress = 0
                                 downloadDao.update(downloadObject)
-                                FileUtil.moveFile(downloadObject.file, object : FileUtil.MoveCallback {
-                                    override fun onProgress(pair: android.util.Pair<Int, Boolean>) {
-                                        if (!pair.second) {
-                                            downloadObject.progress = pair.first
-                                            updateNotification(downloadObject, false)
-                                            downloadDao.update(downloadObject)
+                                FileUtil.moveFile(
+                                    downloadObject.file,
+                                    object : FileUtil.MoveCallback {
+                                        override fun onProgress(pair: android.util.Pair<Int, Boolean>) {
+                                            if (!pair.second) {
+                                                downloadObject.progress = pair.first
+                                                updateNotification(downloadObject, false)
+                                                downloadDao.update(downloadObject)
                                         } else if (pair.first == -1) {
                                             downloadDao.delete(downloadObject)
                                             errorNotification(downloadObject)

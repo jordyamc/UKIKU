@@ -30,7 +30,6 @@ import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login_buttons.*
 import kotlinx.android.synthetic.main.activity_login_firestore.*
 import kotlinx.android.synthetic.main.activity_login_main.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.math.max
 
@@ -50,7 +49,7 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             }
         }
 
-    @ExperimentalContracts
+    @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!resources.getBoolean(R.bool.isTablet))
@@ -268,17 +267,19 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             val token = Auth.getOAuth2Token()
             if (service is DropBoxService && service?.logIn(token) == true) {
                 Backups.type = Backups.Type.DROPBOX
-                FirebaseAnalytics.getInstance(App.context).logEvent(FirebaseAnalytics.Event.LOGIN, Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "Dropbox") })
+                FirebaseAnalytics.getInstance(App.context).logEvent(
+                    FirebaseAnalytics.Event.LOGIN,
+                    Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "Dropbox") })
             }
             onLogin()
         }
     }
 
-    @ExperimentalContracts
-    @ExperimentalCoroutinesApi
+
+    @OptIn(ExperimentalContracts::class)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (FirestoreManager.handleLogin(this, requestCode, resultCode, data)){
+        if (FirestoreManager.handleLogin(this, requestCode, resultCode, data)) {
             initFirestoreSync()
         }
         onLogin()
