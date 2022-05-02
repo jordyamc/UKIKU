@@ -5,6 +5,7 @@ import androidx.work.*
 import knf.kuma.App
 import knf.kuma.backup.Backups
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.safeContext
 import knf.kuma.pojos.AutoBackupObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -23,7 +24,7 @@ class BackUpWork(val context: Context, workerParameters: WorkerParameters) : Wor
                 if (backupObject == AutoBackupObject(context))
                     Backups.backupAll()
                 else
-                    WorkManager.getInstance().cancelAllWorkByTag(TAG)
+                    WorkManager.getInstance(context).cancelAllWorkByTag(TAG)
             }
             Result.success()
         } else
@@ -53,7 +54,7 @@ class BackUpWork(val context: Context, workerParameters: WorkerParameters) : Wor
         }
 
         fun reSchedule(days: Int) {
-            WorkManager.getInstance().cancelAllWorkByTag(TAG)
+            WorkManager.getInstance(safeContext).cancelAllWorkByTag(TAG)
             if (days > 0) {
                 PeriodicWorkRequestBuilder<BackUpWork>(days.toLong(), TimeUnit.DAYS, 1, TimeUnit.HOURS).apply {
                     setConstraints(networkConnectedConstraints())

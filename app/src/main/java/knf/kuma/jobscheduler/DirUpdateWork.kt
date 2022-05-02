@@ -5,6 +5,7 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.safeContext
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import xdroid.toaster.Toaster
@@ -21,8 +22,8 @@ class DirUpdateWork(val context: Context, workerParameters: WorkerParameters) : 
         const val TAG = "dir-update-work-unique"
 
         fun schedule(context: Context) {
-            WorkManager.getInstance().cancelAllWorkByTag("dir-update-job")
-            WorkManager.getInstance().cancelAllWorkByTag("dir-update-work")
+            WorkManager.getInstance(context).cancelAllWorkByTag("dir-update-job")
+            WorkManager.getInstance(context).cancelAllWorkByTag("dir-update-work")
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val time = (preferences.getString("dir_update_time", "7") ?: "7").toLong()
             if (PrefsUtil.isDirectoryFinished && time > 0)
@@ -39,7 +40,7 @@ class DirUpdateWork(val context: Context, workerParameters: WorkerParameters) : 
                     addTag(TAG)
                 }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.REPLACE)
             else
-                WorkManager.getInstance().cancelAllWorkByTag(TAG)
+                WorkManager.getInstance(safeContext).cancelAllWorkByTag(TAG)
         }
 
         fun runNow() {

@@ -149,7 +149,9 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                 exoPlayer?.prepare()
                 val canResume = playerState.position != C.TIME_UNSET
                 if (canResume)
-                    exoPlayer?.seekTo(playerState.window, playerState.position)
+                    noCrash {
+                        exoPlayer?.seekTo(playerState.window, playerState.position)
+                    }
                 exoPlayer?.playWhenReady = true
                 /*disposable = Observable.interval(1, TimeUnit.SECONDS).map { exoPlayer?.currentPosition?:0 }
                         .subscribeOn(AndroidSchedulers.from(exoPlayer?.applicationLooper, false))
@@ -235,8 +237,10 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     override fun onNewIntent(intent: Intent) {
         setIntent(intent)
         releasePlayer()
-        playerState.window = C.INDEX_UNSET
-        playerState.position = 0
+        if (::playerState.isInitialized) {
+            playerState.window = C.INDEX_UNSET
+            playerState.position = 0
+        }
         checkPlaylist(intent)
         initPlayer(intent)
         super.onNewIntent(intent)
@@ -252,15 +256,17 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         super.onPause()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
             return
-        val state = playerState.apply {
-            title = video_title.text.toString()
-            position = if (!isEnding) {
-                exoPlayer?.currentPosition ?: 0
-            } else
-                0
-        }
-        doAsync {
-            CacheDB.INSTANCE.playerStateDAO().set(state)
+        if (::playerState.isInitialized) {
+            val state = playerState.apply {
+                title = video_title.text.toString()
+                position = if (!isEnding) {
+                    exoPlayer?.currentPosition ?: 0
+                } else
+                    0
+            }
+            doAsync {
+                CacheDB.INSTANCE.playerStateDAO().set(state)
+            }
         }
         if (!isFinishing)
             exoPlayer?.pause()

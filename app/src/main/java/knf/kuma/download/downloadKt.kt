@@ -7,20 +7,26 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.content.ContextCompat
 import knf.kuma.ads.AdsUtils
+import knf.kuma.commons.noCrash
 import org.jetbrains.anko.activityManager
+import java.util.*
 
-val isDeviceSamsung: Boolean get() = Build.MANUFACTURER.toLowerCase() == "samsung"
+val isDeviceSamsung: Boolean get() = Build.MANUFACTURER.lowercase(Locale.getDefault()) == "samsung"
 
 fun Context.service(intent: Intent) {
-    if (isDeviceSamsung && AdsUtils.remoteConfigs.getBoolean("samsung_disable_foreground"))
-        startService(intent)
-    else
-        ContextCompat.startForegroundService(this, intent)
+    noCrash {
+        if (isDeviceSamsung && AdsUtils.remoteConfigs.getBoolean("samsung_disable_foreground"))
+            startService(intent)
+        else
+            ContextCompat.startForegroundService(this, intent)
+    }
 }
 
 fun Service.foreground(id: Int, notification: Notification) {
-    if (isDeviceSamsung && AdsUtils.remoteConfigs.getBoolean("samsung_disable_foreground")) return
-    startForeground(id, notification)
+    noCrash {
+        if (isDeviceSamsung && AdsUtils.remoteConfigs.getBoolean("samsung_disable_foreground")) return@noCrash
+        startForeground(id, notification)
+    }
 }
 
 fun Context.isServiceRunning(serviceClass: Class<*>): Boolean{

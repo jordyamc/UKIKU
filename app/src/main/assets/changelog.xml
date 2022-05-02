@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="196" version="5.1.27">
+        <change type="fix">Error al iniciar en TV</change>
+    </release>
     <release code="195" version="5.1.26">
         <change type="fix">Correccion para noticias</change>
     </release>
