@@ -3,7 +3,7 @@ package knf.kuma.directory
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -14,7 +14,7 @@ object DirManager {
 
     fun checkPreDir(forced: Boolean = false) {
         if (forced || CacheDB.INSTANCE.animeDAO().count < 3200) {
-            doOnUI {
+            doOnUIGlobal {
                 DirectoryService.setStatus(DirectoryService.STATE_CACHED)
             }
             noCrash {

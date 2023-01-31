@@ -188,9 +188,9 @@ object AchievementManager {
         GlobalScope.launch(Dispatchers.IO) {
             val service = Backups.createService()
             if (service?.isLoggedIn == true)
-                service.search(Backups.keyAchievements)?.let { backupObj ->
+                service.search(Backups.keyAchievements, true)?.let { backupObj ->
                     CacheDB.INSTANCE.achievementsDAO().update((backupObj.data?.filterIsInstance<Achievement>()
-                            ?: arrayListOf()).filter { it.isUnlocked })
+                        ?: arrayListOf()).filter { it.isUnlocked })
                     callback()
                 }
         }
@@ -240,7 +240,7 @@ object AchievementManager {
                 val achievementList = mutableListOf<AchievementUnlocked.AchievementData>()
                 list.forEach { achievementList.add(it.achievementData(context)) }
                 resetIndicator()
-                doOnUI {
+                doOnUIGlobal {
                     achievementUnlocked.show(achievementList)
                 }
             } else
@@ -296,7 +296,7 @@ object AchievementManager {
     }
 
     fun onSearch(query: String) {
-        when (query.toLowerCase()) {
+        when (query.lowercase(Locale.getDefault())) {
             "boku no hero" -> unlock(listOf(43))
         }
     }

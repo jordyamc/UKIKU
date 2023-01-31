@@ -50,7 +50,7 @@ class DropBoxService : BackupService() {
         dbToken = null
     }
 
-    override suspend fun search(id: String): BackupObject<*>? {
+    override suspend fun search(id: String, manual: Boolean): BackupObject<*>? {
         return if (isLoggedIn)
             try {
                 val list = client?.files()?.search("", id)?.matches ?: arrayListOf()

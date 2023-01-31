@@ -19,7 +19,7 @@ class WaitingAdapterMaterial(val fragment: HomeFragmentMaterial) : UpdateableAda
     override fun updateList(list: List<Any>) {
         doAsync {
             this@WaitingAdapterMaterial.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

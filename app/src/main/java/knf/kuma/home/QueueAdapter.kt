@@ -22,7 +22,7 @@ class QueueAdapter(val fragment: HomeFragment) : UpdateableAdapter<QueueAdapter.
     override fun updateList(list: List<Any>) {
         doAsync {
             this@QueueAdapter.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

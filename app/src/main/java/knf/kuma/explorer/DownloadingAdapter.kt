@@ -20,6 +20,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.pojos.DownloadObject
 import kotlinx.android.synthetic.main.item_downloading_extra.view.*
+import java.util.*
 
 class DownloadingAdapter internal constructor(private val fragment: Fragment, private val downloadObjects: MutableList<DownloadObject>) : RecyclerView.Adapter<DownloadingAdapter.DownloadingItem>() {
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
@@ -63,7 +64,7 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
         holder.cancel.setOnClickListener {
             fragment.context?.let {
                 MaterialDialog(it).safeShow {
-                    message(text = "¿Cancelar descarga del ${downloadObject.chapter?.toLowerCase()} de ${downloadObject.name}?")
+                    message(text = "¿Cancelar descarga del ${downloadObject.chapter.lowercase(Locale.getDefault())} de ${downloadObject.name}?")
                     positiveButton(text = "CONFIRMAR") {
                         try {
                             downloadObjects.removeAt(holder.adapterPosition)
@@ -126,7 +127,7 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
         ArrayList(downloadObjects).forEachIndexed { index, downloadObject ->
             if (downloadObject.eid == eid) {
                 downloadObjects.removeAt(index)
-                doOnUI { notifyItemRemoved(index) }
+                fragment.doOnUI { notifyItemRemoved(index) }
                 return
             }
         }

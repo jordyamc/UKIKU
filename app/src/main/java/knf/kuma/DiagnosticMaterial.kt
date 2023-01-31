@@ -60,7 +60,7 @@ class DiagnosticMaterial : GenericActivity() {
 
     private fun startTests() {
         runNetworkTests()
-        runInternetTest()
+        //runInternetTest()
         runDirectoryTest()
         runMemoryTest()
         runBackupTest()
@@ -220,7 +220,7 @@ class DiagnosticMaterial : GenericActivity() {
                         downState.load("Error: ${errorMessage ?: ""}", StateViewMaterial.STATE_ERROR)
                     }
                 })
-                startDownload("http://1.testdebit.info/10M.iso")
+                startDownload("https://speed.hetzner.de/100MB.bin")
             }
         }
         doAsync {
@@ -238,7 +238,7 @@ class DiagnosticMaterial : GenericActivity() {
                         upState.load("Error: ${errorMessage ?: ""}", StateViewMaterial.STATE_ERROR)
                     }
                 })
-                startUpload("http://ipv4.ikoula.testdebit.info/", 5000000)
+                startUpload("http://bouygues.testdebit.info/ul/", 5000000)
             }
         }
     }
@@ -272,10 +272,14 @@ class DiagnosticMaterial : GenericActivity() {
     }
 
     private fun runMemoryTest() {
-        val dirs = getExternalFilesDirs(null)
-        internalState.load(getAvailable(dirs[0].freeSpace))
-        if (dirs.size > 1)
-            externalState.load(getAvailable(dirs[1].freeSpace))
+        val dirs = getExternalFilesDirs(null).toList().filterNotNull()
+        noCrash {
+            internalState.load(getAvailable(dirs[0].freeSpace))
+        }
+        noCrash {
+            if (dirs.size > 1)
+                externalState.load(getAvailable(dirs[1].freeSpace))
+        }
     }
 
     private fun getAvailable(size: Long): String {
@@ -399,7 +403,7 @@ class DiagnosticMaterial : GenericActivity() {
                 append(text)
                 append("\n")
             }
-            doOnUI { logText.text = builder.toString() }
+            lifecycleScope.launch(Dispatchers.Main) { logText.text = builder.toString() }
         }
     }
 }

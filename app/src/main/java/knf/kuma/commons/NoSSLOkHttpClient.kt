@@ -1,7 +1,9 @@
 package knf.kuma.commons
 
+import okhttp3.Cache
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
+import java.io.File
 import java.security.cert.CertificateException
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
@@ -10,6 +12,7 @@ import javax.net.ssl.X509TrustManager
 
 
 object NoSSLOkHttpClient {
+    private val appCache by lazy { Cache(File(safeContext.cacheDir, "okhttpcache"), 10 * 1024 * 1024) }
     fun get(): OkHttpClient {
         try {
             val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -42,6 +45,7 @@ object NoSSLOkHttpClient {
                 connectTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 readTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+                cache(appCache)
                 hostnameVerifier { _, _ -> /*isHostValid(hostName)*/ true }
                 connectionSpecs(
                     listOf(
@@ -53,6 +57,11 @@ object NoSSLOkHttpClient {
                     )
                 )
             }
+            /*val dns = DnsOverHttps.Builder().client(builder).apply {
+                url("https://dns.google/dns-query".toHttpUrl())
+                bootstrapDnsHosts(InetAddress.getByName("8.8.4.4"), InetAddress.getByName("8.8.8.8"))
+            }.build()
+            return builder.newBuilder().dns(dns).build()*/
             return builder.build()
         } catch (e: Exception) {
             throw RuntimeException(e)

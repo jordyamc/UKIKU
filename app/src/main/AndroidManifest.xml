@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="knf.kuma">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature
         android:name="android.software.leanback"
@@ -47,6 +46,7 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
         android:name="android.permission.RECORD_AUDIO"
         android:requiredFeature="android.software.leanback" />
@@ -65,7 +65,7 @@
         android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.DayNight"
-        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security"
         tools:replace="android:fullBackupContent">
 
         <meta-data
@@ -105,6 +105,21 @@
                     android:scheme="http" />
                 <data
                     android:host="ukiku.app"
+                    android:pathPrefix="/*"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="ukiku.ga"
+                    android:pathPrefix="/*"
+                    android:scheme="http" />
+                <data
+                    android:host="ukiku.ga"
                     android:pathPrefix="/*"
                     android:scheme="https" />
             </intent-filter>
@@ -436,7 +451,6 @@
         <activity android:name=".shortcuts.DummyExplorerActivity" />
         <activity android:name=".shortcuts.DummyEmissionActivity" />
         <activity android:name=".profile.TopActivityMaterial" />
-        <activity android:name="com.appbrain.AppBrainActivity" />
         <activity
             android:name=".tv.streaming.StreamTvActivity"
             android:exported="true"

@@ -133,7 +133,7 @@ class ServersFactory {
     }
 
     private fun showServerList(useLast: Boolean = true) {
-        doOnUI {
+        doOnUIGlobal {
             try {
                 if (servers.size == 0) {
                     Toaster.toast("Sin servidores disponibles")
@@ -180,7 +180,7 @@ class ServersFactory {
     }
 
     private fun showOptions(server: VideoServer, isCast: Boolean) {
-        doOnUI {
+        doOnUIGlobal {
             try {
                 MaterialDialog(this@ServersFactory.context).safeShow {
                     title(text = server.name)
@@ -227,7 +227,7 @@ class ServersFactory {
             val jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value
                     ?: throw EJNFException())
             if (jsonObject.length() > 1) {
-                doOnUI {
+                doOnUIGlobal {
                     MaterialDialog(context).safeShow {
                         listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
                             doAsync {
@@ -355,7 +355,7 @@ class ServersFactory {
             downloadObject.headers = option.headers
             if (PrefsUtil.downloaderType == 0) {
                 CacheDB.INSTANCE.downloadsDAO().insert(downloadObject)
-                doOnUI {
+                doOnUIGlobal {
                     context.service(Intent(App.context, DownloadService::class.java).putExtra("eid", downloadObject.eid).setData(Uri.parse(option.url)))
                     callOnFinish(true, true)
                 }
@@ -492,7 +492,6 @@ class ServersFactory {
 
         fun startPlay(context: Context?, title: String, file_name: String) {
             if (context == null) return
-            Log.e("Video", "On play")
             AchievementManager.onPlayChapter()
             if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 context.startActivity(PrefsUtil.getPlayerIntent()
@@ -513,7 +512,6 @@ class ServersFactory {
         }
 
         fun getPlayIntent(context: Context, title: String, file_name: String): PendingIntent {
-            val file = FileAccessHelper.getFile(file_name)
             return if (PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0") {
                 PendingIntent.getActivity(
                     context,

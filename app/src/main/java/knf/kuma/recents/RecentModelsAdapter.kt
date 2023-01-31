@@ -410,12 +410,14 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                             )
                         )
                     else {
-                        iconView.setImageDrawable(icon.drawable)
+                        iconView.setImageDrawable(icon!!.drawable)
                     }
                     primary.text = headline
                     secondary.text = body
-                    cta.text = callToAction.lowercase(Locale.getDefault())
-                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                    if (callToAction != null) {
+                        cta.text = callToAction!!.lowercase(Locale.getDefault())
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                    }
                     nativeAdView.setNativeAd(modelAd.unifiedNativeAd)
                 }
             }

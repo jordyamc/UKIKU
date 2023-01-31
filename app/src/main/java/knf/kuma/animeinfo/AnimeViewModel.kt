@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.noCrashLet
 import knf.kuma.database.CacheDB
@@ -35,8 +35,8 @@ class AnimeViewModel : ViewModel() {
         doAsync {
             aid?.let {
                 val animeObject = CacheDB.INSTANCE.animeDAO().getAnimeByAid(aid)
-                doOnUI { liveData.value = animeObject }
-            } ?: doOnUI { liveData.value = null }
+                doOnUIGlobal { liveData.value = animeObject }
+            } ?: doOnUIGlobal { liveData.value = null }
         }
     }
 

@@ -37,10 +37,11 @@
         android:id="@+id/sync_seen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:si_hideBackup="true"
+        android:visibility="gone"
         app:si_actionId="seen"
+        app:si_hideBackup="true"
         app:si_showDivider="true"
-        app:si_title="Vistos"/>
+        app:si_title="Vistos" />
 
     <knf.kuma.custom.SyncItemView
         android:id="@+id/sync_seen_new"
@@ -48,7 +49,7 @@
         android:layout_height="wrap_content"
         app:si_actionId="seencompact"
         app:si_showDivider="false"
-        app:si_title="Vistos (nuevo)" />
+        app:si_title="Vistos" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logOut"

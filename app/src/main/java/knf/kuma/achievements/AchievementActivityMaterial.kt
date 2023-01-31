@@ -16,7 +16,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -35,9 +35,9 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
 import kotlinx.android.synthetic.main.activity_news.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.toast
 import xdroid.toaster.Toaster
 import java.text.NumberFormat
@@ -116,10 +116,10 @@ class AchievementActivityMaterial : GenericActivity() {
     @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
-        CacheDB.INSTANCE.achievementsDAO().totalUnlockedPoints.observe(this, Observer {
-            doOnUI {
+        CacheDB.INSTANCE.achievementsDAO().totalUnlockedPoints.observe(this) {
+            lifecycleScope.launch(Dispatchers.Main) {
                 levelCalculator.calculate(it ?: 0)
-                if (it != withContext(Dispatchers.IO){ CacheDB.INSTANCE.achievementsDAO().totalPoints }) {
+                if (it != withContext(Dispatchers.IO) { CacheDB.INSTANCE.achievementsDAO().totalPoints }) {
                     progress.progressMax = levelCalculator.max.toFloat()
                     progress.progress = levelCalculator.progress.toFloat()
                     progressIndText.visibility = View.VISIBLE
@@ -132,7 +132,7 @@ class AchievementActivityMaterial : GenericActivity() {
                 }
                 level.text = levelCalculator.level.toString()
             }
-        })
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -141,18 +141,16 @@ class AchievementActivityMaterial : GenericActivity() {
             val cost = ((achievement.points / 1000) * 25)
             buyButton.text = cost.toString()
             buyButton.visibility = View.VISIBLE
-            buyButton.onClick {
-                doOnUI {
-                    if (Economy.buy(cost)) {
-                        achievement.isRevealed = true
-                        doAsync {
-                            CacheDB.INSTANCE.achievementsDAO().update(achievement)
-                            syncData { achievements() }
-                        }
-                        onMoreInfo(achievement)
-                    } else
-                        toast("Loli-coins insuficientes")
-                }
+            buyButton.setOnClickListener {
+                if (Economy.buy(cost)) {
+                    achievement.isRevealed = true
+                    doAsync {
+                        CacheDB.INSTANCE.achievementsDAO().update(achievement)
+                        syncData { achievements() }
+                    }
+                    onMoreInfo(achievement)
+                } else
+                    toast("Loli-coins insuficientes")
             }
         } else buyButton.visibility = View.GONE
         icon.setImageResource(achievement.usableIcon())
@@ -243,11 +241,11 @@ class AchievementActivityMaterial : GenericActivity() {
                     setLarge(true)
                     setDismissible(true)
                 }
-                doAsync {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val list = CacheDB.INSTANCE.achievementsDAO().completedAchievements
                     val achievementList = mutableListOf<AchievementUnlocked.AchievementData>()
                     list.forEach { achievementList.add(it.achievementData(this@AchievementActivityMaterial)) }
-                    doOnUI {
+                    launch(Dispatchers.Main) {
                         achievementUnlocked.show(achievementList)
                     }
                 }

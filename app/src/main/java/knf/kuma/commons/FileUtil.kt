@@ -44,12 +44,12 @@ object FileUtil {
 
             val lines = s.toString().split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             for (line in lines) {
-                if (!line.toLowerCase(Locale.US).contains("asec")) {
+                if (!line.lowercase(Locale.US).contains("asec")) {
                     if (line.matches(reg.toRegex())) {
                         val parts = line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                         for (part in parts) {
                             if (part.startsWith("/")) {
-                                if (!part.toLowerCase(Locale.US).contains("vold")) {
+                                if (!part.lowercase(Locale.US).contains("vold")) {
                                     out.add(part)
                                 }
                             }
@@ -155,7 +155,7 @@ object FileUtil {
     fun moveFile(resolver: ContentResolver, uri: Uri?, outputStream: OutputStream?, delete: Boolean = true): LiveData<Pair<Int, Boolean>> {
         val liveData = MutableLiveData<Pair<Int, Boolean>>()
         if (uri == null || outputStream == null) {
-            doOnUI { liveData.setValue(Pair(-1, true)) }
+            doOnUIGlobal { liveData.setValue(Pair(-1, true)) }
             return liveData
         }
         doAsync {
@@ -169,7 +169,7 @@ object FileUtil {
                     outputStream.write(buffer, 0, read)
                     current += read.toLong()
                     val prog = (current * 100 / total).toInt()
-                    doOnUI { liveData.setValue(Pair(prog, false)) }
+                    doOnUIGlobal { liveData.setValue(Pair(prog, false)) }
                     read = inputStream?.read(buffer) ?: 0
                 }
                 inputStream?.close()
@@ -182,11 +182,11 @@ object FileUtil {
                     e.printStackTrace()
                 }
 
-                doOnUI { liveData.setValue(Pair(100, true)) }
+                doOnUIGlobal { liveData.setValue(Pair(100, true)) }
             } catch (e: Exception) {
                 e.printStackTrace()
                 FirebaseCrashlytics.getInstance().recordException(e)
-                doOnUI { liveData.setValue(Pair(-1, true)) }
+                doOnUIGlobal { liveData.setValue(Pair(-1, true)) }
             }
         }
         return liveData
@@ -210,13 +210,13 @@ object FileUtil {
                         outputStream?.write(buffer, 0, read)
                         current += read.toLong()
                         val prog = (current * 100 / total).toInt()
-                        doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), prog), false)) }
+                        doOnUIGlobal { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), prog), false)) }
                         read = inputStream?.read(buffer) ?: 0
                     }
                     inputStream?.close()
                     outputStream?.flush()
                     outputStream?.close()
-                    doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), 100), false)) }
+                    doOnUIGlobal { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, g_count, gTotal), 100), false)) }
                     try {
                         DocumentsContract.deleteDocument(resolver, pair.first)
                     } catch (e: Exception) {
@@ -231,7 +231,7 @@ object FileUtil {
 
             }
             val finalSuccess = success
-            doOnUI { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, gTotal, gTotal), finalSuccess), true)) }
+            doOnUIGlobal { liveData.setValue(Pair(Pair(String.format(Locale.US, ps, gTotal, gTotal), finalSuccess), true)) }
         }
         return liveData
     }

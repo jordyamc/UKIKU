@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import knf.kuma.R
 import knf.kuma.commons.bind
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.inflate
 import knf.kuma.home.UpdateableAdapter
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -77,21 +77,21 @@ class HomeList : LinearLayout {
     }
 
     fun hide() {
-        doOnUI {
+        doOnUIGlobal {
             isHidden = true
             visibility = View.GONE
         }
     }
 
     fun show() {
-        doOnUI {
+        doOnUIGlobal {
             isHidden = false
             visibility = View.VISIBLE
         }
     }
 
     fun setSubheader(text: String) {
-        doOnUI { subheader.text = text.also { subheaderText = it } }
+        doOnUIGlobal { subheader.text = text.also { subheaderText = it } }
     }
 
     fun <T> setViewAllClass(clazz: Class<T>) {
@@ -103,13 +103,13 @@ class HomeList : LinearLayout {
     }
 
     fun setAdapter(adapter: UpdateableAdapter<*>) {
-        doOnUI {
+        doOnUIGlobal {
             recyclerView.adapter = adapter.also { this.adapter = it }
         }
     }
 
     fun updateList(list: List<Any>) {
-        doOnUI {
+        doOnUIGlobal {
             if (showError)
                 errorTV.visibility = if (list.isEmpty())
                     View.VISIBLE

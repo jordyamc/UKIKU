@@ -86,7 +86,7 @@ object NativeManager {
                         }
                     }
                     .withAdListener(object : AdListener() {
-                        override fun onAdFailedToLoad(p0: LoadAdError?) {
+                        override fun onAdFailedToLoad(p0: LoadAdError) {
                             super.onAdFailedToLoad(p0)
                             if (loader?.isLoading == false) {
                                 isLoading = false
@@ -97,7 +97,7 @@ object NativeManager {
                             }
                         }
                     }).build()
-            loader?.loadAds(AdsUtilsMob.adRequest, 5)
+            loader.loadAds(AdsUtilsMob.adRequest, 5)
         }
     }
 }

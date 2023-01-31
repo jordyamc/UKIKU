@@ -88,7 +88,7 @@ class ChangelogActivity : GenericActivity() {
                     val cCode = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0)
                     val pCode = PackageInfoCompat.getLongVersionCode(activity.packageManager.getPackageInfo(activity.packageName, 0)).toInt()
                     if (pCode > cCode && cCode != 0) {
-                        doOnUI {
+                        activity.doOnUI {
                             MaterialDialog(activity).safeShow {
                                 message(text = "Nueva versión, ¿Leer Changelog?")
                                 positiveButton(text = "Leer") {

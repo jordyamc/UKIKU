@@ -333,7 +333,7 @@ class DirectoryService : IntentService("Directory update") {
         }
 
         fun setStatus(status: Int) {
-            doOnUI { liveStatus.setValue(status) }
+            doOnUIGlobal { liveStatus.setValue(status) }
         }
 
         fun getLiveStatus(): LiveData<Int> {

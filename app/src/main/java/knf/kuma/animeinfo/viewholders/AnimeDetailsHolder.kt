@@ -19,7 +19,6 @@ import knf.kuma.animeinfo.AnimeRelatedAdapter
 import knf.kuma.animeinfo.AnimeTagsAdapter
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.removeAllDecorations
 import knf.kuma.custom.ExpandableTV
@@ -81,7 +80,7 @@ class AnimeDetailsHolder(val view: View) {
                     desc.setTextAndIndicator(animeObject.description?.trim() ?: "", expandIcon)
                     desc.setAnimationDuration(300)
                     val onClickListener = View.OnClickListener {
-                        doOnUI {
+                        launch(Dispatchers.Main) {
                             expandIcon.setImageResource(if (desc.isExpanded) R.drawable.action_expand else R.drawable.action_shrink)
                             desc.toggle()
                         }
@@ -151,7 +150,7 @@ class AnimeDetailsHolder(val view: View) {
                     recyclerViewRelated.adapter = AnimeRelatedAdapter(fragment, animeObject.related)
                     showCard(cardViews[6])
                 } else {
-                    doOnUI { cardViews[6].visibility = View.GONE }
+                    launch(Dispatchers.Main) { cardViews[6].visibility = View.GONE }
                 }
             }
             needAnimation = false

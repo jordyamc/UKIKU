@@ -28,7 +28,7 @@ class RecentsAdapter(val fragment: HomeFragment, private val isLarge: Boolean = 
     override fun updateList(list: List<Any>) {
         doAsync {
             this@RecentsAdapter.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

@@ -13,7 +13,9 @@ import knf.kuma.animeinfo.AnimeChaptersAdapter
 import knf.kuma.animeinfo.BottomActionsDialog
 import knf.kuma.animeinfo.ChapterObjWrap
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.safeDismiss
+import knf.kuma.commons.showSnackbar
 import knf.kuma.custom.CenterLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -23,7 +25,6 @@ import kotlinx.android.synthetic.main.recycler_chapters.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
-import java.util.*
 
 class AnimeChaptersHolder(view: View, private val fragment: Fragment, private val callback: ChapHolderCallback) {
     val recyclerView: RecyclerView = view.recycler
@@ -82,17 +83,17 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                                 seeingDAO.update(seeingObject)
                                                 syncData { seeing() }
                                             }
-                                            doOnUI {
-                                                adapter?.apply {
-                                                    if (selection.isNotEmpty()){
-                                                        selection.forEach {
-                                                            this.chapters[it].isSeen = true
+                                                fragment.doOnUI {
+                                                    adapter?.apply {
+                                                        if (selection.isNotEmpty()) {
+                                                            selection.forEach {
+                                                                this.chapters[it].isSeen = true
+                                                            }
+                                                            deselectAll()
                                                         }
-                                                        deselectAll()
                                                     }
                                                 }
-                                            }
-                                            doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                         }
                                         BottomActionsDialog.STATE_UNSEEN -> doAsync {
                                             try {
@@ -109,9 +110,9 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                                     seeingDAO.update(seeingObject)
                                                     syncData { seeing() }
                                                 }
-                                                doOnUI {
+                                                fragment.doOnUI {
                                                     adapter?.apply {
-                                                        if (selection.isNotEmpty()){
+                                                        if (selection.isNotEmpty()) {
                                                             selection.forEach {
                                                                 this.chapters[it].isSeen = false
                                                             }
@@ -119,10 +120,10 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                                         }
                                                     }
                                                 }
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                         BottomActionsDialog.STATE_IMPORT_MULTIPLE -> doAsync {
@@ -138,10 +139,10 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                                 }
                                                 callback.onImportMultiple(cChapters)
                                                 recyclerView.post { adapter?.deselectAll() }
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                         BottomActionsDialog.STATE_DOWNLOAD_MULTIPLE -> doAsync {
@@ -156,11 +157,11 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                                         cChapters.add(chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                                 callback.onDownloadMultiple(false, cChapters)
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                         BottomActionsDialog.STATE_QUEUE_MULTIPLE -> doAsync {
@@ -177,11 +178,11 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                                         QueueManager.add(Uri.fromFile(chapter.fileWrapper().file()), true, chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                                 callback.onDownloadMultiple(true, cChapters)
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
-                                                doOnUI { snackbar.safeDismiss() }
+                                                fragment.doOnUI { snackbar.safeDismiss() }
                                             }
                                         }
                                     }

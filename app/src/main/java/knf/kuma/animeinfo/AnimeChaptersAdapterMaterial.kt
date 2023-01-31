@@ -255,7 +255,7 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                                     }
 
                                     override fun onProgressIndicator(boolean: Boolean) {
-                                        doOnUI {
+                                        fragment.doOnUI {
                                             if (boolean) {
                                                 holder.progressBar.isIndeterminate = true
                                                 holder.progressBarRoot.visibility = View.VISIBLE
@@ -329,7 +329,7 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                                     override fun onCast(url: String?) {}
 
                                     override fun onProgressIndicator(boolean: Boolean) {
-                                        doOnUI {
+                                        fragment.doOnUI {
                                             if (boolean) {
                                                 holder.progressBar.isIndeterminate = true
                                                 holder.progressBarRoot.visibility = View.VISIBLE

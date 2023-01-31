@@ -8,7 +8,7 @@ import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.noCrashLet
 import knf.kuma.commons.safeShow
@@ -37,7 +37,7 @@ object FavToSeeing {
             noCrash {
                 val favList = CacheDB.INSTANCE.favsDAO().allRaw
                 var count = 0
-                doOnUI {
+                doOnUIGlobal {
                     val dialog = MaterialDialog(context).apply {
                         lifecycleOwner()
                         message(text = "Procesando favoritos... ($count/${favList.size})")
@@ -63,7 +63,7 @@ object FavToSeeing {
                                 }
                             }
                             count++
-                            doOnUI { dialog.message(text = "Procesando favoritos... ($count/${favList.size})") }
+                            doOnUIGlobal { dialog.message(text = "Procesando favoritos... ($count/${favList.size})") }
                         }
                         syncData {
                             if (needSeeingUpdate)
@@ -71,7 +71,7 @@ object FavToSeeing {
                             if (needSeenUpdate)
                                 seen()
                         }
-                        doOnUI { dialog.getActionButton(WhichButton.POSITIVE).isEnabled = true }
+                        doOnUIGlobal { dialog.getActionButton(WhichButton.POSITIVE).isEnabled = true }
                     }
                 }
             }

@@ -2,7 +2,7 @@ package knf.kuma.favorite
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.database.CacheDB
 import knf.kuma.favorite.objects.FavSorter
 import knf.kuma.favorite.objects.InfoContainer
@@ -71,7 +71,7 @@ object FavSectionHelper {
     }
 
     private fun setLiveData(list: MutableList<FavoriteObject>) {
-        doOnUI { liveData.setValue(list) }
+        doOnUIGlobal { liveData.setValue(list) }
     }
 
     fun reload() {

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.leanback.widget.Presenter
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.iterator
 import knf.kuma.commons.jsoupCookies
 import knf.kuma.database.CacheDB
@@ -25,6 +25,7 @@ import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
 import xdroid.toaster.Toaster
+import java.util.*
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalCoroutinesApi
@@ -38,15 +39,17 @@ class TVServersFactory private constructor(private val activity: Activity, priva
     private var current: VideoServer? = null
 
     fun showServerList() {
-        doOnUI {
+        doOnUIGlobal {
             try {
                 if (servers.isEmpty()) {
                     Toaster.toast("Sin servidores disponibles")
                     serversInterface.onFinish(false, false)
                 } else {
-                    activity.startActivityForResult(Intent(activity, TVServerSelection::class.java)
+                    activity.startActivityForResult(
+                        Intent(activity, TVServerSelection::class.java)
                             .putExtra(TVServerSelectionFragment.SERVERS_DATA, Server.getNames(servers) as ArrayList),
-                            REQUEST_CODE_LIST)
+                        REQUEST_CODE_LIST
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -107,7 +110,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                 } else if (server.haveOptions()) {
                     showOptions(server)
                 } else {
-                    when (text.toLowerCase()) {
+                    when (text.lowercase(Locale.getDefault())) {
                         "mega" -> {
                             Toaster.toast("No se puede usar Mega en TV")
                             showServerList()

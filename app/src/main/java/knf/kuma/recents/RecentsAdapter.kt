@@ -157,7 +157,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                             }
 
                                             override fun onProgressIndicator(boolean: Boolean) {
-                                                doOnUI {
+                                                fragment.doOnUI {
                                                     if (boolean) {
                                                         holder.progressBar.isIndeterminate = true
                                                         holder.progressBarRoot.visibility = View.VISIBLE
@@ -239,7 +239,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                 }
 
                                 override fun onProgressIndicator(boolean: Boolean) {
-                                    doOnUI {
+                                    fragment.doOnUI {
                                         if (boolean) {
                                             holder.progressBar.isIndeterminate = true
                                             holder.progressBarRoot.visibility = View.VISIBLE

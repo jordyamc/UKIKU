@@ -13,7 +13,6 @@ import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.distinct
-import knf.kuma.commons.doOnUI
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -24,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 
 class EmissionFragment : Fragment(), RemoveListener {
     private var adapter: EmissionAdapter? = null
@@ -81,7 +79,7 @@ class EmissionFragment : Fragment(), RemoveListener {
     }
 
     override fun onRemove(showError: Boolean) {
-        if (showError) doOnUI { error.visibility = View.VISIBLE }
+        if (showError) lifecycleScope.launch(Dispatchers.Main) { error.visibility = View.VISIBLE }
     }
 
     private fun smoothScroll() {
@@ -89,7 +87,7 @@ class EmissionFragment : Fragment(), RemoveListener {
     }
 
     fun updateChanges() {
-        doOnUI { adapter?.notifyDataSetChanged() }
+        lifecycleScope.launch(Dispatchers.Main) { adapter?.notifyDataSetChanged() }
     }
 
     internal fun reloadList() {

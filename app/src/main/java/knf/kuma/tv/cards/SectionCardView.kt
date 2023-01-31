@@ -3,7 +3,7 @@ package knf.kuma.tv.cards
 import android.content.Context
 import android.widget.ImageView
 import knf.kuma.R
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.tv.BindableCardView
 import knf.kuma.tv.sections.SectionObject
 import kotlinx.android.synthetic.main.item_tv_card_section.view.*
@@ -17,7 +17,7 @@ class SectionCardView(context: Context) : BindableCardView<SectionObject>(contex
         get() = img
 
     override fun bind(data: SectionObject) {
-        doOnUI { imageView.setImageResource(data.image) }
+        doOnUIGlobal { imageView.setImageResource(data.image) }
         title.text = data.title
     }
 }

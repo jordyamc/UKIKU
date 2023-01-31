@@ -190,7 +190,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                     if (it.isEmpty())
                         GlobalScope.launch {
                             val adView = AdView(context)
-                            adView.adSize = getAdSize(width.toFloat())
+                            adView.setAdSize(getAdSize(width.toFloat()))
                             adView.adUnitId = unitID
                             adView.adListener = object : AbsAdListener() {
                                 override fun onAdClicked() {
@@ -240,7 +240,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                 }
             } else {
                 val adView = AdView(context)
-                adView.adSize = getAdSize(width.toFloat())
+                adView.setAdSize(getAdSize(width.toFloat()))
                 adView.adUnitId = unitID
                 adView.adListener = object : AbsAdListener() {
                     override fun onAdClicked() {
@@ -315,6 +315,7 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
             }
 
             override fun onAdFailedToLoad(p0: LoadAdError) {
+                Log.e("Ad", "Ad failed to load, code: ${p0.code}")
                 createAndLoad()
             }
         })
@@ -358,6 +359,7 @@ class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenA
             }
 
             override fun onAdFailedToLoad(p0: LoadAdError) {
+                Log.e("Ad", "Ad failed to load, code: ${p0.code}")
                 createAndLoad()
             }
         })

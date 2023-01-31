@@ -19,7 +19,7 @@ class SearchAdapterMaterial(val fragment: HomeFragmentMaterial) : UpdateableAdap
     override fun updateList(list: List<Any>) {
         doAsync {
             this@SearchAdapterMaterial.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

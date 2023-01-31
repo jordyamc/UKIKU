@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.item_downloading_extra.view.progress
 import kotlinx.android.synthetic.main.item_downloading_extra.view.server
 import kotlinx.android.synthetic.main.item_downloading_extra.view.title
 import kotlinx.android.synthetic.main.item_downloading_extra_material.view.*
+import java.util.*
 
 class DownloadingAdapterMaterial internal constructor(private val fragment: Fragment, private val downloadObjects: MutableList<DownloadObject>) : RecyclerView.Adapter<DownloadingAdapterMaterial.DownloadingItem>() {
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
@@ -66,7 +67,7 @@ class DownloadingAdapterMaterial internal constructor(private val fragment: Frag
                 R.id.cancel -> {
                     fragment.context?.let {
                         MaterialDialog(it).safeShow {
-                            message(text = "¿Cancelar descarga del ${downloadObject.chapter?.toLowerCase()} de ${downloadObject.name}?")
+                            message(text = "¿Cancelar descarga del ${downloadObject.chapter.lowercase(Locale.getDefault())} de ${downloadObject.name}?")
                             positiveButton(text = "CONFIRMAR") {
                                 try {
                                     downloadObjects.removeAt(holder.adapterPosition)
@@ -122,7 +123,7 @@ class DownloadingAdapterMaterial internal constructor(private val fragment: Frag
         ArrayList(downloadObjects).forEachIndexed { index, downloadObject ->
             if (downloadObject.eid == eid) {
                 downloadObjects.removeAt(index)
-                doOnUI { notifyItemRemoved(index) }
+                fragment.doOnUI { notifyItemRemoved(index) }
                 return
             }
         }

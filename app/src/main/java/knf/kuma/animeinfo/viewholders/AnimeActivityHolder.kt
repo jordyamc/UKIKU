@@ -23,7 +23,7 @@ import knf.kuma.commons.forceHide
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 
-class AnimeActivityHolder(activity: AppCompatActivity) {
+class AnimeActivityHolder(val activity: AppCompatActivity) {
     val appBarLayout: AppBarLayout by bind(activity, R.id.appBar)
     private val collapsingToolbarLayout: CollapsingToolbarLayout by bind(activity, R.id.collapsingToolbar)
     val imageView: ImageView by bind(activity, R.id.img)
@@ -85,14 +85,14 @@ class AnimeActivityHolder(activity: AppCompatActivity) {
     }
 
     fun setFABState(isFav: Boolean) {
-        doOnUI {
+        activity.doOnUI {
             fab.setImageDrawable(if (isFav) drawableHeartFull else drawableHeartEmpty)
             fab.invalidate()
         }
     }
 
     fun showFAB() {
-        doOnUI {
+        activity.doOnUI {
             fab.isEnabled = true
             //fab.show()
         }

@@ -84,20 +84,20 @@ class CastUtil private constructor(private val context: Context) : CastListener,
     }
 
     private fun startLoading(view: View) {
-        doOnUI {
+        doOnUIGlobal {
             loading = getLoading(view)
         }
     }
 
     private fun stopLoading() {
-        doOnUI {
+        doOnUIGlobal {
             loading?.safeDismiss()
             loading = null
         }
     }
 
     private fun setEid(eid: String) {
-        doOnUI {
+        doOnUIGlobal {
             casting.setValue(eid)
         }
     }

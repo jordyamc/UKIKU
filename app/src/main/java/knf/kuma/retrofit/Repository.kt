@@ -144,7 +144,7 @@ class Repository {
                 val dbLink = "%/${link.substringAfterLast("/")}"
                 dao.getAnimeRaw(dbLink)?.let {
                     cacheUsed = true
-                    doOnUI {
+                    doOnUIGlobal {
                         data.value = it
                     }
                 }
@@ -163,7 +163,7 @@ class Repository {
                                         val animeObject = AnimeObject(link, response.body())
                                         if (persist)
                                             dao.insert(animeObject)
-                                        doOnUI { data.value = animeObject }
+                                        doOnUIGlobal { data.value = animeObject }
                                     }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -192,11 +192,11 @@ class Repository {
                         rest
                     ).enqueue(callback)
                 } else if (!cacheUsed)
-                    doOnUI { data.value = null }
+                    doOnUIGlobal { data.value = null }
             } catch (e: Exception) {
                 e.printStackTrace()
                 if (!cacheUsed)
-                    doOnUI { data.value = null }
+                    doOnUIGlobal { data.value = null }
             }
         }
         return data

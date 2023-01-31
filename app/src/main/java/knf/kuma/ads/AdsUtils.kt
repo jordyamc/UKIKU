@@ -74,7 +74,9 @@ object AdsUtils {
                 "bypass_max_tries" to 3L,
                 "bypass_skip_captcha" to true,
                 "bypass_use_dialog" to true,
-                "bypass_dialog_style" to 1L
+                "bypass_dialog_style" to 1L,
+                "full_show_extra_probability" to 60.0,
+                "full_show_probability" to 70.0
             )
         )
         fetch().addOnCompleteListener {

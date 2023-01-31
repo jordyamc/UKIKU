@@ -20,7 +20,7 @@ class RecommendedAdapterMaterial(val activity: Activity?) : UpdateableAdapter<Re
     override fun updateList(list: List<Any>) {
         doAsync {
             this@RecommendedAdapterMaterial.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            doOnUIGlobal { notifyDataSetChanged() }
         }
     }
 

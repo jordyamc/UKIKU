@@ -16,8 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
@@ -40,7 +38,7 @@ import xdroid.toaster.Toaster
 
 class CustomExoPlayer : GenericActivity(), Player.Listener {
     private var exoPlayer: ExoPlayer? = null
-    private lateinit var playerState: PlayerState
+    private var playerState: PlayerState = PlayerState()
     private var isEnding = false
     private var playList: List<QueueObject> = ArrayList()
 
@@ -149,9 +147,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                 exoPlayer?.prepare()
                 val canResume = playerState.position != C.TIME_UNSET
                 if (canResume)
-                    noCrash {
-                        exoPlayer?.seekTo(playerState.window, playerState.position)
-                    }
+                    exoPlayer?.seekTo(playerState.window, playerState.position)
                 exoPlayer?.playWhenReady = true
                 /*disposable = Observable.interval(1, TimeUnit.SECONDS).map { exoPlayer?.currentPosition?:0 }
                         .subscribeOn(AndroidSchedulers.from(exoPlayer?.applicationLooper, false))
@@ -237,10 +233,8 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     override fun onNewIntent(intent: Intent) {
         setIntent(intent)
         releasePlayer()
-        if (::playerState.isInitialized) {
-            playerState.window = C.INDEX_UNSET
-            playerState.position = 0
-        }
+        playerState.window = C.INDEX_UNSET
+        playerState.position = 0
         checkPlaylist(intent)
         initPlayer(intent)
         super.onNewIntent(intent)
@@ -256,17 +250,15 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         super.onPause()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
             return
-        if (::playerState.isInitialized) {
-            val state = playerState.apply {
-                title = video_title.text.toString()
-                position = if (!isEnding) {
-                    exoPlayer?.currentPosition ?: 0
-                } else
-                    0
-            }
-            doAsync {
-                CacheDB.INSTANCE.playerStateDAO().set(state)
-            }
+        val state = playerState.apply {
+            title = video_title.text.toString()
+            position = if (!isEnding) {
+                exoPlayer?.currentPosition ?: 0
+            } else
+                0
+        }
+        doAsync {
+            CacheDB.INSTANCE.playerStateDAO().set(state)
         }
         if (!isFinishing)
             exoPlayer?.pause()
@@ -280,10 +272,6 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-
-    }
-
-    override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
 
     }
 

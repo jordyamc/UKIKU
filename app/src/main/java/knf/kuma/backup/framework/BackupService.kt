@@ -15,7 +15,7 @@ abstract class BackupService {
 
     abstract fun logOut()
 
-    abstract suspend fun search(id: String): BackupObject<*>?
+    abstract suspend fun search(id: String, manual: Boolean = false): BackupObject<*>?
 
     abstract suspend fun backup(backupObject: BackupObject<*>, id: String): BackupObject<*>?
 

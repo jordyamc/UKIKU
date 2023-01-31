@@ -260,7 +260,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     }
 
                                     override fun onProgressIndicator(boolean: Boolean) {
-                                        doOnUI {
+                                        fragment.doOnUI {
                                             if (boolean) {
                                                 holder.progressBar.isIndeterminate = true
                                                 holder.progressBarRoot.visibility = View.VISIBLE
@@ -334,7 +334,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     override fun onCast(url: String?) {}
 
                                     override fun onProgressIndicator(boolean: Boolean) {
-                                        doOnUI {
+                                        fragment.doOnUI {
                                             if (boolean) {
                                                 holder.progressBar.isIndeterminate = true
                                                 holder.progressBarRoot.visibility = View.VISIBLE
@@ -469,7 +469,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
             selection.add(start)
         else
             selection.remove(start)
-        doOnUI { notifyItemChanged(start, true) }
+        fragment.doOnUI { notifyItemChanged(start, true) }
     }
 
     fun deselectAll() {

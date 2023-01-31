@@ -211,7 +211,7 @@ class Main : GenericActivity(),
 
     @SuppressLint("SetTextI18n")
     private fun setNavigationButtons() {
-        doOnUI {
+        lifecycleScope.launch(Dispatchers.Main) {
             badgeEmission = navigationView.menu.findItem(R.id.drawer_emision).actionView as TextView
             badgeSeeing = navigationView.menu.findItem(R.id.drawer_seeing).actionView as TextView
             badgeQueue = navigationView.menu.findItem(R.id.drawer_queue).actionView as TextView
@@ -548,7 +548,7 @@ class Main : GenericActivity(),
     }
 
     private fun setFragment(fragment: BottomFragment) {
-        doOnUI {
+        lifecycleScope.launch(Dispatchers.Main) {
             try {
                 if (fragment !is SearchFragment)
                     selectedFragment = fragment
@@ -659,7 +659,7 @@ class Main : GenericActivity(),
         super.onResume()
         invalidateOptionsMenu()
         connectionState.setUp(this, ::onStateDialog)
-        doOnUI {
+        lifecycleScope.launch(Dispatchers.Main) {
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             backupLocation.text = when (Backups.type) {
                 Backups.Type.NONE -> "Sin respaldos"

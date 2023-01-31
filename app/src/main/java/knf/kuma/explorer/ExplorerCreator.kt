@@ -2,7 +2,7 @@ package knf.kuma.explorer
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.doAsync
@@ -55,7 +55,7 @@ object ExplorerCreator {
     }
 
     private fun postState(state: String?) {
-        doOnUI { STATE_LISTENER.setValue(state) }
+        doOnUIGlobal { STATE_LISTENER.setValue(state) }
     }
 
     interface EmptyListener {

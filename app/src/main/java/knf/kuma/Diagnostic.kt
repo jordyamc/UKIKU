@@ -61,7 +61,7 @@ class Diagnostic : GenericActivity() {
 
     private fun startTests() {
         runNetworkTests()
-        runInternetTest()
+        //runInternetTest()
         runDirectoryTest()
         runMemoryTest()
         runBackupTest()
@@ -269,16 +269,20 @@ class Diagnostic : GenericActivity() {
                 else -> "Incompleto"
             }
         )
-        CacheDB.INSTANCE.animeDAO().countLive.observe(this, {
+        CacheDB.INSTANCE.animeDAO().countLive.observe(this) {
             dirTotalState.load(it.toString())
-        })
+        }
     }
 
     private fun runMemoryTest() {
         val dirs = getExternalFilesDirs(null)
-        internalState.load(getAvailable(dirs[0].freeSpace))
-        if (dirs.size > 1)
-            externalState.load(getAvailable(dirs[1].freeSpace))
+        noCrash {
+            internalState.load(getAvailable(dirs[0].freeSpace))
+        }
+        noCrash {
+            if (dirs.size > 1)
+                externalState.load(getAvailable(dirs[1].freeSpace))
+        }
     }
 
     private fun getAvailable(size: Long): String {

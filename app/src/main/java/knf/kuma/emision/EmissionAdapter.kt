@@ -75,7 +75,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
                     showHidden = PrefsUtil.emissionShowHidden
                     val result = if (animate) DiffUtil.calculateDiff(EmissionDiff(list, newList), true) else null
                     list = newList
-                    doOnUI {
+                    fragment.doOnUI {
                         try {
                             if (animate)
                                 result?.dispatchUpdatesTo(this@EmissionAdapter)

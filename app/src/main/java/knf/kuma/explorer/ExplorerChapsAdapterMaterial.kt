@@ -122,7 +122,7 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
             downloadsDAO.deleteByEid(obj.eid)
             QueueManager.remove(obj.eid)
             explorerObject.fileList.removeAt(position)
-            doOnUI { notifyItemRemoved(position) }
+            fragment.doOnUI { notifyItemRemoved(position) }
             if (explorerObject.fileList.size == 0) {
                 model.remove(explorerObject.obj)
                 clearInterface?.onClear()
@@ -138,7 +138,7 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
                 FileAccessHelper.delete(obj.obj.fileName, true)
                 downloadsDAO.deleteByEid(obj.obj.eid)
                 QueueManager.remove(obj.obj.eid)
-                doOnUI {
+                fragment.doOnUI {
                     notifyItemRemoved(i)
                 }
             }
@@ -148,7 +148,7 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
     }
 
     private fun loadThumb(fileDownObj: ExplorerObject.FileDownObj, imageView: ImageView?) {
-        val file = File(context?.cacheDir, explorerObject.obj.fileName + "_" + fileDownObj.chapter.toLowerCase() + ".png")
+        val file = File(context?.cacheDir, explorerObject.obj.fileName + "_" + fileDownObj.chapter.lowercase(Locale.getDefault()) + ".png")
         if (file.exists()) {
             fileDownObj.thumb = file
             PicassoSingle.get().load(file).into(imageView)
@@ -167,10 +167,10 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
                         file.createNewFile()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(file))
                         fileDownObj.thumb = file
-                        doOnUI { PicassoSingle.get().load(file).into(imageView) }
+                        fragment.doOnUI { PicassoSingle.get().load(file).into(imageView) }
                     }
                 } catch (e: Exception) {
-                    doOnUI { PicassoSingle.get().load(R.drawable.ic_no_thumb).fit().into(imageView) }
+                    fragment.doOnUI { PicassoSingle.get().load(R.drawable.ic_no_thumb).fit().into(imageView) }
                 }
             }
         }

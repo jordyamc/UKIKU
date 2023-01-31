@@ -10,12 +10,13 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import knf.kuma.R
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.noCrash
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_CIRCULAR
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_HORIZONTAL
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_NORMAL
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import java.util.*
 
 /**
  * Core class constructing the SnackProgressBar.
@@ -264,8 +265,8 @@ internal class SnackProgressBarCore private constructor(
         val action = snackProgressBar.getAction()
         val onActionClickListener = snackProgressBar.getOnActionClickListener()
         // set the text
-        snackProgressBarLayout.actionText.text = action.toUpperCase()
-        snackProgressBarLayout.actionNextLineText.text = action.toUpperCase()
+        snackProgressBarLayout.actionText.text = action.uppercase(Locale.getDefault())
+        snackProgressBarLayout.actionNextLineText.text = action.uppercase(Locale.getDefault())
         // set the onClickListener
         val onClickListener = View.OnClickListener {
             onActionClickListener?.onActionClick()
@@ -336,7 +337,7 @@ internal class SnackProgressBarCore private constructor(
      * Removes the overlayLayout
      */
     internal fun removeOverlayLayout() {
-        doOnUI {
+        doOnUIGlobal {
             parentView.removeView(overlayLayout)
         }
     }

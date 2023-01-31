@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import knf.kuma.R
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import kotlinx.android.synthetic.main.layout_loading_text_material.view.*
 import org.jetbrains.anko.textColor
 
@@ -32,7 +32,7 @@ class StateViewMaterial @JvmOverloads constructor(context: Context, attrs: Attri
 
     fun load(contentText: String, state: Int = STATE_NORMAL) {
         val shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-        doOnUI {
+        doOnUIGlobal {
             visibility = View.VISIBLE
             when (state) {
                 STATE_OK -> text.textColor = ContextCompat.getColor(context, R.color.stateOk)

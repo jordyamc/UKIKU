@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.doOnUI
 import knf.kuma.news.AdNewsObject
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
@@ -154,24 +153,7 @@ fun ViewGroup.implBannerBrains(unitID: AdsType, isSmart: Boolean = false) {
 }
 
 fun ViewGroup.implBannerBrains(unitID: String, isSmart: Boolean = false) {
-    if (PrefsUtil.isAdsEnabled)
-        doOnUI {
-            /*val adView = AppBrainBanner(context)
-            adView.bannerListener = object : BannerListener {
-                override fun onClick() {
-                    FirebaseAnalytics.getInstance(App.context).logEvent("Ad_clicked", Bundle())
-                }
 
-                override fun onAdRequestDone(p0: Boolean) {
-                }
-            }
-            if (this is BannerContainerView) {
-                show(adView)
-            } else {
-                removeAllViews()
-                addView(adView)
-            }*/
-        }
 }
 
 fun getFAdLoaderBrains(context: Context, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderBrains(context, onUpdate)

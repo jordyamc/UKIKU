@@ -19,7 +19,7 @@ class SearchAdapter(val fragment: HomeFragment) : UpdateableAdapter<SearchAdapte
     override fun updateList(list: List<Any>) {
         doAsync {
             this@SearchAdapter.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

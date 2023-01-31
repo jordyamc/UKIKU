@@ -28,7 +28,7 @@ class RecentsAdapterMaterial(val fragment: HomeFragmentMaterial, private val isL
     override fun updateList(list: List<Any>) {
         doAsync {
             this@RecentsAdapterMaterial.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

@@ -68,7 +68,7 @@ internal class SeeingAdapterMaterial(private val activity: Activity, private val
                         }
                         syncData { seeing() }
                         if (isFullList)
-                            doOnUI {
+                            doOnUIGlobal {
                                 (holder as? SeeingItem)?.chapter?.text = getCardText(seeingObject)
                             }
                     }

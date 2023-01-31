@@ -19,7 +19,7 @@ class DirAdapterMaterial(val fragment: HomeFragmentMaterial) : UpdateableAdapter
     override fun updateList(list: List<Any>) {
         doAsync {
             this@DirAdapterMaterial.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

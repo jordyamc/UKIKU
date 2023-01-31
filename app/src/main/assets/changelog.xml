@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="198" version="5.2.0">
+        <change type="fix">Error al verificar suscripciones</change>
+    </release>
+    <release code="197" version="5.1.28">
+        <change type="fix">Error en backup local</change>
+    </release>
     <release code="196" version="5.1.27">
         <change type="fix">Error al iniciar en TV</change>
     </release>

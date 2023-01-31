@@ -60,7 +60,7 @@ object Backups {
             val snackbar = view?.showSnackbar("Respaldando...", Snackbar.LENGTH_INDEFINITE)
             val service = backupService ?: createService()
             service?.backup(BackupObject(getList(id)), id)?.let { onBackup(it) } ?: onBackup(null)
-            doOnUI { snackbar?.safeDismiss() }
+            doOnUIGlobal { snackbar?.safeDismiss() }
         }
     }
 

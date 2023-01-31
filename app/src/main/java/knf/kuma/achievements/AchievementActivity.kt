@@ -39,7 +39,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.toast
 import xdroid.toaster.Toaster
 import java.text.NumberFormat
@@ -142,18 +141,16 @@ class AchievementActivity : GenericActivity() {
             val cost = ((achievement.points / 1000) * 25)
             buyButton.text = cost.toString()
             buyButton.visibility = View.VISIBLE
-            buyButton.onClick {
-                doOnUI {
-                    if (Economy.buy(cost)) {
-                        achievement.isRevealed = true
-                        doAsync {
-                            CacheDB.INSTANCE.achievementsDAO().update(achievement)
-                            syncData { achievements() }
-                        }
-                        onMoreInfo(achievement)
-                    } else
-                        toast("Loli-coins insuficientes")
-                }
+            buyButton.setOnClickListener {
+                if (Economy.buy(cost)) {
+                    achievement.isRevealed = true
+                    doAsync {
+                        CacheDB.INSTANCE.achievementsDAO().update(achievement)
+                        syncData { achievements() }
+                    }
+                    onMoreInfo(achievement)
+                } else
+                    toast("Loli-coins insuficientes")
             }
         } else buyButton.visibility = View.GONE
         icon.setImageResource(achievement.usableIcon())
@@ -244,11 +241,11 @@ class AchievementActivity : GenericActivity() {
                     setLarge(true)
                     setDismissible(true)
                 }
-                doAsync {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val list = CacheDB.INSTANCE.achievementsDAO().completedAchievements
                     val achievementList = mutableListOf<AchievementUnlocked.AchievementData>()
                     list.forEach { achievementList.add(it.achievementData(this@AchievementActivity)) }
-                    doOnUI {
+                    launch(Dispatchers.Main) {
                         achievementUnlocked.show(achievementList)
                     }
                 }

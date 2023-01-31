@@ -36,7 +36,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import androidx.paging.PagedList
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
@@ -129,7 +129,7 @@ fun verifiyFF() {
 }
 
 fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
-    doOnUI {
+    doOnUIGlobal {
         try {
             lifecycleOwner()
             this.func()
@@ -142,7 +142,7 @@ fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
 }
 
 fun MaterialDialog.safeShow() {
-    doOnUI {
+    doOnUIGlobal {
         try {
             lifecycleOwner()
             this@safeShow.show()
@@ -195,14 +195,14 @@ fun gridColumns(size: Int = 115): Int {
 fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT, animation: Int = Snackbar.ANIMATION_MODE_FADE): Snackbar {
     return Snackbar.make(this, text, duration).apply {
         animationMode = animation
-    }.also { doOnUI { it.show() } }
+    }.also { doOnUIGlobal { it.show() } }
 }
 
 fun View.showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT, button: String, onAction: (View) -> Unit): Snackbar {
     return Snackbar.make(this, text, duration).apply {
         animationMode = Snackbar.ANIMATION_MODE_SLIDE
         setAction(button, onAction)
-    }.also { doOnUI { it.show() } }
+    }.also { doOnUIGlobal { it.show() } }
 }
 
 fun SnackProgressBarManager.showProgressSnackbar(text: String, duration: Int = SnackProgressBarManager.LENGTH_SHORT) {
@@ -210,7 +210,7 @@ fun SnackProgressBarManager.showProgressSnackbar(text: String, duration: Int = S
             .setIsIndeterminate(true)
             .setProgressMax(100)
             .setShowProgressPercentage(false)
-    doOnUI { show(snackbar, duration) }
+    doOnUIGlobal { show(snackbar, duration) }
 }
 
 fun View.createSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Snackbar {
@@ -392,7 +392,15 @@ fun String?.toastLong() {
         Toaster.toastLong(this)
 }
 
-fun doOnUI(enableLog: Boolean = true, onLog: (text: String) -> Unit = {}, func: suspend () -> Unit) {
+fun LifecycleOwner.doOnUI(enableLog: Boolean = true, onLog: (text: String) -> Unit = {}, func: suspend () -> Unit) {
+    lifecycleScope.launch(Dispatchers.Main) {
+        noCrashSuspend(enableLog) {
+            func()
+        }?.also { onLog(it) }
+    }
+}
+
+fun doOnUIGlobal(enableLog: Boolean = true, onLog: (text: String) -> Unit = {}, func: suspend () -> Unit) {
     GlobalScope.launch(Dispatchers.Main) {
         noCrashSuspend(enableLog) {
             func()
@@ -502,10 +510,8 @@ fun FloatingActionButton.forceHide() {
     visibility = View.GONE
 }
 
-fun pagedConfig(size: Int): PagedList.Config = PagedList.Config.Builder()
-        .setPageSize(size)
-        .setEnablePlaceholders(PrefsUtil.usePlaceholders)
-        .build()
+fun httpRequest(url: String) =
+    NoSSLOkHttpClient.get().newCall(okHttpCookies(url)).execute()
 
 fun jsoupCookies(url: String?, followRedirects: Boolean = true): Connection =
         Jsoup.connect(url)
@@ -565,7 +571,8 @@ fun isHostValid(hostName: String): Boolean {
         "streamango.com",
         "ok.ru",
         "www.rapidvideo.com",
-        "nuclient-verification.herokuapp.com",
+        "us-central1-nu-client.cloudfunctions.net",
+        "",
         "worldvideodownload.com",
         "okvid.download",
         "www.yourupload.com" -> true
@@ -642,11 +649,11 @@ fun View.onClickMenu(
 
 @SuppressLint("RestrictedApi")
 fun popUpMenu(
-        view: View,
-        @MenuRes menu: Int, showIcons: Boolean = true,
-        hideItems: () -> List<Int> = { emptyList() },
-        onItemClicked: (item: MenuItem) -> Unit = {}
-) = doOnUI {
+    view: View,
+    @MenuRes menu: Int, showIcons: Boolean = true,
+    hideItems: () -> List<Int> = { emptyList() },
+    onItemClicked: (item: MenuItem) -> Unit = {}
+) = doOnUIGlobal {
     PopupMenu(view.context, view).apply {
         inflate(menu)
         setOnMenuItemClickListener {

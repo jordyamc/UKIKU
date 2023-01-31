@@ -81,7 +81,7 @@ class AnimeDetailsMaterialHolder(val view: View) {
                     desc.setTextAndIndicator(animeObject.description?.trim() ?: "", expandIcon)
                     desc.setAnimationDuration(300)
                     val onClickListener = View.OnClickListener {
-                        doOnUI {
+                        launch(Dispatchers.Main) {
                             expandIcon.setImageResource(if (desc.isExpanded) R.drawable.action_expand else R.drawable.action_shrink)
                             desc.toggle()
                         }
@@ -167,7 +167,7 @@ class AnimeDetailsMaterialHolder(val view: View) {
                     recyclerViewRelated.adapter = AnimeRelatedAdapterMaterial(fragment, animeObject.related)
                     showLayout(layouts[6])
                 } else {
-                    doOnUI { layouts[6].visibility = View.GONE }
+                    launch(Dispatchers.Main) { layouts[6].visibility = View.GONE }
                 }
             }
             needAnimation = false

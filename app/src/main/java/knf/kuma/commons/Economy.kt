@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
@@ -43,14 +42,14 @@ object Economy {
     fun buy(price: Int): Boolean {
         val total = PrefsUtil.userCoins
         return if (total >= price) {
-            PrefsUtil.userCoins = (total - price).also { doOnUI { coinsLiveData.value = it } }
+            PrefsUtil.userCoins = (total - price).also { doOnUIGlobal { coinsLiveData.value = it } }
             doAsync { repeat(price) { FirebaseAnalytics.getInstance(App.context).logEvent("Coins_used", Bundle()) } }
             true
         } else false
     }
 
     fun showWallet(activity: FragmentActivity, themed: Boolean = false, onShow: () -> Unit) {
-        doOnUI {
+        activity.doOnUI {
             val view = activity.layoutInflater.inflate(R.layout.dialog_wallet, null)
             if (themed) {
                 view.coinsCount.setTextColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
@@ -58,11 +57,11 @@ object Economy {
                 view.backgroundBottom.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColor()))
             }
             view.coinsCount.text = PrefsUtil.userCoins.toString()
-            coinsLiveData.observe(activity, Observer {
-                doOnUI {
+            coinsLiveData.observe(activity) {
+                activity.doOnUI {
                     view.coinsCount.text = it.toString()
                 }
-            })
+            }
             view.showAdButton.onClick { onShow() }
             AlertDialog.Builder(activity).apply {
                 setView(view)

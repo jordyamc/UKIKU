@@ -1,7 +1,6 @@
 package knf.kuma.emision
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.distinct
-import knf.kuma.commons.doOnUI
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -25,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 
 class EmissionFragmentMaterial : Fragment(), RemoveListener {
     private var adapter: EmissionAdapterMaterial? = null
@@ -46,7 +43,6 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.e("Emission","On create fragment")
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
             adContainer.implBanner(AdsType.EMISSION_BANNER, true)
@@ -59,8 +55,8 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
         recycler.verifyManager()
         recycler.adapter = adapter
         if (context != null)
-            observeList(Observer { animeObjects ->
-                lifecycleScope.launch(Dispatchers.Main){
+            observeList { animeObjects ->
+                lifecycleScope.launch(Dispatchers.Main) {
                     progress.visibility = View.GONE
                     adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }, false) { smoothScroll() }
                     if (isFirst) {
@@ -70,7 +66,7 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
                     }
                     error.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
                 }
-            })
+            }
     }
 
     private fun observeList(obs: Observer<MutableList<SearchObject>>) {
@@ -83,7 +79,7 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
     }
 
     override fun onRemove(showError: Boolean) {
-        if (showError) doOnUI { error.visibility = View.VISIBLE }
+        if (showError) lifecycleScope.launch(Dispatchers.Main) { error.visibility = View.VISIBLE }
     }
 
     private fun smoothScroll() {
@@ -91,13 +87,13 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
     }
 
     fun updateChanges() {
-        doOnUI { adapter?.notifyDataSetChanged() }
+        lifecycleScope.launch(Dispatchers.Main) { adapter?.notifyDataSetChanged() }
     }
 
     internal fun reloadList() {
         if (context != null)
-            observeList(Observer { animeObjects ->
-                lifecycleScope.launch(Dispatchers.Main){
+            observeList { animeObjects ->
+                lifecycleScope.launch(Dispatchers.Main) {
                     error?.visibility = View.GONE
                     if (animeObjects != null && animeObjects.isNotEmpty())
                         adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }) { smoothScroll() }
@@ -106,7 +102,7 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
                     if (animeObjects == null || animeObjects.isEmpty())
                         error?.visibility = View.VISIBLE
                 }
-            })
+            }
     }
 
     companion object {

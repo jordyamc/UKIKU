@@ -19,7 +19,7 @@ class DirAdapter(val fragment: HomeFragment) : UpdateableAdapter<DirAdapter.Rece
     override fun updateList(list: List<Any>) {
         doAsync {
             this@DirAdapter.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

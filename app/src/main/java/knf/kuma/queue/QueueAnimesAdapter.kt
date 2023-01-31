@@ -54,7 +54,7 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
     fun update(list: MutableList<QueueObject>) {
         if (this.list notSameContent list) {
             this.list = list
-            doOnUI { notifyDataSetChanged() }
+            doOnUIGlobal { notifyDataSetChanged() }
         }
     }
 

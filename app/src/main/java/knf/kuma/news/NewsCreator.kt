@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import knf.kuma.ads.AdCallback
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.toast
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
@@ -45,12 +45,12 @@ object NewsCreator {
                             title, link, date, author, categories, description, content
                     ))
                 }
-                doOnUI {
+                doOnUIGlobal {
                     liveData.value = news
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                doOnUI {
+                doOnUIGlobal {
                     liveData.value = null
                 }
             }
@@ -58,7 +58,7 @@ object NewsCreator {
     }
 
     fun destroy() {
-        doOnUI {
+        doOnUIGlobal {
             liveData.value = null
         }
     }

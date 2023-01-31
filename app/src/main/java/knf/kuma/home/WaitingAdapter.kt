@@ -19,7 +19,7 @@ class WaitingAdapter(val fragment: HomeFragment) : UpdateableAdapter<WaitingAdap
     override fun updateList(list: List<Any>) {
         doAsync {
             this@WaitingAdapter.list = list.transform()
-            doOnUI { notifyDataSetChanged() }
+            fragment.doOnUI { notifyDataSetChanged() }
         }
     }
 

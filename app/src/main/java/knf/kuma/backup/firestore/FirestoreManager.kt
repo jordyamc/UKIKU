@@ -320,20 +320,20 @@ object FirestoreManager {
 
     fun updateHistory(collection: CollectionReference) =
             noCrash {
-                doOnUI { historyLiveData.value = State.SYNC }
+                doOnUIGlobal { historyLiveData.value = State.SYNC }
                 collection.document("history").set(HistoryData.create()).addOnSuccessListener {
                     Log.e("Firestore", "History upload success")
                     PrefsUtil.lsHistory = currentTime()
-                    doOnUI { historyLiveData.value = State.IDLE }
+                    doOnUIGlobal { historyLiveData.value = State.IDLE }
                 }.addOnFailureListener {
                     Log.e("Firestore", "History upload error", it)
-                    doOnUI { historyLiveData.value = State.IDLE }
+                    doOnUIGlobal { historyLiveData.value = State.IDLE }
                 }
             }
 
     fun updateSeen(collection: CollectionReference) =
             noCrash {
-                doOnUI { seenLiveData.value = State.SYNC }
+                doOnUIGlobal { seenLiveData.value = State.SYNC }
                 val data = SeenData.create()
                 val segments = data.list.chunked(10000).map { SeenData(it) }
                 collection.document("seen").set(mapOf("size" to segments.size))
@@ -367,84 +367,84 @@ object FirestoreManager {
                     }
                 }
                 PrefsUtil.lsSeen = currentTime()
-                doOnUI { seenLiveData.value = State.IDLE }
+                doOnUIGlobal { seenLiveData.value = State.IDLE }
             }
 
     fun updateAchievements(collection: CollectionReference) =
             noCrash {
-                doOnUI { achievementsLiveData.value = State.SYNC }
+                doOnUIGlobal { achievementsLiveData.value = State.SYNC }
                 collection.document("achievements").set(AchievementsData.create()).addOnSuccessListener {
                     Log.e("Firestore", "Achievements upload success")
                     PrefsUtil.lsAchievements = currentTime()
-                    doOnUI { achievementsLiveData.value = State.IDLE }
+                    doOnUIGlobal { achievementsLiveData.value = State.IDLE }
                 }.addOnFailureListener {
                     Log.e("Firestore", "Achievements upload error", it)
-                    doOnUI { achievementsLiveData.value = State.IDLE }
+                    doOnUIGlobal { achievementsLiveData.value = State.IDLE }
                 }
             }
 
     fun updateEA(collection: CollectionReference) =
             noCrash {
-                doOnUI { eaLiveData.value = State.SYNC }
+                doOnUIGlobal { eaLiveData.value = State.SYNC }
                 collection.document("ea").set(EAData.create()).addOnSuccessListener {
                     Log.e("Firestore", "EA upload success")
                     PrefsUtil.lsEa = currentTime()
-                    doOnUI { eaLiveData.value = State.IDLE }
+                    doOnUIGlobal { eaLiveData.value = State.IDLE }
                 }.addOnFailureListener {
                     Log.e("Firestore", "EA upload error", it)
-                    doOnUI { eaLiveData.value = State.IDLE }
+                    doOnUIGlobal { eaLiveData.value = State.IDLE }
                 }
             }
 
     fun updateFavs(collection: CollectionReference) =
             noCrash {
-                doOnUI { favsLiveData.value = State.SYNC }
+                doOnUIGlobal { favsLiveData.value = State.SYNC }
                 collection.document("favs").set(FavsData.create()).addOnSuccessListener {
                     Log.e("Firestore", "Favs upload success")
                     PrefsUtil.lsFavs = currentTime()
-                    doOnUI { favsLiveData.value = State.IDLE }
+                    doOnUIGlobal { favsLiveData.value = State.IDLE }
                 }.addOnFailureListener {
                     Log.e("Firestore", "Favs upload error", it)
-                    doOnUI { favsLiveData.value = State.IDLE }
+                    doOnUIGlobal { favsLiveData.value = State.IDLE }
                 }
             }
 
     fun updateGenres(collection: CollectionReference) =
             noCrash {
-                doOnUI { genresLiveData.value = State.SYNC }
+                doOnUIGlobal { genresLiveData.value = State.SYNC }
                 collection.document("genres").set(GenresData.create()).addOnSuccessListener {
                     Log.e("Firestore", "Genres upload success")
                     PrefsUtil.lsGenres = currentTime()
-                    doOnUI { genresLiveData.value = State.IDLE }
+                    doOnUIGlobal { genresLiveData.value = State.IDLE }
                 }.addOnFailureListener {
                     Log.e("Firestore", "Genres upload error", it)
-                    doOnUI { genresLiveData.value = State.IDLE }
+                    doOnUIGlobal { genresLiveData.value = State.IDLE }
                 }
             }
 
     fun updateQueue(collection: CollectionReference) =
             noCrash {
-                doOnUI { queueLiveData.value = State.SYNC }
+                doOnUIGlobal { queueLiveData.value = State.SYNC }
                 collection.document("queue").set(QueueData.create()).addOnSuccessListener {
                     Log.e("Firestore", "Queue upload success")
                     PrefsUtil.lsQueue = currentTime()
-                    doOnUI { queueLiveData.value = State.IDLE }
+                    doOnUIGlobal { queueLiveData.value = State.IDLE }
                 }.addOnFailureListener {
                     Log.e("Firestore", "Queue upload error", it)
-                    doOnUI { queueLiveData.value = State.IDLE }
+                    doOnUIGlobal { queueLiveData.value = State.IDLE }
                 }
             }
 
     fun updateSeeing(collection: CollectionReference) =
             noCrash {
-                doOnUI { seeingLiveData.value = State.SYNC }
+                doOnUIGlobal { seeingLiveData.value = State.SYNC }
                 collection.document("seeing").set(SeeingData.create()).addOnSuccessListener {
                     Log.e("Firestore", "Seeing upload success")
                     PrefsUtil.lsSeeing = currentTime()
-                    doOnUI { seeingLiveData.value = State.IDLE }
+                    doOnUIGlobal { seeingLiveData.value = State.IDLE }
                 }.addOnFailureListener {
                     Log.e("Firestore", "Seeing upload error", it)
-                    doOnUI { seeingLiveData.value = State.IDLE }
+                    doOnUIGlobal { seeingLiveData.value = State.IDLE }
                 }
             }
 

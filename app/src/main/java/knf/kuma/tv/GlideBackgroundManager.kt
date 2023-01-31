@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import knf.kuma.App
-import knf.kuma.commons.doOnUI
+import knf.kuma.commons.doOnUIGlobal
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -84,7 +84,7 @@ class GlideBackgroundManager(activity: Activity) {
 
     private inner class UpdateBackgroundTask : TimerTask() {
         override fun run() {
-            doOnUI {
+            doOnUIGlobal {
                 if (mBackgroundURI != null) {
                     updateBackground()
                 }
