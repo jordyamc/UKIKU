@@ -131,21 +131,28 @@
                         android:id="@+id/bypassState"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:sv_title="Estado general"/>
+                        app:sv_title="Estado general" />
 
                     <knf.kuma.custom.StateView
                         android:id="@+id/ipState"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone"
-                        app:sv_title="IP"/>
+                        app:sv_title="IP" />
+
+                    <knf.kuma.custom.StateView
+                        android:id="@+id/countryState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:sv_title="País" />
 
                     <knf.kuma.custom.StateView
                         android:id="@+id/clearanceState"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone"
-                        app:sv_title="cf_clearance"/>
+                        app:sv_title="cf_clearance" />
 
                     <knf.kuma.custom.StateView
                         android:id="@+id/cfduidState"

@@ -127,6 +127,9 @@ interface AnimeDAO {
     @Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE state LIKE 'En emisión' AND day = :day ORDER BY name")
     fun getByDayDir(day: Int): LiveData<MutableList<DirObject>>
 
+    @Query("SELECT `key`,aid,name,link,rate_stars,type FROM AnimeObject WHERE state LIKE 'En emisión' ORDER BY name")
+    fun getAllEmission(): List<DirObject>
+
     @Query("SELECT count(*) FROM AnimeObject WHERE state = 'En emisión' AND NOT day = 0 AND aid NOT IN (:list)")
     fun getInEmission(list: Set<String>): LiveData<Int>
 

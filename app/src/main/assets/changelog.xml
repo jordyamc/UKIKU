@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="199" version="5.2.1">
+        <change type="fix">Error al expandir texto en informacion de anime</change>
+        <change type="fix">Error al buscar imagenes de mejor calidad</change>
+    </release>
     <release code="198" version="5.2.0">
         <change type="fix">Error al verificar suscripciones</change>
     </release>

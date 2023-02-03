@@ -11,6 +11,7 @@ import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import java.net.URLEncoder
+import java.util.*
 
 class ActivityImgFull : GenericActivity() {
 
@@ -32,28 +33,32 @@ class ActivityImgFull : GenericActivity() {
                 try {
                     val title = intent.getStringExtra(keyTitle)
                     val response = Request.Builder()
-                            .url("https://api.jikan.moe/v3/search/anime?q=${URLEncoder.encode(title, "utf-8")}&page=1")
+                        .url("https://api.jikan.moe/v4/anime?q=${URLEncoder.encode(title, "utf-8")}&page=1")
                             .build().execute()
                     if (response.code != 200)
                         throw IllegalStateException("Response code: ${response.code}")
-                    val results = JSONObject(response.body?.string()
-                            ?: "{}").getJSONArray("results")
+                    val results = JSONObject(
+                        response.body?.string()
+                            ?: "{}"
+                    ).getJSONArray("data")
                     response.close()
                     for (i in 0 until results.length()) {
                         val json = results.getJSONObject(i)
-                        val name = json.getString(keyTitle).toLowerCase()
-                        if (title?.toLowerCase() == name) {
+                        val name = json.getString(keyTitle).lowercase(Locale.getDefault())
+                        if (title?.lowercase(Locale.getDefault()) == name) {
                             val list = mutableListOf<String>()
-                            list.add(json.getString("image_url"))
+                            //list.add(json.getString("image_url"))
                             try {
-                                val picturesResponse = Request.Builder().url("https://api.jikan.moe/v3/anime/${json.getString("mal_id")}/pictures").build().execute()
+                                val picturesResponse = Request.Builder().url("https://api.jikan.moe/v4/anime/${json.getString("mal_id")}/pictures").build().execute()
                                 if (picturesResponse.code != 200)
                                     throw IllegalStateException("Response code: ${picturesResponse.code}")
-                                val picturesArray = JSONObject(picturesResponse.body?.string()
-                                        ?: "{}").getJSONArray("pictures")
+                                val picturesArray = JSONObject(
+                                    picturesResponse.body?.string()
+                                        ?: "{}"
+                                ).getJSONArray("data")
                                 picturesResponse.close()
                                 for (item in picturesArray) {
-                                    list.add(item.getString("large"))
+                                    list.add(item.getJSONObject("jpg").getString("large_image_url"))
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()

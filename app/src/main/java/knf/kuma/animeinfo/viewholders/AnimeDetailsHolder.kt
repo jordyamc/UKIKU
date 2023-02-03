@@ -80,10 +80,8 @@ class AnimeDetailsHolder(val view: View) {
                     desc.setTextAndIndicator(animeObject.description?.trim() ?: "", expandIcon)
                     desc.setAnimationDuration(300)
                     val onClickListener = View.OnClickListener {
-                        launch(Dispatchers.Main) {
-                            expandIcon.setImageResource(if (desc.isExpanded) R.drawable.action_expand else R.drawable.action_shrink)
-                            desc.toggle()
-                        }
+                        expandIcon.setImageResource(if (desc.isExpanded) R.drawable.action_expand else R.drawable.action_shrink)
+                        desc.toggle()
                     }
                     desc.setOnClickListener(onClickListener)
                     expandIcon.setOnClickListener(onClickListener)

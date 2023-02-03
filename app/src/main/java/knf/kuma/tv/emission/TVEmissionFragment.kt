@@ -83,49 +83,49 @@ class TVEmissionFragment : BrowseSupportFragment(), OnItemViewClickedListener {
     }
 
     private fun fetchData() {
-        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.MONDAY.value).distinct.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.MONDAY.value).distinct.observe(viewLifecycleOwner, Observer {
             mRows.get(AnimeObject.Day.MONDAY.value)?.apply {
                 page = page.plus(1)
                 setList(it)
             }
             startEntranceTransition()
         })
-        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.TUESDAY.value).distinct.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.TUESDAY.value).distinct.observe(viewLifecycleOwner, Observer {
             mRows.get(AnimeObject.Day.TUESDAY.value)?.apply {
                 page = page.plus(1)
                 setList(it)
             }
             startEntranceTransition()
         })
-        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.WEDNESDAY.value).distinct.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.WEDNESDAY.value).distinct.observe(viewLifecycleOwner, Observer {
             mRows.get(AnimeObject.Day.WEDNESDAY.value)?.apply {
                 page = page.plus(1)
                 setList(it)
             }
             startEntranceTransition()
         })
-        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.THURSDAY.value).distinct.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.THURSDAY.value).distinct.observe(viewLifecycleOwner, Observer {
             mRows.get(AnimeObject.Day.THURSDAY.value)?.apply {
                 page = page.plus(1)
                 setList(it)
             }
             startEntranceTransition()
         })
-        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.FRIDAY.value).distinct.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.FRIDAY.value).distinct.observe(viewLifecycleOwner, Observer {
             mRows.get(AnimeObject.Day.FRIDAY.value)?.apply {
                 page = page.plus(1)
                 setList(it)
             }
             startEntranceTransition()
         })
-        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.SATURDAY.value).distinct.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.SATURDAY.value).distinct.observe(viewLifecycleOwner, Observer {
             mRows.get(AnimeObject.Day.SATURDAY.value)?.apply {
                 page = page.plus(1)
                 setList(it)
             }
             startEntranceTransition()
         })
-        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.SUNDAY.value).distinct.observe(this, Observer {
+        CacheDB.INSTANCE.animeDAO().getByDayDir(AnimeObject.Day.SUNDAY.value).distinct.observe(viewLifecycleOwner, Observer {
             mRows.get(AnimeObject.Day.SUNDAY.value)?.apply {
                 page = page.plus(1)
                 setList(it)

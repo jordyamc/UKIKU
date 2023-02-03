@@ -183,10 +183,14 @@ class DiagnosticMaterial : GenericActivity() {
     }
 
     private fun loadBypassInfo() {
-        ipState.apply {
-            doAsync {
-                val document = Jsoup.connect("http://checkip.org/").get()
-                load(document.select("div#yourip h1 span").text())
+        doAsync {
+            val document = Jsoup.connect("https://check-ip.com/").get()
+            ipState.load(document.select("span#your-ip").text())
+            val country = document.select("span[data-field=ipv6]").text()
+            if (country == "Peru") {
+                countryState.load("$country - VPN necesario", StateView.STATE_ERROR)
+            } else {
+                countryState.load(country, StateView.STATE_OK)
             }
         }
         clearanceState.apply {
