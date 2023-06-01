@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor
+import knf.kuma.R
 import knf.kuma.animeinfo.AnimeChaptersAdapter
 import knf.kuma.animeinfo.BottomActionsDialog
 import knf.kuma.animeinfo.ChapterObjWrap
@@ -21,13 +22,13 @@ import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
-import kotlinx.android.synthetic.main.recycler_chapters.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 
 class AnimeChaptersHolder(view: View, private val fragment: Fragment, private val callback: ChapHolderCallback) {
-    val recyclerView: RecyclerView = view.recycler
+    val recyclerView: RecyclerView = view.find(R.id.recycler)
     private val manager: LinearLayoutManager = CenterLayoutManager(view.context)
     private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
     var adapter: AnimeChaptersAdapter? = null

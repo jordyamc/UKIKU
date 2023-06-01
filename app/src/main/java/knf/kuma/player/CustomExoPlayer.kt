@@ -11,29 +11,33 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.webkit.MimeTypeMap
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.R
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.SSLSkipper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.ExoPlayerBinding
 import knf.kuma.pojos.QueueObject
-import kotlinx.android.synthetic.main.exo_playback_control_view.*
-import kotlinx.android.synthetic.main.exo_player.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 
 class CustomExoPlayer : GenericActivity(), Player.Listener {
@@ -41,6 +45,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     private var playerState: PlayerState = PlayerState()
     private var isEnding = false
     private var playList: List<QueueObject> = ArrayList()
+    private val binding by lazy { ExoPlayerBinding.inflate(layoutInflater) }
 
     private val resizeMode: Int
         get() {
@@ -57,15 +62,15 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        setContentView(R.layout.exo_player)
+        setContentView(binding.root)
         window.decorView.setBackgroundColor(Color.BLACK)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
-            pip.visibility = View.VISIBLE
-        pip.setOnClickListener { onPip() }
-        skip.setOnClickListener { onSkip() }
+            find<View>(R.id.pip).visibility = View.VISIBLE
+        find<View>(R.id.pip).setOnClickListener { onPip() }
+        find<View>(R.id.skip).setOnClickListener { onSkip() }
         hideUI()
-        player.resizeMode = resizeMode
-        player.requestFocus()
+        binding.player.resizeMode = resizeMode
+        binding.player.requestFocus()
         lifecycleScope.launch(Dispatchers.Main) {
             playerState = withContext(Dispatchers.IO) {
                 CacheDB.INSTANCE.playerStateDAO().find(intent.getStringExtra("title") ?: "???")
@@ -98,52 +103,13 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
 
     private fun initPlayer(intent: Intent) {
         if (exoPlayer == null) {
+            SSLSkipper.skip()
             lifecycleScope.launch(Dispatchers.Main) {
-                video_title.text = intent.getStringExtra("title")
-                val sources: List<MediaItem> =
-                    if (intent.getBooleanExtra("isPlayList", false)) {
-                        val sourceList = ArrayList<MediaItem>()
-                        playList = withContext(Dispatchers.IO) {
-                            CacheDB.INSTANCE.queueDAO()
-                                .getAllByAid(intent.getStringExtra("playlist") ?: "empty")
-                        }
-                        noCrash { video_title.text = playList[0].title() }
-                        DefaultHttpDataSource.Factory()
-                        for (queueObject in playList) {
-                            sourceList.add(
-                                ProgressiveMediaSource.Factory(
-                                    DefaultDataSourceFactory(
-                                        this@CustomExoPlayer,
-                                        BypassUtil.userAgent,
-                                        null
-                                    )
-                                )
-                                    .createMediaSource(MediaItem.fromUri(queueObject.createUri())).mediaItem
-                            )
-                        }
-                        sourceList
-                    } else {
-                        if (intent.getBooleanExtra("isFile", false)) {
-                            listOf(MediaItem.fromUri(intent.data ?: Uri.parse("")))
-                        } else {
-                            listOf(
-                                ProgressiveMediaSource.Factory(
-                                    DefaultHttpDataSource.Factory().apply {
-                                        setUserAgent(BypassUtil.userAgent)
-                                        setAllowCrossProtocolRedirects(true)
-                                    }
-                                ).createMediaSource(
-                                    MediaItem.fromUri(
-                                        intent.data ?: Uri.parse("")
-                                    )
-                                ).mediaItem
-                            )
-                        }
-                    }
+                find<TextView>(R.id.video_title).text = intent.getStringExtra("title")
                 exoPlayer = ExoPlayer.Builder(this@CustomExoPlayer).build()
-                player.player = exoPlayer
+                binding.player.player = exoPlayer
                 exoPlayer?.addListener(this@CustomExoPlayer)
-                exoPlayer?.setMediaItems(sources)
+                addMedia(exoPlayer, intent)
                 exoPlayer?.prepare()
                 val canResume = playerState.position != C.TIME_UNSET
                 if (canResume)
@@ -157,6 +123,61 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                         }*/
             }
         }
+    }
+
+    private suspend fun addMedia(player: ExoPlayer?, intent: Intent) {
+        player?: return
+        if (intent.getBooleanExtra("isPlayList", false)) {
+            val sourceList = ArrayList<MediaSource>()
+            playList = withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.queueDAO()
+                        .getAllByAid(intent.getStringExtra("playlist") ?: "empty")
+                }
+                noCrash { find<TextView>(R.id.video_title).text = playList[0].title() }
+                DefaultHttpDataSource.Factory()
+                for (queueObject in playList) {
+                    sourceList.add(
+                        ProgressiveMediaSource.Factory(
+                            DefaultHttpDataSource.Factory().apply {
+                                setUserAgent(BypassUtil.userAgent)
+                            }
+                        ).createMediaSource(MediaItem.fromUri(queueObject.createUri()))
+                    )
+                }
+                player.addMediaSources(sourceList)
+            } else {
+                if (intent.getBooleanExtra("isFile", false) || !intent.hasExtra("headers")) {
+                    player.addMediaItem(MediaItem.fromUri(intent.data ?: Uri.parse("")))
+                } else {
+                    val httpFactory = DefaultHttpDataSource.Factory().apply {
+                        setAllowCrossProtocolRedirects(true)
+                        intent.getStringArrayExtra("headers") ?.let { headerArray ->
+                            val slices = headerArray.toList().chunked(2)
+                            val headers = mutableMapOf<String, String>()
+                            slices.forEach {
+                                headers[it[0]] = it[1]
+                            }
+                            setDefaultRequestProperties(headers)
+                            if (headers.contains("User-Agent")) {
+                                setUserAgent(headers["User-Agent"])
+                            } else {
+                                setUserAgent(BypassUtil.userAgent)
+                            }
+                        }?: setUserAgent(BypassUtil.userAgent)
+                    }
+                    val factory = when(MimeTypeMap.getFileExtensionFromUrl(intent.data?.toString())) {
+                        "m3u8" -> HlsMediaSource.Factory(httpFactory)
+                        else -> ProgressiveMediaSource.Factory(httpFactory)
+                    }
+                    player.addMediaSource(
+                        factory.createMediaSource(
+                            MediaItem.fromUri(
+                                intent.data ?: Uri.parse("")
+                            )
+                        )
+                    )
+                }
+            }
     }
 
     private fun releasePlayer() {
@@ -198,30 +219,30 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         if (!isInPictureInPictureMode) {
             runOnUiThread {
-                lay_top.visibility = View.VISIBLE
-                lay_bottom.visibility = View.VISIBLE
-                player.useController = true
+                find<View>(R.id.lay_top).visibility = View.VISIBLE
+                find<View>(R.id.lay_bottom).visibility = View.VISIBLE
+                binding.player.useController = true
             }
             /*getApplication().startActivity(new Intent(this, getClass())
                     .putExtra("isReorder", true)
                     .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));*/
         } else {
             runOnUiThread {
-                lay_top.visibility = View.GONE
-                lay_bottom.visibility = View.GONE
-                progress.visibility = View.GONE
-                player.useController = false
+                find<View>(R.id.lay_top).visibility = View.GONE
+                find<View>(R.id.lay_bottom).visibility = View.GONE
+                find<View>(R.id.progress).visibility = View.GONE
+                binding.player.useController = false
             }
         }
     }
 
     private fun checkPlaylist(intent: Intent) {
         if (!intent.getBooleanExtra("isPlayList", false)) {
-            exo_next.visibility = View.GONE
-            exo_prev.visibility = View.GONE
+            find<View>(com.google.android.exoplayer2.R.id.exo_next).visibility = View.GONE
+            find<View>(com.google.android.exoplayer2.R.id.exo_prev).visibility = View.GONE
         } else {
-            exo_next.visibility = View.VISIBLE
-            exo_prev.visibility = View.VISIBLE
+            find<View>(com.google.android.exoplayer2.R.id.exo_next).visibility = View.VISIBLE
+            find<View>(com.google.android.exoplayer2.R.id.exo_prev).visibility = View.VISIBLE
         }
     }
 
@@ -251,7 +272,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
             return
         val state = playerState.apply {
-            title = video_title.text.toString()
+            title = find<TextView>(R.id.video_title).text.toString()
             position = if (!isEnding) {
                 exoPlayer?.currentPosition ?: 0
             } else
@@ -278,7 +299,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     override fun onLoadingChanged(isLoading: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
             return
-        progress.post { progress.visibility = if (isLoading) View.VISIBLE else View.GONE }
+        find<View>(R.id.progress).post { find<View>(R.id.progress).visibility = if (isLoading) View.VISIBLE else View.GONE }
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -356,7 +377,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                     CacheDB.INSTANCE.playerStateDAO().set(state)
                 }
                 playerState.window = latestPosition
-                video_title.text = playList[playerState.window].title()
+                find<TextView>(R.id.video_title).text = playList[playerState.window].title()
             }
         } catch (e: Exception) {
             e.printStackTrace()

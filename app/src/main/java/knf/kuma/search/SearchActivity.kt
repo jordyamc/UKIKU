@@ -11,22 +11,23 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.activity_search.*
+import knf.kuma.databinding.ActivitySearchBinding
 
 class SearchActivity : GenericActivity() {
 
     private val model by viewModels<SearchViewModel>()
+    private val binding by lazy { ActivitySearchBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setSurfaceBars()
-        setContentView(R.layout.activity_search)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        etSearch.setText(model.queryListener.value)
-        etSearch.requestFocus()
-        etSearch.addTextChangedListener(afterTextChanged = {
+        binding.etSearch.setText(model.queryListener.value)
+        binding.etSearch.requestFocus()
+        binding.etSearch.addTextChangedListener(afterTextChanged = {
             EAHelper.checkStart(it.toString())
             AchievementManager.onSearch(it.toString())
             model.sendQuery(it?.toString())

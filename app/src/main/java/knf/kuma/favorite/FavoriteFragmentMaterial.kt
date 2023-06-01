@@ -67,7 +67,7 @@ class FavoriteFragmentMaterial : BottomFragment(), FavsSectionAdapterMaterial.On
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.favsDAO().all.observe(viewLifecycleOwner, Observer { FavSectionHelper.reload() })
+        CacheDB.INSTANCE.favsDAO().all.observe(viewLifecycleOwner) { FavSectionHelper.reload() }
         activity?.let {
             observeList(it, Observer { favoriteObjects ->
                 if (favoriteObjects == null || favoriteObjects.isEmpty()) {

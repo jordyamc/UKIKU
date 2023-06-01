@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
+import knf.kuma.databinding.ItemRelatedBinding
 import knf.kuma.pojos.AnimeObject
-import kotlinx.android.synthetic.main.item_related.view.*
 
 internal class AnimeRelatedAdapterMaterial(private val fragment: Fragment, private val list: MutableList<AnimeObject.WebInfo.AnimeRelated>) : RecyclerView.Adapter<AnimeRelatedAdapterMaterial.RelatedHolder>() {
 
@@ -38,10 +38,10 @@ internal class AnimeRelatedAdapterMaterial(private val fragment: Fragment, priva
         return list.size
     }
 
-    internal class RelatedHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: LinearLayout = itemView.card
-        val imageView: ImageView = itemView.img
-        val textView: TextView = itemView.title
-        val relation: TextView = itemView.relation
+    internal class RelatedHolder(itemView: View, binding: ItemRelatedBinding = ItemRelatedBinding.bind(itemView)) : RecyclerView.ViewHolder(itemView) {
+        val cardView: LinearLayout = binding.card
+        val imageView: ImageView = binding.img
+        val textView: TextView = binding.title
+        val relation: TextView = binding.relation
     }
 }

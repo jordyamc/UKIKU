@@ -13,42 +13,43 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.asPx
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.activity_news.*
+import knf.kuma.databinding.ActivityNewsBinding
 
 class NewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
+    private val binding by lazy { ActivityNewsBinding.inflate(layoutInflater) }
     val adapter: NewsAdapter by lazy { NewsAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_news)
-        toolbar.title = "Noticias"
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        binding.toolbar.title = "Noticias"
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
-        toolbar.setNavigationOnClickListener { onBackPressed() }
-        refresh.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
-        refresh.setOnRefreshListener(this)
-        refresh.isRefreshing = true
-        recycler.adapter = adapter
-        recycler.addItemDecoration(SpacingItemDecoration(0, 10.asPx))
-        NewsCreator.createNews().observe(this, {
+        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
+        binding.refresh.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
+        binding.refresh.setOnRefreshListener(this)
+        binding.refresh.isRefreshing = true
+        binding.recycler.adapter = adapter
+        binding.recycler.addItemDecoration(SpacingItemDecoration(0, 10.asPx))
+        NewsCreator.createNews().observe(this) {
             if (it == null || it.isEmpty())
-                error.visibility = View.VISIBLE
+                binding.error.visibility = View.VISIBLE
             else {
-                error.visibility = View.GONE
+                binding.error.visibility = View.GONE
 
                 adapter.update(it)
-                recycler.scheduleLayoutAnimation()
+                binding.recycler.scheduleLayoutAnimation()
             }
-            refresh.isRefreshing = false
-        })
+            binding.refresh.isRefreshing = false
+        }
         if (!PrefsUtil.isNativeAdsEnabled)
-            adContainer.implBanner(AdsType.NEWS_BANNER)
+            binding.adContainer.implBanner(AdsType.NEWS_BANNER)
     }
 
     override fun onRefresh() {
-        refresh.isRefreshing = true
+        binding.refresh.isRefreshing = true
         NewsCreator.reload()
     }
 

@@ -21,6 +21,10 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
 
     abstract val videoServer: VideoServer?
 
+    open val canStream: Boolean = true
+
+    open val canDownload: Boolean = canStream
+
     val verified: VideoServer?
         get() {
             if (server == null)
@@ -102,7 +106,8 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 NatsukiServer(context, base),
                 GoCDNServer(context, base),
                 StapeServer(context, base),
-                SBServer(context, base),
+                StreamWishServer(context, base),
+                //SBServer(context, base),
                 VeryStreamServer(context, base),
                 FembedServer(context, base),
                 FenixServer(context, base),
@@ -113,8 +118,8 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 OkruServer(context, base),
                 RVServer(context, base),
                 ZippyServer(context, base),
-                    YUServer(context, base),
-                    MP4UploadServer(context, base)
+                YUServer(context, base),
+                MP4UploadServer(context, base)
             )
         }
 

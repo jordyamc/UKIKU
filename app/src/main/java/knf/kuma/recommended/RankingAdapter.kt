@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.pojos.GenreStatusObject
-import kotlinx.android.synthetic.main.item_ranking.view.*
+import org.jetbrains.anko.find
 
 class RankingAdapter(val list: List<GenreStatusObject>) : RecyclerView.Adapter<RankingAdapter.RankHolder>() {
 
@@ -36,8 +36,8 @@ class RankingAdapter(val list: List<GenreStatusObject>) : RecyclerView.Adapter<R
     }
 
     inner class RankHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = itemView.title
-        val count: TextView = itemView.count
-        val ranking: ProgressBar = itemView.ranking
+        val title: TextView = itemView.find(R.id.title)
+        val count: TextView = itemView.find(R.id.count)
+        val ranking: ProgressBar = itemView.find(R.id.ranking)
     }
 }

@@ -15,10 +15,10 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.distinct
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.RecyclerEmisionBinding
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.search.SearchObject
 import knf.kuma.search.forFav
-import kotlinx.android.synthetic.main.recycler_emision.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -28,6 +28,7 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
     private var adapter: EmissionAdapterMaterial? = null
     private var isFirst = true
 
+    private lateinit var binding: RecyclerEmisionBinding
     private lateinit var liveData: LiveData<MutableList<SearchObject>>
     private lateinit var observer: Observer<MutableList<SearchObject>>
 
@@ -38,33 +39,35 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
             PrefsUtil.emissionBlacklist
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return LayoutInflater.from(context).inflate(R.layout.recycler_emision, container, false)
+        return LayoutInflater.from(context).inflate(R.layout.recycler_emision, container, false).also {
+            binding = RecyclerEmisionBinding.bind(it)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
-            adContainer.implBanner(AdsType.EMISSION_BANNER, true)
+            binding.adContainer.implBanner(AdsType.EMISSION_BANNER, true)
         }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         adapter = EmissionAdapterMaterial(this)
-        recycler.verifyManager()
-        recycler.adapter = adapter
+        binding.recycler.verifyManager()
+        binding.recycler.adapter = adapter
         if (context != null)
             observeList { animeObjects ->
                 lifecycleScope.launch(Dispatchers.Main) {
-                    progress.visibility = View.GONE
+                    binding.progress.visibility = View.GONE
                     adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }, false) { smoothScroll() }
                     if (isFirst) {
                         isFirst = false
-                        recycler.scheduleLayoutAnimation()
+                        binding.recycler.scheduleLayoutAnimation()
                         //checkStates(animeObjects)
                     }
-                    error.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
+                    binding.error.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
     }
@@ -79,7 +82,7 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
     }
 
     override fun onRemove(showError: Boolean) {
-        if (showError) lifecycleScope.launch(Dispatchers.Main) { error.visibility = View.VISIBLE }
+        if (showError) lifecycleScope.launch(Dispatchers.Main) { binding.error.visibility = View.VISIBLE }
     }
 
     private fun smoothScroll() {
@@ -94,13 +97,13 @@ class EmissionFragmentMaterial : Fragment(), RemoveListener {
         if (context != null)
             observeList { animeObjects ->
                 lifecycleScope.launch(Dispatchers.Main) {
-                    error?.visibility = View.GONE
+                    binding.error.visibility = View.GONE
                     if (animeObjects != null && animeObjects.isNotEmpty())
                         adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }) { smoothScroll() }
                     else
                         adapter?.update(ArrayList()) { smoothScroll() }
                     if (animeObjects == null || animeObjects.isEmpty())
-                        error?.visibility = View.VISIBLE
+                        binding.error.visibility = View.VISIBLE
                 }
             }
     }

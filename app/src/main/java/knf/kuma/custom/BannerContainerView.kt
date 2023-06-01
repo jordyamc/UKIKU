@@ -3,9 +3,10 @@ package knf.kuma.custom
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import knf.kuma.R
-import kotlinx.android.synthetic.main.lay_banner_container.view.*
+import org.jetbrains.anko.find
 
 class BannerContainerView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : LinearLayout(context, attrs, defStyle) {
     private var showBottom = false
@@ -21,9 +22,11 @@ class BannerContainerView @JvmOverloads constructor(context: Context, attrs: Att
 
     fun show(view: View) {
         if (showBottom)
-            spaceBottom.visibility = View.VISIBLE
-        spaceTop.visibility = View.VISIBLE
-        container.removeAllViews()
-        container.addView(view)
+            find<View>(R.id.spaceBottom).visibility = View.VISIBLE
+        find<View>(R.id.spaceTop).visibility = View.VISIBLE
+        with(find<ViewGroup>(R.id.container)) {
+            removeAllViews()
+            addView(view)
+        }
     }
 }

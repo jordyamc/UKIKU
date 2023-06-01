@@ -17,9 +17,9 @@ import knf.kuma.ads.implAdsNews
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.isSameContent
 import knf.kuma.commons.noCrashLet
-import kotlinx.android.synthetic.main.item_news.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -71,9 +71,9 @@ class NewsAdapter(val activity: AppCompatActivity) : RecyclerView.Adapter<Recycl
     }
 
     class NewsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val card: MaterialCardView = itemView.card
-        val metadata: TextView = itemView.metadata
-        val title: TextView = itemView.title
-        val description: TextView = itemView.description
+        val card: MaterialCardView = itemView.find(R.id.card)
+        val metadata: TextView = itemView.find(R.id.metadata)
+        val title: TextView = itemView.find(R.id.title)
+        val description: TextView = itemView.find(R.id.description)
     }
 }

@@ -3,11 +3,12 @@ package knf.kuma.custom
 import android.os.Bundle
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.setSurfaceBars
-import kotlinx.android.synthetic.main.activity_fragment.*
+import org.jetbrains.anko.find
 
 abstract class SingleFragmentMaterialActivity : AppCompatActivity() {
 
@@ -25,8 +26,10 @@ abstract class SingleFragmentMaterialActivity : AppCompatActivity() {
         setSurfaceBars()
         setContentView(layoutResId)
 
-        setSupportActionBar(toolbar)
-        toolbar.setNavigationOnClickListener { onBackPressed() }
+        with(find<Toolbar>(R.id.toolbar)) {
+            setSupportActionBar(this)
+            setNavigationOnClickListener { onBackPressed() }
+        }
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getActivityTitle()

@@ -18,8 +18,8 @@ import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
 import knf.kuma.commons.toast
 import knf.kuma.database.CacheDB
-import kotlinx.android.synthetic.main.lay_migrate_success.view.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 
 class MigrateSuccessFragment : Fragment() {
@@ -30,9 +30,9 @@ class MigrateSuccessFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.lay_migrate_success, container, false)
-        root = view.root
-        view.migrate_favs.setOnClickListener { onMigrateFavs() }
-        view.migrate_seen.setOnClickListener { onMigrateSeen() }
+        root = view.find(R.id.root)
+        view.find<View>(R.id.migrate_favs).setOnClickListener { onMigrateFavs() }
+        view.find<View>(R.id.migrate_seen).setOnClickListener { onMigrateSeen() }
         return view
     }
 

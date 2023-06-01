@@ -20,6 +20,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
@@ -33,6 +34,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
+import com.appodeal.ads.Appodeal
+import com.appodeal.ads.initializing.ApdInitializationCallback
+import com.appodeal.ads.initializing.ApdInitializationError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -81,7 +85,6 @@ import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import knh.kuma.commons.cloudflarebypass.CfCallback
 import knh.kuma.commons.cloudflarebypass.Cloudflare
-import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -131,7 +134,18 @@ class Main : GenericActivity(),
             return
         }
         MobileAds.initialize(this)
-        AdsUtilsMob.setUp()
+        AdsUtils.setUp()
+        Appodeal.initialize(this, "194ea6b7f4ce96f47f0ba841e344eff5a56916e84012691f", Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO or Appodeal.NATIVE, object :
+            ApdInitializationCallback {
+            override fun onInitializationFinished(errors: List<ApdInitializationError>?) {
+                errors?.forEach {
+                    Log.e("Appodeal", "Init error: ${it.message}")
+                    it.printStackTrace()
+                }
+                Appodeal.cache(this@Main, Appodeal.NATIVE, 3)
+                //Appodeal.startTestActivity(this@MainMaterial)
+            }
+        })
         FirebaseAnalytics.getInstance(this).setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
         try {
             setContentView(R.layout.activity_main_drawer)
@@ -216,7 +230,7 @@ class Main : GenericActivity(),
             badgeSeeing = navigationView.menu.findItem(R.id.drawer_seeing).actionView as TextView
             badgeQueue = navigationView.menu.findItem(R.id.drawer_queue).actionView as TextView
             navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg())
-            val header = navigationView.getHeaderView(0).img
+            val header = navigationView.getHeaderView(0).findViewById<View>(R.id.img)
             ViewCompat.setOnApplyWindowInsetsListener(header) { v, insets ->
                 v.apply {
                     if (insets.getInsets(WindowInsetsCompat.Type.systemBars()).top > 0)
@@ -224,12 +238,12 @@ class Main : GenericActivity(),
                 }
                 insets
             }
-            val actionShare = navigationView.getHeaderView(0).action_share
-            val actionInfo = navigationView.getHeaderView(0).action_info
-            val actionTrophy = navigationView.getHeaderView(0).action_trophy
-            val actionLogin = navigationView.getHeaderView(0).action_login
-            val actionMigrate = navigationView.getHeaderView(0).action_migrate
-            val actionMap = navigationView.getHeaderView(0).action_map
+            val actionShare = navigationView.getHeaderView(0).findViewById<View>(R.id.action_share)
+            val actionInfo = navigationView.getHeaderView(0).findViewById<View>(R.id.action_info)
+            val actionTrophy = navigationView.getHeaderView(0).findViewById<View>(R.id.action_trophy)
+            val actionLogin = navigationView.getHeaderView(0).findViewById<View>(R.id.action_login)
+            val actionMigrate = navigationView.getHeaderView(0).findViewById<View>(R.id.action_migrate)
+            val actionMap = navigationView.getHeaderView(0).findViewById<View>(R.id.action_map)
             actionShare.onClick {
                 startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
@@ -269,29 +283,29 @@ class Main : GenericActivity(),
                         .setShowShadow(false)
                         .setGravityOffset(5f, 5f, true)
                         .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight()))
-                CacheDB.INSTANCE.favsDAO().countLive.observe(this, { integer ->
+                CacheDB.INSTANCE.favsDAO().countLive.observe(this) { integer ->
                     if (badgeView != null && integer != null)
                         if (PrefsUtil.showFavIndicator)
                             badgeView?.badgeNumber = integer
                         else
                             badgeView?.hide(false)
-                })
-                PrefsUtil.getLiveShowFavIndicator().observe(this, { aBoolean ->
+                }
+                PrefsUtil.getLiveShowFavIndicator().observe(this) { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean)
                             lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().count } }
                         else
                             badgeView?.hide(false)
                     }
-                })
+                }
                 PreferenceManager.getDefaultSharedPreferences(this).stringLiveData("theme_color", "0")
-                        .observe(this, {
+                        .observe(this) {
                             (badgeView as? QBadgeView)?.badgeBackgroundColor = ContextCompat.getColor(this, EAHelper.getThemeColorLight(it))
                             badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
                             badgeSeeing.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
                             badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor(it)))
                             navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg(it))
-                        })
+                        }
             }
             badgeEmission.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeEmission.setTypeface(null, Typeface.BOLD)
@@ -302,20 +316,20 @@ class Main : GenericActivity(),
             badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeQueue.setTypeface(null, Typeface.BOLD)
             badgeQueue.gravity = Gravity.CENTER_VERTICAL
-            PrefsUtil.getLiveEmissionBlackList().observe(this, { strings ->
-                CacheDB.INSTANCE.animeDAO().getInEmission(strings).observe(this, { integer ->
+            PrefsUtil.getLiveEmissionBlackList().observe(this) { strings ->
+                CacheDB.INSTANCE.animeDAO().getInEmission(strings).observe(this) { integer ->
                     badgeEmission.text = integer.toString()
                     badgeEmission.visibility = if (integer == 0) View.GONE else View.VISIBLE
-                })
-            })
-            CacheDB.INSTANCE.seeingDAO().countWatchingLive.observe(this, { integer ->
+                }
+            }
+            CacheDB.INSTANCE.seeingDAO().countWatchingLive.observe(this) { integer ->
                 badgeSeeing.text = integer.toString()
                 badgeSeeing.visibility = if (integer == 0) View.GONE else View.VISIBLE
-            })
-            CacheDB.INSTANCE.queueDAO().countLive.observe(this, { integer ->
+            }
+            CacheDB.INSTANCE.queueDAO().countLive.observe(this) { integer ->
                 badgeQueue.text = integer.toString()
                 badgeQueue.visibility = if (integer == 0) View.GONE else View.VISIBLE
-            })
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -324,9 +338,19 @@ class Main : GenericActivity(),
 
     @TargetApi(Build.VERSION_CODES.M)
     private fun checkPermissions() {
-        if (Build.VERSION.SDK_INT in Build.VERSION_CODES.M..Build.VERSION_CODES.P &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 55498)
+        val permissions = mutableListOf<String>()
+        if (isFullMode) {
+            if (Build.VERSION.SDK_INT in Build.VERSION_CODES.M..Build.VERSION_CODES.P &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (permissions.isNotEmpty()) {
+            requestPermissions(permissions.toTypedArray(), 55498)
+        }
     }
 
     private fun showRationalPermission(denied: Boolean = false) {
@@ -647,11 +671,14 @@ class Main : GenericActivity(),
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED)
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                showRationalPermission()
-            else
-                showRationalPermission(true)
+        permissions.forEachIndexed { result, permission ->
+            if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE && result != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    showRationalPermission()
+                else
+                    showRationalPermission(true)
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")

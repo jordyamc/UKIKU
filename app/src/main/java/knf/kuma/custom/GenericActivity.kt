@@ -94,7 +94,7 @@ open class GenericActivity : AppCompatActivity() {
                         )
                     }
                 }
-                if (!PrefsUtil.isBypassWarningShown){
+                if (isFullMode && !PrefsUtil.isBypassWarningShown){
                     lifecycleScope.launch(Dispatchers.Main){
                         MaterialDialog(this@GenericActivity).show {
                             lifecycleOwner(this@GenericActivity)

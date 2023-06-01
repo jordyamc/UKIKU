@@ -19,6 +19,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -30,6 +31,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
+import com.appodeal.ads.Appodeal
+import com.appodeal.ads.initializing.ApdInitializationCallback
+import com.appodeal.ads.initializing.ApdInitializationError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
@@ -79,8 +83,6 @@ import knf.kuma.search.SearchActivity
 import knf.kuma.seeing.SeeingActivityMaterial
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
-import kotlinx.android.synthetic.main.activity_main_material.*
-import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -103,6 +105,7 @@ class MainMaterial : GenericActivity(),
     private val drawer by bind<DrawerLayout>(R.id.drawer_layout)
     private val navigationView by bind<NavigationView>(R.id.nav_view)
     private val connectionState by bind<ConnectionState>(R.id.connectionState)
+    private val root by bind<View>(R.id.root)
     private val bottomNavigationView by bind<BottomNavigationView>(R.id.bottomNavigation)
     internal var selectedFragment: BottomFragment? = null
     private lateinit var badgeEmission: TextView
@@ -128,8 +131,18 @@ class MainMaterial : GenericActivity(),
             RequestConfiguration.Builder()
                 .setTestDeviceIds(listOf("A7538543A53633612D25FDE0B64A4AEE")).build()
         )
+        Appodeal.initialize(this, "194ea6b7f4ce96f47f0ba841e344eff5a56916e84012691f", Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO or Appodeal.NATIVE, object : ApdInitializationCallback {
+            override fun onInitializationFinished(errors: List<ApdInitializationError>?) {
+                errors?.forEach {
+                    Log.e("Appodeal", "Init error: ${it.message}")
+                    it.printStackTrace()
+                }
+                Appodeal.cache(this@MainMaterial, Appodeal.NATIVE, 3)
+                //Appodeal.startTestActivity(this@MainMaterial)
+            }
+        })
         //NativeManager
-        AdsUtilsMob.setUp()
+        AdsUtils.setUp()
         FirebaseAnalytics.getInstance(this)
             .setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
         try {
@@ -138,7 +151,7 @@ class MainMaterial : GenericActivity(),
             setContentView(R.layout.activity_main_drawer_nwv)
         }
         //setDefaults()
-        drawer_layout.setStatusBarBackgroundColor(getSurfaceColor())
+        drawer.setStatusBarBackgroundColor(getSurfaceColor())
         setSupportActionBar(toolbar)
         supportActionBar?.title = "Buscar animes"
         toolbar.setNavigationOnClickListener { drawer.openDrawer(GravityCompat.START) }
@@ -218,7 +231,7 @@ class MainMaterial : GenericActivity(),
             badgeSeeing = navigationView.menu.findItem(R.id.drawer_seeing).actionView as TextView
             badgeQueue = navigationView.menu.findItem(R.id.drawer_queue).actionView as TextView
             navigationView.getHeaderView(0).findViewById<View>(R.id.img).setBackgroundResource(EAHelper.getThemeImg())
-            val header = navigationView.getHeaderView(0).img
+            val header = navigationView.getHeaderView(0).findViewById<View>(R.id.img)
             ViewCompat.setOnApplyWindowInsetsListener(header) { v, insets ->
                 v.apply {
                     if (insets.systemWindowInsetTop > 0)
@@ -226,12 +239,12 @@ class MainMaterial : GenericActivity(),
                 }
                 insets
             }
-            val actionShare = navigationView.getHeaderView(0).action_share
-            val actionInfo = navigationView.getHeaderView(0).action_info
-            val actionTrophy = navigationView.getHeaderView(0).action_trophy
-            val actionLogin = navigationView.getHeaderView(0).action_login
-            val actionMigrate = navigationView.getHeaderView(0).action_migrate
-            val actionMap = navigationView.getHeaderView(0).action_map
+            val actionShare = navigationView.getHeaderView(0).findViewById<View>(R.id.action_share)
+            val actionInfo = navigationView.getHeaderView(0).findViewById<View>(R.id.action_info)
+            val actionTrophy = navigationView.getHeaderView(0).findViewById<View>(R.id.action_trophy)
+            val actionLogin = navigationView.getHeaderView(0).findViewById<View>(R.id.action_login)
+            val actionMigrate = navigationView.getHeaderView(0).findViewById<View>(R.id.action_migrate)
+            val actionMap = navigationView.getHeaderView(0).findViewById<View>(R.id.action_map)
             actionShare.onClick {
                 startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
@@ -326,9 +339,19 @@ class MainMaterial : GenericActivity(),
 
     @TargetApi(Build.VERSION_CODES.M)
     private fun checkPermissions() {
-        if (Build.VERSION.SDK_INT in Build.VERSION_CODES.M..Build.VERSION_CODES.P &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 55498)
+        val permissions = mutableListOf<String>()
+        if (isFullMode) {
+            if (Build.VERSION.SDK_INT in Build.VERSION_CODES.M..Build.VERSION_CODES.P &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (permissions.isNotEmpty()) {
+            requestPermissions(permissions.toTypedArray(), 55498)
+        }
     }
 
     private fun showRationalPermission(denied: Boolean = false) {
@@ -572,11 +595,14 @@ class MainMaterial : GenericActivity(),
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED)
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                showRationalPermission()
-            else
-                showRationalPermission(true)
+        permissions.forEachIndexed { result, permission ->
+            if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE && result != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    showRationalPermission()
+                else
+                    showRationalPermission(true)
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -641,7 +667,7 @@ class MainMaterial : GenericActivity(),
         onNeedRecreate()
     }
 
-    override fun getSnackbarAnchor(): View? {
+    override fun getSnackbarAnchor(): View {
         return root
     }
 }

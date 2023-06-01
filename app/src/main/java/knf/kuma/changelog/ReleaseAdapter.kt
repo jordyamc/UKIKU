@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.changelog.objects.Changelog
-import kotlinx.android.synthetic.main.item_changelog.view.*
+import org.jetbrains.anko.find
 
 internal class ReleaseAdapter(changelog: Changelog) : RecyclerView.Adapter<ReleaseAdapter.ReleaseItem>() {
 
@@ -29,8 +29,8 @@ internal class ReleaseAdapter(changelog: Changelog) : RecyclerView.Adapter<Relea
     }
 
     internal inner class ReleaseItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val version: TextView = itemView.version
-        val code: TextView = itemView.code
-        val recyclerView: RecyclerView = itemView.recycler
+        val version: TextView = itemView.find(R.id.version)
+        val code: TextView = itemView.find(R.id.code)
+        val recyclerView: RecyclerView = itemView.find(R.id.recycler)
     }
 }

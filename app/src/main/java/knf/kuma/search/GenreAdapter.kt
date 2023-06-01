@@ -14,7 +14,7 @@ import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.load
-import kotlinx.android.synthetic.main.item_dir.view.*
+import org.jetbrains.anko.find
 
 internal class GenreAdapter(private val activity: Activity) : PagingDataAdapter<SearchObject, GenreAdapter.ItemHolder>(DIFF_CALLBACK) {
 
@@ -32,9 +32,9 @@ internal class GenreAdapter(private val activity: Activity) : PagingDataAdapter<
     }
 
     internal inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: MaterialCardView = itemView.card
-        val imageView: ImageView = itemView.img
-        val textView: TextView = itemView.title
+        val cardView: MaterialCardView = itemView.find(R.id.card)
+        val imageView: ImageView = itemView.find(R.id.img)
+        val textView: TextView = itemView.find(R.id.title)
     }
 
     companion object {

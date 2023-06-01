@@ -2,13 +2,16 @@ package knf.kuma.tv
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.leanback.widget.Presenter
+import knf.kuma.App
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.iterator
 import knf.kuma.commons.jsoupCookies
 import knf.kuma.database.CacheDB
+import knf.kuma.player.openWebPlayer
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.RecordObject
@@ -20,17 +23,25 @@ import knf.kuma.tv.streaming.TVServerSelectionFragment
 import knf.kuma.videoservers.Option
 import knf.kuma.videoservers.Server
 import knf.kuma.videoservers.VideoServer
+import knf.kuma.videoservers.WebServer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
 import xdroid.toaster.Toaster
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalCoroutinesApi
 @ExperimentalContracts
-class TVServersFactory private constructor(private val activity: Activity, private val url: String, private val chapter: AnimeObject.WebInfo.AnimeChapter, val viewHolder: Presenter.ViewHolder?, private val serversInterface: ServersInterface) {
+class TVServersFactory private constructor(
+    private val activity: Activity,
+    private val url: String,
+    private val chapter: AnimeObject.WebInfo.AnimeChapter,
+    val viewHolder: Presenter.ViewHolder?,
+    private val serversInterface: ServersInterface
+) {
     private val downloadObject: DownloadObject = DownloadObject.fromChapter(chapter, false)
 
     private var jsonObject: JSONObject? = null
@@ -70,7 +81,7 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                     servers.add(server)
             }
             val jsonArray = jsonObject?.getJSONArray(if (position == 0) "SUB" else "LAT")
-                    ?: JSONArray()
+                ?: JSONArray()
             for (baseLink in jsonArray) {
                 val server = Server.check(activity, baseLink.optString("code"))
                 if (server != null)
@@ -109,12 +120,30 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                     showServerList()
                 } else if (server.haveOptions()) {
                     showOptions(server)
+                } else if (servers[position] is WebServer) {
+                    try {
+                        openWebPlayer(activity, server.option.url!!)
+                        doAsync {
+                            CacheDB.INSTANCE.seenDAO().addChapter(SeenObject.fromChapter(chapter))
+                            CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(chapter))
+                            syncData {
+                                history()
+                                seen()
+                            }
+                        }
+                        serversInterface.onFinish(false, true)
+                    } catch (ex: Exception) {
+                        Toaster.toast("Error al abrir explorador web")
+                        showServerList()
+                    }
+
                 } else {
                     when (text.lowercase(Locale.getDefault())) {
                         "mega" -> {
                             Toaster.toast("No se puede usar Mega en TV")
                             showServerList()
                         }
+
                         else -> startStreaming(server.option)
                     }
                 }
@@ -130,11 +159,15 @@ class TVServersFactory private constructor(private val activity: Activity, priva
 
     private fun showOptions(server: VideoServer) {
         this.current = server
-        activity.startActivityForResult(Intent(activity, TVServerSelection::class.java)
+        activity.startActivityForResult(
+            Intent(activity, TVServerSelection::class.java)
                 .putExtra("name", server.name)
-                .putExtra(TVServerSelectionFragment.VIDEO_DATA, (Option.getNames(server.options) as? ArrayList)
-                        ?: arrayListOf<String>()),
-                REQUEST_CODE_OPTION)
+                .putExtra(
+                    TVServerSelectionFragment.VIDEO_DATA, (Option.getNames(server.options) as? ArrayList)
+                        ?: arrayListOf<String>()
+                ),
+            REQUEST_CODE_OPTION
+        )
     }
 
     private fun startStreaming(option: Option) {
@@ -147,10 +180,10 @@ class TVServersFactory private constructor(private val activity: Activity, priva
             }
         }
         activity.startActivity(Intent(activity, TVPlayer::class.java).apply {
-            putExtra("url", option.url)
+            setDataAndType(Uri.parse(option.url), "video/*")
             putExtra("title", downloadObject.name)
             putExtra("chapter", downloadObject.chapter)
-            putExtra("headers", option.headers?.createHeadersMap())
+            putStringArrayListExtra("headers", ArrayList(option.headers?.createHeadersList()?: emptyList()))
         })
         serversInterface.onFinish(false, true)
     }
@@ -172,8 +205,10 @@ class TVServersFactory private constructor(private val activity: Activity, priva
             jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value)
             if (jsonObject?.length() ?: 0 > 1) {
                 this.servers = servers
-                activity.startActivityForResult(Intent(activity, TVMultiSelection::class.java),
-                        REQUEST_CODE_MULTI)
+                activity.startActivityForResult(
+                    Intent(activity, TVMultiSelection::class.java),
+                    REQUEST_CODE_MULTI
+                )
             } else {
                 val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
                 for (e in downloads) {
@@ -188,9 +223,11 @@ class TVServersFactory private constructor(private val activity: Activity, priva
                     val server = Server.check(activity, baseLink.optString("code"))
                     if (server != null)
                         servers.add(server)
+                    else if (baseLink.optString("title").startsWith("SB"))
+                        servers.add(WebServer(App.context, baseLink.optString("code"), baseLink.optString("title")))
                 }
                 servers.sort()
-                this.servers = servers
+                this.servers = servers.filter { it is WebServer || it.canStream }.distinctBy { it.baseLink.dropLastWhile { it == '/' }.substringAfterLast("/") }.toMutableList()
                 showServerList()
             }
         } catch (e: Exception) {

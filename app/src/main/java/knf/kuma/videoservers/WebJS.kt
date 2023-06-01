@@ -21,13 +21,21 @@ class WebJS(private val context: Context) {
 
     fun evalOnFinish(link: String, js: String, callback: (String) -> Unit) {
         this.callback = callback
-        webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    webView.loadUrl("javascript:myInterface.returnResult(eval('try{$js}catch(e){e}'));")
-                }, 1000)
+        var response = false
+        val handler = Handler(Looper.getMainLooper())
+        val run = Runnable {
+            if (!response) {
+                response = true
+                webView.loadUrl("javascript:myInterface.returnResult(eval('try{$js}catch(e){e}'));")
             }
         }
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                handler.removeCallbacks(run)
+                run.run()
+            }
+        }
+        handler.postDelayed(run, 5000)
         webView.loadUrl(link)
     }
 

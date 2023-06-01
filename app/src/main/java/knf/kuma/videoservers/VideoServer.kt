@@ -72,6 +72,7 @@ open class VideoServer : Parcelable {
         const val ZIPPYSHARE = "Zippyshare"
         const val GOCDN = "GoCDN"
         const val STAPE = "Stape"
+        const val STREAMWISH = "Streamwish"
         const val SBVIDEO = "SBVideo"
         const val MEGA = "Mega"
 
@@ -86,6 +87,7 @@ open class VideoServer : Parcelable {
                 SBVIDEO,
                 GOCDN,
                 STAPE,
+                STREAMWISH,
                 VERYSTREAM,
                 FENIX,
                 RV,

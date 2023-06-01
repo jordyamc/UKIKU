@@ -23,14 +23,21 @@ import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.FirestoreManager
-import knf.kuma.commons.*
+import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.isTV
+import knf.kuma.commons.jsoupCookies
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.StateView
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.LayoutDiagnosticBinding
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
 import knf.tools.bypass.startBypass
-import kotlinx.android.synthetic.main.layout_diagnostic.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -38,24 +45,27 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.json.JSONObject
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.net.URL
 
 class Diagnostic : GenericActivity() {
 
+    private val binding by lazy { LayoutDiagnosticBinding.inflate(layoutInflater) }
     private val networkStatus by lazy { NetworkStatus() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.layout_diagnostic)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Diagnóstico"
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.setNavigationOnClickListener { finish() }
         startTests()
     }
 
@@ -79,37 +89,42 @@ class Diagnostic : GenericActivity() {
         networkStatus.mainResult = responseCode
         val loadingTime = System.currentTimeMillis() - startTime
         withContext(Dispatchers.Main) {
-            codeState.load(
+            binding.codeState.load(
                 responseCode.toString(), when (responseCode) {
                     200 -> StateView.STATE_OK
                     503 -> StateView.STATE_WARNING
                     else -> StateView.STATE_ERROR
                 }
             )
-            timeoutState.load(
+            binding.timeoutState.load(
                 "$loadingTime ms", when {
                     loadingTime < 1000 -> StateView.STATE_OK
                     loadingTime < 2000 -> StateView.STATE_WARNING
                     else -> StateView.STATE_ERROR
                 }
             )
-            generalState.load(when {
+            binding.generalState.load(when {
                 responseCode == 200 && loadingTime < 1000 -> "Correcto"
+                responseCode == 502 -> "Animeflv caido"
                 responseCode == 503 -> "Cloudflare activado"
                 responseCode == 403 -> "Bloqueado por animeflv"
                 loadingTime > 1000 -> "Página lenta"
                 else -> "Desconocido"
             }, when {
                 responseCode == 200 && loadingTime < 1000 -> StateView.STATE_OK.also {
-                    info.visibility = View.GONE
+                    binding.info.visibility = View.GONE
                 }
-                responseCode == 503 || responseCode == 403 || loadingTime > 1000 -> StateView.STATE_WARNING.also {
-                    info.visibility = View.VISIBLE
+                responseCode in listOf(503, 403) || loadingTime > 1000 -> StateView.STATE_WARNING.also {
+                    binding.info.visibility = View.VISIBLE
                 }
-                else -> StateView.STATE_ERROR.also { info.visibility = View.GONE }
+                responseCode == 502 -> StateView.STATE_ERROR.also {
+                    binding.info.visibility = View.VISIBLE
+                }
+                else -> StateView.STATE_ERROR.also { binding.info.visibility = View.GONE }
             })
-            info.setOnClickListener {
+            binding.info.setOnClickListener {
                 when {
+                    networkStatus.mainResult == 502 -> show502Info()
                     networkStatus.mainResult == 503 -> show503Info()
                     networkStatus.mainResult == 403 -> show403Info()
                     loadingTime > 1000 -> showTimeoutInfo()
@@ -122,11 +137,11 @@ class Diagnostic : GenericActivity() {
     private suspend fun runBypassTest() {
         try {
             Jsoup.connect(BypassUtil.testLink).followRedirects(true).timeout(0).execute()
-            bypassState.load("No se necesita")
-            withContext(Dispatchers.Main) { bypassRecreate.visibility = View.GONE }
+            binding.bypassState.load("No se necesita")
+            withContext(Dispatchers.Main) { binding.bypassRecreate.visibility = View.GONE }
         } catch (e: HttpStatusException) {
             withContext(Dispatchers.Main) {
-                bypassRecreate.apply {
+                binding.bypassRecreate.apply {
                     visibility = View.VISIBLE
                     onClick {
                         startBypass(
@@ -147,22 +162,23 @@ class Diagnostic : GenericActivity() {
             }
             try {
                 jsoupCookies(BypassUtil.testLink).timeout(0).get()
-                bypassState.load("Valido", StateView.STATE_OK)
+                binding.bypassState.load("Valido", StateView.STATE_OK)
                 if (networkStatus.isMainTestExecuted && networkStatus.mainResult in listOf(
                         403,
                         503
                     )
                 ) {
                     withContext(Dispatchers.Main) {
-                        codeState.load("200", StateView.STATE_OK)
-                        generalState.load("Bypass activo", StateView.STATE_OK)
-                        info.isVisible = false
+                        binding.codeState.load("200", StateView.STATE_OK)
+                        binding.generalState.load("Bypass activo", StateView.STATE_OK)
+                        binding.info.isVisible = false
                     }
                 }
             } catch (e: HttpStatusException) {
                 when (e.statusCode) {
-                    503 -> bypassState.load("Caducado", StateView.STATE_WARNING)
-                    else -> bypassState.load(
+                    502 -> binding.bypassState.load("Animeflv caido", StateView.STATE_ERROR)
+                    503 -> binding.bypassState.load("Caducado", StateView.STATE_WARNING)
+                    else -> binding.bypassState.load(
                         "Error en página: HTTP ${e.statusCode}",
                         StateView.STATE_ERROR
                     )
@@ -171,7 +187,7 @@ class Diagnostic : GenericActivity() {
             loadBypassInfo()
         } catch (e: Exception) {
             e.printStackTrace()
-            bypassState.load("Error en página: ${e.message}", StateView.STATE_ERROR)
+            binding.bypassState.load("Error en página: ${e.message}", StateView.STATE_ERROR)
         }
         networkStatus.isBypassTestExecuted = true
     }
@@ -185,26 +201,26 @@ class Diagnostic : GenericActivity() {
 
     private fun loadBypassInfo() {
         doAsync {
-            val document = Jsoup.connect("https://check-ip.com/").get()
-            ipState.load(document.select("span#your-ip").text())
-            val country = document.select("span[data-field=ipv6]").text()
-            if (country == "Peru") {
-                countryState.load("$country - VPN necesario", StateView.STATE_ERROR)
+            val json = JSONObject(URL("https://ipinfo.io/json").readText())
+            val region = json.getString("region")
+            val country = json.getString("country")
+            if (country == "PE") {
+                binding.countryState.load("$region - VPN necesario", StateView.STATE_ERROR)
             } else {
-                countryState.load(country, StateView.STATE_OK)
+                binding.countryState.load(region, StateView.STATE_OK)
             }
         }
-        clearanceState.apply {
+        binding.clearanceState.apply {
             val data = BypassUtil.getClearance(this@Diagnostic)
             if (data.isNotEmpty())
                 load(data)
         }
-        cfduidState.apply {
+        binding.cfduidState.apply {
             val data = BypassUtil.getCFDuid(this@Diagnostic)
             if (data.isNotEmpty())
                 load(data)
         }
-        userAgentState.apply {
+        binding.userAgentState.apply {
             load(BypassUtil.userAgent)
         }
     }
@@ -214,15 +230,15 @@ class Diagnostic : GenericActivity() {
             SpeedTestSocket().apply {
                 addSpeedTestListener(object : ISpeedTestListener {
                     override fun onCompletion(report: SpeedTestReport?) {
-                        report?.let { downState.load(formatBigDecimal(it.transferRateOctet)) }
+                        report?.let { binding.downState.load(formatBigDecimal(it.transferRateOctet)) }
                     }
 
                     override fun onProgress(percent: Float, report: SpeedTestReport?) {
-                        report?.let { downState.load(formatBigDecimal(it.transferRateOctet)) }
+                        report?.let { binding.downState.load(formatBigDecimal(it.transferRateOctet)) }
                     }
 
                     override fun onError(speedTestError: SpeedTestError?, errorMessage: String?) {
-                        downState.load("Error: ${errorMessage ?: ""}", StateView.STATE_ERROR)
+                        binding.downState.load("Error: ${errorMessage ?: ""}", StateView.STATE_ERROR)
                     }
                 })
                 startDownload("http://1.testdebit.info/10M.iso")
@@ -232,15 +248,15 @@ class Diagnostic : GenericActivity() {
             SpeedTestSocket().apply {
                 addSpeedTestListener(object : ISpeedTestListener {
                     override fun onCompletion(report: SpeedTestReport?) {
-                        report?.let { upState.load(formatBigDecimal(it.transferRateOctet)) }
+                        report?.let { binding.upState.load(formatBigDecimal(it.transferRateOctet)) }
                     }
 
                     override fun onProgress(percent: Float, report: SpeedTestReport?) {
-                        report?.let { upState.load(formatBigDecimal(it.transferRateOctet)) }
+                        report?.let { binding.upState.load(formatBigDecimal(it.transferRateOctet)) }
                     }
 
                     override fun onError(speedTestError: SpeedTestError?, errorMessage: String?) {
-                        upState.load("Error: ${errorMessage ?: ""}", StateView.STATE_ERROR)
+                        binding.upState.load("Error: ${errorMessage ?: ""}", StateView.STATE_ERROR)
                     }
                 })
                 startUpload("http://ipv4.ikoula.testdebit.info/", 5000000)
@@ -265,7 +281,7 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun runDirectoryTest() {
-        dirState.load(
+        binding.dirState.load(
             when {
                 PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning -> "Completo"
                 PrefsUtil.isDirectoryFinished && DirectoryUpdateService.isRunning -> "Actualizando"
@@ -274,18 +290,18 @@ class Diagnostic : GenericActivity() {
             }
         )
         CacheDB.INSTANCE.animeDAO().countLive.observe(this) {
-            dirTotalState.load(it.toString())
+            binding.dirTotalState.load(it.toString())
         }
     }
 
     private fun runMemoryTest() {
         val dirs = getExternalFilesDirs(null)
         noCrash {
-            internalState.load(getAvailable(dirs[0].freeSpace))
+            binding.internalState.load(getAvailable(dirs[0].freeSpace))
         }
         noCrash {
             if (dirs.size > 1)
-                externalState.load(getAvailable(dirs[1].freeSpace))
+                binding.externalState.load(getAvailable(dirs[1].freeSpace))
         }
     }
 
@@ -294,7 +310,7 @@ class Diagnostic : GenericActivity() {
     }
 
     private fun runBackupTest() {
-        uuid.text = FirestoreManager.uid ?: "Solo firestore"
+        binding.uuid.text = FirestoreManager.uid ?: "Solo firestore"
         GlobalScope.launch(Dispatchers.IO) {
             if (PrefsUtil.isSubscriptionEnabled) {
                 val status = SubscriptionReceiver.checkStatus(
@@ -303,15 +319,15 @@ class Diagnostic : GenericActivity() {
                 )
                 if (status.isActive) {
                     if (status.isActive)
-                        subscriptionState.load("Activa")
+                        binding.subscriptionState.load("Activa")
                     else
-                        subscriptionState.load("Activa pero no renovada")
+                        binding.subscriptionState.load("Activa pero no renovada")
                 } else
-                    subscriptionState.load("Cancelada o inexistente")
+                    binding.subscriptionState.load("Cancelada o inexistente")
             } else
-                subscriptionState.load("No suscrito")
+                binding.subscriptionState.load("No suscrito")
         }
-        backupState.load(
+        binding.backupState.load(
             when (Backups.type) {
                 Backups.Type.DROPBOX -> "Dropbox"
                 Backups.Type.FIRESTORE -> "Firestore"
@@ -320,7 +336,14 @@ class Diagnostic : GenericActivity() {
             }
         )
         if (Backups.type != Backups.Type.NONE)
-            lastBackupState.load(PrefsUtil.lastBackup)
+            binding.lastBackupState.load(PrefsUtil.lastBackup)
+    }
+
+    private fun show502Info() {
+        MaterialDialog(this).safeShow {
+            title(text = "HTTP 502")
+            message(text = "Animeflv esta caido por el momento, revisa de nuevo en unas horas")
+        }
     }
 
     private fun show503Info() {

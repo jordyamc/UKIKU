@@ -13,7 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import knf.kuma.R
 import knf.kuma.commons.isFullMode
-import kotlinx.android.synthetic.main.lay_bottom_actions.view.*
+import knf.kuma.databinding.LayBottomActionsBinding
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
 
@@ -23,25 +23,26 @@ class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.lay_bottom_actions, container, false)
+        val binding = LayBottomActionsBinding.bind(view)
         if (listSize <= 1) {
-            view.action_seen.text = "Marcar como visto"
-            view.action_unseen.text = "Marcar como no visto"
-            view.action_import_all.text = "Importar archivo"
-            view.action_download_all.text = "Descargar"
+            binding.actionSeen.text = "Marcar como visto"
+            binding.actionUnseen.text = "Marcar como no visto"
+            binding.actionImportAll.text = "Importar archivo"
+            binding.actionDownloadAll.text = "Descargar"
         }
-        view.action_seen.onClick {
+        binding.actionSeen.onClick {
             callback?.onSelect(STATE_SEEN)
             safeDismiss()
         }
-        view.action_unseen.onClick {
+        binding.actionUnseen.onClick {
             callback?.onSelect(STATE_UNSEEN)
             safeDismiss()
         }
-        view.action_import_all.onClick {
+        binding.actionImportAll.onClick {
             callback?.onSelect(STATE_IMPORT_MULTIPLE)
             safeDismiss()
         }
-        view.action_download_all.onClick {
+        binding.actionDownloadAll.onClick {
             if (!isFullMode) {
                 toast("Deshabilitado para esta version")
             } else {
@@ -49,7 +50,7 @@ class BottomActionsDialog : BottomSheetDialogFragment(), LifecycleObserver {
             }
             safeDismiss()
         }
-        view.action_queue_all.onClick {
+        binding.actionQueueAll.onClick {
             if (!isFullMode) {
                 toast("Deshabilitado para esta version")
             } else {

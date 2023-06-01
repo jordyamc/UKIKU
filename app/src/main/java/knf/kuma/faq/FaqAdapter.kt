@@ -8,7 +8,7 @@ import com.github.florent37.expansionpanel.ExpansionLayout
 import com.github.florent37.expansionpanel.viewgroup.ExpansionLayoutCollection
 import knf.kuma.R
 import knf.kuma.commons.inflate
-import kotlinx.android.synthetic.main.item_faq.view.*
+import org.jetbrains.anko.find
 
 class FaqAdapter(private val list: List<FaqItem>) : RecyclerView.Adapter<FaqAdapter.ItemHolder>() {
 
@@ -34,8 +34,8 @@ class FaqAdapter(private val list: List<FaqItem>) : RecyclerView.Adapter<FaqAdap
     }
 
     class ItemHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val question: TextView by lazy { view.question }
-        val answer: TextView by lazy { view.answer }
-        val expansionLayout: ExpansionLayout by lazy { view.expansionLayout }
+        val question: TextView by lazy { view.find(R.id.question) }
+        val answer: TextView by lazy { view.find(R.id.answer) }
+        val expansionLayout: ExpansionLayout by lazy { view.find(R.id.expansionLayout) }
     }
 }

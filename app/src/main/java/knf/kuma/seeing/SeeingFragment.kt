@@ -14,8 +14,8 @@ import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.FragmentSeeingBinding
 import knf.kuma.pojos.SeeingObject
-import kotlinx.android.synthetic.main.fragment_seeing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -27,23 +27,26 @@ class SeeingFragment : Fragment() {
 
     var clickCount = 0
 
+    private lateinit var binding: FragmentSeeingBinding
     private val adapter: SeeingAdapter? by lazy { activity?.let { SeeingAdapter(it, arguments?.getInt("state", 0) == 0) } }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         lifecycleScope.launch {
             liveData.collectLatest {
-                progress.visibility = View.GONE
+                binding.progress.visibility = View.GONE
                 adapter?.submitData(it)
             }
         }
         adapter?.addLoadStateListener {
-            error.isVisible = it.append.endOfPaginationReached && adapter?.itemCount == 0
+            binding.error.isVisible = it.append.endOfPaginationReached && adapter?.itemCount == 0
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_seeing, container, false)
+        return inflater.inflate(R.layout.fragment_seeing, container, false).also {
+            binding = FragmentSeeingBinding.bind(it)
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -51,33 +54,33 @@ class SeeingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
-            adContainer.implBanner(AdsType.SEEING_BANNER, true)
+            binding.adContainer.implBanner(AdsType.SEEING_BANNER, true)
         }
         when (arguments?.getInt("state", 0)) {
             1 -> {
-                error_text.text = "No estas viendo ningún anime"
-                error_img.setImageResource(R.drawable.ic_watching)
+                binding.errorText.text = "No estas viendo ningún anime"
+                binding.errorImg.setImageResource(R.drawable.ic_watching)
             }
             2 -> {
-                error_text.text = "No consideras ningún anime"
-                error_img.setImageResource(R.drawable.ic_considering)
+                binding.errorText.text = "No consideras ningún anime"
+                binding.errorImg.setImageResource(R.drawable.ic_considering)
             }
             3 -> {
-                error_text.text = "No has terminado ningún anime"
-                error_img.setImageResource(R.drawable.ic_completed)
+                binding.errorText.text = "No has terminado ningún anime"
+                binding.errorImg.setImageResource(R.drawable.ic_completed)
             }
             4 -> {
-                error_text.text = "No has dropeado ningún anime"
-                error_img.setImageResource(R.drawable.ic_droped)
+                binding.errorText.text = "No has dropeado ningún anime"
+                binding.errorImg.setImageResource(R.drawable.ic_droped)
             }
             5 -> {
-                error_text.text = "No tienes pausado ningún anime"
-                error_img.setImageResource(R.drawable.ic_paused)
+                binding.errorText.text = "No tienes pausado ningún anime"
+                binding.errorImg.setImageResource(R.drawable.ic_paused)
             }
-            else -> error_text.text = "No has marcado ningún anime"
+            else -> binding.errorText.text = "No has marcado ningún anime"
         }
-        recycler.verifyManager()
-        recycler.adapter = adapter
+        binding.recycler.verifyManager()
+        binding.recycler.adapter = adapter
     }
 
     val liveData: Flow<PagingData<SeeingObject>>

@@ -1,54 +1,55 @@
 package knf.kuma.preferences
 
 import android.os.Bundle
-import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.activity_ads_settings.*
+import knf.kuma.databinding.ActivityAdsSettingsBinding
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class AdsPreferenceActivity : GenericActivity() {
 
+    private val binding by lazy { ActivityAdsSettingsBinding.inflate(layoutInflater) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ads_settings)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Configuracion de anuncios"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        switchNative.isChecked = PrefsUtil.isNativeAdsEnabled
-        preferenceNative.onClick {
-            switchNative.toggle()
-            PrefsUtil.isNativeAdsEnabled = switchNative.isChecked
+        binding.switchNative.isChecked = PrefsUtil.isNativeAdsEnabled
+        binding.preferenceNative.onClick {
+            binding.switchNative.toggle()
+            PrefsUtil.isNativeAdsEnabled = binding.switchNative.isChecked
         }
-        switchFull.isChecked = PrefsUtil.isFullAdsEnabled
-        preferenceFullText.isEnabled = switchFull.isChecked
-        preferenceFullTextExtra.isEnabled = switchFull.isChecked
-        sliderFull.isEnabled = switchFull.isChecked
-        sliderFullExtra.isEnabled = switchFull.isChecked
-        probabilityFull.isEnabled = switchFull.isChecked
-        probabilityFullExtra.isEnabled = switchFull.isChecked
-        preferenceFull.onClick {
-            switchFull.toggle()
-            PrefsUtil.isFullAdsEnabled = switchFull.isChecked
-            preferenceFullText.isEnabled = switchFull.isChecked
-            preferenceFullTextExtra.isEnabled = switchFull.isChecked
-            sliderFull.isEnabled = switchFull.isChecked
-            sliderFullExtra.isEnabled = switchFull.isChecked
-            probabilityFull.isEnabled = switchFull.isChecked
-            probabilityFullExtra.isEnabled = switchFull.isChecked
+        binding.switchFull.isChecked = PrefsUtil.isFullAdsEnabled
+        binding.preferenceFullText.isEnabled = binding.switchFull.isChecked
+        binding.preferenceFullTextExtra.isEnabled = binding.switchFull.isChecked
+        binding.sliderFull.isEnabled = binding.switchFull.isChecked
+        binding.sliderFullExtra.isEnabled = binding.switchFull.isChecked
+        binding.probabilityFull.isEnabled = binding.switchFull.isChecked
+        binding.probabilityFullExtra.isEnabled = binding.switchFull.isChecked
+        binding.preferenceFull.onClick {
+            binding.switchFull.toggle()
+            PrefsUtil.isFullAdsEnabled = binding.switchFull.isChecked
+            binding.preferenceFullText.isEnabled = binding.switchFull.isChecked
+            binding.preferenceFullTextExtra.isEnabled = binding.switchFull.isChecked
+            binding.sliderFull.isEnabled = binding.switchFull.isChecked
+            binding.sliderFullExtra.isEnabled = binding.switchFull.isChecked
+            binding.probabilityFull.isEnabled = binding.switchFull.isChecked
+            binding.probabilityFullExtra.isEnabled = binding.switchFull.isChecked
         }
-        sliderFull.value = PrefsUtil.fullAdsProbability
-        sliderFullExtra.value = PrefsUtil.fullAdsExtraProbability
-        probabilityFull.text = "${PrefsUtil.fullAdsProbability.toInt()}%"
-        probabilityFullExtra.text = "${PrefsUtil.fullAdsExtraProbability.toInt()}%"
-        sliderFull.addOnChangeListener { _, value, _ ->
-            probabilityFull.text = "${value.toInt()}%"
+        binding.sliderFull.value = PrefsUtil.fullAdsProbability
+        binding.sliderFullExtra.value = PrefsUtil.fullAdsExtraProbability
+        binding.probabilityFull.text = "${PrefsUtil.fullAdsProbability.toInt()}%"
+        binding.probabilityFullExtra.text = "${PrefsUtil.fullAdsExtraProbability.toInt()}%"
+        binding.sliderFull.addOnChangeListener { _, value, _ ->
+            binding.probabilityFull.text = "${value.toInt()}%"
             PrefsUtil.fullAdsProbability = value
         }
-        sliderFullExtra.addOnChangeListener { _, value, _ ->
-            probabilityFullExtra.text = "${value.toInt()}%"
+        binding.sliderFullExtra.addOnChangeListener { _, value, _ ->
+            binding.probabilityFullExtra.text = "${value.toInt()}%"
             PrefsUtil.fullAdsExtraProbability = value
         }
     }

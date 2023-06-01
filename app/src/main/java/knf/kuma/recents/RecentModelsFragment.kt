@@ -20,14 +20,15 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
+import knf.kuma.custom.BannerContainerView
 import knf.kuma.home.HomeFragmentMaterial
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.FileActions
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.android.synthetic.main.fragment_recent_material.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.support.v4.find
 
 class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: RecentModelsViewModel by viewModels()
@@ -87,6 +88,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
 
     private fun loadAds(list: List<RecentModel>) {
         if (PrefsUtil.isAdsEnabled) {
+            val adContainer = find<BannerContainerView>(R.id.adContainer)
             if (AdsUtils.isAdmobEnabled && PrefsUtil.isNativeAdsEnabled) {
                 if (adapter.hasAds()) return
                 lifecycleScope.launch(Dispatchers.Main) {

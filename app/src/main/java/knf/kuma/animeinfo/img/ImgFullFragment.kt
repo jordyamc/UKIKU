@@ -20,36 +20,33 @@ import knf.kuma.commons.createSnackbar
 import knf.kuma.commons.load
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
-import kotlinx.android.synthetic.main.layout_img_big.*
-import kotlinx.android.synthetic.main.layout_img_big.view.*
+import knf.kuma.databinding.LayoutImgBigBinding
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.io.FileOutputStream
 
-class ImgFullFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
+class ImgFullFragment : Fragment(R.layout.layout_img_big), PopupMenu.OnMenuItemClickListener {
 
     private var bitmap: Bitmap? = null
     private val keyTitle = "title"
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.layout_img_big, container, false)
-    }
+    private lateinit var binding: LayoutImgBigBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.img.load(arguments?.getString("img"), object : Callback {
+        binding = LayoutImgBigBinding.bind(view)
+        binding.img.load(arguments?.getString("img"), object : Callback {
             override fun onSuccess() {
-                bitmap = (view.img.drawable as BitmapDrawable).bitmap
+                bitmap = (binding.img.drawable as BitmapDrawable).bitmap
             }
 
-            override fun onError() {
-                view.error.visibility = View.VISIBLE
+            override fun onError(e: java.lang.Exception?) {
+                binding.error.visibility = View.VISIBLE
             }
         })
-        view.img.setOnLongClickListener {
+        binding.img.setOnLongClickListener {
             if (bitmap != null) {
                 context?.let {
-                    val popupMenu = PopupMenu(it, view.anchor)
+                    val popupMenu = PopupMenu(it, binding.anchor)
                     popupMenu.inflate(R.menu.menu_img)
                     popupMenu.setOnMenuItemClickListener(this@ImgFullFragment)
                     popupMenu.show()
@@ -87,7 +84,7 @@ class ImgFullFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val snackbar = img.createSnackbar("Guardando...", Snackbar.LENGTH_INDEFINITE)
+        val snackbar = binding.img.createSnackbar("Guardando...", Snackbar.LENGTH_INDEFINITE)
         val progressBar = ProgressBar(context).also {
             it.isIndeterminate = true
         }
@@ -102,12 +99,12 @@ class ImgFullFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
                     fileOutputStream.close()
                     it.close()
                     snackbar.safeDismiss()
-                    img.showSnackbar("Imagen guardada!")
+                    binding.img.showSnackbar("Imagen guardada!")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 snackbar.safeDismiss()
-                img.showSnackbar("Error al guardar imagen")
+                binding.img.showSnackbar("Error al guardar imagen")
             }
         }
     }

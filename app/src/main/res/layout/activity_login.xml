@@ -29,12 +29,16 @@
             android:animateLayoutChanges="true">
 
             <include
+                android:id="@+id/lay_main"
                 layout="@layout/activity_login_main"/>
 
             <include
+                android:id="@+id/lay_buttons"
                 layout="@layout/activity_login_buttons"/>
 
-            <include layout="@layout/activity_login_firestore" />
+            <include
+                android:id="@+id/lay_firestore"
+                layout="@layout/activity_login_firestore" />
 
         </RelativeLayout>
 

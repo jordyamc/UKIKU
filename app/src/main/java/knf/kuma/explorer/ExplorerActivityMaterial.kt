@@ -13,12 +13,13 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
+import knf.kuma.databinding.ActivityExplorerMaterialBinding
 import knf.kuma.download.FileAccessHelper
-import kotlinx.android.synthetic.main.activity_explorer.*
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
 class ExplorerActivityMaterial : GenericActivity(), OnFileStateChange {
+    private val binding by lazy { ActivityExplorerMaterialBinding.inflate(layoutInflater) }
     private var adapter: ExplorerPagerAdapterMaterial? = null
     private var isExplorerFiles = true
 
@@ -26,18 +27,18 @@ class ExplorerActivityMaterial : GenericActivity(), OnFileStateChange {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setSurfaceBars()
-        setContentView(R.layout.activity_explorer_material)
-        toolbar.title = "Explorador"
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        binding.toolbar.title = "Explorador"
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
-        toolbar?.setNavigationOnClickListener { onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
         if (savedInstanceState == null)
             ExplorerCreator.onDestroy()
-        pager.offscreenPageLimit = 2
+        binding.pager.offscreenPageLimit = 2
         adapter = ExplorerPagerAdapterMaterial(this, supportFragmentManager)
-        pager.adapter = adapter
-        tabs.setupWithViewPager(pager)
+        binding.pager.adapter = adapter
+        binding.tabs.setupWithViewPager(binding.pager)
         lifecycleScope.launch {
             if (!FileAccessHelper.isStoragePermissionEnabledAsync())
                 Toaster.toastLong("¡Se necesita el permiso de almacenamiento!")
@@ -72,7 +73,7 @@ class ExplorerActivityMaterial : GenericActivity(), OnFileStateChange {
 
     override fun onBackPressed() {
         adapter?.let {
-            if ((it.getItem(pager.currentItem) as? FragmentBase)?.onBackPressed() == false)
+            if ((it.getItem(binding.pager.currentItem) as? FragmentBase)?.onBackPressed() == false)
                 super.onBackPressed()
         } ?: super.onBackPressed()
     }

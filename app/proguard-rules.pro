@@ -45,6 +45,8 @@
 
 -dontwarn retrofit2.**
 -keep class retrofit2.** { *; }
+-keepclassmembers class * implements pl.droidsonroids.jspoon.ElementConverter
+-keep class pl.droidsonroids.jspoon.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
 
@@ -68,6 +70,9 @@
 }
 -keep public class * extends java.lang.Exception
 -keep class org.jsoup.**{*;}
+-keep class com.google.gson.reflect.TypeToken
+-keep class * extends com.google.gson.reflect.TypeToken
+-keep public class * implements java.lang.reflect.Type
 -keeppackagenames org.jsoup.nodes
 -dontwarn com.amazon.client.metrics.**
 -dontwarn com.beloo.widget.chipslayoutmanager.**
@@ -117,6 +122,3 @@
 -dontwarn io.opencensus.**
 -dontwarn dagger.**
 -dontwarn com.tonyodev.**
--dontwarn java.lang.instrument.ClassFileTransformer
--dontwarn com.android.installreferrer.api.InstallReferrerStateListener
--dontwarn sun.misc.SignalHandler

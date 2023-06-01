@@ -15,6 +15,17 @@ class Headers : Parcelable {
         cookies = parcel.readArrayList(null)?.filterIsInstance<Pair<String, String>>() as MutableList<Pair<String, String>>
     }
 
+    fun createHeadersList(): List<String> = mutableListOf<String>().apply {
+        headers.forEach {
+            add(it.first)
+            add(it.second)
+        }
+        if (cookies.size > 0) {
+            add("Cookie")
+            add(getCookies())
+        }
+    }
+
     fun createHeaders(): List<Pair<String, String>> =
             mutableListOf<Pair<String, String>>().apply {
                 addAll(headers)

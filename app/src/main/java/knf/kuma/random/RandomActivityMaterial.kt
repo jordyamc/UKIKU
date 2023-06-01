@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import biz.kasual.materialnumberpicker.MaterialNumberPicker
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
@@ -19,7 +20,6 @@ import knf.kuma.commons.*
 import knf.kuma.custom.BannerContainerView
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
-import kotlinx.android.synthetic.main.dialog_random_picker.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -91,10 +91,11 @@ class RandomActivityMaterial : GenericActivity(), SwipeRefreshLayout.OnRefreshLi
         AlertDialog.Builder(this).apply {
             setTitle("Numero de resultados")
             val view = inflate(this@RandomActivityMaterial, R.layout.dialog_random_picker)
-            view.picker.value = PrefsUtil.randomLimit
+            val picker = view.find<MaterialNumberPicker>(R.id.picker)
+            picker.value = PrefsUtil.randomLimit
             setView(view)
             setPositiveButton("OK") { _, _ ->
-                PrefsUtil.randomLimit = view.picker.value
+                PrefsUtil.randomLimit = picker.value
                 refreshLayout.post { refreshLayout.isRefreshing = true }
                 refreshList()
             }

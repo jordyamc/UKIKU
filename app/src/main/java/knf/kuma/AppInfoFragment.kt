@@ -19,7 +19,12 @@ import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.backup.Backups
 import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.changelog.ChangelogActivityMaterial
-import knf.kuma.commons.*
+import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.EAUnlockActivity
+import knf.kuma.commons.Economy
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.isFullMode
+import knf.kuma.commons.safeShow
 import knf.kuma.profile.TopActivity
 import knf.kuma.profile.TopActivityMaterial
 import knf.tools.kprobability.item
@@ -106,7 +111,7 @@ class AppInfoFragment: MaterialAboutFragment() {
                     getDrawable(requireContext(), R.drawable.ic_paypal),
                     "Paypal",
                     false,
-                    paypalUri
+                    Uri.parse("https://www.paypal.com/donate/?hosted_button_id=AFBFBHD8F4Z5C")
                 )
             )
             donateCard.addItem(
@@ -150,9 +155,9 @@ class AppInfoFragment: MaterialAboutFragment() {
             ConvenienceBuilder.createWebsiteActionItem(
                 requireContext(),
                 getDrawable(requireContext(), R.drawable.ic_web),
-                "Página web",
+                "Politica de privacidad",
                 true,
-                Uri.parse("https://ukiku.app")
+                Uri.parse("https://ukiku.app/policy.html")
             )
         )
         extraCard.addItem(

@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.search.GenreActivity
-import kotlinx.android.synthetic.main.item_chip.view.*
+import org.jetbrains.anko.find
 
 internal class AnimeTagsAdapter(private val context: Context, private val list: MutableList<String>) : RecyclerView.Adapter<AnimeTagsAdapter.TagHolder>() {
 
@@ -27,6 +27,6 @@ internal class AnimeTagsAdapter(private val context: Context, private val list: 
     }
 
     internal inner class TagHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var chip: TextView = itemView.chip
+        var chip: TextView = itemView.find(R.id.chip)
     }
 }

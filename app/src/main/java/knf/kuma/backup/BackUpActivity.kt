@@ -26,15 +26,17 @@ import knf.kuma.backup.framework.LocalService
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.SyncItemView
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_login_buttons.*
-import kotlinx.android.synthetic.main.activity_login_firestore.*
-import kotlinx.android.synthetic.main.activity_login_main.*
+import knf.kuma.databinding.ActivityLoginBinding
 import kotlin.contracts.ExperimentalContracts
 import kotlin.math.max
 
 class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
-    private val syncItems: MutableList<SyncItemView> by lazy { arrayListOf(sync_favs, sync_history, sync_following, sync_seen, sync_seen_new) }
+    val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
+    private val syncItems: MutableList<SyncItemView> by lazy {
+        with(binding.layButtons) {
+            arrayListOf(syncFavs, syncHistory, syncFollowing, syncSeen, syncSeenNew)
+        }
+    }
     private var service: BackupService? = null
     private var waitingLogin = false
 
@@ -54,27 +56,27 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
         super.onCreate(savedInstanceState)
         if (!resources.getBoolean(R.bool.isTablet))
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        setContentView(R.layout.activity_login)
+        setContentView(binding.root)
         service = Backups.createService()
-        login_dropbox.setOnClickListener { onDropBoxLogin() }
+        binding.layMain.loginDropbox.setOnClickListener { onDropBoxLogin() }
         if (!PrefsUtil.isAdsEnabled && !BuildConfig.DEBUG && !admFile.exists() && !PrefsUtil.isSubscriptionEnabled) {
-            login_firestore.isEnabled = false
-            ads_required.visibility = View.VISIBLE
+            binding.layMain.loginFirestore.isEnabled = false
+            binding.layMain.adsRequired.visibility = View.VISIBLE
         } else if (PrefsUtil.isAdsEnabled && Network.isAdsBlocked && !BuildConfig.DEBUG && !admFile.exists() && !PrefsUtil.isSubscriptionEnabled) {
-            login_firestore.isEnabled = false
-            ads_required.text = "Anuncios bloqueados por host"
-            ads_required.visibility = View.VISIBLE
+            binding.layMain.loginFirestore.isEnabled = false
+            binding.layMain.adsRequired.text = "Anuncios bloqueados por host"
+            binding.layMain.adsRequired.visibility = View.VISIBLE
         } else if (!PrefsUtil.isSecurityUpdated && PrefsUtil.spProtectionEnabled && PrefsUtil.spErrorType != null) {
-            login_firestore.isEnabled = false
-            ads_required.text =
+            binding.layMain.loginFirestore.isEnabled = false
+            binding.layMain.adsRequired.text =
                 "Proveedor de seguridad no pudo ser actualizado (${PrefsUtil.spErrorType})"
-            ads_required.visibility = View.VISIBLE
+            binding.layMain.adsRequired.visibility = View.VISIBLE
         }
         FirestoreManager.start()
-        login_firestore.setOnClickListener { onFirestoreLogin() }
-        login_local.setOnClickListener { onLocalLogin() }
-        logOut.setOnClickListener { onLogOut() }
-        logOutFirestore.setOnClickListener { onLogOut() }
+        binding.layMain.loginFirestore.setOnClickListener { onFirestoreLogin() }
+        binding.layMain.loginLocal.setOnClickListener { onLocalLogin() }
+        binding.layButtons.logOut.setOnClickListener { onLogOut() }
+        binding.layFirestore.logOutFirestore.setOnClickListener { onLogOut() }
         when {
             service?.isLoggedIn == true -> {
                 setState(true)
@@ -98,14 +100,14 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
 
     private fun initFirestoreSync() {
         AchievementManager.onBackup()
-        staticSyncAchievements.suscribe(this, FirestoreManager.achievementsLiveData)
-        staticSyncEA.suscribe(this, FirestoreManager.eaLiveData)
-        staticSyncFavs.suscribe(this, FirestoreManager.favsLiveData)
-        staticSyncGenres.suscribe(this, FirestoreManager.genresLiveData)
-        staticSyncHistory.suscribe(this, FirestoreManager.historyLiveData)
-        staticSyncQueue.suscribe(this, FirestoreManager.queueLiveData)
-        staticSyncSeeing.suscribe(this, FirestoreManager.seeingLiveData)
-        staticSyncSeen.suscribe(this, FirestoreManager.seenLiveData)
+        binding.layFirestore.staticSyncAchievements.suscribe(this, FirestoreManager.achievementsLiveData)
+        binding.layFirestore.staticSyncEA.suscribe(this, FirestoreManager.eaLiveData)
+        binding.layFirestore.staticSyncFavs.suscribe(this, FirestoreManager.favsLiveData)
+        binding.layFirestore.staticSyncGenres.suscribe(this, FirestoreManager.genresLiveData)
+        binding.layFirestore.staticSyncHistory.suscribe(this, FirestoreManager.historyLiveData)
+        binding.layFirestore.staticSyncQueue.suscribe(this, FirestoreManager.queueLiveData)
+        binding.layFirestore.staticSyncSeeing.suscribe(this, FirestoreManager.seeingLiveData)
+        binding.layFirestore.staticSyncSeen.suscribe(this, FirestoreManager.seenLiveData)
     }
 
     private fun clearSyncButtons() {
@@ -140,15 +142,15 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     override fun onAction(syncItemView: SyncItemView, id: String, isBackup: Boolean) {
         noCrash {
             if (isBackup)
-                Backups.backup(colorChanger, service, id) {
+                Backups.backup(binding.colorChanger, service, id) {
                     noCrash {
                         if (it == null)
-                            colorChanger.showSnackbar("Error al respaldar")
+                            binding.colorChanger.showSnackbar("Error al respaldar")
                         syncItemView.enableBackup(it, this@BackUpActivity)
                     }
                 }
             else
-                Backups.restoreDialog(this, colorChanger, id, syncItemView.backupObj)
+                Backups.restoreDialog(this, binding.colorChanger, id, syncItemView.backupObj)
         }
     }
 
@@ -181,28 +183,28 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             showColor(true)
             initSyncButtons()
         } else if (waitingLogin) {
-            colorChanger.showSnackbar("Error al iniciar sesión")
+            binding.colorChanger.showSnackbar("Error al iniciar sesión")
         }
         waitingLogin = false
     }
 
     private fun showColor(animate: Boolean) {
-        colorChanger.post {
+        binding.colorChanger.post {
             try {
-                colorChanger.setBackgroundColor(backColor)
+                binding.colorChanger.setBackgroundColor(backColor)
                 if (animate) {
                     val bounds = Rect()
-                    colorChanger.getDrawingRect(bounds)
+                    binding.colorChanger.getDrawingRect(bounds)
                     val centerX = bounds.centerX()
                     val centerY = bounds.centerY()
                     val finalRadius = max(bounds.width(), bounds.height())
-                    val animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, 0f, finalRadius.toFloat())
+                    val animator = ViewAnimationUtils.createCircularReveal(binding.colorChanger, centerX, centerY, 0f, finalRadius.toFloat())
                     animator.duration = 1000
                     animator.interpolator = AccelerateDecelerateInterpolator()
-                    colorChanger.visibility = View.VISIBLE
+                    binding.colorChanger.visibility = View.VISIBLE
                     animator.start()
                 } else {
-                    colorChanger.visibility = View.VISIBLE
+                    binding.colorChanger.visibility = View.VISIBLE
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -211,13 +213,13 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     }
 
     private fun revertColor() {
-        colorChanger.post {
+        binding.colorChanger.post {
             val bounds = Rect()
-            colorChanger.getDrawingRect(bounds)
+            binding.colorChanger.getDrawingRect(bounds)
             val centerX = bounds.centerX()
             val centerY = bounds.centerY()
             val finalRadius = max(bounds.width(), bounds.height())
-            val animator = ViewAnimationUtils.createCircularReveal(colorChanger, centerX, centerY, finalRadius.toFloat(), 0f)
+            val animator = ViewAnimationUtils.createCircularReveal(binding.colorChanger, centerX, centerY, finalRadius.toFloat(), 0f)
             animator.duration = 1000
             animator.interpolator = AccelerateDecelerateInterpolator()
             animator.addListener(object : Animator.AnimatorListener {
@@ -226,7 +228,7 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
-                    colorChanger?.visibility = View.INVISIBLE
+                    binding.colorChanger.visibility = View.INVISIBLE
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
@@ -243,19 +245,19 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
 
     private fun setState(isLoggedIn: Boolean) {
         runOnUiThread {
-            lay_main?.visibility = if (isLoggedIn) View.GONE else View.VISIBLE
+            binding.layMain.root.visibility = if (isLoggedIn) View.GONE else View.VISIBLE
             when (Backups.type) {
                 Backups.Type.LOCAL, Backups.Type.DROPBOX -> {
-                    lay_buttons?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
-                    lay_firestore?.visibility = View.GONE
+                    binding.layButtons.root.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                    binding.layFirestore.root.visibility = View.GONE
                 }
                 Backups.Type.FIRESTORE -> {
-                    lay_firestore?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
-                    lay_buttons?.visibility = View.GONE
+                    binding.layFirestore.root.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                    binding.layButtons.root.visibility = View.GONE
                 }
                 Backups.Type.NONE -> {
-                    lay_buttons?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
-                    lay_firestore?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                    binding.layButtons.root.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+                    binding.layFirestore.root.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
                 }
             }
         }

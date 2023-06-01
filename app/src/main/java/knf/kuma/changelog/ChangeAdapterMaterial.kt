@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import knf.kuma.R
 import knf.kuma.changelog.objects.Release
-import kotlinx.android.synthetic.main.item_release_material.view.*
+import org.jetbrains.anko.find
 
 internal class ChangeAdapterMaterial(release: Release) : RecyclerView.Adapter<ChangeAdapterMaterial.ChangeItem>() {
 
@@ -48,7 +48,7 @@ internal class ChangeAdapterMaterial(release: Release) : RecyclerView.Adapter<Ch
     }
 
     internal inner class ChangeItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var type: Chip = itemView.type
-        var description: TextView = itemView.description
+        var type: Chip = itemView.find(R.id.type)
+        var description: TextView = itemView.find(R.id.description)
     }
 }

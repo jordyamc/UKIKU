@@ -12,6 +12,8 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.DiscontinuityReason
 import com.google.android.exoplayer2.util.ErrorMessageProvider
 import com.google.android.exoplayer2.video.VideoSize
+import knf.kuma.commons.findActivity
+import xdroid.toaster.Toaster
 
 /**
  * Leanback `PlayerAdapter` implementation for [SimpleExoPlayer].
@@ -182,6 +184,8 @@ class LeanbackPlayerAdapter
         }
 
         override fun onPlayerError(error: PlaybackException) {
+            context.findActivity()?.finish()
+            Toaster.toast("Error al reproducir")
             callback.onError(this@LeanbackPlayerAdapter, error.errorCode, error.message)
         }
 

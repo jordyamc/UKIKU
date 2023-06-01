@@ -11,11 +11,11 @@ import knf.kuma.R
 import knf.kuma.commons.notSameContent
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
-import kotlinx.android.synthetic.main.item_queue.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.anko.find
 import java.util.*
 
 internal class QueueListAdapter(val callback: () -> Unit) : RecyclerView.Adapter<QueueListAdapter.ListItemHolder>() {
@@ -57,8 +57,8 @@ internal class QueueListAdapter(val callback: () -> Unit) : RecyclerView.Adapter
     }
 
     internal inner class ListItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val chapter: TextView = itemView.chapter
-        val icon: ImageView = itemView.icon
-        val actionDelete: ImageButton = itemView.action_delete
+        val chapter: TextView = itemView.find(R.id.chapter)
+        val icon: ImageView = itemView.find(R.id.icon)
+        val actionDelete: ImageButton = itemView.find(R.id.action_delete)
     }
 }

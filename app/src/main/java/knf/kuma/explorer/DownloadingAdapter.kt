@@ -19,7 +19,7 @@ import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.pojos.DownloadObject
-import kotlinx.android.synthetic.main.item_downloading_extra.view.*
+import org.jetbrains.anko.find
 import java.util.*
 
 class DownloadingAdapter internal constructor(private val fragment: Fragment, private val downloadObjects: MutableList<DownloadObject>) : RecyclerView.Adapter<DownloadingAdapter.DownloadingItem>() {
@@ -134,12 +134,12 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
     }
 
     inner class DownloadingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val server: TextView = itemView.server
-        val title: TextView = itemView.title
-        val chapter: TextView = itemView.chapter
-        val eta: TextView = itemView.eta
-        val action: Button = itemView.action
-        val cancel: Button = itemView.cancel
-        val progress: ProgressBar = itemView.progress
+        val server: TextView = itemView.find(R.id.server)
+        val title: TextView = itemView.find(R.id.title)
+        val chapter: TextView = itemView.find(R.id.chapter)
+        val eta: TextView = itemView.find(R.id.eta)
+        val action: Button = itemView.find(R.id.action)
+        val cancel: Button = itemView.find(R.id.cancel)
+        val progress: ProgressBar = itemView.find(R.id.progress)
     }
 }

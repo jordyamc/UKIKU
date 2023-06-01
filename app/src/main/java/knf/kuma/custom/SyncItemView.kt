@@ -12,7 +12,7 @@ import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.objects.BackupObject
 import knf.kuma.commons.Network
 import knf.kuma.commons.noCrash
-import kotlinx.android.synthetic.main.sync_item_layout.view.*
+import knf.kuma.databinding.SyncItemLayoutBinding
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
 import xdroid.toaster.Toaster
 
@@ -40,10 +40,12 @@ class SyncItemView : RelativeLayout {
         setDefaults(context, attrs)
     }
 
+    private lateinit var binding: SyncItemLayoutBinding
     private fun inflate(context: Context) {
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.sync_item_layout, this)
+        binding = SyncItemLayoutBinding.bind(this)
     }
 
     private fun setDefaults(context: Context, attrs: AttributeSet) {
@@ -57,11 +59,11 @@ class SyncItemView : RelativeLayout {
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        title.text = cardTitle
+        binding.title.text = cardTitle
         if (!showDivider)
-            separator?.visibility = View.GONE
+            binding.separator.visibility = View.GONE
         if (hideBackup)
-            backup?.isEnabled = false
+            binding.backup.isEnabled = false
     }
 
     fun enableBackup(backupObject: BackupObject<*>?, onClick: OnClick) {
@@ -69,24 +71,24 @@ class SyncItemView : RelativeLayout {
             noCrash {
                 if (Network.isConnected) {
                     if (!hideBackup)
-                        backup?.isEnabled = true
+                        binding.backup.isEnabled = true
                     if (backupObject == null)
-                        date.text = "Sin respaldo"
+                        binding.date.text = "Sin respaldo"
                     else {
-                        date.text = backupObject.date
-                        restore?.isEnabled = true
+                        binding.date.text = backupObject.date
+                        binding.restore.isEnabled = true
                     }
-                    backup?.onLongClick(returnValue = true) { Toaster.toast("Respaldar a la nube") }
-                    backup?.setOnClickListener {
+                    binding.backup.onLongClick(returnValue = true) { Toaster.toast("Respaldar a la nube") }
+                    binding.backup.setOnClickListener {
                         noCrash {
                             onClick.onAction(this@SyncItemView, actionId, true)
                             AchievementManager.onBackup()
                         }
                     }
-                    restore?.onLongClick(returnValue = true) { Toaster.toast("Restaurar desde la nube") }
-                    restore?.setOnClickListener { noCrash { onClick.onAction(this@SyncItemView, actionId, false) } }
+                    binding.restore.onLongClick(returnValue = true) { Toaster.toast("Restaurar desde la nube") }
+                    binding.restore.setOnClickListener { noCrash { onClick.onAction(this@SyncItemView, actionId, false) } }
                 } else {
-                    date.text = "Sin internet"
+                    binding.date.text = "Sin internet"
                 }
             }
         }
@@ -95,9 +97,9 @@ class SyncItemView : RelativeLayout {
     fun clear() {
         backupObj = null
         post {
-            backup?.isEnabled = false
-            restore?.isEnabled = false
-            date?.text = "Cargando..."
+            binding.backup.isEnabled = false
+            binding.restore.isEnabled = false
+            binding.date.text = "Cargando..."
         }
     }
 

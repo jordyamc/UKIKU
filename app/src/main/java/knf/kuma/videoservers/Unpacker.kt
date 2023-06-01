@@ -1,8 +1,11 @@
 package knf.kuma.videoservers
 
 import android.content.Context
+import android.util.Log
 import android.webkit.WebView
 import com.venom.greendark.decoder.WebJS
+import de.prosiebensat1digital.oasisjsbridge.JsBridge
+import de.prosiebensat1digital.oasisjsbridge.JsBridgeConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -16,17 +19,11 @@ object Unpacker {
     private val packedRegex2 =
         "eval\\((function\\(p,a,c,k,e,?[dr]?\\).*.split\\('\\|'\\).*)\\)".toRegex()
 
-    fun unpack(context: Context, link: String): String {
+    fun unpack(link: String): String {
         val html = Jsoup.connect(link).ignoreContentType(true).execute().body()
-        val evaluator = WebView(context)
         val packedCode = packedRegex2.find(html)?.destructured?.component1()
-        return runBlocking(Dispatchers.Main) {
-            suspendCoroutine { continuation ->
-                evaluator.evaluateJavascript("function prnt() {var txt = $packedCode; return txt;}prnt();") {
-                    continuation.resume(it)
-                }
-            }
-        }
+        val jsBridge = JsBridge(JsBridgeConfig.bareConfig())
+        return jsBridge.evaluateBlocking("function prnt() {var txt = $packedCode; return txt;}prnt();")
     }
 
     fun evalJs(context: Context, code: String): String {

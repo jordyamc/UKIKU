@@ -23,7 +23,7 @@ import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.data.TopData
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.recycler_loader.*
+import knf.kuma.databinding.RecyclerLoaderBinding
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import kotlin.contracts.ExperimentalContracts
@@ -41,6 +41,7 @@ class TopActivity : GenericActivity() {
     private var interstitial: FullscreenAdLoader = getFAdLoaderInterstitial(this)
 
     private var topList: List<TopData> = emptyList()
+    private val binding by lazy { RecyclerLoaderBinding.inflate(layoutInflater) }
 
     private fun showAd() {
         diceOf<() -> Unit> {
@@ -54,17 +55,17 @@ class TopActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.recycler_loader)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         title = "Videos vistos"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
-        toolbar.setNavigationOnClickListener { finish() }
-        recycler.apply {
+        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.recycler.apply {
             addItemDecoration(DividerItemDecoration(this@TopActivity, DividerItemDecoration.VERTICAL))
             adapter = topAdapter
         }
-        loading.show()
+        binding.loading.show()
         listener = FirestoreManager.listenTop { topList ->
             this.topList = topList
             reload()
@@ -74,7 +75,7 @@ class TopActivity : GenericActivity() {
     }
 
     private fun reload() {
-        doOnUI { loading.show() }
+        doOnUI { binding.loading.show() }
         doAsync {
             val sorted = topList.sortedByDescending { it.number }
             val list = sorted.take(PrefsUtil.topCount).mapIndexed { index, topData -> TopItem(index + 1, topData) }.toMutableList()
@@ -83,7 +84,7 @@ class TopActivity : GenericActivity() {
             if (current != null && currentPosition > PrefsUtil.topCount - 1)
                 list.add(TopItem(currentPosition + 1, current))
             doOnUI {
-                loading.hide()
+                binding.loading.hide()
                 topAdapter.submitList(list)
             }
         }
@@ -91,7 +92,7 @@ class TopActivity : GenericActivity() {
 
     private fun showSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT) {
         snackbar?.dismiss()
-        snackbar = Snackbar.make(recycler, text, duration).also { it.show() }
+        snackbar = Snackbar.make(binding.recycler, text, duration).also { it.show() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

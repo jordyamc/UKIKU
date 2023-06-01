@@ -2,6 +2,7 @@ package knf.kuma.player
 
 import android.content.Intent
 import android.support.v4.media.MediaDescriptionCompat
+import androidx.core.os.bundleOf
 import knf.kuma.pojos.QueueObject
 
 /**
@@ -32,6 +33,7 @@ open class MediaCatalog(private val list: MutableList<MediaDescriptionCompat>, p
                         setTitle(intent.getStringExtra("title"))
                         setMediaId("1")
                         setMediaUri(intent.data)
+                        setExtras(bundleOf("headers" to intent.getStringArrayExtra("headers")))
                         build()
                     })
     }

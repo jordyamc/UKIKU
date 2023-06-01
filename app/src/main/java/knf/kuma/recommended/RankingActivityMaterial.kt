@@ -17,30 +17,32 @@ import knf.kuma.commons.safeShow
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
-import kotlinx.android.synthetic.main.recycler_ranking.*
+import knf.kuma.databinding.RecyclerRankingBinding
+import knf.kuma.databinding.RecyclerRankingMaterialBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
-
 class RankingActivityMaterial : GenericActivity() {
+
+    private val binding by lazy { RecyclerRankingMaterialBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setSurfaceBars()
-        setContentView(R.layout.recycler_ranking_material)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(false)
             title = "Ranking"
         }
-        with(toolbar) {
+        with(binding.toolbar) {
             setNavigationIcon(R.drawable.ic_close)
             setNavigationOnClickListener { finish() }
         }
-        with(recycler) {
+        with(binding.recycler) {
             layoutManager = LinearLayoutManager(this@RankingActivityMaterial)
             lifecycleScope.launch(Dispatchers.Main){
                 adapter = RankingAdapterMaterial(withContext(Dispatchers.IO) { CacheDB.INSTANCE.genresDAO().ranking })

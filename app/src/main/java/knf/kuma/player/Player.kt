@@ -8,7 +8,8 @@ import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.support.v4.media.MediaDescriptionCompat
-import android.webkit.URLUtil
+import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.media.AudioAttributesCompat
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -19,7 +20,9 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
+import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
@@ -28,6 +31,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
+import knf.kuma.commons.noCrashLetNullable
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import okhttp3.OkHttpClient
@@ -56,7 +60,6 @@ class PlayerHolder(
     val audioFocusPlayer: ExoPlayer
     val playerCallback: PlayerCallback
     private var listPosition = 0
-    var retriever = MediaMetadataRetriever()
     private val mediaCatalog: MediaCatalog
     private var disposable: Disposable? = null
     private var lastPosition = 0L
@@ -65,14 +68,13 @@ class PlayerHolder(
     init {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val audioAttributes = AudioAttributesCompat.Builder()
-                .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
+                .setContentType(AudioAttributesCompat.CONTENT_TYPE_MOVIE)
                 .setUsage(AudioAttributesCompat.USAGE_MEDIA)
                 .build()
         playerCallback = context as PlayerCallback
         mediaCatalog = MediaCatalog(mutableListOf(), intent, playList)
         playerCallback.onChangeTitle((mediaCatalog[listPosition].title ?: "").toString())
         mediaCatalog[listPosition].title?.let { playerState.title = it.toString() }
-        setUpRetriever(mediaCatalog[listPosition])
         if (mediaCatalog.size == 1) playerCallback.onChangeTitle(mediaCatalog[0].title.toString())
         audioFocusPlayer = AudioFocusWrapper(
                 audioAttributes,
@@ -90,43 +92,71 @@ class PlayerHolder(
                 }*/
     }
 
-    private fun setUpRetriever(description: MediaDescriptionCompat) {
-        description.mediaUri?.let {
-            noCrash {
-                if (URLUtil.isFileUrl(it.toString()))
-                    retriever.setDataSource(context, it)
-                else
-                    retriever.setDataSource(it.toString(), mapOf())
-            }
-        }
+    private fun buildMediaSource(): List<MediaData> {
+        return mediaCatalog.mapNotNull { noCrashLetNullable { createExtractorMediaSource(it) } }
     }
 
-    private fun buildMediaSource(): List<MediaItem> {
-        return mediaCatalog.map { createExtractorMediaSource(it.mediaUri ?: Uri.EMPTY) }
-    }
-
-    private fun createExtractorMediaSource(uri: Uri): MediaItem {
-        val item = MediaItem.fromUri(uri)
-        if (intent.getBooleanExtra("isFile", false)) return item
-        return ProgressiveMediaSource.Factory(
-            if (PrefsUtil.useExperimentalOkHttp)
-                DefaultDataSource.Factory(
-                    context,
-                    OkHttpDataSource.Factory(OkHttpClient()).apply {
+    private fun createExtractorMediaSource(descriptor: MediaDescriptionCompat): MediaData {
+        val item = MediaItem.fromUri(descriptor.mediaUri?: Uri.EMPTY)
+        if (intent.getBooleanExtra("isFile", false)) return MediaData(item)
+        val httpFactory = if (PrefsUtil.useExperimentalOkHttp)
+            OkHttpDataSource.Factory(OkHttpClient()).apply {
+                descriptor.extras?.getStringArray("headers")?.let { headerArray ->
+                    val headers = headerArray.toList().chunked(2).associate { Pair(it[0], it[1]) }
+                    setDefaultRequestProperties(headers)
+                    if (headers.contains("User-Agent")) {
+                        setUserAgent(headers["User-Agent"])
+                    } else {
                         setUserAgent(BypassUtil.userAgent)
                     }
-                )
-            else
-                DefaultHttpDataSource.Factory().apply {
-                    setUserAgent(BypassUtil.userAgent)
-                }
-        ).createMediaSource(item).mediaItem
+                }?: setUserAgent(BypassUtil.userAgent)
+            }
+        else
+            DefaultHttpDataSource.Factory().apply {
+                descriptor.extras?.getStringArray("headers")?.let { headerArray ->
+                    val headers = headerArray.toList().chunked(2).associate { Pair(it[0], it[1]) }
+                    setDefaultRequestProperties(headers)
+                    if (headers.contains("User-Agent")) {
+                        setUserAgent(headers["User-Agent"])
+                    } else {
+                        setUserAgent(BypassUtil.userAgent)
+                    }
+                }?: setUserAgent(BypassUtil.userAgent)
+            }
+        val factory = when(MimeTypeMap.getFileExtensionFromUrl(descriptor.mediaUri?.toString())) {
+            "m3u8" -> HlsMediaSource.Factory(httpFactory)
+            else -> ProgressiveMediaSource.Factory(httpFactory)
+        }
+        return MediaData(factory.createMediaSource(item))
+    }
+
+    class MediaData {
+        constructor(media: MediaSource) {
+            mediaSource = media
+        }
+
+        constructor(media: MediaItem) {
+            mediaItem = media
+        }
+        private lateinit var mediaSource: MediaSource
+        private lateinit var mediaItem: MediaItem
+        fun addMedia(exoPlayer: ExoPlayer) {
+            if (::mediaSource.isInitialized) {
+                exoPlayer.addMediaSource(mediaSource)
+            }
+            if (::mediaItem.isInitialized) {
+                exoPlayer.addMediaItem(mediaItem)
+            }
+        }
     }
 
     // Prepare playback.
     fun start() {
         // Load media.
-        audioFocusPlayer.setMediaItems(buildMediaSource())
+        buildMediaSource().forEach {
+            it.addMedia(audioFocusPlayer)
+        }
+        //audioFocusPlayer.setMediaItems(buildMediaSource())
         audioFocusPlayer.prepare()
         // Restore state (after onResume()/onStart())
         with(playerState) {
@@ -145,13 +175,14 @@ class PlayerHolder(
             // Save state
             saveState()
             // Stop the exoPlayer (and release it's resources). The exoPlayer instance can be reused.
-            stop(true)
+            stop()
+            clearMediaItems()
         }
     }
 
     fun skip() {
         with(audioFocusPlayer) {
-            seekTo(currentWindowIndex, currentPosition + 85000)
+            seekTo(currentMediaItemIndex, currentPosition + 85000)
         }
     }
 
@@ -159,7 +190,7 @@ class PlayerHolder(
         with(audioFocusPlayer) {
             with(playerState) {
                 position = currentPosition
-                window = currentWindowIndex
+                window = currentMediaItemIndex
                 whenReady = playWhenReady
             }
         }
@@ -228,7 +259,6 @@ class PlayerHolder(
                             (mediaCatalog[listPosition].title
                                 ?: "").toString()
                         )
-                        setUpRetriever(mediaCatalog[listPosition])
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

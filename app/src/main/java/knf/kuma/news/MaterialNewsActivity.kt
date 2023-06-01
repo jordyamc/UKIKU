@@ -24,14 +24,14 @@ import knf.kuma.ads.implBanner
 import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.activity_news_material.*
+import knf.kuma.databinding.ActivityNewsMaterialBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val model: NewsViewModel by viewModels()
+    private val binding by lazy { ActivityNewsMaterialBinding.inflate(layoutInflater) }
     val adapter: MaterialNewsAdapter by lazy { MaterialNewsAdapter(this) }
     var snack: Snackbar? = null
 
@@ -39,21 +39,21 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setSurfaceBars()
-        setContentView(R.layout.activity_news_material)
-        toolbar.title = "Noticias"
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        binding.toolbar.title = "Noticias"
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
-        toolbar.setNavigationOnClickListener { onBackPressed() }
-        refresh.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
-        refresh.setOnRefreshListener(this)
-        refresh.isRefreshing = true
-        recycler.adapter = adapter
-        recycler.addItemDecoration(SpacingItemDecoration(0, 20.asPx))
+        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
+        binding.refresh.setColorSchemeResources(EAHelper.getThemeColor(), EAHelper.getThemeColorLight(), R.color.colorPrimary)
+        binding.refresh.setOnRefreshListener(this)
+        binding.refresh.isRefreshing = true
+        binding.recycler.adapter = adapter
+        binding.recycler.addItemDecoration(SpacingItemDecoration(0, 20.asPx))
         loadList()
         lifecycleScope.launch(Dispatchers.IO) {
             delay(500)
-            adContainer.implBanner(AdsType.NEWS_BANNER, true)
+            binding.adContainer.implBanner(AdsType.NEWS_BANNER, true)
         }
         showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
     }
@@ -64,21 +64,21 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
             lifecycleScope.launch {
                 NewsRepository.getNews(getCategory()) { isEmpty, cause ->
                     if (isEmpty) {
-                        error.visibility = View.VISIBLE
-                        snack = recycler.showSnackbar("Error al cargar noticias: $cause", Snackbar.LENGTH_INDEFINITE, "reintentar") {
+                        binding.error.visibility = View.VISIBLE
+                        snack = binding.recycler.showSnackbar("Error al cargar noticias: $cause", Snackbar.LENGTH_INDEFINITE, "reintentar") {
                             loadList()
                         }
                     } else {
-                        error.visibility = View.GONE
-                        recycler.scheduleLayoutAnimation()
+                        binding.error.visibility = View.GONE
+                        binding.recycler.scheduleLayoutAnimation()
                     }
-                    runOnUiThread { refresh.isRefreshing = false }
+                    runOnUiThread { binding.refresh.isRefreshing = false }
                 }.collect {
                     adapter.submitData(it)
                 }
             }
         else {
-            snack = recycler.showSnackbar("Sin internet", Snackbar.LENGTH_INDEFINITE)
+            snack = binding.recycler.showSnackbar("Sin internet", Snackbar.LENGTH_INDEFINITE)
         }
     }
 
@@ -122,7 +122,7 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
     }
 
     override fun onRefresh() {
-        refresh.isRefreshing = true
+        binding.refresh.isRefreshing = true
         loadList()
     }
 

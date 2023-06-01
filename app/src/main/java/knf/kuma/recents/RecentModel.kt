@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.google.errorprone.annotations.Keep
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
@@ -28,6 +29,7 @@ import pl.droidsonroids.jspoon.annotation.Selector
 import kotlin.math.abs
 
 @Entity
+@Keep
 open class RecentModel {
 
     @JvmField
@@ -116,6 +118,7 @@ class RecentState(val model: RecentModel) {
     val canPlay: Boolean get() = downloadObject?.isDownloadingOrPaused == false && checkIsDownloaded
 }
 
+@Keep
 class RecentsPage {
     @Selector("ul.ListEpisodios li:not(article), ul.List-Episodes li:not(article)")
     var list: List<RecentModel> = emptyList()

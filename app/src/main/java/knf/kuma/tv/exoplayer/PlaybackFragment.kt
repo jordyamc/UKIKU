@@ -5,12 +5,14 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.webkit.MimeTypeMap
 import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
@@ -27,7 +29,9 @@ class PlaybackFragment : VideoSupportFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mVideo = Video(activity?.intent?.extras)
+        activity?.intent?.let {
+            mVideo = Video(it)
+        }
     }
 
     override fun onStart() {
@@ -66,7 +70,6 @@ class PlaybackFragment : VideoSupportFragment() {
     }
 
     private fun initializePlayer() {
-        val bandwidthMeter = DefaultBandwidthMeter.Builder(requireContext()).build()
         val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
         mTrackSelector = DefaultTrackSelector(requireContext(), videoTrackSelectionFactory)
         mPlayer =
@@ -95,14 +98,20 @@ class PlaybackFragment : VideoSupportFragment() {
         mPlayerGlue?.play()
     }
 
-    private fun prepareMediaForPlaying(mediaSourceUri: Uri, headers: HashMap<String, String>?) {
+    private fun prepareMediaForPlaying(mediaSourceUri: Uri, headers: Map<String, String>?) {
         activity?.let {
-            val userAgent = Util.getUserAgent(it, "UKIKU")
-            val mediaSource = ProgressiveMediaSource.Factory(
-                DefaultHttpDataSource.Factory().apply {
-                    setUserAgent(userAgent)
-                    setDefaultRequestProperties(headers ?: emptyMap())
-                }).createMediaSource(MediaItem.fromUri(mediaSourceUri))
+            val httpFactory = DefaultHttpDataSource.Factory().apply {
+                if (headers?.containsKey("User-Agent") != true) {
+                    setUserAgent(Util.getUserAgent(it, "UKIKU"))
+                } else {
+                    setUserAgent(headers["User-Agent"])
+                }
+                setDefaultRequestProperties(headers ?: emptyMap())
+            }
+            val mediaSource = when(MimeTypeMap.getFileExtensionFromUrl(mediaSourceUri.toString())) {
+                "m3u8" -> HlsMediaSource.Factory(httpFactory)
+                else -> ProgressiveMediaSource.Factory(httpFactory)
+            }.createMediaSource(MediaItem.fromUri(mediaSourceUri))
             mPlayer?.setMediaSource(mediaSource)
             mPlayer?.prepare()
         }

@@ -16,12 +16,13 @@ import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.custom.BannerContainerView
 import knf.kuma.home.HomeFragment
 import knf.kuma.pojos.RecentObject
 import knf.kuma.recents.viewholders.RecyclerRefreshHolder
 import knf.kuma.videoservers.FileActions
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.android.synthetic.main.recycler_refresh_fragment.*
+import org.jetbrains.anko.support.v4.find
 
 class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: RecentsViewModel by viewModels()
@@ -30,15 +31,15 @@ class RecentFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.dbLiveData.observe(viewLifecycleOwner, { objects ->
+        viewModel.dbLiveData.observe(viewLifecycleOwner) { objects ->
             holder?.setError(objects.isEmpty())
             holder?.setRefreshing(false)
             adapter?.updateList(objects) { holder?.recyclerView?.scheduleLayoutAnimation() }
             scrollByKey(objects)
-        })
+        }
         updateList()
         if (!PrefsUtil.isNativeAdsEnabled)
-            adContainer.implBanner(AdsType.RECENT_BANNER)
+            find<BannerContainerView>(R.id.adContainer).implBanner(AdsType.RECENT_BANNER)
     }
 
     private fun scrollByKey(list: List<RecentObject>) {

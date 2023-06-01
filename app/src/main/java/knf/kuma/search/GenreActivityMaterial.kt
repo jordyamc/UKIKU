@@ -14,27 +14,28 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
-import kotlinx.android.synthetic.main.recycler_genre.*
+import knf.kuma.databinding.RecyclerGenreMaterialBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class GenreActivityMaterial : GenericActivity() {
     private val adapter: GenreAdapterMaterial by lazy { GenreAdapterMaterial(this) }
     private var isFirst = true
+    private val binding by lazy { RecyclerGenreMaterialBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setSurfaceBars()
-        setContentView(R.layout.recycler_genre_material)
-        toolbar.title = intent.getStringExtra("name")
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        binding.toolbar.title = intent.getStringExtra("name")
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
-        toolbar.setNavigationOnClickListener { finish() }
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
-        recycler.adapter = adapter
+        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.recycler.layoutManager = LinearLayoutManager(this)
+        binding.recycler.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
+        binding.recycler.adapter = adapter
         lifecycleScope.launch {
             Pager(
                 config = PagingConfig(25), 0,
@@ -42,9 +43,9 @@ class GenreActivityMaterial : GenericActivity() {
             ).flow.collectLatest {
                 adapter.submitData(it)
                 if (isFirst) {
-                    progress.visibility = View.GONE
+                    binding.progress.visibility = View.GONE
                     isFirst = false
-                    recycler.scheduleLayoutAnimation()
+                    binding.recycler.scheduleLayoutAnimation()
                 }
             }
         }

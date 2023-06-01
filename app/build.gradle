@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
@@ -14,8 +13,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 199
-        versionName "5.2.1"
+        versionCode 200
+        versionName "5.2.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -41,7 +40,6 @@ android {
             buildConfigField "String", "APPODEAL_KEY", localProperties['UKIKU_APPODEAL_KEY'] ?: ""
             resValue "string", "twitter_consumer_key", localProperties['UKIKU_TWITTER_API_KEY'] ?: ""
             resValue "string", "twitter_consumer_secret", localProperties['UKIKU_TWITTER_API_SECRET'] ?: ""
-            manifestPlaceholders = [iabPermission: "com.appcoins.dev.BILLING"]
         }
         release {
             minifyEnabled true
@@ -77,12 +75,16 @@ android {
         androidTest.assets.srcDirs +=
                 files("$projectDir/schemas".toString())
     }
+    buildFeatures {
+        viewBinding = true
+        aidl true
+    }
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
+        sourceCompatibility = '17'
+        targetCompatibility = '17'
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_17
     }
     packagingOptions {
         resources {
@@ -93,7 +95,7 @@ android {
 }
 
 configurations.all {
-    resolutionStrategy {
+    resolutionStrategy { 
         force 'org.jsoup:jsoup:1.10.3'
         force 'androidx.core:core-ktx:1.6.0'
     }
@@ -112,7 +114,6 @@ allprojects {
         maven { url "https://dl.bintray.com/blockchainds/bds" }
         maven { url "https://dl.bintray.com/asf/asf" }
         maven { url 'https://swisscodemonkeys.github.io/appbrain-sdk/maven' }
-        maven { url "https://artifactory.appodeal.com/appodeal" }
     }
 }
 
@@ -121,53 +122,52 @@ dependencies {
     implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
     implementation 'com.github.jordyamc:Multi-Display-Cast:2.19'
     implementation 'com.github.jordyamc:PersistentSearchView:1.0.10'
-    implementation 'com.github.jordyamc:UAGenerator:1.1.0'
+    implementation 'com.github.jordyamc:UAGenerator:1.2.0'
     implementation 'com.github.jordyamc:AndroidVideoCache:2.7.6'
     implementation 'com.github.jordyamc:Cloudflare-Bypasser:6a070a78f5'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.browser:browser:1.4.0'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.activity:activity-ktx:1.6.1'
-    implementation 'androidx.fragment:fragment-ktx:1.5.5'
+    implementation 'androidx.browser:browser:1.5.0'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.activity:activity-ktx:1.7.0'
+    implementation 'androidx.fragment:fragment-ktx:1.5.6'
     implementation 'androidx.startup:startup-runtime:1.1.1'
-    implementation 'com.google.android.material:material:1.9.0-alpha01'
+    implementation 'com.google.android.material:material:1.9.0-beta01'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.mediarouter:mediarouter:1.3.1'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.tvprovider:tvprovider:1.0.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'
-    implementation 'com.google.android.gms:play-services-cast:21.2.0'
-    implementation 'com.google.android.gms:play-services-ads:21.4.0'
-    implementation platform('com.google.firebase:firebase-bom:30.4.1')
-    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.android.gms:play-services-cast:21.3.0'
+    implementation 'com.google.android.gms:play-services-ads:22.0.0'
+    implementation platform('com.google.firebase:firebase-bom:31.4.0')
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-config'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'com.google.firebase:firebase-ads:21.4.0'
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'com.google.firebase:firebase-ads:22.0.0'
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
     //implementation 'com.google.ads.mediation:adcolony:4.4.1.0'
     implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     api 'com.google.guava:guava:27.0.1-android'
-    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
     implementation 'androidx.slice:slice-builders-ktx:1.0.0-alpha08'
     implementation 'androidx.slice:slice-builders:1.0.0'
-    implementation 'androidx.work:work-runtime-ktx:2.7.1'
-    implementation 'androidx.room:room-runtime:2.5.0'
-    implementation 'androidx.room:room-ktx:2.5.0'
-    kapt 'androidx.room:room-compiler:2.5.0'
-    androidTestImplementation 'androidx.room:room-testing:2.5.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
+    implementation 'androidx.room:room-runtime:2.5.1'
+    implementation 'androidx.room:room-ktx:2.5.1'
+    kapt 'androidx.room:room-compiler:2.5.1'
+    androidTestImplementation 'androidx.room:room-testing:2.5.1'
     implementation 'com.google.dagger:dagger-android-support:2.34.1'
     kapt 'com.google.dagger:dagger-android-processor:2.34.1'
     implementation 'androidx.paging:paging-runtime-ktx:3.1.1'
@@ -175,7 +175,7 @@ dependencies {
     implementation 'pl.droidsonroids.retrofit2:converter-jspoon:1.3.2'
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.2'
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.0'
@@ -197,6 +197,7 @@ dependencies {
     //Aesthetic
     implementation 'com.afollestad:aesthetic:1.0.0-beta04'
     //---------
+    implementation 'org.apache.commons:commons-text:1.8'
     implementation 'com.shamanland:xdroid-toaster:0.3.0'
     implementation 'com.github.MFlisar:DragSelectRecyclerView:0.3'
     implementation 'com.mani:ThinDownloadManager:1.4.0'
@@ -224,6 +225,7 @@ dependencies {
     implementation 'com.github.jordyamc:CloudflareBypassWebview:1.0.4'
     implementation 'com.github.jordyamc:apk-signatures:1.0.3'
     implementation 'com.github.sephiroth74:android-target-tooltip:2.0.4'
+    implementation 'de.prosiebensat1digital.oasis-jsbridge-android:oasis-jsbridge-quickjs:0.14.5'
     kapt 'com.github.bumptech.glide:compiler:4.14.1'
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
     implementation 'fr.bmartel:jspeedtest:1.32.1'
@@ -237,16 +239,27 @@ dependencies {
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
     testImplementation 'junit:junit:4.13.2'
     //Kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.7.22'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.22'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'org.jetbrains.anko:anko:0.10.8'
     implementation 'org.jetbrains.anko:anko-coroutines:0.10.8'
     //------
+    //Appodeal
+    implementation ('com.appodeal.ads:sdk:3.0.2.+') {
+        exclude group: 'com.appodeal.ads.sdk.services', module: 'adjust'
+        exclude group: 'com.appodeal.ads.sdk.services', module: 'appsflyer'
+        exclude group: 'com.appodeal.ads.sdk.services', module: 'firebase'
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'admob'
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'yandex'
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'facebook'
+        exclude group: 'com.appodeal.ads.sdk.services', module: 'facebook_analytics'
+    }
+    //-------
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'androidx.work:work-testing:2.7.1'
+    androidTestImplementation 'androidx.work:work-testing:2.8.1'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 }

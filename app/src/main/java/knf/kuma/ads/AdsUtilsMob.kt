@@ -6,7 +6,13 @@ import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
@@ -26,12 +32,13 @@ import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
-import kotlinx.android.synthetic.main.admob_ad.view.*
+import knf.kuma.widgets.AdTemplateView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.collections.forEachReversedWithIndex
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster.toast
 
 object AdsUtilsMob {
@@ -209,25 +216,25 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                                 AdsUtilsMob.RECENT_BANNER, AdsUtilsMob.FAVORITE_BANNER -> {
                                     asyncInflate(context, R.layout.admob_ad_card).apply {
                                         Log.e("Ad", "On recent")
-                                        admobAd.setNativeAd(it[0])
+                                        find<AdTemplateView>(R.id.admobAd).setNativeAd(it[0])
                                     }
                                 }
                                 AdsUtilsMob.NEWS_BANNER -> {
                                     asyncInflate(context, R.layout.admob_ad_news).apply {
                                         Log.e("Ad", "On news")
-                                        admobAd.setNativeAd(it[0])
+                                        find<AdTemplateView>(R.id.admobAd).setNativeAd(it[0])
                                     }
                                 }
                                 AdsUtilsMob.ACHIEVEMENT_BANNER, AdsUtilsMob.ACHIEVEMENT_NATIVE -> {
                                     asyncInflate(context, R.layout.admob_ad_plain).apply {
                                         Log.e("Ad", "On Achievement")
-                                        admobAd.setNativeAd(it[0])
+                                        find<AdTemplateView>(R.id.admobAd).setNativeAd(it[0])
                                     }
                                 }
                                 AdsUtilsMob.CAST_BANNER -> {
                                     asyncInflate(context, R.layout.admob_ad_alone).apply {
                                         Log.e("Ad", "On Cast")
-                                        admobAd.setNativeAd(it[0])
+                                        find<AdTemplateView>(R.id.admobAd).setNativeAd(it[0])
                                     }
                                 }
                                 else -> return@launch
@@ -273,7 +280,12 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
 
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 Log.e("Ad", "Ad failed to load, code: ${p0.code}")
-                createAndLoadRewardAd()
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(3000)
+                    if (!context.isFinishing) {
+                        createAndLoadRewardAd()
+                    }
+                }
             }
         })
     }
@@ -316,7 +328,12 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
 
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 Log.e("Ad", "Ad failed to load, code: ${p0.code}")
-                createAndLoad()
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(333)
+                    if (!context.isFinishing) {
+                        createAndLoad()
+                    }
+                }
             }
         })
     }
@@ -360,7 +377,12 @@ class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenA
 
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 Log.e("Ad", "Ad failed to load, code: ${p0.code}")
-                createAndLoad()
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(3000)
+                    if (!context.isFinishing) {
+                        createAndLoad()
+                    }
+                }
             }
         })
     }

@@ -17,8 +17,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.card.MaterialCardView
@@ -34,7 +37,19 @@ import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.animeinfo.ktx.filePath
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
-import knf.kuma.commons.*
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.FileWrapper
+import knf.kuma.commons.Network
+import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.distinct
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.isFullMode
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.noCrashSuspend
+import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.FileAccessHelper
@@ -44,11 +59,15 @@ import knf.kuma.pojos.SeeingObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.net.URL
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicReference
 
 class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerView: RecyclerView, val chapters: List<ChapterObjWrap>, private val touchListener: DragSelectTouchListener) : RecyclerView.Adapter<AnimeChaptersAdapter.ChapterImgHolder>(), FastScrollRecyclerView.SectionedAdapter {
@@ -113,8 +132,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                 override fun onSuccess() {
                     holder.imageView.visibility = View.VISIBLE
                 }
-
-                override fun onError() {
+                override fun onError(e: Exception?) {
 
                 }
             })
@@ -269,7 +287,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                         }
                                     }
 
-                                    override fun getView(): View? {
+                                    override fun getView(): View {
                                         return recyclerView
                                     }
                                 })
@@ -313,7 +331,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
 
                                     }
 
-                                    override fun getView(): View? {
+                                    override fun getView(): View {
                                         return recyclerView
                                     }
                                 })
@@ -343,7 +361,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                         }
                                     }
 
-                                    override fun getView(): View? {
+                                    override fun getView(): View {
                                         return recyclerView
                                     }
                                 })

@@ -13,7 +13,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.inflate
 import knf.kuma.commons.load
 import knf.kuma.commons.noCrash
-import kotlinx.android.synthetic.main.item_news_material.view.*
+import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class MaterialNewsAdapter(val activity: AppCompatActivity) : PagingDataAdapter<NewsItem, MaterialNewsAdapter.NewsViewHolder>(NewsItem.DIFF) {
@@ -47,11 +47,11 @@ class MaterialNewsAdapter(val activity: AppCompatActivity) : PagingDataAdapter<N
     }
 
     class NewsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val root: View = itemView.root
-        val image: ShapeableImageView = itemView.image
-        val progress: ProgressBar = itemView.progress
-        val type: TextView = itemView.type
-        val title: TextView = itemView.title
-        val date: TextView = itemView.date
+        val root: View = itemView.find(R.id.root)
+        val image: ShapeableImageView = itemView.find(R.id.image)
+        val progress: ProgressBar = itemView.find(R.id.progress)
+        val type: TextView = itemView.find(R.id.type)
+        val title: TextView = itemView.find(R.id.title)
+        val date: TextView = itemView.find(R.id.date)
     }
 }

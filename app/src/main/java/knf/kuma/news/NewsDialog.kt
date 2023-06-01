@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -16,7 +17,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import knf.kuma.R
 import knf.kuma.commons.doOnUI
-import kotlinx.android.synthetic.main.lay_news.view.*
+import org.jetbrains.anko.find
 
 class NewsDialog : BottomSheetDialogFragment(), LifecycleObserver {
     private var link: String = "about:blank"
@@ -25,7 +26,7 @@ class NewsDialog : BottomSheetDialogFragment(), LifecycleObserver {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.lay_news, container, false)
         doOnUI {
-            rootView.webview.apply {
+            rootView.find<WebView>(R.id.webview).apply {
                 setInitialScale(1)
                 settings.useWideViewPort = true
                 settings.loadWithOverviewMode = true

@@ -22,9 +22,9 @@ import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.ExpandableTV
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.FragmentAnimeDetailsMaterialBinding
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.SeeingObject
-import kotlinx.android.synthetic.main.fragment_anime_details_material.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,20 +34,21 @@ import uz.jamshid.library.ExactRatingBar
 import xdroid.toaster.Toaster
 
 class AnimeDetailsMaterialHolder(val view: View) {
-    private var layouts: MutableList<View> = arrayListOf(view.lay_title, view.lay_description, view.adContainer, view.lay_details, view.lay_genres, view.lay_follow, view.lay_related)
-    internal val title: TextView = view.title
-    private val expandIcon: ImageButton = view.expand_icon
-    private val desc: ExpandableTV = view.expandable_desc
-    internal val type: TextView = view.type
-    internal val state: TextView = view.state
-    internal val id: TextView = view.aid
-    internal val followers: TextView = view.followers
-    private val layScore: LinearLayout = view.lay_score
-    private val ratingCount: TextView = view.rating_count
-    private val ratingBar: ExactRatingBar = view.ratingBar
-    private val recyclerViewGenres: RecyclerView = view.recycler_genres
-    private val spinnerList: Spinner = view.spinner_list
-    private val recyclerViewRelated: RecyclerView = view.recycler_related
+    private val binding = FragmentAnimeDetailsMaterialBinding.bind(view)
+    private var layouts: MutableList<View> = arrayListOf(binding.layTitle, binding.layDescription, binding.adContainer, binding.layDetails, binding.layGenres, binding.layFollow, binding.layRelated)
+    internal val title: TextView = binding.title
+    private val expandIcon: ImageButton = binding.expandIcon
+    private val desc: ExpandableTV = binding.expandableDesc
+    internal val type: TextView = binding.type
+    internal val state: TextView = binding.state
+    internal val id: TextView = binding.aid
+    internal val followers: TextView = binding.followers
+    private val layScore: LinearLayout = binding.layScore
+    private val ratingCount: TextView = binding.ratingCount
+    private val ratingBar: ExactRatingBar = binding.ratingBar
+    private val recyclerViewGenres: RecyclerView = binding.recyclerGenres
+    private val spinnerList: Spinner = binding.spinnerList
+    private val recyclerViewRelated: RecyclerView = binding.recyclerRelated
     private val clipboardManager = view.context.applicationContext.clipboardManager
     private var needAnimation = true
 
@@ -55,7 +56,7 @@ class AnimeDetailsMaterialHolder(val view: View) {
         recyclerViewGenres.layoutManager = ChipsLayoutManager.newBuilder(view.context).build()
         recyclerViewGenres.addItemDecoration(SpacingItemDecoration(5, 5))
         recyclerViewRelated.layoutManager = LinearLayoutManager(view.context)
-        view.lay_ad.isVisible = PrefsUtil.isAdsEnabled
+        binding.layAd.isVisible = PrefsUtil.isAdsEnabled
     }
 
     @SuppressLint("SetTextI18n")
@@ -88,7 +89,7 @@ class AnimeDetailsMaterialHolder(val view: View) {
                     expandIcon.setOnClickListener(onClickListener)
                     showLayout(layouts[1])
                 } else {
-                    view.lay_description_separator.isVisible = false
+                    binding.layDescriptionSeparator.isVisible = false
                 }
             }
             if (PrefsUtil.isAdsEnabled) {
@@ -97,12 +98,15 @@ class AnimeDetailsMaterialHolder(val view: View) {
                         if (AdsUtils.isAdmobEnabled)
                             NativeManager.take(fragment.lifecycleScope, 1) {
                                 if (it.isNotEmpty()) {
-                                    view.adContainer.setNativeAd(it[0])
+                                    binding.adContainer.setNativeAd(it[0])
+                                } else {
+                                    binding.adContainer.isVisible = false
+                                    binding.layAd.implBanner(AdsType.INFO_BANNER)
                                 }
                             }
                         else {
-                            view.adContainer.isVisible = false
-                            view.lay_ad.implBanner(AdsType.INFO_BANNER)
+                            binding.adContainer.isVisible = false
+                            binding.layAd.implBanner(AdsType.INFO_BANNER)
                         }
                     }
                 }

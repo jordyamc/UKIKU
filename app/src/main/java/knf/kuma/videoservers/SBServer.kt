@@ -23,7 +23,7 @@ class SBServer internal constructor(context: Context, baseLink: String) :
     override val videoServer: VideoServer?
         get() {
             return try {
-                val downLink = PatternUtil.extractLink(baseLink).replace("/e/", "/")
+                val downLink = PatternUtil.extractLink(baseLink).replace("/e/", "/d/")
                 val userAgent = randomUA()
                 val html = Jsoup.connect(downLink).userAgent(userAgent).get().html()
                 val (videoId, type, hash) = Regex("download_video\\('(\\w+)','([nhl])','([\\w-]+)'\\)").find(

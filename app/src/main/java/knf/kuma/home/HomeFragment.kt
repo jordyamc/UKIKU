@@ -14,6 +14,7 @@ import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.FragmentHomeBinding
 import knf.kuma.pojos.QueueObject
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.SeeingObject
@@ -23,7 +24,6 @@ import knf.kuma.recents.RecentsViewModel
 import knf.kuma.recommended.RecommendActivity
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.seeing.SeeingActivity
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,20 +33,59 @@ class HomeFragment : BottomFragment() {
 
     private val viewModel: RecentsViewModel by viewModels()
     private var lastNew: String = "0"
+    private lateinit var binding: FragmentHomeBinding
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        EAHelper.enter1("R")
+        return inflater.inflate(R.layout.fragment_home, container, false).also {
+            binding = FragmentHomeBinding.bind(it)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.listNew.apply {
+            setAdapter(RecentsAdapter(this@HomeFragment, isLarge = false, showSeen = false))
+            setViewAllOnClick {
+                PrefsUtil.recentLastHiddenNew = lastNew.toInt()
+                binding.listNew.hide()
+            }
+        }
+        binding.listFavUpdated.apply {
+            setAdapter(RecentsAdapter(this@HomeFragment, true))
+            setViewAllClass(RecentsActivity::class.java)
+        }
+        binding.listBestEmission.setAdapter(DirAdapter(this))
+        binding.listPending.apply {
+            setAdapter(QueueAdapter(this@HomeFragment))
+            setViewAllClass(QueueActivity::class.java)
+        }
+        binding.listWaiting.apply {
+            setAdapter(WaitingAdapter(this@HomeFragment))
+            setViewAllClass(SeeingActivity::class.java)
+        }
+        binding.listRecommended.apply {
+            setAdapter(RecommendedAdapter(activity))
+            setViewAllClass(RecommendActivity::class.java)
+        }
+        binding.listRecommendedStaff.setAdapter(SearchAdapter(this))
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000)
+            binding.adContainer.implBanner(AdsType.RECENT_BANNER, true)
+            delay(500)
+            binding.adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
+        }
         viewModel.dbLiveData.observe(viewLifecycleOwner, Observer { list ->
             doAsync {
-                listNew.updateList(filterNew(list.filter { it.isNew }))
+                binding.listNew.updateList(filterNew(list.filter { it.isNew }))
                 val favFiltered = list.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }
                 if (favFiltered.isEmpty()) {
-                    listFavUpdated.apply {
+                    binding.listFavUpdated.apply {
                         setSubheader("Ultimos actualizados")
                         updateList(list)
                     }
                 } else {
-                    listFavUpdated.apply {
+                    binding.listFavUpdated.apply {
                         setSubheader("Favoritos actualizados")
                         updateList(favFiltered)
                     }
@@ -54,64 +93,24 @@ class HomeFragment : BottomFragment() {
             }
         })
         CacheDB.INSTANCE.favsDAO().countLive.observe(viewLifecycleOwner, Observer {
-            doAsync { listFavUpdated.updateList(CacheDB.INSTANCE.recentsDAO().all.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }) }
+            doAsync { binding.listFavUpdated.updateList(CacheDB.INSTANCE.recentsDAO().all.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }) }
             RecommendHelper.createRecommended {
-                listRecommended.updateList(it)
+                binding.listRecommended.updateList(it)
             }
         })
         CacheDB.INSTANCE.animeDAO().emissionVotesLimited.observe(viewLifecycleOwner, Observer {
-            listBestEmission.updateList(it)
+            binding.listBestEmission.updateList(it)
         })
         CacheDB.INSTANCE.queueDAO().all.observe(viewLifecycleOwner, Observer {
-            doAsync { listPending.updateList(QueueObject.takeOne(it)) }
+            doAsync { binding.listPending.updateList(QueueObject.takeOne(it)) }
         })
         CacheDB.INSTANCE.seeingDAO().getAllWState(SeeingObject.STATE_CONSIDERING, SeeingObject.STATE_PAUSED).observe(viewLifecycleOwner, Observer {
-            listWaiting.updateList(it)
+            binding.listWaiting.updateList(it)
         })
         StaffRecommendations.createList {
-            listRecommendedStaff.updateList(it)
+            binding.listRecommendedStaff.updateList(it)
         }
         viewModel.reload()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        EAHelper.enter1("R")
-        return inflater.inflate(R.layout.fragment_home, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        listNew.apply {
-            setAdapter(RecentsAdapter(this@HomeFragment, isLarge = false, showSeen = false))
-            setViewAllOnClick {
-                PrefsUtil.recentLastHiddenNew = lastNew.toInt()
-                listNew.hide()
-            }
-        }
-        listFavUpdated.apply {
-            setAdapter(RecentsAdapter(this@HomeFragment, true))
-            setViewAllClass(RecentsActivity::class.java)
-        }
-        listBestEmission.setAdapter(DirAdapter(this))
-        listPending.apply {
-            setAdapter(QueueAdapter(this@HomeFragment))
-            setViewAllClass(QueueActivity::class.java)
-        }
-        listWaiting.apply {
-            setAdapter(WaitingAdapter(this@HomeFragment))
-            setViewAllClass(SeeingActivity::class.java)
-        }
-        listRecommended.apply {
-            setAdapter(RecommendedAdapter(activity))
-            setViewAllClass(RecommendActivity::class.java)
-        }
-        listRecommendedStaff.setAdapter(SearchAdapter(this))
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(1000)
-            adContainer.implBanner(AdsType.RECENT_BANNER, true)
-            delay(500)
-            adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
-        }
     }
 
     private fun filterNew(list: List<RecentObject>): List<RecentObject> {

@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.Fragment
 import knf.kuma.App
 import knf.kuma.R
-import kotlinx.android.synthetic.main.lay_migrate_version.*
+import org.jetbrains.anko.find
 
 class MigrateVersionFragment : Fragment() {
 
@@ -16,9 +17,8 @@ class MigrateVersionFragment : Fragment() {
         return inflater.inflate(R.layout.lay_migrate_version, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        tv_version_bad.text = installedCode.toString()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        view.find<TextView>(R.id.tv_version_bad).text = installedCode.toString()
     }
 
     companion object {

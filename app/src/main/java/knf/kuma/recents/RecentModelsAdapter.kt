@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.gms.ads.nativead.NativeAdView
@@ -33,13 +34,12 @@ import knf.kuma.pojos.RecordObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.FileActions
-import kotlinx.android.synthetic.main.item_ad_recents_material.view.*
-import kotlinx.android.synthetic.main.item_recents_material.view.*
 import kotlinx.coroutines.*
+import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.util.*
 
-class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentModel, RecyclerView.ViewHolder>(RecentModel.DIFF) {
+class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentModel, ViewHolder>(RecentModel.DIFF) {
 
     private val lifecycleScope = fragment.lifecycleScope
     private val chaptersDAO by lazy { CacheDB.INSTANCE.seenDAO() }
@@ -60,13 +60,13 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
             1
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             if (viewType == 0)
                 AdsViewHolder(fragment.lifecycleScope, parent.inflate(R.layout.item_ad_recents_material))
             else
                 ModelsViewHolder(fragment.viewLifecycleOwner, parent.inflate(R.layout.item_recents_material))
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         if (holder is ModelsViewHolder) {
             holder.apply {
@@ -198,7 +198,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
         }
     }
 
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+    override fun onViewRecycled(holder: ViewHolder) {
         super.onViewRecycled(holder)
         if (holder is ModelsViewHolder)
             holder.recycle()
@@ -225,19 +225,19 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
 
     fun hasAds(): Boolean = adsList.isNotEmpty()
 
-    class ModelsViewHolder(private val lifecycleOwner: LifecycleOwner, view: View) : RecyclerView.ViewHolder(view) {
-        val root: View = itemView.root
-        val image: ImageView = itemView.image
-        val chapter: TextView = itemView.chapter
-        val name: TextView = itemView.name
-        val newIndicator: ImageView = itemView.newIndicator
-        val seenIndicator: View = itemView.seenIndicator
-        val favIndicator: ImageView = itemView.favIndicator
-        val actionMenu: View = itemView.actionMenu
-        val downloadedChip: Chip = itemView.downloadedChip
-        private val layDownloading: View = itemView.layDownloading
-        private val progressIndicator: CircularProgressIndicator = itemView.progressIndicator
-        private val actionCancel: View = itemView.actionCancel
+    class ModelsViewHolder(private val lifecycleOwner: LifecycleOwner, view: View) : ViewHolder(view) {
+        val root: View = itemView.find(R.id.root)
+        val image: ImageView = itemView.find(R.id.image)
+        val chapter: TextView = itemView.find(R.id.chapter)
+        val name: TextView = itemView.find(R.id.name)
+        val newIndicator: ImageView = itemView.find(R.id.newIndicator)
+        val seenIndicator: View = itemView.find(R.id.seenIndicator)
+        val favIndicator: ImageView = itemView.find(R.id.favIndicator)
+        val actionMenu: View = itemView.find(R.id.actionMenu)
+        val downloadedChip: Chip = itemView.find(R.id.downloadedChip)
+        private val layDownloading: View = itemView.find(R.id.layDownloading)
+        private val progressIndicator: CircularProgressIndicator = itemView.find(R.id.progressIndicator)
+        private val actionCancel: View = itemView.find(R.id.actionCancel)
 
         private lateinit var state: RecentState
         private var checkJob: Job? = null
@@ -380,16 +380,18 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
         }
     }
 
-    class AdsViewHolder(private val scope: CoroutineScope, view: View) : RecyclerView.ViewHolder(view) {
-        private val nativeAdView: NativeAdView = itemView.nativeAdView
-        private val iconView: ShapeableImageView = itemView.icon
-        private val primary: TextView = itemView.primary
-        private val secondary: TextView = itemView.secondary
-        private val cta: Chip = itemView.cta
+    class AdsDealsViewHolder(private val scope: CoroutineScope, view: View): ViewHolder(view)
+
+    class AdsViewHolder(private val scope: CoroutineScope, view: View) : ViewHolder(view) {
+        private val nativeAdView: NativeAdView = itemView.find(R.id.nativeAdView)
+        private val iconV: ShapeableImageView = itemView.find(R.id.icon)
+        private val primary: TextView = itemView.find(R.id.primary)
+        private val secondary: TextView = itemView.find(R.id.secondary)
+        private val cta: Chip = itemView.find(R.id.cta)
 
         init {
             nativeAdView.apply {
-                iconView = icon
+                iconView = iconV
                 headlineView = primary
                 bodyView = secondary
                 callToActionView = cta
@@ -401,7 +403,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
             modelAd.unifiedNativeAd.apply {
                 scope.launch(Dispatchers.Main) {
                     if (icon == null)
-                        iconView.setImageDrawable(
+                        iconV.setImageDrawable(
                             ColorDrawable(
                                 ContextCompat.getColor(
                                     App.context,
@@ -410,7 +412,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                             )
                         )
                     else {
-                        iconView.setImageDrawable(icon!!.drawable)
+                        iconV.setImageDrawable(icon!!.drawable)
                     }
                     primary.text = headline
                     secondary.text = body

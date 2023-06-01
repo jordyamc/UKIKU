@@ -13,27 +13,28 @@ import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
-import kotlinx.android.synthetic.main.recycler_genre.*
+import knf.kuma.databinding.RecyclerGenreBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class GenreActivity : GenericActivity() {
     private var adapter: GenreAdapter? = null
     private var isFirst = true
+    private val binding by lazy { RecyclerGenreBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.recycler_genre)
-        toolbar.title = intent.getStringExtra("name")
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        binding.toolbar.title = intent.getStringExtra("name")
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
-        toolbar.setNavigationOnClickListener { finish() }
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
+        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.recycler.layoutManager = LinearLayoutManager(this)
+        binding.recycler.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
         adapter = GenreAdapter(this)
-        recycler.adapter = adapter
+        binding.recycler.adapter = adapter
         lifecycleScope.launch {
             Pager(
                 config = PagingConfig(25), 0,
@@ -41,9 +42,9 @@ class GenreActivity : GenericActivity() {
             ).flow.collectLatest {
                 adapter?.submitData(it)
                 if (isFirst) {
-                    progress.visibility = View.GONE
+                    binding.progress.visibility = View.GONE
                     isFirst = false
-                    recycler.scheduleLayoutAnimation()
+                    binding.recycler.scheduleLayoutAnimation()
                 }
             }
         }

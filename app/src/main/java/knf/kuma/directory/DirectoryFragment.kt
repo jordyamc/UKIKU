@@ -15,12 +15,13 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
+import knf.kuma.custom.BannerContainerView
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.viewholders.DirMainFragmentHolder
-import kotlinx.android.synthetic.main.fragment_directory.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.support.v4.find
 
 class DirectoryFragment : BottomFragment() {
     private var fragmentHolder: DirMainFragmentHolder? = null
@@ -61,7 +62,7 @@ class DirectoryFragment : BottomFragment() {
         if (PrefsUtil.isDirectoryFinished)
             lifecycleScope.launch(Dispatchers.IO) {
                 delay(1000)
-                adContainer.implBanner(AdsType.DIRECTORY_BANNER, true)
+                find<BannerContainerView>(R.id.adContainer).implBanner(AdsType.DIRECTORY_BANNER, true)
             }
     }
 

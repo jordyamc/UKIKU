@@ -9,13 +9,12 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import knf.kuma.R
 import knf.kuma.changelog.objects.Changelog
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.recycler_changelog.*
+import knf.kuma.databinding.RecyclerChangelogBinding
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
@@ -25,6 +24,7 @@ import java.io.InputStreamReader
 
 class ChangelogActivity : GenericActivity() {
 
+    private val binding by lazy { RecyclerChangelogBinding.inflate(layoutInflater) }
     private val changelog: Changelog
         @Throws(Exception::class)
         get() = if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("changelog_load", true)) {
@@ -57,17 +57,17 @@ class ChangelogActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.recycler_changelog)
-        toolbar.title = "Changelog"
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        binding.toolbar.title = "Changelog"
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.setNavigationOnClickListener { finish() }
         doAsync {
             try {
                 val changelog = changelog
-                progress.post { progress.visibility = View.GONE }
-                recycler.post { recycler.adapter = ReleaseAdapter(changelog) }
+                binding.progress.post { binding.progress.visibility = View.GONE }
+                binding.recycler.post { binding.recycler.adapter = ReleaseAdapter(changelog) }
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Toaster.toast("Error al cargar changelog")

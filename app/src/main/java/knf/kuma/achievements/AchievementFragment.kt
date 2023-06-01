@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
-import kotlinx.android.synthetic.main.fragment_achievements.*
+import nl.dionsegijn.konfetti.KonfettiView
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import org.jetbrains.anko.find
@@ -26,6 +26,7 @@ class AchievementFragment : Fragment() {
     private lateinit var error: View
     private lateinit var errorText: TextView
     private lateinit var onClick: OnClick
+    private lateinit var konfetti: KonfettiView
     private val adapter = AchievementAdapter {
         onClick.invoke(it)
     }
@@ -51,6 +52,7 @@ class AchievementFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_achievements, container, false).also {
             error = it.find(R.id.error)
             errorText = it.find(R.id.error_text)
+            konfetti = it.find(R.id.konfetti)
             errorText.text = if (arguments?.getInt(isUnlockedKey, 0) == 0) "Has completado todos los logros" else "No has completado ningun logro"
             recyclerView = it.find(R.id.recycler)
             recyclerView.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))

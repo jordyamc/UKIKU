@@ -26,6 +26,7 @@ import knf.kuma.custom.exceptions.EJNFException
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
 import knf.kuma.download.*
+import knf.kuma.player.openWebPlayer
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
@@ -121,7 +122,7 @@ class ServersFactory {
                         else ->
                             when {
                                 isCasting -> callOnCast(server.option.url)
-                                isStream -> startStreaming(server.option)
+                                isStream -> startStreaming(server.option, servers[selected] is WebServer)
                                 else -> startDownload(server.option)
                             }
                     }
@@ -188,7 +189,7 @@ class ServersFactory {
                         saveLastServer(server.name)
                         when {
                             isCast -> callOnCast(server.options[index].url)
-                            isStream -> startStreaming(server.options[index])
+                            isStream -> startStreaming(server.options[index], false)
                             else -> startDownload(server.options[index])
                         }
                     }
@@ -245,8 +246,9 @@ class ServersFactory {
                                             else -> jsonObject.getJSONArray("SUB")
                                         }
                                 for (baseLink in jsonArray) {
+                                    Log.e("Link", "Process ${baseLink}")
                                     val server = Server.check(context, baseLink.optString("code"))
-                                    if (server != null)
+                                    if (server != null) {
                                         try {
                                             var skip = false
                                             servers.forEach {
@@ -260,6 +262,9 @@ class ServersFactory {
                                         } catch (e: Exception) {
                                             e.printStackTrace()
                                         }
+                                    } else {
+                                        servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
+                                    }
                                 }
                                 servers.sort()
                                 this@ServersFactory.servers = servers
@@ -280,8 +285,9 @@ class ServersFactory {
                 }
                 val jsonArray = jsonObject.getJSONArray(if (jsonObject.has("SUB")) "SUB" else "LAT")
                 for (baseLink in jsonArray) {
+                    Log.e("Link", "Process ${baseLink}")
                     val server = Server.check(context, baseLink.optString("code"))
-                    if (server != null)
+                    if (server != null) {
                         try {
                             var skip = false
                             servers.forEach {
@@ -295,11 +301,21 @@ class ServersFactory {
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
+                    } else {
+                        servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
+                    }
                 }
                 servers.sort()
                 this@ServersFactory.servers = servers
                 showServerList()
             }
+            this.servers = servers.filter {
+                if (downloadObject.addQueue || isCasting || !isStream) {
+                    it.canDownload
+                } else {
+                    true
+                }
+            }.toMutableList()
         } catch (e: EJNFException) {
             e.printStackTrace()
             this@ServersFactory.servers = ArrayList()
@@ -312,13 +328,15 @@ class ServersFactory {
         }
     }
 
-    private fun startStreaming(option: Option) {
+    private fun startStreaming(option: Option, isWeb: Boolean) {
         if (chapter != null && downloadObject.addQueue) {
             QueueManager.add(Uri.parse(option.url), false, chapter)
         } else {
             AchievementManager.onPlayChapter()
             try {
-                if (PreferenceManager.getDefaultSharedPreferences(App.context).getString("player_type", "0") == "0") {
+                if (isWeb) {
+                    openWebPlayer(context, option.url!!)
+                } else if (PreferenceManager.getDefaultSharedPreferences(App.context).getString("player_type", "0") == "0") {
                     App.context.startActivity(
                             PrefsUtil.getPlayerIntent()
                                     .setData(Uri.parse(option.url))

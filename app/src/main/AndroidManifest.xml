@@ -9,22 +9,7 @@
         android:name="android.hardware.touchscreen"
         android:required="false" />
     <uses-feature
-        android:name="android.hardware.microphone"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.faketouch"
-        android:required="false" />
-    <uses-feature
         android:name="android.hardware.telephony"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.nfc"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.location.gps"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.location"
@@ -466,6 +451,9 @@
                     android:scheme="ukiku" />
             </intent-filter>
         </activity>
+        <activity android:name="knf.kuma.player.WebPlayerActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="sensorLandscape"/>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

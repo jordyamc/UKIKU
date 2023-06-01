@@ -14,23 +14,25 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.recycler_faq.*
+import knf.kuma.databinding.RecyclerFaqMaterialBinding
 import org.jetbrains.anko.toast
 
 class FaqActivityMaterial : GenericActivity() {
+
+    private val binding by lazy { RecyclerFaqMaterialBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setSurfaceBars()
-        setContentView(R.layout.recycler_faq_material)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "FAQ"
-        toolbar.setNavigationOnClickListener { onBackPressed() }
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = FaqAdapter(createFAQList())
+        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
+        binding.recycler.layoutManager = LinearLayoutManager(this)
+        binding.recycler.adapter = FaqAdapter(createFAQList())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

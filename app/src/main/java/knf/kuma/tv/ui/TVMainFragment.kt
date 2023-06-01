@@ -128,7 +128,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
     private fun fetchData() {
         Repository().reloadRecents()
         activity?.let {
-            CacheDB.INSTANCE.recentsDAO().objects.distinct.observe(it, { recentObjects ->
+            CacheDB.INSTANCE.recentsDAO().objects.distinct.observe(it) { recentObjects ->
                 mRows?.get(RECENTS)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -137,8 +137,8 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                     }
                 }
                 startEntranceTransition()
-            })
-            CacheDB.INSTANCE.recordsDAO().allLive.distinct.observe(it, { recordObjects ->
+            }
+            CacheDB.INSTANCE.recordsDAO().allLive.distinct.observe(it) { recordObjects ->
                 mRows?.get(LAST_SEEN)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -147,8 +147,8 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                     }
                 }
                 startEntranceTransition()
-            })
-            CacheDB.INSTANCE.favsDAO().all.distinct.observe(it, { favoriteObjects ->
+            }
+            CacheDB.INSTANCE.favsDAO().all.distinct.observe(it) { favoriteObjects ->
                 mRows?.get(FAVORITES)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -157,7 +157,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                     }
                 }
                 startEntranceTransition()
-            })
+            }
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 var recList = emptyList<DirObject>()
                 while (recList.size < 15) {
@@ -177,18 +177,18 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                 }
             }
             CacheDB.INSTANCE.animeDAO().emissionVotesLimited.distinct.observe(
-                it,
-                { emissionObjects ->
-                    mRows?.get(BEST)?.apply {
-                        page = page.plus(1)
-                        adapter?.apply {
-                            clear()
-                            addAll(0, emissionObjects)
-                        }
+                it
+            ) { emissionObjects ->
+                mRows?.get(BEST)?.apply {
+                    page = page.plus(1)
+                    adapter?.apply {
+                        clear()
+                        addAll(0, emissionObjects)
                     }
-                    startEntranceTransition()
-                })
-            CacheDB.INSTANCE.animeDAO().allVotesLimited.distinct.observe(it, { emissionObjects ->
+                }
+                startEntranceTransition()
+            }
+            CacheDB.INSTANCE.animeDAO().allVotesLimited.distinct.observe(it) { emissionObjects ->
                 mRows?.get(BESTGLOBAL)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -197,7 +197,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                     }
                 }
                 startEntranceTransition()
-            })
+            }
             arrayListOf(DirSection(), EmissionSection()).let { sections ->
                 mRows?.get(SECTIONS)?.apply {
                     page = page.plus(1)

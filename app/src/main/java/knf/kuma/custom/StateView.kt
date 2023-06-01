@@ -6,10 +6,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import knf.kuma.R
 import knf.kuma.commons.doOnUIGlobal
-import kotlinx.android.synthetic.main.layout_loading_text.view.*
+import org.jetbrains.anko.find
 import org.jetbrains.anko.textColor
 
 class StateView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : LinearLayout(context, attrs, defStyle) {
@@ -27,19 +28,21 @@ class StateView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        title.text = titleText
+        find<TextView>(R.id.title).text = titleText
     }
 
     fun load(contentText: String, state: Int = STATE_NORMAL) {
         val shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
         doOnUIGlobal {
             visibility = View.VISIBLE
+            val textView = find<TextView>(R.id.text)
+            val loading = find<View>(R.id.loading)
             when (state) {
-                STATE_OK -> text.textColor = ContextCompat.getColor(context, R.color.stateOk)
-                STATE_WARNING -> text.textColor = ContextCompat.getColor(context, R.color.stateWarning)
-                STATE_ERROR -> text.textColor = ContextCompat.getColor(context, R.color.stateError)
+                STATE_OK -> textView.textColor = ContextCompat.getColor(context, R.color.stateOk)
+                STATE_WARNING -> textView.textColor = ContextCompat.getColor(context, R.color.stateWarning)
+                STATE_ERROR -> textView.textColor = ContextCompat.getColor(context, R.color.stateError)
             }
-            text.apply {
+            textView.apply {
                 text = contentText
                 if (!isSetted) {
                     alpha = 0f

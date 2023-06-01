@@ -16,17 +16,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import knf.kuma.R
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.activity_eamap.*
+import knf.kuma.databinding.ActivityEamapBinding
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
 class EAMapActivity : GenericActivity(), OnMapReadyCallback {
 
+    private val binding by lazy { ActivityEamapBinding.inflate(layoutInflater) }
     private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_eamap)
+        setContentView(binding.root)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as? SupportMapFragment
@@ -59,7 +60,7 @@ class EAMapActivity : GenericActivity(), OnMapReadyCallback {
         googleMap.setOnMarkerClickListener { m ->
             if (m == marker) {
                 EAHelper.enter3()
-                konfetti.build()
+                binding.konfetti.build()
                         .addColors(Color.BLUE, Color.RED, Color.YELLOW, Color.GREEN, Color.MAGENTA)
                         .setDirection(0.0, 359.0)
                         .setSpeed(4f, 7f)
@@ -67,7 +68,7 @@ class EAMapActivity : GenericActivity(), OnMapReadyCallback {
                         .setTimeToLive(2000)
                         .addShapes(Shape.RECT, Shape.CIRCLE)
                         .addSizes(Size(12, 6f), Size(16, 6f))
-                        .setPosition(-50f, konfetti.width + 50f, -50f, -50f)
+                        .setPosition(-50f, binding.konfetti.width + 50f, -50f, -50f)
                         .streamFor(300, 10000L)
             }
             false

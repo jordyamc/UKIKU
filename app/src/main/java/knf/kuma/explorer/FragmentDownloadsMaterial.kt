@@ -16,29 +16,31 @@ import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.RecyclerDownloadingBinding
 import knf.kuma.download.DownloadManager
 import knf.kuma.pojos.DownloadObject
-import kotlinx.android.synthetic.main.recycler_downloading.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class FragmentDownloadsMaterial : FragmentBase() {
     private var isFirst = true
     private var adapter: DownloadingAdapterMaterial? = null
+    private lateinit var binding: RecyclerDownloadingBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adContainer.implBanner(AdsType.EXPLORER_BANNER, true)
+        binding = RecyclerDownloadingBinding.bind(view)
+        binding.adContainer.implBanner(AdsType.EXPLORER_BANNER, true)
         CacheDB.INSTANCE.downloadsDAO().active.observe(viewLifecycleOwner, Observer { downloadObjects ->
-            progress?.visibility = View.GONE
-            error?.visibility = if (downloadObjects.isEmpty()) View.VISIBLE else View.GONE
-            clear?.visibility = if (downloadObjects.isEmpty()) View.GONE else View.VISIBLE
-            if (isFirst || downloadObjects.isEmpty() || recycler.adapter != null && downloadObjects.size > recycler.adapter?.itemCount ?: 0) {
+            binding.progress.visibility = View.GONE
+            binding.error.visibility = if (downloadObjects.isEmpty()) View.VISIBLE else View.GONE
+            binding.clear.visibility = if (downloadObjects.isEmpty()) View.GONE else View.VISIBLE
+            if (isFirst || downloadObjects.isEmpty() || binding.recycler.adapter != null && downloadObjects.size > binding.recycler.adapter?.itemCount ?: 0) {
                 isFirst = false
-                recycler.adapter = DownloadingAdapterMaterial(this@FragmentDownloadsMaterial, downloadObjects as MutableList<DownloadObject>).also { adapter = it }
+                binding.recycler.adapter = DownloadingAdapterMaterial(this@FragmentDownloadsMaterial, downloadObjects as MutableList<DownloadObject>).also { adapter = it }
             }
         })
-        clear.onClick {
+        binding.clear.onClick {
             activity?.let {
                 MaterialDialog(it).safeShow {
                     lifecycleOwner()
@@ -53,8 +55,8 @@ class FragmentDownloadsMaterial : FragmentBase() {
     }
 
     private fun onRemoveAll() {
-        clear.visibility = View.GONE
-        val snackbar = recycler.showSnackbar("Limpiando lista...", Snackbar.LENGTH_INDEFINITE)
+        binding.clear.visibility = View.GONE
+        val snackbar = binding.recycler.showSnackbar("Limpiando lista...", Snackbar.LENGTH_INDEFINITE)
         doAsync {
             DownloadManager.cancelAll()
             doOnUI { snackbar.safeDismiss() }

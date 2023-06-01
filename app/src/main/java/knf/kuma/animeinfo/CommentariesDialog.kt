@@ -16,7 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import knf.kuma.R
-import kotlinx.android.synthetic.main.lay_comments.view.*
+import knf.kuma.databinding.LayCommentsBinding
 
 class CommentariesDialog : BottomSheetDialogFragment(), LifecycleObserver {
     private var link: String = "about:blank"
@@ -24,7 +24,8 @@ class CommentariesDialog : BottomSheetDialogFragment(), LifecycleObserver {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.lay_comments, container, false)
-        rootView.webview.apply {
+        val binding = LayCommentsBinding.bind(rootView)
+        binding.webview.apply {
             setInitialScale(1)
             settings.useWideViewPort = true
             settings.loadWithOverviewMode = true
@@ -32,7 +33,7 @@ class CommentariesDialog : BottomSheetDialogFragment(), LifecycleObserver {
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
-                    rootView.loading.visibility = View.GONE
+                    binding.loading.visibility = View.GONE
                 }
             }
             loadUrl(link)

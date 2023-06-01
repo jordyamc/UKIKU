@@ -33,10 +33,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.aesthetic.AestheticActivity
@@ -87,8 +85,10 @@ fun Toolbar.changeToolbarFont(@FontRes res: Int) {
 
 val String.urlFixed: String get() = if (!contains("animeflv.net")) "https://animeflv.net$this" else this
 
+val String.fixedHost: String get() = if (!startsWith("http")) "https:$this" else this
+
 val <T>LiveData<T>.distinct: LiveData<T>
-    get() = Transformations.distinctUntilChanged(this)
+    get() = this.distinctUntilChanged()
 
 
 fun getPackage(): String {
@@ -177,10 +177,6 @@ fun RecyclerView.verifyManager(size: Int = 115) {
         layoutManager = manager
     }
     setHasFixedSize(true)
-}
-
-fun <T> MutableList<T>.toArray(): Array<T> {
-    return this.toArray()
 }
 
 val canGroupNotifications: Boolean
@@ -696,10 +692,30 @@ fun String.resolveRedirection(tryCount: Int = 0): String =
             resolveRedirection(tryCount + 1)
     }
 
+fun List<Pair<String,String>>.toArray(): Array<String> {
+    val list = mutableListOf<String>()
+    forEach { e ->
+        list.add(e.first)
+        list.add(e.second)
+    }
+    return list.toTypedArray()
+}
+
 val isFullMode: Boolean get() = BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "release"
 
 private fun isIntentResolved(ctx: Context, intent: Intent): Boolean {
     return ctx.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null
+}
+
+fun <T: View> FragmentActivity.findView(@IdRes id: Int): Lazy<T> = object : Lazy<T> {
+
+    private var view: T? = null
+    override val value: T
+        get() = view ?: findViewById<T>(id).also { view = it }
+
+    override fun isInitialized(): Boolean {
+        return view != null
+    }
 }
 
 fun isMIUI(ctx: Context): Boolean {

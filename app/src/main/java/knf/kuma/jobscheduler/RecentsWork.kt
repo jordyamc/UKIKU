@@ -206,6 +206,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
                     )
                 )
             setGroup(RECENTS_GROUP)
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
         }.build()
         notificationDAO.add(obj)
         manager.notify(obj.key, notification)
@@ -293,7 +294,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
         const val KEY_SUMMARY = 55971
         internal const val TAG = "recents-job"
 
-        suspend fun schedule(context: Context) {
+        fun schedule(context: Context) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val time = (preferences.getString("recents_time", "1") ?: "1").toInt() * 15
             PeriodicWorkRequestBuilder<RecentsWork>(
@@ -340,7 +341,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
                     //setConstraints(networkConnectedConstraints())
                     //setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
                     addTag(TAG)
-                }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.REPLACE)
+                }.build().enqueueUnique(TAG, ExistingPeriodicWorkPolicy.UPDATE)
         }
 
         fun run() = OneTimeWorkRequestBuilder<RecentsWork>().build().enqueue()

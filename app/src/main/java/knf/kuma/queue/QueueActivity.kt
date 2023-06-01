@@ -139,16 +139,16 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
         } else {
             currentData = CacheDB.INSTANCE.queueDAO().allAsort
             currentData.observe(this@QueueActivity, object : Observer<MutableList<QueueObject>> {
-                override fun onChanged(list: MutableList<QueueObject>?) {
+                override fun onChanged(value: MutableList<QueueObject>) {
                     isFirst = false
                     clearInterfaces()
-                    errorView.visibility = if (list?.isEmpty() == true) View.VISIBLE else View.GONE
+                    errorView.visibility = if (value.isEmpty()) View.VISIBLE else View.GONE
                     val allAdapter = QueueAllAdapter(this@QueueActivity)
                     recyclerView.adapter = allAdapter
                     dettachHelper()
                     mItemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(allAdapter))
                     mItemTouchHelper?.attachToRecyclerView(recyclerView)
-                    allAdapter.update(list ?: mutableListOf())
+                    allAdapter.update(value)
                     currentData.removeObserver(this)
                 }
             })

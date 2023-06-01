@@ -1,5 +1,7 @@
 package knf.kuma.commons
 
+import android.os.Build
+import knf.kuma.BuildConfig
 import java.security.GeneralSecurityException
 import java.security.SecureRandom
 import java.security.cert.CertificateException

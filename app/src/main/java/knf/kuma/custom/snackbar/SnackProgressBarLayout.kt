@@ -17,7 +17,7 @@ import androidx.core.view.ViewCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.snackbar.ContentViewCallback
 import knf.kuma.R
-import kotlinx.android.synthetic.main.snackprogressbar.view.*
+import knf.kuma.databinding.SnackprogressbarBinding
 
 /**
  * Layout class for SnackProgressBar.
@@ -38,18 +38,19 @@ internal class SnackProgressBarLayout @JvmOverloads constructor(
         internal const val ANIMATION_DURATION = 250L      // animation duration as per BaseTransientBottomBar
     }
 
-    private val backgroundLayout by lazy { snackProgressBar_layout_background }
-    private val mainLayout by lazy { snackProgressBar_layout_main }
-    private val actionNextLineLayout by lazy { snackProgressBar_layout_actionNextLine }
-    internal val iconImage by lazy { snackProgressBar_img_icon }
-    internal val messageText by lazy { snackProgressBar_txt_message }
-    internal val actionText by lazy { snackProgressBar_txt_action }
-    internal val actionNextLineText by lazy { snackProgressBar_txt_actionNextLine }
-    internal val progressText by lazy { snackProgressBar_txt_progress }
-    internal val progressTextCircular by lazy { snackProgressBar_txt_progress_circular }
-    internal val horizontalProgressBar by lazy { snackProgressBar_progressbar_horizontal }
-    internal val circularDeterminateProgressBar by lazy { snackProgressBar_progressbar_circular_determinate }
-    internal val circularIndeterminateProgressBar by lazy { snackProgressBar_progressbar_circular_indeterminate }
+    private val binding by lazy { SnackprogressbarBinding.bind(this) }
+    private val backgroundLayout by lazy { binding.snackProgressBarLayoutBackground }
+    private val mainLayout by lazy { binding.snackProgressBarLayoutMain }
+    private val actionNextLineLayout by lazy { binding.snackProgressBarLayoutActionNextLine }
+    internal val iconImage by lazy { binding.snackProgressBarImgIcon }
+    internal val messageText by lazy { binding.snackProgressBarTxtMessage }
+    internal val actionText by lazy { binding.snackProgressBarTxtAction }
+    internal val actionNextLineText by lazy { binding.snackProgressBarTxtActionNextLine }
+    internal val progressText by lazy { binding.snackProgressBarTxtProgress }
+    internal val progressTextCircular by lazy { binding.snackProgressBarTxtProgressCircular }
+    internal val horizontalProgressBar by lazy { binding.snackProgressBarProgressbarHorizontal }
+    internal val circularDeterminateProgressBar by lazy { binding.snackProgressBarProgressbarCircularDeterminate }
+    internal val circularIndeterminateProgressBar by lazy { binding.snackProgressBarProgressbarCircularIndeterminate }
 
     private val startAlphaSwipeDistance = 0.1f     // as per Behavior in BaseTransientBottomBar
     private val endAlphaSwipeDistance = 0.6f       // as per Behavior in BaseTransientBottomBar

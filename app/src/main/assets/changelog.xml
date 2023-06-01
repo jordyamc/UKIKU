@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="200" version="5.2.1">
+        <change type="new">Servidor Streamwish (Solo streaming)</change>
+        <change type="change">Mensaje de error para error desconocido en Peru</change>
+        <change type="change">Soporte mejorado para Okru y Yourupload</change>
+    </release>
     <release code="199" version="5.2.1">
         <change type="fix">Error al expandir texto en informacion de anime</change>
         <change type="fix">Error al buscar imagenes de mejor calidad</change>

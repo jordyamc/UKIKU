@@ -23,9 +23,9 @@ import knf.kuma.commons.noCrash
 import knf.kuma.commons.removeAllDecorations
 import knf.kuma.custom.ExpandableTV
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.FragmentAnimeDetailsBinding
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.SeeingObject
-import kotlinx.android.synthetic.main.fragment_anime_details.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.clipboardManager
 import org.jetbrains.anko.doAsync
@@ -33,20 +33,21 @@ import uz.jamshid.library.ExactRatingBar
 import xdroid.toaster.Toaster
 
 class AnimeDetailsHolder(val view: View) {
-    private var cardViews: MutableList<View> = arrayListOf(view.card_title, view.card_desc, view.adContainer, view.card_details, view.card_genres, view.card_list, view.card_related)
-    internal val title: TextView = view.title
-    private val expandIcon: ImageButton = view.expand_icon
-    private val desc: ExpandableTV = view.expandable_desc
-    internal val type: TextView = view.type
-    internal val state: TextView = view.state
-    internal val id: TextView = view.aid
-    internal val followers: TextView = view.followers
-    private val layScore: LinearLayout = view.lay_score
-    private val ratingCount: TextView = view.rating_count
-    private val ratingBar: ExactRatingBar = view.ratingBar
-    private val recyclerViewGenres: RecyclerView = view.recycler_genres
-    private val spinnerList: Spinner = view.spinner_list
-    private val recyclerViewRelated: RecyclerView = view.recycler_related
+    private val binding = FragmentAnimeDetailsBinding.bind(view)
+    private var cardViews: MutableList<View> = arrayListOf(binding.cardTitle, binding.cardDesc, binding.adContainer, binding.cardDetails, binding.cardGenres, binding.cardList, binding.cardRelated)
+    internal val title: TextView = binding.title
+    private val expandIcon: ImageButton = binding.expandIcon
+    private val desc: ExpandableTV = binding.expandableDesc
+    internal val type: TextView = binding.type
+    internal val state: TextView = binding.state
+    internal val id: TextView = binding.aid
+    internal val followers: TextView = binding.followers
+    private val layScore: LinearLayout = binding.layScore
+    private val ratingCount: TextView = binding.ratingCount
+    private val ratingBar: ExactRatingBar = binding.ratingBar
+    private val recyclerViewGenres: RecyclerView = binding.recyclerGenres
+    private val spinnerList: Spinner = binding.spinnerList
+    private val recyclerViewRelated: RecyclerView = binding.recyclerRelated
     private val clipboardManager = view.context.applicationContext.clipboardManager
     private var retard = 0
     private var needAnimation = true
@@ -156,7 +157,7 @@ class AnimeDetailsHolder(val view: View) {
                 fragment.lifecycleScope.launch(Dispatchers.IO) {
                     retard += 300
                     delay(retard.toLong())
-                    view.adContainer.implBanner(AdsType.INFO_BANNER, true)
+                    binding.adContainer.implBanner(AdsType.INFO_BANNER, true)
                 }
             }
         }

@@ -21,17 +21,19 @@ import knf.kuma.Diagnostic
 import knf.kuma.R
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.LayStatusBarBinding
 import knf.kuma.directory.DirectoryService
-import kotlinx.android.synthetic.main.lay_status_bar.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
 import org.jetbrains.anko.textColor
+import org.json.JSONObject
 import org.jsoup.Connection
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import java.net.SocketTimeoutException
+import java.net.URL
 
 @SuppressLint("SetTextI18n")
 class ConnectionState : LinearLayout {
@@ -48,6 +50,7 @@ class ConnectionState : LinearLayout {
     }
 
     private var bgColor = Color.TRANSPARENT
+    private lateinit var binding: LayStatusBarBinding
 
     private fun inflate(context: Context, attrs: AttributeSet? = null) {
         context.obtainStyledAttributes(attrs, R.styleable.ConnectionState).use {
@@ -56,11 +59,12 @@ class ConnectionState : LinearLayout {
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.lay_status_bar, this)
+        binding = LayStatusBarBinding.bind(this)
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        container.setBackgroundColor(bgColor)
+        binding.container.setBackgroundColor(bgColor)
     }
 
     private var isInitialized = false
@@ -122,6 +126,7 @@ class ConnectionState : LinearLayout {
                 }
                 GenericActivity.addBypassObserver("connectionState", owner, observer)
             }
+            502 -> errorDownState(owner, onShowDialog)
             503 -> {
                 errorBlockedState(503, onShowDialog)
                 var defResult = true
@@ -148,7 +153,14 @@ class ConnectionState : LinearLayout {
                 }
                 GenericActivity.addBypassObserver("connectionState", owner, observer)
             }
-            else -> networkErrorState(owner, onShowDialog)
+            else -> {
+                val json = JSONObject(withContext(Dispatchers.IO){ URL("https://ipinfo.io/json").readText() })
+                if (json.getString("country") == "PE") {
+                    errorCountryState(owner, onShowDialog)
+                } else {
+                    networkErrorState(owner, onShowDialog)
+                }
+            }
         }
     }
 
@@ -210,39 +222,50 @@ class ConnectionState : LinearLayout {
     }
 
     private fun normalState() {
-        container.setBackgroundColor(bgColor)
-        progress.visibility = View.VISIBLE
-        icon.visibility = View.GONE
-        message.text = "Comprobando..."
-        message.textColor = ContextCompat.getColor(context, R.color.textSecondary)
-        container.setOnClickListener(null)
-        container.setOnLongClickListener(null)
+        binding.container.setBackgroundColor(bgColor)
+        binding.progress.visibility = View.VISIBLE
+        binding.icon.visibility = View.GONE
+        binding.message.text = "Comprobando..."
+        binding.message.textColor = ContextCompat.getColor(context, R.color.textSecondary)
+        binding.container.setOnClickListener(null)
+        binding.container.setOnLongClickListener(null)
     }
 
     private fun noNetworkState() {
-        container.setBackgroundColor(bgColor)
-        progress.visibility = View.GONE
-        icon.setImageResource(R.drawable.ic_no_network)
-        icon.visibility = View.VISIBLE
-        message.text = "Sin internet!"
-        message.textColor = ContextCompat.getColor(context, R.color.textSecondary)
-        container.setOnClickListener(null)
-        container.setOnLongClickListener(null)
+        binding.container.setBackgroundColor(bgColor)
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_no_network)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Sin internet!"
+        binding.message.textColor = ContextCompat.getColor(context, R.color.textSecondary)
+        binding.container.setOnClickListener(null)
+        binding.container.setOnLongClickListener(null)
+    }
+
+    private fun errorDownState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_error)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Animeflv caido"
+        binding.message.textColor = Color.WHITE
+        binding.container.onClick { onShowDialog("Animeflv parece estar caido por el momento, intenta de nuevo mas tarde") }
+        binding.container.onLongClick { setUp(owner, onShowDialog) }
     }
 
     private fun errorBlockedState(errorCode: Int, onShowDialog: (message: String) -> Unit) {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
-        progress.visibility = View.GONE
-        icon.setImageResource(R.drawable.ic_error)
-        icon.visibility = View.VISIBLE
-        message.text = "Error HTTP $errorCode!"
-        message.textColor = Color.WHITE
-        container.onClick {
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_error)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Error HTTP $errorCode!"
+        binding.message.textColor = Color.WHITE
+        binding.container.onClick {
             PrefsUtil.isForbiddenTipShown = true
             context.startActivity(Intent(context, Diagnostic.FullBypass::class.java))
         }
-        container.setOnLongClickListener(null)
-        if (!PrefsUtil.isForbiddenTipShown) {
+        binding.container.setOnLongClickListener(null)
+        if (isFullMode && !PrefsUtil.isForbiddenTipShown) {
             noCrash {
                 Tooltip.Builder(context).apply {
                     arrow(true)
@@ -256,26 +279,37 @@ class ConnectionState : LinearLayout {
         }
     }
 
+    private fun errorCountryState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_error)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "VPN necesario"
+        binding.message.textColor = Color.WHITE
+        binding.container.onClick { onShowDialog("Tu pais ha bloqueado la conexion con Animeflv por lo que es necesario usar una VPN para seguir usando la app") }
+        binding.container.onLongClick { setUp(owner, onShowDialog) }
+    }
+
     private fun networkErrorState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
-        progress.visibility = View.GONE
-        icon.setImageResource(R.drawable.ic_error)
-        icon.visibility = View.VISIBLE
-        message.text = "Error desconocido!"
-        message.textColor = Color.WHITE
-        container.onClick { onShowDialog("Hubo un error haciendo las pruebas de conexion!") }
-        container.onLongClick { setUp(owner, onShowDialog) }
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_error)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Error desconocido!"
+        binding.message.textColor = Color.WHITE
+        binding.container.onClick { onShowDialog("Hubo un error haciendo las pruebas de conexion!") }
+        binding.container.onLongClick { setUp(owner, onShowDialog) }
     }
 
     private fun networkTimeoutState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
-        progress.visibility = View.GONE
-        icon.setImageResource(R.drawable.ic_error)
-        icon.visibility = View.VISIBLE
-        message.text = "Animeflv lento!"
-        message.textColor = Color.WHITE
-        container.onClick { onShowDialog("Se detectó un problema con la página de Animeflv, es posible que esté en mantenimiento, este problema se solucionará solo, no es necesario reportarlo!") }
-        container.onLongClick { setUp(owner, onShowDialog) }
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_error)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Animeflv lento!"
+        binding.message.textColor = Color.WHITE
+        binding.container.onClick { onShowDialog("Se detectó un problema con la página de Animeflv, es posible que esté en mantenimiento, este problema se solucionará solo, no es necesario reportarlo!") }
+        binding.container.onLongClick { setUp(owner, onShowDialog) }
         owner.doAsync {
             var isFixed = false
             repeat(3) {
@@ -288,40 +322,40 @@ class ConnectionState : LinearLayout {
     }
 
     private fun warningState(onShowDialog: (message: String) -> Unit) {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
-        progress.visibility = View.GONE
-        icon.setImageResource(R.drawable.ic_warning)
-        icon.visibility = View.VISIBLE
-        message.text = "Cloudflare activado!"
-        message.textColor = Color.WHITE
-        container.onClick { onShowDialog("Cloudflare activado, espera al bypass") }
-        container.onLongClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_warning)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Cloudflare activado!"
+        binding.message.textColor = Color.WHITE
+        binding.container.onClick { onShowDialog("Cloudflare activado, espera al bypass") }
+        binding.container.onLongClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
     }
 
     private fun warningCreatingState() {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
-        progress.visibility = View.GONE
-        icon.setImageResource(R.drawable.ic_warning)
-        icon.visibility = View.VISIBLE
-        message.text = "Actualizando bypass!"
-        message.textColor = Color.WHITE
-        container.setOnClickListener(null)
-        container.setOnLongClickListener(null)
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_warning)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Actualizando bypass!"
+        binding.message.textColor = Color.WHITE
+        binding.container.setOnClickListener(null)
+        binding.container.setOnLongClickListener(null)
     }
 
     private suspend fun directoryListenState() {
         (context.findActivity() as? AppCompatActivity)?.let { owner ->
-            container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
-            progress.visibility = View.GONE
-            icon.setImageResource(R.drawable.ic_warning)
-            icon.visibility = View.VISIBLE
-            message.textColor = Color.WHITE
-            container.setOnClickListener(null)
-            container.setOnLongClickListener(null)
+            binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
+            binding.progress.visibility = View.GONE
+            binding.icon.setImageResource(R.drawable.ic_warning)
+            binding.icon.visibility = View.VISIBLE
+            binding.message.textColor = Color.WHITE
+            binding.container.setOnClickListener(null)
+            binding.container.setOnLongClickListener(null)
             var maxPages = "3200~"
             var msg = "Calculando"
             CacheDB.INSTANCE.animeDAO().countLive.distinct.observe(owner, Observer {
-                message.text = "$msg: $it/$maxPages"
+                binding.message.text = "$msg: $it/$maxPages"
             })
             DirectoryService.getLiveStatus().observe(owner, Observer {
                 when (it) {
@@ -356,14 +390,14 @@ class ConnectionState : LinearLayout {
     }
 
     private fun okState() {
-        container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentGreen))
-        progress.visibility = View.GONE
-        icon.setImageResource(R.drawable.ic_check)
-        icon.visibility = View.VISIBLE
-        message.text = "Todo en orden!"
-        message.textColor = Color.WHITE
-        container.setOnClickListener(null)
-        container.setOnLongClickListener(null)
+        binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentGreen))
+        binding.progress.visibility = View.GONE
+        binding.icon.setImageResource(R.drawable.ic_check)
+        binding.icon.visibility = View.VISIBLE
+        binding.message.text = "Todo en orden!"
+        binding.message.textColor = Color.WHITE
+        binding.container.setOnClickListener(null)
+        binding.container.setOnLongClickListener(null)
     }
 
     private fun show() {

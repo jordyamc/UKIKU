@@ -16,7 +16,7 @@ import androidx.lifecycle.Observer
 import com.github.marlonlom.utilities.timeago.TimeAgo
 import knf.kuma.R
 import knf.kuma.backup.firestore.FirestoreManager
-import kotlinx.android.synthetic.main.view_sync_firestore.view.*
+import knf.kuma.databinding.ViewSyncFirestoreBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -48,10 +48,11 @@ class SyncStaticItemView : RelativeLayout {
         setDefaults(context, attrs)
     }
 
+    private lateinit var binding: ViewSyncFirestoreBinding
     private fun inflate(context: Context) {
         val inflater = context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        inflater.inflate(R.layout.view_sync_firestore, this)
+        binding = ViewSyncFirestoreBinding.inflate(inflater, this, true)
     }
 
     private fun setDefaults(context: Context, attrs: AttributeSet) {
@@ -76,8 +77,8 @@ class SyncStaticItemView : RelativeLayout {
         GlobalScope.launch(Dispatchers.Main) {
             if (!::lastState.isInitialized) {
                 lastState = state
-                indicator.setImageResource(R.drawable.ic_check_bold)
-                stateText.text = "Última sincronización: ${timeAgo()}"
+                binding.indicator.setImageResource(R.drawable.ic_check_bold)
+                binding.stateText.text = "Última sincronización: ${timeAgo()}"
                 return@launch
             } else if (lastState != FirestoreManager.State.IDLE) {
                 lastState = state
@@ -86,11 +87,11 @@ class SyncStaticItemView : RelativeLayout {
                     delay(100)
                 }
                 val transform = ContextCompat.getDrawable(context, R.drawable.anim_sync_check) as? AnimatedVectorDrawable
-                indicator.setImageDrawable(transform)
+                binding.indicator.setImageDrawable(transform)
                 transform?.start()
                 delay(600)
-                stateText.text = "Última sincronización: ${timeAgo()}"
-                indicator.setImageResource(R.drawable.ic_check_bold)
+                binding.stateText.text = "Última sincronización: ${timeAgo()}"
+                binding.indicator.setImageResource(R.drawable.ic_check_bold)
             }
         }
     }
@@ -106,16 +107,16 @@ class SyncStaticItemView : RelativeLayout {
         GlobalScope.launch(Dispatchers.Main) {
             if (!::lastState.isInitialized) {
                 lastState = state
-                stateText.text = "Sincronizando..."
-                indicator.setImageResource(R.drawable.ic_sync_rotate)
+                binding.stateText.text = "Sincronizando..."
+                binding.indicator.setImageResource(R.drawable.ic_sync_rotate)
             } else if (lastState == FirestoreManager.State.IDLE) {
                 lastState = state
                 val transform = ContextCompat.getDrawable(context, R.drawable.anim_check_sync) as? AnimatedVectorDrawable
-                indicator.setImageDrawable(transform)
+                binding.indicator.setImageDrawable(transform)
                 transform?.start()
                 delay(600)
-                stateText.text = "Sincronizando..."
-                indicator.setImageResource(R.drawable.ic_sync_rotate)
+                binding.stateText.text = "Sincronizando..."
+                binding.indicator.setImageResource(R.drawable.ic_sync_rotate)
             }
             rotateAnimation = RotateAnimation(180f, 0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f).apply {
                 duration = 500
@@ -138,15 +139,15 @@ class SyncStaticItemView : RelativeLayout {
                 })
             }.also {
                 isRotating = true
-                indicator.startAnimation(it)
+                binding.indicator.startAnimation(it)
             }
         }
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        title.text = cardTitle
+        binding.title.text = cardTitle
         if (!showDivider)
-            separator?.visibility = View.GONE
+            binding.separator.visibility = View.GONE
     }
 }

@@ -40,16 +40,16 @@ class SplashActivity : GenericActivity() {
                 startActivity(Intent(this, TVMain::class.java))
                 finish()
             }
-            !isFullMode && BuildConfig.BUILD_TYPE != "amazon" && !PrefsUtil.isPSWarned -> MaterialDialog(
+            /*!isFullMode && BuildConfig.BUILD_TYPE != "amazon" && !PrefsUtil.isPSWarned -> MaterialDialog(
                 this
             ).safeShow {
                 title(text = "Aviso")
-                message(text = "Usted esta usando la version de Google Play, esta version tiene las descargas y streaming deshabilitados debido al copyright, para una experiencia completa por favor use la version de la pagina oficial\nEscriba \"confirmar\" para continuar.")
+                message(text = "Usted esta usando la version de Google Play, esta version tiene caracteristicas deshabilitadas, para una experiencia completa por favor use la version de la pagina oficial\nEscriba \"confirmar\" para continuar.")
                 input(hint = "Respuesta...", waitForPositiveButton = false) { _, text ->
                     getActionButton(WhichButton.POSITIVE).isEnabled = text.toString()
                         .lowercase(Locale.getDefault()) == "confirmar"
                 }
-                negativeButton(text = "Descargar") {
+                negativeButton(text = "Web") {
                     noCrash {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.app")))
                     }
@@ -59,7 +59,7 @@ class SplashActivity : GenericActivity() {
                     startApp()
                 }
                 cancelOnTouchOutside(false)
-            }
+            }*/
             else -> {
                 startApp()
             }

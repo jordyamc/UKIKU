@@ -4,8 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
+import com.google.android.gms.security.ProviderInstaller
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import knf.kuma.commons.*
 import knf.kuma.custom.GenericActivity
@@ -27,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import xdroid.toaster.Toaster
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -52,12 +57,41 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             DirUpdateWork.schedule(this)
             RecentsNotReceiver.removeAll(this)
             UpdateChecker.check(this, this)
+            RecentsWork.schedule(this@TVMain)
             lifecycleScope.launch(Dispatchers.IO) {
-                RecentsWork.schedule(this@TVMain)
                 DirManager.checkPreDir()
                 DirectoryService.run(this@TVMain)
+                installSecurityProvider()
             }
             ChannelUtils.createIfNeeded(this)
+        }
+    }
+
+    private suspend fun installSecurityProvider() {
+        withContext(Dispatchers.IO) {
+            try {
+                ProviderInstaller.installIfNeeded(this@TVMain)
+                PrefsUtil.isSecurityUpdated = true
+                PrefsUtil.spErrorType = null
+            } catch (e: GooglePlayServicesRepairableException) {
+                PrefsUtil.isSecurityUpdated = false
+                PrefsUtil.spErrorType = "Gplay services deshabilitado o desactualizado"
+                e.printStackTrace()
+            } catch (e: GooglePlayServicesNotAvailableException) {
+                PrefsUtil.isSecurityUpdated = false
+                PrefsUtil.spErrorType = "GPlay services no esta disponible"
+                e.printStackTrace()
+            } catch (e: Exception) {
+                PrefsUtil.isSecurityUpdated = false
+                //Toaster.toastLong("SProvider: Unknown error, ${e.message}")
+                PrefsUtil.spErrorType = "Error desconocido: ${e.message}"
+                e.printStackTrace()
+            }
+            if (!PrefsUtil.isSecurityUpdated && FirebaseCrashlytics.getInstance().didCrashOnPreviousExecution()) {
+                PrefsUtil.spProtectionEnabled = true
+                //Toaster.toastLong("Proteccion de SP reactivada")
+
+            }
         }
     }
 
@@ -126,6 +160,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             Repository().reloadAllRecents()
             BypassUtil.isLoading = false
             PicassoSingle.clear()
+            RecentsWork.run()
             doOnUI {
                 "Bypass actualizado".toast()
             }

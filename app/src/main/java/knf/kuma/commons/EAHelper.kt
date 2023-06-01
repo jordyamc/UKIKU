@@ -8,10 +8,12 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.preference.PreferenceManager
+import com.google.android.material.button.MaterialButton
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
@@ -23,14 +25,14 @@ import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.EADB
+import knf.kuma.databinding.ActivityEaBinding
 import knf.kuma.iap.IAPWrapper
 import knf.kuma.iap.Inventory
 import knf.kuma.iap.PayloadHelper
 import knf.kuma.pojos.EAObject
-import kotlinx.android.synthetic.main.activity_ea.*
-import kotlinx.android.synthetic.main.item_ea_step.view.*
 import moe.feng.common.stepperview.IStepperAdapter
 import moe.feng.common.stepperview.VerticalStepperItemView
+import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
 import java.util.*
@@ -70,7 +72,7 @@ object EAHelper {
             else -> 0
         }
 
-    val eaMessage: String?
+    val eaMessage: String
         get() = when {
             isPart3Unlocked -> "Disfruta de la recompensa"
             isPart2Unlocked -> "El tesoro esta en Akihabara"
@@ -351,6 +353,7 @@ object EAHelper {
 
 class EAUnlockActivity : GenericActivity(), IStepperAdapter {
 
+    private val binding by lazy { ActivityEaBinding.inflate(layoutInflater) }
     private val iapWrapper: IAPWrapper by lazy { IAPWrapper(this) }
     private val rewardedAd: FullscreenAdLoader by lazy { getFAdLoaderRewarded(this) }
     private var interstitial: FullscreenAdLoader = getFAdLoaderInterstitial(this)
@@ -358,12 +361,12 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ea)
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.title = "Easter egg"
-        toolbar.setNavigationOnClickListener { onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
         rewardedAd.load()
         interstitial.load()
     }
@@ -374,9 +377,9 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
             if (it)
                 invalidateOptionsMenu()
             doOnUI {
-                progress.visibility = View.GONE
-                vertical_stepper_view.stepperAdapter = this@EAUnlockActivity
-                vertical_stepper_view.currentStep = checkPurchases()
+                binding.progress.visibility = View.GONE
+                binding.verticalStepperView.stepperAdapter = this@EAUnlockActivity
+                binding.verticalStepperView.currentStep = checkPurchases()
             }
         }
     }
@@ -423,12 +426,12 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
     @SuppressLint("SetTextI18n")
     override fun onCreateCustomView(index: Int, context: Context?, view: VerticalStepperItemView?): View {
         val inflateView = LayoutInflater.from(context).inflate(R.layout.item_ea_step, view, false)
-        val hint = inflateView.hint
+        val hint = inflateView.find<TextView>(R.id.hint)
         hint.text = EAHelper.getMessage(index)
-        val unlockButton = inflateView.unlock
-        val unlockCoinsButton = inflateView.unlockCoins
+        val unlockButton = inflateView.find<MaterialButton>(R.id.unlock)
+        val unlockCoinsButton = inflateView.find<MaterialButton>(R.id.unlockCoins)
         if (index == 0 || index == 4) {
-            inflateView.layBuy.visibility = View.GONE
+            inflateView.find<View>(R.id.layBuy).visibility = View.GONE
         } else {
             if (iapWrapper.isEnabled) {
                 val details = iapWrapper.inventory?.skuList?.let { it[getSkuCode(index)] }
@@ -445,7 +448,7 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
                 else
                     if (iapWrapper.launchPurchaseFlow(this@EAUnlockActivity,
                                     getSkuCode(index), PayloadHelper.buildIntentPayload(BuildConfig.APPCOINS_ADDRESS, null)))
-                        block_view.visibility = View.VISIBLE
+                        binding.blockView.visibility = View.VISIBLE
             }
             unlockCoinsButton.onClick {
                 doOnUI {
@@ -495,21 +498,21 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
         when (sku) {
             "ee_2" -> {
                 EAHelper.setUnlocked(1)
-                vertical_stepper_view.nextStep()
+                binding.verticalStepperView.nextStep()
             }
             "ee_3" -> {
                 EAHelper.setUnlocked(2)
-                vertical_stepper_view.nextStep()
+                binding.verticalStepperView.nextStep()
             }
             "ee_4" -> {
                 EAHelper.setUnlocked(3)
-                vertical_stepper_view.nextStep()
+                binding.verticalStepperView.nextStep()
             }
             "ee_all" -> {
                 EAHelper.setUnlocked(1)
                 EAHelper.setUnlocked(2)
                 EAHelper.setUnlocked(3)
-                vertical_stepper_view.currentStep = 4
+                binding.verticalStepperView.currentStep = 4
                 invalidateOptionsMenu()
             }
         }
@@ -547,7 +550,7 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
                 else
                     if (iapWrapper.launchPurchaseFlow(this@EAUnlockActivity,
                                     getSkuCode(0), PayloadHelper.buildIntentPayload(BuildConfig.APPCOINS_ADDRESS, null)))
-                        block_view.visibility = View.VISIBLE
+                        binding.blockView.visibility = View.VISIBLE
             }
             R.id.coins -> {
                 Economy.showWallet(this) {
@@ -560,7 +563,7 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        block_view.visibility = View.GONE
+        binding.blockView.visibility = View.GONE
         iapWrapper.handleActivityResult(requestCode, resultCode, data) { success, sku ->
             if (success)
                 unlock(sku)

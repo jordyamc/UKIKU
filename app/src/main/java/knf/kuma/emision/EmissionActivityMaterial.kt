@@ -13,11 +13,12 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
-import kotlinx.android.synthetic.main.activity_emision.*
-import java.util.*
+import knf.kuma.databinding.ActivityEmisionMaterialBinding
+import java.util.Calendar
 
 class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListener {
     private var pagerAdapter: EmissionPagerAdapterMaterial? = null
+    private val binding by lazy { ActivityEmisionMaterialBinding.inflate(layoutInflater) }
 
     private val currentDay: Int
         get() {
@@ -33,18 +34,18 @@ class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListe
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
         setSurfaceBars()
-        setContentView(R.layout.activity_emision_material)
-        toolbar.title = "Emisión"
-        setSupportActionBar(toolbar)
+        setContentView(binding.root)
+        binding.toolbar.title = "Emisión"
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener { finish() }
-        pager.offscreenPageLimit = 7
+        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.pager.offscreenPageLimit = 7
         pagerAdapter = EmissionPagerAdapterMaterial(supportFragmentManager)
-        pager.adapter = pagerAdapter
-        tabs.setupWithViewPager(pager)
-        tabs.addOnTabSelectedListener(this)
-        pager.setCurrentItem(currentDay - 1, true)
+        binding.pager.adapter = pagerAdapter
+        binding.tabs.setupWithViewPager(binding.pager)
+        binding.tabs.addOnTabSelectedListener(this)
+        binding.pager.setCurrentItem(currentDay - 1, true)
         EAHelper.clear2()
         showRandomInterstitial(this,PrefsUtil.fullAdsExtraProbability)
     }

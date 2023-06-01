@@ -19,12 +19,7 @@ import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.pojos.DownloadObject
-import kotlinx.android.synthetic.main.item_downloading_extra.view.chapter
-import kotlinx.android.synthetic.main.item_downloading_extra.view.eta
-import kotlinx.android.synthetic.main.item_downloading_extra.view.progress
-import kotlinx.android.synthetic.main.item_downloading_extra.view.server
-import kotlinx.android.synthetic.main.item_downloading_extra.view.title
-import kotlinx.android.synthetic.main.item_downloading_extra_material.view.*
+import org.jetbrains.anko.find
 import java.util.*
 
 class DownloadingAdapterMaterial internal constructor(private val fragment: Fragment, private val downloadObjects: MutableList<DownloadObject>) : RecyclerView.Adapter<DownloadingAdapterMaterial.DownloadingItem>() {
@@ -144,11 +139,11 @@ class DownloadingAdapterMaterial internal constructor(private val fragment: Frag
     }
 
     inner class DownloadingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val server: TextView = itemView.server
-        val title: TextView = itemView.title
-        val chapter: TextView = itemView.chapter
-        val eta: TextView = itemView.eta
-        val actionMenu: View = itemView.actionMenu
-        val progress: ProgressBar = itemView.progress
+        val server: TextView = itemView.find(R.id.server)
+        val title: TextView = itemView.find(R.id.title)
+        val chapter: TextView = itemView.find(R.id.chapter)
+        val eta: TextView = itemView.find(R.id.eta)
+        val actionMenu: View = itemView.find(R.id.actionMenu)
+        val progress: ProgressBar = itemView.find(R.id.progress)
     }
 }

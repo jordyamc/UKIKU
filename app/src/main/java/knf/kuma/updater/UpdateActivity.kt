@@ -18,12 +18,13 @@ import knf.kuma.R
 import knf.kuma.commons.getUpdateDir
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
+import knf.kuma.databinding.ActivityUpdaterBinding
 import knf.kuma.download.DownloadManager
-import kotlinx.android.synthetic.main.activity_updater.*
 import java.io.File
 
 class UpdateActivity : GenericActivity() {
 
+    private val binding by lazy { ActivityUpdaterBinding.inflate(layoutInflater) }
     private val updaterViewModel: UpdaterViewModel by viewModels()
     private val update: File by lazy { File.createTempFile("update", ".apk", filesDir) }
     private var isUpdateDownloaded = false
@@ -31,11 +32,11 @@ class UpdateActivity : GenericActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_updater)
+        setContentView(binding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-        download.setOnClickListener { install() }
-        progress.max = 100
-        val animationDrawable = rel_back.background as AnimationDrawable
+        binding.download.setOnClickListener { install() }
+        binding.progress.max = 100
+        val animationDrawable = binding.relBack.background as AnimationDrawable
         if (!animationDrawable.isRunning) {
             animationDrawable.setEnterFadeDuration(2500)
             animationDrawable.setExitFadeDuration(2500)
@@ -45,7 +46,7 @@ class UpdateActivity : GenericActivity() {
                 .observe(this, Observer {
                     when (it.first) {
                         UpdaterType.TYPE_IDLE -> {
-                            progress.isIndeterminate = true
+                            binding.progress.isIndeterminate = true
                         }
                         UpdaterType.TYPE_PROGRESS -> {
                             setDownProgress(it.second as Int)
@@ -55,8 +56,8 @@ class UpdateActivity : GenericActivity() {
                         }
                         UpdaterType.TYPE_COMPLETED -> {
                             isUpdateDownloaded = true
-                            progress.progress = 100
-                            progress_text.text = "100%"
+                            binding.progress.progress = 100
+                            binding.progressText.text = "100%"
                             prepareForInstall()
                         }
                     }
@@ -81,11 +82,11 @@ class UpdateActivity : GenericActivity() {
 
     private fun setDownProgress(p: Int) {
         try {
-            progress.apply {
+            binding.progress.apply {
                 isIndeterminate = false
                 progress = p
             }
-            progress_text.text = String.format("%d%%", p)
+            binding.progressText.text = String.format("%d%%", p)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -97,14 +98,14 @@ class UpdateActivity : GenericActivity() {
         fadein.duration = 1000
         val fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout)
         fadeout.duration = 1000
-        progress_text.post {
-            with(progress_text) {
+        binding.progressText.post {
+            with(binding.progressText) {
                 visibility = View.INVISIBLE
                 startAnimation(fadeout)
             }
         }
-        download.post {
-            with(download) {
+        binding.download.post {
+            with(binding.download) {
                 visibility = View.VISIBLE
                 startAnimation(fadein)
             }

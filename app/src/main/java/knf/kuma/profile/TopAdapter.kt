@@ -2,12 +2,14 @@ package knf.kuma.profile
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.commons.inflate
-import kotlinx.android.synthetic.main.item_top.view.*
+import org.jetbrains.anko.find
 
 class TopAdapter : ListAdapter<TopItem, TopAdapter.ItemHolder>(TopItem.diffCallback) {
 
@@ -26,12 +28,11 @@ class TopAdapter : ListAdapter<TopItem, TopAdapter.ItemHolder>(TopItem.diffCallb
     override fun getItemViewType(position: Int): Int = if (getItem(position).data.uid == uid) 0 else 1
 
     class ItemHolder(val view: View) : RecyclerView.ViewHolder(view) {
-
         fun bind(item: TopItem, position: Int) {
-            view.ranking.text = "#${item.position}"
-            view.name.text = item.data.name
-            view.counter.text = item.data.number.toString()
-            view.trophy.apply {
+            view.find<TextView>(R.id.ranking).text = "#${item.position}"
+            view.find<TextView>(R.id.name).text = item.data.name
+            view.find<TextView>(R.id.counter).text = item.data.number.toString()
+            view.find<ImageView>(R.id.trophy).apply {
                 visibility = if (position in 0..2) {
                     setImageResource(when (position) {
                         0 -> R.drawable.ic_trophy_gold

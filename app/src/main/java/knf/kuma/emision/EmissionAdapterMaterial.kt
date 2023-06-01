@@ -12,13 +12,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnimeMaterial
-import knf.kuma.commons.*
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.distinct
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.load
+import knf.kuma.commons.notSameContent
 import knf.kuma.custom.HiddenOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.search.SearchObjectFav
 import knf.kuma.widgets.emision.WEmisionProvider
-import kotlinx.android.synthetic.main.item_emision_material.view.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 
 
 class EmissionAdapterMaterial internal constructor(private val fragment: Fragment) : RecyclerView.Adapter<EmissionAdapterMaterial.EmissionItem>() {
@@ -114,11 +119,11 @@ class EmissionAdapterMaterial internal constructor(private val fragment: Fragmen
     }
 
     inner class EmissionItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: View = itemView.card
-        val imageView: ImageView = itemView.img
-        val hiddenOverlay: HiddenOverlay = itemView.hidden
-        val heart: View = itemView.heart
-        val title: TextView = itemView.title
+        val cardView: View = itemView.find(R.id.card)
+        val imageView: ImageView = itemView.find(R.id.img)
+        val hiddenOverlay: HiddenOverlay = itemView.find(R.id.hidden)
+        val heart: View = itemView.find(R.id.heart)
+        val title: TextView = itemView.find(R.id.title)
 
         private lateinit var liveData: LiveData<Boolean>
         private lateinit var observer: Observer<Boolean>

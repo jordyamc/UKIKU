@@ -11,7 +11,7 @@ import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.firestore.FirestoreManager
-import kotlinx.android.synthetic.main.dialog_wallet.view.*
+import knf.kuma.databinding.DialogWalletBinding
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster.toast
@@ -51,18 +51,19 @@ object Economy {
     fun showWallet(activity: FragmentActivity, themed: Boolean = false, onShow: () -> Unit) {
         activity.doOnUI {
             val view = activity.layoutInflater.inflate(R.layout.dialog_wallet, null)
+            val binding = DialogWalletBinding.bind(view)
             if (themed) {
-                view.coinsCount.setTextColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
-                view.backgroundTop.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
-                view.backgroundBottom.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColor()))
+                binding.coinsCount.setTextColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
+                binding.backgroundTop.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColorLight()))
+                binding.backgroundBottom.setBackgroundColor(ContextCompat.getColor(activity, EAHelper.getThemeColor()))
             }
-            view.coinsCount.text = PrefsUtil.userCoins.toString()
+            binding.coinsCount.text = PrefsUtil.userCoins.toString()
             coinsLiveData.observe(activity) {
                 activity.doOnUI {
-                    view.coinsCount.text = it.toString()
+                    binding.coinsCount.text = it.toString()
                 }
             }
-            view.showAdButton.onClick { onShow() }
+            binding.showAdButton.onClick { onShow() }
             AlertDialog.Builder(activity).apply {
                 setView(view)
             }.show()

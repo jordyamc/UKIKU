@@ -1,8 +1,11 @@
 package knf.kuma.videoservers
 
 import android.content.Context
+import android.util.Log
 import knf.kuma.commons.PatternUtil
 import knf.kuma.videoservers.VideoServer.Names.YOURUPLOAD
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -20,7 +23,7 @@ class YUServer(context: Context, baseLink: String) : Server(context, baseLink) {
         get() {
             val yuLink = PatternUtil.extractLink(baseLink)
             try {
-                val videoLink = PatternUtil.getYUvideoLink(Jsoup.connect(yuLink).get().html())
+                val videoLink = PatternUtil.getYUvideoLink(runBlocking(Dispatchers.Main) { Unpacker.getHtml(context, yuLink)!! })
                 val client = OkHttpClient().newBuilder()
                         .connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                                 .allEnabledTlsVersions()
@@ -34,10 +37,9 @@ class YUServer(context: Context, baseLink: String) : Server(context, baseLink) {
                 val response = client.newCall(request).execute()
                 val refVideoLink = response.header("Location")
                 response.close()
-                Jsoup.connect(refVideoLink).ignoreContentType(true).timeout(2000).execute()
                 val headers = Headers()
                 headers.addHeader("Range", "bytes=0-")
-                headers.addHeader("Referer", yuLink)
+                headers.addHeader("Referer", "https://www.yourupload.com/")
                 return VideoServer(YOURUPLOAD, Option(name, null, refVideoLink, headers))
             } catch (e: Exception) {
                 e.printStackTrace()

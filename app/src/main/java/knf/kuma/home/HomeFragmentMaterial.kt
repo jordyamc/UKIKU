@@ -15,6 +15,7 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrashSuspend
 import knf.kuma.database.CacheDB
+import knf.kuma.databinding.FragmentHomeMaterialBinding
 import knf.kuma.pojos.QueueObject
 import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.SeeingObject
@@ -24,7 +25,6 @@ import knf.kuma.recents.RecentsViewModel
 import knf.kuma.recommended.RecommendActivityMaterial
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.seeing.SeeingActivityMaterial
-import kotlinx.android.synthetic.main.fragment_home_material.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,20 +34,61 @@ class HomeFragmentMaterial : BottomFragment() {
 
     private val viewModel: RecentsViewModel by viewModels()
     private var lastNew: String = "0"
+    private lateinit var binding: FragmentHomeMaterialBinding
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        EAHelper.enter1("R")
+        return inflater.inflate(R.layout.fragment_home_material, container, false).also {
+            binding = FragmentHomeMaterialBinding.bind(it)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.listNew.apply {
+            setAdapter(RecentsAdapterMaterial(this@HomeFragmentMaterial, isLarge = false, showSeen = false))
+            setViewAllOnClick {
+                PrefsUtil.recentLastHiddenNew = lastNew.toInt()
+                binding.listNew.hide()
+            }
+        }
+        binding.listFavUpdated.apply {
+            setAdapter(RecentsAdapterMaterial(this@HomeFragmentMaterial, true))
+            setViewAllClass(RecentsModelActivity::class.java)
+        }
+        binding.listBestEmission.setAdapter(DirAdapterMaterial(this))
+        binding.listPending.apply {
+            setAdapter(QueueAdapterMaterial(this@HomeFragmentMaterial))
+            setViewAllClass(QueueActivityMaterial::class.java)
+        }
+        binding.listWaiting.apply {
+            setAdapter(WaitingAdapterMaterial(this@HomeFragmentMaterial))
+            setViewAllClass(SeeingActivityMaterial::class.java)
+        }
+        binding.listRecommended.apply {
+            setAdapter(RecommendedAdapterMaterial(activity))
+            setViewAllClass(RecommendActivityMaterial::class.java)
+        }
+        binding.listRecommendedStaff.setAdapter(SearchAdapterMaterial(this))
+        lifecycleScope.launch(Dispatchers.IO) {
+            noCrashSuspend {
+                delay(1000)
+                binding.adContainer.implBanner(AdsType.RECENT_BANNER, true)
+                delay(500)
+                binding.adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
+            }
+        }
         viewModel.dbLiveData.observe(viewLifecycleOwner, Observer { list ->
             doAsync {
-                listNew.updateList(filterNew(list.filter { it.isNew }))
+                binding.listNew.updateList(filterNew(list.filter { it.isNew }))
                 val favFiltered = list.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }
                 if (favFiltered.isEmpty()) {
-                    listFavUpdated.apply {
+                    binding.listFavUpdated.apply {
                         setSubheader("Ultimos actualizados")
                         updateList(list)
                     }
                 } else {
-                    listFavUpdated.apply {
+                    binding.listFavUpdated.apply {
                         setSubheader("Favoritos actualizados")
                         updateList(favFiltered)
                     }
@@ -55,66 +96,24 @@ class HomeFragmentMaterial : BottomFragment() {
             }
         })
         CacheDB.INSTANCE.favsDAO().countLive.observe(viewLifecycleOwner, Observer {
-            doAsync { listFavUpdated.updateList(CacheDB.INSTANCE.recentsDAO().all.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }) }
+            doAsync { binding.listFavUpdated.updateList(CacheDB.INSTANCE.recentsDAO().all.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }) }
             RecommendHelper.createRecommended {
-                listRecommended.updateList(it)
+                binding.listRecommended.updateList(it)
             }
         })
         CacheDB.INSTANCE.animeDAO().emissionVotesLimited.observe(viewLifecycleOwner, Observer {
-            listBestEmission.updateList(it)
+            binding.listBestEmission.updateList(it)
         })
         CacheDB.INSTANCE.queueDAO().all.observe(viewLifecycleOwner, Observer {
-            doAsync { listPending.updateList(QueueObject.takeOne(it)) }
+            doAsync { binding.listPending.updateList(QueueObject.takeOne(it)) }
         })
         CacheDB.INSTANCE.seeingDAO().getAllWState(SeeingObject.STATE_CONSIDERING, SeeingObject.STATE_PAUSED).observe(viewLifecycleOwner, Observer {
-            listWaiting.updateList(it)
+            binding.listWaiting.updateList(it)
         })
         StaffRecommendations.createList {
-            listRecommendedStaff.updateList(it)
+            binding.listRecommendedStaff.updateList(it)
         }
         viewModel.reload()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        EAHelper.enter1("R")
-        return inflater.inflate(R.layout.fragment_home_material, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        listNew.apply {
-            setAdapter(RecentsAdapterMaterial(this@HomeFragmentMaterial, isLarge = false, showSeen = false))
-            setViewAllOnClick {
-                PrefsUtil.recentLastHiddenNew = lastNew.toInt()
-                listNew.hide()
-            }
-        }
-        listFavUpdated.apply {
-            setAdapter(RecentsAdapterMaterial(this@HomeFragmentMaterial, true))
-            setViewAllClass(RecentsModelActivity::class.java)
-        }
-        listBestEmission.setAdapter(DirAdapterMaterial(this))
-        listPending.apply {
-            setAdapter(QueueAdapterMaterial(this@HomeFragmentMaterial))
-            setViewAllClass(QueueActivityMaterial::class.java)
-        }
-        listWaiting.apply {
-            setAdapter(WaitingAdapterMaterial(this@HomeFragmentMaterial))
-            setViewAllClass(SeeingActivityMaterial::class.java)
-        }
-        listRecommended.apply {
-            setAdapter(RecommendedAdapterMaterial(activity))
-            setViewAllClass(RecommendActivityMaterial::class.java)
-        }
-        listRecommendedStaff.setAdapter(SearchAdapterMaterial(this))
-        lifecycleScope.launch(Dispatchers.IO) {
-            noCrashSuspend {
-                delay(1000)
-                adContainer.implBanner(AdsType.RECENT_BANNER, true)
-                delay(500)
-                adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
-            }
-        }
     }
 
     private fun filterNew(list: List<RecentObject>): List<RecentObject> {

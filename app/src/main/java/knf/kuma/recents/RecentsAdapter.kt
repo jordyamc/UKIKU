@@ -31,9 +31,9 @@ import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.*
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
-import kotlinx.android.synthetic.main.item_recents.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.find
 import xdroid.toaster.Toaster.toast
 import java.util.*
 
@@ -72,7 +72,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                 holder.setNew(recentObject.isNew)
                 holder.setFav(recentObject.isFav)
                 holder.setSeen(recentObject.isSeen)
-                dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment, Observer { object1 -> holder.setFav((object1 != null).also { recentObject.isFav = it }) })
+                dao.favObserver(Integer.parseInt(recentObject.aid)).distinct.observe(fragment) { object1 -> holder.setFav((object1 != null).also { recentObject.isFav = it }) }
                 holder.setChapterObserver(chaptersDAO.chapterSeen(recentObject.aid, recentObject.chapter).distinct, fragment, Observer { chapter -> holder.setSeen(chapter != null) })
                 holder.setState(isNetworkAvailable, recentObject.isDownloading)
                 holder.apply {
@@ -166,7 +166,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                                 }
                                             }
 
-                                            override fun getView(): View? {
+                                            override fun getView(): View {
                                                 return view
                                             }
                                         })
@@ -248,7 +248,7 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
                                     }
                                 }
 
-                                override fun getView(): View? {
+                                override fun getView(): View {
                                     return view
                                 }
                             })
@@ -330,29 +330,29 @@ class RecentsAdapter internal constructor(private val fragment: Fragment, privat
     }
 
     inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: MaterialCardView = itemView.card
-        val imageView: ImageView = itemView.img
-        val title: TextView = itemView.title
-        val chapter: TextView = itemView.chapter
-        val streaming: Button = itemView.streaming
-        val download: Button = itemView.download
-        val animeOverlay: SeenAnimeOverlay = itemView.seenOverlay
-        val downIcon: ImageView = itemView.down_icon
-        private val newIcon: ImageView = itemView.new_icon
-        private val favIcon: ImageView = itemView.fav_icon
-        val progressBar: ProgressBar = itemView.progress
-        val progressBarRoot: View = itemView.progress_root
-        val layButtons: View = itemView.lay_buttons
+        val cardView: MaterialCardView = itemView.find(R.id.card)
+        val imageView: ImageView = itemView.find(R.id.img)
+        val title: TextView = itemView.find(R.id.title)
+        val chapter: TextView = itemView.find(R.id.chapter)
+        val streaming: Button = itemView.find(R.id.streaming)
+        val download: Button = itemView.find(R.id.download)
+        val animeOverlay: SeenAnimeOverlay = itemView.find(R.id.seenOverlay)
+        val downIcon: ImageView = itemView.find(R.id.down_icon)
+        private val newIcon: ImageView = itemView.find(R.id.new_icon)
+        private val favIcon: ImageView = itemView.find(R.id.fav_icon)
+        val progressBar: ProgressBar = itemView.find(R.id.progress)
+        val progressBarRoot: View = itemView.find(R.id.progress_root)
+        val layButtons: View = itemView.find(R.id.lay_buttons)
         var fileWrapperJob: Job? = null
 
         private var chapterLiveData: LiveData<SeenObject> = MutableLiveData()
         private var downloadLiveData: LiveData<DownloadObject> = MutableLiveData()
 
-        private var chapterObserver: Observer<SeenObject>? = null
+        private var chapterObserver: Observer<SeenObject?>? = null
         private var downloadObserver: Observer<DownloadObject>? = null
         private var castingObserver: Observer<String>? = null
 
-        fun setChapterObserver(chapterLiveData: LiveData<SeenObject>, owner: LifecycleOwner, observer: Observer<SeenObject>) {
+        fun setChapterObserver(chapterLiveData: LiveData<SeenObject>, owner: LifecycleOwner, observer: Observer<SeenObject?>) {
             this.chapterLiveData = chapterLiveData
             this.chapterObserver = observer
             this.chapterLiveData.observe(owner, observer)

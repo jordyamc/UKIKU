@@ -31,10 +31,10 @@ import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.*
 import knf.kuma.custom.AchievementUnlocked
+import knf.kuma.custom.BannerContainerView
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
-import kotlinx.android.synthetic.main.activity_news.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,6 +63,7 @@ class AchievementActivity : GenericActivity() {
     private val progressIndText: TextView by bind(R.id.progress_ind_text)
     private val name: TextView by bind(R.id.achievement_name)
     private val description: TextView by bind(R.id.achievement_description)
+    private val adContainer: BannerContainerView by bind(R.id.adContainer)
     private lateinit var bottomSheet: BottomSheetBehavior<MaterialCardView>
 
     private var syncButton: MenuItem? = null

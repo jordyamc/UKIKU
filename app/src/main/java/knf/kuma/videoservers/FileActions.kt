@@ -32,6 +32,7 @@ import knf.kuma.commons.*
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
 import knf.kuma.download.*
+import knf.kuma.player.openWebPlayer
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
@@ -179,7 +180,7 @@ object FileActions {
                                             }
                                     for (baseLink in jsonArray) {
                                         val server = Server.check(context, baseLink.optString("code"))
-                                        if (server != null)
+                                        if (server != null) {
                                             try {
                                                 var skip = false
                                                 servers.forEach {
@@ -193,9 +194,18 @@ object FileActions {
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
                                             }
+                                        } else {
+                                            servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
+                                        }
                                     }
                                     servers.sort()
-                                    this@FileActions.servers = servers
+                                    this@FileActions.servers = servers.filter {
+                                        if (downloadObject.addQueue || type != Type.STREAM) {
+                                            it.canDownload
+                                        } else {
+                                            true
+                                        }
+                                    }.toMutableList()
                                     showServerList(actionRequest)
                                 }
                             }
@@ -233,7 +243,7 @@ object FileActions {
                         val jsonArray = jsonObject.getJSONArray(if (jsonObject.has("SUB")) "SUB" else "LAT")
                         for (baseLink in jsonArray) {
                             val server = Server.check(context, baseLink.optString("code"))
-                            if (server != null)
+                            if (server != null) {
                                 try {
                                     var skip = false
                                     servers.forEach {
@@ -247,9 +257,18 @@ object FileActions {
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
+                            } else {
+                                servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
+                            }
                         }
                         servers.sort()
-                        this@FileActions.servers = servers
+                        this@FileActions.servers = servers.filter {
+                            if (downloadObject.addQueue || type != Type.STREAM) {
+                                it.canDownload
+                            } else {
+                                true
+                            }
+                        }.toMutableList()
                         showServerList(actionRequest)
                     }
                 } catch (e: Exception) {
@@ -348,8 +367,8 @@ object FileActions {
                     showOptions(actionRequest, server)
                 } else {
                     saveLastServer(text)
-                    when (text.toLowerCase(Locale.ENGLISH)) {
-                        "mega d", "mega s" -> {
+                    when {
+                        text.lowercase(Locale.ENGLISH) in listOf("mega d", "mega s") -> {
                             if (actionRequest.downloadObject.addQueue) {
                                 Toaster.toast("Servidor no disponible para añadir a cola")
                                 showServerList(actionRequest)
@@ -363,6 +382,13 @@ object FileActions {
                                 }
                                 actionRequest.callback.call(CallbackState.EXTERNAL_LINK)
                             }
+                            reset()
+                        }
+                        text.endsWith("(WEB)") -> {
+                            delay(1000)
+                            openWebPlayer(actionRequest.context, server.option.url!!)
+                            actionRequest.callback.call(CallbackState.EXTERNAL_LINK)
+                            reset()
                         }
                         else ->
                             when (actionRequest.type) {
@@ -427,7 +453,6 @@ object FileActions {
 
     private fun startStreaming(actionRequest: ActionRequest, option: Option) {
         reset()
-        Log.e("FileActions", "On start streaming")
         if (actionRequest.item is AnimeObject.WebInfo.AnimeChapter && actionRequest.downloadObject.addQueue) {
             QueueManager.add(Uri.parse(option.url), false, actionRequest.item)
         } else {
@@ -438,11 +463,13 @@ object FileActions {
                             PrefsUtil.getPlayerIntent()
                                     .setData(Uri.parse(option.url))
                                     .putExtra("title", actionRequest.downloadObject.title)
+                                    .putExtra("headers", option.headers?.headers?.toArray())
                                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 } else {
                     val intent = Intent(Intent.ACTION_VIEW)
                             .setDataAndType(Uri.parse(option.url), "video/mp4")
                             .putExtra("title", actionRequest.downloadObject.title)
+                            .putExtra("headers", option.headers?.headers?.toArray())
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     App.context.startActivity(intent)
                 }
@@ -451,6 +478,7 @@ object FileActions {
                         PrefsUtil.getPlayerIntent()
                                 .setData(Uri.parse(option.url))
                                 .putExtra("title", actionRequest.downloadObject.title)
+                                .putExtra("headers", option.headers?.headers?.toArray())
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             }
         }

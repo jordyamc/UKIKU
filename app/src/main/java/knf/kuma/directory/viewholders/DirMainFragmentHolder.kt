@@ -5,12 +5,13 @@ import androidx.fragment.app.FragmentManager
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.BottomFragment
+import knf.kuma.R
 import knf.kuma.directory.DirPagerAdapter
-import kotlinx.android.synthetic.main.fragment_directory.view.*
+import org.jetbrains.anko.find
 
 class DirMainFragmentHolder(view: View, manager: FragmentManager) {
-    private val tabLayout: TabLayout = view.tabs
-    internal val pager: ViewPager = view.pager
+    private val tabLayout: TabLayout = view.find(R.id.tabs)
+    internal val pager: ViewPager = view.find(R.id.pager)
     private val adapter: DirPagerAdapter
 
     init {
