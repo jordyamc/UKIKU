@@ -8,7 +8,12 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import knf.kuma.App
-import knf.kuma.commons.*
+import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.Network
+import knf.kuma.commons.NoSSLOkHttpClient
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirObject
 import knf.kuma.directory.DirObjectCompact
@@ -29,7 +34,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.Executors
 import javax.inject.Singleton
 
@@ -71,18 +76,18 @@ class Repository {
                     t.printStackTrace()
                     if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
                         tryCount++
-                        getFactoryBack("https://animeflv.net/").getRecents(
+                        getFactoryBack("https://www3.animeflv.net/").getRecents(
                             BypassUtil.getStringCookie(
                                 App.context
-                            ), BypassUtil.userAgent, "https://animeflv.net"
+                            ), BypassUtil.userAgent, "https://www3.animeflv.net"
                         ).enqueue(this)
                     }
                 }
             }
-            getFactoryBack("https://animeflv.net/").getRecents(
+            getFactoryBack("https://www3.animeflv.net/").getRecents(
                 BypassUtil.getStringCookie(App.context),
                 BypassUtil.userAgent,
-                "https://animeflv.net"
+                "https://www3.animeflv.net"
             ).enqueue(callback)
         }
     }
@@ -113,18 +118,18 @@ class Repository {
                     t.printStackTrace()
                     if (tryCount < 3 && PrefsUtil.alwaysGenerateUA) {
                         tryCount++
-                        getFactoryBack("https://animeflv.net/").getRecentModels(
+                        getFactoryBack("https://www3.animeflv.net/").getRecentModels(
                             BypassUtil.getStringCookie(
                                 App.context
-                            ), BypassUtil.userAgent, "https://animeflv.net"
+                            ), BypassUtil.userAgent, "https://www3.animeflv.net"
                         ).enqueue(this)
                     }
                 }
             }
-            getFactoryBack("https://animeflv.net/").getRecentModels(
+            getFactoryBack("https://www3.animeflv.net/").getRecentModels(
                 BypassUtil.getStringCookie(App.context),
                 BypassUtil.userAgent,
-                "https://animeflv.net"
+                "https://www3.animeflv.net"
             ).enqueue(callback)
         }
     }
@@ -178,7 +183,7 @@ class Repository {
                                 getFactory(base).getAnime(
                                     BypassUtil.getStringCookie(context),
                                     BypassUtil.userAgent,
-                                    "https://animeflv.net",
+                                    "https://www3.animeflv.net",
                                     rest
                                 ).enqueue(this)
                             } else
@@ -188,7 +193,7 @@ class Repository {
                     getFactory(base).getAnime(
                         BypassUtil.getStringCookie(context),
                         BypassUtil.userAgent,
-                        "https://animeflv.net",
+                        "https://www3.animeflv.net",
                         rest
                     ).enqueue(callback)
                 } else if (!cacheUsed)
@@ -313,7 +318,7 @@ class Repository {
             config = PagingConfig(24),
             pagingSourceFactory = {
                 SearchCompactDataSource(
-                    getFactory("https://animeflv.net"),
+                    getFactory("https://www3.animeflv.net"),
                     query,
                     onInit
                 )

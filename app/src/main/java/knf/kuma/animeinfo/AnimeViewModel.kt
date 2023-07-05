@@ -23,7 +23,7 @@ class AnimeViewModel : ViewModel() {
         link?.let {
             if (it.contains("/ver/")) {
                 viewModelScope.launch {
-                    val nLink = withContext(Dispatchers.IO) { "https://animeflv.net" + noCrashLet { jsoupCookies(it).get().select("a[href~=/anime/]").attr("href") } }
+                    val nLink = withContext(Dispatchers.IO) { "https://www3.animeflv.net" + noCrashLet { jsoupCookies(it).get().select("a[href~=/anime/]").attr("href") } }
                     repository.getAnime(context, nLink, persist, liveData)
                 }
             } else

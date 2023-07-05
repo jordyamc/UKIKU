@@ -168,7 +168,7 @@ public class ExplorerObject {
             this.time = getTime(context, file);
             if (time.equals(""))
                 throw new IllegalStateException("No duration");
-            this.link = "https://animeflv.net/ver/" + fileName.substring(fileName.indexOf("$") + 1).replace(".mp4", "");
+            this.link = "https://www3.animeflv.net/ver/" + fileName.substring(fileName.indexOf("$") + 1).replace(".mp4", "");
         }
 
         public static String[] getTitles(List<FileDownObj> list) {
@@ -193,7 +193,7 @@ public class ExplorerObject {
 
         public String getChapPreviewLink() {
             if (thumb == null)
-                return "https://animeflv.net/uploads/animes/screenshots/" + aid + "/" + chapter + "/th_2.jpg";
+                return "https://www3.animeflv.net/uploads/animes/screenshots/" + aid + "/" + chapter + "/th_2.jpg";
             else
                 return ThumbServer.INSTANCE.loadFile(thumb);
         }

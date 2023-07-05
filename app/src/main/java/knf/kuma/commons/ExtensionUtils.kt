@@ -83,7 +83,7 @@ fun Toolbar.changeToolbarFont(@FontRes res: Int) {
     }
 }
 
-val String.urlFixed: String get() = if (!contains("animeflv.net")) "https://animeflv.net$this" else this
+val String.urlFixed: String get() = if (!contains("animeflv.net")) "https://www3.animeflv.net$this" else this
 
 val String.fixedHost: String get() = if (!startsWith("http")) "https:$this" else this
 

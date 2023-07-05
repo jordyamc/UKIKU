@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
@@ -19,10 +20,14 @@ import it.sephiroth.android.library.xtooltip.Tooltip
 import knf.kuma.App
 import knf.kuma.Diagnostic
 import knf.kuma.R
+import knf.kuma.ads.AdsUtils
 import knf.kuma.commons.*
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.LayStatusBarBinding
 import knf.kuma.directory.DirectoryService
+import knf.tools.bypass.DisplayType
+import knf.tools.bypass.Request
+import knf.tools.bypass.startBypass
 import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -177,6 +182,7 @@ class ConnectionState : LinearLayout {
 
     private fun doCookiesTest(): Int {
         return try {
+            Log.e("Bypass test", "UA: ${BypassUtil.userAgent}, Cookies: ${BypassUtil.getMapCookie(App.context)}")
             val timeout = PrefsUtil.timeoutTime.toInt() * 1000
             val response = Jsoup.connect(BypassUtil.testLink)
                     .cookies(BypassUtil.getMapCookie(App.context))
@@ -207,7 +213,7 @@ class ConnectionState : LinearLayout {
             else -> return false
         } * 1000
         return try {
-            Jsoup.connect("https://animeflv.net")
+            Jsoup.connect("https://www3.animeflv.net")
                     .cookies(BypassUtil.getMapCookie(App.context))
                     .userAgent(BypassUtil.userAgent)
                     .timeout(timeout.toInt())
@@ -262,7 +268,22 @@ class ConnectionState : LinearLayout {
         binding.message.textColor = Color.WHITE
         binding.container.onClick {
             PrefsUtil.isForbiddenTipShown = true
-            context.startActivity(Intent(context, Diagnostic.FullBypass::class.java))
+            //context.startActivity(Intent(context, Diagnostic.FullBypass::class.java))
+            (context.findActivity() as? AppCompatActivity)?.startBypass(
+                4157,
+                Request(
+                    BypassUtil.testLink,
+                    lastUA = PrefsUtil.userAgent,
+                    showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                    useFocus = isTV,
+                    maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
+                    useLatestUA = true,
+                    reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                    clearCookiesAtStart = true,
+                    displayType = DisplayType.DIALOG,
+                    dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style").toInt()
+                )
+            )
         }
         binding.container.setOnLongClickListener(null)
         if (isFullMode && !PrefsUtil.isForbiddenTipShown) {
@@ -375,9 +396,9 @@ class ConnectionState : LinearLayout {
             })
             maxPages = withContext(Dispatchers.IO) {
                 noCrashLet("3200~") {
-                    val main = jsoupCookies("https://animeflv.net/browse").get()
+                    val main = jsoupCookies("https://www3.animeflv.net/browse").get()
                     val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
-                    val last = jsoupCookies("https://animeflv.net/browse?page=$lastPage").get()
+                    val last = jsoupCookies("https://www3.animeflv.net/browse?page=$lastPage").get()
                     ((24 * (lastPage - 1)) + last.select("article").size).toString()
                 }
             }

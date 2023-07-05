@@ -126,13 +126,13 @@ class RecentsPage {
 
 class AFixer : ElementConverter<String> {
     override fun convert(node: Element, selector: Selector): String {
-        return "https://animeflv.net${node.attr("href")}"
+        return "https://www3.animeflv.net${node.attr("href")}"
     }
 }
 
 class ImageFixer : ElementConverter<String> {
     override fun convert(node: Element, selector: Selector): String {
-        return "https://animeflv.net${node.attr("src")}"
+        return "https://www3.animeflv.net${node.attr("src")}"
     }
 }
 

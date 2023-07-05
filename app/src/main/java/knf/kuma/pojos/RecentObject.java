@@ -131,8 +131,8 @@ public class RecentObject {
         this.chapter = webInfo.chapter.trim();
         this.eid = String.valueOf(abs((aid + chapter).hashCode()));
         this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
-        this.url = "https://animeflv.net" + webInfo.url;
-        this.img = "https://animeflv.net" + webInfo.img.replace("thumbs", "covers");
+        this.url = "https://www3.animeflv.net" + webInfo.url;
+        this.img = "https://www3.animeflv.net" + webInfo.img.replace("thumbs", "covers");
         this.isNew = chapter.matches("^.* [10]$");
         this.anime = PatternUtil.INSTANCE.getAnimeUrl(this.url, this.aid);
         //File file = FileAccessHelper.INSTANCE.findFile(getFilePath());

@@ -25,7 +25,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
             val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
                 putString(MediaMetadata.KEY_TITLE, chapter.name)
                 putString(MediaMetadata.KEY_SUBTITLE, chapter.number)
-                addImage(WebImage(Uri.parse(if (chapter.img.isNullOrBlank()) "https://animeflv.net/uploads/animes/thumbs/${chapter.aid}.jpg" else chapter.img)))
+                addImage(WebImage(Uri.parse(if (chapter.img.isNullOrBlank()) "https://www3.animeflv.net/uploads/animes/thumbs/${chapter.aid}.jpg" else chapter.img)))
             }
             val fUrl = when {
                 url.isNullOrBlank() -> SelfServer.start(chapter.filePath, true)
@@ -45,7 +45,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
             val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
                 putString(MediaMetadata.KEY_TITLE, recent.name)
                 putString(MediaMetadata.KEY_SUBTITLE, recent.chapter)
-                addImage(WebImage(Uri.parse("https://animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
+                addImage(WebImage(Uri.parse("https://www3.animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
             }
             val fUrl = when {
                 url.isNullOrBlank() -> SelfServer.start(recent.filePath, true)
@@ -65,7 +65,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
             val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
                 putString(MediaMetadata.KEY_TITLE, recent.name)
                 putString(MediaMetadata.KEY_SUBTITLE, recent.chapter)
-                addImage(WebImage(Uri.parse("https://animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
+                addImage(WebImage(Uri.parse("https://www3.animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
             }
             val fUrl = when {
                 url.isNullOrBlank() -> SelfServer.start(recent.extras.filePath, true)

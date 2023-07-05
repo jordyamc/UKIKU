@@ -5,7 +5,19 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.DetailsSupportFragment
-import androidx.leanback.widget.*
+import androidx.leanback.widget.Action
+import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.ClassPresenterSelector
+import androidx.leanback.widget.DetailsOverviewRow
+import androidx.leanback.widget.HeaderItem
+import androidx.leanback.widget.ListRow
+import androidx.leanback.widget.ListRowPresenter
+import androidx.leanback.widget.OnActionClickedListener
+import androidx.leanback.widget.OnItemViewClickedListener
+import androidx.leanback.widget.Presenter
+import androidx.leanback.widget.Row
+import androidx.leanback.widget.RowPresenter
+import androidx.leanback.widget.SparseArrayObjectAdapter
 import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
@@ -205,7 +217,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
         val activity = activity ?: return
         if (item is AnimeObject.WebInfo.AnimeRelated) {
-            TVAnimesDetails.start(activity, "https://animeflv.net" + item.link)
+            TVAnimesDetails.start(activity, "https://www3.animeflv.net" + item.link)
         } else if (item is AnimeObject.WebInfo.AnimeChapter) {
             currentChapter = item
             TVServersFactory.start(activity, item.link, item, itemViewHolder, activity as? TVServersFactory.ServersInterface)

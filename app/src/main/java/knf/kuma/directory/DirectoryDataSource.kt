@@ -34,5 +34,5 @@ class DirectoryDataSource(val factory: knf.kuma.retrofit.Factory, val type: Stri
 fun createDirectoryPagedList(type: String, retryCallback: () -> Unit) =
         Pager(
             config = PagingConfig(24),
-            pagingSourceFactory = { DirectoryDataSource(Repository.getFactory("https://animeflv.net"), type, retryCallback) }
+            pagingSourceFactory = { DirectoryDataSource(Repository.getFactory("https://www3.animeflv.net"), type, retryCallback) }
         ).flow

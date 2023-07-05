@@ -93,9 +93,9 @@ class DirectoryService : IntentService("Directory update") {
 
     private fun calculateMax() {
         noCrash {
-            val main = jsoupCookiesDir("https://animeflv.net/browse",needCookies).get()
+            val main = jsoupCookiesDir("https://www3.animeflv.net/browse", needCookies).get()
             val lastPage = main.select("ul.pagination li:matches(\\d+)").last().text().trim().toInt()
-            val last = jsoupCookiesDir("https://animeflv.net/browse?page=$lastPage",needCookies).get()
+            val last = jsoupCookiesDir("https://www3.animeflv.net/browse?page=$lastPage", needCookies).get()
             maxAnimes = ((24 * (lastPage - 1)) + last.select("article").size) - 1
             Log.e(TAG, "Max pages = $maxAnimes")
         }
@@ -164,7 +164,7 @@ class DirectoryService : IntentService("Directory update") {
                     Thread.sleep(6000)
                 else
                     Thread.sleep(1000)
-                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$s", needCookies).get()
+                val document = jsoupCookiesDir("https://www3.animeflv.net/browse?order=added&page=$s", needCookies).get()
                 if (document.select("article").size != 0) {
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimes(animeDAO, jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {
@@ -211,7 +211,7 @@ class DirectoryService : IntentService("Directory update") {
             try {
                 if (needCookies)
                     Thread.sleep(6000)
-                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page", needCookies).get()
+                val document = jsoupCookiesDir("https://www3.animeflv.net/browse?order=added&page=$page", needCookies).get()
                 Log.e(TAG, "Read page $page")
                 if (document.select("ul.ListAnimes").isNotEmpty() && document.select("article").isNotEmpty()) {
                     page++

@@ -11,7 +11,14 @@ import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
-import knf.kuma.commons.*
+import knf.kuma.ads.AdsUtils
+import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.isTV
+import knf.kuma.commons.toast
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.SSLManager
 import knf.kuma.directory.DirManager
@@ -26,12 +33,13 @@ import knf.kuma.tv.TVServersFactory
 import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
+import knf.tools.bypass.DisplayType
+import knf.tools.bypass.Request
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import xdroid.toaster.Toaster
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -120,16 +128,21 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                 PrefsUtil.alwaysGenerateUA = false
             if (withContext(Dispatchers.IO) { BypassUtil.isNeeded() }) {
                 startBypass(
-                    this@TVMain, 7425, BypassUtil.testLink,
-                    lastUA = PrefsUtil.userAgent,
-                    showReload = false,
-                    maxTryCount = 3,//AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
-                    reloadOnCaptcha = true,////AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
-                    clearCookiesAtStart = false,//AdsUtils.remoteConfigs.getBoolean("bypass_clear_cookies"),
-                    useDialog = true,
-                    dialogStyle = 1//AdsUtils.remoteConfigs.getLong("bypass_dialog_style").toInt()
+                    7425,
+                    Request(
+                        BypassUtil.testLink,
+                        lastUA = PrefsUtil.userAgent,
+                        showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                        useFocus = isTV,
+                        maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
+                        useLatestUA = true,
+                        reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                        clearCookiesAtStart = true,
+                        displayType = DisplayType.DIALOG,
+                        dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style").toInt()
+                    )
                 )
-                //startBypass(this@TVMain, 7425, "https://animeflv.net", true)
+                //startBypass(this@TVMain, 7425, "https://www3.animeflv.net", true)
             }
         }
     }

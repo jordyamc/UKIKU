@@ -20,25 +20,25 @@ class DirectoryPage {
             if (Network.isConnected) {
                 if (!animeDAO.existLink("%animeflv.net$link")) {
                     try {
-                        val response = jsoupCookies("https://animeflv.net$link", true).execute()
+                        val response = jsoupCookies("https://www3.animeflv.net$link", true).execute()
                         val body = response.body()
                         if (response.statusCode() == 200 && body != null) {
                             val webInfo =
                                 jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(body)
                             if (isFullMode && !PrefsUtil.isFamilyFriendly) {
-                                animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
-                                Log.e("Directory Getter", "Added: https://animeflv.net$link")
+                                animeObjects.add(AnimeObject("https://www3.animeflv.net$link", webInfo))
+                                Log.e("Directory Getter", "Added: https://www3.animeflv.net$link")
                             } else {
                                 if (webInfo.genres.contains("Ecchi"))
-                                    Log.e("Directory Getter", "Skip: https://animeflv.net$link")
+                                    Log.e("Directory Getter", "Skip: https://www3.animeflv.net$link")
                                 else {
                                     animeObjects.add(
                                         AnimeObject(
-                                            "https://animeflv.net$link",
+                                            "https://www3.animeflv.net$link",
                                             webInfo
                                         )
                                     )
-                                    Log.e("Directory Getter", "Added: https://animeflv.net$link")
+                                    Log.e("Directory Getter", "Added: https://www3.animeflv.net$link")
                                 }
                             }
                             updateInterface.onAdd()
@@ -47,7 +47,7 @@ class DirectoryPage {
                         } else check(response.statusCode() < 400) { "Response code: ${response.statusCode()}" }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        Log.e("Directory Getter", "Error adding: https://animeflv.net" + link + "\nCause: " + e.message)
+                        Log.e("Directory Getter", "Error adding: https://www3.animeflv.net" + link + "\nCause: " + e.message)
                         updateInterface.onError()
                     }
                     if (isCloudflareActive)
@@ -66,22 +66,22 @@ class DirectoryPage {
         for (link in links) {
             if (Network.isConnected) {
                 try {
-                    val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies("https://animeflv.net$link").get().outerHtml())
+                    val webInfo = jspoon.adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies("https://www3.animeflv.net$link").get().outerHtml())
                     if (isFullMode && !PrefsUtil.isFamilyFriendly) {
-                        animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
-                        Log.e("Directory Getter", "Replaced: https://animeflv.net$link")
+                        animeObjects.add(AnimeObject("https://www3.animeflv.net$link", webInfo))
+                        Log.e("Directory Getter", "Replaced: https://www3.animeflv.net$link")
                     } else {
                         if (webInfo.genres.contains("Ecchi"))
-                            Log.e("Directory Getter", "Skip: https://animeflv.net$link")
+                            Log.e("Directory Getter", "Skip: https://www3.animeflv.net$link")
                         else {
-                            animeObjects.add(AnimeObject("https://animeflv.net$link", webInfo))
-                            Log.e("Directory Getter", "Replaced: https://animeflv.net$link")
+                            animeObjects.add(AnimeObject("https://www3.animeflv.net$link", webInfo))
+                            Log.e("Directory Getter", "Replaced: https://www3.animeflv.net$link")
                         }
                     }
                     updateInterface.onAdd()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Log.e("Directory Getter", "Error replacing: https://animeflv.net" + link + "\nCause: " + e.message)
+                    Log.e("Directory Getter", "Error replacing: https://www3.animeflv.net" + link + "\nCause: " + e.message)
                     updateInterface.onError()
                 }
                 if (isCloudflareActive)

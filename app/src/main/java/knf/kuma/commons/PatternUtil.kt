@@ -135,7 +135,7 @@ object PatternUtil {
     }
 
     fun getAnimeUrl(chapter: String, aid: String): String {
-        return "https://animeflv.net/anime/" + aid + chapter.substring(
+        return "https://www3.animeflv.net/anime/" + aid + chapter.substring(
             chapter.lastIndexOf("/"),
             chapter.lastIndexOf("-")
         )
@@ -160,7 +160,7 @@ object PatternUtil {
     }
 
     fun getBanner(aid: String): String {
-        return "https://animeflv.net/uploads/animes/banners/$aid.jpg"
+        return "https://www3.animeflv.net/uploads/animes/banners/$aid.jpg"
     }
 
     fun getEpListMap(code: String): HashMap<String, String> {

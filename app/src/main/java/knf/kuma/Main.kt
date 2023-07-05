@@ -20,7 +20,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
@@ -45,7 +44,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsUtils
-import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
 import knf.kuma.backup.MigrationActivity
@@ -193,7 +191,7 @@ class Main : GenericActivity(),
         DirManager.checkPreDir()
         if (PrefsUtil.useDefaultUserAgent && Network.isConnected) {
             val isBrowserOk = noCrashLet(false) {
-                jsoupCookiesDir("https://animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
+                jsoupCookiesDir("https://www3.animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
                 true
             }
             if (!isBrowserOk) {
@@ -202,7 +200,7 @@ class Main : GenericActivity(),
                 suspendCoroutine<Boolean> {
                     lifecycleScope.launch(Dispatchers.Main) {
                         noCrash {
-                            Cloudflare(this@Main, "https://animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
+                            Cloudflare(this@Main, "https://www3.animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
                                 setCfCallback(object : CfCallback {
                                     override fun onSuccess(cookieList: MutableList<HttpCookie>?, hasNewUrl: Boolean, newUrl: String?) {
                                         PrefsUtil.dirCookies = cookieList ?: emptyList()

@@ -23,12 +23,24 @@ import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.animeinfo.img.ActivityImgFull
 import knf.kuma.animeinfo.viewholders.AnimeActivityHolder
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirObject
 import knf.kuma.directory.DirObjectCompact
-import knf.kuma.pojos.*
+import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.ExplorerObject
+import knf.kuma.pojos.FavoriteObject
+import knf.kuma.pojos.NotificationObj
+import knf.kuma.pojos.QueueObject
+import knf.kuma.pojos.RecentObject
+import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.SeeingObject
 import knf.kuma.recommended.AnimeShortObject
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
@@ -42,7 +54,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onLongClick
 import org.jetbrains.anko.toast
 import xdroid.toaster.Toaster
-import java.util.*
+import java.util.Locale
 import kotlin.random.Random
 
 class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
@@ -84,7 +96,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                 doOnUI {
                     chapters = animeObject.chapters ?: mutableListOf()
                     genres = animeObject.genres ?: mutableListOf()
-                    if (PrefsUtil.isFamilyFriendly && genres.map { it.toLowerCase() }.contains("ecchi")) {
+                    if (PrefsUtil.isFamilyFriendly && genres.map { it.lowercase(Locale.getDefault()) }.contains("ecchi")) {
                         toast("Anime no familiar")
                         onBackPressed()
                     }
@@ -381,7 +393,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
 
         fun open(fragment: Fragment, animeRelated: AnimeObject.WebInfo.AnimeRelated) {
             val intent = Intent(fragment.context, DesignUtils.infoClass)
-            intent.data = Uri.parse("https://animeflv.net/" + animeRelated.link)
+            intent.data = Uri.parse("https://www3.animeflv.net/" + animeRelated.link)
             intent.putExtra(keyTitle, animeRelated.name)
             intent.putExtra(keyAid, animeRelated.aid)
             fragment.startActivityForResult(intent, REQUEST_CODE)
@@ -390,7 +402,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         fun open(fragment: Fragment, animeObject: AnimeObject.WebInfo.AnimeRelated, view: ImageView, persist: Boolean = true, animate: Boolean = true) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, DesignUtils.infoClass)
-            intent.data = Uri.parse("https://animeflv.net/" + animeObject.link)
+            intent.data = Uri.parse("https://www3.animeflv.net/" + animeObject.link)
             intent.putExtra(keyTitle, animeObject.name)
             intent.putExtra(keyAid, animeObject.aid)
             intent.putExtra(keyImg, PatternUtil.getCover(animeObject.aid))

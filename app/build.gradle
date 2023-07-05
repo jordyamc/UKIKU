@@ -13,8 +13,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 200
-        versionName "5.2.2"
+        versionCode 201
+        versionName "5.2.3"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -124,7 +124,7 @@ dependencies {
     implementation 'com.github.jordyamc:PersistentSearchView:1.0.10'
     implementation 'com.github.jordyamc:UAGenerator:1.2.0'
     implementation 'com.github.jordyamc:AndroidVideoCache:2.7.6'
-    implementation 'com.github.jordyamc:Cloudflare-Bypasser:6a070a78f5'
+    implementation 'com.github.jordyamc:Cloudflare-Bypasser:1.0.23'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

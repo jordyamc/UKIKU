@@ -37,6 +37,8 @@ import knf.kuma.database.CacheDB
 import knf.kuma.databinding.LayoutDiagnosticBinding
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
+import knf.tools.bypass.DisplayType
+import knf.tools.bypass.Request
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -145,17 +147,19 @@ class Diagnostic : GenericActivity() {
                     visibility = View.VISIBLE
                     onClick {
                         startBypass(
-                            5546, BypassUtil.testLink,
-                            lastUA = PrefsUtil.userAgent,
-                            showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
-                            useFocus = isTV,
-                            maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries")
-                                .toInt(),
-                            reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
-                            clearCookiesAtStart = true,
-                            useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
-                            dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
-                                .toInt()
+                            5546,
+                            Request(
+                                BypassUtil.testLink,
+                                lastUA = PrefsUtil.userAgent,
+                                showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                                useFocus = isTV,
+                                maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
+                                useLatestUA = true,
+                                reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                                clearCookiesAtStart = true,
+                                displayType = DisplayType.DIALOG,
+                                dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style").toInt()
+                            )
                         )
                     }
                 }

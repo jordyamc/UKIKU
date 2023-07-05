@@ -26,6 +26,7 @@ import org.jsoup.nodes.Element;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,7 +138,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         this.webInfo = webInfo;
         this.aid = webInfo.aid;
         this.name = PatternUtil.INSTANCE.fromHtml(webInfo.name);
-        this.img = "https://animeflv.net" + webInfo.img;
+        this.img = "https://www3.animeflv.net" + webInfo.img;
         this.description = PatternUtil.INSTANCE.fromHtml(webInfo.description);
         this.type = getType(webInfo.type);
         this.state = getState(webInfo.state);
@@ -395,12 +396,12 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                     this.chapterType = ChapterType.OLD;
                     String full = element.select("a").first().text();
                     this.number = "Episodio " + extract(full, "^.* (\\d+\\.?\\d*):?.*$");
-                    this.link = "https://animeflv.net" + element.select("a").first().attr("href");
+                    this.link = "https://www3.animeflv.net" + element.select("a").first().attr("href");
                     this.eid = String.valueOf(abs((aid + number).hashCode()));
                 } else {
                     this.chapterType = ChapterType.NEW;
                     this.number = element.select("p").first().ownText();
-                    this.link = "https://animeflv.net" + element.select("a").first().attr("href");
+                    this.link = "https://www3.animeflv.net" + element.select("a").first().attr("href");
                     this.eid = String.valueOf(abs((aid + number).hashCode()));
                     this.img = element.select("img.lazy").first().attr("src");
                 }
@@ -415,7 +416,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
                 this.chapterType = ChapterType.NEW;
                 this.aid = info.getAid();
                 this.number = "Episodio " + num;
-                this.link = "https://animeflv.net/ver/" + info.getSid() + "-" + num;
+                this.link = "https://www3.animeflv.net/ver/" + info.getSid() + "-" + num;
                 this.eid = String.valueOf(abs((aid + number).hashCode()));
                 this.img = "https://cdn.animeflv.net/screenshots/" + info.getAid() + "/" + num + "/th_3.jpg";
                 this.key = (aid + number).hashCode();
@@ -475,10 +476,10 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             public String commentariesLink(String version) {
                 try {
-                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(ExtensionUtilsKt.resolveRedirection(link, 0), "UTF-8") + "&s_o=default#version=" + version;
+                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(ExtensionUtilsKt.resolveRedirection(link, 0), StandardCharsets.UTF_8) + "&s_o=default#version=" + version;
                 } catch (Exception e) {
                     try {
-                        return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(link, "UTF-8") + "&s_o=default#version=" + version;
+                        return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(link, StandardCharsets.UTF_8) + "&s_o=default#version=" + version;
                     } catch (Exception ex) {
                         return link;
                     }

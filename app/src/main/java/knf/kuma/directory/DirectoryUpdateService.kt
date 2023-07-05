@@ -9,7 +9,11 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import knf.kuma.R
-import knf.kuma.commons.*
+import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.jsoupCookiesDir
 import knf.kuma.database.CacheDB
 import knf.kuma.database.dao.AnimeDAO
 import knf.kuma.download.foreground
@@ -80,7 +84,7 @@ class DirectoryUpdateService : IntentService("Directory re-update") {
                     Thread.sleep(6000)
                 else
                     Thread.sleep(1000)
-                val document = jsoupCookiesDir("https://animeflv.net/browse?order=added&page=$page", needCookies).get()
+                val document = jsoupCookiesDir("https://www3.animeflv.net/browse?order=added&page=$page", needCookies).get()
                 if (document.select("article").size != 0) {
                     val animeObjects = jspoon.adapter(DirectoryPage::class.java).fromHtml(document.outerHtml()).getAnimesRecreate(jspoon, object : DirectoryPage.UpdateInterface {
                         override fun onAdd() {

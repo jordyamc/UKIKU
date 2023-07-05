@@ -21,13 +21,21 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import knf.kuma.R
 import knf.kuma.ads.AdsUtils
-import knf.kuma.commons.*
+import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.isFullMode
+import knf.kuma.commons.isTV
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.toastLong
 import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryService
 import knf.kuma.retrofit.Repository
 import knf.kuma.uagen.randomUA
 import knf.kuma.videoservers.FileActions
 import knf.kuma.videoservers.ServersFactory
+import knf.tools.bypass.DisplayType
+import knf.tools.bypass.Request
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,16 +89,19 @@ open class GenericActivity : AppCompatActivity() {
                         bypassLive.value = Pair(true, true)
                         BypassUtil.isLoading = true
                         startBypass(
-                            4157, BypassUtil.testLink,
-                            lastUA = PrefsUtil.userAgent,
-                            showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
-                            useFocus = isTV,
-                            maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
-                            reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
-                            clearCookiesAtStart = AdsUtils.remoteConfigs.getBoolean("bypass_clear_cookies"),
-                            useDialog = AdsUtils.remoteConfigs.getBoolean("bypass_use_dialog"),
-                            dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style")
-                                .toInt()
+                            4157,
+                            Request(
+                                BypassUtil.testLink,
+                                lastUA = PrefsUtil.userAgent,
+                                showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                                useFocus = isTV,
+                                maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
+                                useLatestUA = true,
+                                reloadOnCaptcha = AdsUtils.remoteConfigs.getBoolean("bypass_skip_captcha"),
+                                clearCookiesAtStart = true,
+                                displayType = DisplayType.DIALOG,
+                                dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style").toInt()
+                            )
                         )
                     }
                 }

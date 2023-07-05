@@ -54,7 +54,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
         try {
             val recents = withContext(Dispatchers.IO) {
                 Jspoon.create().adapter(Recents::class.java)
-                    .fromHtml(jsoupCookies("https://animeflv.net/").get().outerHtml())
+                    .fromHtml(jsoupCookies("https://www3.animeflv.net/").get().outerHtml())
             }
             val objects = RecentObject.create(recents.list ?: listOf())
             for ((i, recentObject) in objects.withIndex())

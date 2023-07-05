@@ -11,7 +11,7 @@ class SimpleFileCreator(val base: File) : Creator {
 
     override fun createLinksList(): List<String> {
         return if (base.exists())
-            base.listFiles(FileFilter { it.isDirectory })?.map { "https://animeflv.net/anime/${it.name}" }?: emptyList()
+            base.listFiles(FileFilter { it.isDirectory })?.map { "https://www3.animeflv.net/anime/${it.name}" } ?: emptyList()
         else
             emptyList()
     }

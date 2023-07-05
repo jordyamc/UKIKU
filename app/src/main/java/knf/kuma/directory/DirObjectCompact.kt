@@ -24,7 +24,7 @@ class DirObjectCompact {
 
     class LinkExtractor @Keep constructor() : ElementConverter<String> {
         override fun convert(node: Element, selector: Selector): String {
-            return "https://animeflv.net${node.select("a").attr("href")}"
+            return "https://www3.animeflv.net${node.select("a").attr("href")}"
         }
     }
 
