@@ -37,6 +37,12 @@
         android:requiredFeature="android.software.leanback" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:node="remove" />
 
 
     <application
@@ -307,7 +313,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5390653757953587~9838518341" />
+            android:value="ca-app-pub-8896186846999141~6494272184" />
         <!--<meta-data
             android:name="com.google.android.gms.ads.flag.rtb_enabled"
             android:value="false"/>-->

@@ -6,8 +6,11 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.preference.PreferenceManager
 import knf.kuma.App
+import knf.kuma.ads.AdsUtils
 import knf.kuma.uagen.UAGenerator
 import knf.kuma.uagen.randomUA
+import knf.tools.bypass.DisplayType
+import knf.tools.bypass.Request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.HttpStatusException
@@ -26,7 +29,7 @@ class BypassUtil {
     companion object {
         val userAgent: String
             get() = if (PrefsUtil.useDefaultUserAgent && !PrefsUtil.alwaysGenerateUA) noCrashLet { WebSettings.getDefaultUserAgent(App.context) }
-                    ?: PrefsUtil.userAgent else PrefsUtil.userAgent
+                ?: PrefsUtil.userAgent else PrefsUtil.userAgent
         var isLoading = false
         var isChecking = false
 
@@ -36,15 +39,31 @@ class BypassUtil {
         private const val defaultValue = ""
         const val testLink = "https://www3.animeflv.net/"
 
+        fun createRequest(): Request {
+            return Request(
+                testLink,
+                lastUA = PrefsUtil.userAgent,
+                showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                useFocus = isTV,
+                maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
+                useLatestUA = true,
+                reloadOnCaptcha = false,
+                waitCaptcha = true,
+                clearCookiesAtStart = true,
+                displayType = DisplayType.DIALOG,
+                dialogStyle = 0
+            )
+        }
+
         suspend fun clearCookiesIfNeeded() {
             if (!withContext(Dispatchers.IO) { isCloudflareActive() })
                 clearCookies(null)
         }
 
         fun saveCookies(context: Context, cookies: String): Boolean =
-                noCrashLet(false) {
-                    bypassCookies = cookies
-                    if (cookies.contains(keyCfClearance)) {
+            noCrashLet(false) {
+                bypassCookies = cookies
+                if (cookies.contains(keyCfClearance)) {
                         val parts = cookies.split(";").dropLastWhile { it.isEmpty() }.toTypedArray()
                         for (cookie in parts) {
                             if (cookie.contains(keyCfDuid))

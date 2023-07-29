@@ -387,8 +387,4 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
 
     }
-
-    override fun onSeekProcessed() {
-
-    }
 }

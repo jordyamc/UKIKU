@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -123,16 +124,18 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
             holder.progressBarRoot.visibility = View.GONE
         if (!Network.isConnected || chapter.chapter.img == null)
             holder.imageView.visibility = View.GONE
-        if (chapter.chapter.img != null)
+        if (chapter.chapter.img != null) {
+            Log.e("Piccasso", "Chapter preview: ${chapter.chapter.img}")
             PicassoSingle.get().load(chapter.chapter.img).into(holder.imageView, object : Callback {
                 override fun onSuccess() {
                     holder.imageView.visibility = View.VISIBLE
                 }
 
                 override fun onError(e: java.lang.Exception?) {
-
+                    e?.printStackTrace()
                 }
             })
+        }
         val downloadObject = AtomicReference<DownloadObject>()
         holder.apply {
             fileWrapperJob?.cancel()

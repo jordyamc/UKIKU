@@ -1,5 +1,6 @@
 package knf.kuma
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,18 +13,19 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
 import fr.bmartel.speedtest.model.SpeedTestError
-import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.isTV
 import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
@@ -35,8 +37,7 @@ import knf.kuma.database.CacheDB
 import knf.kuma.databinding.LayoutDiagnosticMaterialBinding
 import knf.kuma.directory.DirectoryService
 import knf.kuma.directory.DirectoryUpdateService
-import knf.tools.bypass.DisplayType
-import knf.tools.bypass.Request
+import knf.kuma.uagen.randomUA
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -147,17 +148,7 @@ class DiagnosticMaterial : GenericActivity() {
                     onClick {
                         startBypass(
                             5546,
-                            Request(
-                                BypassUtil.testLink,
-                                lastUA = PrefsUtil.userAgent,
-                                showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
-                                useFocus = isTV,
-                                maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
-                                useLatestUA = true,
-                                clearCookiesAtStart = true,
-                                displayType = DisplayType.DIALOG,
-                                dialogStyle = AdsUtils.remoteConfigs.getLong("bypass_dialog_style").toInt()
-                            )
+                            BypassUtil.createRequest()
                         )
                     }
                 }
@@ -365,8 +356,20 @@ class DiagnosticMaterial : GenericActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 5546)
+        if (requestCode == 5546) {
+            if (resultCode == Activity.RESULT_OK) {
+                Firebase.analytics.logEvent("bypass_success") {
+                    param("user_agent", data?.getStringExtra("user_agent") ?: "empty")
+                    param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
+                }
+            }
+            data?.let {
+                PrefsUtil.useDefaultUserAgent = false
+                PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()
+                BypassUtil.saveCookies(this, it.getStringExtra("cookies") ?: "null")
+            }
             runNetworkTests()
+        }
     }
 
     companion object {
