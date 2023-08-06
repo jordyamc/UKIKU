@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.securepreferences.SecurePreferences
 import knf.kuma.App
-import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.ads.AdsUtils
 import knf.kuma.player.CustomExoPlayer
@@ -54,7 +53,7 @@ object PrefsUtil {
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
 
     val isAdsEnabled: Boolean
-        get() = (!BuildConfig.DEBUG && !isSubscriptionEnabled && AdsUtils.remoteConfigs.getBoolean("ads_forced")) ||
+        get() = (!isSubscriptionEnabled && AdsUtils.remoteConfigs.getBoolean("ads_forced")) ||
                 PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ads_enabled_new", true)
 
     val downloaderType: Int

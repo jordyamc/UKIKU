@@ -7,7 +7,16 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.SearchSupportFragment
-import androidx.leanback.widget.*
+import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.HeaderItem
+import androidx.leanback.widget.ListRow
+import androidx.leanback.widget.ListRowPresenter
+import androidx.leanback.widget.ObjectAdapter
+import androidx.leanback.widget.OnItemViewClickedListener
+import androidx.leanback.widget.Presenter
+import androidx.leanback.widget.Row
+import androidx.leanback.widget.RowPresenter
+import androidx.leanback.widget.SpeechRecognitionCallback
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import knf.kuma.commons.noCrash
@@ -40,12 +49,6 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
         arrayObjectAdapter?.clear()
         arrayObjectAdapter?.add(ListRow(headerItem, objectAdapter))
         setResult("")
-    }
-
-    override fun onPause() {
-        noCrash {
-            super.onPause()
-        }
     }
 
     private fun checkPermissions() {

@@ -19,7 +19,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -44,14 +43,12 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
-import knf.kuma.ads.AdsUtilsMob
 import knf.kuma.ads.NativeManager
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
 import knf.kuma.backup.MigrationActivity
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.changelog.ChangelogActivityMaterial
 import knf.kuma.commons.*
 import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
@@ -635,7 +632,7 @@ class MainMaterial : GenericActivity(),
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        ChangelogActivityMaterial.check(this)
+        //ChangelogActivityMaterial.check(this)
         UpdateChecker.check(this, this)
     }
 

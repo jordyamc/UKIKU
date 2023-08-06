@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
@@ -34,8 +33,11 @@ import org.json.JSONObject
 import org.jsoup.Connection
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
+import java.net.NoRouteToHostException
 import java.net.SocketTimeoutException
 import java.net.URL
+import java.net.UnknownHostException
+import javax.net.ssl.SSLException
 
 @SuppressLint("SetTextI18n")
 class ConnectionState : LinearLayout {
@@ -90,7 +92,7 @@ class ConnectionState : LinearLayout {
     }
 
     private suspend fun doNetworkTests(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
-        when (withContext(Dispatchers.IO + untilDestroyJob(owner)) {
+        when (val code = withContext(Dispatchers.IO + untilDestroyJob(owner)) {
             doCookiesTest()
         }) {
             -2 -> networkTimeoutState(owner, onShowDialog)
@@ -156,11 +158,24 @@ class ConnectionState : LinearLayout {
                 GenericActivity.addBypassObserver("connectionState", owner, observer)
             }
             else -> {
-                val json = JSONObject(withContext(Dispatchers.IO){ URL("https://ipinfo.io/json").readText() })
-                if (json.getString("country") == "PE") {
-                    errorCountryState(owner, onShowDialog)
-                } else {
-                    networkErrorState(owner, onShowDialog)
+                try {
+                    val json = JSONObject(withContext(Dispatchers.IO) { URL("https://ipinfo.io/json").readText() })
+                    if (json.getString("country") == "PE") {
+                        errorCountryState(owner, onShowDialog)
+                    } else {
+                        networkErrorState(owner = owner, onShowDialog = onShowDialog)
+                    }
+                } catch (e: Exception) {
+                    when (e) {
+                        is UnknownHostException, is NoRouteToHostException, is SSLException -> {
+                            okState()
+                            dismiss()
+                        }
+
+                        else -> {
+                            networkErrorState(owner = owner, message = "HTTP $code Error", onShowDialog = onShowDialog)
+                        }
+                    }
                 }
             }
         }
@@ -179,7 +194,6 @@ class ConnectionState : LinearLayout {
 
     private fun doCookiesTest(): Int {
         return try {
-            Log.e("Bypass test", "UA: ${BypassUtil.userAgent}, Cookies: ${BypassUtil.getMapCookie(App.context)}")
             val timeout = PrefsUtil.timeoutTime.toInt() * 1000
             val response = Jsoup.connect(BypassUtil.testLink)
                     .cookies(BypassUtil.getMapCookie(App.context))
@@ -297,12 +311,12 @@ class ConnectionState : LinearLayout {
         binding.container.onLongClick { setUp(owner, onShowDialog) }
     }
 
-    private fun networkErrorState(owner: LifecycleOwner, onShowDialog: (message: String) -> Unit) {
+    private fun networkErrorState(owner: LifecycleOwner, message: String = "Error desconocido!", onShowDialog: (message: String) -> Unit) {
         binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
         binding.progress.visibility = View.GONE
         binding.icon.setImageResource(R.drawable.ic_error)
         binding.icon.visibility = View.VISIBLE
-        binding.message.text = "Error desconocido!"
+        binding.message.text = message
         binding.message.textColor = Color.WHITE
         binding.container.onClick { onShowDialog("Hubo un error haciendo las pruebas de conexion!") }
         binding.container.onLongClick { setUp(owner, onShowDialog) }

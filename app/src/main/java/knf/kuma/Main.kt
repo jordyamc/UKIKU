@@ -49,7 +49,6 @@ import knf.kuma.backup.Backups
 import knf.kuma.backup.MigrationActivity
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.changelog.ChangelogActivity
 import knf.kuma.commons.*
 import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
@@ -709,7 +708,7 @@ class Main : GenericActivity(),
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        ChangelogActivity.check(this)
+        //ChangelogActivity.check(this)
         UpdateChecker.check(this, this)
     }
 

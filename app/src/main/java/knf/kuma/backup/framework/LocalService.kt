@@ -15,7 +15,7 @@ class LocalService : BackupService() {
 
     private val baseFile by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            safeContext.getExternalFilesDir("backups")!!
+            safeContext.getExternalFilesDir("backups") ?: File(safeContext.filesDir, "backups")
         } else {
             File(Environment.getExternalStorageDirectory(), "UKIKU/backups")
         }

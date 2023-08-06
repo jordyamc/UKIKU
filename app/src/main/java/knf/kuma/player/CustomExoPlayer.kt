@@ -111,7 +111,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                 exoPlayer?.addListener(this@CustomExoPlayer)
                 addMedia(exoPlayer, intent)
                 exoPlayer?.prepare()
-                val canResume = playerState.position != C.TIME_UNSET
+                val canResume = playerState.window >= 0 && playerState.position != C.TIME_UNSET
                 if (canResume)
                     exoPlayer?.seekTo(playerState.window, playerState.position)
                 exoPlayer?.playWhenReady = true

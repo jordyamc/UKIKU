@@ -84,28 +84,23 @@ fun ViewGroup.implBannerCastDeal() {
 
 fun ViewGroup.implBannerDeal(adsType: AdsType) {
     if (PrefsUtil.isAdsEnabled) {
-        GlobalScope.launch g@{
+        GlobalScope.launch(Dispatchers.Main) g@{
             if (this@implBannerDeal.tag == "AdView added")
                 return@g
             if (this@implBannerDeal !is BannerContainerView) {
-                if (Appodeal.isLoaded(Appodeal.NATIVE)) {
+                if (Appodeal.isLoaded(Appodeal.NATIVE) && Appodeal.getAvailableNativeAdsCount() > 0) {
                     addView(NativeAdViewNewsFeed(context, Appodeal.getNativeAds(1).first()))
                     this@implBannerDeal.tag = "AdView added"
                 } else {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        val adView = Appodeal.getBannerView(context)
-                        addView(adView)
-                        this@implBannerDeal.tag = "AdView added"
-                        Appodeal.show(context.findActivity(), Appodeal.BANNER_VIEW)
-                    }
+                    val adView = Appodeal.getBannerView(context)
+                    addView(adView)
+                    this@implBannerDeal.tag = "AdView added"
+                    Appodeal.show(context.findActivity(), Appodeal.BANNER_VIEW)
                 }
             } else {
-                val adView = Appodeal.getBannerView(context)
-                launch(Dispatchers.Main) {
-                    show(adView)
-                    Appodeal.show(context.findActivity(), Appodeal.BANNER_VIEW)
-                    this@implBannerDeal.tag = "AdView added"
-                }
+                show(Appodeal.getBannerView(context))
+                Appodeal.show(context.findActivity(), Appodeal.BANNER_VIEW)
+                this@implBannerDeal.tag = "AdView added"
             }
         }
     }

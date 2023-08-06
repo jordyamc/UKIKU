@@ -1,5 +1,11 @@
 package knf.kuma.custom;
 
+import static android.text.TextUtils.isEmpty;
+import static android.view.Gravity.CENTER_HORIZONTAL;
+import static android.view.View.GONE;
+import static android.widget.LinearLayout.VERTICAL;
+import static java.lang.Boolean.FALSE;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -42,16 +48,12 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+
 import java.util.Collection;
 
-import androidx.annotation.Nullable;
+import knf.kuma.App;
 import knf.kuma.BuildConfig;
-
-import static android.text.TextUtils.isEmpty;
-import static android.view.Gravity.CENTER_HORIZONTAL;
-import static android.view.View.GONE;
-import static android.widget.LinearLayout.VERTICAL;
-import static java.lang.Boolean.FALSE;
 
 /**
  * Basically an animated toast notification with queue support.
@@ -89,7 +91,7 @@ public class AchievementUnlocked {
     private int initialSize = -1;
     //indices of data iterator
     private int index = 0;
-    private Context context;
+    private final Context context;
     private boolean dismissible = false;
     private boolean added = false;
     //achievements data
@@ -1320,9 +1322,7 @@ public class AchievementUnlocked {
         @Override
         public void setVisibility(int visibility) {
             super.setVisibility(visibility);
-            if (visibility != VISIBLE) {
-                setSelected(false);
-            } else setSelected(true);
+            setSelected(visibility == VISIBLE);
         }
 
         @Override
@@ -1495,7 +1495,7 @@ public class AchievementUnlocked {
     final static class DeceleratingInterpolator implements TimeInterpolator {
 
         private final float mLogScale;
-        private int mBase;
+        private final int mBase;
 
         DeceleratingInterpolator(int base) {
             mBase = base;
@@ -1519,17 +1519,17 @@ public class AchievementUnlocked {
     }
 
     private class SwipeDismissTouchListener implements View.OnTouchListener {
-        private int mSlop;
-        private int mMinFlingVelocity;
-        private int mMaxFlingVelocity;
-        private long mAnimationTime;
+        private final int mSlop;
+        private final int mMinFlingVelocity;
+        private final int mMaxFlingVelocity;
+        private final long mAnimationTime;
         private float mDownX;
         private boolean mSwiping;
         private float mTranslationX;
-        private Runnable end;
+        private final Runnable end;
 
         SwipeDismissTouchListener() {
-            ViewConfiguration vc = ViewConfiguration.get(container.getContext());
+            ViewConfiguration vc = ViewConfiguration.get(App.Companion.getContext());
             mSlop = vc.getScaledTouchSlop();
             mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
             mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();

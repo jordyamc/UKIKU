@@ -6,10 +6,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
@@ -36,7 +34,10 @@ class ImgFullFragment : Fragment(R.layout.layout_img_big), PopupMenu.OnMenuItemC
         binding = LayoutImgBigBinding.bind(view)
         binding.img.load(arguments?.getString("img"), object : Callback {
             override fun onSuccess() {
-                bitmap = (binding.img.drawable as BitmapDrawable).bitmap
+                bitmap = (binding.img.drawable as? BitmapDrawable)?.bitmap
+                if (bitmap == null) {
+                    binding.error.visibility = View.VISIBLE
+                }
             }
 
             override fun onError(e: java.lang.Exception?) {

@@ -6,46 +6,35 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.media.AudioManager
-import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import com.github.rubensousa.previewseekbar.PreviewLoader
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.SSLSkipper
 import knf.kuma.commons.doOnUI
-import knf.kuma.commons.findView
 import knf.kuma.commons.noCrash
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
-import knf.kuma.databinding.ExoPlaybackYoutubeControlViewBinding
 import knf.kuma.databinding.PlayerViewBinding
 import knf.kuma.pojos.QueueObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import java.util.concurrent.Future
 
 /**
  * Allows playback of videos that are in a playlist, using [PlayerHolder] to load the and render
@@ -244,11 +233,11 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
                 // If QueueNavigator isn't set, then mediaSessionConnector will not handle following
                 // MediaSession actions (and they won't show up in the minimized PIP activity):
                 // [ACTION_SKIP_PREVIOUS], [ACTION_SKIP_NEXT], [ACTION_SKIP_TO_QUEUE_ITEM]
-                setQueueNavigator(object : TimelineQueueNavigator(mediaSession) {
+                /*setQueueNavigator(object : TimelineQueueNavigator(mediaSession) {
                     override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
-                        return MediaCatalog(mutableListOf(), intent, playList)[windowIndex]
+
                     }
-                })
+                })*/
             }
 
 

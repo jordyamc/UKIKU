@@ -13,14 +13,13 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 202
-        versionName "5.2.4"
+        versionCode 203
+        versionName "5.2.5"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = ["room.schemaLocation":
-                                     "$projectDir/schemas".toString()]
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
     }
@@ -124,7 +123,7 @@ dependencies {
     implementation 'com.github.jordyamc:PersistentSearchView:1.0.10'
     implementation 'com.github.jordyamc:UAGenerator:1.2.0'
     implementation 'com.github.jordyamc:AndroidVideoCache:2.7.6'
-    implementation 'com.github.jordyamc:Cloudflare-Bypasser:1.0.23'
+    implementation 'com.github.jordyamc:Cloudflare-Bypasser:1.0.24'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -177,7 +176,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.2'
     implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.0'
     implementation 'com.beloo.widget:ChipsLayoutManager:0.3.7@aar'
     implementation 'com.google.code.gson:gson:2.9.0'

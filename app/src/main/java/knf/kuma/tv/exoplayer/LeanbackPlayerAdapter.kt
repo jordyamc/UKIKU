@@ -8,8 +8,15 @@ import android.view.SurfaceHolder
 import androidx.leanback.media.PlaybackGlueHost
 import androidx.leanback.media.PlayerAdapter
 import androidx.leanback.media.SurfaceHolderGlueHost
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.ExoPlayerLibraryInfo
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Player.DiscontinuityReason
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.util.ErrorMessageProvider
 import com.google.android.exoplayer2.video.VideoSize
 import knf.kuma.commons.findActivity
@@ -206,11 +213,13 @@ class LeanbackPlayerAdapter
         // SimpleExoplayerView.Callback implementation.
 
         override fun onVideoSizeChanged(videoSize: VideoSize) {
-            callback.onVideoSizeChanged(
-                this@LeanbackPlayerAdapter,
-                videoSize.width,
-                videoSize.height
-            )
+            if (videoSize.width > 0 && videoSize.height > 0) {
+                callback.onVideoSizeChanged(
+                    this@LeanbackPlayerAdapter,
+                    videoSize.width,
+                    videoSize.height
+                )
+            }
         }
 
         override fun onRenderedFirstFrame() {

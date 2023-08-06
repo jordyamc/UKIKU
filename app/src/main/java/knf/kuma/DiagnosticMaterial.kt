@@ -52,6 +52,7 @@ import org.jsoup.Jsoup
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.net.URL
+import java.net.UnknownHostException
 
 class DiagnosticMaterial : GenericActivity() {
 
@@ -87,6 +88,8 @@ class DiagnosticMaterial : GenericActivity() {
             response.statusCode()
         } catch (e: HttpStatusException) {
             e.statusCode
+        } catch (e: UnknownHostException) {
+            404
         }
         networkStatus.mainResult = responseCode
         val loadingTime = System.currentTimeMillis() - startTime

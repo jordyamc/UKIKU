@@ -1,21 +1,21 @@
 package knf.kuma
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.actions.getActionButton
-import com.afollestad.materialdialogs.input.input
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.security.ProviderInstaller
+import com.google.android.ump.ConsentInformation
+import com.google.android.ump.ConsentRequestParameters
+import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.SubscriptionReceiver
-import knf.kuma.commons.*
+import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
 import knf.tools.signatures.getSignatures
@@ -24,8 +24,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
-import java.util.*
 import kotlin.contracts.ExperimentalContracts
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalCoroutinesApi
 @ExperimentalContracts
@@ -61,8 +62,40 @@ class SplashActivity : GenericActivity() {
                 cancelOnTouchOutside(false)
             }*/
             else -> {
-                startApp()
+                lifecycleScope.launch {
+                    showGDPR { startApp() }
+                }
             }
+        }
+    }
+
+    private suspend fun showGDPR(onFinish: () -> Unit) {
+        val consentInfo = UserMessagingPlatform.getConsentInformation(this)
+        val params = ConsentRequestParameters.Builder().apply {
+            setTagForUnderAgeOfConsent(false)
+        }.build()
+        suspendCoroutine {
+            val ok = { it.resume(true) }
+            consentInfo.requestConsentInfoUpdate(this, params, { ok() }, { ok() })
+        }
+        Log.e("GDPR", "On consent, status: ${consentInfo.consentStatus}, available: ${consentInfo.isConsentFormAvailable}")
+        if (consentInfo.consentStatus == ConsentInformation.ConsentStatus.REQUIRED && consentInfo.isConsentFormAvailable) {
+            val form = suspendCoroutine { continuation ->
+                UserMessagingPlatform.loadConsentForm(this,
+                    {
+                        continuation.resume(it)
+                    },
+                    {
+                        continuation.resume(null)
+                    }
+                )
+            }
+            form?.show(this) {
+                Log.e("GDPR", "On form dismiss, obtained: ${consentInfo.consentStatus == ConsentInformation.ConsentStatus.OBTAINED}")
+                onFinish()
+            }
+        } else {
+            onFinish()
         }
     }
 
