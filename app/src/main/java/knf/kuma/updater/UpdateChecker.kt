@@ -1,17 +1,20 @@
 package knf.kuma.updater
 
-import android.content.Context
 import android.util.Log
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import knf.kuma.commons.Network
 import knf.kuma.commons.isFullMode
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 
 object UpdateChecker {
-    fun check(context: Context, listener: CheckListener) {
+    fun check(context: FragmentActivity, listener: CheckListener) {
         if (Network.isConnected && isFullMode)
-            doAsync {
+            context.lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     val document =
                         Jsoup.connect("https://raw.githubusercontent.com/jordyamc/UKIKU/master/version.num")
@@ -24,6 +27,7 @@ object UpdateChecker {
                         )
                     ).toInt()
                     if (nCode > oCode) {
+                        delay(2000)
                         listener.onNeedUpdate(oCode.toString(), nCode.toString())
                     } else {
                         context.filesDir.listFiles()

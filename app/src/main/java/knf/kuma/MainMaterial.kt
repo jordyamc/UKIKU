@@ -215,8 +215,7 @@ class MainMaterial : GenericActivity(),
         }
     }
 
-    private suspend fun checkDirectoryState() {
-        Log.e("Predir", "Check")
+    private fun checkDirectoryState() {
         DirManager.checkPreDir()
         DirectoryService.run(this@MainMaterial)
     }

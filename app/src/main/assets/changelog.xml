@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="204" version="5.2.6">
+        <change type="fix">Error al mostrar dialogo de actualizacion</change>
+        <change type="fix">Error en bypass</change>
+    </release>
     <release code="203" version="5.2.5">
         <change type="fix">Error en bypass</change>
     </release>

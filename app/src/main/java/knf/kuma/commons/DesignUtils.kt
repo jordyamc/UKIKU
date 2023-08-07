@@ -64,14 +64,14 @@ object DesignUtils {
     }
 
     fun listenDesignChange(activity: FragmentActivity){
-        PrefsUtil.getLiveDesignType().observe(activity, {
+        PrefsUtil.getLiveDesignType().observe(activity) {
             noCrash {
                 if (it != lastPref && it.toInt() >= 0) {
                     lastPref = it
                     change(activity, it)
                 }
             }
-        })
+        }
     }
 
 }

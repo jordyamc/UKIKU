@@ -11,9 +11,9 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import knf.kuma.R
-import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.Network
 import knf.kuma.commons.isFullMode
+import knf.kuma.updater.UpdateActivity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.notificationManager
 import org.jsoup.Jsoup
@@ -55,7 +55,7 @@ class UpdateWork(val context: Context, workerParameters: WorkerParameters) : Wor
                     PendingIntent.getActivity(
                         context,
                         5598,
-                        Intent(context, DesignUtils.mainClass),
+                        Intent(context, UpdateActivity::class.java),
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                 )
