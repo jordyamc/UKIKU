@@ -1,12 +1,9 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import android.util.Log
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.jsoupCookies
-import knf.kuma.videoservers.VideoServer.Names.FENIX
 import knf.kuma.videoservers.VideoServer.Names.STREAMWISH
-import org.json.JSONObject
+import java.net.URL
 
 class StreamWishServer internal constructor(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -26,8 +23,8 @@ class StreamWishServer internal constructor(context: Context, baseLink: String) 
         get() {
             return try {
                 val downLink = PatternUtil.extractLink(baseLink)
-                val unpack = Unpacker.unpack(downLink)
-                val link = "file:\"(.*)\"\\}\\],image".toRegex().find(unpack)?.destructured?.component1()
+                val unpack = URL(downLink).readText() //Unpacker.unpack(downLink)
+                val link = "file:\"(.*)\"".toRegex().find(unpack)?.destructured?.component1()
                 VideoServer(name, Option(name, null, link))
             } catch (e: Exception) {
                 e.printStackTrace()
