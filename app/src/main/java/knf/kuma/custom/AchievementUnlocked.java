@@ -1533,8 +1533,7 @@ public class AchievementUnlocked {
             mSlop = vc.getScaledTouchSlop();
             mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
             mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
-            mAnimationTime = container.getContext().getResources().getInteger(
-                    android.R.integer.config_shortAnimTime);
+            mAnimationTime = App.Companion.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime);
             end = new Runnable() {
                 @Override
                 public void run() {

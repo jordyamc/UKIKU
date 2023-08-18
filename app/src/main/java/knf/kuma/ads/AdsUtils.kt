@@ -87,8 +87,8 @@ object AdsUtils {
         }
     }
 
-    val isAdmobEnabled get() = false//remoteConfigs.getBoolean("admob_enabled")
-    val isAppodealEnabled get() = true//remoteConfigs.getBoolean("appodeal_enabled")
+    val isAdmobEnabled get() = remoteConfigs.getBoolean("admob_enabled")
+    val isAppodealEnabled get() = remoteConfigs.getBoolean("appodeal_enabled")
 
     fun setUp() {
         if (isAppodealEnabled) {

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="206" version="5.2.8">
+        <change type="fix">Corrección de bugs</change>
+    </release>
     <release code="205" version="5.2.7">
         <change type="fix">Corrección StreamWish</change>
     </release>

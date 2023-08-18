@@ -11,7 +11,6 @@ import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
-import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeDismiss
 import knf.kuma.custom.BannerContainerView
@@ -34,13 +33,12 @@ class DirectoryFragmentMaterial : BottomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (PrefsUtil.isDirectoryFinished)
-            lifecycleScope.launch(Dispatchers.IO) {
-                delay(1000)
-                noCrash {
-                    find<BannerContainerView>(R.id.adContainer).implBanner(AdsType.DIRECTORY_BANNER, true)
-                }
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000)
+            noCrash {
+                find<BannerContainerView>(R.id.adContainer).implBanner(AdsType.DIRECTORY_BANNER, true)
             }
+        }
     }
 
     override fun onDestroyView() {

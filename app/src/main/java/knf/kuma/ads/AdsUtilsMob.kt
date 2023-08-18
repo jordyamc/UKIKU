@@ -68,7 +68,7 @@ object AdsUtilsMob {
 
     fun setUp() {
         if (!BuildConfig.DEBUG) return
-        val builder = RequestConfiguration.Builder().setTestDeviceIds(listOf("E3C4128C4939EAEB2AEB3AB373256828"))
+        val builder = RequestConfiguration.Builder().setTestDeviceIds(listOf("FE18DCEC5EE5755C3927E4EC30CD4F9D"))
         MobileAds.setRequestConfiguration(builder.build())
     }
 }
@@ -420,27 +420,25 @@ class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenA
 abstract class AbsAdListener : AdListener()
 
 object AdmobID {
-    private val useFallback = AdsUtils.remoteConfigs.getBoolean("admob_use_fallback")
-    val APP_ID get() = if (useFallback) "ca-app-pub-5390653757953587~3146487686" else "ca-app-pub-5390653757953587~9838518341"
-    val RECENT_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/7671520004"
-    val RECENT_BANNER2 get() = if (useFallback) "ca-app-pub-5390653757953587/1833406019" else "ca-app-pub-5390653757953587/9263803277"
-    val FAVORITE_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/3484862982"
-    val FAVORITE_BANNER2 get() = if (useFallback) "ca-app-pub-5390653757953587/1833406019" else "ca-app-pub-5390653757953587/5919454637"
-    val DIRECTORY_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/3243144237"
-    val HOME_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/5095281956"
-    val HOME_BANNER2 get() = if (useFallback) "ca-app-pub-5390653757953587/1833406019" else "ca-app-pub-5390653757953587/9925964473"
-    val EMISSION_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/8320211094"
-    val SEEING_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/2035387232"
-    val RECOMMEND_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/3304715801"
-    val QUEUE_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/6258182200"
-    val RECORD_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/9869042584"
-    val RANDOM_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/9263803277"
-    val NEWS_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/1562628412"
-    val INFO_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/5488026017"
-    val ACHIEVEMENT_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/4233626428"
-    val EXPLORER_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/1041869769"
-    val CAST_BANNER get() = if (useFallback) "ca-app-pub-5390653757953587/3528812824" else "ca-app-pub-5390653757953587/5535283585"
-    val LIST_NATIVE get() = if (useFallback) "ca-app-pub-5390653757953587/6115625326" else "ca-app-pub-5390653757953587/5447863415"
-    val REWARDED get() = if (useFallback) "ca-app-pub-5390653757953587/9902649482" else "ca-app-pub-5390653757953587/5420761189"
-    val INTERSTITIAL get() = if (useFallback) "ca-app-pub-5390653757953587/7928041071" else "ca-app-pub-5390653757953587/5880297311"
+    const val RECENT_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val RECENT_BANNER2 = "ca-app-pub-8896186846999141/5663284088"
+    const val FAVORITE_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val FAVORITE_BANNER2 = "ca-app-pub-8896186846999141/5663284088"
+    const val DIRECTORY_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val HOME_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val HOME_BANNER2 = "ca-app-pub-8896186846999141/5663284088"
+    const val EMISSION_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val SEEING_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val RECOMMEND_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val QUEUE_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val RECORD_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val RANDOM_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val NEWS_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val INFO_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val ACHIEVEMENT_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val EXPLORER_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val CAST_BANNER = "ca-app-pub-8896186846999141/5663284088"
+    const val LIST_NATIVE = "ca-app-pub-8896186846999141/5113437989"
+    const val REWARDED = "ca-app-pub-8896186846999141/9219385713"
+    const val INTERSTITIAL = "ca-app-pub-8896186846999141/7231764047"
 }

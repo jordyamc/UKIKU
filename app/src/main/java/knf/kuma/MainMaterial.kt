@@ -34,7 +34,6 @@ import com.appodeal.ads.Appodeal
 import com.appodeal.ads.initializing.ApdInitializationCallback
 import com.appodeal.ads.initializing.ApdInitializationError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -125,10 +124,6 @@ class MainMaterial : GenericActivity(),
         MobileAds.initialize(this) {
             NativeManager
         }
-        MobileAds.setRequestConfiguration(
-            RequestConfiguration.Builder()
-                .setTestDeviceIds(listOf("A7538543A53633612D25FDE0B64A4AEE")).build()
-        )
         Appodeal.initialize(this, "194ea6b7f4ce96f47f0ba841e344eff5a56916e84012691f", Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO or Appodeal.NATIVE, object : ApdInitializationCallback {
             override fun onInitializationFinished(errors: List<ApdInitializationError>?) {
                 errors?.forEach {
