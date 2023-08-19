@@ -2,12 +2,15 @@ package knf.kuma.ads
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appodeal.ads.Appodeal
 import com.appodeal.ads.InterstitialCallbacks
 import com.appodeal.ads.RewardedVideoCallbacks
+import com.appodeal.ads.initializing.ApdInitializationCallback
+import com.appodeal.ads.initializing.ApdInitializationError
 import com.appodeal.ads.native_ad.views.NativeAdViewNewsFeed
 import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
@@ -32,7 +35,19 @@ import xdroid.toaster.Toaster.toast
 
 object AdsUtilsAppodeal {
 
-    fun setUp() {
+    fun setUp(context: Activity, callback: () -> Unit) {
+        Appodeal.initialize(context, "194ea6b7f4ce96f47f0ba841e344eff5a56916e84012691f", Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO or Appodeal.NATIVE, object :
+            ApdInitializationCallback {
+            override fun onInitializationFinished(errors: List<ApdInitializationError>?) {
+                errors?.forEach {
+                    Log.e("Appodeal", "Init error: ${it.message}")
+                    it.printStackTrace()
+                }
+                Appodeal.cache(context, Appodeal.NATIVE, 3)
+                callback()
+                //Appodeal.startTestActivity(this@MainMaterial)
+            }
+        })
         if (!BuildConfig.DEBUG) return
         //Appodeal.setTesting(true)
     }

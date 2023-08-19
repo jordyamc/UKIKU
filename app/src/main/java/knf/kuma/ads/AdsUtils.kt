@@ -1,6 +1,7 @@
 package knf.kuma.ads
 
 import android.app.Activity
+import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.AdSize
@@ -90,12 +91,14 @@ object AdsUtils {
     val isAdmobEnabled get() = remoteConfigs.getBoolean("admob_enabled")
     val isAppodealEnabled get() = remoteConfigs.getBoolean("appodeal_enabled")
 
-    fun setUp() {
+    fun setUp(context: Activity, callback: () -> Unit) {
         if (isAppodealEnabled) {
-            AdsUtilsAppodeal.setUp()
+            Log.e("ADS", "Appodeal enabled")
+            AdsUtilsAppodeal.setUp(context, callback)
         }
         if (isAdmobEnabled) {
-            AdsUtilsMob.setUp()
+            Log.e("ADS", "Admob enabled")
+            AdsUtilsMob.setUp(context, callback)
         }
     }
 }

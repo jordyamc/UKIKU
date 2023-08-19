@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -30,10 +29,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.appodeal.ads.Appodeal
-import com.appodeal.ads.initializing.ApdInitializationCallback
-import com.appodeal.ads.initializing.ApdInitializationError
-import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -42,7 +37,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
-import knf.kuma.ads.NativeManager
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
 import knf.kuma.backup.MigrationActivity
@@ -121,21 +115,6 @@ class MainMaterial : GenericActivity(),
             finish()
             return
         }
-        MobileAds.initialize(this) {
-            NativeManager
-        }
-        Appodeal.initialize(this, "194ea6b7f4ce96f47f0ba841e344eff5a56916e84012691f", Appodeal.BANNER or Appodeal.INTERSTITIAL or Appodeal.REWARDED_VIDEO or Appodeal.NATIVE, object : ApdInitializationCallback {
-            override fun onInitializationFinished(errors: List<ApdInitializationError>?) {
-                errors?.forEach {
-                    Log.e("Appodeal", "Init error: ${it.message}")
-                    it.printStackTrace()
-                }
-                Appodeal.cache(this@MainMaterial, Appodeal.NATIVE, 3)
-                //Appodeal.startTestActivity(this@MainMaterial)
-            }
-        })
-        //NativeManager
-        AdsUtils.setUp()
         FirebaseAnalytics.getInstance(this)
             .setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
         try {

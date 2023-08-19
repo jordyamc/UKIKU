@@ -66,7 +66,11 @@ object AdsUtilsMob {
     val adRequest: AdRequest get() = AdRequest.Builder().build()
     val ACHIEVEMENT_NATIVE = "achievement_native"
 
-    fun setUp() {
+    fun setUp(context: Activity, callback: () -> Unit) {
+        MobileAds.initialize(context) {
+            NativeManager
+            callback()
+        }
         if (!BuildConfig.DEBUG) return
         val builder = RequestConfiguration.Builder().setTestDeviceIds(listOf("FE18DCEC5EE5755C3927E4EC30CD4F9D"))
         MobileAds.setRequestConfiguration(builder.build())
