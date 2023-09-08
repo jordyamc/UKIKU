@@ -246,7 +246,6 @@ class ServersFactory {
                                             else -> jsonObject.getJSONArray("SUB")
                                         }
                                 for (baseLink in jsonArray) {
-                                    Log.e("Link", "Process ${baseLink}")
                                     val server = Server.check(context, baseLink.optString("code"))
                                     if (server != null) {
                                         try {
@@ -285,7 +284,6 @@ class ServersFactory {
                 }
                 val jsonArray = jsonObject.getJSONArray(if (jsonObject.has("SUB")) "SUB" else "LAT")
                 for (baseLink in jsonArray) {
-                    Log.e("Link", "Process ${baseLink}")
                     val server = Server.check(context, baseLink.optString("code"))
                     if (server != null) {
                         try {

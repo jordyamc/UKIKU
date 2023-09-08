@@ -156,9 +156,13 @@ class SplashActivity : GenericActivity() {
             installSecurityProvider()
             DesignUtils.change(this@SplashActivity, start = false)
             AdsUtils.remoteConfigs.ensureInitialized().addOnCompleteListener {
+                var initializated = false
                 AdsUtils.setUp(this@SplashActivity) {
-                    startActivity(Intent(this@SplashActivity, DesignUtils.mainClass))
-                    finish()
+                    if (!initializated) {
+                        initializated = true
+                        startActivity(Intent(this@SplashActivity, DesignUtils.mainClass))
+                        finish()
+                    }
                 }
             }
         }

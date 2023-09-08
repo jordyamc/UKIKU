@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="207" version="5.2.9">
+        <change type="fix">Corrección de Streamwish para algunos capitulos viejos</change>
+    </release>
     <release code="206" version="5.2.8">
         <change type="fix">Corrección de bugs</change>
     </release>

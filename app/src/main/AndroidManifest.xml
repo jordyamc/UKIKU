@@ -313,7 +313,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-8896186846999141~6494272184" />
+            android:value="${admobID}" />
         <!--<meta-data
             android:name="com.google.android.gms.ads.flag.rtb_enabled"
             android:value="false"/>-->
@@ -357,14 +357,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/ver/"
-                    android:scheme="https" />
-                <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/ver/"
-                    android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="animeflv.net" />
+                <data android:pathPrefix="/ver/" />
+                <data android:scheme="http" />
             </intent-filter>
         </activity>
         <activity android:name=".custom.ThemedControlsActivity" />

@@ -13,8 +13,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 206
-        versionName "5.2.8"
+        versionCode 207
+        versionName "5.2.9"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -25,6 +25,7 @@ android {
     }
     buildTypes {
         debug {
+            manifestPlaceholders.admobID = localProperties['UKIKU_ADMOB_ID'] ?: ""
             buildConfigField "String", "IAB_KEY", localProperties['APPCOINS_IAB_KEY'] ?: ""
             buildConfigField "String", "IAB_UPDATE_ACTION", localProperties['APPCOINS_IAB_UPDATE_ACTION'] ?: ""
             buildConfigField "String", "IAB_BIND_ACTION", localProperties['APPCOINS_DEV_IAB_BIND_ACTION'] ?: ""
@@ -44,6 +45,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-android.txt'
+            manifestPlaceholders.admobID = localProperties['UKIKU_ADMOB_ID'] ?: ""
             buildConfigField "String", "IAB_KEY", localProperties['APPCOINS_IAB_KEY'] ?: ""
             buildConfigField "String", "IAB_UPDATE_ACTION", localProperties['APPCOINS_IAB_UPDATE_ACTION'] ?: ""
             buildConfigField "String", "IAB_BIND_ACTION", localProperties['APPCOINS_DEV_IAB_BIND_ACTION'] ?: ""

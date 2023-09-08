@@ -1,13 +1,9 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.iterator
-import knf.kuma.uagen.randomLatestUA
-import knf.kuma.uagen.randomWindowsUA
 import knf.kuma.videoservers.VideoServer.Names.OKRU
-import kotlinx.coroutines.runBlocking
 import org.apache.commons.text.StringEscapeUtils
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -42,7 +38,7 @@ class OkruServer(context: Context, baseLink: String) : Server(context, baseLink)
                         "ultra" -> "4000p"
                         else -> "Default"
                     }
-                    options.add(Option(this.name, name, url, Headers().apply { addHeader("User-Agent", HttpConnection.DEFAULT_UA) }))//mapOf("User-agent" to userAgent)
+                    options.add(Option(this.name, name, url, Headers { add("User-Agent" to HttpConnection.DEFAULT_UA) }))//mapOf("User-agent" to userAgent)
                 }
                 check(options.isNotEmpty())
                 return VideoServer(OKRU, options, true)

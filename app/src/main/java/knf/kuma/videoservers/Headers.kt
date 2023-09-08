@@ -10,6 +10,10 @@ class Headers : Parcelable {
 
     constructor()
 
+    constructor(block: MutableList<Pair<String, String>>.() -> Unit) {
+        block(headers)
+    }
+
     constructor(parcel: Parcel) {
         headers = parcel.readArrayList(null)?.filterIsInstance<Pair<String, String>>() as MutableList<Pair<String, String>>
         cookies = parcel.readArrayList(null)?.filterIsInstance<Pair<String, String>>() as MutableList<Pair<String, String>>
@@ -68,6 +72,10 @@ class Headers : Parcelable {
             parcel.writeList(headers as List<*>?)
             parcel.writeList(cookies as List<*>?)
         }
+    }
+
+    override fun toString(): String {
+        return createHeadersList().toString()
     }
 
     companion object CREATOR : Parcelable.Creator<Headers> {

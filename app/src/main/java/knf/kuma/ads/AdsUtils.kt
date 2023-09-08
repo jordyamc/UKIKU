@@ -17,6 +17,7 @@ import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
+import org.nield.kotlinstatistics.weightedCoinFlip
 
 enum class AdsType {
     RECENT_BANNER,
@@ -56,6 +57,7 @@ object AdsUtils {
                 "appodeal_enabled" to false,
                 "admob_use_fallback" to false,
                 "ads_forced" to false,
+                "ads_remote" to 1.0,
                 "admob_percent" to 100.0,
                 "appodeal_percent" to 100.0,
                 "appbrains_percent" to 0.0,
@@ -88,10 +90,18 @@ object AdsUtils {
         }
     }
 
+    val isRemoteAdsEnabled by lazy {
+        weightedCoinFlip(remoteConfigs.getDouble("ads_remote"))
+    }
     val isAdmobEnabled get() = remoteConfigs.getBoolean("admob_enabled")
     val isAppodealEnabled get() = remoteConfigs.getBoolean("appodeal_enabled")
 
     fun setUp(context: Activity, callback: () -> Unit) {
+        if (!isRemoteAdsEnabled || !listOf(isAdmobEnabled, isAdmobEnabled).any { it }) {
+            Log.e("ADS", "All disabled")
+            callback()
+            return
+        }
         if (isAppodealEnabled) {
             Log.e("ADS", "Appodeal enabled")
             AdsUtilsAppodeal.setUp(context, callback)
@@ -104,7 +114,7 @@ object AdsUtils {
 }
 
 fun MutableList<RecentObject>.implAdsRecent() {
-    if (PrefsUtil.isAdsEnabled)
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled)
         noCrash {
             diceOf({ implAdsRecentBrains() }) {
                 if (AdsUtils.isAdmobEnabled)
@@ -118,100 +128,106 @@ fun MutableList<RecentObject>.implAdsRecent() {
 }
 
 fun MutableList<FavoriteObject>.implAdsFavorite() {
-    noCrash {
-        diceOf({ implAdsFavoriteBrains() }) {
-            if (AdsUtils.isAdmobEnabled)
-                put({ implAdsFavoriteMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
-            if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implAdsFavoriteBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-            if (AdsUtils.isAppodealEnabled)
-                put({ implAdsFavoriteDeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
-        }()
-    }
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled)
+        noCrash {
+            diceOf({ implAdsFavoriteBrains() }) {
+                if (AdsUtils.isAdmobEnabled)
+                    put({ implAdsFavoriteMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
+                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
+                    put({ implAdsFavoriteBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                if (AdsUtils.isAppodealEnabled)
+                    put({ implAdsFavoriteDeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
+            }()
+        }
 }
 
 fun MutableList<NewsObject>.implAdsNews() {
-    noCrash {
-        diceOf({ implAdsNewsBrain() }) {
-            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                put({ implAdsNewsMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
-            if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implAdsNewsBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-            if (AdsUtils.isAppodealEnabled)
-                put({ implAdsNewsDeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
-        }()
-    }
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled)
+        noCrash {
+            diceOf({ implAdsNewsBrain() }) {
+                if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
+                    put({ implAdsNewsMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
+                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
+                    put({ implAdsNewsBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                if (AdsUtils.isAppodealEnabled)
+                    put({ implAdsNewsDeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
+            }()
+        }
 }
 
 fun MutableList<Achievement>.implAdsAchievement() {
-    noCrash {
-        diceOf({ implAdsAchievementBrain() }) {
-            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                put({ implAdsAchievementMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
-            if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put({ implAdsAchievementBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-            if (AdsUtils.isAppodealEnabled)
-                put({ implAdsAchievementDeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
-        }()
-    }
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled)
+        noCrash {
+            diceOf({ implAdsAchievementBrain() }) {
+                if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
+                    put({ implAdsAchievementMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
+                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
+                    put({ implAdsAchievementBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
+                if (AdsUtils.isAppodealEnabled)
+                    put({ implAdsAchievementDeal() }, AdsUtils.remoteConfigs.getDouble("appodeal_percent"))
+            }()
+        }
 }
 
 fun ViewGroup.implBannerCast() {
-    noCrash {
-        diceOf({ implBannerCastBrains() }) {
-            if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                put({ implBannerCastMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
-            if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put(
-                    { implBannerCastBrains() },
-                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
-                )
-        }()
-    }
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled)
+        noCrash {
+            diceOf({ implBannerCastBrains() }) {
+                if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
+                    put({ implBannerCastMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
+                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
+                    put(
+                        { implBannerCastBrains() },
+                        AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                    )
+            }()
+        }
 }
 
 fun ViewGroup.implBanner(unitID: String, isSmart: Boolean = false) {
-    noCrash {
-        diceOf({ implBannerBrains(unitID, isSmart) }) {
-            if (AdsUtils.isAdmobEnabled)
-                put(
-                    { implBannerMob(unitID, isSmart) },
-                    AdsUtils.remoteConfigs.getDouble("admob_percent")
-                )
-            if (AdsUtils.isAppodealEnabled)
-                put(
-                    { implBannerDeal(AdsType.RECENT_BANNER) },
-                    AdsUtils.remoteConfigs.getDouble("appodeal_percent")
-                )
-            if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put(
-                    { implBannerBrains(unitID, isSmart) },
-                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
-                )
-        }()
-    }
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled)
+        noCrash {
+            diceOf({ implBannerBrains(unitID, isSmart) }) {
+                if (AdsUtils.isAdmobEnabled)
+                    put(
+                        { implBannerMob(unitID, isSmart) },
+                        AdsUtils.remoteConfigs.getDouble("admob_percent")
+                    )
+                if (AdsUtils.isAppodealEnabled)
+                    put(
+                        { implBannerDeal(AdsType.RECENT_BANNER) },
+                        AdsUtils.remoteConfigs.getDouble("appodeal_percent")
+                    )
+                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
+                    put(
+                        { implBannerBrains(unitID, isSmart) },
+                        AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                    )
+            }()
+        }
 }
 
 fun ViewGroup.implBanner(unitID: AdsType, isSmart: Boolean = false) {
-    noCrash {
-        diceOf({ implBannerBrains(unitID, isSmart) }) {
-            if (AdsUtils.isAdmobEnabled)
-                put(
-                    { implBannerMob(unitID, isSmart) },
-                    AdsUtils.remoteConfigs.getDouble("admob_percent")
-                )
-            if (AdsUtils.isAppodealEnabled)
-                put(
-                    { implBannerDeal(unitID) },
-                    AdsUtils.remoteConfigs.getDouble("appodeal_percent")
-                )
-            if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                put(
-                    { implBannerBrains(unitID, isSmart) },
-                    AdsUtils.remoteConfigs.getDouble("appbrains_percent")
-                )
-        }()
-    }
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled)
+        noCrash {
+            diceOf({ implBannerBrains(unitID, isSmart) }) {
+                if (AdsUtils.isAdmobEnabled)
+                    put(
+                        { implBannerMob(unitID, isSmart) },
+                        AdsUtils.remoteConfigs.getDouble("admob_percent")
+                    )
+                if (AdsUtils.isAppodealEnabled)
+                    put(
+                        { implBannerDeal(unitID) },
+                        AdsUtils.remoteConfigs.getDouble("appodeal_percent")
+                    )
+                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
+                    put(
+                        { implBannerBrains(unitID, isSmart) },
+                        AdsUtils.remoteConfigs.getDouble("appbrains_percent")
+                    )
+            }()
+        }
 }
 
 fun getFAdLoaderRewarded(context: Activity, onUpdate: () -> Unit = {}): FullscreenAdLoader =
@@ -255,7 +271,7 @@ fun showRandomInterstitial(
     context: AppCompatActivity,
     probability: Float = PrefsUtil.fullAdsProbability
 ) {
-    if (PrefsUtil.isAdsEnabled && PrefsUtil.isFullAdsEnabled && probability > 0) {
+    if (AdsUtils.isRemoteAdsEnabled && PrefsUtil.isAdsEnabled && PrefsUtil.isFullAdsEnabled && probability > 0) {
         val probDefault = 100f - probability
         diceOf<() -> Unit> {
             if (AdsUtils.isAdmobEnabled)
