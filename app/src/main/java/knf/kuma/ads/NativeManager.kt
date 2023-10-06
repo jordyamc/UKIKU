@@ -6,8 +6,13 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.NativeAd
 import knf.kuma.App
 import knf.kuma.commons.Network
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -20,11 +25,11 @@ object NativeManager {
         cacheAds()
     }
 
-    suspend fun take(scope: CoroutineScope, size: Int, tryCount: Int = 0, callback: TakeCallback) {
+    suspend fun take(scope: CoroutineScope, size: Int, tryCount: Int = 0, callback: TakeCallback<NativeAd>) {
         val operation = suspend {
-            scope.launch{
+            scope.launch {
                 if (internalSize >= size) {
-                    launch(Dispatchers.Main){
+                    launch(Dispatchers.Main) {
                         callback(suspendCoroutine {
                             launch {
                                 val pendingList = mutableListOf<NativeAd>()
@@ -103,4 +108,4 @@ object NativeManager {
 }
 
 typealias PendingCallback = suspend () -> Unit
-typealias TakeCallback = (List<NativeAd>) -> Unit
+typealias TakeCallback<T> = (List<T>) -> Unit

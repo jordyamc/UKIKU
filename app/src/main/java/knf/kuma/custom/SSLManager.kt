@@ -1,5 +1,6 @@
 package knf.kuma.custom
 
+import knf.kuma.commons.isMIUI
 import knf.kuma.commons.noCrash
 import java.security.SecureRandom
 import java.security.cert.CertificateException
@@ -36,10 +37,15 @@ object SSLManager {
         })
 
         try {
-            val sslContext = SSLContext.getInstance("SSL")
-            sslContext.init(null, trustAllCerts, SecureRandom())
-
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.socketFactory)
+            val sslContext = SSLContext.getInstance("SSL").apply {
+                init(null, trustAllCerts, SecureRandom())
+            }
+            val factory = if (isMIUI) {
+                TlsOnlySocketFactory(sslContext.socketFactory)
+            } else {
+                sslContext.socketFactory
+            }
+            HttpsURLConnection.setDefaultSSLSocketFactory(factory)
         } catch (e: Exception) {
             e.printStackTrace()
         }

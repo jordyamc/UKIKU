@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import knf.kuma.App
-import okhttp3.OkHttpClient
 
 object PicassoSingle {
     @SuppressLint("StaticFieldLeak")
@@ -17,13 +16,16 @@ object PicassoSingle {
     }
 
     private fun create(): Picasso = Picasso.Builder(App.context)
-        .downloader(OkHttp3Downloader(OkHttpClient().newBuilder().addInterceptor {
-            val nRequest = it.request().newBuilder().apply {
-                addHeader("Cookie", BypassUtil.getStringCookie(App.context))
-                addHeader("User-Agent", BypassUtil.userAgent)
+        .downloader(OkHttp3Downloader(NoSSLOkHttpClient.get().newBuilder()
+            .addInterceptor {
+                val nRequest = it.request().newBuilder().apply {
+                    addHeader("Cookie", BypassUtil.getStringCookie(App.context))
+                    addHeader("User-Agent", BypassUtil.userAgent)
+                }.build()
+                it.proceed(nRequest)
             }.build()
-            it.proceed(nRequest)
-        }.build())).build()
+        )
+        ).build()
 
     fun clear() {
         picasso = create()

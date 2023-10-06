@@ -6,15 +6,18 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.changelog.objects.Changelog
 import knf.kuma.commons.EAHelper
-import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.databinding.RecyclerChangelogBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
@@ -88,7 +91,8 @@ class ChangelogActivity : GenericActivity() {
                     val cCode = PreferenceManager.getDefaultSharedPreferences(activity).getInt("version_code", 0)
                     val pCode = PackageInfoCompat.getLongVersionCode(activity.packageManager.getPackageInfo(activity.packageName, 0)).toInt()
                     if (pCode > cCode && cCode != 0) {
-                        activity.doOnUI {
+                        activity.lifecycleScope.launch(Dispatchers.Main) {
+                            delay(2000)
                             MaterialDialog(activity).safeShow {
                                 message(text = "Nueva versión, ¿Leer Changelog?")
                                 positiveButton(text = "Leer") {

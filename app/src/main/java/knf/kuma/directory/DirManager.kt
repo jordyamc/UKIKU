@@ -13,13 +13,13 @@ import java.net.URL
 object DirManager {
 
     fun checkPreDir(forced: Boolean = false) {
-        if (forced || CacheDB.INSTANCE.animeDAO().count < 3200) {
+        if (forced || CacheDB.INSTANCE.animeDAO().count < 3500) {
             doOnUIGlobal {
                 DirectoryService.setStatus(DirectoryService.STATE_CACHED)
             }
             noCrash {
                 val info = JSONObject(URL("https://ukiku.app/dirs/directoryInfo.json").readText())
-                for (index in 0..6) {
+                for (index in 0 until info.keys().asSequence().count()) {
                     val json = info.getJSONObject(index.toString())
                     if (!CacheDB.INSTANCE.animeDAO().hasRange(json.getString("idF"), json.getString("idL"))) {
                         val sliceJson = URL("https://ukiku.app/dirs/directory$index.json").readText()

@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -162,11 +163,12 @@ class MainMaterial : GenericActivity(),
             RecentsNotReceiver.removeAll(this@MainMaterial)
             EAHelper.clear1()
             verifiyFF()
-            //saveDir()
+            saveDir()
         }
     }
 
     private fun saveDir() {
+        if (!BuildConfig.DEBUG) return
         val lists = CacheDB.INSTANCE.animeDAO().all.chunked(500)
         var number = 0
         val json = JSONObject()
@@ -182,11 +184,13 @@ class MainMaterial : GenericActivity(),
                 file.writeText(Gson().toJson(list))
             }
             number++
+            Log.e("Dir files", "Process chunk: $number")
         }
         val file = File(getExternalFilesDir(null), "directoryInfo.json")
         if (!file.exists()) {
             file.createNewFile()
             file.writeText(json.toString())
+            Log.e("Dir files", "Save finished")
         }
     }
 

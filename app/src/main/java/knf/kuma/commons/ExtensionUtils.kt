@@ -718,32 +718,29 @@ fun <T: View> FragmentActivity.findView(@IdRes id: Int): Lazy<T> = object : Lazy
     }
 }
 
-fun isMIUI(ctx: Context): Boolean {
-    return isIntentResolved(
-        ctx,
-        Intent("miui.intent.action.OP_AUTO_START").addCategory(Intent.CATEGORY_DEFAULT)
-    )
-            || isIntentResolved(
-        ctx,
-        Intent().setComponent(
-            ComponentName(
-                "com.miui.securitycenter",
-                "com.miui.permcenter.autostart.AutoStartManagementActivity"
+val isMIUI: Boolean by lazy {
+    Build.MANUFACTURER.lowercase().contains("huawei") ||
+            Build.BRAND.contains("huawei") ||
+            isIntentResolved(
+                safeContext,
+                Intent("miui.intent.action.OP_AUTO_START").addCategory(Intent.CATEGORY_DEFAULT)
+            ) ||
+            isIntentResolved(
+                safeContext,
+                Intent().setComponent(
+                    ComponentName(
+                        "com.miui.securitycenter",
+                        "com.miui.permcenter.autostart.AutoStartManagementActivity"
+                    )
+                )
             )
-        )
+            || isIntentResolved(
+        safeContext, Intent("miui.intent.action.POWER_HIDE_MODE_APP_LIST").addCategory(Intent.CATEGORY_DEFAULT)
     )
             || isIntentResolved(
-        ctx, Intent("miui.intent.action.POWER_HIDE_MODE_APP_LIST").addCategory(
-            Intent.CATEGORY_DEFAULT
-        )
-    )
-            || isIntentResolved(
-        ctx,
+        safeContext,
         Intent().setComponent(
-            ComponentName(
-                "com.miui.securitycenter",
-                "com.miui.powercenter.PowerSettings"
-            )
+            ComponentName("com.miui.securitycenter", "com.miui.powercenter.PowerSettings")
         )
     )
 }

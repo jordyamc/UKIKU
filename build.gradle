@@ -31,9 +31,7 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
-        maven {
-            url "https://artifactory.appodeal.com/appodeal"
-        }
+        maven { url "https://android-sdk.is.com" }
         maven {
             url 'https://swisscodemonkeys.github.io/appbrain-sdk/maven'
         }

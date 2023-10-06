@@ -1,5 +1,6 @@
 package knf.kuma.commons
 
+import knf.kuma.custom.TlsOnlySocketFactory
 import okhttp3.Cache
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
@@ -38,9 +39,14 @@ object NoSSLOkHttpClient {
                     return arrayOf()
                 }
             })
-            val sslContext = SSLContext.getInstance("SSL")
-            sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-            val sslSocketFactory = sslContext.socketFactory
+            val sslContext = SSLContext.getInstance("SSL").apply {
+                init(null, trustAllCerts, java.security.SecureRandom())
+            }
+            val sslSocketFactory = if (isMIUI) {
+                TlsOnlySocketFactory(sslContext.socketFactory)
+            } else {
+                sslContext.socketFactory
+            }
             val builder = OkHttpClient.Builder().apply {
                 connectTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)
                 readTimeout(PrefsUtil.timeoutTime, TimeUnit.SECONDS)

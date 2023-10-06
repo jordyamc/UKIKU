@@ -285,7 +285,7 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 Log.e("Ad", "Ad failed to load, code: ${p0.code}")
                 GlobalScope.launch(Dispatchers.Main) {
-                    delay(3000)
+                    delay(2000)
                     if (!context.isFinishing) {
                         createAndLoadRewardAd()
                     }
@@ -313,6 +313,7 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
 
     override fun show() {
         when {
+            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
             rewardedAd != null -> showRewarded()
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
             else -> toast("Anuncio aún cargando...")
@@ -333,7 +334,7 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 Log.e("Ad", "Ad failed to load, code: ${p0.code}")
                 GlobalScope.launch(Dispatchers.Main) {
-                    delay(333)
+                    delay(2000)
                     if (!context.isFinishing) {
                         createAndLoad()
                     }
@@ -348,6 +349,7 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
 
     override fun show() {
         when {
+            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
             interstitialAd != null -> {
                 interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                     override fun onAdDismissedFullScreenContent() {

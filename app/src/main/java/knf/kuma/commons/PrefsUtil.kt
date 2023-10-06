@@ -60,7 +60,7 @@ object PrefsUtil {
         get() = Integer.parseInt(
             PreferenceManager.getDefaultSharedPreferences(context)
                 .getString("downloader_type", null)
-                ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isMIUI(safeContext)) "0" else "1"
+                ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isMIUI) "0" else "1"
         )
 
     var autoBackupTime: String
