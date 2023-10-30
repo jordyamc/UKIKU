@@ -242,7 +242,7 @@ class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: ()
 }
 
 class FAdLoaderRewardedLovin(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
-    private var rewardedAd: MaxRewardedAd = MaxRewardedAd.getInstance("e5f776a3ccb9282e", context)
+    private var rewardedAd: MaxRewardedAd = MaxRewardedAd.getInstance("e3b2506478ae074c", context)
     private var isLoading = false
 
     init {
