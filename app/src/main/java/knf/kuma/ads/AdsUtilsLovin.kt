@@ -10,8 +10,12 @@ import androidx.lifecycle.lifecycleScope
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxAdListener
 import com.applovin.mediation.MaxError
+import com.applovin.mediation.MaxReward
+import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxAdView
 import com.applovin.mediation.ads.MaxInterstitialAd
+import com.applovin.mediation.ads.MaxRewardedAd
+import com.applovin.sdk.AppLovinPrivacySettings
 import com.applovin.sdk.AppLovinSdk
 import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
@@ -38,7 +42,14 @@ object AdsUtilsLovin {
     fun setUp(context: Activity, callback: () -> Unit) {
         AppLovinSdk.getInstance(context).apply {
             mediationProvider = "max"
-            initializeSdk()
+            initializeSdk {
+                if (!AppLovinPrivacySettings.hasUserConsent(context)) {
+                    AppLovinPrivacySettings.setHasUserConsent(true, context)
+                    AppLovinPrivacySettings.setIsAgeRestrictedUser(false, context)
+                    AppLovinPrivacySettings.setDoNotSell(false, context)
+                }
+                callback()
+            }
         }
     }
 }
@@ -170,6 +181,7 @@ fun ViewGroup.implBannerLovin() {
 }
 
 fun getFAdLoaderInterstitialLovin(context: Activity, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderInterstitialLovin(context, onUpdate)
+fun getFAdLoaderRewardedLovin(context: Activity, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderRewardedLovin(context, onUpdate)
 
 class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
     private var interstitialAd: MaxInterstitialAd = MaxInterstitialAd("e5f776a3ccb9282e", context)
@@ -178,6 +190,7 @@ class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: ()
     init {
         isLoading = true
         interstitialAd.setListener(object : MaxAdListener {
+            var isClicked = false
             override fun onAdLoaded(p0: MaxAd?) {
                 isLoading = false
             }
@@ -193,12 +206,16 @@ class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: ()
                 isLoading = true
                 interstitialAd.loadAd()
                 FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
-                Economy.reward(false)
+                Economy.reward(isClicked)
+                isClicked = false
                 onUpdate()
             }
 
             override fun onAdDisplayed(p0: MaxAd?) {}
-            override fun onAdClicked(p0: MaxAd?) {}
+            override fun onAdClicked(p0: MaxAd?) {
+                isClicked = true
+            }
+
             override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {}
         })
         interstitialAd.loadAd()
@@ -224,6 +241,63 @@ class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: ()
     }
 }
 
+class FAdLoaderRewardedLovin(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
+    private var rewardedAd: MaxRewardedAd = MaxRewardedAd.getInstance("e5f776a3ccb9282e", context)
+    private var isLoading = false
+
+    init {
+        isLoading = true
+        rewardedAd.setListener(object : MaxRewardedAdListener {
+            var isClicked = false
+            override fun onAdLoaded(p0: MaxAd?) {
+                isLoading = false
+            }
+
+            override fun onAdDisplayed(p0: MaxAd?) {}
+            override fun onAdHidden(p0: MaxAd?) {
+                isClicked = false
+                isLoading = true
+                rewardedAd.loadAd()
+                onUpdate()
+            }
+
+            override fun onAdClicked(p0: MaxAd?) {
+                isClicked = true
+            }
+
+            override fun onAdLoadFailed(p0: String?, p1: MaxError?) {}
+            override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {}
+            override fun onUserRewarded(p0: MaxAd?, p1: MaxReward?) {
+                FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
+                Economy.reward(isClicked)
+            }
+
+            override fun onRewardedVideoStarted(p0: MaxAd?) {}
+            override fun onRewardedVideoCompleted(p0: MaxAd?) {}
+        })
+        rewardedAd.loadAd()
+    }
+
+    override fun load() {
+        if (!isLoading && !rewardedAd.isReady) {
+            isLoading = true
+            rewardedAd.loadAd()
+        }
+    }
+
+    override fun show() {
+        when {
+            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
+            rewardedAd.isReady -> {
+                rewardedAd.showAd()
+            }
+
+            Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
+            else -> toast("Anuncio aún cargando...")
+        }
+    }
+}
+
 class FAdLoaderInterstitialLazyLovin(val context: AppCompatActivity) : FullscreenAdLoader {
     private var interstitialAd: MaxInterstitialAd = MaxInterstitialAd("e5f776a3ccb9282e", context)
     private var isLoading = false
@@ -231,6 +305,7 @@ class FAdLoaderInterstitialLazyLovin(val context: AppCompatActivity) : Fullscree
     init {
         isLoading = true
         interstitialAd.setListener(object : MaxAdListener {
+            var isClicked = false
             override fun onAdLoaded(p0: MaxAd?) {
                 isLoading = false
             }
@@ -246,11 +321,15 @@ class FAdLoaderInterstitialLazyLovin(val context: AppCompatActivity) : Fullscree
                 isLoading = true
                 interstitialAd.loadAd()
                 FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
-                Economy.reward(false)
+                Economy.reward(isClicked)
+                isClicked = false
             }
 
             override fun onAdDisplayed(p0: MaxAd?) {}
-            override fun onAdClicked(p0: MaxAd?) {}
+            override fun onAdClicked(p0: MaxAd?) {
+                isClicked = true
+            }
+
             override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {}
         })
         interstitialAd.loadAd()

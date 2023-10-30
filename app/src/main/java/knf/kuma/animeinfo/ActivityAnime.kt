@@ -29,10 +29,12 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUI
+import knf.kuma.commons.noCrash
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirObject
 import knf.kuma.directory.DirObjectCompact
+import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.ExplorerObject
 import knf.kuma.pojos.FavoriteObject
@@ -221,6 +223,19 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             finish()
         } else {
             supportFinishAfterTransition()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        noCrash {
+            if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == RESULT_OK) {
+                val validation = FileAccessHelper.isUriValid(data?.data)
+                if (!validation.isValid) {
+                    Toaster.toast("Directorio invalido: $validation")
+                    FileAccessHelper.openTreeChooser(this)
+                }
+            }
         }
     }
 

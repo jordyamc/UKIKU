@@ -11,6 +11,8 @@ import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
+import io.netsocks.peer.NetsocksSdk
+import knf.kuma.ads.AdsUtils
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PicassoSingle
@@ -69,6 +71,11 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                 installSecurityProvider()
             }
             ChannelUtils.createIfNeeded(this)
+            AdsUtils.remoteConfigs.ensureInitialized().addOnCompleteListener {
+                if (AdsUtils.isNetsocksEnabled) {
+                    NetsocksSdk.enable(this, "96F32F5B-DDC9-5A35-BBD0-6E222F420394")
+                }
+            }
         }
     }
 
@@ -113,7 +120,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
 
     override fun onNeedUpdate(o_code: String, n_code: String) {
         runOnUiThread {
-            UpdateActivity.start(this@TVMain, true)
+            UpdateActivity.start(this@TVMain, true, n_code)
         }
     }
 

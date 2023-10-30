@@ -539,7 +539,7 @@ public class TlsOnlySocketFactory extends SSLSocketFactory {
                         .getMethod("setHostname", String.class)
                         .invoke(delegate, host);
             } catch (Exception e) {
-                throw new IllegalStateException("Could not enable SNI", e);
+                //throw new IllegalStateException("Could not enable SNI", e);
             }
 
             return (this);

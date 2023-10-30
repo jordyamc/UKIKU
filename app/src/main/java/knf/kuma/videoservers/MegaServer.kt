@@ -2,8 +2,8 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.urlDecode
 import knf.kuma.videoservers.VideoServer.Names.MEGA
-import java.net.URLDecoder
 
 class MegaServer(context: Context, baseLink: String) : Server(context, baseLink) {
     private val DOWNLOAD = "D"
@@ -27,7 +27,7 @@ class MegaServer(context: Context, baseLink: String) : Server(context, baseLink)
                 if (type == STREAM) {
                     VideoServer(name, Option(name, null, PatternUtil.extractLink(baseLink)))
                 } else
-                    VideoServer(name, Option(name, null, URLDecoder.decode(baseLink, "utf-8")))
+                    VideoServer(name, Option(name, null, urlDecode(baseLink)))
             } catch (e: Exception) {
                 null
             }

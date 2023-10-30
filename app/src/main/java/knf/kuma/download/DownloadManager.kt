@@ -276,7 +276,7 @@ class DownloadManager : Service() {
                     downloadObject.setDid(request.id)
                     downloadObject.canResume = true
                     downloadDao.insert(downloadObject)
-                    fetch?.enqueue(request, Func { Log.e("Download", "Queued " + it.id) }, Func {
+                    fetch?.enqueue(request, { Log.e("Download", "Queued " + it.id) }, {
                         it.throwable?.printStackTrace()
                         downloadDao.delete(downloadObject)
                     })

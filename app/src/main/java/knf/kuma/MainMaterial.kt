@@ -355,29 +355,22 @@ class MainMaterial : GenericActivity(),
     override fun onNeedUpdate(o_code: String, n_code: String) {
         runOnUiThread {
             try {
-                MaterialDialog(this).safeShow {
-                    title(text = "Actualización")
-                    if (n_code.toInt() > AdsUtils.remoteConfigs.getLong("min_version").toInt()) {
+                if (n_code.toInt() > AdsUtils.remoteConfigs.getLong("min_version").toInt()) {
+                    MaterialDialog(this@MainMaterial).safeShow {
+                        title(text = "Actualización")
                         message(text = "Parece que la versión $n_code está disponible, ¿Quieres actualizar?")
-                        positiveButton(text = "si") {
-                            UpdateActivity.start(
-                                this@MainMaterial,
-                                true
-                            )
-                        }
+                        positiveButton(text = "si") { UpdateActivity.start(this@MainMaterial, true, n_code) }
                         negativeButton(text = "despues") {
                             checkBypass()
                         }
-                    } else {
-                        message(text = "Parece que la versión $n_code está disponible, es obligatoria")
-                        positiveButton(text = "actualizar") {
-                            UpdateActivity.start(
-                                this@MainMaterial,
-                                false
-                            )
-                        }
-                        cancelable(false)
                     }
+                } else {
+                    finish()
+                    UpdateActivity.start(
+                        this@MainMaterial,
+                        false,
+                        n_code
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

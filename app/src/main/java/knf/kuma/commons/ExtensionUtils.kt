@@ -70,6 +70,9 @@ import org.jsoup.nodes.Document
 import org.nield.kotlinstatistics.WeightedDice
 import xdroid.toaster.Toaster
 import java.io.File
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -692,7 +695,7 @@ fun String.resolveRedirection(tryCount: Int = 0): String =
             resolveRedirection(tryCount + 1)
     }
 
-fun List<Pair<String,String>>.toArray(): Array<String> {
+fun List<Pair<String, String>>.toArray(): Array<String> {
     val list = mutableListOf<String>()
     forEach { e ->
         list.add(e.first)
@@ -701,13 +704,37 @@ fun List<Pair<String,String>>.toArray(): Array<String> {
     return list.toTypedArray()
 }
 
-val isFullMode: Boolean get() = BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "release"
+fun urlEncode(url: String): String {
+    return try {
+        if (Build.VERSION.SDK_INT >= 33) {
+            URLEncoder.encode(url, StandardCharsets.UTF_8)
+        } else {
+            URLEncoder.encode(url, "utf-8")
+        }
+    } catch (e: Exception) {
+        url
+    }
+}
+
+fun urlDecode(url: String): String {
+    return try {
+        if (Build.VERSION.SDK_INT >= 33) {
+            URLDecoder.decode(url, StandardCharsets.UTF_8)
+        } else {
+            URLDecoder.decode(url, "utf-8")
+        }
+    } catch (e: Exception) {
+        url
+    }
+}
+
+val isFullMode: Boolean get() = BuildConfig.DEBUG || BuildConfig.BUILD_TYPE != "playstore"
 
 private fun isIntentResolved(ctx: Context, intent: Intent): Boolean {
     return ctx.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null
 }
 
-fun <T: View> FragmentActivity.findView(@IdRes id: Int): Lazy<T> = object : Lazy<T> {
+fun <T : View> FragmentActivity.findView(@IdRes id: Int): Lazy<T> = object : Lazy<T> {
 
     private var view: T? = null
     override val value: T

@@ -28,10 +28,24 @@ import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.isNull
+import knf.kuma.commons.iterator
+import knf.kuma.commons.jsoupCookies
+import knf.kuma.commons.safeShow
+import knf.kuma.commons.showProgressSnackbar
+import knf.kuma.commons.toArray
+import knf.kuma.commons.urlDecode
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
-import knf.kuma.download.*
+import knf.kuma.download.DownloadManager
+import knf.kuma.download.DownloadService
+import knf.kuma.download.FileAccessHelper
+import knf.kuma.download.MultipleDownloadManager
+import knf.kuma.download.service
 import knf.kuma.player.openWebPlayer
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
@@ -43,8 +57,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import xdroid.toaster.Toaster
-import java.net.URLDecoder
-import java.util.*
+import java.util.Locale
 
 object FileActions {
     private var isExecuting = false
@@ -235,7 +248,7 @@ object FileActions {
                         val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
                         for (e in downloads) {
                             var z = e.attr("href")
-                            z = URLDecoder.decode(z.substring(z.lastIndexOf("http")), "utf-8")
+                            z = urlDecode(z.substring(z.lastIndexOf("http")))
                             val server = Server.check(context, z)
                             if (server != null)
                                 servers.add(server)

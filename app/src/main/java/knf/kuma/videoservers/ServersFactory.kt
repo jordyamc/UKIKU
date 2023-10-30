@@ -38,7 +38,6 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import xdroid.toaster.Toaster
-import java.net.URLDecoder
 import java.util.*
 import kotlin.math.abs
 
@@ -277,7 +276,7 @@ class ServersFactory {
                 val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
                 for (e in downloads) {
                     var z = e.attr("href")
-                    z = URLDecoder.decode(z.substring(z.lastIndexOf("http")), "utf-8")
+                    z = urlDecode(z.substring(z.lastIndexOf("http")))
                     val server = Server.check(context, z)
                     if (server != null)
                         servers.add(server)

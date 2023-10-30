@@ -266,6 +266,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
             .setContentTitle("Nuevos capitulos")
             .setContentText("Hay nuevos capitulos recientes!!")
             .setGroupSummary(true)
+            .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN)
             .setGroup(RECENTS_GROUP)
             .setAutoCancel(true)
             .setContentIntent(

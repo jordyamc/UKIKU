@@ -25,8 +25,6 @@ import org.jsoup.nodes.Element;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -476,10 +474,10 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
             public String commentariesLink(String version) {
                 try {
-                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(ExtensionUtilsKt.resolveRedirection(link, 0), StandardCharsets.UTF_8) + "&s_o=default#version=" + version;
+                    return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + ExtensionUtilsKt.urlEncode(ExtensionUtilsKt.resolveRedirection(link, 0)) + "&s_o=default#version=" + version;
                 } catch (Exception e) {
                     try {
-                        return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + URLEncoder.encode(link, StandardCharsets.UTF_8) + "&s_o=default#version=" + version;
+                        return "https://disqus.com/embed/comments/?base=default&f=https-animeflv-net&t_u=" + ExtensionUtilsKt.urlEncode(link) + "&s_o=default#version=" + version;
                     } catch (Exception ex) {
                         return link;
                     }

@@ -54,6 +54,7 @@ class UpdateActivity : GenericActivity() {
                         UpdaterType.TYPE_ERROR -> {
                             finish()
                         }
+
                         UpdaterType.TYPE_COMPLETED -> {
                             isUpdateDownloaded = true
                             binding.progress.progress = 100
@@ -64,13 +65,23 @@ class UpdateActivity : GenericActivity() {
                 })
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (!intent.getBooleanExtra("canExit", true)) {
+            MaterialDialog(this).safeShow {
+                message(text = "Parece que la versión ${intent.getStringExtra("version")} está disponible, es obligatoria")
+                positiveButton(text = "ok")
+            }
+        }
+    }
+
     private fun install() {
         DownloadManager.pauseAll()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "${applicationContext.packageName}.fileprovider", update))
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
-                    .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, packageName)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
+                .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, packageName)
             startActivity(intent)
         } else {
             val intent = Intent(Intent.ACTION_VIEW)
@@ -130,10 +141,10 @@ class UpdateActivity : GenericActivity() {
     }
 
     companion object {
-
-        fun start(context: Context, canExit: Boolean) {
+        fun start(context: Context, canExit: Boolean, version: String) {
             context.startActivity(Intent(context, UpdateActivity::class.java).apply {
                 putExtra("canExit", canExit)
+                putExtra("version", version)
             })
         }
     }

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="210" version="5.3.0">
+        <change type="change">Soporte Android 14</change>
+        <change type="fix">Corrección de bugs</change>
+    </release>
+    <release code="209" version="5.2.11">
+        <change type="fix">Corrección especifica para Xiaomi de SSL</change>
+        <change type="fix">Corrección de bugs</change>
+    </release>
     <release code="208" version="5.2.10">
         <change type="fix">Corrección de SSL para telefonos sin GPlay</change>
     </release>

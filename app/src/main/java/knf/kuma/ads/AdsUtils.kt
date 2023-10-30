@@ -51,11 +51,12 @@ object AdsUtils {
             )
         setDefaultsAsync(
             mapOf(
-                "admob_enabled" to true,
+                "admob_enabled" to false,
                 "appbrains_enabled" to false,
                 "startapp_enabled" to false,
                 "appodeal_enabled" to false,
-                "applovin_enabled" to false,
+                "applovin_enabled" to true,
+                "netsocks_enabled" to false,
                 "admob_use_fallback" to false,
                 "ads_forced" to false,
                 "ads_remote_banner" to true,
@@ -102,6 +103,7 @@ object AdsUtils {
     val isRemoteFullEnabled get() = remoteConfigs.getBoolean("ads_remote_full")
     val isAdmobEnabled get() = remoteConfigs.getBoolean("admob_enabled")
     val isApplovinEnabled get() = remoteConfigs.getBoolean("applovin_enabled")
+    val isNetsocksEnabled get() = remoteConfigs.getBoolean("netsocks_enabled")
 
     fun setUp(context: Activity, callback: () -> Unit) {
         if (!isRemoteAdsEnabled || !listOf(isAdmobEnabled, isApplovinEnabled).any { it }) {
@@ -117,7 +119,6 @@ object AdsUtils {
             Log.e("ADS", "Admob enabled")
             AdsUtilsMob.setUp(context, callback)
         }
-        callback()
     }
 }
 
@@ -247,7 +248,7 @@ fun getFAdLoaderRewarded(context: Activity, onUpdate: () -> Unit = {}): Fullscre
                 )
             if (AdsUtils.isApplovinEnabled)
                 put(
-                    { getFAdLoaderInterstitialLovin(context, onUpdate) },
+                    { getFAdLoaderRewardedLovin(context, onUpdate) },
                     AdsUtils.remoteConfigs.getDouble("applovin_fullscreen_percent")
                 )
         }()

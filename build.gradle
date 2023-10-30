@@ -32,6 +32,7 @@ allprojects {
         jcenter()
         mavenCentral()
         maven { url "https://android-sdk.is.com" }
+        maven { url 'https://artifactory.netsocks.io/artifactory/maven' }
         maven {
             url 'https://swisscodemonkeys.github.io/appbrain-sdk/maven'
         }
