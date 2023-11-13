@@ -278,7 +278,9 @@ class DownloadManager : Service() {
                     downloadDao.insert(downloadObject)
                     fetch?.enqueue(request, { Log.e("Download", "Queued " + it.id) }, {
                         it.throwable?.printStackTrace()
-                        downloadDao.delete(downloadObject)
+                        GlobalScope.launch(Dispatchers.IO) {
+                            downloadDao.delete(downloadObject)
+                        }
                     })
                     fetch?.resumeAll()
                 } ?: return false

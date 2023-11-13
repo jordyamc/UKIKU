@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="211" version="5.3.1">
+        <change type="fix">Error en descargas</change>
+    </release>
     <release code="210" version="5.3.0">
         <change type="change">Soporte Android 14</change>
         <change type="fix">Corrección de bugs</change>
