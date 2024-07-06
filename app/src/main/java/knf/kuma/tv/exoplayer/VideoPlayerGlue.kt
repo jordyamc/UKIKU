@@ -5,6 +5,10 @@ import androidx.leanback.media.PlaybackTransportControlGlue
 import androidx.leanback.widget.Action
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.PlaybackControlsRow
+import knf.kuma.database.CacheDB
+import knf.kuma.player.PlayerState
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 /**
@@ -89,6 +93,14 @@ class VideoPlayerGlue(
         }
     }
 
+    fun save(video: Video?) {
+        if (video != null) {
+            GlobalScope.launch {
+                CacheDB.INSTANCE.playerStateDAO().set(PlayerState("${video.title}: ${video.chapter}", currentPosition))
+            }
+        }
+    }
+
     private fun notifyActionChanged(
             action: PlaybackControlsRow.MultiAction, adapter: ArrayObjectAdapter?) {
         if (adapter != null) {
@@ -122,6 +134,7 @@ class VideoPlayerGlue(
             playerAdapter.seekTo(newPosition)
         }
     }
+
 
     /**
      * Listens for when skip to next and previous actions have been dispatched.

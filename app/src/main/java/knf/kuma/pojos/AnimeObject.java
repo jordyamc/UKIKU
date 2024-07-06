@@ -274,7 +274,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
         @Selector(value = "div.Image img[src]", attr = "src", format = "/(\\d+)[/.]")
         @SerializedName("aid")
         public String aid;
-        @Selector(value = "meta[property='og:title']", attr = "content", format = "^ ?V?e?r? ?A?n?i?m?e? ?(.+ ?O?n?l?i?n?e?) Online", defValue = "Error")
+        @Selector(value = "h1.Title", defValue = "Error")
         @ColumnInfo(name = "web_name")
         @SerializedName("web_name")
         public String name;

@@ -172,7 +172,7 @@ public class RecentObject {
         public String aid;
         @Selector(value = "a", attr = "href", format = "/(.*)$")
         public String eid;
-        @Selector(value = "img", attr = "alt")
+        @Selector(value = ".Title")
         public String name;
         @Selector(".Capi")
         public String chapter;

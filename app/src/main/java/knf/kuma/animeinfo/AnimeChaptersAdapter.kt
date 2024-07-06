@@ -58,6 +58,7 @@ import knf.kuma.pojos.RecordObject
 import knf.kuma.pojos.SeeingObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
+import knf.kuma.videoservers.FileActions
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -262,41 +263,34 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                             }
                             R.id.download -> {
                                 setOrientation(true)
-                                ServersFactory.start(context, chapter.chapter.link, chapter.chapter, false, false, object : ServersFactory.ServersInterface {
-                                    override fun onFinish(started: Boolean, success: Boolean) {
-                                        fragment.lifecycleScope.launch(Dispatchers.Main) {
-                                            if (started) {
+                                FileActions.download(fragment, chapter.chapter) { state, _ ->
+                                    when (state) {
+                                        FileActions.CallbackState.START_DOWNLOAD -> {
+                                            fragment.lifecycleScope.launch(Dispatchers.Main) {
+                                                holder.progressBar.isIndeterminate = true
+                                                holder.progressBarRoot.visibility = View.VISIBLE
                                                 holder.setQueue(withContext(Dispatchers.IO) { CacheDB.INSTANCE.queueDAO().isInQueue(chapter.chapter.eid) }, true)
                                                 chapter.chapter.fileWrapper().exist = true
                                             }
-                                            setOrientation(false)
                                         }
-                                    }
 
-                                    override fun onCast(url: String?) {
-
-                                    }
-
-                                    override fun onProgressIndicator(boolean: Boolean) {
-                                        fragment.doOnUI {
-                                            if (boolean) {
-                                                holder.progressBar.isIndeterminate = true
-                                                holder.progressBarRoot.visibility = View.VISIBLE
-                                            } else
+                                        else -> {
+                                            fragment.doOnUI {
                                                 holder.progressBarRoot.visibility = View.GONE
+                                            }
                                         }
                                     }
-
-                                    override fun getView(): View {
-                                        return recyclerView
-                                    }
-                                })
+                                    setOrientation(false)
+                                }
                             }
                             R.id.streaming -> {
                                 setOrientation(true)
-                                ServersFactory.start(context, chapter.chapter.link, chapter.chapter, true, false, object : ServersFactory.ServersInterface {
-                                    override fun onFinish(started: Boolean, success: Boolean) {
-                                        if (!started && success) {
+                                FileActions.stream(fragment, chapter.chapter) { state, extra ->
+                                    when (state) {
+                                        FileActions.CallbackState.START_STREAM, FileActions.CallbackState.START_CAST -> {
+                                            if (state == FileActions.CallbackState.START_CAST) {
+                                                CastUtil.get().play(recyclerView, CastMedia.create(chapter.chapter, extra as? String))
+                                            }
                                             fragment.lifecycleScope.launch(Dispatchers.IO) {
                                                 chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
                                                 recordsDAO.add(RecordObject.fromChapter(chapter.chapter))
@@ -309,32 +303,13 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                             updateSeeing(chapter.chapter.number)
                                             holder.setSeen(true)
                                         }
-                                        setOrientation(false)
-                                    }
 
-                                    override fun onCast(url: String?) {
-                                        CastUtil.get().play(recyclerView, CastMedia.create(chapter.chapter, url))
-                                        fragment.lifecycleScope.launch(Dispatchers.IO) {
-                                            chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
-                                            recordsDAO.add(RecordObject.fromChapter(chapter.chapter))
+                                        else -> {
+                                            //
                                         }
-                                        chapter.isSeen = true
-                                        syncData {
-                                            history()
-                                            seen()
-                                        }
-                                        updateSeeing(chapter.chapter.number)
-                                        holder.setSeen(true)
                                     }
-
-                                    override fun onProgressIndicator(boolean: Boolean) {
-
-                                    }
-
-                                    override fun getView(): View {
-                                        return recyclerView
-                                    }
-                                })
+                                    setOrientation(false)
+                                }
                             }
                             R.id.queue -> if (isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get())) {
                                 QueueManager.add(chapter.chapter.fileWrapper(), downloadObject.get(), true, chapter.chapter)
@@ -374,7 +349,14 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 fragment.lifecycleScope.launch(Dispatchers.Main) {
                                     try {
                                         val version = withContext(Dispatchers.IO) {
-                                            Regex("load\\.(\\w+)\\.js").find(URL("https://https-animeflv-net.disqus.com/embed.js").readText())?.destructured?.component1()
+                                            try {
+                                                Regex("load\\.(\\w+)\\.js").find(URL("https://https-animeflv-net.disqus.com/embed.js").readText())?.destructured?.component1()
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
+                                                AdsUtils.remoteConfigs.getString(
+                                                    "disqus_version"
+                                                )
+                                            }
                                         }
                                         CommentariesDialog.show(
                                             fragment,

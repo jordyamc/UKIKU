@@ -3,7 +3,8 @@ package knf.kuma.animeinfo
 import knf.kuma.commons.PatternUtil
 import knf.kuma.pojos.AnimeObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import java.util.regex.Pattern
 
 class AnimeInfo(code: String) {
@@ -36,12 +37,12 @@ class AnimeInfo(code: String) {
     private var date: String? = null
 
     init {
-        val matcher = Pattern.compile("\"([^\"<>]*)\",?").matcher(code)
+        val matcher = Pattern.compile("\"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\",?").matcher(code)
         var i = 0
         while (matcher.find()) {
             when (i) {
                 0 -> this.aid = matcher.group(1)
-                1 -> this.title = PatternUtil.fromHtml(matcher.group(1))
+                1 -> this.title = PatternUtil.fromHtml(matcher.group(1)).replace("\\", "")
                 2 -> this.sid = matcher.group(1)
                 3 -> this.date = matcher.group(1)
             }

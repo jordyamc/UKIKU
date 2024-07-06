@@ -1,7 +1,12 @@
 package knf.kuma.database.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.TypeConverters
 import knf.kuma.database.BaseConverter
 import knf.kuma.pojos.FavoriteObject
 
@@ -54,13 +59,13 @@ interface FavsDAO {
     fun favObserver(key: Int): LiveData<FavoriteObject?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addFav(favoriteObject: FavoriteObject?)
+    fun addFav(favoriteObject: FavoriteObject)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAll(list: List<FavoriteObject>)
 
     @Delete
-    fun deleteFav(favoriteObject: FavoriteObject?)
+    fun deleteFav(favoriteObject: FavoriteObject)
 
     @Query("DELETE FROM favoriteobject")
     fun clear()

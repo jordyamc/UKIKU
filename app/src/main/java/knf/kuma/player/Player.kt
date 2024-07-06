@@ -5,10 +5,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.support.v4.media.MediaDescriptionCompat
-import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.media.AudioAttributesCompat
 import androidx.room.Entity
@@ -24,17 +22,15 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.reactivex.rxjava3.disposables.Disposable
 import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.NoSSLOkHttpClient
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.noCrash
 import knf.kuma.commons.noCrashLetNullable
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
-import okhttp3.OkHttpClient
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 
@@ -100,7 +96,7 @@ class PlayerHolder(
         val item = MediaItem.fromUri(descriptor.mediaUri?: Uri.EMPTY)
         if (intent.getBooleanExtra("isFile", false)) return MediaData(item)
         val httpFactory = if (PrefsUtil.useExperimentalOkHttp)
-            OkHttpDataSource.Factory(OkHttpClient()).apply {
+            OkHttpDataSource.Factory(NoSSLOkHttpClient.get()).apply {
                 descriptor.extras?.getStringArray("headers")?.let { headerArray ->
                     val headers = headerArray.toList().chunked(2).associate { Pair(it[0], it[1]) }
                     setDefaultRequestProperties(headers)

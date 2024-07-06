@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.webkit.MimeTypeMap
 import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
+import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -16,9 +17,10 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelector
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
+import knf.kuma.database.CacheDB
+import kotlinx.coroutines.launch
 
 class PlaybackFragment : VideoSupportFragment() {
     private var mPlayerGlue: VideoPlayerGlue? = null
@@ -55,6 +57,7 @@ class PlaybackFragment : VideoSupportFragment() {
     @TargetApi(Build.VERSION_CODES.N)
     override fun onPause() {
         super.onPause()
+        mPlayerGlue?.save(mVideo)
         if (mPlayerGlue?.isPlaying == true)
             mPlayerGlue?.pause()
         if (Util.SDK_INT <= 23) {
@@ -92,10 +95,16 @@ class PlaybackFragment : VideoSupportFragment() {
     }
 
     private fun play(video: Video?) {
-        mPlayerGlue?.title = video?.title
-        mPlayerGlue?.subtitle = video?.chapter
-        prepareMediaForPlaying(video?.uri ?: Uri.EMPTY, video?.headers)
-        mPlayerGlue?.play()
+        lifecycleScope.launch {
+            mPlayerGlue?.title = video?.title
+            mPlayerGlue?.subtitle = video?.chapter
+            prepareMediaForPlaying(video?.uri ?: Uri.EMPTY, video?.headers)
+            val state = CacheDB.INSTANCE.playerStateDAO().find("${video?.title}: ${video?.chapter}")
+            if (state != null) {
+                mPlayerGlue?.seekTo(state.position)
+            }
+            mPlayerGlue?.play()
+        }
     }
 
     private fun prepareMediaForPlaying(mediaSourceUri: Uri, headers: Map<String, String>?) {

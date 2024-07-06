@@ -11,10 +11,14 @@ import androidx.room.PrimaryKey
 import com.google.errorprone.annotations.Keep
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.FileWrapper
+import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PatternUtil.getAnimeUrl
 import knf.kuma.commons.PatternUtil.getFileName
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.PrefsUtil.saveWithName
+import knf.kuma.commons.distinct
 import knf.kuma.database.CacheDB
 import knf.kuma.database.CacheDBWrap
 import knf.kuma.database.dao.SeenDAO
@@ -41,7 +45,7 @@ open class RecentModel {
     var aid: String = "0"
 
     @JvmField
-    @Selector(value = "img", attr = "alt")
+    @Selector(value = ".Title")
     var name: String = ""
 
     @JvmField
