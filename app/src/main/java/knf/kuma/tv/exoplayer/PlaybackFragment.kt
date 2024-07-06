@@ -20,7 +20,9 @@ import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
 import knf.kuma.database.CacheDB
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PlaybackFragment : VideoSupportFragment() {
     private var mPlayerGlue: VideoPlayerGlue? = null
@@ -99,7 +101,7 @@ class PlaybackFragment : VideoSupportFragment() {
             mPlayerGlue?.title = video?.title
             mPlayerGlue?.subtitle = video?.chapter
             prepareMediaForPlaying(video?.uri ?: Uri.EMPTY, video?.headers)
-            val state = CacheDB.INSTANCE.playerStateDAO().find("${video?.title}: ${video?.chapter}")
+            val state = withContext(Dispatchers.IO) { CacheDB.INSTANCE.playerStateDAO().find("${video?.title}: ${video?.chapter}") }
             if (state != null) {
                 mPlayerGlue?.seekTo(state.position)
             }

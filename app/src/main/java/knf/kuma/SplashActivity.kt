@@ -36,6 +36,7 @@ import kotlin.coroutines.suspendCoroutine
 class SplashActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_blank)
         AchievementManager.onAppStart()
         SubscriptionReceiver.check(intent)
         printSignatures()
