@@ -24,17 +24,13 @@ import knf.kuma.videoservers.Option
 import knf.kuma.videoservers.Server
 import knf.kuma.videoservers.VideoServer
 import knf.kuma.videoservers.WebServer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
 import xdroid.toaster.Toaster
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.contracts.ExperimentalContracts
+import java.util.Locale
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
+
 class TVServersFactory private constructor(
     private val activity: Activity,
     private val url: String,

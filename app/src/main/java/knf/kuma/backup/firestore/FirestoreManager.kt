@@ -24,12 +24,32 @@ import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.backup.Backups
-import knf.kuma.backup.firestore.data.*
-import knf.kuma.commons.*
+import knf.kuma.backup.firestore.data.AchievementsData
+import knf.kuma.backup.firestore.data.EAData
+import knf.kuma.backup.firestore.data.FavsData
+import knf.kuma.backup.firestore.data.GenresData
+import knf.kuma.backup.firestore.data.HistoryData
+import knf.kuma.backup.firestore.data.QueueData
+import knf.kuma.backup.firestore.data.SeeingData
+import knf.kuma.backup.firestore.data.SeenData
+import knf.kuma.backup.firestore.data.TopData
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.admFile
+import knf.kuma.commons.currentTime
+import knf.kuma.commons.doOnUIGlobal
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.noCrashExec
+import knf.kuma.commons.noCrashLet
+import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.database.EADB
 import knf.kuma.pojos.SeenObject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster.toast
 import kotlin.contracts.ExperimentalContracts
@@ -60,8 +80,8 @@ object FirestoreManager {
     private var isUpdateBlocked = false
     var isFirestoreEnabled = false
 
-    @ExperimentalContracts
-    @ExperimentalCoroutinesApi
+
+    @OptIn(ExperimentalContracts::class)
     fun start() {
         if (!isGPlayServicesEnabled() || isFirestoreEnabled) return
         if (isLoggedIn && ((PrefsUtil.isAdsEnabled && !Network.isAdsBlocked) || BuildConfig.DEBUG || admFile.exists() || PrefsUtil.isSubscriptionEnabled)) {
@@ -245,8 +265,6 @@ object FirestoreManager {
         listeners.forEach { it.remove() }
     }
 
-    @ExperimentalCoroutinesApi
-    @ExperimentalContracts
     private fun uploadAllData(checkForFiles: Boolean, activity: Activity) {
         if (!isFirestoreEnabled) return
         if (checkForFiles)
@@ -506,8 +524,8 @@ object FirestoreManager {
 
     fun doSignOut(context: Context) = AuthUI.getInstance().signOut(context)
 
-    @ExperimentalContracts
-    @ExperimentalCoroutinesApi
+
+    @OptIn(ExperimentalContracts::class)
     fun handleLogin(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == 5548) {
             val response = IdpResponse.fromResultIntent(data)

@@ -1,17 +1,16 @@
 package knf.kuma.tv.anime
 
 import android.view.ViewGroup
-
 import androidx.leanback.widget.Presenter
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecentObject
 import knf.kuma.tv.cards.RecentsCardView
 import knf.kuma.tv.details.TVAnimesDetails
-import kotlinx.coroutines.*
-import kotlin.contracts.ExperimentalContracts
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class RecentsPresenter : Presenter() {
 
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {

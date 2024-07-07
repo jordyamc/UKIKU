@@ -44,7 +44,22 @@ import knf.kuma.backup.MigrationActivity
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.changelog.ChangelogActivityMaterial
-import knf.kuma.commons.*
+import knf.kuma.commons.BypassUtil
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.EAMapActivity
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.changeToolbarFont
+import knf.kuma.commons.getSurfaceColor
+import knf.kuma.commons.isFullMode
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.safeShow
+import knf.kuma.commons.stringLiveData
+import knf.kuma.commons.toast
+import knf.kuma.commons.verifiyFF
 import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
@@ -84,7 +99,6 @@ import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
 import java.io.File
-import kotlin.contracts.ExperimentalContracts
 
 class MainMaterial : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -107,7 +121,6 @@ class MainMaterial : GenericActivity(),
     private var readyToFinish = false
     private var isFirst = true
 
-    @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getThemeNA())
         super.onCreate(savedInstanceState)
@@ -325,7 +338,9 @@ class MainMaterial : GenericActivity(),
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
         }
         if (permissions.isNotEmpty()) {
-            requestPermissions(permissions.toTypedArray(), 55498)
+            noCrash {
+                requestPermissions(permissions.toTypedArray(), 55498)
+            }
         }
     }
 

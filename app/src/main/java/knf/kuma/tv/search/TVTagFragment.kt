@@ -2,19 +2,19 @@ package knf.kuma.tv.search
 
 import android.os.Bundle
 import androidx.leanback.app.VerticalGridSupportFragment
-import androidx.leanback.widget.*
+import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.OnItemViewClickedListener
+import androidx.leanback.widget.Presenter
+import androidx.leanback.widget.Row
+import androidx.leanback.widget.RowPresenter
+import androidx.leanback.widget.VerticalGridPresenter
 import androidx.lifecycle.Observer
 import knf.kuma.commons.doOnUI
 import knf.kuma.database.CacheDB
 import knf.kuma.tv.anime.AnimePresenter
 import knf.kuma.tv.details.TVAnimesDetails
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
-import kotlin.contracts.ExperimentalContracts
 
-
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class TVTagFragment : VerticalGridSupportFragment(), OnItemViewClickedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -36,14 +36,9 @@ import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.contracts.ExperimentalContracts
 
-
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecker.CheckListener {
 
     private var fragment: TVMainFragment? = null

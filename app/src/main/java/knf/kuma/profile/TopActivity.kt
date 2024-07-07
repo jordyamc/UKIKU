@@ -21,7 +21,12 @@ import knf.kuma.ads.getFAdLoaderInterstitial
 import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.data.TopData
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.Economy
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.diceOf
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.databinding.RecyclerLoaderBinding
 import org.jetbrains.anko.doAsync
@@ -49,7 +54,6 @@ class TopActivity : GenericActivity() {
             put({ interstitial.show() }, AdsUtils.remoteConfigs.getDouble("interstitial_percent"))
         }()
     }
-
 
     @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -23,11 +23,16 @@ import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.framework.DropBoxService
 import knf.kuma.backup.framework.LocalService
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.admFile
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.safeShow
+import knf.kuma.commons.showSnackbar
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.SyncItemView
 import knf.kuma.databinding.ActivityLoginBinding
-import kotlin.contracts.ExperimentalContracts
 import kotlin.math.max
 
 class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
@@ -51,7 +56,6 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
             }
         }
 
-    @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!resources.getBoolean(R.bool.isTablet))
@@ -278,7 +282,6 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     }
 
 
-    @OptIn(ExperimentalContracts::class)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (FirestoreManager.handleLogin(this, requestCode, resultCode, data)) {

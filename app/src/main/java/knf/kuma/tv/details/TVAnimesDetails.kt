@@ -9,11 +9,8 @@ import knf.kuma.R
 import knf.kuma.commons.doOnUI
 import knf.kuma.tv.TVBaseActivity
 import knf.kuma.tv.TVServersFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
+
 class TVAnimesDetails : TVBaseActivity(), TVServersFactory.ServersInterface {
     private var fragment: TVAnimesDetailsFragment? = null
     private var serversFactory: TVServersFactory? = null

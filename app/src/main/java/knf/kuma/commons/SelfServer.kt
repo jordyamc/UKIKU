@@ -25,9 +25,15 @@ import java.net.URL
 
 class SelfServer : Service() {
 
+    private var running = false
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        foreground(64587, foregroundNotification())
+        if (!running) {
+            foreground(64587, foregroundNotification())
+            running = true
+        }
         if (intent != null && intent.action != null && intent.action == "stop.foreground") {
+            running = false
             CastUtil.get().stop()
             stopForeground(true)
             stopSelf()
@@ -37,7 +43,10 @@ class SelfServer : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        foreground(64587, foregroundNotification())
+        if (!running) {
+            foreground(64587, foregroundNotification())
+            running = true
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -165,7 +174,7 @@ class SelfServer : Service() {
             return res ?: getResponse("Error 404: File not found")
         }
 
-        private fun serveFile(header: Map<String, String>, file_name: String): Response? {
+        private fun serveFile(header: Map<String, String>, file_name: String): Response {
             var res: Response?
             val mime = "video/mp4"
             val fileWrapper = FileWrapper.create(file_name)
@@ -237,7 +246,7 @@ class SelfServer : Service() {
             return res ?: getResponse("Error 404: File not found")
         }
 
-        private fun serveFile(header: Map<String, String>, file: File): Response? {
+        private fun serveFile(header: Map<String, String>, file: File): Response {
             var res: Response?
             val mime = "video/mp4"
             try {

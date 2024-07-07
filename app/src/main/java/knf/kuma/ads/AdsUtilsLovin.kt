@@ -15,8 +15,10 @@ import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxAdView
 import com.applovin.mediation.ads.MaxInterstitialAd
 import com.applovin.mediation.ads.MaxRewardedAd
+import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinPrivacySettings
 import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
 import knf.kuma.R
@@ -40,16 +42,16 @@ import xdroid.toaster.Toaster.toast
 
 object AdsUtilsLovin {
     fun setUp(context: Activity, callback: () -> Unit) {
-        AppLovinSdk.getInstance(context).apply {
-            mediationProvider = "max"
-            initializeSdk {
-                if (!AppLovinPrivacySettings.hasUserConsent(context)) {
-                    AppLovinPrivacySettings.setHasUserConsent(true, context)
-                    AppLovinPrivacySettings.setIsAgeRestrictedUser(false, context)
-                    AppLovinPrivacySettings.setDoNotSell(false, context)
-                }
-                callback()
+        val initConfig = AppLovinSdkInitializationConfiguration.builder("QHQI9Sl_Fltmz6OzT9WBg6sTUG3SlJOaLf6E7G4xMGsOake13NQHoHFK6dAUnG0u_18dllB1Q7mGheTwmEl8AD", context)
+            .setMediationProvider(AppLovinMediationProvider.MAX)
+            .build()
+        AppLovinSdk.getInstance(context).initialize(initConfig) {
+            if (!AppLovinPrivacySettings.hasUserConsent(context)) {
+                AppLovinPrivacySettings.setHasUserConsent(true, context)
+                AppLovinPrivacySettings.setIsAgeRestrictedUser(false, context)
+                AppLovinPrivacySettings.setDoNotSell(false, context)
             }
+            callback()
         }
     }
 }

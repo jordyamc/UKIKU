@@ -22,7 +22,12 @@ import knf.kuma.ads.getFAdLoaderInterstitial
 import knf.kuma.ads.getFAdLoaderRewarded
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.data.TopData
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.Economy
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.diceOf
+import knf.kuma.commons.safeShow
+import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
 import knf.kuma.databinding.RecyclerLoaderMaterialBinding
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +58,6 @@ class TopActivityMaterial : GenericActivity() {
         }()
     }
 
-    @OptIn(ExperimentalContracts::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
@@ -74,7 +78,7 @@ class TopActivityMaterial : GenericActivity() {
         interstitial.load()
     }
 
-    @ExperimentalContracts
+    @OptIn(ExperimentalContracts::class)
     private fun listen() {
         if (::listener.isInitialized)
             listener.remove()

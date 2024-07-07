@@ -23,16 +23,13 @@ import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
 import knf.tools.signatures.getSignatures
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
-import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
+
 class SplashActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

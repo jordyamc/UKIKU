@@ -36,13 +36,9 @@ import knf.kuma.tv.TVServersFactory
 import knf.kuma.tv.anime.ChapterPresenter
 import knf.kuma.tv.anime.RelatedPresenter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListener, OnActionClickedListener {
 
     private var mRowsAdapter: ArrayObjectAdapter? = null

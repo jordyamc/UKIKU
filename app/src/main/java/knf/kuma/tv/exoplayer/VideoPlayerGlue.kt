@@ -7,6 +7,7 @@ import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.PlaybackControlsRow
 import knf.kuma.database.CacheDB
 import knf.kuma.player.PlayerState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -95,8 +96,9 @@ class VideoPlayerGlue(
 
     fun save(video: Video?) {
         if (video != null) {
-            GlobalScope.launch {
-                CacheDB.INSTANCE.playerStateDAO().set(PlayerState("${video.title}: ${video.chapter}", currentPosition))
+            val pos = currentPosition
+            GlobalScope.launch(Dispatchers.IO) {
+                CacheDB.INSTANCE.playerStateDAO().set(PlayerState("${video.title}: ${video.chapter}", pos))
             }
         }
     }

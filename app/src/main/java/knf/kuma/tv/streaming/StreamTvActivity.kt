@@ -11,12 +11,8 @@ import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.tv.TVBaseActivity
 import knf.kuma.tv.TVServersFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.anko.doAsync
-import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class StreamTvActivity : TVBaseActivity() {
 
     private lateinit var downloadObject: DownloadObject

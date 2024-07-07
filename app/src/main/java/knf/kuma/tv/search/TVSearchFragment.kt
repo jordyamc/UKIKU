@@ -1,11 +1,6 @@
 package knf.kuma.tv.search
 
-import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.leanback.app.SearchSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
@@ -16,32 +11,23 @@ import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
-import androidx.leanback.widget.SpeechRecognitionCallback
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.search.SearchFragment
 import knf.kuma.tv.anime.AnimePresenter
 import knf.kuma.tv.details.TVAnimesDetails
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
-class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, SpeechRecognitionCallback, OnItemViewClickedListener {
+class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, OnItemViewClickedListener {
     private var arrayObjectAdapter: ArrayObjectAdapter? = null
     private lateinit var liveData: LiveData<MutableList<BasicAnimeObject>>
     private lateinit var observer: Observer<MutableList<BasicAnimeObject>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkPermissions()
         arrayObjectAdapter = ArrayObjectAdapter(ListRowPresenter())
         setSearchResultProvider(this)
         setOnItemViewClickedListener(this)
-        if (context?.packageManager?.hasSystemFeature("amazon.hardware.fire_tv") == true)
-            setSpeechRecognitionCallback(this)
         val headerItem = HeaderItem("Géneros")
         val objectAdapter = ArrayObjectAdapter(TagPresenter()).also {
             it.addAll(0, SearchFragment.genres)
@@ -49,13 +35,6 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
         arrayObjectAdapter?.clear()
         arrayObjectAdapter?.add(ListRow(headerItem, objectAdapter))
         setResult("")
-    }
-
-    private fun checkPermissions() {
-        context?.let {
-            if (ContextCompat.checkSelfPermission(it, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-                requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 55498)
-        }
     }
 
     override fun getResultsAdapter(): ObjectAdapter? {
@@ -67,24 +46,9 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
         return true
     }
 
-    override fun recognizeSpeech() {
-        noCrash {
-            startActivityForResult(recognizerIntent, 5589)
-        }
-    }
-
     override fun onQueryTextSubmit(query: String): Boolean {
         setResult(query.trim())
         return true
-    }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            5589 -> if (resultCode == Activity.RESULT_OK)
-                setSearchQuery(data, true)
-        }
     }
 
     private fun setResult(query: String) {
@@ -94,7 +58,7 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
             liveData = CacheDB.INSTANCE.animeDAO().getSearchList("%$query%")
             observer = Observer { animeObjects ->
                 liveData.removeObservers(it)
-                if (arrayObjectAdapter?.size() ?: 0 > 1)
+                if ((arrayObjectAdapter?.size() ?: 0) > 1)
                     arrayObjectAdapter?.removeItems(1, 1)
                 val objectAdapter = ArrayObjectAdapter(AnimePresenter())
                 for (animeObject in animeObjects)

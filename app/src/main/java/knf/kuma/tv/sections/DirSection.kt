@@ -4,11 +4,7 @@ import android.content.Context
 import android.content.Intent
 import knf.kuma.R
 import knf.kuma.tv.directory.TVDir
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class DirSection : SectionObject() {
     override val image: Int
         get() = R.drawable.ic_directory_not

@@ -13,7 +13,11 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
-import androidx.preference.*
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceManager
+import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.input.getInputField
@@ -28,7 +32,23 @@ import knf.kuma.R
 import knf.kuma.ads.AdsUtils
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.FirestoreManager
-import knf.kuma.commons.*
+import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.FileUtil
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.admFile
+import knf.kuma.commons.canGroupNotifications
+import knf.kuma.commons.decrypt
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.encryptOrThrow
+import knf.kuma.commons.ffFile
+import knf.kuma.commons.getPackage
+import knf.kuma.commons.isNull
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.safeContext
+import knf.kuma.commons.safeDelete
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.PreferenceFragmentCompat
 import knf.kuma.database.CacheDB
 import knf.kuma.directory.DirManager
@@ -49,7 +69,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.support.v4.toast
 import xdroid.toaster.Toaster
 import java.io.FileOutputStream
-import kotlin.contracts.ExperimentalContracts
 
 
 class ConfigurationFragment : PreferenceFragmentCompat() {
@@ -71,7 +90,6 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
         super.onAttach(activity)
     }
 
-    @OptIn(ExperimentalContracts::class)
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         if (activity != null && context != null)
             doOnUI {

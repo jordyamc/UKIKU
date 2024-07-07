@@ -8,7 +8,14 @@ import android.util.SparseArray
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BrowseSupportFragment
-import androidx.leanback.widget.*
+import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.HeaderItem
+import androidx.leanback.widget.ListRow
+import androidx.leanback.widget.ListRowPresenter
+import androidx.leanback.widget.OnItemViewClickedListener
+import androidx.leanback.widget.Presenter
+import androidx.leanback.widget.Row
+import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.lifecycleScope
 import com.dropbox.core.android.Auth
 import knf.kuma.App
@@ -30,7 +37,11 @@ import knf.kuma.retrofit.Repository
 import knf.kuma.tv.AnimeRow
 import knf.kuma.tv.GlideBackgroundManager
 import knf.kuma.tv.TVServersFactory
-import knf.kuma.tv.anime.*
+import knf.kuma.tv.anime.FavPresenter
+import knf.kuma.tv.anime.RecentsPresenter
+import knf.kuma.tv.anime.RecordPresenter
+import knf.kuma.tv.anime.SectionPresenter
+import knf.kuma.tv.anime.SyncPresenter
 import knf.kuma.tv.details.TVAnimesDetails
 import knf.kuma.tv.directory.DirPresenter
 import knf.kuma.tv.search.TVSearch
@@ -41,14 +52,10 @@ import knf.kuma.tv.sync.BypassObject
 import knf.kuma.tv.sync.LogOutObject
 import knf.kuma.tv.sync.SyncObject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
-import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.OnClickListener {
     private var mRows: SparseArray<AnimeRow>? = null
 

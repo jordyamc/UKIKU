@@ -5,7 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
 import androidx.leanback.app.BrowseSupportFragment
-import androidx.leanback.widget.*
+import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.HeaderItem
+import androidx.leanback.widget.ListRow
+import androidx.leanback.widget.ListRowPresenter
+import androidx.leanback.widget.OnItemViewClickedListener
+import androidx.leanback.widget.Presenter
+import androidx.leanback.widget.Row
+import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.Observer
 import knf.kuma.commons.distinct
 import knf.kuma.database.CacheDB
@@ -14,11 +21,7 @@ import knf.kuma.pojos.AnimeObject
 import knf.kuma.tv.AnimeRow
 import knf.kuma.tv.details.TVAnimesDetails
 import knf.kuma.tv.directory.DirPresenter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlin.contracts.ExperimentalContracts
 
-@ExperimentalCoroutinesApi
-@ExperimentalContracts
 class TVEmissionFragment : BrowseSupportFragment(), OnItemViewClickedListener {
     private val mRows: SparseArray<AnimeRow> = SparseArray()
     override fun onActivityCreated(savedInstanceState: Bundle?) {
