@@ -294,10 +294,6 @@
         <service
             android:name=".commons.SelfServer"
             android:foregroundServiceType="mediaPlayback" />
-        <service
-            android:name="io.netsocks.peer.NetsocksService"
-            android:foregroundServiceType="dataSync"
-            android:stopWithTask="false" />
 
         <receiver
             android:name=".widgets.emision.WEmisionProvider"

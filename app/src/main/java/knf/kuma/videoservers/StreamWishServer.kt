@@ -24,9 +24,9 @@ class StreamWishServer internal constructor(context: Context, baseLink: String) 
             return try {
                 val downLink = PatternUtil.extractLink(baseLink)
                 val unpack = URL(downLink).readText() //Unpacker.unpack(downLink)
-                val options = "file:\"([^\"]+sw-cdnstream[^\"]+)\"(?:,label:\"(\\d+p))?".toRegex().findAll(unpack).map {
-                    val (link, label: String?) = it.destructured
-                    Option(name, label, link)
+                val options = "file: ?\"(http[^\"]+)".toRegex().findAll(unpack).map {
+                    val (link) = it.destructured
+                    Option(name, "HLS", link)
                 }.toMutableList()
                 VideoServer(name, options)
             } catch (e: Exception) {

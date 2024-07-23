@@ -11,14 +11,12 @@ import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import io.netsocks.peer.NetsocksSdk
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsUtils
 import knf.kuma.ads.SubscriptionReceiver
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.isFullMode
 import knf.kuma.custom.GenericActivity
 import knf.kuma.tv.ui.TVMain
 import knf.tools.signatures.getSignatures
@@ -156,9 +154,6 @@ class SplashActivity : GenericActivity() {
             installSecurityProvider()
             DesignUtils.change(this@SplashActivity, start = false)
             AdsUtils.remoteConfigs.ensureInitialized().addOnCompleteListener {
-                if (isFullMode && AdsUtils.isNetsocksEnabled) {
-                    NetsocksSdk.enable(this@SplashActivity, "96F32F5B-DDC9-5A35-BBD0-6E222F420394")
-                }
                 var initializated = false
                 AdsUtils.setUp(this@SplashActivity) {
                     if (!initializated) {
