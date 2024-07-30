@@ -13,8 +13,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 215
-        versionName "5.3.5"
+        versionCode 216
+        versionName "5.3.6"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -120,7 +120,7 @@ allprojects {
 dependencies {
     //implementation project(path:':multidisplaycast', configuration:'default')
     implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
-    implementation 'com.github.jordyamc:Multi-Display-Cast:2.19'
+    implementation 'com.github.jordyamc:Multi-Display-Cast:2.20'
     implementation 'com.github.jordyamc:PersistentSearchView:1.0.10'
     implementation 'com.github.jordyamc:UAGenerator:1.2.2'
     implementation 'com.github.jordyamc:AndroidVideoCache:2.7.6'

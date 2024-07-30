@@ -3,7 +3,10 @@ package knf.kuma.commons
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
@@ -26,17 +29,19 @@ import java.net.URL
 class SelfServer : Service() {
 
     private var running = false
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            running = false
+            CastUtil.get().stop()
+            stopForeground(true)
+            stopSelf()
+        }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (!running) {
             foreground(64587, foregroundNotification())
             running = true
-        }
-        if (intent != null && intent.action != null && intent.action == "stop.foreground") {
-            running = false
-            CastUtil.get().stop()
-            stopForeground(true)
-            stopSelf()
         }
         return START_STICKY
     }
@@ -47,6 +52,18 @@ class SelfServer : Service() {
             foreground(64587, foregroundNotification())
             running = true
         }
+        val filter = IntentFilter("knf.cast.stop.foreground")
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+        running = false
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -64,26 +81,12 @@ class SelfServer : Service() {
             else
                 setContentTitle("Servidor activo")
             addAction(R.drawable.ic_stop, "Detener",
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        PendingIntent.getForegroundService(
-                            App.context,
-                            4689,
-                            Intent(
-                                App.context,
-                                SelfServer::class.java
-                            ).setAction("stop.foreground"),
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    else
-                        PendingIntent.getService(
-                            App.context,
-                            4689,
-                            Intent(
-                                App.context,
-                                SelfServer::class.java
-                            ).setAction("stop.foreground"),
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
+                PendingIntent.getBroadcast(
+                    App.context,
+                    4689,
+                    Intent("knf.cast.stop.foreground"),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             )
         }.build()
     }
@@ -103,14 +106,14 @@ class SelfServer : Service() {
                 Toaster.toast("Error al iniciar server")
                 null
             }
-
         }
 
         fun stop(isRestart: Boolean = false) {
-            if (INSTANCE?.isAlive == true)
+            if (INSTANCE?.isAlive == true) {
                 INSTANCE?.stop()
-            if (!isRestart)
-                App.context.service(Intent(App.context, SelfServer::class.java).setAction("stop.foreground"))
+                if (!isRestart)
+                    App.context.sendBroadcast(Intent("knf.cast.stop.foreground"))
+            }
         }
     }
 
@@ -121,7 +124,7 @@ class SelfServer : Service() {
             start(SOCKET_READ_TIMEOUT, false)
         }
 
-        override fun serve(session: IHTTPSession): Response? {
+        override fun serve(session: IHTTPSession): Response {
             return if (isFile)
                 if (URLUtil.isFileUrl(data)) {
                     var file = File(Uri.parse(data).path)

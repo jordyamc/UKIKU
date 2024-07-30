@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="220" version="5.360">
+        <change type="fix">Corrección StreamWish</change>
+        <change type="fix">Mejora de conexión para CAST</change>
+    </release>
     <release code="215" version="5.3.5">
         <change type="fix">Errores generales</change>
         <change type="fix">Corrección StreamWish</change>
