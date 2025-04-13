@@ -1,22 +1,11 @@
 package knf.kuma.ads
 
-import com.google.android.gms.ads.AdListener
+/*import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.nativead.NativeAd
-import knf.kuma.App
-import knf.kuma.commons.Network
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import com.google.android.gms.ads.nativead.NativeAd*/
 
-object NativeManager {
+/*object NativeManager {
     private var isLoading = false
     private var internalSize = 0
     private val adsChannel = Channel<NativeAd>(Int.MAX_VALUE)
@@ -105,7 +94,7 @@ object NativeManager {
             loader.loadAds(AdsUtilsMob.adRequest, 5)
         }
     }
-}
+}*/
 
 typealias PendingCallback = suspend () -> Unit
 typealias TakeCallback<T> = (List<T>) -> Unit

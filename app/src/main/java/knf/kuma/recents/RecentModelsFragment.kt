@@ -14,7 +14,6 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.AdsUtils
-import knf.kuma.ads.NativeManager
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.Network
@@ -91,7 +90,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
             val adContainer = find<BannerContainerView>(R.id.adContainer)
             if (AdsUtils.isAdmobEnabled && PrefsUtil.isNativeAdsEnabled) {
                 if (adapter.hasAds()) return
-                lifecycleScope.launch(Dispatchers.Main) {
+                /*lifecycleScope.launch(Dispatchers.Main) {
                     NativeManager.take(this, 3) {
                         if (it.isEmpty())
                             adContainer.implBanner(AdsType.RECENT_BANNER, true)
@@ -101,7 +100,7 @@ class RecentModelsFragment : BottomFragment(), SwipeRefreshLayout.OnRefreshListe
                             }
                         }
                     }
-                }
+                }*/
             } else
                 adContainer.implBanner(AdsType.RECENT_BANNER, true)
         }

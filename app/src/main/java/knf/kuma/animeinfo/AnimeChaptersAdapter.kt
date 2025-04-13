@@ -350,7 +350,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                     try {
                                         val version = withContext(Dispatchers.IO) {
                                             try {
-                                                Regex("load\\.(\\w+)\\.js").find(URL("https://https-animeflv-net.disqus.com/embed.js").readText())?.destructured?.component1()
+                                                Regex("load\\.(\\w+)\\.js").find(URL("https://https-myanimelist-net-2.disqus.com/embed.js").readText())?.destructured?.component1()!!
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
                                                 AdsUtils.remoteConfigs.getString(
@@ -360,9 +360,9 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                         }
                                         CommentariesDialog.show(
                                             fragment,
-                                            withContext(Dispatchers.IO) {
-                                                chapter.chapter.commentariesLink(version)
-                                            })
+                                            chapter.chapter.link,
+                                            version
+                                        )
                                     } catch (e: ActivityNotFoundException) {
                                         noCrashSuspend {
                                             context.startActivity(

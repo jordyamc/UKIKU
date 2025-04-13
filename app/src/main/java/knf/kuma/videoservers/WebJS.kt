@@ -19,7 +19,7 @@ class WebJS(private val context: Context) {
         webView.addJavascriptInterface(JSInterface { callback?.invoke(it) }, "myInterface")
     }
 
-    fun evalOnFinish(link: String, js: String, callback: (String) -> Unit) {
+    fun evalOnFinish(link: String, js: String, delay: Long = 5000, callback: (String) -> Unit) {
         this.callback = callback
         var response = false
         val handler = Handler(Looper.getMainLooper())
@@ -35,7 +35,7 @@ class WebJS(private val context: Context) {
                 run.run()
             }
         }
-        handler.postDelayed(run, 5000)
+        handler.postDelayed(run, delay)
         webView.loadUrl(link)
     }
 

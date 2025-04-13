@@ -48,7 +48,6 @@ object AdsUtilsLovin {
         AppLovinSdk.getInstance(context).initialize(initConfig) {
             if (!AppLovinPrivacySettings.hasUserConsent(context)) {
                 AppLovinPrivacySettings.setHasUserConsent(true, context)
-                AppLovinPrivacySettings.setIsAgeRestrictedUser(false, context)
                 AppLovinPrivacySettings.setDoNotSell(false, context)
             }
             callback()
@@ -273,9 +272,6 @@ class FAdLoaderRewardedLovin(val context: Activity, private val onUpdate: () -> 
                 FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
                 Economy.reward(isClicked)
             }
-
-            override fun onRewardedVideoStarted(p0: MaxAd) {}
-            override fun onRewardedVideoCompleted(p0: MaxAd) {}
         })
         rewardedAd.loadAd()
     }

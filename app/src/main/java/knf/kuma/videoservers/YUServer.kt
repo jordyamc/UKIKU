@@ -1,7 +1,6 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import android.util.Log
 import knf.kuma.commons.PatternUtil
 import knf.kuma.videoservers.VideoServer.Names.YOURUPLOAD
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +8,6 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jsoup.Jsoup
 
 class YUServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -23,7 +21,7 @@ class YUServer(context: Context, baseLink: String) : Server(context, baseLink) {
         get() {
             val yuLink = PatternUtil.extractLink(baseLink)
             try {
-                val videoLink = PatternUtil.getYUvideoLink(runBlocking(Dispatchers.Main) { Unpacker.getHtml(context, yuLink)!! })
+                val videoLink = PatternUtil.getYUvideoLink(runBlocking(Dispatchers.Main) { Unpacker.getHtml(context, yuLink, 8000)!! })
                 val client = OkHttpClient().newBuilder()
                         .connectionSpecs(listOf(ConnectionSpec.CLEARTEXT, ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                                 .allEnabledTlsVersions()

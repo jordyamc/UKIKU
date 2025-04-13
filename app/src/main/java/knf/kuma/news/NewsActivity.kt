@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import ir.mahdiparastesh.chlm.SpacingItemDecoration
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner

@@ -1,31 +1,35 @@
 package knf.kuma.recents
 
+//import com.google.android.gms.ads.nativead.NativeAdView
 import android.annotation.SuppressLint
-import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
-import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.material.chip.Chip
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
-import knf.kuma.commons.*
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.inflate
+import knf.kuma.commons.isFullMode
+import knf.kuma.commons.isVisibleAnimate
+import knf.kuma.commons.load
+import knf.kuma.commons.onClickMenu
+import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.FileAccessHelper
@@ -34,10 +38,16 @@ import knf.kuma.pojos.RecordObject
 import knf.kuma.pojos.SeenObject
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.FileActions
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import java.util.*
+import java.util.Locale
 
 class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentModel, ViewHolder>(RecentModel.DIFF) {
 
@@ -383,24 +393,24 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
     class AdsDealsViewHolder(private val scope: CoroutineScope, view: View): ViewHolder(view)
 
     class AdsViewHolder(private val scope: CoroutineScope, view: View) : ViewHolder(view) {
-        private val nativeAdView: NativeAdView = itemView.find(R.id.nativeAdView)
+        //private val nativeAdView: NativeAdView = itemView.find(R.id.nativeAdView)
         private val iconV: ShapeableImageView = itemView.find(R.id.icon)
-        private val primary: TextView = itemView.find(R.id.primary)
+        /*private val primary: TextView = itemView.find(R.id.primary)
         private val secondary: TextView = itemView.find(R.id.secondary)
-        private val cta: Chip = itemView.find(R.id.cta)
+        private val cta: Chip = itemView.find(R.id.cta)*/
 
-        init {
+        /*init {
             nativeAdView.apply {
                 iconView = iconV
                 headlineView = primary
                 bodyView = secondary
                 callToActionView = cta
             }
-        }
+        }*/
 
         @SuppressLint("DefaultLocale")
         fun setAd(modelAd: RecentModelAd) {
-            modelAd.unifiedNativeAd.apply {
+            /*modelAd.unifiedNativeAd.apply {
                 scope.launch(Dispatchers.Main) {
                     if (icon == null)
                         iconV.setImageDrawable(
@@ -422,7 +432,7 @@ class RecentModelsAdapter(private val fragment: Fragment) : ListAdapter<RecentMo
                     }
                     nativeAdView.setNativeAd(modelAd.unifiedNativeAd)
                 }
-            }
+            }*/
         }
     }
 }

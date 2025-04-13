@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<View xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="0dp"></View><!--
 <com.google.android.gms.ads.nativead.NativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -87,4 +90,4 @@
         </LinearLayout>
     </LinearLayout>
 
-</com.google.android.gms.ads.nativead.NativeAdView>
+</com.google.android.gms.ads.nativead.NativeAdView>-->

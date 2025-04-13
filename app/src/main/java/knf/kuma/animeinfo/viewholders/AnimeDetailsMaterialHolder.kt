@@ -1,25 +1,34 @@
 package knf.kuma.animeinfo.viewholders
 
+//import knf.kuma.ads.NativeManager
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
-import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration
+import ir.mahdiparastesh.chlm.ChipsLayoutManager
+import ir.mahdiparastesh.chlm.SpacingItemDecoration
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.AdsUtils
-import knf.kuma.ads.NativeManager
 import knf.kuma.ads.implBanner
 import knf.kuma.animeinfo.AnimeRelatedAdapterMaterial
 import knf.kuma.animeinfo.AnimeTagsAdapterMaterial
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.isVisibleAnimate
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.noCrashSuspend
+import knf.kuma.commons.removeAllDecorations
 import knf.kuma.custom.ExpandableTV
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.FragmentAnimeDetailsMaterialBinding
@@ -96,14 +105,14 @@ class AnimeDetailsMaterialHolder(val view: View) {
                 launch {
                     noCrashSuspend {
                         if (AdsUtils.isAdmobEnabled)
-                            NativeManager.take(fragment.lifecycleScope, 1) {
-                                if (it.isNotEmpty()) {
-                                    binding.adContainer.setNativeAd(it[0])
-                                } else {
-                                    binding.adContainer.isVisible = false
-                                    binding.layAd.implBanner(AdsType.INFO_BANNER)
-                                }
+                        /*NativeManager.take(fragment.lifecycleScope, 1) {
+                            if (it.isNotEmpty()) {
+                                binding.adContainer.setNativeAd(it[0])
+                            } else {
+                                binding.adContainer.isVisible = false
+                                binding.layAd.implBanner(AdsType.INFO_BANNER)
                             }
+                        }*/
                         else {
                             binding.adContainer.isVisible = false
                             binding.layAd.implBanner(AdsType.INFO_BANNER)

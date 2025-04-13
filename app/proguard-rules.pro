@@ -122,3 +122,4 @@
 -dontwarn io.opencensus.**
 -dontwarn dagger.**
 -dontwarn com.tonyodev.**
+-dontwarn ir.mahdiparastesh.chlm.Orientation

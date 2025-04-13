@@ -349,13 +349,13 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                                 fragment.lifecycleScope.launch(Dispatchers.Main){
                                     try {
                                         val version = withContext(Dispatchers.IO) {
-                                            Regex("load\\.(\\w+)\\.js").find(URL("https://https-animeflv-net.disqus.com/embed.js").readText())?.destructured?.component1()
+                                            Regex("load\\.(\\w+)\\.js").find(URL("https://https-myanimelist-net-2.disqus.com/embed.js").readText())?.destructured?.component1()!!
                                         }
                                         CommentariesDialog.show(
                                             fragment,
-                                            withContext(Dispatchers.IO) {
-                                                chapter.chapter.commentariesLink(version)
-                                            })
+                                            chapter.chapter.link,
+                                            version
+                                        )
                                     } catch (e: Exception) {
                                         noCrashSuspend {
                                             context.startActivity(

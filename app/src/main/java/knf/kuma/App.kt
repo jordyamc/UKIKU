@@ -82,7 +82,8 @@ class App : Application(), Configuration.Provider {
             ).apply { setShowBadge(false) })
     }
 
-    override fun getWorkManagerConfiguration() = Configuration.Builder().build()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().build()
 
     override fun onCreate() {
         super.onCreate()

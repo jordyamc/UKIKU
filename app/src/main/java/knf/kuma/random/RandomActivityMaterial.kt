@@ -16,15 +16,19 @@ import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.inflate
+import knf.kuma.commons.setSurfaceBars
+import knf.kuma.commons.verifyManager
 import knf.kuma.custom.BannerContainerView
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.find
 
 class RandomActivityMaterial : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val toolbar: Toolbar by bind(R.id.toolbar)
@@ -60,7 +64,7 @@ class RandomActivityMaterial : GenericActivity(), SwipeRefreshLayout.OnRefreshLi
         refreshList()
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
-            find<BannerContainerView>(R.id.adContainer).implBanner(AdsType.RANDOM_BANNER, true)
+            findViewById<BannerContainerView>(R.id.adContainer).implBanner(AdsType.RANDOM_BANNER, true)
         }
     }
 
@@ -68,7 +72,7 @@ class RandomActivityMaterial : GenericActivity(), SwipeRefreshLayout.OnRefreshLi
         counter++
         if (counter >= 15)
             AchievementManager.unlock(listOf(32))
-        doAsync {
+        lifecycleScope.launch(Dispatchers.IO) {
             val list = CacheDB.INSTANCE.animeDAO().getRandom(PrefsUtil.randomLimit)
             doOnUI {
                 refreshLayout.isRefreshing = false
@@ -91,7 +95,7 @@ class RandomActivityMaterial : GenericActivity(), SwipeRefreshLayout.OnRefreshLi
         AlertDialog.Builder(this).apply {
             setTitle("Numero de resultados")
             val view = inflate(this@RandomActivityMaterial, R.layout.dialog_random_picker)
-            val picker = view.find<MaterialNumberPicker>(R.id.picker)
+            val picker = view.findViewById<MaterialNumberPicker>(R.id.picker)
             picker.value = PrefsUtil.randomLimit
             setView(view)
             setPositiveButton("OK") { _, _ ->

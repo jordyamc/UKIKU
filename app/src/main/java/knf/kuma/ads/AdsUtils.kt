@@ -4,10 +4,8 @@ import android.app.Activity
 import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.ads.AdSize
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.diceOf
@@ -298,19 +296,6 @@ fun showRandomInterstitial(
             put({}, probDefault.toDouble())
         }()
     }
-}
-
-fun getAdSize(width: Float): AdSize {
-    val metrics = App.context.resources.displayMetrics
-    val density = metrics.density
-    var adWidthPixels = width
-    if (adWidthPixels == 0f) {
-        adWidthPixels = metrics.widthPixels.toFloat()
-    }
-
-    val adWidth = (adWidthPixels / density).toInt()
-    return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(App.context, adWidth)
-
 }
 
 interface FullscreenAdLoader {

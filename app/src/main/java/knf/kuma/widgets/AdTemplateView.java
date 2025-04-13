@@ -3,7 +3,6 @@ package knf.kuma.widgets;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.Button;
@@ -14,11 +13,6 @@ import android.widget.TextView;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.ads.nativead.NativeAd;
-import com.google.android.gms.ads.nativead.NativeAdView;
-
-import org.jetbrains.annotations.NotNull;
-
 import knf.kuma.R;
 
 /**
@@ -28,8 +22,8 @@ public class AdTemplateView extends FrameLayout {
 
     private static final String SMALL_TEMPLATE = "small_template";
     private NativeTemplateStyle styles;
-    private NativeAd nativeAd;
-    private NativeAdView nativeAdView;
+    //private NativeAd nativeAd;
+    //private NativeAdView nativeAdView;
     private TextView primaryView;
     private TextView secondaryView;
     private ImageView iconView;
@@ -59,9 +53,9 @@ public class AdTemplateView extends FrameLayout {
         this.applyStyles();
     }
 
-    public NativeAdView getNativeAdView() {
+    /*public NativeAdView getNativeAdView() {
         return nativeAdView;
-    }
+    }*/
 
     private void applyStyles() {
 
@@ -99,7 +93,7 @@ public class AdTemplateView extends FrameLayout {
         requestLayout();
     }
 
-    private boolean adHasOnlyStore(NativeAd nativeAd) {
+    /*private boolean adHasOnlyStore(NativeAd nativeAd) {
         String store = nativeAd.getStore();
         String advertiser = nativeAd.getAdvertiser();
         return !TextUtils.isEmpty(store) && TextUtils.isEmpty(advertiser);
@@ -144,16 +138,16 @@ public class AdTemplateView extends FrameLayout {
         }
 
         nativeAdView.setNativeAd(nativeAd);
-    }
+    }*/
 
     /**
      * To prevent memory leaks, make sure to destroy your ad when you don't need it anymore. This
      * method does not destroy the template view.
      * https://developers.google.com/admob/android/native-unified#destroy_ad
      */
-    public void destroyNativeAd() {
+    /*public void destroyNativeAd() {
         nativeAd.destroy();
-    }
+    }*/
 
     public String getTemplateTypeName() {
         return SMALL_TEMPLATE;
@@ -171,11 +165,11 @@ public class AdTemplateView extends FrameLayout {
     @Override
     public void onFinishInflate() {
         super.onFinishInflate();
-        nativeAdView = findViewById(R.id.native_ad_view);
-        primaryView = findViewById(R.id.primary);
-        secondaryView = findViewById(R.id.secondary);
+        //nativeAdView = findViewById(R.id.native_ad_view);
+        //primaryView = findViewById(R.id.primary);
+        //secondaryView = findViewById(R.id.secondary);
 
-        callToActionView = findViewById(R.id.cta);
+        //callToActionView = findViewById(R.id.cta);
         iconView = findViewById(R.id.icon);
     }
 }

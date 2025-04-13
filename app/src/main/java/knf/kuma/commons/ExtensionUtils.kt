@@ -21,7 +21,13 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.*
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.FontRes
+import androidx.annotation.IdRes
+import androidx.annotation.LayoutRes
+import androidx.annotation.MenuRes
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
@@ -34,10 +40,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.afollestad.aesthetic.AestheticActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -60,7 +68,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Connection
@@ -218,10 +225,6 @@ fun View.createSnackbar(text: String, duration: Int = Snackbar.LENGTH_SHORT): Sn
 
 val Int.asPx: Int
     get() = (this * Resources.getSystem().displayMetrics.density).toInt()
-
-fun AestheticActivity.setDefaults() {
-    AestheticUtils.setDefaults(applicationContext)
-}
 
 fun <T : View> Activity.bind(@IdRes res: Int): Lazy<T> {
     @Suppress("UNCHECKED_CAST")
@@ -644,7 +647,7 @@ fun View.onClickMenu(
         @MenuRes menu: Int, showIcons: Boolean = true,
         hideItems: () -> List<Int> = { emptyList() },
         onItemClicked: (item: MenuItem) -> Unit = {}
-) = this.onClick { popUpMenu(this@onClickMenu, menu, showIcons, hideItems, onItemClicked) }
+) = this.setOnClickListener { popUpMenu(this@onClickMenu, menu, showIcons, hideItems, onItemClicked) }
 
 @SuppressLint("RestrictedApi")
 fun popUpMenu(

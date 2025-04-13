@@ -1,13 +1,8 @@
 package knf.kuma.ads
 
-import android.app.Activity
-import android.os.Bundle
-import android.util.Log
-import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.AdListener
+/*import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
@@ -16,30 +11,19 @@ import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.firebase.analytics.FirebaseAnalytics
-import knf.kuma.App
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback*/
+import android.app.Activity
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import knf.kuma.BuildConfig
-import knf.kuma.R
-import knf.kuma.commons.Economy
-import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.asyncInflate
-import knf.kuma.custom.BannerContainerView
 import knf.kuma.news.AdNewsObject
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
-import knf.kuma.widgets.AdTemplateView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.collections.forEachReversedWithIndex
-import org.jetbrains.anko.find
-import xdroid.toaster.Toaster.toast
 
 object AdsUtilsMob {
     val RECENT_BANNER get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else AdmobID.RECENT_BANNER
@@ -63,17 +47,18 @@ object AdsUtilsMob {
     val LIST_NATIVE get() = if (BuildConfig.DEBUG) "ca-app-pub-5390653757953587/5447863415" else AdmobID.LIST_NATIVE
     val REWARDED get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/5224354917" else AdmobID.REWARDED
     val INTERSTITIAL get() = if (BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else AdmobID.INTERSTITIAL
-    val adRequest: AdRequest get() = AdRequest.Builder().build()
+
+    //val adRequest: AdRequest get() = AdRequest.Builder().build()
     val ACHIEVEMENT_NATIVE = "achievement_native"
 
     fun setUp(context: Activity, callback: () -> Unit) {
-        MobileAds.initialize(context) {
+        /*MobileAds.initialize(context) {
             NativeManager
             callback()
         }
         if (!BuildConfig.DEBUG) return
         val builder = RequestConfiguration.Builder().setTestDeviceIds(listOf("FE18DCEC5EE5755C3927E4EC30CD4F9D"))
-        MobileAds.setRequestConfiguration(builder.build())
+        MobileAds.setRequestConfiguration(builder.build())*/
     }
 }
 
@@ -192,7 +177,7 @@ fun ViewGroup.implBannerMob(unitID: AdsType, isSmart: Boolean = false) {
 }
 
 fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
-    if (PrefsUtil.isAdsEnabled) {
+    /*if (PrefsUtil.isAdsEnabled) {
         GlobalScope.launch g@{
             if (this@implBannerMob.tag == "AdView added")
                 return@g
@@ -265,7 +250,7 @@ fun ViewGroup.implBannerMob(unitID: String, isSmart: Boolean = false) {
                 }
             }
         }
-    }
+    }*/
 }
 
 fun getFAdLoaderRewardedMob(context: Activity, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderRewardedMob(context, onUpdate)
@@ -273,7 +258,7 @@ fun getFAdLoaderInterstitialMob(context: Activity, onUpdate: () -> Unit): Fullsc
 
 class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
 
-    private var rewardedAd: RewardedAd? = null
+    /*private var rewardedAd: RewardedAd? = null
 
     private fun createAndLoadRewardAd() {
         rewardedAd = null
@@ -292,10 +277,10 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
                 }
             }
         })
-    }
+    }*/
 
     private fun showRewarded() {
-        rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+        /*rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 createAndLoadRewardAd()
             }
@@ -304,25 +289,25 @@ class FAdLoaderRewardedMob(val context: Activity, private val onUpdate: () -> Un
             FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
             Economy.reward(baseReward = 2)
             onUpdate()
-        }
+        }*/
     }
 
     override fun load() {
-        if (rewardedAd == null) createAndLoadRewardAd()
+        //if (rewardedAd == null) createAndLoadRewardAd()
     }
 
     override fun show() {
-        when {
+        /*when {
             !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
             rewardedAd != null -> showRewarded()
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
             else -> toast("Anuncio aún cargando...")
-        }
+        }*/
     }
 }
 
 class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
-    private var interstitialAd: InterstitialAd? = null
+    /*private var interstitialAd: InterstitialAd? = null
 
     private fun createAndLoad() {
         interstitialAd = null
@@ -341,40 +326,40 @@ class FAdLoaderInterstitialMob(val context: Activity, private val onUpdate: () -
                 }
             }
         })
-    }
+    }*/
 
     override fun load() {
-        if (interstitialAd == null) createAndLoad()
+        //if (interstitialAd == null) createAndLoad()
     }
 
     override fun show() {
-        when {
-            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
-            interstitialAd != null -> {
-                interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                    override fun onAdDismissedFullScreenContent() {
-                        FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
-                        createAndLoad()
-                        Economy.reward(false)
-                        onUpdate()
-                    }
-                }
-                interstitialAd?.show(context)
-            }
-            Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
-            else -> toast("Anuncio aún cargando...")
-        }
+        /* when {
+             !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
+             interstitialAd != null -> {
+                 interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                     override fun onAdDismissedFullScreenContent() {
+                         FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
+                         createAndLoad()
+                         Economy.reward(false)
+                         onUpdate()
+                     }
+                 }
+                 interstitialAd?.show(context)
+             }
+             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
+             else -> toast("Anuncio aún cargando...")
+         }*/
     }
 }
 
 class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenAdLoader {
-    private var interstitialAd: InterstitialAd? = null
+    //private var interstitialAd: InterstitialAd? = null
 
     init {
-        createAndLoad()
+        //createAndLoad()
     }
 
-    private fun createAndLoad() {
+    /*private fun createAndLoad() {
         interstitialAd = null
         InterstitialAd.load(context, AdsUtilsMob.INTERSTITIAL, AdsUtilsMob.adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(p0: InterstitialAd) {
@@ -391,14 +376,14 @@ class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenA
                 }
             }
         })
-    }
+    }*/
 
     override fun load() {
-        if (interstitialAd == null) createAndLoad()
+        //if (interstitialAd == null) createAndLoad()
     }
 
     override fun show() {
-        when {
+        /*when {
             interstitialAd != null -> {
                 interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                     override fun onAdDismissedFullScreenContent() {
@@ -419,11 +404,24 @@ class FAdLoaderInterstitialLazyMob(val context: AppCompatActivity) : FullscreenA
                 if (interstitialAd != null)
                     show()
             }
-        }
+        }*/
     }
 }
 
-abstract class AbsAdListener : AdListener()
+/*fun getAdSize(width: Float): AdSize {
+    val metrics = App.context.resources.displayMetrics
+    val density = metrics.density
+    var adWidthPixels = width
+    if (adWidthPixels == 0f) {
+        adWidthPixels = metrics.widthPixels.toFloat()
+    }
+
+    val adWidth = (adWidthPixels / density).toInt()
+    return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(App.context, adWidth)
+
+}*/
+
+//abstract class AbsAdListener : AdListener()
 
 object AdmobID {
     const val RECENT_BANNER = "ca-app-pub-8896186846999141/5663284088"
