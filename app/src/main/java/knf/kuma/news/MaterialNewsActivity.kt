@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -45,7 +46,7 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
         super.onCreate(savedInstanceState)
         setSurfaceBars()
         setContentView(binding.root)
-        binding.toolbar.title = "Noticias"
+        binding.toolbar.title = "Recientes"
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
@@ -69,6 +70,7 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
             lifecycleScope.launch {
                 NewsRepository.getNews(getCategory()) { isEmpty, cause ->
                     if (isEmpty) {
+                        Log.e("News", "Error loading: $cause")
                         binding.error.visibility = View.VISIBLE
                         snack = binding.recycler.showSnackbar("Error al cargar noticias: $cause", Snackbar.LENGTH_INDEFINITE, "reintentar") {
                             loadList()
@@ -89,16 +91,16 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
 
     private fun getCategory(): String {
         return when (model.selectedFilter) {
-            1 -> "categoria/noticias/anime"
-            2 -> "categoria/noticias/cultura-otaku"
-            3 -> "categoria/noticias/japon"
-            4 -> "categoria/noticias/live-action"
-            5 -> "categoria/noticias/manga"
-            6 -> "categoria/noticias/mercancia-de-anime"
-            7 -> "categoria/noticias/novelas-ligeras"
-            8 -> "categoria/noticias/videojuegos"
-            9 -> "categoria/resenas"
-            else -> "noticias"
+            1 -> "noticias/anime"
+            2 -> "noticias/cultura-otaku"
+            3 -> "noticias/japon"
+            4 -> "noticias/live-action"
+            5 -> "noticias/manga"
+            6 -> "noticias/mercancia-de-anime"
+            7 -> "noticias/novelas-ligeras"
+            8 -> "noticias/videojuegos"
+            9 -> "noticias/resenas"
+            else -> "noticias/"
         }
     }
 
@@ -118,7 +120,8 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
                 initialSelection = model.selectedFilter,
                 waitForPositiveButton = false
             ) { _, index, name ->
-                supportActionBar?.title = if (index == 0) "Noticias" else name
+                binding.refresh.isRefreshing = true
+                supportActionBar?.title = name
                 model.selectedFilter = index
                 loadList()
             }

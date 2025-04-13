@@ -1,18 +1,14 @@
 package knf.kuma.commons
 
-import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.databinding.DialogWalletBinding
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster.toast
 
@@ -30,7 +26,6 @@ object Economy {
                 put(baseReward + 1, if (isAdClicked) 15.0 else 8.0)
                 put(baseReward + 2, if (isAdClicked) 5.0 else 2.0)
             }
-            doAsync { repeat(reward) { FirebaseAnalytics.getInstance(App.context).logEvent("Coins_generated", Bundle()) } }
             PrefsUtil.userCoins = (PrefsUtil.userCoins + reward).also { coinsLiveData.value = it }
             PrefsUtil.userRewardedVideoCount = (PrefsUtil.userRewardedVideoCount + 1).also { rewardedVideoLiveData.value = it }
             FirestoreManager.updateTop()
@@ -43,7 +38,6 @@ object Economy {
         val total = PrefsUtil.userCoins
         return if (total >= price) {
             PrefsUtil.userCoins = (total - price).also { doOnUIGlobal { coinsLiveData.value = it } }
-            doAsync { repeat(price) { FirebaseAnalytics.getInstance(App.context).logEvent("Coins_used", Bundle()) } }
             true
         } else false
     }

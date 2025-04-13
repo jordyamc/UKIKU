@@ -1,7 +1,6 @@
 package knf.kuma.ads
 
 import android.app.Activity
-import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +18,6 @@ import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinPrivacySettings
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
-import com.google.firebase.analytics.FirebaseAnalytics
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.commons.Economy
@@ -206,7 +204,6 @@ class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: ()
             override fun onAdHidden(p0: MaxAd) {
                 isLoading = true
                 interstitialAd.loadAd()
-                FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
                 Economy.reward(isClicked)
                 isClicked = false
                 onUpdate()
@@ -269,7 +266,6 @@ class FAdLoaderRewardedLovin(val context: Activity, private val onUpdate: () -> 
             override fun onAdLoadFailed(p0: String, p1: MaxError) {}
             override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {}
             override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
-                FirebaseAnalytics.getInstance(App.context).logEvent("Rewarded_Ad_watched", Bundle())
                 Economy.reward(isClicked)
             }
         })
@@ -318,7 +314,6 @@ class FAdLoaderInterstitialLazyLovin(val context: AppCompatActivity) : Fullscree
             override fun onAdHidden(p0: MaxAd) {
                 isLoading = true
                 interstitialAd.loadAd()
-                FirebaseAnalytics.getInstance(App.context).logEvent("Interstitial_Ad_watched", Bundle())
                 Economy.reward(isClicked)
                 isClicked = false
             }

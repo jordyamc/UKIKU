@@ -1,6 +1,5 @@
 package knf.kuma
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,9 +11,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
-import com.google.firebase.ktx.Firebase
 import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
 import fr.bmartel.speedtest.inter.ISpeedTestListener
@@ -360,12 +356,6 @@ class Diagnostic : GenericActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 5546) {
-            if (resultCode == Activity.RESULT_OK) {
-                Firebase.analytics.logEvent("bypass_success") {
-                    param("user_agent", data?.getStringExtra("user_agent") ?: "empty")
-                    param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
-                }
-            }
             data?.let {
                 PrefsUtil.useDefaultUserAgent = false
                 PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()

@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="?colorSurface"
+        android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay.Simple.NoBackground"
         app:elevation="0dp">
 

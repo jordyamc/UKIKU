@@ -53,12 +53,12 @@ class DropBoxService : BackupService() {
     override suspend fun search(id: String, manual: Boolean): BackupObject<*>? {
         return if (isLoggedIn)
             try {
-                val list = client?.files()?.search("", id)?.matches ?: arrayListOf()
+                val list = client?.files()?.searchV2(id)?.matches ?: arrayListOf()
                 if (list.size > 0) {
                     val downloader = client?.files()?.download("/$id")
-                    val reader = InputStreamReader(downloader?.inputStream)
-                    val backupObject = Gson().fromJson<Any>(reader.readText().checkResponse(id), Backups.getType(id)) as BackupObject<*>
-                    reader.close()
+                    val backupObject = InputStreamReader(downloader?.inputStream).use {
+                        Gson().fromJson<Any>(it.readText().checkResponse(id), Backups.getType(id)) as BackupObject<*>
+                    }
                     downloader?.close()
                     backupObject
                 } else

@@ -7,10 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.security.ProviderInstaller
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PicassoSingle
@@ -139,12 +136,6 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 7425) {
-            if (resultCode == Activity.RESULT_OK) {
-                Firebase.analytics.logEvent("bypass_success") {
-                    param("user_agent", data?.getStringExtra("user_agent") ?: "empty")
-                    param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
-                }
-            }
             val cookiesUpdated = data?.let {
                 PrefsUtil.useDefaultUserAgent = false
                 PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()

@@ -1,6 +1,5 @@
 package knf.kuma.custom
 
-import android.app.Activity
 import android.app.ActivityManager
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -15,10 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
 import knf.kuma.R
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.PicassoSingle
@@ -118,12 +114,6 @@ open class GenericActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 4157) {
-            if (resultCode == Activity.RESULT_OK) {
-                Firebase.analytics.logEvent("bypass_success") {
-                    param("user_agent", data?.getStringExtra("user_agent") ?: "empty")
-                    param("bypass_time", data?.getLongExtra("finishTime", 0L) ?: 0L)
-                }
-            }
             val cookiesUpdated = data?.let {
                 PrefsUtil.useDefaultUserAgent = false
                 PrefsUtil.userAgent = it.getStringExtra("user_agent") ?: randomUA()

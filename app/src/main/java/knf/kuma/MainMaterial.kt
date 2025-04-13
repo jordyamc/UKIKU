@@ -33,7 +33,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import knf.kuma.achievements.AchievementActivityMaterial
@@ -129,8 +128,6 @@ class MainMaterial : GenericActivity(),
             finish()
             return
         }
-        FirebaseAnalytics.getInstance(this)
-            .setUserProperty("ads_enabled_new", PrefsUtil.isAdsEnabled.toString())
         try {
             setContentView(R.layout.activity_main_material)
         } catch (e: Exception) {

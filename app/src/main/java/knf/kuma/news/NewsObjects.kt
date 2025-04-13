@@ -8,7 +8,11 @@ import android.net.Uri
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
-import androidx.paging.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import androidx.recyclerview.widget.DiffUtil
 import knf.kuma.commons.NoSSLOkHttpClient
 import knf.kuma.commons.safeContext
@@ -28,19 +32,19 @@ import retrofit2.http.Path
 
 @Keep
 class NewsItem {
-    @Selector("header h2", defValue = "")
+    @Selector("header h3", defValue = "")
     lateinit var title: String
 
-    @Selector("header span.typ", defValue = "")
+    @Selector("header p", defValue = "")
     lateinit var type: String
 
-    @Selector("header span.db.op5", defValue = "")
+    @Selector(":root", converter = DateConverter::class)
     lateinit var date: String
 
     @Selector(":root", converter = ImageConverter::class)
     lateinit var image: String
 
-    @Selector("a", attr = "href", defValue = "")
+    @Selector("header h3 a", attr = "href", defValue = "")
     lateinit var link: String
 
     class ImageConverter : ElementConverter<String> {
@@ -51,6 +55,13 @@ class NewsItem {
                 image.hasAttr("src") -> image.attr("src")
                 else -> ""
             }
+        }
+    }
+
+    class DateConverter : ElementConverter<String> {
+        override fun convert(node: Element, selector: Selector): String {
+            val date = node.select("footer > span:last-of-type").first()
+            return date.text().substringBeforeLast(" por ")
         }
     }
 
@@ -66,7 +77,7 @@ class NewsItem {
 }
 
 class NewsPage {
-    @Selector("article:not(.logo)")
+    @Selector("article:has(figure):has(h3):not(.logo):not(.grid)")
     var newsList: List<NewsItem> = emptyList()
 }
 
@@ -80,18 +91,23 @@ class NewsDataSource(private val newsFactory: NewsFactory, val category: String,
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, NewsItem> {
         val page = params.key?:1
         try {
-            val response = withContext(Dispatchers.IO) { newsFactory.getNewsPage(category, page).execute() }
+            val response = withContext(Dispatchers.IO) {
+                when (category) {
+                    "noticias/" -> newsFactory.getLatestPage().execute()
+                    else -> newsFactory.getNewsPage(category, page).execute()
+                }
+            }
             if (response.isSuccessful){
                 response.body()?.let {
                     if (page == 1)
                         onInit(false, null)
-                    return LoadResult.Page(it.newsList, null, if (it.newsList.size < 12) null else page + 1)
+                    return LoadResult.Page(it.newsList, null, if (it.newsList.size < 12 || category == "noticias/") null else page + 1)
                 } ?: run{
                     if (page == 1)
                         onInit(true, "Empty body")
                 }
             }
-            val errorString = withContext(Dispatchers.IO) { response.errorBody()?.toString() }
+            val errorString = withContext(Dispatchers.IO) { response.errorBody()?.string() }
             if (page == 1)
                 onInit(true, "$errorString")
             return LoadResult.Error(IllegalStateException())
@@ -108,8 +124,11 @@ class NewsDataSource(private val newsFactory: NewsFactory, val category: String,
 }
 
 interface NewsFactory {
-    @GET("{category}/page/{page}/")
+    @GET("{category}/{page}/")
     fun getNewsPage(@Path("category") category: String, @Path("page") page: Int): Call<NewsPage>
+
+    @GET("noticias/")
+    fun getLatestPage(): Call<NewsPage>
 }
 
 object NewsRepository {

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="218" version="5.3.8">
+        <change type="fix">Corrección en noticias</change>
+    </release>
     <release code="217" version="5.3.7">
         <change type="fix">Corrección StreamWish</change>
         <change type="fix">Corrección comentarios</change>

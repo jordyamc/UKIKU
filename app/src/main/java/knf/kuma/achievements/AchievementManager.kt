@@ -6,16 +6,19 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.google.firebase.analytics.FirebaseAnalytics
-import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.Backups
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.distinct
+import knf.kuma.commons.doOnUIGlobal
+import knf.kuma.commons.isTV
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.toast
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.database.CacheDB
 import knf.kuma.database.EADB
@@ -27,7 +30,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 @SuppressLint("StaticFieldLeak")
 object AchievementManager {
@@ -225,7 +229,6 @@ object AchievementManager {
                     if (!achievementsDAO.isUnlocked(it) && !isTV) {
                         val achievement = achievementsDAO.find(it)
                         if (achievement != null) {
-                            FirebaseAnalytics.getInstance(App.context).logEvent("Achievement", Bundle().apply { putInt("code", it) })
                             list.add(achievement.apply {
                                 isUnlocked = true
                                 time = System.currentTimeMillis()
