@@ -14,8 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.dropbox.core.android.Auth
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
@@ -76,14 +74,8 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
                 "Proveedor de seguridad no pudo ser actualizado (${PrefsUtil.spErrorType})"
             binding.layMain.adsRequired.visibility = View.VISIBLE
         }
-        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
-            FirestoreManager.start()
-            binding.layMain.loginFirestore.setOnClickListener { onFirestoreLogin() }
-        } else {
-            binding.layMain.loginFirestore.isEnabled = false
-            binding.layMain.adsRequired.text = "Google Play Services no disponibles"
-            binding.layMain.adsRequired.visibility = View.VISIBLE
-        }
+        FirestoreManager.start()
+        binding.layMain.loginFirestore.setOnClickListener { onFirestoreLogin() }
         binding.layMain.loginLocal.setOnClickListener { onLocalLogin() }
         binding.layButtons.logOut.setOnClickListener { onLogOut() }
         binding.layFirestore.logOutFirestore.setOnClickListener { onLogOut() }

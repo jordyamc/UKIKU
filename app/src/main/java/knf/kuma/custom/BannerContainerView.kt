@@ -5,6 +5,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import knf.kuma.R
 import org.jetbrains.anko.find
 
@@ -21,8 +23,13 @@ class BannerContainerView @JvmOverloads constructor(context: Context, attrs: Att
     }
 
     fun show(view: View) {
-        if (showBottom)
+        if (showBottom) {
+            ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+                find<View>(R.id.spaceBottom).layoutParams.height = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+                WindowInsetsCompat.CONSUMED
+            }
             find<View>(R.id.spaceBottom).visibility = View.VISIBLE
+        }
         find<View>(R.id.spaceTop).visibility = View.VISIBLE
         with(find<ViewGroup>(R.id.container)) {
             removeAllViews()

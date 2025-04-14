@@ -10,6 +10,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorAccentLight">@color/colorAccentLight</item>
         <item name="colorOnSurface">@color/textPrimary</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
@@ -71,9 +72,7 @@
     <style name="AppTheme.NoActionBar" parent="AppTheme.DayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
     <style name="AppTheme.FullScreen" parent="AppTheme.DayNight">
@@ -146,6 +145,7 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Light">
         <item name="android:background">?attr/colorSurface</item>
+        <item name="android:backgroundTint">?colorSurface</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay.Simple" parent="ThemeOverlay.MaterialComponents.Light">

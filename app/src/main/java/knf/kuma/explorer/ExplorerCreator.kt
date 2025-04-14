@@ -6,8 +6,7 @@ import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.ExplorerObject
 import org.jetbrains.anko.doAsync
-import xdroid.toaster.Toaster
-import java.util.*
+import java.util.Locale
 
 object ExplorerCreator {
     var IS_CREATED = false
@@ -22,9 +21,10 @@ object ExplorerCreator {
         IS_CREATED = true
         doAsync {
             if (!FileAccessHelper.isStoragePermissionEnabled()) {
-                Toaster.toastLong("Permiso de almacenamiento no concedido")
-                listener.onEmpty()
+                //Toaster.toastLong("Permiso de almacenamiento no concedido")
+                listener.onPermissionFailed()
                 postState(null)
+                IS_CREATED = false
                 return@doAsync
             }
             postState("Iniciando busqueda")
@@ -60,5 +60,6 @@ object ExplorerCreator {
 
     interface EmptyListener {
         fun onEmpty()
+        fun onPermissionFailed()
     }
 }

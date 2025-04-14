@@ -510,6 +510,9 @@ object FirestoreManager {
                     AuthUI.IdpConfig.GoogleBuilder().build(),
                     AuthUI.IdpConfig.TwitterBuilder().build()
             )
+            /*if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity) != ConnectionResult.SUCCESS) {
+                providers.removeAt(1)
+            }*/
             activity.startActivityForResult(
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()

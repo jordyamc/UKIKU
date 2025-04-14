@@ -12,11 +12,13 @@ import knf.kuma.pojos.ExplorerObject
 import xdroid.toaster.Toaster
 
 
-class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.SelectedListener, FragmentChaptersMaterial.ClearInterface, ExplorerCreator.EmptyListener {
+class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.SelectedListener, FragmentChaptersMaterial.ClearInterface, ExplorerCreator.EmptyListener,
+    FragmentPermission.PermissionListener {
 
     private val model: ExplorerFilesModel by activityViewModels()
     private var files: FragmentFilesMaterial = FragmentFilesMaterial[this]
     private val chapters: FragmentChaptersMaterial = FragmentChaptersMaterial[this]
+    private val permissions: FragmentPermission = FragmentPermission[this]
     private var isFiles = true
     private var name: String? = null
     private var stateChange: OnFileStateChange? = null
@@ -36,6 +38,8 @@ class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.Selected
             transaction.add(R.id.root, files, FragmentFiles.TAG)
         if (!chapters.isAdded)
             transaction.add(R.id.root, chapters, FragmentChapters.TAG)
+        if (!permissions.isAdded)
+            transaction.add(R.id.root, permissions, FragmentPermission.TAG)
         transaction.commit()
         super.onViewCreated(view, savedInstanceState)
     }
@@ -47,6 +51,7 @@ class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.Selected
         ExplorerCreator.IS_FILES = isFiles
         ExplorerCreator.FILES_NAME = explorerObject
         val transaction = childFragmentManager.beginTransaction()
+        transaction.hide(permissions)
         if (isFiles) {
             transaction.hide(chapters)
             transaction.show(files)
@@ -56,6 +61,14 @@ class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.Selected
             transaction.show(chapters)
         }
         transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout)
+        transaction.commit()
+    }
+
+    private fun showPermissionScreen() {
+        val transaction = childFragmentManager.beginTransaction()
+        transaction.hide(files)
+        transaction.hide(chapters)
+        transaction.show(permissions)
         transaction.commit()
     }
 
@@ -103,6 +116,16 @@ class FragmentFilesRootMaterial : FragmentBase(), FragmentFilesMaterial.Selected
 
     override fun onEmpty() {
         files.onEmpty()
+    }
+
+    override fun onPermissionFailed() {
+        showPermissionScreen()
+    }
+
+    override fun onPermission() {
+        setFragment(ExplorerCreator.IS_FILES, ExplorerCreator.FILES_NAME)
+        if (!ExplorerCreator.IS_CREATED)
+            ExplorerCreator.start(model, this)
     }
 
     override fun onBackPressed(): Boolean {

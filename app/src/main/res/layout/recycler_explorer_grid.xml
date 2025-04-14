@@ -27,7 +27,8 @@
         <knf.kuma.custom.BannerContainerView
             android:id="@+id/adContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:showBottomSpace="true" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
@@ -63,8 +64,8 @@
             android:layout_height="200dp"
             android:layout_gravity="center_horizontal"
             android:adjustViewBounds="false"
-            android:tint="?android:textColorSecondary"
-            app:srcCompat="@drawable/ic_no_downloads"/>
+            app:srcCompat="@drawable/ic_no_downloads"
+            app:tint="?android:textColorSecondary" />
 
         <TextView
             android:layout_width="wrap_content"

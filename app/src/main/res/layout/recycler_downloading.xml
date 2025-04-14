@@ -62,7 +62,8 @@
             android:id="@+id/adContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true"
+            app:showBottomSpace="true" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/clear"
