@@ -20,9 +20,11 @@ class TVTagFragment : VerticalGridSupportFragment(), OnItemViewClickedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = arguments?.getString("genre")
-        gridPresenter = VerticalGridPresenter().apply {
-            numberOfColumns = 4
-        }
+        setGridPresenter(
+            VerticalGridPresenter().apply {
+                numberOfColumns = 4
+            }
+        )
         onItemViewClickedListener = this
         CacheDB.INSTANCE.animeDAO().getAllGenreLive("%" + arguments?.getString("genre") + "%").observe(this, Observer {
             if (!it.isNullOrEmpty()) {

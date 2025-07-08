@@ -11,7 +11,7 @@ class SectionPresenter : Presenter() {
         return ViewHolder(SectionCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         (item as? SectionObject)?.let {
             (viewHolder.view as? SectionCardView)?.bind(it)
         }

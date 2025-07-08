@@ -55,7 +55,7 @@ class DirectoryPageAdapterMaterial internal constructor(private val fragment: Fr
             1 -> "\u2605${getItem(position)?.rate_stars ?: "?.?"}"
             2 -> getItem(position)?.aid ?: ""
             3 -> getItem(position)?.aid ?: ""
-            else -> getItem(position)?.name?.first()?.toUpperCase()?.toString() ?: ""
+            else -> getItem(position)?.name?.first()?.uppercaseChar()?.toString() ?: ""
         }
     }
 

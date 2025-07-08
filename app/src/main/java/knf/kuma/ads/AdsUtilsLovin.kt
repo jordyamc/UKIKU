@@ -19,6 +19,7 @@ import com.applovin.sdk.AppLovinPrivacySettings
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import knf.kuma.App
+import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.Economy
 import knf.kuma.commons.Network
@@ -40,13 +41,13 @@ import xdroid.toaster.Toaster.toast
 
 object AdsUtilsLovin {
     fun setUp(context: Activity, callback: () -> Unit) {
-        val initConfig = AppLovinSdkInitializationConfiguration.builder("QHQI9Sl_Fltmz6OzT9WBg6sTUG3SlJOaLf6E7G4xMGsOake13NQHoHFK6dAUnG0u_18dllB1Q7mGheTwmEl8AD", context)
+        val initConfig = AppLovinSdkInitializationConfiguration.builder("QHQI9Sl_Fltmz6OzT9WBg6sTUG3SlJOaLf6E7G4xMGsOake13NQHoHFK6dAUnG0u_18dllB1Q7mGheTwmEl8AD")
             .setMediationProvider(AppLovinMediationProvider.MAX)
             .build()
         AppLovinSdk.getInstance(context).initialize(initConfig) {
-            if (!AppLovinPrivacySettings.hasUserConsent(context)) {
-                AppLovinPrivacySettings.setHasUserConsent(true, context)
-                AppLovinPrivacySettings.setDoNotSell(false, context)
+            if (!AppLovinPrivacySettings.hasUserConsent()) {
+                AppLovinPrivacySettings.setHasUserConsent(true)
+                AppLovinPrivacySettings.setDoNotSell(false)
             }
             callback()
         }
@@ -156,7 +157,7 @@ fun ViewGroup.implBannerLovin() {
                 return@g
             if (this@implBannerLovin !is BannerContainerView) {
                 GlobalScope.launch {
-                    val adView = MaxAdView("91d782c7eb7efc75", App.context)
+                    val adView = MaxAdView("91d782c7eb7efc75")
                     adView.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50.asPx)
                     adView.setBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
                     launch(Dispatchers.Main) {
@@ -166,7 +167,7 @@ fun ViewGroup.implBannerLovin() {
                     }
                 }
             } else {
-                val adView = MaxAdView("91d782c7eb7efc75", App.context)
+                val adView = MaxAdView("91d782c7eb7efc75")
                 adView.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50.asPx)
                 adView.setBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
                 launch(Dispatchers.Main) {
@@ -183,7 +184,7 @@ fun getFAdLoaderInterstitialLovin(context: Activity, onUpdate: () -> Unit): Full
 fun getFAdLoaderRewardedLovin(context: Activity, onUpdate: () -> Unit): FullscreenAdLoader = FAdLoaderRewardedLovin(context, onUpdate)
 
 class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
-    private var interstitialAd: MaxInterstitialAd = MaxInterstitialAd("e5f776a3ccb9282e", context)
+    private var interstitialAd: MaxInterstitialAd = MaxInterstitialAd("e5f776a3ccb9282e")
     private var isLoading = false
 
     init {
@@ -228,9 +229,9 @@ class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: ()
 
     override fun show() {
         when {
-            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
+            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled || BuildConfig.DEBUG -> return
             interstitialAd.isReady -> {
-                interstitialAd.showAd()
+                interstitialAd.showAd(context)
             }
 
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
@@ -240,7 +241,7 @@ class FAdLoaderInterstitialLovin(val context: Activity, private val onUpdate: ()
 }
 
 class FAdLoaderRewardedLovin(val context: Activity, private val onUpdate: () -> Unit) : FullscreenAdLoader {
-    private var rewardedAd: MaxRewardedAd = MaxRewardedAd.getInstance("e3b2506478ae074c", context)
+    private var rewardedAd: MaxRewardedAd = MaxRewardedAd.getInstance("e3b2506478ae074c")
     private var isLoading = false
 
     init {
@@ -281,9 +282,9 @@ class FAdLoaderRewardedLovin(val context: Activity, private val onUpdate: () -> 
 
     override fun show() {
         when {
-            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
+            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled || BuildConfig.DEBUG -> return
             rewardedAd.isReady -> {
-                rewardedAd.showAd()
+                rewardedAd.showAd(context)
             }
 
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")
@@ -293,7 +294,7 @@ class FAdLoaderRewardedLovin(val context: Activity, private val onUpdate: () -> 
 }
 
 class FAdLoaderInterstitialLazyLovin(val context: AppCompatActivity) : FullscreenAdLoader {
-    private var interstitialAd: MaxInterstitialAd = MaxInterstitialAd("e5f776a3ccb9282e", context)
+    private var interstitialAd: MaxInterstitialAd = MaxInterstitialAd("e5f776a3ccb9282e")
     private var isLoading = false
 
     init {
@@ -337,9 +338,9 @@ class FAdLoaderInterstitialLazyLovin(val context: AppCompatActivity) : Fullscree
 
     override fun show() {
         when {
-            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled -> return
+            !AdsUtils.isRemoteAdsEnabled || !AdsUtils.isRemoteFullEnabled || BuildConfig.DEBUG -> return
             interstitialAd.isReady -> {
-                interstitialAd.showAd()
+                interstitialAd.showAd(context)
             }
 
             Network.isAdsBlocked -> toast("Anuncios bloqueados por host")

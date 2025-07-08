@@ -13,7 +13,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
-import knf.kuma.ads.*
+import knf.kuma.ads.AdCallback
+import knf.kuma.ads.AdCardItemHolder
+import knf.kuma.ads.AdFavoriteObject
+import knf.kuma.ads.AdsUtilsMob
+import knf.kuma.ads.implAdsFavorite
 import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PicassoSingle
@@ -99,7 +103,7 @@ class FavsSectionAdapterMaterial(private val fragment: Fragment, private val rec
                     0 -> {
                         val name = list[position].name
                         if (name.isNotEmpty())
-                            name.substring(0, 1).toUpperCase()
+                            name.substring(0, 1).uppercase()
                         else
                             name
                     }

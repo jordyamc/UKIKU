@@ -14,7 +14,6 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Player.DiscontinuityReason
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.util.ErrorMessageProvider
@@ -52,9 +51,10 @@ class LeanbackPlayerAdapter
         //controlDispatcher = DefaultControlDispatcher()
         updateProgressRunnable = object : Runnable {
             override fun run() {
-                val callback = callback
-                callback.onCurrentPositionChanged(this@LeanbackPlayerAdapter)
-                callback.onBufferedPositionChanged(this@LeanbackPlayerAdapter)
+                callback?.apply {
+                    onCurrentPositionChanged(this@LeanbackPlayerAdapter)
+                    onBufferedPositionChanged(this@LeanbackPlayerAdapter)
+                }
                 handler.postDelayed(this, updatePeriodMs.toLong())
             }
         }
@@ -62,7 +62,7 @@ class LeanbackPlayerAdapter
 
     // PlayerAdapter implementation.
 
-    override fun onAttachedToHost(host: PlaybackGlueHost?) {
+    override fun onAttachedToHost(host: PlaybackGlueHost) {
         if (host is SurfaceHolderGlueHost) {
             surfaceHolderGlueHost = host
             surfaceHolderGlueHost?.setSurfaceHolderCallback(componentListener)
@@ -77,9 +77,11 @@ class LeanbackPlayerAdapter
         surfaceHolderGlueHost = null
         hasSurface = false
         val callback = callback
-        callback.onBufferingStateChanged(this, false)
-        callback.onPlayStateChanged(this)
-        maybeNotifyPreparedStateChanged(callback)
+        callback?.apply {
+            onBufferingStateChanged(this@LeanbackPlayerAdapter, false)
+            onPlayStateChanged(this@LeanbackPlayerAdapter)
+            maybeNotifyPreparedStateChanged(callback)
+        }
     }
 
     override fun setProgressUpdatingEnabled(enabled: Boolean) {
@@ -147,18 +149,20 @@ class LeanbackPlayerAdapter
         val playbackState = player.playbackState
         val callback = callback
         maybeNotifyPreparedStateChanged(callback)
-        callback.onPlayStateChanged(this)
-        callback.onBufferingStateChanged(this, playbackState == Player.STATE_BUFFERING)
-        if (playbackState == Player.STATE_ENDED) {
-            callback.onPlayCompleted(this)
+        callback?.apply {
+            onPlayStateChanged(this@LeanbackPlayerAdapter)
+            onBufferingStateChanged(this@LeanbackPlayerAdapter, playbackState == Player.STATE_BUFFERING)
+            if (playbackState == Player.STATE_ENDED) {
+                onPlayCompleted(this@LeanbackPlayerAdapter)
+            }
         }
     }
 
-    private fun maybeNotifyPreparedStateChanged(callback: Callback) {
+    private fun maybeNotifyPreparedStateChanged(callback: Callback?) {
         val isPrepared = isPrepared
         if (lastNotifiedPreparedState != isPrepared) {
             lastNotifiedPreparedState = isPrepared
-            callback.onPreparedStateChanged(this)
+            callback?.onPreparedStateChanged(this)
         }
     }
 
@@ -186,35 +190,36 @@ class LeanbackPlayerAdapter
         // Player.EventListener implementation.
 
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            callback.onPlayStateChanged(this@LeanbackPlayerAdapter)
+            callback?.onPlayStateChanged(this@LeanbackPlayerAdapter)
             notifyStateChanged()
         }
 
         override fun onPlayerError(error: PlaybackException) {
             context.findActivity()?.finish()
             Toaster.toast("Error al reproducir")
-            callback.onError(this@LeanbackPlayerAdapter, error.errorCode, error.message)
+            callback?.onError(this@LeanbackPlayerAdapter, error.errorCode, error.message)
         }
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-            callback.apply {
+            callback?.apply {
                 onDurationChanged(this@LeanbackPlayerAdapter)
                 onCurrentPositionChanged(this@LeanbackPlayerAdapter)
                 onBufferedPositionChanged(this@LeanbackPlayerAdapter)
             }
         }
 
-        override fun onPositionDiscontinuity(@DiscontinuityReason reason: Int) {
-            val callback = callback
-            callback.onCurrentPositionChanged(this@LeanbackPlayerAdapter)
-            callback.onBufferedPositionChanged(this@LeanbackPlayerAdapter)
+        override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
+            callback?.apply {
+                onCurrentPositionChanged(this@LeanbackPlayerAdapter)
+                onBufferedPositionChanged(this@LeanbackPlayerAdapter)
+            }
         }
 
         // SimpleExoplayerView.Callback implementation.
 
         override fun onVideoSizeChanged(videoSize: VideoSize) {
             if (videoSize.width > 0 && videoSize.height > 0) {
-                callback.onVideoSizeChanged(
+                callback?.onVideoSizeChanged(
                     this@LeanbackPlayerAdapter,
                     videoSize.width,
                     videoSize.height

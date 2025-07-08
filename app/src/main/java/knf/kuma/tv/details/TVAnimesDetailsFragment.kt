@@ -156,19 +156,21 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                             )
                                         )
                                     }
-                                    actionAdapter?.set(
-                                        2,
-                                        Action(
+                                    actionAdapter?.apply {
+                                        set(
                                             2,
-                                            "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})",
-                                            null,
-                                            ContextCompat.getDrawable(
-                                                App.context,
-                                                R.drawable.ic_seeing
+                                            Action(
+                                                2,
+                                                "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})",
+                                                null,
+                                                ContextCompat.getDrawable(
+                                                    App.context,
+                                                    R.drawable.ic_seeing
+                                                )
                                             )
                                         )
-                                    )
-                                    detailsOverview.actionsAdapter = actionAdapter
+                                        detailsOverview.actionsAdapter = this
+                                    }
                                     rowPresenter.onActionClickedListener =
                                         this@TVAnimesDetailsFragment
                                     mRowsAdapter?.add(detailsOverview)

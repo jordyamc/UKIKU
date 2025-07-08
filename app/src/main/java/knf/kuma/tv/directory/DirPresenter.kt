@@ -11,7 +11,8 @@ class DirPresenter : Presenter() {
         return ViewHolder(DirCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
+        if (item == null) return
         (viewHolder.view as DirCardView).bind(item as DirObject)
     }
 

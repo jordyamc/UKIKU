@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="220" version="5.3.10">
+        <change type="fix">Corrección de imagenes en recientes</change>
+        <change type="change">Soporte Android 16</change>
+    </release>
     <release code="219" version="5.3.9">
         <change type="fix">Corrección en login de firebase</change>
-        <change type="fix">Correcciónes generales para Android 35</change>
+        <change type="fix">Correcciónes generales para Android 15</change>
     </release>
     <release code="218" version="5.3.8">
         <change type="fix">Corrección en noticias</change>

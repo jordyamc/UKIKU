@@ -64,7 +64,7 @@ class DownloadService : IntentService("Download service") {
     override fun onHandleIntent(intent: Intent?) {
         foreground(DOWNLOADING_ID, startNotification)
         val currentEid = intent?.getStringExtra("eid") ?: return
-        manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         current = downloadsDAO.getByEid(currentEid)
         if (current == null)
             return
@@ -196,7 +196,7 @@ class DownloadService : IntentService("Download service") {
                 .setColor(ContextCompat.getColor(applicationContext, android.R.color.holo_red_dark))
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(current?.name)
-                .setContentText("Error al descargar " + current?.chapter?.toLowerCase())
+            .setContentText("Error al descargar " + current?.chapter?.lowercase())
                 .setOngoing(false)
                 .setWhen(current?.time ?: 0)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

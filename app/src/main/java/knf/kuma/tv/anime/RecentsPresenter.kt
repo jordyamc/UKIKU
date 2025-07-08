@@ -17,7 +17,8 @@ class RecentsPresenter : Presenter() {
         return ViewHolder(RecentsCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
+        if (item == null) return
         (viewHolder.view as RecentsCardView).bind(item as RecentObject)
         viewHolder.view.setOnLongClickListener { v ->
             GlobalScope.launch(Dispatchers.Main){

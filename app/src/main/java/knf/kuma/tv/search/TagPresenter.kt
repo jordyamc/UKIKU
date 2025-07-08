@@ -10,7 +10,8 @@ class TagPresenter : Presenter() {
         return ViewHolder(TagCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
+        if (item == null) return
         (viewHolder.view as TagCardView).bind(item as String)
     }
 

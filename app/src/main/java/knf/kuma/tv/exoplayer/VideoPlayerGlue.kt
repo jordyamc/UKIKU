@@ -87,9 +87,9 @@ class VideoPlayerGlue(
                 action.nextIndex()
                 // Notify adapter of action changes to handle secondary actions, such as, thumbs up/down
                 // and repeat.
-                notifyActionChanged(
-                        action,
-                        controlsRow.secondaryActionsAdapter as ArrayObjectAdapter)
+                controlsRow?.secondaryActionsAdapter?.apply {
+                    notifyActionChanged(action, this as ArrayObjectAdapter)
+                }
             }
         }
     }

@@ -632,7 +632,7 @@ class MainMaterial : GenericActivity(),
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         noCrash {
-            if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (requestCode == FileAccessHelper.SD_REQUEST && resultCode == RESULT_OK) {
                 val validation = FileAccessHelper.isUriValid(data?.data)
                 if (!validation.isValid) {
                     Toaster.toast("Directorio invalido: $validation")

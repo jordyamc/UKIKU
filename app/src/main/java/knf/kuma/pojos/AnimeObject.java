@@ -581,6 +581,9 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
 
         @TypeConverter
         public int dayToInt(Day day) {
+            if (day == null) {
+                return 0;
+            }
             return day.value;
         }
     }

@@ -11,7 +11,8 @@ class AnimePresenter : Presenter() {
         return ViewHolder(AnimeCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
+        if (item == null) return
         (viewHolder.view as AnimeCardView).bind(item as BasicAnimeObject)
     }
 

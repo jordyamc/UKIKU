@@ -24,10 +24,11 @@ class TVMultiSelectionFragment : GuidedStepSupportFragment(){
         }
     }
 
-    override fun onGuidedActionClicked(action: GuidedAction?) {
+    override fun onGuidedActionClicked(action: GuidedAction) {
         super.onGuidedActionClicked(action)
         activity?.setResult(Activity.RESULT_OK, Intent()
-                .putExtra("position", action?.id?.toInt() ?: 0))
+            .putExtra("position", action.id.toInt())
+        )
         activity?.finish()
     }
 }

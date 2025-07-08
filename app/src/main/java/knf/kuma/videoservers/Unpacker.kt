@@ -5,6 +5,7 @@ import android.webkit.WebView
 import com.venom.greendark.decoder.WebJS
 import de.prosiebensat1digital.oasisjsbridge.JsBridge
 import de.prosiebensat1digital.oasisjsbridge.JsBridgeConfig
+import knf.kuma.commons.safeContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -21,7 +22,7 @@ object Unpacker {
     fun unpack(link: String): String {
         val html = Jsoup.connect(link).ignoreContentType(true).execute().body()
         val packedCode = packedRegex2.find(html)?.destructured?.component1()
-        val jsBridge = JsBridge(JsBridgeConfig.bareConfig())
+        val jsBridge = JsBridge(JsBridgeConfig.bareConfig(), safeContext)
         return jsBridge.evaluateBlocking("function prnt() {var txt = $packedCode; return txt;}prnt();")
     }
 

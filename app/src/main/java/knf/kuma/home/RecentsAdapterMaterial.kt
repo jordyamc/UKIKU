@@ -9,7 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.inflate
+import knf.kuma.commons.load
+import knf.kuma.commons.optionalBind
+import knf.kuma.commons.transform
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecentObject
@@ -39,7 +45,7 @@ class RecentsAdapterMaterial(val fragment: HomeFragmentMaterial, private val isL
     override fun onBindViewHolder(holder: RecentViewHolder, position: Int) {
         if (list.isEmpty()) return
         val item = list[position]
-        holder.img.load(item.img)
+        holder.img.load(PatternUtil.getCover(item.aid))
         holder.title.text = item.name
         holder.type?.text = item.chapter
         holder.root.onClick {

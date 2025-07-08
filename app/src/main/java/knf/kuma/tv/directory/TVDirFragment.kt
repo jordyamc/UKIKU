@@ -20,9 +20,11 @@ class TVDirFragment : VerticalGridSupportFragment(), OnItemViewClickedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = "Directorio"
-        gridPresenter = VerticalGridPresenter().apply {
-            numberOfColumns = 4
-        }
+        setGridPresenter(
+            VerticalGridPresenter().apply {
+                numberOfColumns = 4
+            }
+        )
         onItemViewClickedListener = this
         CacheDB.INSTANCE.animeDAO().allLive.observe(this, Observer {
             if (!it.isNullOrEmpty()) {

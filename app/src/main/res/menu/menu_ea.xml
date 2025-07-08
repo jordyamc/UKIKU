@@ -7,9 +7,4 @@
         android:icon="@drawable/ic_coin"
         android:title="Conseguir monedas"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/unlock"
-        android:icon="@drawable/ic_unlock"
-        android:title="Desbloquear todo"
-        app:showAsAction="always"/>
 </menu>

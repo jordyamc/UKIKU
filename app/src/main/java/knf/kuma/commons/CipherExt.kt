@@ -2,7 +2,6 @@ package knf.kuma.commons
 
 import android.util.Base64
 import knf.kuma.BuildConfig
-import se.simbio.encryption.Encryption
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.IvParameterSpec

@@ -12,7 +12,7 @@ class SyncPresenter : Presenter() {
         return ViewHolder(SyncCardView(parent.context))
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         (item as? SyncObject)?.let {
             (viewHolder.view as? SyncCardView)?.bind(it)
         }

@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.leanback.app.GuidedStepSupportFragment
 import androidx.leanback.widget.GuidanceStylist
 import androidx.leanback.widget.GuidedAction
-import java.util.*
 
 class TVServerSelectionFragment : GuidedStepSupportFragment() {
 
@@ -35,11 +34,12 @@ class TVServerSelectionFragment : GuidedStepSupportFragment() {
         }
     }
 
-    override fun onGuidedActionClicked(action: GuidedAction?) {
+    override fun onGuidedActionClicked(action: GuidedAction) {
         super.onGuidedActionClicked(action)
         activity?.setResult(Activity.RESULT_OK, Intent()
                 .putExtra(keyIsVideoServer, arguments?.getBoolean(IS_SERVER_DATA, false))
-                .putExtra(keyPosition, action?.id?.toInt()))
+            .putExtra(keyPosition, action.id.toInt())
+        )
         activity?.finish()
     }
 
