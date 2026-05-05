@@ -4,7 +4,6 @@ import android.content.Context
 import knf.kuma.R
 import org.cryse.widget.persistentsearch.SearchItem
 import org.cryse.widget.persistentsearch.SearchSuggestionsBuilder
-import java.util.*
 
 class FiltersSuggestion(private val context: Context) : SearchSuggestionsBuilder {
 

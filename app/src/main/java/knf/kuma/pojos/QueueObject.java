@@ -2,10 +2,6 @@ package knf.kuma.pojos;
 
 import android.net.Uri;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.Keep;
 import androidx.room.Embedded;
 import androidx.room.Entity;
@@ -13,6 +9,11 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.RoomWarnings;
 import androidx.room.TypeConverters;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import knf.kuma.database.BaseConverter;
 import knf.kuma.database.CacheDBWrap;
 

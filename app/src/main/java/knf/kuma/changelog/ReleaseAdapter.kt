@@ -28,7 +28,7 @@ internal class ReleaseAdapter(changelog: Changelog) : RecyclerView.Adapter<Relea
         return list.size
     }
 
-    internal inner class ReleaseItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class ReleaseItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val version: TextView = itemView.find(R.id.version)
         val code: TextView = itemView.find(R.id.code)
         val recyclerView: RecyclerView = itemView.find(R.id.recycler)

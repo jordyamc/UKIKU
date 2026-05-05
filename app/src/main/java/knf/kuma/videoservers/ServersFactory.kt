@@ -274,7 +274,7 @@ class ServersFactory {
                                         } catch (e: Exception) {
                                             e.printStackTrace()
                                         }
-                                    } else {
+                                    } else if (!baseLink.optString("code").contains("linkinpork")) {
                                         servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
                                     }
                                 }
@@ -312,7 +312,7 @@ class ServersFactory {
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
-                    } else {
+                    } else if (!baseLink.optString("code").contains("linkinpork")) {
                         servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
                     }
                 }

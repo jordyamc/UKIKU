@@ -22,7 +22,7 @@ class SeeingPagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapte
         return fragmentList.size
     }
 
-    override fun getPageTitle(position: Int): CharSequence? {
+    override fun getPageTitle(position: Int): CharSequence {
         return fragmentList[position].title
     }
 }

@@ -12,7 +12,12 @@ import knf.kuma.commons.FileWrapper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
-import knf.kuma.pojos.*
+import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.DownloadObject
+import knf.kuma.pojos.ExplorerObject
+import knf.kuma.pojos.QueueObject
+import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.SeenObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync

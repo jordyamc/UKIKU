@@ -12,7 +12,8 @@ import com.bumptech.glide.request.transition.Transition
 import knf.kuma.App
 import knf.kuma.commons.doOnUIGlobal
 import java.lang.ref.WeakReference
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 
 class GlideBackgroundManager(activity: Activity) {
     private val mActivityWeakReference: WeakReference<Activity> = WeakReference(activity)

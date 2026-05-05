@@ -20,12 +20,12 @@ object Unpacker {
     private val packedRegex2 =
         "eval\\((function\\(p,a,c,k,e,?[dr]?\\).*.split\\('\\|'\\).*)\\)".toRegex()
 
-    fun unpack(link: String): String {
-        val html = Jsoup.connect(link).ignoreContentType(true).execute().body()
-        val packedCode = packedRegex2.find(html)?.destructured?.component1()
-        if (packedCode == null) return html
+    fun unpack(link: String): UnpackResult {
+        val result = Jsoup.connect(link).ignoreContentType(true).execute()
+        val html = result.body()
+        val packedCode = packedRegex2.find(html)?.destructured?.component1() ?: return UnpackResult(result.url().toString(), html)
         val jsBridge = JsBridge(JsBridgeConfig.bareConfig(), safeContext)
-        return jsBridge.evaluateBlocking("function prnt() {var txt = $packedCode; return txt;}prnt();")
+        return UnpackResult(result.url().toString(), jsBridge.evaluateBlocking("function prnt() {var txt = $packedCode; return txt;}prnt();"))
     }
 
     suspend fun unpackWeb(context: Context, link: String): UnpackResult {

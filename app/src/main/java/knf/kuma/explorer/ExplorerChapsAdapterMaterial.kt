@@ -21,7 +21,12 @@ import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
-import knf.kuma.commons.*
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.PicassoSingle
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
@@ -35,7 +40,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
+import java.util.Locale
 
 
 class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, private val recyclerView: RecyclerView, val explorerObject: ExplorerObjectWrap, private val model: ExplorerFilesModel, private var clearInterface: FragmentChaptersMaterial.ClearInterface?) : RecyclerView.Adapter<ExplorerChapsAdapterMaterial.ChapItem>() {
@@ -185,7 +190,7 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
 
     }
 
-    inner class ChapItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ChapItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: View by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val seenOverlay: SeenAnimeOverlay by itemView.bind(R.id.seen)

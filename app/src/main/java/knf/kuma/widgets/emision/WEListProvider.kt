@@ -13,7 +13,7 @@ import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
 import xdroid.toaster.Toaster
-import java.util.*
+import java.util.Calendar
 
 class WEListProvider internal constructor(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val items = mutableListOf<WEListItem>()

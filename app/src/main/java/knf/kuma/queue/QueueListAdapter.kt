@@ -16,7 +16,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
-import java.util.*
 
 internal class QueueListAdapter(val callback: () -> Unit) : RecyclerView.Adapter<QueueListAdapter.ListItemHolder>() {
     private var current = "0000"
@@ -56,7 +55,7 @@ internal class QueueListAdapter(val callback: () -> Unit) : RecyclerView.Adapter
         }
     }
 
-    internal inner class ListItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class ListItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val chapter: TextView = itemView.find(R.id.chapter)
         val icon: ImageView = itemView.find(R.id.icon)
         val actionDelete: ImageButton = itemView.find(R.id.action_delete)

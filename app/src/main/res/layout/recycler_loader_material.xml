@@ -42,7 +42,7 @@
                 android:layoutAnimation="@anim/layout_fall_down"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
-                app:layoutManager="LinearLayoutManager"
+                app:layoutManager=".custom.VariantLinearLayoutManager"
                 tools:listitem="@layout/item_top" />
 
             <androidx.core.widget.ContentLoadingProgressBar

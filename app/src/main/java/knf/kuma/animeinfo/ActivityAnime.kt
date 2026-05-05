@@ -1,5 +1,6 @@
 package knf.kuma.animeinfo
 
+import androidx.activity.addCallback
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -87,6 +88,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
             viewModel.init(this@ActivityAnime, intent.dataString, intent.getBooleanExtra(keyPersist, true))
         if (intent.getBooleanExtra(keyNotification, false))
             sendBroadcast(NotificationObj.fromIntent(intent).getBroadcast(this@ActivityAnime))
+        onBackPressedDispatcher.addCallback(this) { closeActivity() }
         load()
         checkBypass()
         showRandomInterstitial(this)
@@ -100,7 +102,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                     genres = animeObject.genres ?: mutableListOf()
                     if (PrefsUtil.isFamilyFriendly && genres.map { it.lowercase(Locale.getDefault()) }.contains("ecchi")) {
                         toast("Anime no familiar")
-                        onBackPressed()
+                        onBackPressedDispatcher.onBackPressed()
                     }
                     favoriteObject = FavoriteObject(animeObject)
                     favoriteObject?.let { fav ->
@@ -142,7 +144,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                 }
             } else {
                 Toaster.toast("Error al cargar información del anime")
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
         })
     }
@@ -237,10 +239,6 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
                 }
             }
         }
-    }
-
-    override fun onBackPressed() {
-        closeActivity()
     }
 
     companion object {

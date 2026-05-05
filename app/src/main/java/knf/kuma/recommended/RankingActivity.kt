@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import knf.kuma.R
 import knf.kuma.ads.showRandomInterstitial
@@ -15,6 +14,7 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.RecyclerRankingBinding
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,7 @@ class RankingActivity : GenericActivity() {
             setNavigationOnClickListener { finish() }
         }
         with(binding.recycler) {
-            layoutManager = LinearLayoutManager(this@RankingActivity)
+            layoutManager = VariantLinearLayoutManager(this@RankingActivity)
             lifecycleScope.launch(Dispatchers.Main){
                 adapter = RankingAdapterMaterial(withContext(Dispatchers.IO) { CacheDB.INSTANCE.genresDAO().ranking })
             }

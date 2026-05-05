@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import pl.droidsonroids.jspoon.Jspoon
 import java.util.Locale
@@ -63,13 +64,13 @@ class Repository {
         if (Network.isConnected) {
             GlobalScope.launch(Dispatchers.IO) {
                 try {
-                    val page = Jspoon.create().adapter(RecentsPage::class.java).fromHtml(jsoupCookies("https://www3.animeflv.net/").get().outerHtml())
+                    val page = Jspoon.create().adapter(RecentsPage::class.java).fromHtml(jsoupCookies("https://animeflv.net/").get().outerHtml())
                     val list = page.list.apply {
                         forEachIndexed { index, model ->
                             model.key = index
                         }
                     }
-                    GlobalScope.launch(Dispatchers.IO) {
+                    withContext(Dispatchers.IO) {
                         CacheDB.INSTANCE.recentModelsDAO().setCache(list)
                     }
                 } catch (e: Exception) {

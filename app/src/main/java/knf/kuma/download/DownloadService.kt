@@ -3,7 +3,6 @@ package knf.kuma.download
 import android.app.IntentService
 import android.app.Notification
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.media.MediaScannerConnection
 import android.net.Uri

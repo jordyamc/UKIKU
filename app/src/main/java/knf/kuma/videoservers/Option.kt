@@ -2,7 +2,6 @@ package knf.kuma.videoservers
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.util.*
 
 open class Option : Parcelable {
     var server: String? = null

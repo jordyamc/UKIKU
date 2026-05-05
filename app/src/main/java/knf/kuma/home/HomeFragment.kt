@@ -4,15 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.safeContext
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.FragmentHomeBinding
 import knf.kuma.pojos.QueueObject
@@ -26,6 +30,7 @@ import knf.kuma.recommended.RecommendHelper
 import knf.kuma.seeing.SeeingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 
@@ -75,25 +80,56 @@ class HomeFragment : BottomFragment() {
             delay(500)
             binding.adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
         }
-        viewModel.dbLiveData.observe(viewLifecycleOwner, Observer { list ->
-            doAsync {
-                binding.listNew.updateList(filterNew(list.filter { it.isNew }))
-                val favFiltered = list.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }
-                if (favFiltered.isEmpty()) {
-                    binding.listFavUpdated.apply {
-                        setSubheader("Ultimos actualizados")
-                        updateList(list)
-                    }
-                } else {
-                    binding.listFavUpdated.apply {
-                        setSubheader("Favoritos actualizados")
-                        updateList(favFiltered)
+        lifecycleScope.launch {
+            viewModel.dbFlow.collect { list ->
+                if (list.isNotEmpty()) {
+                    doAsync {
+                        try {
+                            binding.listNew.updateList(filterNew(list.filter { it.isNew }))
+                            val favFiltered = list.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }
+                            if (favFiltered.isEmpty()) {
+                                binding.listFavUpdated.apply {
+                                    setSubheader("Ultimos actualizados")
+                                    setError("Recientes no actualizados")
+                                    updateList(list)
+                                }
+                            } else {
+                                binding.listFavUpdated.apply {
+                                    setSubheader("Favoritos actualizados")
+                                    updateList(favFiltered)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Firebase.crashlytics.recordException(e)
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                Toast.makeText(safeContext, "Error al mostrar recientes: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
                     }
                 }
             }
-        })
+        }
+        lifecycleScope.launch {
+            CacheDB.INSTANCE.favsDAO().countFlow.drop(1).collect {
+                doAsync {
+                    val cached = CacheDB.INSTANCE.recentsDAO().all
+                    val filtered = cached.filter {
+                        CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt())
+                    }
+                    binding.listFavUpdated.apply {
+                        if (filtered.isEmpty()) {
+                            setSubheader("Ultimos actualizados")
+                            setError("Recientes no actualizados")
+                            updateList(cached)
+                        } else {
+                            setSubheader("Favoritos actualizados")
+                            updateList(filtered)
+                        }
+                    }
+                }
+            }
+        }
         CacheDB.INSTANCE.favsDAO().countLive.observe(viewLifecycleOwner, Observer {
-            doAsync { binding.listFavUpdated.updateList(CacheDB.INSTANCE.recentsDAO().all.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }) }
             RecommendHelper.createRecommended {
                 binding.listRecommended.updateList(it)
             }

@@ -17,7 +17,7 @@
         android:paddingTop="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="140dp"
-        app:layoutManager="LinearLayoutManager"
+        app:layoutManager=".custom.VariantLinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/item_dir"/>
 

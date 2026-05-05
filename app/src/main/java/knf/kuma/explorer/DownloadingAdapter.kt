@@ -1,7 +1,6 @@
 package knf.kuma.explorer
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,10 +66,10 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
                     message(text = "¿Cancelar descarga del ${downloadObject.chapter.lowercase(Locale.getDefault())} de ${downloadObject.name}?")
                     positiveButton(text = "CONFIRMAR") {
                         try {
-                            downloadObjects.removeAt(holder.adapterPosition)
-                            notifyItemRemoved(holder.adapterPosition)
+                            downloadObjects.removeAt(holder.bindingAdapterPosition)
+                            notifyItemRemoved(holder.bindingAdapterPosition)
                             DownloadManagerCentral.cancel(downloadObject.eid)
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             //
                         }
                     }
@@ -81,8 +80,8 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
         downloadsDAO.getLiveByKey(downloadObject.key).observe(fragment, Observer { downloadObject1 ->
             try {
                 if (downloadObject1 == null || downloadObject1.state == DownloadObject.COMPLETED) {
-                    downloadObjects.removeAt(holder.adapterPosition)
-                    notifyItemRemoved(holder.adapterPosition)
+                    downloadObjects.removeAt(holder.bindingAdapterPosition)
+                    notifyItemRemoved(holder.bindingAdapterPosition)
                 } else {
                     downloadObject.state = downloadObject1.state
                     if (downloadObject1.state == DownloadObject.PENDING) {
@@ -102,10 +101,7 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
                         }
                         holder.progress.isIndeterminate = false
                         if (downloadObject1.getEta() == -2L || PrefsUtil.downloaderType == 0)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                                holder.progress.setProgress(downloadObject1.progress, true)
-                            else
-                                holder.progress.progress = downloadObject1.progress
+                            holder.progress.setProgress(downloadObject1.progress, true)
                         else {
                             holder.progress.progress = 0
                             holder.progress.secondaryProgress = downloadObject1.progress
@@ -113,7 +109,7 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
                         holder.eta.text = downloadObject1.subtext
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 //
             }
         })
@@ -133,7 +129,7 @@ class DownloadingAdapter internal constructor(private val fragment: Fragment, pr
         }
     }
 
-    inner class DownloadingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class DownloadingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val server: TextView = itemView.find(R.id.server)
         val title: TextView = itemView.find(R.id.title)
         val chapter: TextView = itemView.find(R.id.chapter)

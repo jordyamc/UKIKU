@@ -11,13 +11,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnimeMaterial
-import knf.kuma.commons.*
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.load
+import knf.kuma.commons.notSameContent
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.RecordObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
-import java.util.*
 
 class RecordsAdapterMaterial(private val activity: AppCompatActivity) : RecyclerView.Adapter<RecordsAdapterMaterial.RecordItem>() {
     private var items: MutableList<RecordObject> = ArrayList()
@@ -78,7 +81,7 @@ class RecordsAdapterMaterial(private val activity: AppCompatActivity) : Recycler
         }
     }
 
-    inner class RecordItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class RecordItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: View by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)

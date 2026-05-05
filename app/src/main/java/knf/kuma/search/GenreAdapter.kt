@@ -31,7 +31,7 @@ internal class GenreAdapter(private val activity: Activity) : PagingDataAdapter<
         }
     }
 
-    internal inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView = itemView.find(R.id.card)
         val imageView: ImageView = itemView.find(R.id.img)
         val textView: TextView = itemView.find(R.id.title)

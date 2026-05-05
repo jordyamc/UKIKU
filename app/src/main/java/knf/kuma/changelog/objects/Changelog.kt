@@ -1,7 +1,6 @@
 package knf.kuma.changelog.objects
 
 import org.jsoup.nodes.Document
-import java.util.*
 
 class Changelog(document: Document) {
     var releases: MutableList<Release>

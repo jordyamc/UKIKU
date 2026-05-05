@@ -2,7 +2,8 @@ package knf.kuma.backup.objects
 
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 open class BackupObject<T> {
     @SerializedName("date")

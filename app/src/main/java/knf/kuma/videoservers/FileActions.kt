@@ -207,7 +207,7 @@ object FileActions {
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
                                             }
-                                        } else {
+                                        } else if (!baseLink.optString("code").contains("linkinpork")) {
                                             servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
                                         }
                                     }
@@ -270,7 +270,7 @@ object FileActions {
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
-                            } else {
+                            } else if (!baseLink.optString("code").contains("linkinpork")) {
                                 servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
                             }
                         }

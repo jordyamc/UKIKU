@@ -8,11 +8,11 @@ import android.view.animation.AnimationUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.recyclerview.widget.LinearLayoutManager
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.RecyclerGenreMaterialBinding
 import kotlinx.coroutines.flow.collectLatest
@@ -33,7 +33,7 @@ class GenreActivityMaterial : GenericActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         binding.toolbar.setNavigationOnClickListener { finish() }
-        binding.recycler.layoutManager = LinearLayoutManager(this)
+        binding.recycler.layoutManager = VariantLinearLayoutManager(this)
         binding.recycler.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
         binding.recycler.adapter = adapter
         lifecycleScope.launch {

@@ -4,7 +4,6 @@ package knf.kuma.ads
 import android.content.Context
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.news.AdNewsObject
@@ -13,8 +12,6 @@ import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecentObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
 object AdsUtilsBrains {
@@ -241,13 +238,5 @@ class FAdLoaderInterstitialLazyBrains(val context: AppCompatActivity) : Fullscre
     override fun show() {
         if (Network.isAdsBlocked)
             Toaster.toast("Anuncios bloqueados por host")
-        else
-            context.lifecycleScope.launch(Dispatchers.Main) {
-                var tryCount = 11
-                /*while (!builder.show(context)) {
-                    delay(250)
-                    tryCount--
-                }*/
-            }
     }
 }

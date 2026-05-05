@@ -148,29 +148,48 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
 
                 if (!isActive)
                     return@launch
-                setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.chapter.eid), fragment, Observer {
-                    setQueue(it, isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get()))
-                })
-                setDownloadObserver(downloadsDAO.getLiveByEid(chapter.chapter.eid).distinct, fragment, Observer { downloadObject1 ->
+                setQueueObserver(CacheDB.INSTANCE.queueDAO().isInQueueLive(chapter.chapter.eid), fragment) {
+                    setQueue(
+                        it,
+                        isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get())
+                    )
+                }
+                setDownloadObserver(downloadsDAO.getLiveByEid(chapter.chapter.eid).distinct, fragment) { downloadObject1 ->
                     setDownloadState(downloadObject1)
                     val casting = CastUtil.get().casting.value
                     val isCasting = casting != null && casting == chapter.chapter.eid
                     if (!isCasting)
                         fragment.lifecycleScope.launch(Dispatchers.IO) {
-                            setQueue(QueueManager.isInQueue(chapter.chapter.eid), isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject1))
+                            setQueue(
+                                QueueManager.isInQueue(chapter.chapter.eid),
+                                isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject1)
+                            )
                         }
                     else
-                        setDownloaded(isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject1), true)
+                        setDownloaded(
+                            isPlayAvailable(
+                                chapter.chapter.fileWrapper(),
+                                downloadObject1
+                            ), true
+                        )
                     downloadObject.set(downloadObject1)
-                })
-                setCastingObserver(fragment, Observer { s ->
+                }
+                setCastingObserver(fragment) { s ->
                     if (chapter.chapter.eid != s)
                         fragment.lifecycleScope.launch(Dispatchers.IO) {
-                            setQueue(QueueManager.isInQueue(chapter.chapter.eid), isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get()))
+                            setQueue(
+                                QueueManager.isInQueue(chapter.chapter.eid),
+                                isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get())
+                            )
                         }
                     else
-                        setDownloaded(isPlayAvailable(chapter.chapter.fileWrapper(), downloadObject.get()), chapter.chapter.eid == s)
-                })
+                        setDownloaded(
+                            isPlayAvailable(
+                                chapter.chapter.fileWrapper(),
+                                downloadObject.get()
+                            ), chapter.chapter.eid == s
+                        )
+                }
             }
         }
         holder.chapter.setTextColor(ContextCompat.getColor(context, if (chapter.isSeen) EAHelper.getThemeColor() else R.color.textPrimary))
@@ -221,7 +240,6 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                 Toaster.toast("Aun no se está descargando")
                             }
                             R.id.cast -> if (canPlay(chapter.chapter.fileWrapper())) {
-                                //CastUtil.get().play(fragment.activity as Activity, recyclerView, chapter.eid, SelfServer.start(chapter.fileName, true), chapter.name, chapter.number, if (chapter.img == null) chapter.aid else chapter.img, chapter.img == null)
                                 CastUtil.get().play(recyclerView, CastMedia.create(chapter.chapter))
                                 fragment.lifecycleScope.launch(Dispatchers.IO) {
                                     chaptersDAO.addChapter(SeenObject.fromChapter(chapter.chapter))
@@ -363,7 +381,7 @@ class AnimeChaptersAdapter(private val fragment: Fragment, private val recyclerV
                                             chapter.chapter.link,
                                             version
                                         )
-                                    } catch (e: ActivityNotFoundException) {
+                                    } catch (_: ActivityNotFoundException) {
                                         noCrashSuspend {
                                             context.startActivity(
                                                 Intent(

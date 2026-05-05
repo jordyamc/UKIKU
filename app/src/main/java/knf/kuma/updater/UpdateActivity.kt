@@ -1,5 +1,6 @@
 package knf.kuma.updater
 
+import androidx.activity.addCallback
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -45,6 +46,13 @@ class UpdateActivity : GenericActivity() {
             animationDrawable.setEnterFadeDuration(2500)
             animationDrawable.setExitFadeDuration(2500)
             animationDrawable.start()
+        }
+        onBackPressedDispatcher.addCallback(this) {
+            if (intent.getBooleanExtra("canExit", true)) {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
         }
         start()
     }
@@ -189,11 +197,6 @@ class UpdateActivity : GenericActivity() {
         if (isUpdateDownloaded) {
             onShowAlternativeDownload()
         }
-    }
-
-    override fun onBackPressed() {
-        if (intent.getBooleanExtra("canExit", true))
-            super.onBackPressed()
     }
 
     companion object {

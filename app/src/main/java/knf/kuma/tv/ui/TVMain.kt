@@ -1,6 +1,5 @@
 package knf.kuma.tv.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
@@ -99,7 +98,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             if (blockCount >= 2)
                 return true
         }
-        return blockCount >= 2
+        return false
     }
 
     override fun onNeedUpdate(o_code: String, n_code: String) {

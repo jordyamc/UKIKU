@@ -1,5 +1,6 @@
 package knf.kuma.animeinfo.img
 
+import androidx.activity.addCallback
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
@@ -37,6 +38,7 @@ class ActivityImgFull : GenericActivity() {
             WindowInsetsCompat.CONSUMED
         }
         searchInMAL()
+        onBackPressedDispatcher.addCallback(this) { supportFinishAfterTransition() }
     }
 
     private fun searchInMAL() {
@@ -86,9 +88,5 @@ class ActivityImgFull : GenericActivity() {
                     snackbar.safeDismiss()
                 }
             }
-    }
-
-    override fun onBackPressed() {
-        supportFinishAfterTransition()
     }
 }

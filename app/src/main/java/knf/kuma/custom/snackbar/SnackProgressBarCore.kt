@@ -16,7 +16,7 @@ import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_CIRCULAR
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_HORIZONTAL
 import knf.kuma.custom.snackbar.SnackProgressBar.Companion.TYPE_NORMAL
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import java.util.*
+import java.util.Locale
 
 /**
  * Core class constructing the SnackProgressBar.

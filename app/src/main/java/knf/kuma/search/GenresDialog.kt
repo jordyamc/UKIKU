@@ -8,7 +8,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import knf.kuma.commons.transform
-import java.util.*
 
 class GenresDialog : DialogFragment() {
 

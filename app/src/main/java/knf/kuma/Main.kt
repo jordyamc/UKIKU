@@ -1,5 +1,6 @@
 package knf.kuma
 
+import androidx.activity.addCallback
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
@@ -34,6 +35,7 @@ import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import knf.kuma.achievements.AchievementActivity
 import knf.kuma.achievements.AchievementManager
@@ -106,11 +108,12 @@ import xdroid.toaster.Toaster
 import java.net.HttpCookie
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import androidx.core.net.toUri
 
 class Main : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
-        BottomNavigationView.OnNavigationItemSelectedListener,
-        BottomNavigationView.OnNavigationItemReselectedListener,
+        NavigationBarView.OnItemSelectedListener,
+        NavigationBarView.OnItemReselectedListener,
         UpdateChecker.CheckListener, BypassUtil.BypassListener,
         ConfigurationFragment.UAChangeListener {
 
@@ -152,8 +155,8 @@ class Main : GenericActivity(),
         toolbar.changeToolbarFont(R.font.audiowide)
         setNavigationButtons()
         navigationView.setNavigationItemSelectedListener(this)
-        bottomNavigationView.setOnNavigationItemSelectedListener(this)
-        bottomNavigationView.setOnNavigationItemReselectedListener(this)
+        bottomNavigationView.setOnItemSelectedListener(this)
+        bottomNavigationView.setOnItemReselectedListener(this)
         setSearch()
         if (savedInstanceState == null) {
             checkServices()
@@ -163,6 +166,18 @@ class Main : GenericActivity(),
         //checkBypass()
         migrateSeen()
         FirestoreManager.start()
+        onBackPressedDispatcher.addCallback(this) {
+            when {
+                drawer.isDrawerOpen(GravityCompat.START) -> drawer.closeDrawer(GravityCompat.START)
+                searchView.isSearching -> closeSearch()
+                readyToFinish -> finish()
+                else -> {
+                    readyToFinish = true
+                    Toaster.toast("Presione de nuevo para salir")
+                    Handler().postDelayed({ readyToFinish = false }, 2000)
+                }
+            }
+        }
         DesignUtils.listenDesignChange(this)
     }
 
@@ -327,20 +342,23 @@ class Main : GenericActivity(),
 
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     private fun checkPermissions() {
-        val permissions = mutableListOf<String>()
-        if (isFullMode) {
-            if (Build.VERSION.SDK_INT in Build.VERSION_CODES.M..Build.VERSION_CODES.P &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        try {
+            val permissions = mutableListOf<String>()
+            if (isFullMode) {
+                if (Build.VERSION.SDK_INT in Build.VERSION_CODES.M..Build.VERSION_CODES.P &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                }
             }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
-        }
-        if (permissions.isNotEmpty()) {
-            requestPermissions(permissions.toTypedArray(), 55498)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            if (permissions.isNotEmpty()) {
+                requestPermissions(permissions.toTypedArray(), 55498)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -351,7 +369,7 @@ class Main : GenericActivity(),
             positiveButton(text = "Aceptar") {
                 if (denied) {
                     try {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")).apply {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:$packageName".toUri()).apply {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         }
                         finish()
@@ -442,22 +460,6 @@ class Main : GenericActivity(),
         MaterialDialog(this).safeShow {
             message(text = message)
             positiveButton()
-        }
-    }
-
-    override fun onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
-        } else if (searchView.isSearching) {
-            closeSearch()
-        } else {
-            if (readyToFinish) {
-                super.onBackPressed()
-            } else {
-                readyToFinish = true
-                Toaster.toast("Presione de nuevo para salir")
-                Handler().postDelayed({ readyToFinish = false }, 2000)
-            }
         }
     }
 

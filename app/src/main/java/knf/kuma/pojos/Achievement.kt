@@ -17,7 +17,8 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.database.BaseConverter
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 @Keep
 @Entity

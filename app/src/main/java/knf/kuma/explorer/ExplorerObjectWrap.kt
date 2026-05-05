@@ -2,7 +2,7 @@ package knf.kuma.explorer
 
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
-import java.util.*
+import java.util.Locale
 
 class ExplorerObjectWrap(val obj: ExplorerObject){
     val fileList = obj.chapters.map { FileDownWrap(it) }.toMutableList()

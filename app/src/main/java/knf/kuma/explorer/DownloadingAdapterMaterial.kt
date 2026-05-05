@@ -138,7 +138,7 @@ class DownloadingAdapterMaterial internal constructor(private val fragment: Frag
         return list
     }
 
-    inner class DownloadingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class DownloadingItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val server: TextView = itemView.find(R.id.server)
         val title: TextView = itemView.find(R.id.title)
         val chapter: TextView = itemView.find(R.id.chapter)

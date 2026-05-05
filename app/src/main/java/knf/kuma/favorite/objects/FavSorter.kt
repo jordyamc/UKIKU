@@ -2,7 +2,6 @@ package knf.kuma.favorite.objects
 
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.pojos.FavoriteObject
-import java.util.*
 
 class FavSorter : Comparator<FavoriteObject> {
 

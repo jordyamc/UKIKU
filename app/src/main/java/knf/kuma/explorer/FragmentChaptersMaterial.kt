@@ -18,7 +18,12 @@ import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.CastUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.noCrashSuspend
+import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
 import knf.kuma.pojos.RecordObject

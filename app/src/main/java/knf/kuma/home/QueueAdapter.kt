@@ -7,13 +7,20 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.inflate
+import knf.kuma.commons.load
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.optionalBind
+import knf.kuma.commons.transform
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import knf.kuma.queue.QueueActivity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import java.util.*
+import java.util.Locale
 
 class QueueAdapter(val fragment: HomeFragment) : UpdateableAdapter<QueueAdapter.RecentViewHolder>() {
 

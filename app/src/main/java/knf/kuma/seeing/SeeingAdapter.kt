@@ -122,11 +122,11 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         }
     }
 
-    internal inner class SeeingItem(itemView: View) : SeeingItemNormal(itemView) {
+    internal class SeeingItem(itemView: View) : SeeingItemNormal(itemView) {
         val chapter: TextView by itemView.bind(R.id.chapter)
     }
 
-    internal open inner class SeeingItemNormal(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal open class SeeingItemNormal(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val progressView: ProgressBar? by itemView.optionalBind(R.id.progress)

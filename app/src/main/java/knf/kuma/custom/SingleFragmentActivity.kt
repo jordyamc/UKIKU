@@ -26,7 +26,7 @@ abstract class SingleFragmentActivity : AppCompatActivity() {
         setContentView(layoutResId)
         with(find<Toolbar>(R.id.toolbar)) {
             setSupportActionBar(this)
-            setNavigationOnClickListener { onBackPressed() }
+            setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         }
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

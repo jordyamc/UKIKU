@@ -20,7 +20,14 @@ import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.safeShow
+import knf.kuma.commons.showSnackbar
+import knf.kuma.commons.toast
+import knf.kuma.commons.verifyManager
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import org.jetbrains.anko.doAsync

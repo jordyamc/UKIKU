@@ -33,7 +33,7 @@
             android:clipToPadding="false"
             android:layoutAnimation="@anim/grid_fall_down"
             android:padding="5dp"
-            app:layoutManager="GridLayoutManager"
+            app:layoutManager=".custom.VariantGridLayoutManager"
             app:spanCount="@integer/span_count"
             tools:listitem="@layout/item_fav_grid"/>
 

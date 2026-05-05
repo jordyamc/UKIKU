@@ -41,6 +41,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:nestedScrollingEnabled="false"
-        app:layoutManager="LinearLayoutManager"
+        app:layoutManager=".custom.VariantLinearLayoutManager"
         tools:listitem="@layout/item_release_material"/>
 </LinearLayout>

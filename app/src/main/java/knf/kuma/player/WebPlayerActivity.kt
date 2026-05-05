@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.CookieManager
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -37,10 +38,16 @@ class WebPlayerActivity : AppCompatActivity() {
             }
             webViewClient = object : WebViewClient() {
                 @Deprecated("Deprecated in Java")
-                override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                    //view?.loadUrl(url ?: return true)
+                override fun shouldOverrideUrlLoading(
+                    view: WebView?,
+                    request: WebResourceRequest?
+                ): Boolean {
                     return true
                 }
+               /* override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                    //view?.loadUrl(url ?: return true)
+                    return true
+                }*/
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     binding.loading.isVisible = false

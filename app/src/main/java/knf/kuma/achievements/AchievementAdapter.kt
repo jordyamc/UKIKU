@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
 
 class AchievementAdapter(private val onClick: (achievement: Achievement) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

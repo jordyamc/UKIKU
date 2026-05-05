@@ -53,7 +53,7 @@
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
             android:paddingBottom="56dp"
-            app:layoutManager="LinearLayoutManager"
+            app:layoutManager=".custom.VariantLinearLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_above="@+id/adContainer"
             tools:listitem="@layout/item_explorer" />

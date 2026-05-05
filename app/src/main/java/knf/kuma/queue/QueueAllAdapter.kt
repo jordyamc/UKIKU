@@ -15,7 +15,7 @@ import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.notSameContent
 import knf.kuma.pojos.QueueObject
 import org.jetbrains.anko.find
-import java.util.*
+import java.util.Collections
 
 internal class QueueAllAdapter internal constructor(activity: Activity) : RecyclerView.Adapter<QueueAllAdapter.AnimeHolder>(), ItemTouchHelperAdapter {
 
@@ -86,7 +86,7 @@ internal class QueueAllAdapter internal constructor(activity: Activity) : Recycl
         fun onListCleared()
     }
 
-    internal inner class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView = itemView.find(R.id.card)
         val dragView: ImageView = itemView.find(R.id.drag)
         val title: TextView = itemView.find(R.id.title)

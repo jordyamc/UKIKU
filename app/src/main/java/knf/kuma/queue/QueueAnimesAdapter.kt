@@ -71,7 +71,7 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
         fun onSelect(queueObject: QueueObject)
     }
 
-    internal inner class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)

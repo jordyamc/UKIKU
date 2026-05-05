@@ -119,7 +119,7 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
         }
     }
 
-    inner class EmissionItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class EmissionItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView = itemView.find(R.id.card)
         val imageView: ImageView = itemView.find(R.id.img)
         val hiddenOverlay: HiddenOverlay = itemView.find(R.id.hidden)

@@ -22,36 +22,33 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import androidx.core.net.toUri
 
 class SelfServer : Service() {
-
-    private var running = false
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            running = false
             CastUtil.get().stop()
-            stopForeground(true)
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (!running) {
-            foreground(64587, foregroundNotification())
-            running = true
-        }
+        foreground(64587, foregroundNotification(), false)
         return START_STICKY
     }
 
     override fun onCreate() {
         super.onCreate()
-        if (!running) {
-            foreground(64587, foregroundNotification())
-            running = true
-        }
+        foreground(64587, foregroundNotification(), false)
         val filter = IntentFilter("knf.cast.stop.foreground")
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
@@ -62,8 +59,11 @@ class SelfServer : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(receiver)
-        running = false
+        try {
+            unregisterReceiver(receiver)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -112,7 +112,9 @@ class SelfServer : Service() {
             if (INSTANCE?.isAlive == true) {
                 INSTANCE?.stop()
                 if (!isRestart)
-                    App.context.sendBroadcast(Intent("knf.cast.stop.foreground"))
+                    App.context.sendBroadcast(Intent("knf.cast.stop.foreground").apply {
+                        setPackage("knf.kuma")
+                    })
             }
         }
     }
@@ -127,9 +129,9 @@ class SelfServer : Service() {
         override fun serve(session: IHTTPSession): Response {
             return if (isFile)
                 if (URLUtil.isFileUrl(data)) {
-                    var file = File(Uri.parse(data).path)
+                    var file = File(data.toUri().path)
                     if (!file.exists())
-                        file = file.parentFile?.listFiles { f -> f.name.contains(Uri.parse(data).path!!.substringAfterLast("$")) }!![0]
+                        file = file.parentFile?.listFiles { f -> f.name.contains(data.toUri().path!!.substringAfterLast("$")) }!![0]
                     serveFile(session.headers, file)
                 } else
                     serveFile(session.headers, data)

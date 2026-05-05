@@ -37,7 +37,7 @@
                 android:clipToPadding="false"
                 android:layoutAnimation="@anim/grid_fall_down"
                 android:padding="5dp"
-                app:layoutManager="GridLayoutManager"
+                app:layoutManager=".custom.VariantGridLayoutManager"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:spanCount="@integer/span_count"
                 tools:listitem="@layout/item_fav_grid" />
@@ -106,7 +106,7 @@
                 android:id="@+id/list_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layoutManager="LinearLayoutManager"
+                app:layoutManager=".custom.VariantLinearLayoutManager"
                 tools:listitem="@layout/item_queue"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

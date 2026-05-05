@@ -8,7 +8,6 @@ import knf.kuma.pojos.FavoriteObject
 import xdroid.toaster.Toaster
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.util.*
 
 class FavList {
     @SerializedName("response")

@@ -1,5 +1,6 @@
 package knf.kuma.achievements
 
+import androidx.activity.addCallback
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -26,10 +27,22 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import knf.kuma.R
-import knf.kuma.ads.*
+import knf.kuma.ads.AdsType
+import knf.kuma.ads.AdsUtils
+import knf.kuma.ads.FullscreenAdLoader
+import knf.kuma.ads.getFAdLoaderInterstitial
+import knf.kuma.ads.getFAdLoaderRewarded
+import knf.kuma.ads.implBanner
+import knf.kuma.ads.showRandomInterstitial
 import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.Economy
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.diceOf
+import knf.kuma.commons.getPackage
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.custom.BannerContainerView
 import knf.kuma.custom.GenericActivity
@@ -42,7 +55,8 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import xdroid.toaster.Toaster
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
+import androidx.core.net.toUri
 
 class AchievementActivity : GenericActivity() {
 
@@ -81,9 +95,21 @@ class AchievementActivity : GenericActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.title = "Logros"
-        toolbar.setNavigationOnClickListener { onBackPressed() }
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         bottomSheet = BottomSheetBehavior.from(cardView)
         bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+        val backCallback = onBackPressedDispatcher.addCallback(this, false) {
+            bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+        bottomSheet.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                backCallback.isEnabled = newState == BottomSheetBehavior.STATE_EXPANDED
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+        })
         pager.offscreenPageLimit = 2
         pager.adapter = AchievementsFragmentsPagerAdapter(supportFragmentManager) {
             onMoreInfo(it)
@@ -98,13 +124,14 @@ class AchievementActivity : GenericActivity() {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (!PrefsUtil.isAchievementsOmitted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))
+        if (!PrefsUtil.isAchievementsOmitted && !Settings.canDrawOverlays(this))
             MaterialDialog(this).safeShow {
                 message(text = "Para mostrar una mejor animacion al desbloquear logros, la app necesita un permiso especial, ¿Deseas activarlo?")
                 positiveButton(text = "Activar") {
                     try {
-                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(Uri.parse("package:${getPackage()}")), 5879)
-                    } catch (e: Exception) {
+                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).setData(
+                            "package:${getPackage()}".toUri()), 5879)
+                    } catch (_: Exception) {
                         Toaster.toast("No se pudo abrir la configuracion")
                     }
                 }
@@ -225,17 +252,10 @@ class AchievementActivity : GenericActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED)
-            bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-        else
-            super.onBackPressed()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 5879) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
+            if (Settings.canDrawOverlays(this)) {
                 Toaster.toast("Logros mejorados!")
                 val achievementUnlocked = AchievementUnlocked(this).apply {
                     setRounded(false)

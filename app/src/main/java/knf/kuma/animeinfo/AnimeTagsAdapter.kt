@@ -26,7 +26,7 @@ internal class AnimeTagsAdapter(private val context: Context, private val list: 
         return list.size
     }
 
-    internal inner class TagHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class TagHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var chip: TextView = itemView.find(R.id.chip)
     }
 }

@@ -2,7 +2,11 @@ package knf.kuma.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import knf.kuma.pojos.RecordObject
 
 @Dao

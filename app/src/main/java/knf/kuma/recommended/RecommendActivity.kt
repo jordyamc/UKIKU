@@ -13,15 +13,20 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.gridColumns
+import knf.kuma.commons.removeAll
 import knf.kuma.custom.GenericActivity
+import knf.kuma.custom.VariantGridLayoutManager
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.GenreStatusObject
 import knf.kuma.recommended.sections.MultipleSection
@@ -113,7 +118,7 @@ class RecommendActivity : GenericActivity() {
                         sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[2]), getAnimeList(c), isGrid))
                     val layoutManager: RecyclerView.LayoutManager
                     if (isGrid) {
-                        val grid = GridLayoutManager(this@RecommendActivity, defaultGridColumns)
+                        val grid = VariantGridLayoutManager(this@RecommendActivity, defaultGridColumns)
                         grid.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                             override fun getSpanSize(position: Int): Int {
                                 return try {
@@ -130,7 +135,7 @@ class RecommendActivity : GenericActivity() {
                         }
                         layoutManager = grid
                     } else {
-                        layoutManager = LinearLayoutManager(this@RecommendActivity)
+                        layoutManager = VariantLinearLayoutManager(this@RecommendActivity)
                     }
                     runOnUiThread {
                         loading.visibility = View.GONE

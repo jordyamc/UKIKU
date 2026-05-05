@@ -57,7 +57,7 @@
             app:fastScrollPopupTextColor="@android:color/white"
             app:fastScrollThumbColor="?colorSecondary"
             app:fastScrollThumbInactiveColor="?colorSecondaryVariant"
-            app:layoutManager="GridLayoutManager"
+            app:layoutManager=".custom.VariantGridLayoutManager"
             app:spanCount="@integer/span_count" />
 
         <knf.kuma.custom.BannerContainerView

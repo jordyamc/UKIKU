@@ -47,7 +47,7 @@
                 android:clipToPadding="false"
                 android:layoutAnimation="@anim/layout_fall_down"
                 android:paddingTop="16dp"
-                app:layoutManager="LinearLayoutManager"
+                app:layoutManager=".custom.VariantLinearLayoutManager"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 tools:listitem="@layout/item_news_material" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

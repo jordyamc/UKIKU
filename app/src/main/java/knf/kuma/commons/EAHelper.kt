@@ -33,6 +33,7 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import xdroid.toaster.Toaster
 import java.util.Random
+import androidx.core.content.edit
 
 object EAHelper {
     private val CODE1: String by lazy {
@@ -100,7 +101,12 @@ object EAHelper {
         for (i in 0..9) {
             builder.append(array[Random().nextInt(array.size)])
         }
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(key, builder.toString()).apply()
+        PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putString(
+                key,
+                builder.toString()
+            )
+        }
         return builder.toString()
     }
 
@@ -362,7 +368,7 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.title = "Easter egg"
-        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         rewardedAd.load()
         interstitial.load()
     }
@@ -420,15 +426,6 @@ class EAUnlockActivity : GenericActivity(), IStepperAdapter {
             2 -> "ee_3"
             3 -> "ee_4"
             else -> "ee_all"
-        }
-    }
-
-    private fun getPurchaseInfo(index: Int): String {
-        return when (index) {
-            1 -> "$ 7 usd"
-            2 -> "$ 13 usd"
-            3 -> "$ 5 usd"
-            else -> "..."
         }
     }
 

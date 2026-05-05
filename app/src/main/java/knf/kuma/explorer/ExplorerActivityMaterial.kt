@@ -1,5 +1,6 @@
 package knf.kuma.explorer
 
+import androidx.activity.addCallback
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,13 +29,21 @@ class ExplorerActivityMaterial : GenericActivity(), OnFileStateChange {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(false)
-        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         if (savedInstanceState == null)
             ExplorerCreator.onDestroy()
         binding.pager.offscreenPageLimit = 2
         adapter = ExplorerPagerAdapterMaterial(this, supportFragmentManager)
         binding.pager.adapter = adapter
         binding.tabs.setupWithViewPager(binding.pager)
+        onBackPressedDispatcher.addCallback(this) {
+            val currentFragment = adapter?.getItem(binding.pager.currentItem) as? FragmentBase
+            if (currentFragment?.onBackPressed() != true) {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
+        }
         showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
     }
 
@@ -61,13 +70,6 @@ class ExplorerActivityMaterial : GenericActivity(), OnFileStateChange {
     override fun onDestroy() {
         super.onDestroy()
         ThumbServer.stop()
-    }
-
-    override fun onBackPressed() {
-        adapter?.let {
-            if ((it.getItem(binding.pager.currentItem) as? FragmentBase)?.onBackPressed() == false)
-                super.onBackPressed()
-        } ?: super.onBackPressed()
     }
 
     companion object {

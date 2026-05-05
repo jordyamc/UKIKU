@@ -17,7 +17,12 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import knf.kuma.App
-import knf.kuma.commons.*
+import knf.kuma.commons.FileUtil
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.findActivity
+import knf.kuma.commons.getPackage
+import knf.kuma.commons.isNull
 import knf.kuma.explorer.creator.Creator
 import knf.kuma.explorer.creator.DocumentFileCreator
 import knf.kuma.explorer.creator.SimpleFileCreator
@@ -26,7 +31,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.io.*
+import java.io.File
+import java.io.FileFilter
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 
 object FileAccessHelper {
 

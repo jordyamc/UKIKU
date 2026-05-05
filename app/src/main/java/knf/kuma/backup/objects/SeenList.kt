@@ -9,7 +9,6 @@ import knf.kuma.pojos.SeenObject
 import xdroid.toaster.Toaster
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.util.*
 
 /**
  * Created by jordy on 01/03/2018.

@@ -61,7 +61,7 @@ class ExplorerFilesAdapter internal constructor(private val fragment: Fragment, 
         }
     }
 
-    inner class FileItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class FileItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)

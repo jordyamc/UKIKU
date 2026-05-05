@@ -18,7 +18,12 @@ import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
 import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.animeinfo.viewholders.AnimeChaptersMaterialHolder
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.FileUtil
+import knf.kuma.commons.Network
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.noCrashLet
+import knf.kuma.commons.toast
 import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.download.FileAccessHelper
@@ -29,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
-import java.util.*
 import java.util.regex.Pattern
 
 class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.ChapHolderCallback {

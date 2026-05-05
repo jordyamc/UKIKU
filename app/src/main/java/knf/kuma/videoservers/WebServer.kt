@@ -2,9 +2,6 @@ package knf.kuma.videoservers
 
 import android.content.Context
 import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.jsoupCookies
-import knf.kuma.videoservers.VideoServer.Names.FENIX
-import org.json.JSONObject
 
 class WebServer (context: Context, baseLink: String, val serverName: String) : Server(context, baseLink) {
 

@@ -182,6 +182,9 @@ object PrefsUtil {
                 ?: "Desconocido"
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("last_backup", value).apply()
 
+    val notifyFavs: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notify_favs", false)
+
     val isProxyCastEnabled: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("force_local_cast", false)
 

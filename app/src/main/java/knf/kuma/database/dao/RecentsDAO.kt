@@ -7,11 +7,15 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import knf.kuma.pojos.RecentObject
 import knf.kuma.recents.RecentModelCh
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecentsDAO {
     @get:Query("SELECT * FROM recentobject ORDER BY `key`")
     val objects: LiveData<MutableList<RecentObject>>
+
+    @get:Query("SELECT * FROM recentobject ORDER BY `key`")
+    val objectsFlow: Flow<MutableList<RecentObject>>
 
     @get:Query("SELECT * FROM recentobject ORDER BY `key`")
     val all: MutableList<RecentObject>

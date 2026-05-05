@@ -6,13 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.databinding.RecyclerFaqBinding
 import org.jetbrains.anko.toast
 
@@ -28,8 +28,8 @@ class FaqActivity : GenericActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "FAQ"
-        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
-        binding.recycler.layoutManager = LinearLayoutManager(this)
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.recycler.layoutManager = VariantLinearLayoutManager(this)
         binding.recycler.adapter = FaqAdapter(createFAQList())
     }
 

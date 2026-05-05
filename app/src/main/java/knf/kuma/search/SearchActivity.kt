@@ -1,5 +1,6 @@
 package knf.kuma.search
 
+import androidx.activity.addCallback
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -32,16 +33,15 @@ class SearchActivity : GenericActivity() {
             AchievementManager.onSearch(it.toString())
             model.sendQuery(it?.toString())
         })
+        onBackPressedDispatcher.addCallback(this) {
+            finish()
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         return super.onSupportNavigateUp()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.fade_in,R.anim.fade_out)
     }
 
     companion object {

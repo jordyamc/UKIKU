@@ -48,7 +48,7 @@ class SearchAdapterCompactMaterial internal constructor(private val fragment: Fr
         }
     }
 
-    inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: View by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val progressView: ProgressBar by itemView.bind(R.id.progress)

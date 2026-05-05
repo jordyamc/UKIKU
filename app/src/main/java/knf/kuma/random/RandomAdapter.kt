@@ -11,8 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.*
-import java.util.*
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.load
+import knf.kuma.commons.notSameContent
 
 internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adapter<RandomAdapter.RandomItem>() {
     private var list: List<RandomObject> = ArrayList()
@@ -48,7 +51,7 @@ internal class RandomAdapter(private val activity: Activity) : RecyclerView.Adap
         }
     }
 
-    internal inner class RandomItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class RandomItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)

@@ -10,6 +10,7 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.activity.addCallback
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
@@ -17,7 +18,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.card.MaterialCardView
@@ -25,8 +28,15 @@ import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.gridColumns
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
+import knf.kuma.custom.VariantGridLayoutManager
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
 import kotlinx.coroutines.Dispatchers
@@ -93,8 +103,12 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
         }
         bottomSheetBehavior = BottomSheetBehavior.from(cardView)
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        val backCallback = onBackPressedDispatcher.addCallback(this, false) {
+            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        }
         bottomSheetBehavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                backCallback.isEnabled = newState == BottomSheetBehavior.STATE_EXPANDED
                 if (newState == BottomSheetBehavior.STATE_HIDDEN)
                     current = null
             }
@@ -177,10 +191,10 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
 
     private fun setLayoutManager(isFull: Boolean) {
         if (isFull || PrefsUtil.layType == "0") {
-            recyclerView.layoutManager = LinearLayoutManager(this)
+            recyclerView.layoutManager = VariantLinearLayoutManager(this)
             recyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_fall_down)
         } else {
-            recyclerView.layoutManager = GridLayoutManager(this, gridColumns())
+            recyclerView.layoutManager = VariantGridLayoutManager(this, gridColumns())
             recyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.grid_fall_down)
         }
     }
@@ -202,7 +216,7 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
                                     withContext(Dispatchers.IO) {
                                         try {
                                             list.sortedBy { it.chapter.number.substringAfterLast(" ").toFloat() }.toMutableList()
-                                        } catch (e: Exception) {
+                                        } catch (_: Exception) {
                                             list
                                         }
                                     }
@@ -211,12 +225,12 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
                         }
                         current = queueObject
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     doAsync {
                         CacheDB.INSTANCE.queueDAO().allRaw.forEach {
                             try {
                                 it.chapter.aid
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 CacheDB.INSTANCE.queueDAO().remove(it)
                             }
                         }
@@ -292,13 +306,6 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
             outState.putBoolean("isOpen", true)
         } else
             outState.putBoolean("isOpen", false)
-    }
-
-    override fun onBackPressed() {
-        if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED)
-            bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
-        else
-            super.onBackPressed()
     }
 
     companion object {

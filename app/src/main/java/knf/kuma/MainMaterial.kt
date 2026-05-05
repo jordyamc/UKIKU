@@ -1,9 +1,9 @@
 package knf.kuma
 
+import androidx.activity.addCallback
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -32,6 +32,7 @@ import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
@@ -101,8 +102,8 @@ import java.io.File
 
 class MainMaterial : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
-        BottomNavigationView.OnNavigationItemSelectedListener,
-        BottomNavigationView.OnNavigationItemReselectedListener,
+        NavigationBarView.OnItemSelectedListener,
+        NavigationBarView.OnItemReselectedListener,
         UpdateChecker.CheckListener, BypassUtil.BypassListener,
         ConfigurationFragment.UAChangeListener {
 
@@ -130,7 +131,7 @@ class MainMaterial : GenericActivity(),
         }
         try {
             setContentView(R.layout.activity_main_material)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             setContentView(R.layout.activity_main_drawer_nwv)
         }
         //setDefaults()
@@ -144,8 +145,8 @@ class MainMaterial : GenericActivity(),
         }
         setNavigationButtons()
         navigationView.setNavigationItemSelectedListener(this)
-        bottomNavigationView.setOnNavigationItemSelectedListener(this)
-        bottomNavigationView.setOnNavigationItemReselectedListener(this)
+        bottomNavigationView.setOnItemSelectedListener(this)
+        bottomNavigationView.setOnItemReselectedListener(this)
         if (savedInstanceState == null) {
             checkServices()
             startChange()
@@ -154,6 +155,19 @@ class MainMaterial : GenericActivity(),
         //checkBypass()
         migrateSeen()
         FirestoreManager.start()
+        onBackPressedDispatcher.addCallback(this) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START)
+            } else {
+                if (readyToFinish) {
+                    finish()
+                } else {
+                    readyToFinish = true
+                    Toaster.toast("Presione de nuevo para salir")
+                    Handler().postDelayed({ readyToFinish = false }, 2000)
+                }
+            }
+        }
         DesignUtils.listenDesignChange(this)
         //BypassUtil.doConnectionTests()
         //ThumbsDownloader.start(this)
@@ -399,20 +413,6 @@ class MainMaterial : GenericActivity(),
         MaterialDialog(this).safeShow {
             message(text = message)
             positiveButton()
-        }
-    }
-
-    override fun onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
-        } else {
-            if (readyToFinish) {
-                super.onBackPressed()
-            } else {
-                readyToFinish = true
-                Toaster.toast("Presione de nuevo para salir")
-                Handler().postDelayed({ readyToFinish = false }, 2000)
-            }
         }
     }
 

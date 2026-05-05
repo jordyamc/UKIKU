@@ -12,15 +12,26 @@ import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.framework.DropBoxService
 import knf.kuma.backup.framework.LocalService
 import knf.kuma.backup.objects.BackupObject
-import knf.kuma.commons.*
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.doOnUIGlobal
+import knf.kuma.commons.safeDismiss
+import knf.kuma.commons.safeShow
+import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.*
+import knf.kuma.pojos.Achievement
+import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.AutoBackupObject
+import knf.kuma.pojos.FavoriteObject
+import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.SeeingObject
+import knf.kuma.pojos.SeenObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 object Backups {
 

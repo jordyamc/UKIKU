@@ -51,7 +51,7 @@ internal class ChangeAdapter(release: Release) : RecyclerView.Adapter<ChangeAdap
         return changes.size
     }
 
-    internal inner class ChangeItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class ChangeItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var type: TextView = itemView.find(R.id.type)
         var description: TextView = itemView.find(R.id.description)
     }

@@ -7,13 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
+import knf.kuma.custom.VariantLinearLayoutManager
 import org.jetbrains.anko.find
 
 class RecyclerRefreshHolder(view: View) {
     val recyclerView: RecyclerView = view.find(R.id.recycler)
     val refreshLayout: SwipeRefreshLayout = view.find(R.id.refresh)
     val error: View = view.find(R.id.error)
-    private val layoutManager: LinearLayoutManager = LinearLayoutManager(view.context)
+    private val layoutManager: LinearLayoutManager = VariantLinearLayoutManager(view.context)
 
     init {
         recyclerView.layoutManager = layoutManager

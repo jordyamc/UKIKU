@@ -2,7 +2,6 @@ package knf.kuma.tv.exoplayer
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
 
 class Video(intent: Intent) {
     internal var uri: Uri = Uri.parse(intent.dataString)

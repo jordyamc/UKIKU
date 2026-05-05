@@ -6,7 +6,12 @@ import android.os.Bundle
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.jsoupCookies
+import knf.kuma.commons.safeDismiss
+import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject

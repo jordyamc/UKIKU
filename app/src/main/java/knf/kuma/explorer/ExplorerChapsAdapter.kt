@@ -191,7 +191,7 @@ class ExplorerChapsAdapter internal constructor(val fragment: Fragment, private 
 
     }
 
-    inner class ChapItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ChapItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val seenOverlay: SeenAnimeOverlay by itemView.bind(R.id.seen)

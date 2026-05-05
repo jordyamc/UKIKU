@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layoutAnimation="@anim/layout_fall_down"
-        app:layoutManager="LinearLayoutManager"
+        app:layoutManager=".custom.VariantLinearLayoutManager"
         tools:listitem="@layout/item_achievements"/>
 
     <LinearLayout

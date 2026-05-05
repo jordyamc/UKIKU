@@ -23,7 +23,7 @@
             app:fastScrollPopupTextColor="@android:color/white"
             app:fastScrollThumbColor="?colorSecondary"
             app:fastScrollThumbInactiveColor="?colorSecondaryVariant"
-            app:layoutManager="GridLayoutManager"
+            app:layoutManager=".custom.VariantGridLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:spanCount="@integer/span_count"
             tools:listitem="@layout/item_fav_grid" />

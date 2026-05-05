@@ -86,6 +86,8 @@ open class RecentModel {
             state = RecentState(this)
     }
 
+    val isNew: Boolean get() = chapter.matches("^.* [10]$".toRegex())
+
     override fun equals(other: Any?): Boolean = other is RecentModel && other.chapter == chapter && other.name == name && other.aid == aid && other.key == key
     override fun hashCode(): Int = name.hashCode() + chapter.hashCode()
 

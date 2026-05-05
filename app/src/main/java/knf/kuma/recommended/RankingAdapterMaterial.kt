@@ -34,7 +34,7 @@ class RankingAdapterMaterial(val list: List<GenreStatusObject>) : RecyclerView.A
         return list.size
     }
 
-    inner class RankHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class RankHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.find(R.id.title)
         val count: TextView = itemView.find(R.id.count)
         val ranking: ProgressBar = itemView.find(R.id.ranking)

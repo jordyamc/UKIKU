@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ir.mahdiparastesh.chlm.ChipsLayoutManager
 import ir.mahdiparastesh.chlm.SpacingItemDecoration
@@ -27,6 +26,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.removeAllDecorations
 import knf.kuma.custom.ExpandableTV
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.FragmentAnimeDetailsBinding
 import knf.kuma.pojos.AnimeObject
@@ -40,6 +40,7 @@ import org.jetbrains.anko.clipboardManager
 import org.jetbrains.anko.doAsync
 import uz.jamshid.library.ExactRatingBar
 import xdroid.toaster.Toaster
+import androidx.core.view.isVisible
 
 class AnimeDetailsHolder(val view: View) {
     private val binding = FragmentAnimeDetailsBinding.bind(view)
@@ -64,7 +65,7 @@ class AnimeDetailsHolder(val view: View) {
     init {
         recyclerViewGenres.layoutManager = ChipsLayoutManager.newBuilder(view.context).build()
         recyclerViewGenres.addItemDecoration(SpacingItemDecoration(5, 5))
-        recyclerViewRelated.layoutManager = LinearLayoutManager(view.context)
+        recyclerViewRelated.layoutManager = VariantLinearLayoutManager(view.context)
     }
 
     @SuppressLint("SetTextI18n")
@@ -173,7 +174,7 @@ class AnimeDetailsHolder(val view: View) {
     }
 
     private fun showCard(view: View) {
-        if (view.visibility == View.VISIBLE || !needAnimation) return
+        if (view.isVisible || !needAnimation) return
         retard += 100
         GlobalScope.launch(Dispatchers.Main) {
             delay(retard.toLong())

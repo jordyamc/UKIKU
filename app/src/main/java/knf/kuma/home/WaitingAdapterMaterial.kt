@@ -7,7 +7,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnimeMaterial
-import knf.kuma.commons.*
+import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.inflate
+import knf.kuma.commons.load
+import knf.kuma.commons.noCrash
+import knf.kuma.commons.transform
 import knf.kuma.pojos.SeeingObject
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick

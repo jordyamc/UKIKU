@@ -5,12 +5,17 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.annotation.*
+import androidx.annotation.ColorRes
+import androidx.annotation.FloatRange
+import androidx.annotation.IntDef
 import androidx.annotation.IntRange
+import androidx.annotation.Keep
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import knf.kuma.R
-import java.util.*
+import knf.kuma.custom.snackbar.SnackProgressBarManager.Companion.LENGTH_INDEFINITE
+import knf.kuma.custom.snackbar.SnackProgressBarManager.Companion.LENGTH_LONG
+import knf.kuma.custom.snackbar.SnackProgressBarManager.Companion.LENGTH_SHORT
 
 /**
  * Manager class handling all the SnackProgressBars added.

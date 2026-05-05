@@ -18,7 +18,12 @@ import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
-import knf.kuma.commons.*
+import knf.kuma.commons.EAHelper
+import knf.kuma.commons.PrefsUtil
+import knf.kuma.commons.bind
+import knf.kuma.commons.doOnUI
+import knf.kuma.commons.safeShow
+import knf.kuma.commons.verifyManager
 import knf.kuma.custom.BannerContainerView
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB

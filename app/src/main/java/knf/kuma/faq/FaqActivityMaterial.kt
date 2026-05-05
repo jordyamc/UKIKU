@@ -2,11 +2,10 @@ package knf.kuma.faq
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.net.toUri
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import knf.kuma.R
@@ -14,6 +13,7 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.databinding.RecyclerFaqMaterialBinding
 import org.jetbrains.anko.toast
 
@@ -30,8 +30,8 @@ class FaqActivityMaterial : GenericActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "FAQ"
-        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
-        binding.recycler.layoutManager = LinearLayoutManager(this)
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.recycler.layoutManager = VariantLinearLayoutManager(this)
         binding.recycler.adapter = FaqAdapter(createFAQList())
     }
 
@@ -45,10 +45,10 @@ class FaqActivityMaterial : GenericActivity() {
             title(text = "Reportar problema")
             listItems(items = listOf("Telegram", "Facebook", "Email")) { _, index, _ ->
                 when (index) {
-                    0 -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/unbarredstream")))
-                    1 -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/ukikuapp/")))
+                    0 -> startActivity(Intent(Intent.ACTION_VIEW, "https://t.me/unbarredstream".toUri()))
+                    1 -> startActivity(Intent(Intent.ACTION_VIEW, "https://www.facebook.com/ukikuapp/".toUri()))
                     2 -> {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:?subject=Problema con UKIKU&to=jordyamc@hotmail.com"))
+                        val intent = Intent(Intent.ACTION_VIEW, "mailto:?subject=Problema con UKIKU&to=jordyamc@hotmail.com".toUri())
                         val chooser = Intent.createChooser(intent, "Enviar reporte")
                         if (intent.resolveActivity(packageManager) != null) {
                             startActivity(chooser)

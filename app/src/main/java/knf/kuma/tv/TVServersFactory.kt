@@ -128,7 +128,7 @@ class TVServersFactory private constructor(
                             }
                         }
                         serversInterface.onFinish(false, true)
-                    } catch (ex: Exception) {
+                    } catch (_: Exception) {
                         Toaster.toast("Error al abrir explorador web")
                         showServerList()
                     }
@@ -219,7 +219,7 @@ class TVServersFactory private constructor(
                     val server = Server.check(activity, baseLink.optString("code"))
                     if (server != null)
                         servers.add(server)
-                    else if (baseLink.optString("title").startsWith("SB"))
+                    else if (!baseLink.optString("code").contains("linkinpork"))
                         servers.add(WebServer(App.context, baseLink.optString("code"), baseLink.optString("title")))
                 }
                 servers.sort()

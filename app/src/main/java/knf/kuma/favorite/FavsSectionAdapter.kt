@@ -88,7 +88,7 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     override fun getItemViewType(position: Int): Int {
         return try {
             if (list[position] is AdFavoriteObject) FavsSectionAdapterMaterial.TYPE_AD else if (list[position].isSection) FavsSectionAdapterMaterial.TYPE_HEADER else FavsSectionAdapterMaterial.TYPE_ITEM
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             FavsSectionAdapterMaterial.TYPE_ITEM
         }
     }
@@ -108,7 +108,7 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
                     }
                     else -> list[position].aid
                 }
-        } catch (e: IllegalStateException) {
+        } catch (_: IllegalStateException) {
             ""
         }
     }
@@ -136,14 +136,14 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
         fun onEdit(category: String)
     }
 
-    internal inner class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)
         val type: TextView by itemView.bind(R.id.type)
     }
 
-    internal inner class HeaderHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class HeaderHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val header: TextView by itemView.bind(R.id.header)
         val action: ImageButton by itemView.bind(R.id.action)
     }

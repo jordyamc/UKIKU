@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ir.mahdiparastesh.chlm.ChipsLayoutManager
 import ir.mahdiparastesh.chlm.SpacingItemDecoration
@@ -30,6 +29,7 @@ import knf.kuma.commons.noCrash
 import knf.kuma.commons.noCrashSuspend
 import knf.kuma.commons.removeAllDecorations
 import knf.kuma.custom.ExpandableTV
+import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.FragmentAnimeDetailsMaterialBinding
 import knf.kuma.pojos.AnimeObject
@@ -64,7 +64,7 @@ class AnimeDetailsMaterialHolder(val view: View) {
     init {
         recyclerViewGenres.layoutManager = ChipsLayoutManager.newBuilder(view.context).build()
         recyclerViewGenres.addItemDecoration(SpacingItemDecoration(5, 5))
-        recyclerViewRelated.layoutManager = LinearLayoutManager(view.context)
+        recyclerViewRelated.layoutManager = VariantLinearLayoutManager(view.context)
         binding.layAd.isVisible = PrefsUtil.isAdsEnabled
     }
 
@@ -104,19 +104,8 @@ class AnimeDetailsMaterialHolder(val view: View) {
             if (PrefsUtil.isAdsEnabled) {
                 launch {
                     noCrashSuspend {
-                        if (AdsUtils.isAdmobEnabled)
-                        /*NativeManager.take(fragment.lifecycleScope, 1) {
-                            if (it.isNotEmpty()) {
-                                binding.adContainer.setNativeAd(it[0])
-                            } else {
-                                binding.adContainer.isVisible = false
-                                binding.layAd.implBanner(AdsType.INFO_BANNER)
-                            }
-                        }*/
-                        else {
-                            binding.adContainer.isVisible = false
-                            binding.layAd.implBanner(AdsType.INFO_BANNER)
-                        }
+                        binding.adContainer.isVisible = false
+                        binding.layAd.implBanner(AdsType.INFO_BANNER)
                     }
                 }
                 showLayout(layouts[2])

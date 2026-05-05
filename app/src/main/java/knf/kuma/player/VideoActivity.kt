@@ -62,7 +62,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
         hideUI()
         SSLSkipper.skip()
         binding.player.resizeMode = getResizeMode()
-        find<View>(R.id.exit).onClick { onBackPressed() }
+        find<View>(R.id.exit).onClick { onBackPressedDispatcher.onBackPressed() }
         find<View>(R.id.lock).onClick { lock() }
         find<View>(R.id.skip).setOnClickListener { playerHolder.skip() }
         binding.unlock.onClick { unlock() }

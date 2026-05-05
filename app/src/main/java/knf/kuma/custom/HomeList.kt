@@ -14,6 +14,7 @@ import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.inflate
 import knf.kuma.home.UpdateableAdapter
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import androidx.core.content.withStyledAttributes
 
 class HomeList : LinearLayout {
 
@@ -49,15 +50,15 @@ class HomeList : LinearLayout {
 
     private fun loadVars(attrs: AttributeSet?) {
         attrs?.let {
-            val array = context.obtainStyledAttributes(it, R.styleable.HomeList)
-            showAll = array.getBoolean(R.styleable.HomeList_hm_showViewAll, false)
-            showAllText = array.getString(R.styleable.HomeList_hm_viewAllText) ?: "Ver Todos"
-            isLarge = array.getBoolean(R.styleable.HomeList_hm_isLarge, false)
-            startHidden = array.getBoolean(R.styleable.HomeList_hm_startHidden, false)
-            subheaderText = array.getString(R.styleable.HomeList_hm_subheader) ?: "Subheader"
-            errorText = array.getString(R.styleable.HomeList_hm_errorText)
-            showError = !errorText.isNullOrEmpty()
-            array.recycle()
+            context.withStyledAttributes(it, R.styleable.HomeList) {
+                showAll = getBoolean(R.styleable.HomeList_hm_showViewAll, false)
+                showAllText = getString(R.styleable.HomeList_hm_viewAllText) ?: "Ver Todos"
+                isLarge = getBoolean(R.styleable.HomeList_hm_isLarge, false)
+                startHidden = getBoolean(R.styleable.HomeList_hm_startHidden, false)
+                subheaderText = getString(R.styleable.HomeList_hm_subheader) ?: "Subheader"
+                errorText = getString(R.styleable.HomeList_hm_errorText)
+                showError = !errorText.isNullOrEmpty()
+            }
         }
     }
 
@@ -91,6 +92,10 @@ class HomeList : LinearLayout {
 
     fun setSubheader(text: String) {
         doOnUIGlobal { subheader.text = text.also { subheaderText = it } }
+    }
+
+    fun setError(text: String) {
+        doOnUIGlobal { errorTV.text = text.also { errorText = it } }
     }
 
     fun <T> setViewAllClass(clazz: Class<T>) {

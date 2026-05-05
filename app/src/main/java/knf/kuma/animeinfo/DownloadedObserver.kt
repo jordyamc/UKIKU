@@ -2,7 +2,12 @@ package knf.kuma.animeinfo
 
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.FileWrapper
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 object DownloadedObserver {
     private var observer: Job = Job()

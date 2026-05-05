@@ -39,7 +39,7 @@
                 android:paddingStart="10dp"
                 android:paddingTop="10dp"
                 android:paddingEnd="10dp"
-                app:layoutManager="LinearLayoutManager"
+                app:layoutManager=".custom.VariantLinearLayoutManager"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 tools:listitem="@layout/item_fav" />
 
@@ -107,7 +107,7 @@
                 android:id="@+id/list_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layoutManager="LinearLayoutManager"
+                app:layoutManager=".custom.VariantLinearLayoutManager"
                 tools:listitem="@layout/item_queue"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

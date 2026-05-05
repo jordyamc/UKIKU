@@ -2,7 +2,7 @@ package knf.kuma.videoservers
 
 class KDecoder {
     companion object {
-        fun decodeMango(url: String, mask: Int): String? {
+        fun decodeMango(url: String, mask: Int): String {
             val key = "=/+9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA"
             val result = StringBuffer()
             val u = url.replace("[^A-Za-z0-9+/=]".toRegex(), "")

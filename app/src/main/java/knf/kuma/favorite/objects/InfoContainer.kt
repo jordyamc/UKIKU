@@ -2,7 +2,6 @@ package knf.kuma.favorite.objects
 
 import knf.kuma.pojos.FavSection
 import knf.kuma.pojos.FavoriteObject
-import java.util.*
 
 class InfoContainer {
     var updated: MutableList<FavoriteObject>? = arrayListOf()

@@ -35,7 +35,6 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceRecyclerViewAccessibilityDelegate;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.PreferenceViewHolder;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import knf.kuma.R;
@@ -513,7 +512,7 @@ public abstract class PreferenceFragmentCompat extends Fragment implements
      * @return A new {@link RecyclerView.LayoutManager} instance.
      */
     public RecyclerView.LayoutManager onCreateLayoutManager() {
-        return new LinearLayoutManager(getActivity());
+        return new VariantLinearLayoutManager(getActivity());
     }
 
     /**

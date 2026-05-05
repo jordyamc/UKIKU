@@ -1,7 +1,6 @@
 package knf.kuma.changelog.objects
 
 import org.jsoup.nodes.Element
-import java.util.*
 
 class Release(element: Element) {
     var version: String = element.attr("version")

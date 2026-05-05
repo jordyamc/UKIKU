@@ -9,6 +9,7 @@ import androidx.room.Query
 import androidx.room.TypeConverters
 import knf.kuma.database.BaseConverter
 import knf.kuma.pojos.FavoriteObject
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @TypeConverters(BaseConverter::class)
@@ -36,6 +37,9 @@ interface FavsDAO {
 
     @get:Query("SELECT count(*) FROM favoriteobject")
     val countLive: LiveData<Int>
+
+    @get:Query("SELECT count(*) FROM favoriteobject")
+    val countFlow: Flow<Int>
 
     @Query("SELECT * FROM favoriteobject WHERE category NOT LIKE :category ORDER BY name")
     fun getNotInCategory(category: String): MutableList<FavoriteObject>
