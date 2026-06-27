@@ -464,6 +464,7 @@
         <activity android:name="knf.kuma.player.WebPlayerActivity"
             android:configChanges="orientation"
             android:screenOrientation="sensorLandscape"/>
+        <activity android:name="knf.kuma.migration.MaintainmentActivity" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

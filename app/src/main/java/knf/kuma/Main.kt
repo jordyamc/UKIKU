@@ -109,6 +109,7 @@ import java.net.HttpCookie
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import androidx.core.net.toUri
+import knf.kuma.migration.MaintainmentActivity
 
 class Main : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -192,6 +193,13 @@ class Main : GenericActivity(),
             RecentsNotReceiver.removeAll(this@Main)
             EAHelper.clear1()
             verifiyFF()
+            maintainmentMessage()
+        }
+    }
+
+    private suspend fun maintainmentMessage() {
+        withContext(Dispatchers.Main) {
+            startActivity(Intent(this@Main, MaintainmentActivity::class.java))
         }
     }
 

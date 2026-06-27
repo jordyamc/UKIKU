@@ -96,7 +96,8 @@ class ConnectionState : LinearLayout {
             GlobalScope.launch(Dispatchers.Main + untilDestroyJob(owner)) {
                 normalState()
                 show()
-                delay(1000)
+                warningCustomState("App en mantenimiento", "La app estará en mantenimiento unos días en lo que se migra a otra fuente", onShowDialog)
+                /*delay(1000) TODO
                 if (!Network.isConnected) {
                     noNetworkState()
                     while (!Network.isConnected) {
@@ -104,7 +105,7 @@ class ConnectionState : LinearLayout {
                     }
                     normalState()
                 }
-                doNetworkTests(owner, onShowDialog)
+                doNetworkTests(owner, onShowDialog)*/
                 isInitialized = true
             }
     }
@@ -360,15 +361,14 @@ class ConnectionState : LinearLayout {
         }
     }
 
-    private fun warningState(onShowDialog: (message: String) -> Unit) {
+    private fun warningCustomState(message: String, dialogText: String, onShowDialog: (message: String) -> Unit) {
         binding.container.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccentAmber))
         binding.progress.visibility = GONE
         binding.icon.setImageResource(R.drawable.ic_warning)
         binding.icon.visibility = VISIBLE
-        binding.message.text = "Cloudflare activado!"
+        binding.message.text = message
         binding.message.textColor = Color.WHITE
-        binding.container.onClick { onShowDialog("Cloudflare activado, espera al bypass") }
-        binding.container.onLongClick { context.startActivity(Intent(context, Diagnostic.FullBypass::class.java)) }
+        binding.container.setOnClickListener { onShowDialog(dialogText) }
     }
 
     private fun warningCreatingState() {

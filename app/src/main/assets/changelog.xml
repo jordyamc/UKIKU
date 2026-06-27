@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
-    <release code="228" version="5.3.18">
+    <release code="229" version="5.3.18">
+        <change type="new">Mensaje de mantenimiento</change>
+    </release>
+    <release code="229" version="5.3.19">
         <change type="fix">Mejoras StreamWish</change>
         <change type="fix">Error al mostrar lista de recientes en modo "Home"</change>
+    </release>
+    <release code="228" version="5.3.18">
+        <change type="fix">Correcciones generales</change>
     </release>
     <release code="227" version="5.3.17">
         <change type="fix">Corrección servidor StreamWish</change>

@@ -36,6 +36,8 @@ import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
 import knf.kuma.backup.BackUpActivity
@@ -74,6 +76,7 @@ import knf.kuma.favorite.FavoriteFragmentMaterial
 import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
+import knf.kuma.migration.MaintainmentActivity
 import knf.kuma.news.MaterialNewsActivity
 import knf.kuma.pojos.migrateSeen
 import knf.kuma.preferences.BottomPreferencesFragment
@@ -188,6 +191,13 @@ class MainMaterial : GenericActivity(),
             EAHelper.clear1()
             verifiyFF()
             saveDir()
+            maintainmentMessage()
+        }
+    }
+
+    private suspend fun maintainmentMessage() {
+        withContext(Dispatchers.Main) {
+            startActivity(Intent(this@MainMaterial, MaintainmentActivity::class.java))
         }
     }
 
@@ -205,7 +215,11 @@ class MainMaterial : GenericActivity(),
             val file = File(getExternalFilesDir(null), "directory$number.json")
             if (!file.exists()) {
                 file.createNewFile()
-                file.writeText(Gson().toJson(list))
+                val midJson = JSONObject()
+                list.forEach {
+                    midJson.put(it.sid, JSONObject(Gson().toJson(it.webInfo)))
+                }
+                file.writeText(midJson.toString())
             }
             number++
             Log.e("Dir files", "Process chunk: $number")

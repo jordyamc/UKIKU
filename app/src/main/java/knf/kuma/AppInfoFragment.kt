@@ -173,6 +173,15 @@ class AppInfoFragment: MaterialAboutFragment() {
         extraCard.addItem(
             ConvenienceBuilder.createWebsiteActionItem(
                 requireContext(),
+                getDrawable(requireContext(), R.drawable.ic_twitter),
+                "Twitter (X)",
+                false,
+                "https://x.com/AppsKnf".toUri()
+            )
+        )
+        extraCard.addItem(
+            ConvenienceBuilder.createWebsiteActionItem(
+                requireContext(),
                 getDrawable(requireContext(), R.drawable.ic_discord),
                 "Discord",
                 false,
