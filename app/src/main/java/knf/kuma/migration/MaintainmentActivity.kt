@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
@@ -70,7 +71,7 @@ class MaintainmentActivity : GenericActivity() {
         """.trimIndent(), Html.FROM_HTML_MODE_COMPACT
         )
         binding.socialMessage.movementMethod = LinkMovementMethod.getInstance()
-        if (isHydraInstalled()) {
+        if (false && isHydraInstalled()) {
             binding.download.isEnabled = false
             binding.download.text = "Instalado"
         } else {
@@ -78,6 +79,9 @@ class MaintainmentActivity : GenericActivity() {
                 lifecycleScope.launch {
                     binding.download.isEnabled = false
                     val file = File(getExternalFilesDir(null), "hydra.apk")
+                    if (file.exists()) {
+                        file.delete()
+                    }
                     ThinDownloadManager().add(
                         DownloadRequest("https://github.com/hydra-app/Repository/raw/refs/heads/main/main/app-release.apk".toUri())
                             .setDestinationURI(Uri.fromFile(file))
@@ -93,6 +97,9 @@ class MaintainmentActivity : GenericActivity() {
                                     errorCode: Int,
                                     errorMessage: String?
                                 ) {
+                                    if (file.exists()) {
+                                        file.delete()
+                                    }
                                     ThinDownloadManager().add(
                                         DownloadRequest("https://knf-hydra.app/app/app-release.apk".toUri())
                                             .setDestinationURI(Uri.fromFile(file))
