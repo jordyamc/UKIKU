@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <queries>
+        <package android:name="knf.hydra.main"/>
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>
