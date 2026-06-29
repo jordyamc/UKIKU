@@ -3,7 +3,6 @@ package knf.kuma.migration
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
@@ -12,7 +11,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.remoteConfig
-import com.inmobi.media.bi
 import com.thin.downloadmanager.DefaultRetryPolicy
 import com.thin.downloadmanager.DownloadRequest
 import com.thin.downloadmanager.DownloadStatusListenerV1
@@ -25,7 +23,7 @@ import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 import java.io.File
 
-class MaintainmentActivity: GenericActivity() {
+class MaintainmentActivity : GenericActivity() {
 
     private val binding by lazy { ActivityMaintainmentMessageBinding.inflate(layoutInflater) }
 
@@ -42,7 +40,8 @@ class MaintainmentActivity: GenericActivity() {
             Si todo sale bien quizá en una semana (o menos) se empiece a probar la migración en el grupo de Telegram.
         """.trimIndent()
 
-        binding.progressText.text = "Progreso: ${Firebase.remoteConfig.getLong("migration_percent")}%"
+        binding.progressText.text =
+            "Progreso: ${Firebase.remoteConfig.getLong("migration_percent")}%"
         binding.progressBar.progress = Firebase.remoteConfig.getLong("migration_percent").toInt()
 
         binding.hydraMessage.text = """
@@ -53,27 +52,28 @@ class MaintainmentActivity: GenericActivity() {
 
         binding.faqMessage.text = """
             P: ¿La app ya murió para siempre?
-            R: No, la app aún no ah muerto, regresará en unos dias.
+            R: No, la app aún no ah muerto, regresará en unos días.
             
             P: ¿Hydra en una app oficial?
-            R: Si, Hydra es un proyecto mio (Para los paranoicos de Facebook).
+            R: Si, Hydra es un proyecto mío.
             
-            P: ¿Mis favoritos se perderan con el cambio de fuente?
-            R: No, hasta el momento los unicos animes afectados por el cambio parecen ser algunos animes muy viejos.
+            P: ¿Mis favoritos se perderán con el cambio de fuente?
+            R: No, hasta el momento los únicos animes afectados por el cambio parecen ser algunos animes muy viejos.
         """.trimIndent()
 
-        binding.socialMessage.text = Html.fromHtml("""
+        binding.socialMessage.text = Html.fromHtml(
+            """
             <a href="https://t.me/ukiku_group">Telegram UKIKU</a>
             <br><a href="https://t.me/hydra_app_group">Telegram Hydra</a>
             <br><a href="https://discord.gg/6hzpua6">Discord</a>
             <br><a href="https://x.com/AppsKnf">Twitter (X)</a>
-        """.trimIndent(), Html.FROM_HTML_MODE_COMPACT)
+        """.trimIndent(), Html.FROM_HTML_MODE_COMPACT
+        )
         binding.socialMessage.movementMethod = LinkMovementMethod.getInstance()
         if (isHydraInstalled()) {
             binding.download.isEnabled = false
             binding.download.text = "Instalado"
-        }
-        else {
+        } else {
             binding.download.setOnClickListener {
                 lifecycleScope.launch {
                     binding.download.isEnabled = false
@@ -88,7 +88,11 @@ class MaintainmentActivity: GenericActivity() {
                                     startInstall(file)
                                 }
 
-                                override fun onDownloadFailed(downloadRequest: DownloadRequest?, errorCode: Int, errorMessage: String?) {
+                                override fun onDownloadFailed(
+                                    downloadRequest: DownloadRequest?,
+                                    errorCode: Int,
+                                    errorMessage: String?
+                                ) {
                                     ThinDownloadManager().add(
                                         DownloadRequest("https://knf-hydra.app/app/app-release.apk".toUri())
                                             .setDestinationURI(Uri.fromFile(file))
@@ -99,23 +103,39 @@ class MaintainmentActivity: GenericActivity() {
                                                     startInstall(file)
                                                 }
 
-                                                override fun onDownloadFailed(downloadRequest: DownloadRequest?, errorCode: Int, errorMessage: String?) {
+                                                override fun onDownloadFailed(
+                                                    downloadRequest: DownloadRequest?,
+                                                    errorCode: Int,
+                                                    errorMessage: String?
+                                                ) {
                                                     lifecycleScope.launch(Dispatchers.Main) {
                                                         binding.download.isEnabled = true
                                                         Toaster.toast("Error al descargar app")
                                                     }
                                                 }
 
-                                                override fun onProgress(downloadRequest: DownloadRequest?, totalBytes: Long, downloadedBytes: Long, progress: Int) {
+                                                override fun onProgress(
+                                                    downloadRequest: DownloadRequest?,
+                                                    totalBytes: Long,
+                                                    downloadedBytes: Long,
+                                                    progress: Int
+                                                ) {
 
                                                 }
-                                            }))
+                                            })
+                                    )
                                 }
 
-                                override fun onProgress(downloadRequest: DownloadRequest?, totalBytes: Long, downloadedBytes: Long, progress: Int) {
+                                override fun onProgress(
+                                    downloadRequest: DownloadRequest?,
+                                    totalBytes: Long,
+                                    downloadedBytes: Long,
+                                    progress: Int
+                                ) {
 
                                 }
-                            }))
+                            })
+                    )
                 }
             }
         }
@@ -133,7 +153,14 @@ class MaintainmentActivity: GenericActivity() {
 
     private fun startInstall(file: File) {
         lifecycleScope.launch {
-            val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this@MaintainmentActivity, "${applicationContext.packageName}.fileprovider", file))
+            val intent = Intent(
+                Intent.ACTION_INSTALL_PACKAGE,
+                FileProvider.getUriForFile(
+                    this@MaintainmentActivity,
+                    "${applicationContext.packageName}.fileprovider",
+                    file
+                )
+            )
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                 .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
                 .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, packageName)
