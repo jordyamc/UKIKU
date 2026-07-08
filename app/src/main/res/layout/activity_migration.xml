@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Se intentará migrar la mayor cantidad de datos a la nueva fuente, no cierres la app mientras se completa el proceso.\n"
+        android:text="Se intentará migrar la mayor cantidad de datos a la nueva fuente, no cierres la app mientras se completa el proceso.\nAlgunos datos pueden perderse al no encontrarse en la nueva fuente."
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         app:layout_constraintTop_toBottomOf="@id/divider"/>
 
