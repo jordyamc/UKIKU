@@ -473,9 +473,13 @@ class DirectoryConverter {
     }
     @TypeConverter
     fun stringToGenres(string: String): List<Genre> {
-        return string.split(";").map {
-            val (name, slug) = it.split(":")
-            Genre(name, slug)
+        return string.split(";").mapNotNull {
+            try {
+                val (name, slug) = it.split(":")
+                Genre(name, slug)
+            } catch (e: Exception) {
+                null
+            }
         }
     }
     @TypeConverter
