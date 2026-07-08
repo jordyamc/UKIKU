@@ -8,10 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.doOnUIGlobal
@@ -27,9 +26,9 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
     private val layout: Int
         @LayoutRes
         get() = if (PrefsUtil.layType == "0")
-            R.layout.item_anim_queue
+            if (DesignUtils.isFlat) R.layout.item_anim_queue_material else R.layout.item_anim_queue
         else
-            R.layout.item_anim_queue_grid
+            if (DesignUtils.isFlat) R.layout.item_anim_queue_grid_material else R.layout.item_anim_queue_grid
 
     init {
         this.listener = activity as OnAnimeSelectedListener
@@ -41,9 +40,8 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
 
     override fun onBindViewHolder(holder: AnimeHolder, position: Int) {
         val queueObject = list[position]
-        val img = PatternUtil.getCover(queueObject.chapter.aid)
-        holder.imageView.load(img)
-        holder.title.text = PatternUtil.fromHtml(queueObject.chapter.name)
+        holder.imageView.load("https://cdn.animeav1.com/covers/${queueObject.chapter.aid}.jpg")
+        holder.title.text = queueObject.chapter.name
         holder.type.text = String.format(Locale.getDefault(), if (queueObject.count == 1) "%d episodio" else "%d episodios", queueObject.count)
         holder.cardView.setOnClickListener { listener?.onSelect(queueObject) }
         holder.cardView.setOnLongClickListener {
@@ -72,7 +70,7 @@ internal class QueueAnimesAdapter internal constructor(private val activity: Act
     }
 
     internal class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: MaterialCardView by itemView.bind(R.id.card)
+        val cardView: View by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)
         val type: TextView by itemView.bind(R.id.type)

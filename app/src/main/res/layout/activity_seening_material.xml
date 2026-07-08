@@ -32,6 +32,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <View
+        android:id="@+id/separator"
         android:layout_width="match_parent"
         android:layout_height="@dimen/separator_size"
         android:background="@color/separator"/>

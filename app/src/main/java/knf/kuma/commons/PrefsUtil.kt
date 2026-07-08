@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.securepreferences.SecurePreferences
@@ -14,6 +15,7 @@ import knf.kuma.player.CustomExoPlayer
 import knf.kuma.player.VideoActivity
 import knf.kuma.uagen.randomUA
 import knh.kuma.commons.cloudflarebypass.util.ConvertUtil
+import kotlinx.coroutines.flow.Flow
 import java.net.HttpCookie
 import java.util.UUID
 
@@ -37,6 +39,9 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("favs_order", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("favs_order", value).apply()
 
+    val favsOrderFlow: Flow<Int>
+        get() = PreferenceManager.getDefaultSharedPreferences(context).intFlow("favs_order", 0)
+
     var dirOrder: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("dir_order", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("dir_order", value).apply()
@@ -45,12 +50,24 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("achievements_version", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("achievements_version", value).apply()
 
+    var randomRefresh: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("random_refresh", 0)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit { putInt("random_refresh", value) }
+
     val isChapsAsc: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("asc_chapters", false)
 
     var isDirectoryFinished: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", false)
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("directory_finished", true)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("directory_finished", value).apply()
+
+    var isAV1DataMigrated: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("av1_data_migrated", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("av1_data_migrated", value).apply()
+
+    var isAV1MigrateDirectoryFinished: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("av1_dir_migrated", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("av1_dir_migrated", value).apply()
 
     var isFetchDBReset: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("fetch_db_reset", false)
@@ -306,15 +323,6 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("ls_seen", -1)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("ls_seen", value).apply()
 
-    var isFamilyFriendly: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("family_friendly_enabled", false)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("family_friendly_enabled", value).apply()
-
-    var ffPass: String
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("ff_pass_cbc", "")
-                ?: ""
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putString("ff_pass_cbc", value).apply()
-
     var topCount: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("top_count", 25)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("top_count", value).apply()
@@ -322,10 +330,6 @@ object PrefsUtil {
     var subscriptionToken: String?
         get() = SecurePreferences(context).getString("subscription_token", null)
         set(value) = SecurePreferences(context).edit().putString("subscription_token", value).apply()
-
-    var isPSWarned: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isPSWarned1", false)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("isPSWarned1", value).apply()
 
     var isNativeAdsEnabled: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isNativeAdsEnabled", true)
@@ -383,6 +387,10 @@ object PrefsUtil {
 
     fun getLiveEmissionBlackList(): LiveData<Set<String>> {
         return PreferenceManager.getDefaultSharedPreferences(context).stringSetLiveData("emision_blacklist", LinkedHashSet())
+    }
+
+    fun emissionShowHiddenFlow(): Flow<Boolean> {
+        return PreferenceManager.getDefaultSharedPreferences(context).booleanFlow("show_hidden", false)
     }
 
     fun getPlayerIntent(): Intent {

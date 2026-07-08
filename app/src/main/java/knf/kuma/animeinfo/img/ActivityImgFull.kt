@@ -1,8 +1,8 @@
 package knf.kuma.animeinfo.img
 
-import androidx.activity.addCallback
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
@@ -33,7 +33,7 @@ class ActivityImgFull : GenericActivity() {
         binding.indicator.setViewPager(binding.pager)
         ViewCompat.setOnApplyWindowInsetsListener(binding.indicator) { _, insets ->
             binding.indicator.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = topMargin + insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+                topMargin += insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
             }
             WindowInsetsCompat.CONSUMED
         }

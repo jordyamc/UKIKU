@@ -1,6 +1,5 @@
 package knf.kuma.tv.details
 
-import android.view.ViewGroup
 import androidx.leanback.widget.FullWidthDetailsOverviewRowPresenter
 import androidx.leanback.widget.Presenter
 
@@ -13,7 +12,7 @@ class CustomFullWidthDetailsOverviewRowPresenter internal constructor(detailsPre
     }
 
     override fun onLayoutLogo(viewHolder: ViewHolder, oldState: Int, logoChanged: Boolean) {
-        val v = viewHolder.logoViewHolder.view
+        /*val v = viewHolder.logoViewHolder.view
         val lp = v.layoutParams as ViewGroup.MarginLayoutParams
 
         lp.marginStart = v.resources.getDimensionPixelSize(
@@ -35,6 +34,6 @@ class CustomFullWidthDetailsOverviewRowPresenter internal constructor(detailsPre
             }
         }
         mPreviousState = viewHolder.state
-        v.layoutParams = lp
+        v.layoutParams = lp*/
     }
 }

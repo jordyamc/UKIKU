@@ -2,7 +2,7 @@ package knf.kuma.tv.directory
 
 import android.view.ViewGroup
 import androidx.leanback.widget.Presenter
-import knf.kuma.directory.DirObject
+import knf.kuma.pojos.av1.DirectoryAV1Min
 import knf.kuma.tv.cards.DirCardView
 
 class DirPresenter : Presenter() {
@@ -13,7 +13,7 @@ class DirPresenter : Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         if (item == null) return
-        (viewHolder.view as DirCardView).bind(item as DirObject)
+        (viewHolder.view as DirCardView).bind(item as DirectoryAV1Min)
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {

@@ -46,6 +46,7 @@ class DownloadService : IntentService("Download service") {
             }
             setOngoing(true)
             setSound(null)
+            setOnlyAlertOnce(true)
             setWhen(current?.time ?: 0)
             priority = NotificationCompat.PRIORITY_LOW
         }.build()
@@ -151,6 +152,7 @@ class DownloadService : IntentService("Download service") {
                 .setGroup("manager")
                 .setOngoing(true)
                 .setSound(null)
+                .setOnlyAlertOnce(true)
                 .setWhen(current?.time ?: System.currentTimeMillis())
                 .setPriority(NotificationCompat.PRIORITY_LOW)
         val pending = downloadsDAO.countPending()

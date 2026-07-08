@@ -1,35 +1,35 @@
 package knf.kuma
 
-import androidx.activity.addCallback
 import android.Manifest
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
 import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
@@ -42,7 +42,6 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsUtils
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
-import knf.kuma.backup.MigrationActivity
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.BypassUtil
@@ -50,34 +49,27 @@ import knf.kuma.commons.CastUtil
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.EAMapActivity
-import knf.kuma.commons.Network
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.changeToolbarFont
 import knf.kuma.commons.isFullMode
-import knf.kuma.commons.jsoupCookiesDir
 import knf.kuma.commons.noCrash
-import knf.kuma.commons.noCrashLet
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.stringLiveData
 import knf.kuma.commons.toast
-import knf.kuma.commons.verifiyFF
 import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
-import knf.kuma.directory.DirManager
-import knf.kuma.directory.DirectoryFragment
-import knf.kuma.directory.DirectoryService
+import knf.kuma.directory.DirectoryFragmentMaterial
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.emision.EmissionActivity
 import knf.kuma.explorer.ExplorerActivity
 import knf.kuma.faq.FaqActivity
 import knf.kuma.favorite.FavoriteFragment
-import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.news.NewsActivity
-import knf.kuma.pojos.migrateSeen
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.preferences.ConfigurationFragment
 import knf.kuma.queue.QueueActivity
@@ -86,15 +78,12 @@ import knf.kuma.recents.RecentFragment
 import knf.kuma.recents.RecentsNotReceiver
 import knf.kuma.recommended.RecommendActivity
 import knf.kuma.record.RecordActivity
-import knf.kuma.search.FiltersSuggestion
-import knf.kuma.search.SearchFragment
+import knf.kuma.search.SearchFragmentMaterial
 import knf.kuma.seeing.SeeingActivity
-import knf.kuma.uagen.randomUA
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
-import knh.kuma.commons.cloudflarebypass.CfCallback
-import knh.kuma.commons.cloudflarebypass.Cloudflare
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.cryse.widget.persistentsearch.PersistentSearchView
@@ -105,11 +94,6 @@ import org.jetbrains.anko.textColor
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
-import java.net.HttpCookie
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
-import androidx.core.net.toUri
-import knf.kuma.migration.MaintainmentActivity
 
 class Main : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -126,7 +110,7 @@ class Main : GenericActivity(),
     private val connectionState by bind<ConnectionState>(R.id.connectionState)
     private val bottomNavigationView by bind<BottomNavigationView>(R.id.bottomNavigation)
     internal var selectedFragment: BottomFragment? = null
-    private var searchFragment: SearchFragment? = null
+    private var searchFragment: SearchFragmentMaterial? = null
     private lateinit var badgeEmission: TextView
     private lateinit var badgeSeeing: TextView
     private lateinit var badgeQueue: TextView
@@ -164,8 +148,6 @@ class Main : GenericActivity(),
             startChange()
         } else
             returnSelectFragment()
-        //checkBypass()
-        migrateSeen()
         FirestoreManager.start()
         onBackPressedDispatcher.addCallback(this) {
             when {
@@ -186,55 +168,11 @@ class Main : GenericActivity(),
         lifecycleScope.launch(Dispatchers.IO) {
             BypassUtil.clearCookiesIfNeeded()
             checkPermissions()
-            checkDirectoryState()
             UpdateWork.schedule()
             RecentsWork.schedule(this@Main)
-            DirUpdateWork.schedule(this@Main)
             RecentsNotReceiver.removeAll(this@Main)
             EAHelper.clear1()
-            verifiyFF()
-            maintainmentMessage()
         }
-    }
-
-    private suspend fun maintainmentMessage() {
-        withContext(Dispatchers.Main) {
-            startActivity(Intent(this@Main, MaintainmentActivity::class.java))
-        }
-    }
-
-    private suspend fun checkDirectoryState() {
-        DirManager.checkPreDir()
-        if (PrefsUtil.useDefaultUserAgent && Network.isConnected) {
-            val isBrowserOk = noCrashLet(false) {
-                jsoupCookiesDir("https://www3.animeflv.net/browse?order=added&page=5", BypassUtil.isCloudflareActive()).execute()
-                true
-            }
-            if (!isBrowserOk) {
-                val randomUA = randomUA()
-                PrefsUtil.userAgentDir = randomUA
-                suspendCoroutine<Boolean> {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        noCrash {
-                            Cloudflare(this@Main, "https://www3.animeflv.net/browse?order=added&page=5", PrefsUtil.userAgentDir).apply {
-                                setCfCallback(object : CfCallback {
-                                    override fun onSuccess(cookieList: MutableList<HttpCookie>?, hasNewUrl: Boolean, newUrl: String?) {
-                                        PrefsUtil.dirCookies = cookieList ?: emptyList()
-                                        noCrash { it.resume(true) }
-                                    }
-
-                                    override fun onFail(code: Int, msg: String?) {
-                                        Log.e("Dir cookies", "On error, code $code, msg: $msg")
-                                        noCrash { it.resume(false) }
-                                    }
-                                })
-                            }.getCookies()
-                        }
-                    }
-                }
-            }
-        }
-        DirectoryService.run(this)
     }
 
     @SuppressLint("SetTextI18n")
@@ -256,7 +194,6 @@ class Main : GenericActivity(),
             val actionInfo = navigationView.getHeaderView(0).findViewById<View>(R.id.action_info)
             val actionTrophy = navigationView.getHeaderView(0).findViewById<View>(R.id.action_trophy)
             val actionLogin = navigationView.getHeaderView(0).findViewById<View>(R.id.action_login)
-            val actionMigrate = navigationView.getHeaderView(0).findViewById<View>(R.id.action_migrate)
             val actionMap = navigationView.getHeaderView(0).findViewById<View>(R.id.action_map)
             actionShare.onClick {
                 startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
@@ -271,9 +208,7 @@ class Main : GenericActivity(),
             actionInfo.onClick { AppInfoActivity.open(this@Main) }
             actionTrophy.onClick { AchievementActivity.open(this@Main) }
             actionLogin.onClick { BackUpActivity.start(this@Main) }
-            actionMigrate.onClick { MigrationActivity.start(this@Main) }
             actionMap.onClick { EAMapActivity.start(this@Main) }
-            actionMigrate.visibility = if (Backups.isAnimeflvInstalled) View.VISIBLE else View.GONE
             actionMap.visibility = if (EAHelper.phase == 3) View.VISIBLE else View.GONE
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             backupLocation.text = when (Backups.type) {
@@ -297,21 +232,23 @@ class Main : GenericActivity(),
                         .setShowShadow(false)
                         .setGravityOffset(5f, 5f, true)
                         .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight()))
-                CacheDB.INSTANCE.favsDAO().countLive.observe(this) { integer ->
-                    if (badgeView != null && integer != null)
-                        if (PrefsUtil.showFavIndicator)
-                            badgeView?.badgeNumber = integer
-                        else
-                            badgeView?.hide(false)
+                lifecycleScope.launch {
+                    CacheDB.INSTANCE.favoriteAV1DAO().countFlow.collectLatest {
+                        if (badgeView != null)
+                            if (PrefsUtil.showFavIndicator)
+                                badgeView?.badgeNumber = it
+                            else
+                                badgeView?.hide(false)
+                    }
                 }
-                PrefsUtil.getLiveShowFavIndicator().observe(this) { aBoolean ->
+                PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean)
-                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().count } }
+                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().count } }
                         else
                             badgeView?.hide(false)
                     }
-                }
+                })
                 PreferenceManager.getDefaultSharedPreferences(this).stringLiveData("theme_color", "0")
                         .observe(this) {
                             (badgeView as? QBadgeView)?.badgeBackgroundColor = ContextCompat.getColor(this, EAHelper.getThemeColorLight(it))
@@ -330,19 +267,31 @@ class Main : GenericActivity(),
             badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeQueue.setTypeface(null, Typeface.BOLD)
             badgeQueue.gravity = Gravity.CENTER_VERTICAL
-            PrefsUtil.getLiveEmissionBlackList().observe(this) { strings ->
-                CacheDB.INSTANCE.animeDAO().getInEmission(strings).observe(this) { integer ->
-                    badgeEmission.text = integer.toString()
-                    badgeEmission.visibility = if (integer == 0) View.GONE else View.VISIBLE
+            lifecycleScope.launch {
+                CacheDB.INSTANCE.calendarBlacklistDAO().allAidsFlow.collectLatest { blacklisted ->
+                    val data = JsExtractor.processLink("https://animeav1.com/horario")?: return@collectLatest
+                    var count = 0
+                    for (i in 0 until data.length()) {
+                        val item = data.getJSONObject(i)
+                        if (item.getInt("id") !in blacklisted) {
+                            count++
+                        }
+                    }
+                    badgeEmission.text = count.toString()
+                    badgeEmission.isVisible = count > 0
                 }
             }
-            CacheDB.INSTANCE.seeingDAO().countWatchingLive.observe(this) { integer ->
-                badgeSeeing.text = integer.toString()
-                badgeSeeing.visibility = if (integer == 0) View.GONE else View.VISIBLE
+            lifecycleScope.launch {
+                CacheDB.INSTANCE.organizerDAO().countWatchingFlow.collectLatest {
+                    badgeSeeing.text = it.toString()
+                    badgeSeeing.isVisible = it > 0
+                }
             }
-            CacheDB.INSTANCE.queueDAO().countLive.observe(this) { integer ->
-                badgeQueue.text = integer.toString()
-                badgeQueue.visibility = if (integer == 0) View.GONE else View.VISIBLE
+            lifecycleScope.launch {
+                CacheDB.INSTANCE.queueDAO().countFlow.collectLatest {
+                    badgeQueue.text = it.toString()
+                    badgeQueue.isVisible = it > 0
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -429,7 +378,6 @@ class Main : GenericActivity(),
             textColor = ContextCompat.getColor(this@Main, android.R.color.black)
             hintTextColor = ContextCompat.getColor(this@Main, android.R.color.darker_gray)
         }
-        searchView.setSuggestionBuilder(FiltersSuggestion(this))
         searchView.setSearchListener(object : PersistentSearchView.SearchListener {
             override fun onSearchCleared() {
                 searchFragment?.setSearch("")
@@ -482,7 +430,7 @@ class Main : GenericActivity(),
             }
             if (!PrefsUtil.showFavSections())
                 menu.findItem(R.id.action_new_category).isVisible = false
-        } else if (selectedFragment is DirectoryFragment) {
+        } else if (selectedFragment is DirectoryFragmentMaterial) {
             menuInflater.inflate(R.menu.dir_menu, menu)
             when (PrefsUtil.dirOrder) {
                 0 -> menu.findItem(R.id.by_name_dir).isChecked = true
@@ -503,7 +451,7 @@ class Main : GenericActivity(),
         when (item.itemId) {
             R.id.action_search -> {
                 searchView.openSearch()
-                searchFragment = SearchFragment.get()
+                searchFragment = SearchFragmentMaterial.get()
                 setFragment(searchFragment as BottomFragment)
             }
             R.id.action_new_category -> if (selectedFragment is FavoriteFragment)
@@ -541,10 +489,8 @@ class Main : GenericActivity(),
     }
 
     private fun changeOrder() {
-        if (selectedFragment is FavoriteFragment) {
-            (selectedFragment as FavoriteFragment).onChangeOrder()
-        } else if (selectedFragment is DirectoryFragment) {
-            (selectedFragment as DirectoryFragment).onChangeOrder()
+        if (selectedFragment is DirectoryFragmentMaterial) {
+            (selectedFragment as DirectoryFragmentMaterial).onChangeOrder()
         }
         invalidateOptionsMenu()
     }
@@ -553,7 +499,7 @@ class Main : GenericActivity(),
         when (item.itemId) {
             R.id.action_bottom_recents -> setFragment(RecentFragment.get())
             R.id.action_bottom_favorites -> setFragment(FavoriteFragment.get())
-            R.id.action_bottom_directory -> setFragment(DirectoryFragment.get())
+            R.id.action_bottom_directory -> setFragment(DirectoryFragmentMaterial.get())
             R.id.action_bottom_settings -> setFragment(BottomPreferencesFragment.get())
             R.id.drawer_explorer -> ExplorerActivity.open(this)
             R.id.drawer_emision -> EmissionActivity.open(this)
@@ -573,7 +519,7 @@ class Main : GenericActivity(),
     private fun setFragment(fragment: BottomFragment) {
         lifecycleScope.launch(Dispatchers.Main) {
             try {
-                if (fragment !is SearchFragment)
+                if (fragment !is SearchFragmentMaterial)
                     selectedFragment = fragment
                 val transaction = supportFragmentManager.beginTransaction()
                 //transaction.setCustomAnimations(R.anim.fadein, R.anim.fadeout)
@@ -613,7 +559,7 @@ class Main : GenericActivity(),
         if (selectedFragment != null) {
             when (selectedFragment) {
                 is FavoriteFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_favorites
-                is DirectoryFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_directory
+                is DirectoryFragmentMaterial -> bottomNavigationView.selectedItemId = R.id.action_bottom_directory
                 is BottomPreferencesFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_settings
                 else -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents
             }
@@ -627,7 +573,7 @@ class Main : GenericActivity(),
                         val query = it.substringAfter("ukiku.app/search/")
                         selectedFragment = RecentFragment.get()
                         searchView.openSearch()
-                        setFragment(SearchFragment[query])
+                        setFragment(SearchFragmentMaterial[query])
                         searchView.setSearchString(query, false)
                         true
                     } else
@@ -641,7 +587,7 @@ class Main : GenericActivity(),
             4 -> {
                 selectedFragment = RecentFragment.get()
                 searchView.openSearch()
-                setFragment(SearchFragment[intent.getStringExtra("search_query") ?: ""])
+                setFragment(SearchFragmentMaterial[intent.getStringExtra("search_query") ?: ""])
                 searchView.setSearchString(intent.getStringExtra("search_query") ?: "", false)
             }
             else -> setFragment(RecentFragment.get())
@@ -652,7 +598,7 @@ class Main : GenericActivity(),
         if (selectedFragment != null) {
             when (selectedFragment) {
                 is FavoriteFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents
-                is DirectoryFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_directory
+                is DirectoryFragmentMaterial -> bottomNavigationView.selectedItemId = R.id.action_bottom_directory
                 is BottomPreferencesFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_settings
                 else -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents
             }

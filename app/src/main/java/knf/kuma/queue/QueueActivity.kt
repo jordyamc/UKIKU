@@ -28,6 +28,7 @@ import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.backup.firestore.syncData
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
@@ -67,9 +68,9 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
     private val layout: Int
         @LayoutRes
         get() = if (PrefsUtil.layType == "0") {
-            R.layout.activity_queue
+            if (DesignUtils.isFlat) R.layout.activity_queue_material else R.layout.activity_queue
         } else {
-            R.layout.activity_queue_grid
+            if (DesignUtils.isFlat) R.layout.activity_queue_grid_material else R.layout.activity_queue_grid
         }
 
     @SuppressLint("CheckResult")
@@ -207,7 +208,14 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
                 try {
                     listToolbar.title = queueObject.chapter.name
                     lifecycleScope.launch(Dispatchers.Main) {
-                        val list = withContext(Dispatchers.IO) { CacheDB.INSTANCE.queueDAO().getByAidUnique(queueObject.chapter.aid) }
+                        val list = withContext(Dispatchers.IO) {
+                            try {
+                                CacheDB.INSTANCE.queueDAO().getByAidUnique(queueObject.chapter.aid)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                mutableListOf()
+                            }
+                        }
                         if (list.isEmpty())
                             bottomSheetBehavior?.setState(BottomSheetBehavior.STATE_HIDDEN)
                         else {
@@ -215,7 +223,7 @@ class QueueActivity : GenericActivity(), QueueAnimesAdapter.OnAnimeSelectedListe
                                     queueObject.chapter.aid,
                                     withContext(Dispatchers.IO) {
                                         try {
-                                            list.sortedBy { it.chapter.number.substringAfterLast(" ").toFloat() }.toMutableList()
+                                            list.sortedBy { it.chapter.number.trim().substringAfterLast(" ").toFloat() }.toMutableList()
                                         } catch (_: Exception) {
                                             list
                                         }

@@ -2,6 +2,7 @@ package knf.kuma.seeing
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.map
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
@@ -18,11 +20,14 @@ import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.FragmentSeeingBinding
 import knf.kuma.pojos.SeeingObject
+import knf.kuma.pojos.av1.Organizer
+import knf.kuma.pojos.av1.OrganizerWRecord
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
 
 class SeeingFragment : Fragment() {
@@ -31,19 +36,6 @@ class SeeingFragment : Fragment() {
 
     private lateinit var binding: FragmentSeeingBinding
     private val adapter: SeeingAdapter? by lazy { activity?.let { SeeingAdapter(it, arguments?.getInt("state", 0) == 0) } }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        lifecycleScope.launch {
-            liveData.collectLatest {
-                binding.progress.visibility = View.GONE
-                adapter?.submitData(it)
-            }
-        }
-        adapter?.addLoadStateListener {
-            binding.error.isVisible = it.append.endOfPaginationReached && adapter?.itemCount == 0
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_seeing, container, false).also {
@@ -83,18 +75,31 @@ class SeeingFragment : Fragment() {
         }
         binding.recycler.verifyManager()
         binding.recycler.adapter = adapter
+        viewLifecycleOwner.lifecycleScope.launch {
+            liveData.collectLatest {
+                withContext(Dispatchers.Main) {
+                    binding.progress.visibility = View.GONE
+                }
+                adapter?.submitData(it)
+            }
+        }
+        adapter?.addLoadStateListener {
+            binding.error.isVisible = it.append.endOfPaginationReached && adapter?.itemCount == 0
+        }
     }
 
-    val liveData: Flow<PagingData<SeeingObject>>
+    val liveData: Flow<PagingData<OrganizerWRecord>>
         get() {
+            val state = arguments?.getInt("state", 0) ?: 0
             return Pager(
-                PagingConfig(15, enablePlaceholders = false), 0,
-                (if (arguments?.getInt("state", 0) ?: 0 == 0)
-                    CacheDB.INSTANCE.seeingDAO().allPaging
-                else
-                    CacheDB.INSTANCE.seeingDAO().getLiveByStatePaging(
-                        arguments?.getInt("state", 0) ?: 0
-                    )).asPagingSourceFactory()
+                PagingConfig(20, enablePlaceholders = false),
+                pagingSourceFactory = {
+                    if (state == 0){
+                        CacheDB.INSTANCE.organizerDAO().allPaging
+                    } else {
+                        CacheDB.INSTANCE.organizerDAO().getByStatePaging(state)
+                    }
+                }
             ).flow
         }
 
@@ -113,13 +118,13 @@ class SeeingFragment : Fragment() {
     fun onSelected() {
         clickCount++
         if (clickCount == 3) {
-            lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch {
                 val state = arguments?.getInt("state", -1) ?: -1
                 if (state == -1) return@launch
                 val num = if (state == 0)
-                    CacheDB.INSTANCE.seeingDAO().countAll
+                    CacheDB.INSTANCE.organizerDAO().countAll
                 else
-                    CacheDB.INSTANCE.seeingDAO().countByState(state)
+                    CacheDB.INSTANCE.organizerDAO().countByState(state)
                 if (num > 0)
                     Toaster.toast("$num anime" + adapter?.let { if (num > 1) "s" else "" })
             }

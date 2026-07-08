@@ -23,7 +23,7 @@ import knf.kuma.commons.load
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 
-class AnimeActivityMaterialHolder(val activity: AppCompatActivity) {
+class AnimeActivityMaterialHolder(val activity: AppCompatActivity, isMaterial: Boolean = true) {
     val appBarLayout: AppBarLayout by bind(activity, R.id.appBar)
     private val collapsingToolbarLayout: CollapsingToolbarLayout by bind(activity, R.id.collapsingToolbar)
     val imageView: ImageView by bind(activity, R.id.img)

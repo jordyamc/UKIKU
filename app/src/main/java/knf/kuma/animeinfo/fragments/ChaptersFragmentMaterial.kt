@@ -16,65 +16,47 @@ import knf.kuma.App
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
-import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.animeinfo.viewholders.AnimeChaptersMaterialHolder
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.FileUtil
-import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.noCrashLet
-import knf.kuma.commons.toast
 import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.download.MultipleDownloadManager
-import knf.kuma.jobscheduler.DirUpdateWork
-import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.DirectoryAV1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
-import java.util.regex.Pattern
 
 class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.ChapHolderCallback {
     private var holder: AnimeChaptersMaterialHolder? = null
     private var moveFile: String? = null
-    private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
+    private var anime: DirectoryAV1? = null
+    private var chapters: MutableList<Chapter> = ArrayList()
     private lateinit var snackManager: SnackProgressBarManager
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let { activity ->
-            ViewModelProvider(activity).get(AnimeViewModel::class.java).liveData.observe(viewLifecycleOwner, Observer { animeObject ->
-                if (animeObject != null) {
-                    val chapters = animeObject.chapters
-                    chapters?.let {
-                        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-                            when {
-                                checkIntegrity(chapters) -> {
-                                    if (PrefsUtil.isChapsAsc)
-                                        chapters.reverse()
-                                    holder?.setAdapter(this@ChaptersFragmentMaterial, chapters)
-                                    delay(1000)
-                                    holder?.goToChapter()
-                                }
-                                Network.isConnected -> {
-                                    DirUpdateWork.runNow()
-                                    "Integridad de directorio comprometida, actualizando directorio...".toast()
-                                }
-                            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                ViewModelProvider(activity)[AnimeViewModel::class.java].infoFlow.collectLatest { animeObject ->
+                    animeObject?.chapters?.let {
+                        anime = animeObject
+                        launch(Dispatchers.Main) {
+                            chapters = animeObject.chapters.toMutableList()
+                            if (PrefsUtil.isChapsAsc)
+                                chapters.reverse()
+                            holder?.setAdapter(this@ChaptersFragmentMaterial, animeObject, chapters)
+                            delay(1000)
+                            holder?.goToChapter()
                         }
                     }
                 }
-            })
-        }
-    }
-
-    private fun checkIntegrity(list: List<AnimeObject.WebInfo.AnimeChapter>): Boolean {
-        return try {
-            list.isEmpty() || (list[0].aid != null && list[0].eid != null)
-        } catch (e: Exception) {
-            false
+            }
         }
     }
 
@@ -101,12 +83,13 @@ class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.C
                 .setType("video/mp4"), 55698)
     }
 
-    override fun onImportMultiple(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>) {
+    override fun onImportMultiple(chapters: MutableList<Chapter>) {
+        anime ?: return
         when (chapters.size) {
             0 -> Toaster.toast("No se puede importar ningun episodio")
             1 -> {
-                this.moveFile = chapters[0].fileName
-                onMove(chapters[0].fileName)
+                this.moveFile = chapters[0].filePath(anime!!)
+                onMove(chapters[0].filePath(anime!!))
             }
             else -> {
                 this.chapters = chapters
@@ -119,9 +102,10 @@ class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.C
         }
     }
 
-    override fun onDownloadMultiple(addQueue: Boolean, chapters: List<AnimeObject.WebInfo.AnimeChapter>) {
+    override fun onDownloadMultiple(addQueue: Boolean, chapters: List<Chapter>) {
+        anime?: return
         holder?.let { holder ->
-            MultipleDownloadManager.startDownload(this, holder.recyclerView, chapters.sortedBy { noCrashLet(9999) { "(\\d+)".toRegex().findAll(it.number).last().destructured.component1().toInt() } }, addQueue)
+            MultipleDownloadManager.startDownload(this, holder.recyclerView, anime!!, chapters.sortedBy { it.number }, addQueue)
         }
     }
 
@@ -130,12 +114,12 @@ class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.C
         if (resultCode == Activity.RESULT_OK)
             try {
                 holder?.adapter?.isImporting = true
-                if (data?.clipData == null || data.clipData?.itemCount ?: 0 == 0) {
-                    if (moveFile == null && chapters.size > 0) {
+                if (data?.clipData == null || (data.clipData?.itemCount ?: 0) == 0) {
+                    if (moveFile == null && chapters.isNotEmpty()) {
                         val uri = data?.data
                         val file = DocumentFile.fromSingleUri(App.context, uri ?: Uri.EMPTY)
                         val last = getLastNumber(file?.name)
-                        moveFile = findChapter(last)?.fileName
+                        moveFile = chapters.find { it.number == last }?.filePath(anime!!)
                     }
                     val snackbar = SnackProgressBar(SnackProgressBar.TYPE_HORIZONTAL, "Importando...")
                             .setIsIndeterminate(false)
@@ -175,7 +159,9 @@ class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.C
                             val uri = data.clipData?.getItemAt(i)?.uri ?: Uri.EMPTY
                             val file = DocumentFile.fromSingleUri(App.context, uri)
                             val last = getLastNumber(file?.name)
-                            moveRequests.add(Pair(uri, findChapter(last)?.fileName ?: ""))
+                            chapters.find { it.number == last }?.let {
+                                moveRequests.add(Pair(uri, it.filePath(anime!!)))
+                            }
                         } catch (e: Exception) {
                             //
                         }
@@ -212,34 +198,14 @@ class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.C
 
     }
 
-    private fun findChapter(num: String?): AnimeObject.WebInfo.AnimeChapter? {
-        for (c in ArrayList<AnimeObject.WebInfo.AnimeChapter>(chapters)) {
-            if (c.number == "Episodio $num") {
-                chapters.remove(c)
-                return c
-            }
-        }
-        return null
-    }
-
-    private fun getLastNumber(name: String?): String? {
+    private fun getLastNumber(name: String?): Double? {
         if (name.isNullOrEmpty()) return null
-        val matcher = Pattern.compile(".*[_ ]0?(\\d+)[_ ].*$|0?(\\d+)$").matcher(name.replace(".mp4", ""))
-        var last: String? = null
-        while (matcher.find()) {
-            try {
-                last = matcher.group(1)
-                if (last == null)
-                    last = matcher.group(2)
-            } catch (e: Exception) {
-                try {
-                    last = matcher.group(2)
-                } catch (e1: Exception) {
-                    e1.printStackTrace()
-                }
-            }
+        return try {
+            name.replace(".mp4", "").substringAfterLast("-").toDouble()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
-        return last
     }
 
     companion object {

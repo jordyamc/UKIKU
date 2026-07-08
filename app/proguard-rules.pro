@@ -73,6 +73,8 @@
 -keep class com.google.gson.reflect.TypeToken
 -keep class * extends com.google.gson.reflect.TypeToken
 -keep public class * implements java.lang.reflect.Type
+-keep class org.mozilla.javascript.** { *; }
+-dontwarn org.mozilla.javascript.**
 -keeppackagenames org.jsoup.nodes
 -dontwarn com.amazon.client.metrics.**
 -dontwarn com.beloo.widget.chipslayoutmanager.**

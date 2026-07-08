@@ -8,21 +8,21 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.media.AudioAttributes
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.Configuration
+import androidx.work.WorkManager
 import es.munix.multidisplaycast.CastManager
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.commons.AllSSLOkHttpClient
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.directory.DirectoryService
 import knf.kuma.download.DownloadManager
 import knf.kuma.download.DownloadService
 import knf.kuma.jobscheduler.BackUpWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.widgets.emision.WEmissionService
+import okhttp3.OkHttp
 
 class App : Application(), Configuration.Provider {
     //private lateinit var appCoinsAds: AppCoinsAds
@@ -30,18 +30,6 @@ class App : Application(), Configuration.Provider {
     @TargetApi(Build.VERSION_CODES.O)
     private fun createChannels() {
         val manager = getSystemService(NOTIFICATION_SERVICE) as? NotificationManager
-        val dirChannel = NotificationChannel(
-            DirectoryService.CHANNEL,
-            getString(R.string.directory_channel_title),
-            NotificationManager.IMPORTANCE_MIN
-        )
-        dirChannel.setSound(
-            null,
-            AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
-        )
-        dirChannel.setShowBadge(false)
-        manager?.createNotificationChannel(dirChannel)
         manager?.createNotificationChannel(
             NotificationChannel(
                 RecentsWork.CHANNEL_RECENTS,
@@ -93,14 +81,17 @@ class App : Application(), Configuration.Provider {
             PrefsUtil.isFetchDBReset = true
             deleteDatabase("LibGlobalFetchLib.db")
         }
+        if (!WorkManager.isInitialized()) {
+            WorkManager.initialize(this, Configuration.Builder().build())
+        }
+        OkHttp.initialize(this)
         AppCompatDelegate.setDefaultNightMode(PrefsUtil.themeOption.toInt())
         AllSSLOkHttpClient.enableTLS()
         BackUpWork.checkInit()
         CastManager.register(this)
         AchievementManager.init(this)
         initAppCoins()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            createChannels()
+        createChannels()
     }
 
     private fun initAppCoins() {

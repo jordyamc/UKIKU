@@ -1,6 +1,5 @@
 package knf.kuma.player
 
-import android.annotation.TargetApi
 import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -10,10 +9,10 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Rational
 import android.view.View
-import android.webkit.MimeTypeMap
 import android.widget.TextView
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.C
@@ -35,7 +34,6 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.SSLSkipper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
-import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.ExoPlayerBinding
 import knf.kuma.pojos.QueueObject
@@ -46,7 +44,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 
-class CustomExoPlayer : GenericActivity(), Player.Listener {
+class CustomExoPlayer : AppCompatActivity(), Player.Listener {
     private var exoPlayer: ExoPlayer? = null
     private var playerState: PlayerState = PlayerState()
     private var isEnding = false
@@ -70,7 +68,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         setContentView(binding.root)
         window.decorView.setBackgroundColor(Color.BLACK)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
             find<View>(R.id.pip).visibility = View.VISIBLE
         find<View>(R.id.pip).setOnClickListener { onPip() }
         find<View>(R.id.skip).setOnClickListener { onSkip() }
@@ -152,7 +150,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                 }
                 player.addMediaSources(sourceList)
             } else {
-                if (intent.getBooleanExtra("isFile", false) || !intent.hasExtra("headers")) {
+                if (intent.getBooleanExtra("isFile", false)) {
                     player.addMediaItem(MediaItem.fromUri(intent.data ?: Uri.parse("")))
                 } else {
                     val httpFactory = DefaultHttpDataSource.Factory().apply {
@@ -171,9 +169,11 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
                             }
                         }?: setUserAgent(BypassUtil.userAgent)
                     }
-                    val factory = when(MimeTypeMap.getFileExtensionFromUrl(intent.data?.toString())) {
-                        "m3u8" -> HlsMediaSource.Factory(httpFactory)
-                        else -> ProgressiveMediaSource.Factory(httpFactory)
+                    val url = intent.data?.toString()
+                    val factory = if (url?.contains("m3u8") == true || url?.contains("master.") == true) {
+                        HlsMediaSource.Factory(httpFactory)
+                    } else {
+                        ProgressiveMediaSource.Factory(httpFactory)
                     }
                     player.addMediaSource(
                         factory.createMediaSource(
@@ -192,17 +192,14 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         exoPlayer = null
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
     internal fun onPip() {
         try {
             if (!isInPictureInPictureMode) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    playerState.position = exoPlayer?.currentPosition ?: 0
-                    val params = PictureInPictureParams.Builder()
-                            //.setAspectRatio(Rational(player.width, player.height))
-                            .build()
-                    enterPictureInPictureMode(params)
-                }
+                playerState.position = exoPlayer?.currentPosition ?: 0
+                val params = PictureInPictureParams.Builder()
+                        //.setAspectRatio(Rational(player.width, player.height))
+                        .build()
+                enterPictureInPictureMode(params)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -217,7 +214,6 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(
         isInPictureInPictureMode: Boolean,
         newConfig: Configuration
@@ -253,6 +249,12 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     }
 
     override fun onUserLeaveHint() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            val builder = PictureInPictureParams.Builder()
+                .setAspectRatio(Rational(16, 9))
+                .build()
+            enterPictureInPictureMode(builder)
+        }
         super.onUserLeaveHint()
         exoPlayer?.playWhenReady = false
     }
@@ -275,7 +277,7 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
 
     override fun onPause() {
         super.onPause()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
+        if (isInPictureInPictureMode)
             return
         val state = playerState.apply {
             title = find<TextView>(R.id.video_title).text.toString()
@@ -303,14 +305,15 @@ class CustomExoPlayer : GenericActivity(), Player.Listener {
     }
 
     override fun onLoadingChanged(isLoading: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
+        if (isInPictureInPictureMode)
             return
         find<View>(R.id.progress).post { find<View>(R.id.progress).visibility = if (isLoading) View.VISIBLE else View.GONE }
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        if (playbackState == Player.STATE_READY)
+        if (playbackState == Player.STATE_READY) {
             doOnUI { hideUI() }
+        }
         if (playbackState == Player.STATE_ENDED) {
             isEnding = true
             finish()

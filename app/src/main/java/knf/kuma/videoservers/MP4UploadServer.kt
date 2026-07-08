@@ -1,16 +1,15 @@
 package knf.kuma.videoservers
 
 import android.content.Context
-import knf.kuma.commons.PatternUtil
-import knf.kuma.commons.jsoupCookies
+import android.util.Log
 import knf.kuma.videoservers.VideoServer.Names.MP4UPLOAD
-import org.json.JSONObject
+import kotlinx.coroutines.runBlocking
 import java.util.regex.Pattern
 
 class MP4UploadServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
     override val isValid: Boolean
-        get() = baseLink.contains("s=mp4upload")
+        get() = baseLink.contains("mp4upload")
 
     override val name: String
         get() = MP4UPLOAD
@@ -18,9 +17,17 @@ class MP4UploadServer(context: Context, baseLink: String) : Server(context, base
     override val videoServer: VideoServer?
         get() {
             return try {
-                val downLink = PatternUtil.extractLink(baseLink)
-                val link = JSONObject(jsoupCookies(downLink.replace("embed", "check")).get().body().text()).getString("file")
-                VideoServer(MP4UPLOAD, Option(name, null, link))
+                val url = runBlocking {
+                    Unpacker.listenResources(context, baseLink, Pattern.compile(".*video.mp4"))
+                }
+                Log.e("MP4UPLOAD", "url: $url")
+                VideoServer(
+                    VideoServer.Names.UPNServer,
+                    mutableListOf(
+                        Option(name, null, url, Headers {
+                            add(0, "Referer" to "https://www.mp4upload.com/")
+                        })
+                    ))
             } catch (e: Exception) {
                 e.printStackTrace()
                 null

@@ -7,18 +7,15 @@ import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import knf.kuma.commons.EAHelper
-import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.doOnUI
-import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
-import knf.kuma.pojos.AnimeObject
+import knf.kuma.database.CacheDB
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.NotificationObj
 import knf.kuma.videoservers.ServersFactory
 import org.jetbrains.anko.doAsync
-import java.util.regex.Pattern
 
 class DownloadDialogActivity : GenericActivity() {
 
@@ -37,21 +34,9 @@ class DownloadDialogActivity : GenericActivity() {
         }
         doAsync {
             try {
-                val document = jsoupCookies(intent.dataString).get()
-                val name = PatternUtil.fromHtml(document.select("nav.Brdcrmb.fa-home a[href^=/anime/]").first().text())
-                lateinit var aid: String
-                lateinit var num: String
-                val matcher = Pattern.compile("var (.*) = (\\d+);").matcher(document.html())
-                while (matcher.find()) {
-                    when (matcher.group(1)) {
-                        "anime_id" -> aid = matcher.group(2)
-                        "episode_number" -> num = matcher.group(2)
-                    }
-                }
-                val eid = "${aid}Episodio $num".hashCode().toString()
-                val chapter = AnimeObject.WebInfo.AnimeChapter(Integer.parseInt(aid), "Episodio $num", eid, intent.dataString
-                        ?: "", name, aid)
-                downloadObject = DownloadObject.fromChapter(chapter, false)
+                val recent = CacheDB.INSTANCE.recentAV1DAO().findByEid(intent.getIntExtra("eid", 0))
+                    ?: throw IllegalStateException("Recent no found")
+                downloadObject = recent.asDownload()
                 doOnUI {
                     dialog.safeDismiss()
                     try {
@@ -95,12 +80,6 @@ class DownloadDialogActivity : GenericActivity() {
             }
             setOnCancelListener { finish() }
         }
-    }
-
-    private fun extract(st: String?, regex: String): String {
-        val matcher = Pattern.compile(regex).matcher(st)
-        matcher.find()
-        return matcher.group(1)
     }
 
     private fun removeNotification() {

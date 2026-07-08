@@ -37,6 +37,7 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/separator"
             android:clipToPadding="false"
+            app:layoutManager=".custom.VariantGridLayoutManager"
             android:layoutAnimation="@anim/layout_fall_down"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
@@ -45,13 +46,6 @@
             tools:listitem="@layout/item_ranking">
 
         </androidx.recyclerview.widget.RecyclerView>
-
-        <ProgressBar
-            android:id="@+id/progress"
-            style="@android:style/Widget.Material.ProgressBar.Large"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
     </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

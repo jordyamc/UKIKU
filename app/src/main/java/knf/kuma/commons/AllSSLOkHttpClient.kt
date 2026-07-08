@@ -4,10 +4,14 @@ import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
 import java.security.Security
+import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 
 object AllSSLOkHttpClient {
     fun get() = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .connectionSpecs(
             listOf(
                 ConnectionSpec.CLEARTEXT,

@@ -7,7 +7,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.reflect.TypeToken
 import knf.kuma.App
-import knf.kuma.achievements.AchievementManager
 import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.framework.DropBoxService
 import knf.kuma.backup.framework.LocalService
@@ -19,12 +18,11 @@ import knf.kuma.commons.safeShow
 import knf.kuma.commons.showSnackbar
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.Achievement
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.AutoBackupObject
-import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.RecordObject
-import knf.kuma.pojos.SeeingObject
-import knf.kuma.pojos.SeenObject
+import knf.kuma.pojos.av1.FavoriteAV1
+import knf.kuma.pojos.av1.Organizer
+import knf.kuma.pojos.av1.Record
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -38,8 +36,6 @@ object Backups {
     private const val keyFavs = "favs"
     private const val keyHistory = "history"
     private const val keyFollowing = "following"
-    private const val keySeen = "seen"
-    private const val keySeenNew = "seencompact"
     const val keyAchievements = "achievements"
     const val keyAutoBackup = "autobackup"
 
@@ -81,8 +77,6 @@ object Backups {
             service?.backup(BackupObject(getList(keyFavs)), keyFavs)
             service?.backup(BackupObject(getList(keyHistory)), keyHistory)
             service?.backup(BackupObject(getList(keyFollowing)), keyFollowing)
-            service?.backup(BackupObject(getList(keySeen)), keySeen)
-            service?.backup(BackupObject(getList(keySeenNew)), keySeenNew)
         }
     }
 
@@ -103,8 +97,6 @@ object Backups {
             service?.search(keyFavs)?.let { restore(null, false, keyFavs, it) }
             service?.search(keyHistory)?.let { restore(null, false, keyHistory, it) }
             service?.search(keyFollowing)?.let { restore(null, false, keyFollowing, it) }
-            service?.search(keySeen)?.let { restore(null, false, keySeen, it) }
-            service?.search(keySeenNew)?.let { restore(null, false, keySeenNew, it) }
         }
     }
 
@@ -115,30 +107,18 @@ object Backups {
                 when (id) {
                     keyFavs -> {
                         if (replace)
-                            CacheDB.INSTANCE.favsDAO().clear()
-                        (backupObject.data?.filterIsInstance<FavoriteObject>() as? MutableList<FavoriteObject>)?.let { CacheDB.INSTANCE.favsDAO().addAll(it) }
+                            CacheDB.INSTANCE.favoriteAV1DAO().clear()
+                        (backupObject.data?.filterIsInstance<FavoriteAV1>() as? MutableList<FavoriteAV1>)?.let { CacheDB.INSTANCE.favoriteAV1DAO().addAll(it) }
                     }
                     keyHistory -> {
                         if (replace)
-                            CacheDB.INSTANCE.recordsDAO().clear()
-                        (backupObject.data?.filterIsInstance<RecordObject>() as? MutableList<RecordObject>)?.let { CacheDB.INSTANCE.recordsDAO().addAll(it) }
+                            CacheDB.INSTANCE.recordAV1DAO().clear()
+                        (backupObject.data?.filterIsInstance<Record>() as? MutableList<Record>)?.let { CacheDB.INSTANCE.recordAV1DAO().addAll(it) }
                     }
                     keyFollowing -> {
                         if (replace)
-                            CacheDB.INSTANCE.seeingDAO().clear()
-                        (backupObject.data?.filterIsInstance<SeeingObject>() as? MutableList<SeeingObject>)?.let { CacheDB.INSTANCE.seeingDAO().addAll(it) }
-                    }
-                    keySeen -> {
-                        if (replace) {
-                            CacheDB.INSTANCE.chaptersDAO().clear()
-                            CacheDB.INSTANCE.seenDAO().clear()
-                        }
-                        (backupObject.data?.filterIsInstance<AnimeObject.WebInfo.AnimeChapter>() as? MutableList<AnimeObject.WebInfo.AnimeChapter>)?.let { CacheDB.INSTANCE.seenDAO().addAll(it.map { SeenObject.fromChapter(it) }) }
-                    }
-                    keySeenNew -> {
-                        if (replace)
-                            CacheDB.INSTANCE.seenDAO().clear()
-                        (backupObject.data?.filterIsInstance<SeenObject>() as? MutableList<SeenObject>)?.let { CacheDB.INSTANCE.seenDAO().addAll(it) }
+                            CacheDB.INSTANCE.organizerDAO().clear()
+                        (backupObject.data?.filterIsInstance<Organizer>() as? MutableList<Organizer>)?.let { CacheDB.INSTANCE.organizerDAO().addAll(it) }
                     }
                 }
                 snackbar?.safeDismiss()
@@ -151,16 +131,6 @@ object Backups {
         }
     }
 
-    val isAnimeflvInstalled: Boolean
-        get() =
-            try {
-                App.context.packageManager.getPackageInfo("knf.animeflv", 0)
-                AchievementManager.unlock(listOf(7))
-                true
-            } catch (e: Exception) {
-                false
-            }
-
     val isKeyInstalled: Boolean
         get() =
             try {
@@ -172,10 +142,9 @@ object Backups {
 
     private fun getList(id: String): List<*> {
         return when (id) {
-            keyFavs -> CacheDB.INSTANCE.favsDAO().allRaw
-            keyHistory -> CacheDB.INSTANCE.recordsDAO().allRaw
-            keyFollowing -> CacheDB.INSTANCE.seeingDAO().allRaw
-            keySeenNew -> CacheDB.INSTANCE.seenDAO().all
+            keyFavs -> CacheDB.INSTANCE.favoriteAV1DAO().allRaw
+            keyHistory -> CacheDB.INSTANCE.recordAV1DAO().all
+            keyFollowing -> CacheDB.INSTANCE.organizerDAO().allRaw
             keyAchievements -> CacheDB.INSTANCE.achievementsDAO().all
             else -> mutableListOf<RecordObject>()
         }
@@ -183,19 +152,13 @@ object Backups {
 
     fun getType(id: String): java.lang.reflect.Type {
         return when (id) {
-            keyFavs -> object : TypeToken<BackupObject<FavoriteObject>>() {
+            keyFavs -> object : TypeToken<BackupObject<FavoriteAV1>>() {
 
             }.type
-            keyHistory -> object : TypeToken<BackupObject<RecordObject>>() {
+            keyHistory -> object : TypeToken<BackupObject<Record>>() {
 
             }.type
-            keyFollowing -> object : TypeToken<BackupObject<SeeingObject>>() {
-
-            }.type
-            keySeenNew -> object : TypeToken<BackupObject<SeenObject>>() {
-
-            }.type
-            keySeen -> object : TypeToken<BackupObject<AnimeObject.WebInfo.AnimeChapter>>() {
+            keyFollowing -> object : TypeToken<BackupObject<Organizer>>() {
 
             }.type
             keyAchievements -> object : TypeToken<BackupObject<Achievement>>() {

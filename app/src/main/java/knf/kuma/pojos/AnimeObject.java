@@ -372,7 +372,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
             public transient ChapterType chapterType;
             @SerializedName("chapter_ isDownloaded")
             @Ignore
-            private transient FileWrapper fileWrapper;
+            public transient FileWrapper fileWrapper;
 
             public AnimeChapter() {
             }

@@ -10,6 +10,7 @@ import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeDismiss
@@ -25,7 +26,7 @@ class DirectoryFragmentMaterial : BottomFragment() {
     private var snackbar: Snackbar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_directory_material, container, false)
+        val view = inflater.inflate(if (DesignUtils.isFlat) R.layout.fragment_directory_material else R.layout.fragment_directory, container, false)
         fragmentHolder = DirMainFragmentMaterialHolder(view, childFragmentManager)
         EAHelper.enter1("D")
         return view

@@ -80,6 +80,7 @@
                     android:layout_height="18dp"
                     android:layout_alignParentEnd="true"
                     android:layout_margin="4dp"
+                    android:scaleType="centerCrop"
                     app:srcCompat="@drawable/ic_seen"
                     app:tint="?colorSecondaryVariant" />
             </RelativeLayout>

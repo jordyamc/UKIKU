@@ -14,8 +14,7 @@ object DownloadedObserver {
 
     fun observe(scope: CoroutineScope, size: Int, fileWrapper: FileWrapper<*>) {
         observer.cancel()
-        observer = Job()
-        scope.launch(Dispatchers.IO + observer) {
+        observer = scope.launch(Dispatchers.IO) {
             if (AchievementManager.isUnlocked(35) || size == fileWrapper.parentSize()) {
                 unlock()
                 return@launch
@@ -28,6 +27,7 @@ object DownloadedObserver {
                 delay(1500)
             }
         }
+
     }
 
     private fun unlock() {

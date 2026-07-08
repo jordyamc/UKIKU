@@ -5,35 +5,34 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
-import knf.kuma.commons.gridColumns
-import knf.kuma.commons.removeAll
+import knf.kuma.commons.verifyManager
 import knf.kuma.custom.GenericActivity
-import knf.kuma.custom.VariantGridLayoutManager
-import knf.kuma.custom.VariantLinearLayoutManager
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.GenreStatusObject
-import knf.kuma.recommended.sections.MultipleSection
+import knf.kuma.directory.DirectoryAV1PageAdapter
+import knf.kuma.pojos.av1.GenreRecord
+import knf.kuma.search.SearchFragmentMaterial
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import xdroid.toaster.Toaster
 
@@ -47,16 +46,14 @@ class RecommendActivity : GenericActivity() {
     val error: LinearLayout by bind(R.id.error)
     val loading: LinearLayout by bind(R.id.loading)
     val state: TextView by bind(R.id.state)
-    private val dao = CacheDB.INSTANCE.animeDAO()
-
-    private val defaultGridColumns = gridColumns()
+    val adapter by lazy { DirectoryAV1PageAdapter(this@RecommendActivity as FragmentActivity) }
 
     private val layout: Int
         @LayoutRes
-        get() = if (isGrid) {
-            R.layout.recycler_recommends
+        get() = if (!isGrid) {
+            if (DesignUtils.isFlat) R.layout.recycler_recommends_material else R.layout.recycler_recommends
         } else {
-            R.layout.recycler_recommends_grid
+            if (DesignUtils.isFlat) R.layout.recycler_recommends_grid_material else R.layout.recycler_recommends_grid
         }
 
     private val isGrid: Boolean
@@ -72,142 +69,40 @@ class RecommendActivity : GenericActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         find<FrameLayout>(R.id.adContainer).implBanner(AdsType.RECOMMEND_BANNER, true)
+        recyclerView.verifyManager()
+        recyclerView.adapter = adapter
         setAdapter()
     }
 
     private fun setAdapter() {
-        doAsync {
-            try {
-                val excludeList = LinkedHashSet<String>().apply {
-                    addAll(CacheDB.INSTANCE.favsDAO().allAids)
-                    addAll(CacheDB.INSTANCE.seeingDAO().allAids)
-                }.toList()
-                val status = CacheDB.INSTANCE.genresDAO().top
-                setState("Revisando generos")
-                if (status.size == 3) {
-                    setState("Buscando sugerencias")
-                    val sectionedAdapter = SectionedRecyclerViewAdapter()
-                    val abc = getList(status[0], status[1], status[2])
-                    val ab = getList(status[0], status[1])
-                    ab.removeAll(abc)
-                    val ac = getList(status[0], status[2])
-                    ac.removeAll(abc, ab)
-                    val bc = getList(status[1], status[2])
-                    bc.removeAll(abc, ab, ac)
-                    val a = getList(status[0])
-                    a.removeAll(abc, ab, ac, bc)
-                    val b = getList(status[1])
-                    b.removeAll(abc, ab, ac, bc, a)
-                    val c = getList(status[2])
-                    c.removeAll(abc, ab, ac, bc, a, b)
-                    setState("Filtrando lista")
-                    removeFavs(excludeList, abc, ab, ac, bc, a, b, c)
-                    if (abc.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[1], status[2]), getAnimeList(abc), isGrid))
-                    if (ab.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[1]), getAnimeList(ab), isGrid))
-                    if (ac.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0], status[2]), getAnimeList(ac), isGrid))
-                    if (bc.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[1], status[2]), getAnimeList(bc), isGrid))
-                    if (a.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[0]), getAnimeList(a), isGrid))
-                    if (b.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[1]), getAnimeList(b), isGrid))
-                    if (c.size > 0)
-                        sectionedAdapter.addSection(MultipleSection(this@RecommendActivity, getStringTitle(status[2]), getAnimeList(c), isGrid))
-                    val layoutManager: RecyclerView.LayoutManager
-                    if (isGrid) {
-                        val grid = VariantGridLayoutManager(this@RecommendActivity, defaultGridColumns)
-                        grid.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                            override fun getSpanSize(position: Int): Int {
-                                return try {
-                                    when (sectionedAdapter.getSectionItemViewType(position)) {
-                                        SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER -> defaultGridColumns
-                                        else -> 1
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    defaultGridColumns
-                                }
-
-                            }
-                        }
-                        layoutManager = grid
-                    } else {
-                        layoutManager = VariantLinearLayoutManager(this@RecommendActivity)
-                    }
-                    runOnUiThread {
-                        loading.visibility = View.GONE
-                        recyclerView.layoutManager = layoutManager
-                        recyclerView.adapter = sectionedAdapter
-                    }
-                } else
-                    runOnUiThread {
-                        loading.visibility = View.GONE
-                        error.visibility = View.VISIBLE
-                    }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                FirebaseCrashlytics.getInstance().recordException(e)
-                Toaster.toast("Error al cargar recomendados")
-                runOnUiThread {
-                    loading.visibility = View.GONE
+        lifecycleScope.launch {
+            CacheDB.INSTANCE.genreRecordDAO().allFlow.distinctUntilChanged().collectLatest {
+                try {
+                    error.isVisible = false
+                    loading.isVisible = true
+                    val list = RecommendHelper.createRecommended()
+                    loading.isVisible = false
+                    error.isVisible = list.isEmpty()
+                    adapter.submitData(PagingData.from(list))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                    Toaster.toast("Error al cargar recomendados")
+                    loading.isVisible = false
+                    error.isVisible = true
                 }
             }
         }
     }
 
-    @SafeVarargs
-    private fun removeFavs(excludeList: List<String>, vararg lists: MutableList<String>) {
-        lists.forEach { list ->
-            list.removeAll(list.filter { excludeList.contains(it) })
-        }
-    }
-
-    private fun getList(vararg status: GenreStatusObject): MutableList<String> {
-        return dao.getAidsByGenres(getString(*status))
-    }
-
-    private fun getAnimeList(list: List<String>): MutableList<AnimeShortObject> {
-        val chunk = list.chunked(900)
-        val animes = mutableListOf<AnimeShortObject>()
-        chunk.forEach {
-            animes.addAll(CacheDB.INSTANCE.animeDAO().getAnimesByAids(it))
-        }
-        return animes
-    }
-
-    private fun getString(vararg status: GenreStatusObject): String {
-        val builder = StringBuilder("%")
-        for (s in status) {
-            builder.append(s.name)
-                    .append("%")
-        }
-        return builder.toString()
-    }
-
-    private fun getStringTitle(vararg status: GenreStatusObject): String {
-        val builder = StringBuilder()
-        for (s in status) {
-            builder.append(s.name)
-                    .append(", ")
-        }
-        return builder.toString().substring(0, builder.length - 2)
-    }
-
-    private fun setState(stateString: String) {
-        runOnUiThread {
-            state.text = stateString
-        }
-    }
-
     private fun showBlacklist() {
         lifecycleScope.launch(Dispatchers.Main) {
-            val blacklist = withContext(Dispatchers.IO) { GenreStatusObject.names(CacheDB.INSTANCE.genresDAO().blacklist) }
+            val list = SearchFragmentMaterial.genres.map {
+                CacheDB.INSTANCE.genreRecordDAO().findBySlug(it.slug) ?: GenreRecord(it.slug, it.name, 0)
+            }
             val dialog = BlacklistDialog()
-            dialog.init(blacklist, object : BlacklistDialog.MultiChoiceListener {
-                override fun onOkay(selected: MutableList<String>) {
+            dialog.init(list, object : BlacklistDialog.MultiChoiceListener {
+                override fun onOkay(selected: List<GenreRecord>) {
                     setBlacklist(selected)
                 }
             })
@@ -215,28 +110,9 @@ class RecommendActivity : GenericActivity() {
         }
     }
 
-    private fun setBlacklist(selected: MutableList<String>) {
-        doAsync {
-            for (s in selected)
-                RecommendHelper.block(s)
-            for (statusObject in CacheDB.INSTANCE.genresDAO().all)
-                if (statusObject.isBlocked && !selected.contains(statusObject.name))
-                    RecommendHelper.reset(statusObject.name)
-            resetSuggestions()
-        }
-    }
-
-    private fun resetSuggestions() {
-        setState("Iniciando búsqueda")
-        runOnUiThread {
-            val adapter = recyclerView.adapter as SectionedRecyclerViewAdapter?
-            if (adapter != null) {
-                adapter.removeAllSections()
-                recyclerView.adapter = adapter
-                loading.visibility = View.VISIBLE
-                error.visibility = View.GONE
-                setAdapter()
-            }
+    private fun setBlacklist(selected: List<GenreRecord>) {
+        lifecycleScope.launch {
+            RecommendHelper.block(selected)
         }
     }
 
@@ -248,15 +124,9 @@ class RecommendActivity : GenericActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.blacklist -> showBlacklist()
-            R.id.rating -> RankingActivity.open(this)
+            R.id.rating -> if (DesignUtils.isFlat) RankingActivityMaterial.open(this) else RankingActivity.open(this)
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == 4321)
-            resetSuggestions()
     }
 
     companion object {

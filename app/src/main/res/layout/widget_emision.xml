@@ -26,16 +26,6 @@
             android:textColor="@color/textPrimary"
             android:textSize="20sp"/>
 
-        <TextView
-            android:id="@+id/title_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:text="##"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"/>
-
     </RelativeLayout>
 
     <RelativeLayout

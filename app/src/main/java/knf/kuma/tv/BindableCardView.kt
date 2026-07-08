@@ -35,4 +35,6 @@ abstract class BindableCardView<T> : BaseCardView {
     }
 
     abstract fun bind(data: T)
+
+    open fun unbind() {}
 }

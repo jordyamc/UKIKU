@@ -31,6 +31,7 @@
             android:layout_weight="1"
             android:clipToPadding="false"
             android:layoutAnimation="@anim/layout_fall_down"
+            app:layoutManager=".custom.VariantLinearLayoutManager"
             android:paddingStart="10dp"
             android:paddingTop="10dp"
             android:paddingEnd="10dp"

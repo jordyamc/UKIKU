@@ -13,7 +13,6 @@ class AnimePagerAdapterMaterial(fm: FragmentManager) : FragmentPagerAdapter(fm, 
 
     override fun getPageTitle(position: Int): CharSequence? {
         return when (position) {
-            0 -> "INFO"
             1 -> "EPISODIOS"
             else -> "INFO"
         }
@@ -25,7 +24,6 @@ class AnimePagerAdapterMaterial(fm: FragmentManager) : FragmentPagerAdapter(fm, 
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> detailsFragment
             1 -> chaptersFragment
             else -> detailsFragment
         }

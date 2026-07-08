@@ -5,14 +5,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import knf.kuma.R
 import knf.kuma.ads.showRandomInterstitial
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
+import knf.kuma.commons.optionalBind
 import knf.kuma.custom.GenericActivity
 
 class SeeingActivity : GenericActivity() {
@@ -23,7 +26,7 @@ class SeeingActivity : GenericActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(EAHelper.getTheme())
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_seening)
+        setContentView(if (DesignUtils.isFlat) R.layout.activity_seening_material else R.layout.activity_seening)
         toolbar.title = "Siguiendo"
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -59,18 +62,6 @@ class SeeingActivity : GenericActivity() {
             }
         })
         showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_seeing_auto, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.auto -> FavToSeeing.onConfirmation(this)
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     companion object {

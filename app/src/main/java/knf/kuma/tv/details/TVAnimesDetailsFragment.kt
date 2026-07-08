@@ -3,12 +3,14 @@ package knf.kuma.tv.details
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.DetailsSupportFragment
 import androidx.leanback.widget.Action
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.ClassPresenterSelector
 import androidx.leanback.widget.DetailsOverviewRow
+import androidx.leanback.widget.FullWidthDetailsOverviewRowPresenter
 import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
@@ -31,7 +33,13 @@ import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.FavoriteObject
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.ChapterWID
+import knf.kuma.pojos.av1.DirectoryAV1
+import knf.kuma.pojos.av1.FavoriteAV1
+import knf.kuma.pojos.av1.Relation
 import knf.kuma.retrofit.Repository
+import knf.kuma.tv.TVRepository
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.tv.anime.ChapterPresenter
 import knf.kuma.tv.anime.RelatedPresenter
@@ -42,30 +50,29 @@ import kotlinx.coroutines.withContext
 class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListener, OnActionClickedListener {
 
     private var mRowsAdapter: ArrayObjectAdapter? = null
-    private var favoriteObject: FavoriteObject? = null
-    private var currentChapter: AnimeObject.WebInfo.AnimeChapter? = null
-    private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>? = ArrayList()
-    private var actionAdapter: SparseArrayObjectAdapter? = null
+    private var favoriteObject: FavoriteAV1? = null
+    private var currentChapter: ChapterWID? = null
+    private var chapters: List<ChapterWID>? = ArrayList()
+    private val actionAdapter by lazy { SparseArrayObjectAdapter() }
     private var listRowAdapter: ArrayObjectAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        buildDetails()
-        onItemViewClickedListener = this
     }
 
-    private suspend fun getLastSeen(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?): Int {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        onItemViewClickedListener = this
+        buildDetails()
+    }
+
+    private suspend fun getLastSeen(aid: Int): Int {
         if (chapters?.isNotEmpty() == true) {
-            val eids =
-                chapters.sortedBy { it.number.substringAfterLast(" ").toFloat() }.map { it.eid }
-            eids.chunked(50).forEach { list ->
-                val chapter =
-                    withContext(Dispatchers.IO) { CacheDB.INSTANCE.seenDAO().getLast(list) }
-                if (chapter != null) {
-                    val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
-                    if (position >= 0)
-                        return position
-                }
+            val last = withContext(Dispatchers.IO) { CacheDB.INSTANCE.recordAV1DAO().getLastByAid(aid) }
+            if (last != null) {
+                val position = chapters?.indexOf(chapters?.find { it.eid == last.eid })
+                if (position != null && position >= 0)
+                    return position
             }
         }
         return 0
@@ -73,12 +80,10 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
 
     private fun buildDetails() {
         val activity = activity ?: return
-        Repository().getAnime(
-            arguments?.getString("url")
-                ?: "", true
-        ).observe(activity) { animeObject ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            val animeObject = TVRepository.getAnime(arguments?.getString("url") ?: "")
             if (animeObject != null) {
-                Glide.with(App.context).asBitmap().load(PatternUtil.getCoverGlide(animeObject.aid))
+                Glide.with(App.context).asBitmap().load(animeObject.imageUrl)
                     .into(object : SimpleTarget<Bitmap>() {
                         override fun onResourceReady(
                             resource: Bitmap,
@@ -86,11 +91,10 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                         ) {
                             Palette.from(resource).generate { palette ->
                                 val swatch = palette?.darkMutedSwatch
-                                favoriteObject = FavoriteObject(animeObject)
-                                chapters = animeObject.chapters
-                                chapters?.reversed()
+                                favoriteObject = animeObject.asFavorite()
+                                chapters = animeObject.chapters.sortedBy { it.number }.map { it.withID(animeObject) }
                                 val selector = ClassPresenterSelector()
-                                val rowPresenter = CustomFullWidthDetailsOverviewRowPresenter(
+                                val rowPresenter = FullWidthDetailsOverviewRowPresenter(
                                     if (swatch == null)
                                         DetailsDescriptionPresenter()
                                     else
@@ -111,10 +115,10 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                     DetailsOverviewRow::class.java,
                                     rowPresenter
                                 )
-                                lifecycleScope.launch {
+                                viewLifecycleOwner.lifecycleScope.launch {
                                     selector.addClassPresenter(
                                         ChaptersListRow::class.java,
-                                        ChaptersListPresenter(getLastSeen(chapters))
+                                        ChaptersListPresenter(getLastSeen(animeObject.aid))
                                     )
                                     selector.addClassPresenter(
                                         ListRow::class.java,
@@ -126,11 +130,8 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                     // Add images and action buttons to the details view
                                     detailsOverview.setImageBitmap(activity, resource)
                                     detailsOverview.isImageScaleUpAllowed = true
-                                    actionAdapter = SparseArrayObjectAdapter()
-                                    if (withContext(Dispatchers.IO) {
-                                            CacheDB.INSTANCE.favsDAO().isFav(animeObject.key)
-                                        }) {
-                                        actionAdapter?.set(
+                                    if (withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().isFav(animeObject.aid) }) {
+                                        actionAdapter.set(
                                             1,
                                             Action(
                                                 1,
@@ -143,7 +144,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                             )
                                         )
                                     } else {
-                                        actionAdapter?.set(
+                                        actionAdapter.set(
                                             1,
                                             Action(
                                                 1,
@@ -156,12 +157,12 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                             )
                                         )
                                     }
-                                    actionAdapter?.apply {
+                                    actionAdapter.apply {
                                         set(
                                             2,
                                             Action(
                                                 2,
-                                                "${animeObject.rate_stars}/5.0 (${animeObject.rate_count})",
+                                                "${String.format("%.1f", animeObject.rateStars)}/5.0 (${animeObject.rateCount})",
                                                 null,
                                                 ContextCompat.getDrawable(
                                                     App.context,
@@ -178,7 +179,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                     if (chapters?.isNotEmpty() == true) {
                                         chapters?.let {
                                             listRowAdapter = ArrayObjectAdapter(
-                                                ChapterPresenter()
+                                                ChapterPresenter(viewLifecycleOwner.lifecycleScope)
                                             )
                                             for (chapter in it)
                                                 listRowAdapter?.add(chapter)
@@ -193,11 +194,11 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                     }
 
                                     // Add a Related items row
-                                    if (animeObject.related?.isNotEmpty() == true) {
+                                    if (animeObject.relations.isNotEmpty()) {
                                         val listRowAdapter = ArrayObjectAdapter(
                                             RelatedPresenter()
                                         )
-                                        for (related in animeObject.related ?: listOf())
+                                        for (related in animeObject.relations)
                                             listRowAdapter.add(related)
                                         val header = HeaderItem(0, "Relacionados")
                                         mRowsAdapter?.add(ListRow(header, listRowAdapter))
@@ -214,11 +215,11 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder, item: Any, rowViewHolder: RowPresenter.ViewHolder, row: Row) {
         val activity = activity ?: return
-        if (item is AnimeObject.WebInfo.AnimeRelated) {
-            TVAnimesDetails.start(activity, "https://www3.animeflv.net" + item.link)
-        } else if (item is AnimeObject.WebInfo.AnimeChapter) {
+        if (item is Relation) {
+            TVAnimesDetails.start(activity, item.animeUrl)
+        } else if (item is ChapterWID) {
             currentChapter = item
-            TVServersFactory.start(activity, item.link, item, itemViewHolder, activity as? TVServersFactory.ServersInterface)
+            TVServersFactory.start(activity, item.link, item.name, item.episodeName, item.asRecord() , itemViewHolder, activity as? TVServersFactory.ServersInterface)
         }
     }
 
@@ -228,26 +229,24 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
 
     override fun onActionClicked(action: Action) {
         if (action.id == 1L) {
-            actionAdapter?.clear()
             favoriteObject?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    if (CacheDB.INSTANCE.favsDAO().isFav(it.key)) {
-                        CacheDB.INSTANCE.favsDAO().deleteFav(it)
-                        launch(Dispatchers.Main){
-                            action.label1 = "Añadir favorito"
-                            action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_empty)
-                        }
+                    val updatedAction = Action(1, "Añadir favorito", null, null)
+                    if (CacheDB.INSTANCE.favoriteAV1DAO().isFav(it.aid)) {
+                        CacheDB.INSTANCE.favoriteAV1DAO().delete(it)
+                        updatedAction.label1 = "Añadir favorito"
+                        updatedAction.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_empty)
                     } else {
-                        CacheDB.INSTANCE.favsDAO().addFav(it)
-                        launch(Dispatchers.Main){
-                            action.label1 = "Quitar favorito"
-                            action.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
-                        }
+                        CacheDB.INSTANCE.favoriteAV1DAO().addFav(it)
+                        updatedAction.label1 = "Quitar favorito"
+                        updatedAction.icon = ContextCompat.getDrawable(App.context, R.drawable.heart_full)
                     }
                     syncData { favs() }
+                    withContext(Dispatchers.Main) {
+                        actionAdapter.set(1, updatedAction)
+                    }
                 }
             }
-            actionAdapter?.set(1, action)
         }
     }
 

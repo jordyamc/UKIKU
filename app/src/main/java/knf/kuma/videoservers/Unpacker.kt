@@ -67,16 +67,17 @@ object Unpacker {
         }
     }
 
-    suspend fun listenResources(context: Context, link: String, pattern: Pattern, timeout: Long = 10000): String? {
+    suspend fun listenResources(context: Context, link: String, pattern: Pattern, timeout: Long = 10000, executeOnFinish: String? = null): String? {
         return withContext(Dispatchers.Main) {
             val evaluator = WebJS(context)
             suspendCoroutine { continuation ->
                 evaluator.listenResources(
                     link,
                     pattern,
-                    timeout
-                ) {
-                    continuation.resume(it)
+                    timeout,
+                    executeOnFinish
+                ) { url, headers ->
+                    continuation.resume(url)
                 }
             }
         }

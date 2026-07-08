@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
 import knf.kuma.animeinfo.viewholders.AnimeDetailsMaterialHolder
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class DetailsFragmentMaterial : Fragment() {
     private var holder: AnimeDetailsMaterialHolder? = null
@@ -17,10 +19,12 @@ class DetailsFragmentMaterial : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.liveData.observe(viewLifecycleOwner, Observer { animeObject ->
-            if (animeObject != null)
-                holder?.populate(this@DetailsFragmentMaterial, animeObject)
-        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.infoFlow.collectLatest { animeObject ->
+                if (animeObject != null)
+                    holder?.populate(this@DetailsFragmentMaterial, animeObject)
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

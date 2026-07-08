@@ -9,9 +9,9 @@ class DocumentFileCreator(private val rootDF: DocumentFile?) : Creator {
     override fun exist(): Boolean = rootDF?.exists()
             ?: false
 
-    override fun createLinksList(): List<String> {
+    override fun createSlugList(): List<String> {
         rootDF ?: return emptyList()
-        return rootDF.listFiles().filter { it.isDirectory }.mapNotNull { "https://www3.animeflv.net/anime/${it.name}" }
+        return rootDF.listFiles().filter { it.isDirectory }.mapNotNull { it.name }
     }
 
     override fun createDirectoryList(progressCallback: (Int, Int) -> Unit): List<ExplorerObject> {
@@ -19,7 +19,7 @@ class DocumentFileCreator(private val rootDF: DocumentFile?) : Creator {
         val directories = rootDF.listFiles().filter { it.isDirectory }
         val list = mutableListOf<ExplorerObject>()
         var progress = 0
-        CacheDB.INSTANCE.animeDAO().getAllByFile(directories.mapNotNull { it.name }.toMutableList()).forEach {
+        CacheDB.INSTANCE.directoryDAO().findAllBySlug(directories.mapNotNull { it.name }).forEach {
             try {
                 progress++
                 progressCallback(progress, directories.size)

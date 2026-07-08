@@ -1,22 +1,18 @@
 package knf.kuma.recents
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.RecentObject
+import knf.kuma.pojos.av1.RecentAV1
 import knf.kuma.retrofit.Repository
 import kotlinx.coroutines.flow.Flow
 
 class RecentsViewModel : ViewModel() {
     private val repository = Repository()
 
-    val dbLiveData: LiveData<MutableList<RecentObject>>
-        get() = CacheDB.INSTANCE.recentsDAO().objects
-
-    val dbFlow: Flow<List<RecentObject>>
-        get() = CacheDB.INSTANCE.recentsDAO().objectsFlow
+    val dbFlowData: Flow<List<RecentAV1>>
+        get() = CacheDB.INSTANCE.recentAV1DAO().allFlow
 
     fun reload() {
-        repository.reloadAllRecents()
+        repository.reloadRecents()
     }
 }

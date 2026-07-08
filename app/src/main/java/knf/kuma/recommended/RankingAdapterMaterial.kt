@@ -7,10 +7,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
-import knf.kuma.pojos.GenreStatusObject
+import knf.kuma.pojos.av1.GenreRecord
 import org.jetbrains.anko.find
 
-class RankingAdapterMaterial(val list: List<GenreStatusObject>) : RecyclerView.Adapter<RankingAdapterMaterial.RankHolder>() {
+class RankingAdapterMaterial(val list: List<GenreRecord>) : RecyclerView.Adapter<RankingAdapterMaterial.RankHolder>() {
     private var total = 0
 
     init {

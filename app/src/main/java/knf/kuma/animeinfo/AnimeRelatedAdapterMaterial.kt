@@ -9,12 +9,11 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import knf.kuma.R
-import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.load
 import knf.kuma.databinding.ItemRelatedBinding
-import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.av1.Relation
 
-internal class AnimeRelatedAdapterMaterial(private val fragment: Fragment, private val list: MutableList<AnimeObject.WebInfo.AnimeRelated>) : RecyclerView.Adapter<AnimeRelatedAdapterMaterial.RelatedHolder>() {
+internal class AnimeRelatedAdapterMaterial(private val fragment: Fragment, private val list: List<Relation>) : RecyclerView.Adapter<AnimeRelatedAdapterMaterial.RelatedHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RelatedHolder {
         return RelatedHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_related, parent, false))
@@ -23,14 +22,23 @@ internal class AnimeRelatedAdapterMaterial(private val fragment: Fragment, priva
     override fun onBindViewHolder(holder: RelatedHolder, position: Int) {
         val related = list[position]
         holder.textView.text = related.name
-        holder.relation.text = related.relation
-        if (related.aid != "null") {
-            holder.imageView.visibility = View.VISIBLE
-            holder.imageView.load(PatternUtil.getCover(related.aid))
-            holder.cardView.setOnClickListener { ActivityAnimeMaterial.open(fragment, related, holder.imageView) }
-        } else {
-            holder.imageView.visibility = View.GONE
-            holder.cardView.setOnClickListener { ActivityAnimeMaterial.open(fragment, related) }
+        holder.relation.text = getRelation(related.relation)
+        holder.imageView.visibility = View.VISIBLE
+        holder.imageView.load(related.imageUrl)
+        holder.cardView.setOnClickListener { ActivityAnimeMaterial.open(fragment, related, holder.imageView) }
+    }
+
+    fun getRelation(id: Int): String {
+        return when(id) {
+            8 -> "Historia Principal"
+            1 -> "Precuela"
+            2 -> "Secuela"
+            4 -> "Versión Alternativa"
+            3 -> "Ambientación Alternativa"
+            7 -> "Historia Completa"
+            5 -> "Historia Paralela"
+            6 -> "Resumen"
+            else -> "Otro"
         }
     }
 

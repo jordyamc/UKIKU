@@ -2,8 +2,8 @@ package knf.kuma.tv.anime
 
 import android.view.ViewGroup
 import androidx.leanback.widget.Presenter
+import knf.kuma.pojos.av1.DirectoryAV1Min
 import knf.kuma.tv.cards.AnimeCardView
-import knf.kuma.tv.search.BasicAnimeObject
 
 class AnimePresenter : Presenter() {
 
@@ -13,7 +13,7 @@ class AnimePresenter : Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         if (item == null) return
-        (viewHolder.view as AnimeCardView).bind(item as BasicAnimeObject)
+        (viewHolder.view as AnimeCardView).bind(item as DirectoryAV1Min)
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {

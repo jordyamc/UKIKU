@@ -1,22 +1,27 @@
 package knf.kuma.videoservers
 
-import android.os.Parcel
-import android.os.Parcelable
+data class Option(
+    val server: String,
+    val name: String?,
+    val url: String?,
+    val headers: Headers? = null,
+    val needTabs: Boolean = false
+)
 
-open class Option : Parcelable {
+/*open class Option : Parcelable {
     var server: String? = null
     var name: String? = null
     var url: String? = null
     var headers: Headers? = null
 
-    /**
+    *//**
      * Crea una opcion de descarga
      *
      * @param server  Nombre del servidor de donde viene la opcion [VideoServer.Names]
      * @param name    Nombre de la opcion, null si es una opcion unica
      * @param url     Url de la opcion
      * @param headers Headers requeridos por la opcion
-     */
+     *//*
     constructor(server: String, name: String?, url: String?, headers: Headers?) {
         if (url == null || url.trim { it <= ' ' }.isEmpty())
             throw IllegalStateException("Url is not valid!")
@@ -70,12 +75,5 @@ open class Option : Parcelable {
                 names.add(option.name ?: "")
             return names
         }
-
-        fun getLinks(options: MutableList<Option>): MutableList<String> {
-            val links = ArrayList<String>()
-            for (option in options)
-                links.add(option.name ?: "")
-            return links
-        }
     }
-}
+}*/

@@ -20,6 +20,7 @@
         android:name="android.permission.RECORD_AUDIO"
         android:requiredFeature="android.software.leanback" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <application
         android:name=".App"
@@ -159,12 +160,12 @@
                 <category android:name="android.intent.category.DEFAULT"/>
 
                 <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/ver/"
+                    android:host="animeav1.com"
+                    android:pathPattern="/media/[\\w-]+/\\d+"
                     android:scheme="https"/>
                 <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/ver/"
+                    android:host="animeav1.com"
+                    android:pathPattern="/media/[\\w-]+/\\d+"
                     android:scheme="http"/>
             </intent-filter>
         </activity>

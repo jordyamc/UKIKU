@@ -8,24 +8,23 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
 import knf.kuma.ads.AdCallback
 import knf.kuma.ads.AdCardItemHolder
-import knf.kuma.ads.AdFavoriteObject
 import knf.kuma.ads.AdsUtilsMob
-import knf.kuma.ads.implAdsFavorite
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.load
-import knf.kuma.favorite.objects.InfoContainer
-import knf.kuma.pojos.FavoriteObject
+import knf.kuma.pojos.av1.FavoriteAV1
+import knf.kuma.pojos.av1.FavoriteBase
+import knf.kuma.pojos.av1.FavoriteSectionAV1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -35,14 +34,14 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
     private val context: Context?
     private val listener: OnMoveListener
     private val orderType = PrefsUtil.favsOrder
-    private var list: MutableList<FavoriteObject> = ArrayList()
+    var list: List<FavoriteBase> = ArrayList()
 
     private val layout: Int
         @LayoutRes
         get() = if (PrefsUtil.layType == "0") {
-            R.layout.item_fav
+            if (DesignUtils.isFlat) R.layout.item_fav_material else R.layout.item_fav
         } else {
-            R.layout.item_fav_grid
+            if (DesignUtils.isFlat) R.layout.item_fav_grid_material else R.layout.item_fav_grid
         }
 
     init {
@@ -52,7 +51,6 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            TYPE_HEADER -> HeaderHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_fav_header, parent, false))
             TYPE_ITEM -> ItemHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false))
             TYPE_AD -> AdCardItemHolder(parent, AdCardItemHolder.TYPE_FAV).also {
                 it.loadAd(fragment.lifecycleScope, object : AdCallback {
@@ -65,13 +63,20 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val favoriteObject = list[position]
-        if (holder is HeaderHolder) {
-            holder.header.text = favoriteObject.name
-            holder.action.setOnClickListener { listener.onEdit(favoriteObject.name ?: "") }
-        } else if (holder is ItemHolder) {
-            holder.imageView.load(PatternUtil.getCover(favoriteObject.aid ?: ""))
+        if (holder is HeaderHolder && favoriteObject is FavoriteSectionAV1) {
+            holder.header.text = favoriteObject.name.let {
+                if (it == FavoriteAV1.CATEGORY_NONE) "Sin categoria" else it
+            }
+            if (favoriteObject.name == FavoriteAV1.CATEGORY_NONE) {
+                holder.action.isVisible = false
+            } else {
+                holder.action.isVisible = true
+                holder.action.setOnClickListener { listener.onEdit(favoriteObject.name) }
+            }
+        } else if (holder is ItemHolder && favoriteObject is FavoriteAV1) {
+            holder.imageView.load(favoriteObject.imageUrl)
             holder.title.text = favoriteObject.name
-            holder.type.text = favoriteObject.type
+            holder.type.text = favoriteObject.typeText
             holder.cardView.setOnClickListener { ActivityAnime.open(fragment, favoriteObject, holder.imageView) }
             if (showSections)
                 holder.cardView.setOnLongClickListener {
@@ -87,9 +92,9 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
 
     override fun getItemViewType(position: Int): Int {
         return try {
-            if (list[position] is AdFavoriteObject) FavsSectionAdapterMaterial.TYPE_AD else if (list[position].isSection) FavsSectionAdapterMaterial.TYPE_HEADER else FavsSectionAdapterMaterial.TYPE_ITEM
+            if (list[position] is FavoriteSectionAV1) TYPE_HEADER else TYPE_ITEM
         } catch (_: Exception) {
-            FavsSectionAdapterMaterial.TYPE_ITEM
+            TYPE_ITEM
         }
     }
 
@@ -97,47 +102,40 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
         return try {
             if (showSections)
                 ""
-            else
+            else {
+                val item = list[position] as FavoriteAV1
                 when (orderType) {
                     0 -> {
-                        val name = list[position].name
+                        val name = item.name
                         if (name.isNotEmpty())
                             name.substring(0, 1).uppercase()
                         else
                             name
                     }
-                    else -> list[position].aid
+
+                    else -> item.aid.toString()
                 }
+            }
         } catch (_: IllegalStateException) {
             ""
         }
     }
 
-    fun updatePosition(container: InfoContainer) {
-        val nlist = container.updated
-        if (!nlist.isNullOrEmpty() && container.from != -1 && container.to != -1) {
-            list = nlist
-            recyclerView.post { notifyItemMoved(container.from, container.to) }
-        }
-    }
-
-    fun updateList(list: MutableList<FavoriteObject>) {
+    fun updateList(list: List<FavoriteBase>) {
         fragment.lifecycleScope.launch(Dispatchers.IO) {
             this@FavsSectionAdapter.list = list
-            if (PrefsUtil.layType == "0" && PrefsUtil.isNativeAdsEnabled)
-                this@FavsSectionAdapter.list.implAdsFavorite()
             recyclerView.post { this@FavsSectionAdapter.notifyDataSetChanged() }
         }
     }
 
     internal interface OnMoveListener {
-        fun onSelect(favoriteObject: FavoriteObject)
+        fun onSelect(favoriteObject: FavoriteAV1)
 
         fun onEdit(category: String)
     }
 
     internal class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: MaterialCardView by itemView.bind(R.id.card)
+        val cardView: View by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)
         val type: TextView by itemView.bind(R.id.type)

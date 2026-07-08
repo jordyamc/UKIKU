@@ -1,16 +1,16 @@
 package knf.kuma.cast
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.common.images.WebImage
-import knf.kuma.animeinfo.ktx.filePath
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.SelfServer
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.ExplorerObject
-import knf.kuma.pojos.RecentObject
-import knf.kuma.recents.RecentModel
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.DirectoryAV1
+import knf.kuma.pojos.av1.RecentAV1
 
 data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo) {
 
@@ -20,15 +20,15 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
     val type: String get() = mediaInfo.contentType!!
 
     companion object {
-        fun create(chapter: AnimeObject.WebInfo.AnimeChapter?, url: String? = null): CastMedia? {
-            if (chapter == null) return null
+
+        fun create(anime: DirectoryAV1, chapter: Chapter, url: String? = null): CastMedia {
             val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
                 putString(MediaMetadata.KEY_TITLE, chapter.name)
-                putString(MediaMetadata.KEY_SUBTITLE, chapter.number)
-                addImage(WebImage(Uri.parse(if (chapter.img.isNullOrBlank()) "https://www3.animeflv.net/uploads/animes/thumbs/${chapter.aid}.jpg" else chapter.img)))
+                putString(MediaMetadata.KEY_SUBTITLE, chapter.name)
+                addImage(WebImage(chapter.thumbnail(anime).toUri()))
             }
             val fUrl = when {
-                url.isNullOrBlank() -> SelfServer.start(chapter.filePath, true)
+                url.isNullOrBlank() -> SelfServer.start(chapter.filePath(anime), true)
                 PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
                 else -> url
             }
@@ -37,18 +37,18 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 setContentType("video/mp4")
                 setMetadata(metadata)
             }
-            return CastMedia(fUrl, chapter.eid, mediaInfo.build())
+            return CastMedia(fUrl, chapter.eid.toString(), mediaInfo.build())
         }
 
-        fun create(recent: RecentObject?, url: String? = null): CastMedia? {
+        fun create(recent: RecentAV1?, url: String? = null): CastMedia? {
             if (recent == null) return null
             val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
                 putString(MediaMetadata.KEY_TITLE, recent.name)
                 putString(MediaMetadata.KEY_SUBTITLE, recent.chapter)
-                addImage(WebImage(Uri.parse("https://www3.animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
+                addImage(WebImage(recent.episodeImageUrl.toUri()))
             }
             val fUrl = when {
-                url.isNullOrBlank() -> SelfServer.start(recent.filePath, true)
+                url.isNullOrBlank() -> SelfServer.start(recent.getFilePath(), true)
                 PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
                 else -> url
             }
@@ -57,27 +57,7 @@ data class CastMedia(val url: String, val eid: String, val mediaInfo: MediaInfo)
                 setContentType("video/mp4")
                 setMetadata(metadata)
             }
-            return CastMedia(fUrl, recent.eid, mediaInfo.build())
-        }
-
-        fun create(recent: RecentModel?, url: String? = null): CastMedia? {
-            if (recent == null) return null
-            val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
-                putString(MediaMetadata.KEY_TITLE, recent.name)
-                putString(MediaMetadata.KEY_SUBTITLE, recent.chapter)
-                addImage(WebImage(Uri.parse("https://www3.animeflv.net/uploads/animes/thumbs/${recent.aid}.jpg")))
-            }
-            val fUrl = when {
-                url.isNullOrBlank() -> SelfServer.start(recent.extras.filePath, true)
-                PrefsUtil.isProxyCastEnabled -> ProxyCache.start(url)
-                else -> url
-            }
-            val mediaInfo = MediaInfo.Builder(fUrl!!).apply {
-                setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
-                setContentType("video/mp4")
-                setMetadata(metadata)
-            }
-            return CastMedia(fUrl, recent.extras.eid, mediaInfo.build())
+            return CastMedia(fUrl, recent.eid.toString(), mediaInfo.build())
         }
 
         fun create(fileDownObj: ExplorerObject.FileDownObj?): CastMedia? {

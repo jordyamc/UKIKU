@@ -59,13 +59,13 @@
             android:layout_gravity="center_horizontal"
             android:adjustViewBounds="false"
             android:tint="?android:textColorSecondary"
-            app:srcCompat="@drawable/heart_broken"/>
+            app:srcCompat="@drawable/ic_no_genres"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Aún no tienes favoritos"
+            android:text="No hay suficiente información"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="?android:textColorSecondary"
             android:textSize="24sp"/>

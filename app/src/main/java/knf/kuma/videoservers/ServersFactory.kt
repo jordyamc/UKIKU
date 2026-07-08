@@ -16,6 +16,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
@@ -23,16 +24,14 @@ import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.isNull
 import knf.kuma.commons.iterator
-import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showProgressSnackbar
 import knf.kuma.commons.showSnackbar
-import knf.kuma.commons.urlDecode
-import knf.kuma.custom.exceptions.EJNFException
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManagerCentral
@@ -44,13 +43,20 @@ import knf.kuma.player.openWebPlayer
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.ChapterWID
+import knf.kuma.pojos.av1.DirectoryAV1
 import knf.kuma.queue.QueueManager
+import knf.kuma.videoservers.FileActions.CallbackState
+import knf.kuma.videoservers.FileActions.Type
+import knf.kuma.videoservers.FileActions.reset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
-import org.json.JSONObject
 import xdroid.toaster.Toaster
 import java.util.Locale
 import kotlin.math.abs
@@ -59,7 +65,7 @@ import kotlin.math.abs
 class ServersFactory {
     private var context: Context
     private var url: String
-    private var chapter: AnimeObject.WebInfo.AnimeChapter? = null
+    private var chapter: ChapterWID? = null
     private var downloadObject: DownloadObject
     private var isStream: Boolean = false
     private var isCasting: Boolean = false
@@ -68,11 +74,11 @@ class ServersFactory {
     private var servers: MutableList<Server> = ArrayList()
     private var selected = 0
 
-    private constructor(context: Context, url: String, chapter: AnimeObject.WebInfo.AnimeChapter, isStream: Boolean, addQueue: Boolean, serversInterface: ServersInterface) {
+    private constructor(context: Context, url: String, chapter: ChapterWID, isStream: Boolean, addQueue: Boolean, serversInterface: ServersInterface) {
         this.context = context
         this.url = url
         this.chapter = chapter
-        this.downloadObject = DownloadObject.fromChapter(chapter, addQueue)
+        this.downloadObject = chapter.asDownload(addQueue)
         this.isStream = isStream
         this.isCasting = isStream && CastUtil.get().connected()
         this.serversInterface = serversInterface
@@ -115,8 +121,8 @@ class ServersFactory {
                     showOptions(server, isCasting)
                 } else {
                     saveLastServer(text)
-                    when (text.lowercase(Locale.getDefault())) {
-                        "mega d", "mega s" -> {
+                    when {
+                        server.option.needTabs -> {
                             try {
                                 CustomTabsIntent.Builder()
                                     .setToolbarColor(Color.parseColor("#DA252D"))
@@ -132,12 +138,17 @@ class ServersFactory {
                             }
                             callOnFinish(false, false)
                         }
-                        else ->
+                        text.endsWith("(WEB)") -> {
+                            openWebPlayer(context, server.option.url!!, downloadObject.title)
+                            callOnFinish(false, false)
+                        }
+                        else -> {
                             when {
                                 isCasting -> callOnCast(server.option.url)
                                 isStream -> startStreaming(server.option, servers[selected] is WebServer)
                                 else -> startDownload(server.option)
                             }
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -198,7 +209,7 @@ class ServersFactory {
             try {
                 MaterialDialog(this@ServersFactory.context).safeShow {
                     title(text = server.name)
-                    listItemsSingleChoice(items = Option.getNames(server.options), initialSelection = 0) { _, index, _ ->
+                    listItemsSingleChoice(items = server.options.map { it.name ?: "" }, initialSelection = 0) { _, index, _ ->
                         saveLastServer(server.name)
                         when {
                             isCast -> callOnCast(server.options[index].url)
@@ -224,118 +235,107 @@ class ServersFactory {
     }
 
     fun start() {
-        try {
-            serversInterface.onProgressIndicator(true)
-            showSnack("Obteniendo servidores...")
-            val main = jsoupCookies(url).get()
-            val servers = ArrayList<Server>()
-            val sScript = main.select("script")
-            var j = ""
-            for (element in sScript) {
-                val sEl = element.outerHtml()
-                if ("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().containsMatchIn(sEl)) {
-                    j = sEl
-                    break
-                }
-            }
-            val jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value
-                    ?: throw EJNFException())
-            if (jsonObject.length() > 1) {
-                doOnUIGlobal {
-                    MaterialDialog(context).safeShow {
-                        listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
-                            doAsync {
-                                val downloads = main.select("table.RTbl.Dwnl tr:contains(${if (index == 0) "SUB" else "LAT"}) a.Button.Sm.fa-download")
-                                for (e in downloads) {
-                                    var z = e.attr("href")
-                                    z = z.substring(z.lastIndexOf("http"))
-                                    val server = Server.check(context, z)
-                                    if (server != null)
-                                        servers.add(server)
-                                }
-                                val jsonArray =
-                                        when (index) {
-                                            1 -> jsonObject.getJSONArray("LAT")
-                                            else -> jsonObject.getJSONArray("SUB")
-                                        }
-                                for (baseLink in jsonArray) {
-                                    val server = Server.check(context, baseLink.optString("code"))
-                                    if (server != null) {
-                                        try {
-                                            var skip = false
-                                            servers.forEach {
-                                                if (it.name == server.name) {
-                                                    skip = true
-                                                    return@forEach
-                                                }
-                                            }
-                                            if (!skip)
-                                                servers.add(server)
-                                        } catch (e: Exception) {
-                                            e.printStackTrace()
-                                        }
-                                    } else if (!baseLink.optString("code").contains("linkinpork")) {
-                                        servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
+        runBlocking {
+            try {
+                serversInterface.onProgressIndicator(true)
+                showSnack("Obteniendo servidores...")
+                val response = JsExtractor.processLinkMultiple(url, listOf("embeds", "downloads"))
+                var subServers = mutableListOf<Server>()
+                var dubServers = mutableListOf<Server>()
+                response.forEach { (_, jSONArray) ->
+                    jSONArray?.getJSONObject(0)?.let {
+                        if (it.has("SUB")) {
+                            for (sub in it.getJSONArray("SUB")) {
+                                val name = sub.getString("server")
+                                val url = sub.getString("url")
+                                if (name == "MP4Upload") {
+                                    if (subServers.find { it.baseLink.contains(url.substringAfterLast("/")) } != null){
+                                        continue
                                     }
                                 }
-                                servers.sort()
-                                this@ServersFactory.servers = servers
-                                showServerList()
-                            }
-                        }
-                        setOnCancelListener { callOnFinish(false, false) }
-                    }
-                }
-            } else {
-                val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
-                for (e in downloads) {
-                    var z = e.attr("href")
-                    z = urlDecode(z.substring(z.lastIndexOf("http")))
-                    val server = Server.check(context, z)
-                    if (server != null)
-                        servers.add(server)
-                }
-                val jsonArray = jsonObject.getJSONArray(if (jsonObject.has("SUB")) "SUB" else "LAT")
-                for (baseLink in jsonArray) {
-                    val server = Server.check(context, baseLink.optString("code"))
-                    if (server != null) {
-                        try {
-                            var skip = false
-                            servers.forEach {
-                                if (it.name == server.name) {
-                                    skip = true
-                                    return@forEach
+                                if (name == "PDrain") {
+                                    if (subServers.find { it.baseLink.substringBeforeLast("?").contains(url.substringBeforeLast("?")) } != null){
+                                        continue
+                                    }
+                                }
+                                val server = Server.check(context, url)
+                                if (subServers.find { it.baseLink.substringAfterLast("/") == url.substringAfterLast("/") } == null) {
+                                    subServers.add(server?: WebServer(context, url, name))
                                 }
                             }
-                            if (!skip)
-                                servers.add(server)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
                         }
-                    } else if (!baseLink.optString("code").contains("linkinpork")) {
-                        servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
+                        if (it.has("DUB")) {
+                            for (dub in it.getJSONArray("DUB")) {
+                                val name = dub.getString("server")
+                                val url = dub.getString("url")
+                                if (name == "MP4Upload") {
+                                    if (dubServers.find { it.baseLink.contains(url.substringAfterLast("/")) } != null){
+                                        continue
+                                    }
+                                }
+                                if (name == "PDrain") {
+                                    if (dubServers.find { it.baseLink.substringBeforeLast("?").contains(url.substringBeforeLast("?")) } != null){
+                                        continue
+                                    }
+                                }
+                                val server = Server.check(context, url)
+                                if (dubServers.find { it.baseLink.substringAfterLast("/") == url.substringAfterLast("/") } == null) {
+                                    dubServers.add(server?: WebServer(context, url, name))
+                                }
+                            }
+                        }
                     }
                 }
-                servers.sort()
-                this@ServersFactory.servers = servers
-                showServerList()
-            }
-            this.servers = servers.filter {
-                if (downloadObject.addQueue || isCasting || !isStream) {
-                    it.canDownload
-                } else {
-                    true
+                subServers = subServers.sortedWith(
+                    compareBy(
+                        { it.name.contains("(WEB)") },
+                        {it.name}
+                    )
+                ).toMutableList()
+                dubServers = dubServers.sortedWith(
+                    compareBy(
+                        { it.name.contains("(WEB)") },
+                        {it.name}
+                    )
+                ).toMutableList()
+                val langSelect: (Int) -> Unit = { index ->
+                    servers = if (index == 0) {
+                        subServers
+                    } else {
+                        dubServers
+                    }.filter {
+                        when {
+                            downloadObject.addQueue || isCasting -> it.canDownload
+                            isStream -> it.canStream
+                            else -> it.canDownload
+                        }
+                    }.toMutableList()
+                    showServerList()
                 }
-            }.toMutableList()
-        } catch (e: EJNFException) {
-            e.printStackTrace()
-            this@ServersFactory.servers = ArrayList()
-            Toaster.toast("Sin json de capitulos")
-            callOnFinish(false, false)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            this@ServersFactory.servers = ArrayList()
-            callOnFinish(false, false)
+                if (dubServers.isNotEmpty()) {
+                    if (!MultipleDownloadManager.isLoading || MultipleDownloadManager.langSelected == -1)
+                        launch(Dispatchers.Main) {
+                            MaterialDialog(context).safeShow {
+                                listItems(items = listOf("Subtitulado", "Doblado")) { _, index, _ ->
+                                    langSelect(index)
+                                }
+                                setOnCancelListener {
+                                    callOnFinish(false, false)
+                                }
+                            }
+                        }
+                    else
+                        langSelect(MultipleDownloadManager.langSelected)
+                } else {
+                    langSelect(0)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                FirebaseCrashlytics.getInstance().recordException(e)
+                servers = ArrayList()
+                callOnFinish(false, false)
+                Toaster.toast("Error al obtener servidores: ${e.message}")
+            }
         }
     }
 
@@ -346,7 +346,7 @@ class ServersFactory {
             AchievementManager.onPlayChapter()
             try {
                 if (isWeb) {
-                    openWebPlayer(context, option.url!!)
+                    openWebPlayer(context, option.url!!, downloadObject.title)
                 } else if (PreferenceManager.getDefaultSharedPreferences(App.context).getString("player_type", "0") == "0") {
                     App.context.startActivity(
                             PrefsUtil.getPlayerIntent()
@@ -375,9 +375,9 @@ class ServersFactory {
         doAsync{
             if (BuildConfig.DEBUG) Log.e("Download " + option.server, "${option.url}")
             downloadObject.server = option.server ?: ""
-            if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid ?: "0")) {
-                CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(chapter?.fileName
-                        ?: "null")), true, chapter))
+            if (chapter != null && CacheDB.INSTANCE.queueDAO().isInQueue(chapter?.eid?.toString() ?: "0")) {
+                CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(FileAccessHelper.getFile(chapter?.filePath()
+                        ?: "null")), true, chapter?.asCompatChapter()))
                 syncData { queue() }
             }
             downloadObject.link = option.url
@@ -420,7 +420,7 @@ class ServersFactory {
     private fun showSnack(text: String) {
         dismissSnack()
         //snackbar = serversInterface.getView()?.showSnackbar(text, duration = Snackbar.LENGTH_INDEFINITE)
-        getSnackManager()?.showProgressSnackbar(text, SnackProgressBarManager.LENGTH_INDEFINITE)
+        getSnackManager()?.showProgressSnackbar(text, 5000)
     }
 
     private fun dismissSnack() {
@@ -448,7 +448,7 @@ class ServersFactory {
         fun start(
                 context: Context,
                 url: String,
-                chapter: AnimeObject.WebInfo.AnimeChapter,
+                chapter: ChapterWID,
                 isStream: Boolean = false,
                 addQueue: Boolean = false,
                 serversInterface: ServersInterface
@@ -458,6 +458,56 @@ class ServersFactory {
                     INSTANCE = if (isStream)
                         ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
                     else {
+                        if (!FileAccessHelper.isStoragePermissionEnabledAsync()) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || PrefsUtil.downloadType == "1")
+                                FileAccessHelper.openTreeChooser(context)
+                            else
+                                Toaster.toastLong("¡Se necesita permiso de almacenamiento!")
+                            serversInterface.onFinish(false, false)
+                            return@launch
+                        }
+                        if (!MultipleDownloadManager.isSpaceAvailable(1)) {
+                            serversInterface.getView()?.showSnackbar("Sin espacio suficiente")
+                            serversInterface.onFinish(false, false)
+                            return@launch
+                        }
+                        ServersFactory(context, url, chapter, isStream, addQueue, serversInterface).also { doAsync { it.start() } }
+                    }
+                }
+            else {
+                serversInterface.onFinish(false, false)
+                Toaster.toast("Solo una petición a la vez")
+            }
+        }
+
+        fun start(
+            context: Context,
+            url: String,
+            anime: DirectoryAV1,
+            chapter: Chapter,
+            isStream: Boolean = false,
+            addQueue: Boolean = false,
+            serversInterface: ServersInterface
+        ) {
+            if (!isRunning())
+                GlobalScope.launch(Dispatchers.Main) {
+                    val chapter = ChapterWID(
+                        chapter.eid,
+                        chapter.number,
+                        anime.aid,
+                        anime.slug,
+                        anime.name
+                    )
+                    INSTANCE = if (isStream) {
+                        ServersFactory(
+                            context,
+                            url,
+                            chapter,
+                            isStream,
+                            addQueue,
+                            serversInterface
+                        ).also { doAsync { it.start() } }
+                    } else {
                         if (!FileAccessHelper.isStoragePermissionEnabledAsync()) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || PrefsUtil.downloadType == "1")
                                 FileAccessHelper.openTreeChooser(context)

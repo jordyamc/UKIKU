@@ -23,7 +23,7 @@ import knf.kuma.custom.AchievementUnlocked
 import knf.kuma.database.CacheDB
 import knf.kuma.database.EADB
 import knf.kuma.pojos.Achievement
-import knf.kuma.pojos.FavoriteObject
+import knf.kuma.pojos.av1.Genre
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -56,26 +56,26 @@ object AchievementManager {
             val list: List<Int> = it.map { achievement -> achievement.key.toInt() }
             unlock(list)
         })
-        CacheDB.INSTANCE.seenDAO().countLive.also { liveList.add(it) }.distinct.observeForever {
+        CacheDB.INSTANCE.recordAV1DAO().countLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(33, 39))
         }
-        CacheDB.INSTANCE.favsDAO().countLive.also { liveList.add(it) }.distinct.observeForever {
+        CacheDB.INSTANCE.favoriteAV1DAO().countLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(11, 1, 2, 3, 4, 5))
         }
-        CacheDB.INSTANCE.seeingDAO().countLive.also { liveList.add(it) }.distinct.observeForever {
+        CacheDB.INSTANCE.organizerDAO().countLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(16, 17, 18, 19))
         }
-        CacheDB.INSTANCE.seeingDAO().countCompletedLive.also { liveList.add(it) }.distinct.observeForever {
+        CacheDB.INSTANCE.organizerDAO().countCompletedLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(20, 21, 22, 23))
         }
-        CacheDB.INSTANCE.seeingDAO().countDroppedLive.also { liveList.add(it) }.distinct.observeForever {
+        CacheDB.INSTANCE.organizerDAO().countDroppedLive.also { liveList.add(it) }.distinct.observeForever {
             updateCount(it, listOf(24, 25, 26, 27))
         }
-        CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("363", "1706", "2950", "1182", "2479", "2478")).also { liveList.add(it) }.distinct.observeForever {
-            if (it == 6) unlock(listOf(38))
+        CacheDB.INSTANCE.organizerDAO().isAnimeCompletedLive(listOf(170, 379, 167)).also { liveList.add(it) }.distinct.observeForever {
+            if (it == 3) unlock(listOf(38))
         }
-        CacheDB.INSTANCE.seeingDAO().isAnimeCompleted(listOf("1487", "1488", "1019", "460", "1493", "1494")).also { liveList.add(it) }.distinct.observeForever {
-            if (it == 6) unlock(listOf(45))
+        CacheDB.INSTANCE.organizerDAO().isAnimeCompletedLive(listOf(1014, 1012, 1011, 1010, 1009, 1013, 1005)).also { liveList.add(it) }.distinct.observeForever {
+            if (it == 7) unlock(listOf(45))
         }
     }
 
@@ -308,12 +308,14 @@ object AchievementManager {
         incrementCount(1, listOf(44))
     }
 
-    fun onFavAdded(fav: FavoriteObject) {
+    fun onFavAdded(genres: List<Genre>) {
         doAsync {
-            if (CacheDB.INSTANCE.animeDAO().hasGenre(fav.aid, "Ecchi".like))
+            if (genres.find { it.slug == "ecchi" } != null) {
                 incrementCount(1, listOf(34))
-            if (CacheDB.INSTANCE.animeDAO().hasGenre(fav.aid, "Shounen".like))
+            }
+            if (genres.find { it.slug == "shounen" } != null) {
                 unlock(listOf(37))
+            }
         }
     }
 

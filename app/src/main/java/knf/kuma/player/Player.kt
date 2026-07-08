@@ -7,7 +7,6 @@ import android.content.Intent
 import android.media.AudioManager
 import android.net.Uri
 import android.support.v4.media.MediaDescriptionCompat
-import android.webkit.MimeTypeMap
 import androidx.media.AudioAttributesCompat
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -77,12 +76,6 @@ class PlayerHolder(
                             playerView.player = player
                         }
         )
-        /*disposable = Observable.interval(1, TimeUnit.SECONDS).map { audioFocusPlayer.currentPosition }
-                .subscribeOn(AndroidSchedulers.from(audioFocusPlayer.applicationLooper, false))
-                .subscribe {
-                    if (it > 0)
-                        lastPosition = it
-                }*/
     }
 
     private fun buildMediaSource(): List<MediaData> {
@@ -103,9 +96,11 @@ class PlayerHolder(
                 }
             } ?: setUserAgent(BypassUtil.userAgent)
         }
-        val factory = when(MimeTypeMap.getFileExtensionFromUrl(descriptor.mediaUri?.toString())) {
-            "m3u8" -> HlsMediaSource.Factory(httpFactory)
-            else -> ProgressiveMediaSource.Factory(httpFactory)
+        val url = descriptor.mediaUri?.toString()
+        val factory = if (url?.contains("m3u8") == true || url?.contains("master.") == true) {
+            HlsMediaSource.Factory(httpFactory)
+        } else {
+            ProgressiveMediaSource.Factory(httpFactory)
         }
         return MediaData(factory.createMediaSource(item))
     }

@@ -29,6 +29,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import kotlin.coroutines.cancellation.CancellationException
 
 @Keep
 class NewsItem {
@@ -97,12 +98,16 @@ class NewsDataSource(private val newsFactory: NewsFactory, val category: String,
                     else -> newsFactory.getNewsPage(category, page).execute()
                 }
             }
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 response.body()?.let {
                     if (page == 1)
                         onInit(false, null)
-                    return LoadResult.Page(it.newsList, null, if (it.newsList.size < 12 || category == "noticias/") null else page + 1)
-                } ?: run{
+                    return LoadResult.Page(
+                        it.newsList,
+                        null,
+                        if (it.newsList.size < 12 || category == "noticias/") null else page + 1
+                    )
+                } ?: run {
                     if (page == 1)
                         onInit(true, "Empty body")
                 }
@@ -111,6 +116,8 @@ class NewsDataSource(private val newsFactory: NewsFactory, val category: String,
             if (page == 1)
                 onInit(true, "$errorString")
             return LoadResult.Error(IllegalStateException())
+        } catch (e: CancellationException) {
+            return LoadResult.Error(e)
         }catch (e:Exception){
             if (page == 1) {
                 onInit(true, "${e.message}")

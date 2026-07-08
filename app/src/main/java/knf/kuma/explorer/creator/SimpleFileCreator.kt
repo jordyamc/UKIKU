@@ -9,9 +9,9 @@ class SimpleFileCreator(val base: File) : Creator {
 
     override fun exist(): Boolean = base.exists()
 
-    override fun createLinksList(): List<String> {
+    override fun createSlugList(): List<String> {
         return if (base.exists())
-            base.listFiles(FileFilter { it.isDirectory })?.map { "https://www3.animeflv.net/anime/${it.name}" } ?: emptyList()
+            base.listFiles(FileFilter { it.isDirectory })?.map { it.name } ?: emptyList()
         else
             emptyList()
     }
@@ -22,14 +22,15 @@ class SimpleFileCreator(val base: File) : Creator {
             val files = base.listFiles(FileFilter { it.isDirectory })
             if (files != null) {
                 var progress = 0
-                for (animeObject in CacheDB.INSTANCE.animeDAO().getAllByFile(files.map { it.name }.toMutableList()))
+                CacheDB.INSTANCE.directoryDAO().findAllBySlug(files.mapNotNull { it.name }).forEach {
                     try {
                         progress++
                         progressCallback(progress, files.size)
-                        list.add(ExplorerObject(animeObject))
+                        list.add(ExplorerObject(it))
                     } catch (e: IllegalStateException) {
                         e.printStackTrace()
                     }
+                }
             }
             list
         } else

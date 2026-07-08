@@ -20,7 +20,7 @@ class TVMultiSelectionFragment : GuidedStepSupportFragment(){
     override fun onCreateActions(actions: MutableList<GuidedAction>, savedInstanceState: Bundle?) {
         actions.apply {
             add(GuidedAction.Builder(context).id(0).title("Subtitulado").build())
-            add(GuidedAction.Builder(context).id(1).title("Latino").build())
+            add(GuidedAction.Builder(context).id(1).title("Doblado").build())
         }
     }
 

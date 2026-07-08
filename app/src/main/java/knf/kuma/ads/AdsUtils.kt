@@ -14,7 +14,7 @@ import knf.kuma.commons.noCrashLet
 import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.FavoriteObject
-import knf.kuma.pojos.RecentObject
+import knf.kuma.pojos.av1.BaseRecentAV1
 import org.nield.kotlinstatistics.weightedCoinFlip
 
 enum class AdsType {
@@ -119,17 +119,10 @@ object AdsUtils {
     }
 }
 
-fun MutableList<RecentObject>.implAdsRecent() {
+fun MutableList<BaseRecentAV1>.implAdsRecent() {
     if (AdsUtils.isRemoteAdsEnabled && AdsUtils.isRemoteBannerEnabled && PrefsUtil.isAdsEnabled)
         noCrash {
-            diceOf({ implAdsRecentBrains() }) {
-                if (AdsUtils.isAdmobEnabled)
-                    put({ implAdsRecentMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
-                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                    put({ implAdsRecentBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-                if (AdsUtils.isApplovinEnabled)
-                    put({ implAdsRecentLovin() }, AdsUtils.remoteConfigs.getDouble("applovin_percent"))
-            }()
+            implAdsRecentLovin()
         }
 }
 

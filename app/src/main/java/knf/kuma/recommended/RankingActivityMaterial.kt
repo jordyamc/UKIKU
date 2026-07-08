@@ -45,7 +45,7 @@ class RankingActivityMaterial : GenericActivity() {
         with(binding.recycler) {
             layoutManager = VariantLinearLayoutManager(this@RankingActivityMaterial)
             lifecycleScope.launch(Dispatchers.Main){
-                adapter = RankingAdapterMaterial(withContext(Dispatchers.IO) { CacheDB.INSTANCE.genresDAO().ranking })
+                adapter = RankingAdapterMaterial(withContext(Dispatchers.IO) { CacheDB.INSTANCE.genreRecordDAO().ranking })
             }
         }
         setResult(1234)
@@ -65,7 +65,7 @@ class RankingActivityMaterial : GenericActivity() {
                     positiveButton(text = "continuar") {
                         setResult(4321)
                         doAsync {
-                            CacheDB.INSTANCE.genresDAO().reset()
+                            CacheDB.INSTANCE.genreRecordDAO().reset()
                             syncData { genres() }
                         }
                         finish()
@@ -79,7 +79,7 @@ class RankingActivityMaterial : GenericActivity() {
     companion object {
 
         fun open(activity: Activity) {
-            activity.startActivityForResult(Intent(activity, RankingActivityMaterial::class.java), 46897)
+            activity.startActivity(Intent(activity, RankingActivityMaterial::class.java))
         }
     }
 }

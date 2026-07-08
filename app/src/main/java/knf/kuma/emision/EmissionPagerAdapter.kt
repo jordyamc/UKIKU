@@ -3,17 +3,16 @@ package knf.kuma.emision
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import knf.kuma.pojos.AnimeObject
 
 class EmissionPagerAdapter internal constructor(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
-    private val monday = EmissionFragment[AnimeObject.Day.MONDAY]
-    private val tuesday = EmissionFragment[AnimeObject.Day.TUESDAY]
-    private val wednesday = EmissionFragment[AnimeObject.Day.WEDNESDAY]
-    private val thursday = EmissionFragment[AnimeObject.Day.THURSDAY]
-    private val friday = EmissionFragment[AnimeObject.Day.FRIDAY]
-    private val saturday = EmissionFragment[AnimeObject.Day.SATURDAY]
-    private val sunday = EmissionFragment[AnimeObject.Day.SUNDAY]
+    private val monday = EmissionFragment[1]
+    private val tuesday = EmissionFragment[2]
+    private val wednesday = EmissionFragment[3]
+    private val thursday = EmissionFragment[4]
+    private val friday = EmissionFragment[5]
+    private val saturday = EmissionFragment[6]
+    private val sunday = EmissionFragment[7]
 
     override fun getCount(): Int {
         return 7
@@ -43,25 +42,5 @@ class EmissionPagerAdapter internal constructor(fm: FragmentManager) : FragmentP
             6 -> sunday
             else -> monday
         }
-    }
-
-    fun updateChanges() {
-        monday.updateChanges()
-        tuesday.updateChanges()
-        wednesday.updateChanges()
-        thursday.updateChanges()
-        friday.updateChanges()
-        saturday.updateChanges()
-        sunday.updateChanges()
-    }
-
-    fun reloadPages() {
-        monday.reloadList()
-        tuesday.reloadList()
-        wednesday.reloadList()
-        thursday.reloadList()
-        friday.reloadList()
-        saturday.reloadList()
-        sunday.reloadList()
     }
 }

@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import knf.kuma.animeinfo.ktx.ExtensionsKt;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.BaseConverter;
-import knf.kuma.recents.RecentModel;
 import knf.kuma.videoservers.Headers;
 
 @Entity
@@ -25,6 +24,8 @@ public class DownloadObject {
     public static final int PENDING = -1;
     @Ignore
     public static final int DOWNLOADING = 0;
+    @Ignore
+    public static final int CANCELLED = 5;
     @Ignore
     public static final int COMPLETED = 4;
     @PrimaryKey(autoGenerate = true)
@@ -74,7 +75,7 @@ public class DownloadObject {
     public DownloadObject(String eid, String file, String name, String chapter, boolean addQueue) {
         this.eid = eid;
         this.file = file;
-        this.name = PatternUtil.INSTANCE.fromHtml(name);
+        this.name = name;
         this.addQueue = addQueue;
         this.chapter = chapter;
         this.did = "0";
@@ -87,16 +88,6 @@ public class DownloadObject {
         this.time = System.currentTimeMillis();
         this.canResume = false;
         this.state = PENDING;
-    }
-
-    @NonNull
-    public static DownloadObject fromRecent(RecentObject object) {
-        return new DownloadObject(object.eid, object.getFileName(), PatternUtil.INSTANCE.fromHtml(object.name), object.chapter, false);
-    }
-
-    @NonNull
-    public static DownloadObject fromRecentModel(RecentModel object) {
-        return new DownloadObject(object.extras.getEid(), object.extras.getFileName(), PatternUtil.INSTANCE.fromHtml(object.name), object.chapter, false);
     }
 
     @NonNull

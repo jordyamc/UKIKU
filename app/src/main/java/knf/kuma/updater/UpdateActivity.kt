@@ -22,6 +22,7 @@ import knf.kuma.custom.GenericActivity
 import knf.kuma.databinding.ActivityUpdaterBinding
 import knf.kuma.download.DownloadManagerCentral
 import java.io.File
+import androidx.core.net.toUri
 
 class UpdateActivity : GenericActivity() {
 
@@ -96,18 +97,11 @@ class UpdateActivity : GenericActivity() {
 
     private fun install() {
         DownloadManagerCentral.pauseAll()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "${applicationContext.packageName}.fileprovider", update))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
-                .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, packageName)
-            startActivity(intent)
-        } else {
-            val intent = Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(Uri.fromFile(update), "application/vnd.android.package-archive")
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            startActivity(intent)
-        }
+        val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, FileProvider.getUriForFile(this, "${applicationContext.packageName}.fileprovider", update))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false)
+            .putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, packageName)
+        startActivity(intent)
     }
 
     private fun setDownProgress(p: Int) {
@@ -185,9 +179,9 @@ class UpdateActivity : GenericActivity() {
     private fun onShowAlternativeDownload() {
         MaterialDialog(this).safeShow {
             title(text = "¿Error al actualizar?")
-            message(text = "Puedes descargar la actualizacion desde la pagina web oficial!")
+            message(text = "Puedes descargar la actualización desde la pagina web oficial!")
             positiveButton(text = "Descargar") {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.app")))
+                startActivity(Intent(Intent.ACTION_VIEW, "https://ukiku.app".toUri()))
             }
         }
     }

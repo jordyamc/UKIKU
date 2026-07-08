@@ -1,34 +1,26 @@
 package knf.kuma.database.dao
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import knf.kuma.pojos.RecordObject
 
 @Dao
 interface RecordsDAO {
-    @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
-    val all: DataSource.Factory<Int, RecordObject>
-
-    @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
-    val allLive: LiveData<MutableList<RecordObject>>
-
+    @get:Query("SELECT count(*) FROM recordobject")
+    val count: Int
     @get:Query("SELECT * FROM recordobject ORDER BY date DESC")
     val allRaw: MutableList<RecordObject>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(recordObject: RecordObject)
+    @get:Query("SELECT aid FROM recordobject GROUP BY aid")
+    val allAid: List<String>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addAll(list: List<RecordObject>)
+    @Query("SELECT * FROM recordobject WHERE aid=:aid")
+    fun findByAid(aid: String): List<RecordObject>
+
+    @Query("DELETE FROM recordobject WHERE aid = :aid")
+    fun deleteAllAid(aid: String): Int
 
     @Delete
     fun delete(recordObject: RecordObject)
-
-    @Query("DELETE FROM recordobject")
-    fun clear()
 }

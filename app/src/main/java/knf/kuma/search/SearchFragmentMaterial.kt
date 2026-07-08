@@ -24,9 +24,12 @@ import knf.kuma.commons.isFullMode
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.showSnackbar
 import knf.kuma.commons.verifyManager
+import knf.kuma.directory.DirectoryAV1PageAdapter
+import knf.kuma.pojos.av1.Genre
 import knf.kuma.recommended.RankType
 import knf.kuma.recommended.RecommendHelper
 import knf.kuma.retrofit.Repository
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
 
@@ -37,33 +40,13 @@ class SearchFragmentMaterial : BottomFragment() {
     private lateinit var errorView: View
 
     private val model: SearchViewModel by activityViewModels()
-    private var searchAdapter: SearchAdapterMaterial? = null
-    private var searchAdapterCompact: SearchAdapterCompactMaterial? = null
+    private val searchAdapter: DirectoryAV1PageAdapter by lazy { DirectoryAV1PageAdapter(requireActivity()) }
     private var manager: RecyclerView.LayoutManager? = null
-
-    private var isFirst = true
     private var waitingScroll = false
 
     private var query: String = ""
 
-    private var selected: MutableList<String> = ArrayList()
-
-    private val needOnlineSearch: Boolean by lazy { !PrefsUtil.isDirectoryFinished && Network.isConnected && isFullMode && !PrefsUtil.isFamilyFriendly }
-
-    private val genresString: String
-        get() {
-            return if (selected.size == 0) {
-                ""
-            } else {
-                RecommendHelper.registerAll(selected, RankType.SEARCH)
-                val builder = StringBuilder("%")
-                for (genre in selected) {
-                    builder.append(genre)
-                            .append("%")
-                }
-                builder.toString()
-            }
-        }
+    private var selected: List<Genre> = emptyList()
 
     private val fabIcon: Int
         @DrawableRes
@@ -86,25 +69,16 @@ class SearchFragmentMaterial : BottomFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         noCrash {
-            if (!needOnlineSearch)
-                model.setSearch(query, "") { animeObjects ->
-                    searchAdapter?.submitData(animeObjects)
-                    if (isFirst) {
-                        progressBar.visibility = View.GONE
-                        isFirst = false
-                        recyclerView.scheduleLayoutAnimation()
-                    }
-                }
             model.queryListener.observe(viewLifecycleOwner, {
                 setSearch(it?.trim() ?: "")
             })
-            searchAdapter?.addLoadStateListener {
+            searchAdapter.addLoadStateListener {
                 if (it.append != LoadState.Loading) {
                     progressBar.visibility = View.GONE
                 }
                 if (it.append.endOfPaginationReached) {
                     errorView.visibility =
-                        if (searchAdapter?.itemCount == 0) View.VISIBLE else View.GONE
+                        if (searchAdapter.itemCount == 0) View.VISIBLE else View.GONE
                 }
             }
         }
@@ -141,105 +115,43 @@ class SearchFragmentMaterial : BottomFragment() {
             }
         })
         manager = recyclerView.layoutManager
-        if (needOnlineSearch) {
-            searchAdapterCompact = SearchAdapterCompactMaterial(this)
-            lifecycleScope.launch {
-                Repository().getSearchCompact("") {
-                    if (it) {
-                        errorView.visibility = if (it) View.VISIBLE else View.GONE
-                    }
-                    if (isFirst) {
-                        progressBar.visibility = View.GONE
-                        isFirst = false
-                        recyclerView.scheduleLayoutAnimation()
-                    }
-                }.collect {
-                    searchAdapterCompact?.submitData(it)
-                }
-            }
-            searchAdapterCompact?.registerAdapterDataObserver(object :
-                RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                    if (toPosition == 0 && waitingScroll) {
-                        manager?.smoothScrollToPosition(recyclerView, null, 0)
-                        waitingScroll = false
-                    }
-                }
-            })
-            recyclerView.adapter = searchAdapterCompact
-        } else {
-            searchAdapter = SearchAdapterMaterial(this)
-            searchAdapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                    if (toPosition == 0 && waitingScroll) {
-                        manager?.smoothScrollToPosition(recyclerView, null, 0)
-                        fab.extend()
-                        waitingScroll = false
-                    }
-                }
-
-                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    if (positionStart == 0 && waitingScroll) {
-                        manager?.smoothScrollToPosition(recyclerView, null, 0)
-                        fab.extend()
-                        waitingScroll = false
-                    }
-                }
-            })
-            recyclerView.adapter = searchAdapter
-        }
-        fab.setOnClickListener {
-            if (needOnlineSearch){
-                recyclerView.showSnackbar("Se necesita el directorio completo para busquedas por genero", Snackbar.LENGTH_LONG,Snackbar.ANIMATION_MODE_SLIDE)
-            }else{
-                val dialog = GenresDialog()
-                dialog.init(SearchFragment.genres, selected, object : GenresDialog.MultiChoiceListener {
-                    override fun onOkay(selected: MutableList<String>) {
-                        this@SearchFragmentMaterial.selected = selected
-                        setFabIcon()
-                        setSearchNormal(query)
-                    }
-                })
-                dialog.show(childFragmentManager, "genres")
-            }
-        }
-    }
-
-    private fun setSearch(q: String) = if (needOnlineSearch) setSearchCompact(q) else setSearchNormal(q)
-
-    private fun setSearchCompact(q: String) {
-        waitingScroll = true
-        this.query = q.trim()
         lifecycleScope.launch {
-            Repository().getSearchCompact(q) {
-                errorView.visibility = if (it) View.VISIBLE else View.GONE
-                if (isFirst) {
-                    progressBar.visibility = View.GONE
-                    isFirst = false
-                    recyclerView.scheduleLayoutAnimation()
-                }
-            }.collect {
-                searchAdapterCompact?.submitData(it)
+            model.pagingDataFlow.collectLatest {
+                searchAdapter.submitData(it)
             }
         }
+        searchAdapter.registerAdapterDataObserver(object :
+            RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                if (toPosition == 0 && waitingScroll) {
+                    manager?.smoothScrollToPosition(recyclerView, null, 0)
+                    waitingScroll = false
+                }
+            }
+        })
+        recyclerView.adapter = searchAdapter
+        fab.setOnClickListener {
+            val dialog = GenresDialog()
+            dialog.init(genres, selected, object : GenresDialog.MultiChoiceListener {
+                override fun onOkay(selected: List<Genre>) {
+                    this@SearchFragmentMaterial.selected = selected
+                    setFabIcon()
+                    setSearchNormal(query)
+                }
+            })
+            dialog.show(childFragmentManager, "genres")
+        }
     }
+
+    fun setSearch(q: String) = setSearchNormal(q)
 
     private fun setSearchNormal(q: String) {
-        Log.e("Search", "On search: ")
+        Log.e("Search", "On search: $q")
         waitingScroll = true
         this.query = q.trim()
-        model.setSearch(q.trim(), genresString) { animeObjects ->
-            searchAdapter?.submitData(animeObjects)
-            //errorView.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
-            if (isFirst) {
-                progressBar.visibility = View.GONE
-                isFirst = false
-                recyclerView.scheduleLayoutAnimation()
-            }
-        }
+        RecommendHelper.registerAll(selected, RankType.SEARCH)
+        model.setSearch(q.trim(), selected.map { it.slug })
     }
 
     private fun setFabIcon() {
@@ -259,48 +171,53 @@ class SearchFragmentMaterial : BottomFragment() {
             return fragment
         }
 
-        val genres: MutableList<String>
+        val genres: MutableList<Genre>
             get() = mutableListOf(
-                    "Acción",
-                    "Artes Marciales",
-                    "Aventuras",
-                    "Carreras",
-                    "Ciencia Ficción",
-                    "Comedia",
-                    "Demencia",
-                    "Demonios",
-                    "Deportes",
-                    "Drama",
-                    "Ecchi",
-                    "Escolares",
-                    "Espacial",
-                    "Fantasía",
-                    "Harem",
-                    "Historico",
-                    "Infantil",
-                    "Josei",
-                    "Juegos",
-                    "Magia",
-                    "Mecha",
-                    "Militar",
-                    "Misterio",
-                    "Música",
-                    "Parodia",
-                    "Policía",
-                    "Psicológico",
-                    "Recuentos de la vida",
-                    "Romance",
-                    "Samurai",
-                    "Seinen",
-                    "Shoujo",
-                    "Shounen",
-                    "Sin Generos",
-                    "Sobrenatural",
-                    "Superpoderes",
-                    "Suspenso",
-                    "Terror",
-                    "Vampiros",
-                    "Yaoi",
-                    "Yuri")
+                Genre("Acción", "accion"),
+                Genre("Antropomórfico", "antropomorfico"),
+                Genre("Artes Marciales", "artes-marciales"),
+                Genre("Aventura", "aventura"),
+                Genre("Carreras", "carreras"),
+                Genre("Ciencia Ficción", "ciencia-ficcion"),
+                Genre("Comedia", "comedia"),
+                Genre("Deportes", "deportes"),
+                Genre("Detectives", "detectives"),
+                Genre("Drama", "drama"),
+                Genre("Ecchi", "ecchi"),
+                Genre("Elenco Adulto", "elenco-adulto"),
+                Genre("Escolares", "escolares"),
+                Genre("Espacial", "espacial"),
+                Genre("Fantasía", "fantasia"),
+                Genre("Gore", "gore"),
+                Genre("Gourmet", "gourmet"),
+                Genre("Harem", "harem"),
+                Genre("Histórico", "historico"),
+                Genre("Idols (Hombre)", "idols-hombre"),
+                Genre("Idols (Mujer)", "idols-mujer"),
+                Genre("Infantil", "infantil"),
+                Genre("Isekai", "isekai"),
+                Genre("Josei", "josei"),
+                Genre("Juegos Estrategia", "juegos-estrategia"),
+                Genre("Mahou Shoujo", "mahou-shoujo"),
+                Genre("Mecha", "mecha"),
+                Genre("Militar", "militar"),
+                Genre("Misterio", "misterio"),
+                Genre("Mitología", "mitologia"),
+                Genre("Música", "musica"),
+                Genre("Parodia", "parodia"),
+                Genre("Psicológico", "psicologico"),
+                Genre("Recuentos de la Vida", "recuentos-de-la-vida"),
+                Genre("Romance", "romance"),
+                Genre("Samurai", "samurai"),
+                Genre("Seinen", "seinen"),
+                Genre("Shoujo", "shoujo"),
+                Genre("Shoujo Ai", "shoujo-ai"),
+                Genre("Shounen", "shounen"),
+                Genre("Shounen Ai", "shounen-ai"),
+                Genre("Sobrenatural", "sobrenatural"),
+                Genre("Suspenso", "suspenso"),
+                Genre("Terror", "terror"),
+                Genre("Vampiros", "vampiros"),
+            )
     }
 }

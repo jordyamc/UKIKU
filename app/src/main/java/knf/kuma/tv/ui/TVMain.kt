@@ -15,13 +15,11 @@ import knf.kuma.commons.doOnUI
 import knf.kuma.commons.isTV
 import knf.kuma.commons.toast
 import knf.kuma.custom.GenericActivity
-import knf.kuma.directory.DirManager
-import knf.kuma.directory.DirectoryService
-import knf.kuma.jobscheduler.DirUpdateWork
+import knf.kuma.database.CacheDB
 import knf.kuma.jobscheduler.RecentsWork
+import knf.kuma.migration.MigrationActivity
 import knf.kuma.recents.RecentsNotReceiver
 import knf.kuma.retrofit.Repository
-import knf.kuma.tv.ChannelUtils
 import knf.kuma.tv.TVBaseActivity
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.uagen.randomUA
@@ -29,8 +27,11 @@ import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.jvm.java
+import kotlin.time.Duration.Companion.seconds
 
 class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecker.CheckListener {
 
@@ -45,20 +46,40 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
             startActivity(Intent(this, DesignUtils.mainClass))
             return
         }
+        if (!PrefsUtil.isAV1DataMigrated) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val favs = CacheDB.INSTANCE.favsDAO().count
+                val history = CacheDB.INSTANCE.recordsDAO().count
+                val seen = CacheDB.INSTANCE.seenDAO().count
+                val seeing = CacheDB.INSTANCE.seeingDAO().countAll
+                if (favs > 0 || history > 0 || seen > 0 || seeing > 0) {
+                    startActivity(Intent(this@TVMain, MigrationActivity::class.java).apply {
+                        putExtra("is_tv", true)
+                    })
+                    finish()
+                } else {
+                    PrefsUtil.isAV1DataMigrated = true
+                    withContext(Dispatchers.Main) {
+                        start(savedInstanceState)
+                    }
+                }
+            }
+        } else {
+            start(savedInstanceState)
+        }
+    }
+
+    private fun start(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
             fragment = TVMainFragment.get().also {
                 addFragment(it)
             }
-            DirUpdateWork.schedule(this)
             RecentsNotReceiver.removeAll(this)
             UpdateChecker.check(this, this)
             RecentsWork.schedule(this@TVMain)
             lifecycleScope.launch(Dispatchers.IO) {
-                DirManager.checkPreDir()
-                DirectoryService.run(this@TVMain)
                 installSecurityProvider()
             }
-            ChannelUtils.createIfNeeded(this)
         }
     }
 
@@ -140,19 +161,12 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                 BypassUtil.saveCookies(this, it.getStringExtra("cookies") ?: "null")
             } ?: false
             GenericActivity.bypassLive.postValue(Pair(first = cookiesUpdated, second = false))
-            Repository().reloadAllRecents()
+            Repository().reloadRecents()
             BypassUtil.isLoading = false
             PicassoSingle.clear()
             RecentsWork.run()
             doOnUI {
                 "Bypass actualizado".toast()
-            }
-            ChannelUtils.initChannelIfNeeded(this)
-            if (!PrefsUtil.isDirectoryFinished) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    DirManager.checkPreDir()
-                    DirectoryService.run(this@TVMain)
-                }
             }
         } else
             try {

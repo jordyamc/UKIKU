@@ -132,8 +132,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/anime/"
+                    android:host="animeav1.com"
+                    android:pathPrefix="/media/"
                     android:scheme="https" />
             </intent-filter>
         </activity>
@@ -270,12 +270,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/ver/"
+                    android:host="animeav1.com"
+                    android:pathPrefix="/media/"
                     android:scheme="https" />
                 <data
-                    android:host="animeflv.net"
-                    android:pathPrefix="/ver/"
+                    android:host="animeav1.com"
+                    android:pathPrefix="/media/"
                     android:scheme="http" />
             </intent-filter>
         </activity>

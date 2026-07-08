@@ -22,8 +22,6 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.isFullMode
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.toastLong
-import knf.kuma.directory.DirManager
-import knf.kuma.directory.DirectoryService
 import knf.kuma.retrofit.Repository
 import knf.kuma.uagen.randomUA
 import knf.kuma.videoservers.FileActions
@@ -121,16 +119,10 @@ open class GenericActivity : AppCompatActivity() {
             } ?: false
             BypassUtil.isLoading = false
             bypassLive.value = Pair(first = cookiesUpdated, second = false)
-            Repository().reloadAllRecents()
+            Repository().reloadRecents()
             onBypassUpdated()
             PicassoSingle.clear()
             //ThumbsDownloader.start(this)
-            if (!PrefsUtil.isDirectoryFinished) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    DirManager.checkPreDir()
-                    DirectoryService.run(this@GenericActivity)
-                }
-            }
         }
     }
 

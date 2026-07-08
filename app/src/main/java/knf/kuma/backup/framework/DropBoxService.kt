@@ -1,12 +1,15 @@
 package knf.kuma.backup.framework
 
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.dropbox.core.DbxRequestConfig
 import com.dropbox.core.android.Auth
 import com.dropbox.core.http.OkHttp3Requestor
 import com.dropbox.core.v2.DbxClientV2
 import com.dropbox.core.v2.files.WriteMode
-import com.google.gson.Gson
+import com.google.gson.ExclusionStrategy
+import com.google.gson.FieldAttributes
+import com.google.gson.GsonBuilder
 import knf.kuma.App
 import knf.kuma.backup.Backups
 import knf.kuma.backup.objects.BackupObject
@@ -18,10 +21,23 @@ import java.nio.charset.StandardCharsets
 
 class DropBoxService : BackupService() {
 
+    private val gson = GsonBuilder()
+        .setExclusionStrategies(object : ExclusionStrategy {
+            override fun shouldSkipField(f: FieldAttributes): Boolean {
+                return f.name.endsWith("\$delegate")
+            }
+            override fun shouldSkipClass(clazz: Class<*>?): Boolean = false
+        }).create()
+
     private var client: DbxClientV2? = null
     private var dbToken: String?
         get() = PreferenceManager.getDefaultSharedPreferences(App.context).getString("db_token", null)
-        set(value) = PreferenceManager.getDefaultSharedPreferences(App.context).edit().putString("db_token", value).apply()
+        set(value) = PreferenceManager.getDefaultSharedPreferences(App.context).edit {
+            putString(
+                "db_token",
+                value
+            )
+        }
 
     override fun start() {
         if (dbToken != null)
@@ -54,10 +70,10 @@ class DropBoxService : BackupService() {
         return if (isLoggedIn)
             try {
                 val list = client?.files()?.searchV2(id)?.matches ?: arrayListOf()
-                if (list.size > 0) {
+                if (list.isNotEmpty()) {
                     val downloader = client?.files()?.download("/$id")
                     val backupObject = InputStreamReader(downloader?.inputStream).use {
-                        Gson().fromJson<Any>(it.readText().checkResponse(id), Backups.getType(id)) as BackupObject<*>
+                        gson.fromJson<Any>(it.readText().checkResponse(id), Backups.getType(id)) as BackupObject<*>
                     }
                     downloader?.close()
                     backupObject
@@ -76,7 +92,7 @@ class DropBoxService : BackupService() {
                 client?.files()?.uploadBuilder("/$id")
                         ?.withMute(true)
                         ?.withMode(WriteMode.OVERWRITE)
-                        ?.uploadAndFinish(ByteArrayInputStream(Gson().toJson(backupObject, Backups.getType(id)).checkData(id).toByteArray(StandardCharsets.UTF_8)))
+                        ?.uploadAndFinish(ByteArrayInputStream(gson.toJson(backupObject, Backups.getType(id)).checkData(id).toByteArray(StandardCharsets.UTF_8)))
                 Backups.saveLastBackup()
                 backupObject
             } catch (e: Exception) {

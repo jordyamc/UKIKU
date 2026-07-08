@@ -6,50 +6,61 @@ import android.graphics.Color
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.preference.PreferenceManager
+import androidx.slice.builders.list
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.animeinfo.ActivityAnimeMaterial
 import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
+import knf.kuma.pojos.av1.DirectoryAV1Calendar
+import knf.kuma.pojos.av1.DirectoryAV1Min
+import kotlinx.coroutines.runBlocking
 import xdroid.toaster.Toaster
 import java.util.Calendar
 
 class WEListProvider internal constructor(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
-    private val items = mutableListOf<WEListItem>()
+    private var items = listOf<DirectoryAV1Calendar>()
 
     private val actualDayCode: Int
         get() {
             return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-                Calendar.MONDAY -> 2
-                Calendar.TUESDAY -> 3
-                Calendar.WEDNESDAY -> 4
-                Calendar.THURSDAY -> 5
-                Calendar.FRIDAY -> 6
-                Calendar.SATURDAY -> 7
-                Calendar.SUNDAY -> 1
-                else -> 2
+                Calendar.MONDAY -> 1
+                Calendar.TUESDAY -> 2
+                Calendar.WEDNESDAY -> 3
+                Calendar.THURSDAY -> 4
+                Calendar.FRIDAY -> 5
+                Calendar.SATURDAY -> 6
+                Calendar.SUNDAY -> 7
+                else -> 1
             }
         }
-
-    private fun populateListItem() {
-        items.clear()
-        val list = CacheDB.INSTANCE.animeDAO().getByDayDirect(actualDayCode, getBlacklist(context))
-        for (obj in list) {
-            items.add(WEListItem(obj.key, obj.link, obj.name, obj.aid, PatternUtil.getCover(obj.aid)))
-        }
-    }
 
     override fun onCreate() {
 
     }
 
     override fun onDataSetChanged() {
-        populateListItem()
+        runBlocking {
+            val data = JsExtractor.processLink("https://animeav1.com/horario")
+            if (data != null) {
+                val blacklist = CacheDB.INSTANCE.calendarBlacklistDAO().allAids
+                val allList = mutableListOf<DirectoryAV1Calendar>()
+                for (i in 0 until data.length()) {
+                    allList.add(DirectoryAV1Calendar.fromJson(data.getJSONObject(i)))
+                }
+                if (allList.isNotEmpty()) {
+                    items = allList.filter { it.day == actualDayCode && it.aid !in blacklist }.sortedBy { it.name }
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
-
+        items = emptyList()
     }
 
     override fun getCount(): Int {
@@ -57,29 +68,31 @@ class WEListProvider internal constructor(private val context: Context) : Remote
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        val remoteView = RemoteViews(
-                context.packageName, R.layout.item_widget_list)
+        val remoteView = RemoteViews(context.packageName, R.layout.item_widget_list)
         try {
             val listItem = items[position]
-            remoteView.setTextViewText(R.id.heading, listItem.title)
-            remoteView.setTextColor(R.id.heading, getColor(true))
-            val clickIntent = if (DesignUtils.isFlat)
-                ActivityAnimeMaterial.getSimpleIntent(context, listItem)
-            else
-                ActivityAnime.getSimpleIntent(context, listItem)
-            remoteView.setOnClickPendingIntent(
-                R.id.linear,
-                PendingIntent.getActivity(
-                    context,
-                    324 + position,
-                    clickIntent,
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-            )
+            remoteView.setTextViewText(R.id.item_heading, listItem.name)
+            try {
+                val bitmap = Glide.with(context).asBitmap().load(listItem.imageUrl)
+                    .apply(
+                        RequestOptions()
+                            .override(120, 120)
+                            .centerCrop()
+                            .error(R.drawable.ic_faq)
+                    )
+                    .submit()
+                    .get()
+                remoteView.setImageViewBitmap(R.id.item_image, bitmap)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                remoteView.setImageViewResource(R.id.item_image, R.drawable.ic_faq)
+            }
+            remoteView.setTextColor(R.id.item_heading, getColor(true))
+            val clickIntent = ActivityAnime.getSimpleIntent(listItem)
+            remoteView.setOnClickFillInIntent(R.id.linear, clickIntent)
             remoteView.setInt(R.id.linear, "setBackgroundColor", getColor(false))
         } catch (e: Exception) {
             e.printStackTrace()
-            Toaster.toastLong("Error: ${e.message}")
         }
 
         return remoteView
@@ -111,21 +124,12 @@ class WEListProvider internal constructor(private val context: Context) : Remote
     }
 
     override fun getItemId(position: Int): Long {
-        return try {
-            items[position].key.toLong()
-        } catch (e: Exception) {
-            0
-        }
+        return items[position].aid.toLong()
 
     }
 
     override fun hasStableIds(): Boolean {
         return true
-    }
-
-    private fun getBlacklist(context: Context): Set<String> {
-        return PreferenceManager.getDefaultSharedPreferences(context).getStringSet("emision_blacklist", LinkedHashSet())
-                ?: setOf()
     }
 
 }

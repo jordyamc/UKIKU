@@ -15,13 +15,15 @@ import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.safeContext
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.FragmentHomeBinding
 import knf.kuma.pojos.QueueObject
-import knf.kuma.pojos.RecentObject
 import knf.kuma.pojos.SeeingObject
+import knf.kuma.pojos.av1.DirectoryAV1Min
+import knf.kuma.pojos.av1.RecentAV1
 import knf.kuma.queue.QueueActivity
 import knf.kuma.recents.RecentsActivity
 import knf.kuma.recents.RecentsViewModel
@@ -30,14 +32,15 @@ import knf.kuma.recommended.RecommendHelper
 import knf.kuma.seeing.SeeingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
+import kotlin.math.max
 
 class HomeFragment : BottomFragment() {
 
     private val viewModel: RecentsViewModel by viewModels()
-    private var lastNew: String = "0"
+    private var lastNew: Int = 0
     private lateinit var binding: FragmentHomeBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,17 +53,17 @@ class HomeFragment : BottomFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.listNew.apply {
-            setAdapter(RecentsAdapter(this@HomeFragment, isLarge = false, showSeen = false))
+            setAdapter(RecentsAV1Adapter(this@HomeFragment, false, isLarge = false, showSeen = false))
             setViewAllOnClick {
-                PrefsUtil.recentLastHiddenNew = lastNew.toInt()
+                PrefsUtil.recentLastHiddenNew = lastNew
                 binding.listNew.hide()
             }
         }
         binding.listFavUpdated.apply {
-            setAdapter(RecentsAdapter(this@HomeFragment, true))
+            setAdapter(RecentsAV1Adapter(this@HomeFragment, false))
             setViewAllClass(RecentsActivity::class.java)
         }
-        binding.listBestEmission.setAdapter(DirAdapter(this))
+        binding.listBestEmission.setAdapter(DirAdapter(this, false))
         binding.listPending.apply {
             setAdapter(QueueAdapter(this@HomeFragment))
             setViewAllClass(QueueActivity::class.java)
@@ -70,10 +73,10 @@ class HomeFragment : BottomFragment() {
             setViewAllClass(SeeingActivity::class.java)
         }
         binding.listRecommended.apply {
-            setAdapter(RecommendedAdapter(activity))
+            setAdapter(RecommendedAdapter(requireActivity()))
             setViewAllClass(RecommendActivity::class.java)
         }
-        binding.listRecommendedStaff.setAdapter(SearchAdapter(this))
+        binding.listRecommendedStaff.setAdapter(SearchAdapterMaterial(this))
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
             binding.adContainer.implBanner(AdsType.RECENT_BANNER, true)
@@ -81,12 +84,12 @@ class HomeFragment : BottomFragment() {
             binding.adContainer2.implBanner(AdsType.RECENT_BANNER2, true)
         }
         lifecycleScope.launch {
-            viewModel.dbFlow.collect { list ->
+            viewModel.dbFlowData.collect { list ->
                 if (list.isNotEmpty()) {
                     doAsync {
                         try {
-                            binding.listNew.updateList(filterNew(list.filter { it.isNew }))
-                            val favFiltered = list.filter { CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt()) }
+                            binding.listNew.updateList(filterNew(list.filter { it.state.isNew }))
+                            val favFiltered = list.filter { CacheDB.INSTANCE.favoriteAV1DAO().isFav(it.aid) }
                             if (favFiltered.isEmpty()) {
                                 binding.listFavUpdated.apply {
                                     setSubheader("Ultimos actualizados")
@@ -109,50 +112,38 @@ class HomeFragment : BottomFragment() {
                 }
             }
         }
-        lifecycleScope.launch {
-            CacheDB.INSTANCE.favsDAO().countFlow.drop(1).collect {
-                doAsync {
-                    val cached = CacheDB.INSTANCE.recentsDAO().all
-                    val filtered = cached.filter {
-                        CacheDB.INSTANCE.favsDAO().isFav(it.aid.toInt())
-                    }
-                    binding.listFavUpdated.apply {
-                        if (filtered.isEmpty()) {
-                            setSubheader("Ultimos actualizados")
-                            setError("Recientes no actualizados")
-                            updateList(cached)
-                        } else {
-                            setSubheader("Favoritos actualizados")
-                            updateList(filtered)
-                        }
-                    }
-                }
+        viewLifecycleOwner.lifecycleScope.launch {
+            CacheDB.INSTANCE.favoriteAV1DAO().countFlow.collectLatest {
+                binding.listRecommended.updateList(RecommendHelper.createRecommended())
             }
         }
-        CacheDB.INSTANCE.favsDAO().countLive.observe(viewLifecycleOwner, Observer {
-            RecommendHelper.createRecommended {
-                binding.listRecommended.updateList(it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val result = JsExtractor.processLink("https://animeav1.com/catalogo?category=tv-anime&status=emision&order=score") ?: return@launch
+            val items = mutableListOf<DirectoryAV1Min>()
+            for (i in 0 until max(result.length(), 10)) {
+                val item = result.getJSONObject(i)
+                items.add(DirectoryAV1Min.fromJson(item))
             }
-        })
-        CacheDB.INSTANCE.animeDAO().emissionVotesLimited.observe(viewLifecycleOwner, Observer {
-            binding.listBestEmission.updateList(it)
-        })
+            binding.listBestEmission.updateList(items)
+        }
         CacheDB.INSTANCE.queueDAO().all.observe(viewLifecycleOwner, Observer {
             doAsync { binding.listPending.updateList(QueueObject.takeOne(it)) }
         })
-        CacheDB.INSTANCE.seeingDAO().getAllWState(SeeingObject.STATE_CONSIDERING, SeeingObject.STATE_PAUSED).observe(viewLifecycleOwner, Observer {
-            binding.listWaiting.updateList(it)
-        })
-        StaffRecommendations.createList {
-            binding.listRecommendedStaff.updateList(it)
+        lifecycleScope.launch {
+            CacheDB.INSTANCE.organizerDAO().getAllWState(SeeingObject.STATE_CONSIDERING, SeeingObject.STATE_PAUSED).collectLatest {
+                binding.listWaiting.updateList(it)
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.listRecommendedStaff.updateList(StaffRecommendations.createList())
         }
         viewModel.reload()
     }
 
-    private fun filterNew(list: List<RecentObject>): List<RecentObject> {
+    private fun filterNew(list: List<RecentAV1>): List<RecentAV1> {
         if (list.isNotEmpty()) {
             lastNew = list[0].aid
-            if (list[0].aid.toInt() == PrefsUtil.recentLastHiddenNew)
+            if (list[0].aid == PrefsUtil.recentLastHiddenNew)
                 return emptyList()
         }
         return list

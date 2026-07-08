@@ -2,14 +2,9 @@ package knf.kuma.tv.anime
 
 import android.view.ViewGroup
 import androidx.leanback.widget.Presenter
-import knf.kuma.database.CacheDB
-import knf.kuma.pojos.RecentObject
+import knf.kuma.pojos.av1.RecentAV1
 import knf.kuma.tv.cards.RecentsCardView
 import knf.kuma.tv.details.TVAnimesDetails
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RecentsPresenter : Presenter() {
 
@@ -18,13 +13,10 @@ class RecentsPresenter : Presenter() {
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
-        if (item == null) return
-        (viewHolder.view as RecentsCardView).bind(item as RecentObject)
+        if (item == null || item !is RecentAV1) return
+        (viewHolder.view as RecentsCardView).bind(item)
         viewHolder.view.setOnLongClickListener { v ->
-            GlobalScope.launch(Dispatchers.Main){
-                val animeObject = withContext(Dispatchers.IO) { CacheDB.INSTANCE.animeDAO().getByAid(item.aid) }
-                animeObject?.let { TVAnimesDetails.start(v.context, it.link) }
-            }
+            TVAnimesDetails.start(v.context, item.animeUrl)
             true
         }
     }

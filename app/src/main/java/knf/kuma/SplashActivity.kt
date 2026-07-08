@@ -18,14 +18,19 @@ import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.custom.GenericActivity
+import knf.kuma.database.CacheDB
+import knf.kuma.migration.MigrationActivity
 import knf.kuma.tv.ui.TVMain
 import knf.tools.signatures.getSignatures
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.jvm.java
+import kotlin.time.Duration.Companion.seconds
 
 
 class SplashActivity : GenericActivity() {
@@ -35,34 +40,40 @@ class SplashActivity : GenericActivity() {
         AchievementManager.onAppStart()
         SubscriptionReceiver.check(intent)
         printSignatures()
+        route()
+    }
+
+    private fun route() {
         when {
+            !PrefsUtil.isAV1DataMigrated -> {
+                checkNeedMigration()
+            }
             resources.getBoolean(R.bool.isTv) -> {
                 startActivity(Intent(this, TVMain::class.java))
                 finish()
             }
-            /*!isFullMode && BuildConfig.BUILD_TYPE != "amazon" && !PrefsUtil.isPSWarned -> MaterialDialog(
-                this
-            ).safeShow {
-                title(text = "Aviso")
-                message(text = "Usted esta usando la version de Google Play, esta version tiene caracteristicas deshabilitadas, para una experiencia completa por favor use la version de la pagina oficial\nEscriba \"confirmar\" para continuar.")
-                input(hint = "Respuesta...", waitForPositiveButton = false) { _, text ->
-                    getActionButton(WhichButton.POSITIVE).isEnabled = text.toString()
-                        .lowercase(Locale.getDefault()) == "confirmar"
-                }
-                negativeButton(text = "Web") {
-                    noCrash {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ukiku.app")))
-                    }
-                }
-                positiveButton(text = "Continuar") {
-                    PrefsUtil.isPSWarned = true
-                    startApp()
-                }
-                cancelOnTouchOutside(false)
-            }*/
             else -> {
                 lifecycleScope.launch {
                     showGDPR { startApp() }
+                }
+            }
+        }
+    }
+
+    private fun checkNeedMigration() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val favs = CacheDB.INSTANCE.favsDAO().count
+            val history = CacheDB.INSTANCE.recordsDAO().count
+            val seen = CacheDB.INSTANCE.seenDAO().count
+            val seeing = CacheDB.INSTANCE.seeingDAO().countAll
+            if (favs > 0 || history > 0 || seen > 0 || seeing > 0) {
+                startActivity(Intent(this@SplashActivity, MigrationActivity::class.java))
+                finish()
+            } else {
+                PrefsUtil.isAV1DataMigrated = true
+                delay(1.seconds)
+                withContext(Dispatchers.Main) {
+                    route()
                 }
             }
         }

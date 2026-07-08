@@ -31,7 +31,8 @@ import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
-import knf.kuma.pojos.RecentObject
+import knf.kuma.pojos.av1.AdRecentAV1
+import knf.kuma.pojos.av1.BaseRecentAV1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -54,7 +55,7 @@ object AdsUtilsLovin {
     }
 }
 
-fun MutableList<RecentObject>.implAdsRecentLovin() {
+fun MutableList<BaseRecentAV1>.implAdsRecentLovin() {
     if (!PrefsUtil.isAdsEnabled || isEmpty()) return
     var adIndex = 0
     forEachReversedWithIndex { index, _ ->
@@ -69,10 +70,10 @@ fun MutableList<RecentObject>.implAdsRecentLovin() {
                     AdsUtilsMob.RECENT_BANNER
                 }
             }
-            add(index, AdRecentObject(adID))
+            add(index, AdRecentAV1(adID))
         }
     }
-    add(0, AdRecentObject(AdsUtilsMob.RECENT_BANNER))
+    add(0, AdRecentAV1(AdsUtilsMob.RECENT_BANNER))
 }
 
 fun MutableList<FavoriteObject>.implAdsFavoriteLovin() {

@@ -31,8 +31,7 @@ import knf.kuma.custom.SeenAnimeOverlay
 import knf.kuma.database.CacheDB
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.pojos.ExplorerObject
-import knf.kuma.pojos.RecordObject
-import knf.kuma.pojos.SeenObject
+import knf.kuma.pojos.av1.Record
 import knf.kuma.queue.QueueManager
 import knf.kuma.videoservers.ServersFactory
 import kotlinx.coroutines.Dispatchers
@@ -47,8 +46,7 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
     private val context: Context? = fragment.context
 
     private val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
-    private val chaptersDAO = CacheDB.INSTANCE.seenDAO()
-    private val recordsDAO = CacheDB.INSTANCE.recordsDAO()
+    private val recordsDAO = CacheDB.INSTANCE.recordAV1DAO()
 
     private val layout: Int
         @LayoutRes
@@ -71,13 +69,15 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
         holder.time.text = chapObject.obj.time
         holder.cardView.setOnClickListener {
             fragment.lifecycleScope.launch(Dispatchers.IO) {
-                chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject.obj))
-                recordsDAO.add(RecordObject.fromDownloaded(chapObject.obj))
+                try {
+                    recordsDAO.addChapter(Record.fromDownloaded(chapObject.obj))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
             chapObject.isSeen = true
             syncData {
                 history()
-                seen()
             }
             holder.seenOverlay.setSeen(true, true)
             if (CastUtil.get().connected()) {
@@ -89,18 +89,19 @@ class ExplorerChapsAdapterMaterial internal constructor(val fragment: Fragment, 
         holder.cardView.setOnLongClickListener {
             if (!chapObject.isSeen) {
                 fragment.lifecycleScope.launch(Dispatchers.IO){
-                    chaptersDAO.addChapter(SeenObject.fromDownloaded(chapObject.obj))
+                    recordsDAO.addChapter(Record.fromDownloaded(chapObject.obj))
+                    syncData { history() }
                 }
                 chapObject.isSeen = true
                 holder.seenOverlay.setSeen(true, true)
             } else {
                 fragment.lifecycleScope.launch(Dispatchers.IO) {
-                    chaptersDAO.deleteChapter(chapObject.obj.aid, chapterNum)
+                    recordsDAO.delete(Record.fromDownloaded(chapObject.obj))
+                    syncData { history() }
                 }
                 chapObject.isSeen = false
                 holder.seenOverlay.setSeen(false, true)
             }
-            syncData { seen() }
             true
         }
         holder.action.setOnClickListener {

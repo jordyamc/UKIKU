@@ -10,7 +10,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Entity;
@@ -35,6 +34,7 @@ import knf.kuma.download.FileAccessHelper;
 import knf.kuma.emision.AnimeSubObject;
 import knf.kuma.explorer.ThumbServer;
 import knf.kuma.explorer.creator.SubFile;
+import knf.kuma.pojos.av1.DirectoryAV1;
 import xdroid.toaster.Toaster;
 
 @Entity
@@ -97,8 +97,24 @@ public class ExplorerObject {
         this.name = object.getName();
         this.aid = object.getAid();
         file_list = FileAccessHelper.INSTANCE.getDownloadsDirectoryFiles(object.getFileName());
-        if (file_list.size() == 0) {
+        if (file_list.isEmpty()) {
             throw new IllegalStateException("Directory empty: " + object.getFinalName());
+        }
+        this.count = file_list.size();
+        this.path = "";
+    }
+
+    @Ignore
+    public ExplorerObject(DirectoryAV1 object) throws IllegalStateException {
+        this.key = object.getAid();
+        this.img = object.getImageUrl();
+        this.link = object.getAnimeUrl();
+        this.fileName = object.getSlug();
+        this.name = object.getName();
+        this.aid = String.valueOf(object.getAid());
+        file_list = FileAccessHelper.INSTANCE.getDownloadsDirectoryFiles(object.getSlug());
+        if (file_list.isEmpty()) {
+            throw new IllegalStateException("Directory empty: " + object.getName());
         }
         this.count = file_list.size();
         this.path = "";
@@ -113,7 +129,7 @@ public class ExplorerObject {
                 for (SubFile chap : file_list)
                     try {
                         String file_name = chap.getName();
-                        chapters.add(new FileDownObj(context, name, aid, PatternUtil.INSTANCE.getNumFromFile(file_name), file_name, chap));
+                        chapters.add(new FileDownObj(context, name, aid, PatternUtil.INSTANCE.getNumFromFile(file_name), file_name, fileName, chap));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -143,10 +159,6 @@ public class ExplorerObject {
         return liveData;
     }
 
-    public void clearLiveData(LifecycleOwner owner) {
-        liveData.removeObservers(owner);
-    }
-
     public static class FileDownObj implements Comparable<FileDownObj> {
         public String title;
         public String chapter;
@@ -156,19 +168,21 @@ public class ExplorerObject {
         public String time;
         public String fileName;
         public String link;
+        public String slug;
         public File thumb;
 
-        FileDownObj(Context context, String title, String aid, String chapter, String name, SubFile file) {
+        FileDownObj(Context context, String title, String aid, String chapter, String name, String slug, SubFile file) {
             this.title = title;
             this.chapter = chapter;
             this.aid = aid;
             this.eid = PatternUtil.INSTANCE.getEidFromFile(name);
             this.fileName = name;
             this.file = file;
+            this.slug = slug;
             this.time = getTime(context, file);
             if (time.equals(""))
                 throw new IllegalStateException("No duration");
-            this.link = "https://www3.animeflv.net/ver/" + fileName.substring(fileName.indexOf("$") + 1).replace(".mp4", "");
+            this.link = "https://animeav1.com/media/" + slug;
         }
 
         public static String[] getTitles(List<FileDownObj> list) {
@@ -193,7 +207,7 @@ public class ExplorerObject {
 
         public String getChapPreviewLink() {
             if (thumb == null)
-                return "https://www3.animeflv.net/uploads/animes/screenshots/" + aid + "/" + chapter + "/th_2.jpg";
+                return "https://cdn.animeav1.com/screenshots/" + aid + "/" + chapter + ".jpg";
             else
                 return ThumbServer.INSTANCE.loadFile(thumb);
         }

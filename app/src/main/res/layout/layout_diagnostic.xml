@@ -53,7 +53,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Animeflv.net"
+                            android:text="Animeav1.com"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                             android:textColor="?colorAccent"/>
 

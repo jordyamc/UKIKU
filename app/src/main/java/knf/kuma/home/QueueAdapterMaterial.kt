@@ -17,7 +17,7 @@ import knf.kuma.commons.optionalBind
 import knf.kuma.commons.transform
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.QueueObject
-import knf.kuma.queue.QueueActivityMaterial
+import knf.kuma.queue.QueueActivity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.util.Locale
@@ -47,7 +47,7 @@ class QueueAdapterMaterial(val fragment: HomeFragmentMaterial) : UpdateableAdapt
         }
         holder.root.onClick {
             try {
-                QueueActivityMaterial.open(fragment.context, item.chapter.aid)
+                QueueActivity.open(fragment.context, item.chapter.aid)
             } catch (e: Exception) {
                 doAsync {
                     CacheDB.INSTANCE.queueDAO().allRaw.forEach {

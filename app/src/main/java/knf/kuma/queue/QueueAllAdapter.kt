@@ -9,9 +9,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
-import knf.kuma.commons.PatternUtil
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.notSameContent
 import knf.kuma.pojos.QueueObject
 import org.jetbrains.anko.find
@@ -23,13 +22,13 @@ internal class QueueAllAdapter internal constructor(activity: Activity) : Recycl
     var list: MutableList<QueueObject> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimeHolder {
-        return AnimeHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_queue_full, parent, false))
+        return AnimeHolder(LayoutInflater.from(parent.context).inflate(if (DesignUtils.isFlat) R.layout.item_queue_full_material else R.layout.item_queue_full, parent, false))
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: AnimeHolder, position: Int) {
         val queueObject = list[position]
-        holder.title.text = PatternUtil.fromHtml(queueObject.chapter.name)
+        holder.title.text = queueObject.chapter.name
         holder.chapter.text = queueObject.chapter.number
         holder.state.setImageResource(if (queueObject.isFile) R.drawable.ic_queue_file else R.drawable.ic_web)
         holder.dragView.setOnTouchListener { _, event ->
@@ -87,7 +86,7 @@ internal class QueueAllAdapter internal constructor(activity: Activity) : Recycl
     }
 
     internal class AnimeHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: MaterialCardView = itemView.find(R.id.card)
+        val cardView: View = itemView.find(R.id.card)
         val dragView: ImageView = itemView.find(R.id.drag)
         val title: TextView = itemView.find(R.id.title)
         val chapter: TextView = itemView.find(R.id.chapter)

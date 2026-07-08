@@ -10,7 +10,11 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -19,17 +23,20 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.ads.showRandomInterstitial
-import knf.kuma.backup.firestore.syncData
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
-import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showSnackbar
 import knf.kuma.commons.toast
 import knf.kuma.commons.verifyManager
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 
@@ -38,15 +45,15 @@ class RecordActivity : GenericActivity() {
     val recyclerView: RecyclerView by bind(R.id.recycler)
     val progressBar: ProgressBar by bind(R.id.progress)
     val error: View by bind(R.id.error)
-    private var adapter: RecordsAdapter? = null
+    private val adapter: RecordsAdapter by lazy { RecordsAdapter(this) }
     private var isFirst = true
 
     private val layout: Int
         @LayoutRes
         get() = if (PrefsUtil.layType == "0") {
-            R.layout.recycler_records
+            if (DesignUtils.isFlat) R.layout.recycler_records_material else R.layout.recycler_records
         } else {
-            R.layout.recycler_records_grid
+            if (DesignUtils.isFlat) R.layout.recycler_records_grid_material else R.layout.recycler_records_grid
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,34 +66,48 @@ class RecordActivity : GenericActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
-        adapter = RecordsAdapter(this)
         recyclerView.verifyManager()
         recyclerView.adapter = adapter
-        val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        val touchHelper = ItemTouchHelper(object :
+            ItemTouchHelper.SimpleCallback(ItemTouchHelper.RIGHT, ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
                 return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                adapter?.remove(viewHolder.adapterPosition)
+                adapter.remove(viewHolder.bindingAdapterPosition)
                 recyclerView.showSnackbar("Elemento eliminado")
             }
         })
         touchHelper.attachToRecyclerView(recyclerView)
-        CacheDB.INSTANCE.recordsDAO().allLive.observe(this, Observer { recordObjects ->
-            adapter?.update(recordObjects)
-            if (isFirst) {
-                isFirst = false
-                recyclerView.scheduleLayoutAnimation()
-            } else
-                syncData { history() }
-            if (recordObjects.isEmpty())
-                error.visibility = View.VISIBLE
-            else
-                error.visibility = View.GONE
-            progressBar.visibility = View.GONE
-        })
-        showRandomInterstitial(this,PrefsUtil.fullAdsExtraProbability)
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest {
+                progressBar.isVisible = it.append is LoadState.Loading
+                if (it.append.endOfPaginationReached) {
+                    if (adapter.itemCount == 0)
+                        error.visibility = View.VISIBLE
+                    else
+                        error.visibility = View.GONE
+                }
+            }
+        }
+        lifecycleScope.launch {
+            Pager(
+                config = PagingConfig(20, enablePlaceholders = false),
+                pagingSourceFactory = { CacheDB.INSTANCE.recordAV1DAO().allPagedMaxOnly }
+            ).flow.collectLatest {
+                adapter.submitData(it)
+                if (isFirst) {
+                    isFirst = false
+                    recyclerView.scheduleLayoutAnimation()
+                }
+            }
+        }
+        showRandomInterstitial(this, PrefsUtil.fullAdsExtraProbability)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -99,12 +120,18 @@ class RecordActivity : GenericActivity() {
             R.id.action_clear ->
                 MaterialDialog(this@RecordActivity).safeShow {
                     message(text = "¿Limpiar el historial?")
-                    positiveButton(text = "Continuar") { doAsync { CacheDB.INSTANCE.recordsDAO().clear() } }
+                    positiveButton(text = "Continuar") {
+                        lifecycleScope.launch {
+                            CacheDB.INSTANCE.recordAV1DAO().clear()
+                        }
+                    }
                     negativeButton(text = "cancelar")
                 }
+
             R.id.action_status -> doAsync {
-                val count = CacheDB.INSTANCE.seenDAO().count
-                doOnUI { "$count episodios vistos".toast() }
+                lifecycleScope.launch {
+                    "${withContext(Dispatchers.IO) { CacheDB.INSTANCE.recordAV1DAO().count }} episodios vistos".toast()
+                }
             }
         }
         return super.onOptionsItemSelected(item)

@@ -1,46 +1,53 @@
 package knf.kuma.animeinfo
 
-import android.content.Context
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import knf.kuma.commons.doOnUIGlobal
-import knf.kuma.commons.jsoupCookies
-import knf.kuma.commons.noCrashLet
+import knf.kuma.commons.JsExtractor
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
-import knf.kuma.retrofit.Repository
+import knf.kuma.pojos.av1.DirectoryAV1
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.jetbrains.anko.doAsync
 
 class AnimeViewModel : ViewModel() {
-    private val repository = Repository()
-    val liveData: MutableLiveData<AnimeObject?> = MutableLiveData()
+    val infoFlow: MutableStateFlow<DirectoryAV1?> = MutableStateFlow(null)
 
-    fun init(context: Context, link: String?, persist: Boolean) {
-        link?.let {
-            if (it.contains("/ver/")) {
-                viewModelScope.launch {
-                    val nLink = withContext(Dispatchers.IO) { "https://www3.animeflv.net" + noCrashLet { jsoupCookies(it).get().select("a[href~=/anime/]").attr("href") } }
-                    repository.getAnime(nLink, persist, liveData)
+    fun init(link: String?, persist: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.e("Details", "On load $link")
+            val info = link?.let {
+                try {
+                    val data = JsExtractor.processLink(link)?.getJSONObject(0) ?: return@let null
+                    DirectoryAV1.fromJson(data)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
                 }
-            } else
-                repository.getAnime(link, persist, liveData)
+            }
+            if (info != null && persist) {
+                CacheDB.INSTANCE.directoryDAO().add(info)
+            }
+            infoFlow.value = info
         }
     }
 
-    fun init(aid: String?) {
-        doAsync {
-            aid?.let {
-                val animeObject = CacheDB.INSTANCE.animeDAO().getAnimeByAid(aid)
-                doOnUIGlobal { liveData.value = animeObject }
-            } ?: doOnUIGlobal { liveData.value = null }
+    fun init(aid: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.e("Details", "On load ID $aid")
+            if (aid < 0) {
+                infoFlow.value = null
+            } else {
+                val animeObject = CacheDB.INSTANCE.directoryDAO().findByAid(aid)
+                infoFlow.value = animeObject?.also {
+                    init(animeObject.animeUrl, true)
+                }
+            }
+
         }
     }
 
-    fun reload(context: Context, link: String?, persist: Boolean) {
-        init(context, link, persist)
+    fun reload(link: String?, persist: Boolean) {
+        init(link, persist)
     }
 }

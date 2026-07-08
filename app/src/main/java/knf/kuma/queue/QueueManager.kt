@@ -16,8 +16,10 @@ import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.ExplorerObject
 import knf.kuma.pojos.QueueObject
-import knf.kuma.pojos.RecordObject
-import knf.kuma.pojos.SeenObject
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.ChapterWID
+import knf.kuma.pojos.av1.DirectoryAV1
+import knf.kuma.pojos.av1.Record
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
@@ -31,9 +33,25 @@ object QueueManager {
         }
     }
 
-    fun add(uri: Uri, isFile: Boolean, chapter: AnimeObject.WebInfo.AnimeChapter?) {
+    fun add(uri: Uri, isFile: Boolean, chapter: ChapterWID?) {
         if (chapter == null) return
         doAsync {
+            CacheDB.INSTANCE.queueDAO().add(QueueObject(uri, isFile, chapter.asCompatChapter()))
+            syncData { queue() }
+            Toaster.toast("Episodio añadido a cola")
+        }
+    }
+
+    fun add(uri: Uri, isFile: Boolean, anime: DirectoryAV1, chapter: Chapter) {
+        doAsync {
+            val chapter = AnimeObject.WebInfo.AnimeChapter().apply {
+                this.key = chapter.eid
+                this.number = chapter.name
+                this.eid = chapter.eid.toString()
+                this.link = chapter.link(anime)
+                this.aid = anime.aid.toString()
+                this.fileWrapper = chapter.fileWrapper(anime)
+            }
             CacheDB.INSTANCE.queueDAO().add(QueueObject(uri, isFile, chapter))
             syncData { queue() }
             Toaster.toast("Episodio añadido a cola")
@@ -45,6 +63,24 @@ object QueueManager {
         doAsync {
             val file = wrapper.file() ?: wrapper.let { it.reset(); it.file() }
             ?: dobject?.let { FileWrapper.fromFileName(it.file) } ?: return@doAsync
+            CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(file), isFile, chapter))
+            syncData { queue() }
+            Toaster.toast("Episodio añadido a cola")
+        }
+    }
+
+    fun add(wrapper: FileWrapper<*>, dobject: DownloadObject?, isFile: Boolean, anime: DirectoryAV1, chapter: Chapter) {
+        doAsync {
+            val file = wrapper.file() ?: wrapper.let { it.reset(); it.file() }
+            ?: dobject?.let { FileWrapper.fromFileName(it.file) } ?: return@doAsync
+            val chapter = AnimeObject.WebInfo.AnimeChapter().apply {
+                this.key = chapter.eid
+                this.number = chapter.name
+                this.eid = chapter.eid.toString()
+                this.link = chapter.link(anime)
+                this.aid = anime.aid.toString()
+                this.fileWrapper = chapter.fileWrapper(anime)
+            }
             CacheDB.INSTANCE.queueDAO().add(QueueObject(Uri.fromFile(file), isFile, chapter))
             syncData { queue() }
             Toaster.toast("Episodio añadido a cola")
@@ -195,22 +231,20 @@ object QueueManager {
     private fun markAllSeen(list: List<QueueObject>) {
         if (list.isNotEmpty())
             doAsync {
-                CacheDB.INSTANCE.seenDAO().addAll(list.map { SeenObject.fromChapter(it.chapter) })
-                CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(list.last().chapter))
+                CacheDB.INSTANCE.recordAV1DAO().addAll(list.map { Record.fromLegacyChapter(it.chapter) })
                 syncData {
                     history()
-                    seen()
                 }
             }
     }
 
     suspend fun markAllSeenDownloaded(list: List<ExplorerObject.FileDownObj>) {
         if (list.isNotEmpty()){
-            CacheDB.INSTANCE.seenDAO().addAll(list.map { SeenObject.fromDownloaded(it) })
-            CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromChapter(AnimeObject.WebInfo.AnimeChapter.fromDownloaded(list.last())))
+            withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.recordAV1DAO().addAll(list.map { Record.fromDownloaded(it) })
+            }
             syncData {
                 history()
-                seen()
             }
         }
     }

@@ -4,39 +4,34 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.distinct
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.RecyclerEmisionBinding
-import knf.kuma.pojos.AnimeObject
-import knf.kuma.search.SearchObject
-import knf.kuma.search.forFav
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class EmissionFragment : Fragment(), RemoveListener {
-    private var adapter: EmissionAdapter? = null
+class EmissionFragment : Fragment() {
+    private val adapter: EmissionAdapter by lazy { EmissionAdapter(this) }
     private var isFirst = true
 
     private lateinit var binding: RecyclerEmisionBinding
-    private lateinit var liveData: LiveData<MutableList<SearchObject>>
-    private lateinit var observer: Observer<MutableList<SearchObject>>
 
-    private val blacklist: Set<String>
-        get() = if (PrefsUtil.emissionShowHidden)
-            LinkedHashSet()
-        else
-            PrefsUtil.emissionBlacklist
+    private val vm: EmissionViewModel by activityViewModels<EmissionViewModel>()
+    private val day by lazy { arguments?.getInt("day", 1) ?: 1 }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return LayoutInflater.from(context).inflate(R.layout.recycler_emision, container, false).also {
@@ -44,75 +39,44 @@ class EmissionFragment : Fragment(), RemoveListener {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
             binding.adContainer.implBanner(AdsType.EMISSION_BANNER, true)
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        adapter = EmissionAdapter(this)
         binding.recycler.verifyManager()
         binding.recycler.adapter = adapter
-        if (context != null)
-            observeList(Observer { animeObjects ->
-                lifecycleScope.launch(Dispatchers.Main){
+        viewLifecycleOwner.lifecycleScope.launch {
+            val map = vm.emissionFlow.first { it.isNotEmpty() }
+            PrefsUtil.emissionShowHiddenFlow().flatMapLatest { showHidden ->
+                CacheDB.INSTANCE.calendarBlacklistDAO().allAidsFlow.mapLatest { blacklist ->
+                    if (showHidden) {
+                        map[day]?.onEach { it.isHidden = it.aid in blacklist }
+                    } else {
+                        map[day]?.filter { it.aid !in blacklist }
+                    }
+                }
+            }.collectLatest {
+                if ( it!= null) {
                     binding.progress.visibility = View.GONE
-                    adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }, false) { smoothScroll() }
+                    adapter.update(it.onEach { it.isFavorite = CacheDB.INSTANCE.favoriteAV1DAO().isFavSuspend(it.aid) }, !isFirst)
                     if (isFirst) {
                         isFirst = false
                         binding.recycler.scheduleLayoutAnimation()
-                        //checkStates(animeObjects)
                     }
-                    binding.error.visibility = if (animeObjects.isEmpty()) View.VISIBLE else View.GONE
                 }
-            })
-    }
-
-    private fun observeList(obs: Observer<MutableList<SearchObject>>) {
-        if (::liveData.isInitialized && ::observer.isInitialized)
-            liveData.removeObserver(observer)
-        liveData = CacheDB.INSTANCE.animeDAO().getByDay(arguments?.getInt("day", 1)
-                ?: 1, blacklist).distinct
-        observer = obs
-        liveData.observe(viewLifecycleOwner, observer)
-    }
-
-    override fun onRemove(showError: Boolean) {
-        if (showError) lifecycleScope.launch(Dispatchers.Main) { binding.error.visibility = View.VISIBLE }
-    }
-
-    private fun smoothScroll() {
-        //recycler.layoutManager?.smoothScrollToPosition(recycler,null,0)
-    }
-
-    fun updateChanges() {
-        lifecycleScope.launch(Dispatchers.Main) { adapter?.notifyDataSetChanged() }
-    }
-
-    internal fun reloadList() {
-        if (context != null)
-            observeList { animeObjects ->
-                lifecycleScope.launch(Dispatchers.Main) {
-                    binding.error.visibility = View.GONE
-                    if (animeObjects != null && animeObjects.isNotEmpty())
-                        adapter?.update(withContext(Dispatchers.IO) { animeObjects.map { it.forFav() }.toMutableList() }) { smoothScroll() }
-                    else
-                        adapter?.update(ArrayList()) { smoothScroll() }
-                    if (animeObjects == null || animeObjects.isEmpty())
-                        binding.error.visibility = View.VISIBLE
-                }
+                binding.error.isVisible = it.isNullOrEmpty()
             }
+        }
     }
 
     companion object {
 
-        operator fun get(day: AnimeObject.Day): EmissionFragment {
+        operator fun get(day: Int): EmissionFragment {
             val bundle = Bundle()
-            bundle.putInt("day", day.value)
+            bundle.putInt("day", day)
             val fragment = EmissionFragment()
             fragment.arguments = bundle
             return fragment

@@ -10,6 +10,7 @@ import androidx.room.TypeConverters
 import androidx.room.Update
 import knf.kuma.database.BaseConverter
 import knf.kuma.pojos.QueueObject
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @TypeConverters(BaseConverter::class)
@@ -29,6 +30,9 @@ interface QueueDAO {
 
     @get:Query("SELECT count(*) FROM queueobject")
     val countLive: LiveData<Int>
+
+    @get:Query("SELECT count(*) FROM queueobject")
+    val countFlow: Flow<Int>
 
     @Query("SELECT count(*) FROM queueobject WHERE eid = :eid")
     fun isInQueue(eid: String): Boolean

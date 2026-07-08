@@ -8,10 +8,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
-import androidx.fragment.app.FragmentActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,10 +34,12 @@ import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.FavSection
 import knf.kuma.pojos.FavoriteObject
+import knf.kuma.pojos.av1.FavoriteAV1
+import knf.kuma.pojos.av1.FavoriteSectionAV1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
@@ -49,14 +49,12 @@ import xdroid.toaster.Toaster
 class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     lateinit var recyclerView: FastScrollRecyclerView
     private lateinit var errorLayout: LinearLayout
-    private var edited: FavoriteObject? = null
+    private var edited: FavoriteAV1? = null
     private var manager: RecyclerView.LayoutManager? = null
     private var adapter: FavsSectionAdapter? = null
     private var isFirst = true
 
     private val model: FavoriteViewModel by activityViewModels()
-    private lateinit var liveData: LiveData<MutableList<FavoriteObject>>
-    private lateinit var observer: Observer<MutableList<FavoriteObject>>
 
     private var count = 0
 
@@ -67,38 +65,6 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         } else {
             R.layout.recycler_favs_grid
         }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        CacheDB.INSTANCE.favsDAO().all.observe(viewLifecycleOwner, Observer { FavSectionHelper.reload() })
-        activity?.let {
-            observeList(it, Observer { favoriteObjects ->
-                if (favoriteObjects == null || favoriteObjects.isEmpty()) {
-                    errorLayout.visibility = View.VISIBLE
-                    adapter?.updateList(ArrayList())
-                } else if (PrefsUtil.showFavSections()) {
-                    errorLayout.visibility = View.GONE
-                    val container = FavSectionHelper.getInfoContainer(edited)
-                    if (container.needReload) {
-                        adapter?.updateList(favoriteObjects)
-                        if (isFirst) {
-                            isFirst = false
-                            recyclerView.scheduleLayoutAnimation()
-                        }
-                    } else
-                        adapter?.updatePosition(container)
-                } else {
-                    errorLayout.visibility = View.GONE
-                    adapter?.updateList(favoriteObjects)
-                    if (isFirst) {
-                        isFirst = false
-                        recyclerView.scheduleLayoutAnimation()
-                    }
-                }
-                edited = null
-            })
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
@@ -121,7 +87,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
             (manager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return try {
-                        if (FavSectionHelper.currentList[position].isSection)
+                        if (adapter?.list?.get(position) is FavoriteSectionAV1)
                             (manager as GridLayoutManager).spanCount
                         else
                             1
@@ -132,44 +98,22 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
             }
         }
         recyclerView.adapter = adapter
-        EAHelper.enter1("F")
-    }
-
-    private fun observeList(activity: FragmentActivity, obs: Observer<MutableList<FavoriteObject>>) {
-        adapter?.updateList(mutableListOf())
-        isFirst = true
-        if (::liveData.isInitialized && ::observer.isInitialized)
-            liveData.removeObserver(observer)
-        liveData = model.getData()
-        observer = obs
-        liveData.observe(viewLifecycleOwner, observer)
-    }
-
-    fun onChangeOrder() {
-        activity?.let {
-            observeList(it, Observer { favoriteObjects ->
-                if (favoriteObjects == null || favoriteObjects.isEmpty()) {
-                    adapter?.updateList(ArrayList())
-                    errorLayout.post { errorLayout.visibility = View.VISIBLE }
-                } else {
-                    adapter?.updateList(favoriteObjects)
-                    if (isFirst) {
-                        isFirst = false
-                        recyclerView.scheduleLayoutAnimation()
-                    }
+        viewLifecycleOwner.lifecycleScope.launch {
+            model.favoriteListFlow.collectLatest {
+                adapter?.updateList(it)
+                if (isFirst) {
+                    isFirst = false
+                    recyclerView.scheduleLayoutAnimation()
                 }
-            })
+                errorLayout.isVisible = it.isEmpty()
+            }
         }
-    }
-
-    fun showNewCategoryDialog(favoriteObject: FavoriteObject?) {
-        edited = favoriteObject
-        showNewCategoryDialog(favoriteObject == null, null)
+        EAHelper.enter1("F")
     }
 
     private fun showNewCategoryDialog(isEmpty: Boolean, name: String?) {
         lifecycleScope.launch(Dispatchers.Main) {
-            val categories = withContext(Dispatchers.IO) { FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories) }
+            val categories = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().categories }
             context?.let {
                 MaterialDialog(it).safeShow {
                     title(text = "${if (name == null) "Nueva" else "Renombrar"} categoría")
@@ -190,7 +134,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                                 launch(Dispatchers.IO) {
                                     edited?.let { favObj ->
                                         favObj.category = input
-                                        CacheDB.INSTANCE.favsDAO().addFav(favObj)
+                                        CacheDB.INSTANCE.favoriteAV1DAO().addFav(favObj)
                                         syncData { favs() }
                                         edited = null
                                     }
@@ -205,7 +149,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     fun showNewCategory(prefill: String? = null) {
         lifecycleScope.launch(Dispatchers.Main){
-            val categories = withContext(Dispatchers.IO) { FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories) }
+            val categories = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().categories.map { if (it == FavoriteAV1.CATEGORY_NONE) "Sin categoria" else it } }
             context?.let { ctx ->
                 MaterialDialog(ctx).safeShow {
                     title(text = "Nueva categoría")
@@ -223,7 +167,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             doAsync {
                                 edited?.let {
                                     it.category = input
-                                    CacheDB.INSTANCE.favsDAO().addFav(it)
+                                    CacheDB.INSTANCE.favoriteAV1DAO().addFav(it)
                                     syncData { favs() }
                                 }
                                 doOnUI {
@@ -239,7 +183,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     private fun showCategoryRename(name: String) {
         lifecycleScope.launch(Dispatchers.Main){
-            val categories = withContext(Dispatchers.IO) { FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories) }
+            val categories = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().categories.map { if (it == FavoriteAV1.CATEGORY_NONE) "Sin categoria" else it } }
             context?.let {
                 MaterialDialog(it).safeShow {
                     title(text = "Renombrar categoría")
@@ -255,11 +199,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                             showCategoryRename(name)
                         } else {
                             doAsync {
-                                val objects = CacheDB.INSTANCE.favsDAO().getAllInCategory(name)
-                                for (favoriteObject in objects) {
-                                    favoriteObject.category = input
-                                }
-                                CacheDB.INSTANCE.favsDAO().addAll(objects)
+                                CacheDB.INSTANCE.favoriteAV1DAO().renameCategory(name, input)
                                 syncData { favs() }
                             }
                         }
@@ -271,8 +211,8 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
 
     private fun showAddToCategory(needAnimes: Boolean, name: String) {
         lifecycleScope.launch(Dispatchers.Main) {
-            val fName = if (name == "Sin categoría") FavoriteObject.CATEGORY_NONE else name
-            val favoriteObjects = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().getNotInCategory(fName) }
+            val fName = if (name == "Sin categoría") FavoriteAV1.CATEGORY_NONE else name
+            val favoriteObjects = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().getNotInCategory(fName) }
             if (favoriteObjects.isEmpty()) {
                 if (needAnimes)
                     Toaster.toast("Necesitas favoritos para crear una categoría")
@@ -282,20 +222,20 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                 context?.let {
                     MaterialDialog(it).safeShow {
                         title(text = name)
-                        listItemsMultiChoice(items = FavoriteObject.getNames(favoriteObjects)) { _, indices, _ ->
+                        listItemsMultiChoice(items = favoriteObjects.map { it.name }) { _, indices, _ ->
                             if (needAnimes && indices.isEmpty()) {
                                 Toaster.toast("La nueva categoría necesita animes!")
                                 showAddToCategory(needAnimes, name)
                             } else {
                                 doAsync {
                                     edited = null
-                                    val list = ArrayList<FavoriteObject>()
+                                    val list = mutableListOf<FavoriteAV1>()
                                     for (i in indices) {
                                         val favoriteObject = favoriteObjects[i]
                                         favoriteObject.category = fName
                                         list.add(favoriteObject)
                                     }
-                                    CacheDB.INSTANCE.favsDAO().addAll(list)
+                                    CacheDB.INSTANCE.favoriteAV1DAO().addAll(list)
                                     syncData { favs() }
                                 }
                             }
@@ -315,11 +255,11 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                 message(text = "¿Desea eliminar esta categoría?")
                 positiveButton(text = "Eliminar") {
                     doAsync {
-                        val objects = CacheDB.INSTANCE.favsDAO().getAllInCategory(name)
+                        val objects = CacheDB.INSTANCE.favoriteAV1DAO().getAllInCategory(name)
                         for (favoriteObject in objects) {
-                            favoriteObject.category = FavoriteObject.CATEGORY_NONE
+                            favoriteObject.category = FavoriteAV1.CATEGORY_NONE
                         }
-                        CacheDB.INSTANCE.favsDAO().addAll(objects)
+                        CacheDB.INSTANCE.favoriteAV1DAO().addAll(objects)
                         syncData { favs() }
                     }
                 }
@@ -332,7 +272,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
     private fun showNewCategoryInit(isEdit: Boolean, name: String) {
         lifecycleScope.launch(Dispatchers.Main) {
             val fName = if (name == "Sin categoría") FavoriteObject.CATEGORY_NONE else name
-            val favoriteObjects = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().getNotInCategory(fName) }
+            val favoriteObjects = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().getNotInCategory(fName) }
             if (favoriteObjects.isEmpty()) {
                 Toaster.toast("Necesitas favoritos para crear una categoría")
             } else {
@@ -340,16 +280,16 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                 context?.let {
                     MaterialDialog(it).safeShow {
                         title(text = name)
-                        listItemsMultiChoice(items = FavoriteObject.getNames(favoriteObjects)) { _, indices, _ ->
+                        listItemsMultiChoice(items = favoriteObjects.map { it.name }) { _, indices, _ ->
                             edited = null
-                            val list = ArrayList<FavoriteObject>()
+                            val list = mutableListOf<FavoriteAV1>()
                             for (i in indices) {
                                 val favoriteObject = favoriteObjects[i]
                                 favoriteObject.category = fName
                                 list.add(favoriteObject)
                             }
                             doAsync {
-                                CacheDB.INSTANCE.favsDAO().addAll(list)
+                                CacheDB.INSTANCE.favoriteAV1DAO().addAll(list)
                                 syncData { favs() }
                             }
                         }
@@ -367,11 +307,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
                                         positiveButton(text = "continuar") {
                                             edited = null
                                             doAsync {
-                                                val objects = CacheDB.INSTANCE.favsDAO().getAllInCategory(fName)
-                                                for (favoriteObject in objects) {
-                                                    favoriteObject.category = FavoriteObject.CATEGORY_NONE
-                                                }
-                                                CacheDB.INSTANCE.favsDAO().addAll(objects)
+                                                CacheDB.INSTANCE.favoriteAV1DAO().renameCategory(fName, FavoriteAV1.CATEGORY_NONE)
                                                 syncData { favs() }
                                             }
                                         }
@@ -407,38 +343,38 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
         //showNewCategoryInit(true, category)
     }
 
-    override fun onSelect(favoriteObject: FavoriteObject) {
-        if (favoriteObject !is FavSection) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                val categories = withContext(Dispatchers.IO) { FavoriteObject.getCategories(CacheDB.INSTANCE.favsDAO().categories) }
-                if (categories.size <= 1) {
-                    edited = favoriteObject
-                    showNewCategory(null)
-                } else {
-                    context?.let { context ->
-                        MaterialDialog(context).safeShow {
-                            title(text = "Mover a...")
-                            listItemsSingleChoice(items = categories, initialSelection = categories.indexOf(favoriteObject.category)) { _, _, text ->
-                                doAsync {
-                                    if (text != favoriteObject.category) {
-                                        edited = favoriteObject.also {
-                                            it.category = if (text == "Sin categoría") "_NONE_" else text.toString()
-                                            CacheDB.INSTANCE.favsDAO().addFav(it)
-                                            syncData { favs() }
-                                        }
-                                    } else
-                                        Toaster.toast("Error al mover")
+    override fun onSelect(favoriteObject: FavoriteAV1) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val categories = withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.favoriteAV1DAO().categories
+                    .filter { it != favoriteObject.category }
+                    .sortedBy { it == FavoriteAV1.CATEGORY_NONE }
+                    .map { if (it == FavoriteAV1.CATEGORY_NONE) "Sin categoría" else it }
+            }
+            if (categories.isEmpty()) {
+                edited = favoriteObject
+                showNewCategory(null)
+            } else {
+                context?.let { context ->
+                    MaterialDialog(context).safeShow {
+                        title(text = "Mover a...")
+                        listItemsSingleChoice(items = categories, initialSelection = categories.indexOf(favoriteObject.category)) { _, _, text ->
+                            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                                if (text != favoriteObject.category) {
+                                    favoriteObject.category = if (text == "Sin categoría") "_NONE_" else text.toString()
+                                    CacheDB.INSTANCE.favoriteAV1DAO().addFav(favoriteObject)
+                                    syncData { favs() }
                                 }
                             }
-                            positiveButton(text = "mover")
-                            negativeButton(text = "nuevo") {
-                                edited = favoriteObject
-                                showNewCategory(null)
-                            }
+                        }
+                        positiveButton(text = "mover")
+                        negativeButton(text = "nuevo") {
+                            edited = favoriteObject
+                            showNewCategory(null)
                         }
                     }
-
                 }
+
             }
         }
     }
@@ -451,7 +387,7 @@ class FavoriteFragment : BottomFragment(), FavsSectionAdapter.OnMoveListener {
             if (count == 3) {
                 lifecycleScope.launch(Dispatchers.IO){
                     if (adapter != null)
-                        Toaster.toast("Tienes " + CacheDB.INSTANCE.favsDAO().count + " animes en favoritos")
+                        Toaster.toast("Tienes " + CacheDB.INSTANCE.favoriteAV1DAO().count + " animes en favoritos")
                     count = 0
                 }
             }

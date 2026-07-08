@@ -3,7 +3,6 @@ package knf.kuma.preferences
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,10 +18,6 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onCancel
-import com.afollestad.materialdialogs.input.getInputField
-import com.afollestad.materialdialogs.input.getInputLayout
-import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
@@ -37,12 +32,8 @@ import knf.kuma.commons.EAHelper
 import knf.kuma.commons.FileUtil
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.admFile
 import knf.kuma.commons.canGroupNotifications
-import knf.kuma.commons.decrypt
 import knf.kuma.commons.doOnUI
-import knf.kuma.commons.encryptOrThrow
-import knf.kuma.commons.ffFile
 import knf.kuma.commons.getPackage
 import knf.kuma.commons.isNull
 import knf.kuma.commons.noCrash
@@ -51,13 +42,9 @@ import knf.kuma.commons.safeDelete
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.PreferenceFragmentCompat
 import knf.kuma.database.CacheDB
-import knf.kuma.directory.DirManager
-import knf.kuma.directory.DirectoryService
-import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.download.DownloadManagerCentral
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.jobscheduler.BackUpWork
-import knf.kuma.jobscheduler.DirUpdateWork
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.pojos.AutoBackupObject
 import knf.kuma.widgets.emision.WEmisionProvider
@@ -66,7 +53,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.support.v4.toast
 import xdroid.toaster.Toaster
 import java.io.FileOutputStream
 
@@ -254,160 +240,17 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                     }
                     true
                 }
-                preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
-                    if (newValue == true) {
-                        activity?.let {
-                            MaterialDialog(it).safeShow {
-                                title(text = "Configurar contraseña")
-                                input { _, inputText ->
-                                    MaterialDialog(it).safeShow {
-                                        title(text = "Repetir contraseña")
-                                        input { _, input ->
-                                            if (input.toString() == inputText.toString())
-                                                doOnUI(onLog = {
-                                                    PrefsUtil.isFamilyFriendly = false
-                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
-                                                    toast("Error al encriptar")
-                                                }) {
-                                                    val encrypted = input.toString().encryptOrThrow()
-                                                    check(encrypted.decrypt() == input.toString())
-                                                    PrefsUtil.ffPass = encrypted
-                                                    val file = ffFile
-                                                    file.parentFile?.mkdirs()
-                                                    if (!file.exists())
-                                                        file.createNewFile()
-                                                    file.writeText(encrypted)
-                                                    doAsync { CacheDB.INSTANCE.animeDAO().nukeEcchi() }
-                                                }
-                                            else {
-                                                toast("Las contraseñas no coinciden")
-                                                PrefsUtil.isFamilyFriendly = false
-                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
-                                            }
-                                        }
-                                        getInputLayout().boxBackgroundColor = Color.TRANSPARENT
-                                        getInputField().setBackgroundColor(Color.TRANSPARENT)
-                                        onCancel {
-                                            PrefsUtil.isFamilyFriendly = false
-                                            preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
-                                        }
-                                    }
-                                }
-                                getInputLayout().boxBackgroundColor = Color.TRANSPARENT
-                                getInputField().setBackgroundColor(Color.TRANSPARENT)
-                                onCancel {
-                                    PrefsUtil.isFamilyFriendly = false
-                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = false
-                                }
-                            }
-                        }
-                    } else {
-                        activity?.let {
-                            MaterialDialog(it).safeShow {
-                                title(text = "Ingresa contraseña")
-                                input { _, input ->
-                                    doOnUI(onLog = {
-                                        PrefsUtil.isFamilyFriendly = true
-                                        preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
-                                        toast("Error al desencriptar")
-                                    }) {
-                                        val file = ffFile
-                                        if (file.exists() && !admFile.exists()) {
-                                            val text = file.readText()
-                                            val decrypt = text.decrypt()
-                                            if (decrypt == input.toString()) {
-                                                PrefsUtil.ffPass = ""
-                                                file.delete()
-                                                DirectoryUpdateService.run(context)
-                                            } else {
-                                                PrefsUtil.isFamilyFriendly = true
-                                                preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
-                                                Toaster.toast("Contraseña incorrecta")
-                                            }
-                                        } else if (admFile.exists()) {
-                                            PrefsUtil.ffPass = ""
-                                            file.delete()
-                                            DirectoryUpdateService.run(context)
-                                        } else {
-                                            if (PrefsUtil.ffPass != "") {
-                                                val decrypt = PrefsUtil.ffPass.decrypt()
-                                                if (decrypt == null || decrypt != input.toString()) {
-                                                    file.createNewFile()
-                                                    file.writeText(PrefsUtil.ffPass)
-                                                    PrefsUtil.isFamilyFriendly = true
-                                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
-                                                    Toaster.toast("Contraseña incorrecta")
-                                                } else {
-                                                    PrefsUtil.ffPass = ""
-                                                    DirectoryUpdateService.run(context)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                getInputLayout().boxBackgroundColor = Color.TRANSPARENT
-                                getInputField().setBackgroundColor(Color.TRANSPARENT)
-                                onCancel {
-                                    PrefsUtil.isFamilyFriendly = true
-                                    preferenceScreen.findPreference<SwitchPreference>("family_friendly_enabled")?.isChecked = true
-                                }
-                            }
-                        }
-                    }
-                    true
-                }
                 preferenceScreen.findPreference<Preference>("recents_time")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                     preferenceScreen.findPreference<Preference>("notify_favs")?.isEnabled = "0" != newValue
                     RecentsWork.reSchedule(newValue.toString().toInt() * 15)
-                    true
-                }
-                preferenceScreen.findPreference<Preference>("dir_update_time")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                    DirUpdateWork.reSchedule(newValue.toString().toInt() * 15)
                     true
                 }
                 preferenceScreen.findPreference<Preference>("security_blocking_firestore")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                     FirestoreManager.start()
                     true
                 }
-                preferenceScreen.findPreference<Preference>("dir_update")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                    try {
-                        if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
-                            DirectoryUpdateService.run(App.context)
-                        else if (DirectoryUpdateService.isRunning)
-                            Toaster.toast("Ya se esta actualizando")
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-
-                    false
-                }
                 if (!canGroupNotifications)
                     preferenceScreen.removePreference(preferenceScreen.findPreference("group_notifications")!!)
-                preferenceScreen.findPreference<Preference>("dir_destroy")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                    try {
-                        if (!DirectoryUpdateService.isRunning && !DirectoryService.isRunning)
-                            activity?.let { safe ->
-                                MaterialDialog(safe).safeShow {
-                                    message(text = "¿Desea recrear el directorio?")
-                                    positiveButton(text = "continuar") {
-                                        doAsync {
-                                            CacheDB.INSTANCE.animeDAO().nuke()
-                                            PrefsUtil.isDirectoryFinished = false
-                                            DirManager.checkPreDir()
-                                            DirectoryService.run(safeContext)
-                                        }
-                                    }
-                                    negativeButton(text = "cancelar")
-                                }
-                            }
-                        else if (DirectoryService.isRunning)
-                            Toaster.toast("Ya se esta creando")
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-
-                    false
-                }
                 when (EAHelper.phase) {
                     4 ->
                         preferenceScreen.findPreference<Preference>(keyThemeColor)?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
@@ -503,7 +346,7 @@ class ConfigurationFragment : PreferenceFragmentCompat() {
                 if (BuildConfig.DEBUG) {
                     preferenceScreen.findPreference<Preference>("reset_recents")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                         doAsync {
-                            CacheDB.INSTANCE.recentsDAO().clear()
+                            CacheDB.INSTANCE.recentAV1DAO().clear()
                             RecentsWork.run()
                         }
                         true

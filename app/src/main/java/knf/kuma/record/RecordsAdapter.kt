@@ -8,32 +8,30 @@ import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.PatternUtil
+import knf.kuma.backup.firestore.syncData
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.load
-import knf.kuma.commons.notSameContent
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.av1.Record
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import xdroid.toaster.Toaster
 
-class RecordsAdapter(private val activity: AppCompatActivity) : RecyclerView.Adapter<RecordsAdapter.RecordItem>() {
-    private var items: MutableList<RecordObject> = ArrayList()
+class RecordsAdapter(private val activity: AppCompatActivity) : PagingDataAdapter<Record, RecordsAdapter.RecordItem>(Record.DIFF) {
 
-    private val dao = CacheDB.INSTANCE.recordsDAO()
+    private val dao = CacheDB.INSTANCE.recordAV1DAO()
 
     private val layout: Int
         @LayoutRes
         get() = if (PrefsUtil.layType == "0") {
-            R.layout.item_record
+            if (DesignUtils.isFlat) R.layout.item_record_material else R.layout.item_record
         } else {
-            R.layout.item_record_grid
+            if (DesignUtils.isFlat) R.layout.item_record_grid_material else R.layout.item_record_grid
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordItem {
@@ -41,49 +39,26 @@ class RecordsAdapter(private val activity: AppCompatActivity) : RecyclerView.Ada
     }
 
     override fun onBindViewHolder(holder: RecordItem, position: Int) {
-        val item = items[position]
-        val animeObject = item.animeObject
-        animeObject?.let { holder.imageView.load(PatternUtil.getCover(animeObject.aid)) }
+        val item = getItem(position) ?: return
+        holder.imageView.load(item.imageUrl)
         holder.title.text = item.name
-        holder.chapter.text = getCardText(item)
+        holder.chapter.text = item.chapter
         holder.cardView.setOnClickListener {
-            if (item.animeObject != null)
-                ActivityAnime.open(activity, item, holder.imageView)
-            else
-                Toaster.toast("Error al abrir")
+            ActivityAnime.open(activity, item, holder.imageView)
         }
-    }
-
-    private fun getCardText(recordObject: RecordObject): String {
-        return if (!recordObject.chapter.startsWith("Episodio "))
-            "Episodio ${recordObject.chapter}"
-        else
-            recordObject.chapter
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
     }
 
     fun remove(position: Int) {
         activity.lifecycleScope.launch(Dispatchers.IO){
-            dao.delete(items[position])
-            items.removeAt(position)
-            launch(Dispatchers.Main) {
-                notifyItemRemoved(position)
+            getItem(position)?.let {
+                dao.delete(it)
             }
-        }
-    }
-
-    fun update(items: MutableList<RecordObject>) {
-        if (this.items notSameContent items) {
-            this.items = items
-            notifyDataSetChanged()
+            syncData { history() }
         }
     }
 
     class RecordItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cardView: MaterialCardView by itemView.bind(R.id.card)
+        val cardView: View by itemView.bind(R.id.card)
         val imageView: ImageView by itemView.bind(R.id.img)
         val title: TextView by itemView.bind(R.id.title)
         val chapter: TextView by itemView.bind(R.id.chapter)

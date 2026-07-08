@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.notificationManager
 import xdroid.toaster.Toaster
+import java.io.File
 import java.util.Locale
 
 class DownloadManager : Service() {
@@ -183,6 +184,7 @@ class DownloadManager : Service() {
                         if (downloadObject != null) {
                             errorNotification(downloadObject)
                             downloadDao.delete(downloadObject)
+                            File(download.file).delete()
                             fetch?.delete(download.id)
                             stopIfNeeded()
                         }
@@ -277,6 +279,7 @@ class DownloadManager : Service() {
 
         fun start(downloadObject: DownloadObject): Boolean {
             try {
+                Log.e("Download", "On start: ${downloadObject.file}")
                 val file = FileAccessHelper.getFileCreate(downloadObject.file)
                 file?.let {
                     val request = Request(downloadObject.link, file.absolutePath)

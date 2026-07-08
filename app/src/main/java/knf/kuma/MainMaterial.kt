@@ -1,6 +1,5 @@
 package knf.kuma
 
-import androidx.activity.addCallback
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
@@ -14,17 +13,18 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -35,14 +35,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import knf.kuma.achievements.AchievementActivityMaterial
 import knf.kuma.ads.AdsUtils
 import knf.kuma.backup.BackUpActivity
 import knf.kuma.backup.Backups
-import knf.kuma.backup.MigrationActivity
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.changelog.ChangelogActivityMaterial
@@ -51,6 +47,7 @@ import knf.kuma.commons.CastUtil
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.EAMapActivity
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
@@ -61,47 +58,40 @@ import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.stringLiveData
 import knf.kuma.commons.toast
-import knf.kuma.commons.verifiyFF
 import knf.kuma.custom.ConnectionState
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
-import knf.kuma.directory.DirManager
 import knf.kuma.directory.DirectoryFragmentMaterial
-import knf.kuma.directory.DirectoryService
 import knf.kuma.download.FileAccessHelper
 import knf.kuma.emision.EmissionActivityMaterial
 import knf.kuma.explorer.ExplorerActivityMaterial
 import knf.kuma.faq.FaqActivityMaterial
-import knf.kuma.favorite.FavoriteFragmentMaterial
-import knf.kuma.jobscheduler.DirUpdateWork
+import knf.kuma.favorite.FavoriteFragment
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
-import knf.kuma.migration.MaintainmentActivity
 import knf.kuma.news.MaterialNewsActivity
-import knf.kuma.pojos.migrateSeen
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.preferences.BottomPreferencesMaterialFragment
 import knf.kuma.preferences.ConfigurationFragment
-import knf.kuma.queue.QueueActivityMaterial
-import knf.kuma.random.RandomActivityMaterial
+import knf.kuma.queue.QueueActivity
+import knf.kuma.random.RandomActivity
 import knf.kuma.recents.RecentFragment
 import knf.kuma.recents.RecentModelsFragment
 import knf.kuma.recents.RecentsNotReceiver
-import knf.kuma.recommended.RecommendActivityMaterial
-import knf.kuma.record.RecordActivityMaterial
+import knf.kuma.recommended.RecommendActivity
+import knf.kuma.record.RecordActivity
 import knf.kuma.search.SearchActivity
-import knf.kuma.seeing.SeeingActivityMaterial
+import knf.kuma.seeing.SeeingActivity
 import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.json.JSONObject
 import q.rorbin.badgeview.Badge
 import q.rorbin.badgeview.QBadgeView
 import xdroid.toaster.Toaster
-import java.io.File
 
 class MainMaterial : GenericActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -155,8 +145,6 @@ class MainMaterial : GenericActivity(),
             startChange()
         } else
             returnSelectFragment()
-        //checkBypass()
-        migrateSeen()
         FirestoreManager.start()
         onBackPressedDispatcher.addCallback(this) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -183,58 +171,11 @@ class MainMaterial : GenericActivity(),
         lifecycleScope.launch(Dispatchers.IO) {
             BypassUtil.clearCookiesIfNeeded()
             checkPermissions()
-            checkDirectoryState()
             UpdateWork.schedule()
             RecentsWork.schedule(this@MainMaterial)
-            DirUpdateWork.schedule(this@MainMaterial)
             RecentsNotReceiver.removeAll(this@MainMaterial)
             EAHelper.clear1()
-            verifiyFF()
-            saveDir()
-            maintainmentMessage()
         }
-    }
-
-    private suspend fun maintainmentMessage() {
-        withContext(Dispatchers.Main) {
-            startActivity(Intent(this@MainMaterial, MaintainmentActivity::class.java))
-        }
-    }
-
-    private fun saveDir() {
-        if (!BuildConfig.DEBUG) return
-        val lists = CacheDB.INSTANCE.animeDAO().all.chunked(500)
-        var number = 0
-        val json = JSONObject()
-        lists.forEach { list ->
-            val info = JSONObject().apply {
-                put("idF", list.first().aid)
-                put("idL", list.last().aid)
-            }
-            json.put(number.toString(), info)
-            val file = File(getExternalFilesDir(null), "directory$number.json")
-            if (!file.exists()) {
-                file.createNewFile()
-                val midJson = JSONObject()
-                list.forEach {
-                    midJson.put(it.sid, JSONObject(Gson().toJson(it.webInfo)))
-                }
-                file.writeText(midJson.toString())
-            }
-            number++
-            Log.e("Dir files", "Process chunk: $number")
-        }
-        val file = File(getExternalFilesDir(null), "directoryInfo.json")
-        if (!file.exists()) {
-            file.createNewFile()
-            file.writeText(json.toString())
-            Log.e("Dir files", "Save finished")
-        }
-    }
-
-    private fun checkDirectoryState() {
-        DirManager.checkPreDir()
-        DirectoryService.run(this@MainMaterial)
     }
 
     @SuppressLint("SetTextI18n")
@@ -256,7 +197,6 @@ class MainMaterial : GenericActivity(),
             val actionInfo = navigationView.getHeaderView(0).findViewById<View>(R.id.action_info)
             val actionTrophy = navigationView.getHeaderView(0).findViewById<View>(R.id.action_trophy)
             val actionLogin = navigationView.getHeaderView(0).findViewById<View>(R.id.action_login)
-            val actionMigrate = navigationView.getHeaderView(0).findViewById<View>(R.id.action_migrate)
             val actionMap = navigationView.getHeaderView(0).findViewById<View>(R.id.action_map)
             actionShare.onClick {
                 startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
@@ -271,9 +211,7 @@ class MainMaterial : GenericActivity(),
             actionInfo.onClick { AppInfoActivityMaterial.open(this@MainMaterial) }
             actionTrophy.onClick { AchievementActivityMaterial.open(this@MainMaterial) }
             actionLogin.onClick { BackUpActivity.start(this@MainMaterial) }
-            actionMigrate.onClick { MigrationActivity.start(this@MainMaterial) }
             actionMap.onClick { EAMapActivity.start(this@MainMaterial) }
-            actionMigrate.visibility = if (Backups.isAnimeflvInstalled) View.VISIBLE else View.GONE
             actionMap.visibility = if (EAHelper.phase == 3) View.VISIBLE else View.GONE
             val backupLocation = navigationView.getHeaderView(0).findViewById<TextView>(R.id.backupLocation)
             backupLocation.text = when (Backups.type) {
@@ -297,17 +235,19 @@ class MainMaterial : GenericActivity(),
                         .setShowShadow(false)
                         .setGravityOffset(5f, 5f, true)
                         .setBadgeBackgroundColor(ContextCompat.getColor(this, EAHelper.getThemeColorLight()))
-                CacheDB.INSTANCE.favsDAO().countLive.observe(this, Observer { integer ->
-                    if (badgeView != null && integer != null)
-                        if (PrefsUtil.showFavIndicator)
-                            badgeView?.badgeNumber = integer
-                        else
-                            badgeView?.hide(false)
-                })
+                lifecycleScope.launch {
+                    CacheDB.INSTANCE.favoriteAV1DAO().countFlow.collectLatest {
+                        if (badgeView != null)
+                            if (PrefsUtil.showFavIndicator)
+                                badgeView?.badgeNumber = it
+                            else
+                                badgeView?.hide(false)
+                    }
+                }
                 PrefsUtil.getLiveShowFavIndicator().observe(this, Observer { aBoolean ->
                     if (badgeView != null) {
                         if (aBoolean)
-                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favsDAO().count } }
+                            lifecycleScope.launch { badgeView?.badgeNumber = withContext(Dispatchers.IO) { CacheDB.INSTANCE.favoriteAV1DAO().count } }
                         else
                             badgeView?.hide(false)
                     }
@@ -330,20 +270,32 @@ class MainMaterial : GenericActivity(),
             badgeQueue.setTextColor(ContextCompat.getColor(this, EAHelper.getThemeColor()))
             badgeQueue.setTypeface(null, Typeface.BOLD)
             badgeQueue.gravity = Gravity.CENTER_VERTICAL
-            PrefsUtil.getLiveEmissionBlackList().observe(this, Observer { strings ->
-                CacheDB.INSTANCE.animeDAO().getInEmission(strings).observe(this, Observer { integer ->
-                    badgeEmission.text = integer.toString()
-                    badgeEmission.visibility = if (integer == 0) View.GONE else View.VISIBLE
-                })
-            })
-            CacheDB.INSTANCE.seeingDAO().countWatchingLive.observe(this, Observer { integer ->
-                badgeSeeing.text = integer.toString()
-                badgeSeeing.visibility = if (integer == 0) View.GONE else View.VISIBLE
-            })
-            CacheDB.INSTANCE.queueDAO().countLive.observe(this, Observer { integer ->
-                badgeQueue.text = integer.toString()
-                badgeQueue.visibility = if (integer == 0) View.GONE else View.VISIBLE
-            })
+            lifecycleScope.launch {
+                CacheDB.INSTANCE.calendarBlacklistDAO().allAidsFlow.collectLatest { blacklisted ->
+                    val data = JsExtractor.processLink("https://animeav1.com/horario")?: return@collectLatest
+                    var count = 0
+                    for (i in 0 until data.length()) {
+                        val item = data.getJSONObject(i)
+                        if (item.getInt("id") !in blacklisted) {
+                            count++
+                        }
+                    }
+                    badgeEmission.text = count.toString()
+                    badgeEmission.isVisible = count > 0
+                }
+            }
+            lifecycleScope.launch {
+                CacheDB.INSTANCE.organizerDAO().countWatchingFlow.collectLatest {
+                    badgeSeeing.text = it.toString()
+                    badgeSeeing.isVisible = it > 0
+                }
+            }
+            lifecycleScope.launch {
+                CacheDB.INSTANCE.queueDAO().countFlow.collectLatest {
+                    badgeQueue.text = it.toString()
+                    badgeQueue.isVisible = it > 0
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -433,7 +385,7 @@ class MainMaterial : GenericActivity(),
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (selectedFragment == null || selectedFragment is RecentFragment) {
             menuInflater.inflate(R.menu.main_material, menu)
-        } else if (selectedFragment is FavoriteFragmentMaterial) {
+        } else if (selectedFragment is FavoriteFragment) {
             menuInflater.inflate(R.menu.fav_menu_material, menu)
             when (PrefsUtil.favsOrder) {
                 0 -> menu.findItem(R.id.by_name).isChecked = true
@@ -459,8 +411,8 @@ class MainMaterial : GenericActivity(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_new_category -> if (selectedFragment is FavoriteFragmentMaterial)
-                (selectedFragment as FavoriteFragmentMaterial).showNewCategory(null)
+            R.id.action_new_category -> if (selectedFragment is FavoriteFragment)
+                (selectedFragment as FavoriteFragment).showNewCategory(null)
             R.id.by_name -> {
                 PrefsUtil.favsOrder = 0
                 changeOrder()
@@ -494,9 +446,7 @@ class MainMaterial : GenericActivity(),
     }
 
     private fun changeOrder() {
-        if (selectedFragment is FavoriteFragmentMaterial) {
-            (selectedFragment as FavoriteFragmentMaterial).onChangeOrder()
-        } else if (selectedFragment is DirectoryFragmentMaterial) {
+        if (selectedFragment is DirectoryFragmentMaterial) {
             (selectedFragment as DirectoryFragmentMaterial).onChangeOrder()
         }
         invalidateOptionsMenu()
@@ -505,17 +455,17 @@ class MainMaterial : GenericActivity(),
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_bottom_recents -> setFragment(RecentModelsFragment.get())
-            R.id.action_bottom_favorites -> setFragment(FavoriteFragmentMaterial.get())
+            R.id.action_bottom_favorites -> setFragment(FavoriteFragment.get())
             R.id.action_bottom_directory -> setFragment(DirectoryFragmentMaterial.get())
             R.id.action_bottom_settings -> setFragment(BottomPreferencesMaterialFragment.get())
             R.id.drawer_explorer -> ExplorerActivityMaterial.open(this)
             R.id.drawer_emision -> EmissionActivityMaterial.open(this)
-            R.id.drawer_queue -> QueueActivityMaterial.open(this)
-            R.id.drawer_suggestions -> RecommendActivityMaterial.open(this)
+            R.id.drawer_queue -> QueueActivity.open(this)
+            R.id.drawer_suggestions -> RecommendActivity.open(this)
             R.id.drawer_news -> MaterialNewsActivity.open(this)
-            R.id.drawer_records -> RecordActivityMaterial.open(this)
-            R.id.drawer_seeing -> SeeingActivityMaterial.open(this)
-            R.id.drawer_random -> RandomActivityMaterial.open(this)
+            R.id.drawer_records -> RecordActivity.open(this)
+            R.id.drawer_seeing -> SeeingActivity.open(this)
+            R.id.drawer_random -> RandomActivity.open(this)
             R.id.drawer_faq -> FaqActivityMaterial.open(this)
         }
         closeDrawer()
@@ -553,7 +503,7 @@ class MainMaterial : GenericActivity(),
     private fun returnSelectFragment() {
         if (selectedFragment != null) {
             when (selectedFragment) {
-                is FavoriteFragmentMaterial -> bottomNavigationView.selectedItemId = R.id.action_bottom_favorites
+                is FavoriteFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_favorites
                 is DirectoryFragmentMaterial -> bottomNavigationView.selectedItemId = R.id.action_bottom_directory
                 is BottomPreferencesFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_settings
                 else -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents
@@ -575,7 +525,7 @@ class MainMaterial : GenericActivity(),
     private fun reselectFragment() {
         if (selectedFragment != null) {
             when (selectedFragment) {
-                is FavoriteFragmentMaterial -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents
+                is FavoriteFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents
                 is DirectoryFragmentMaterial -> bottomNavigationView.selectedItemId = R.id.action_bottom_directory
                 is BottomPreferencesFragment -> bottomNavigationView.selectedItemId = R.id.action_bottom_settings
                 else -> bottomNavigationView.selectedItemId = R.id.action_bottom_recents

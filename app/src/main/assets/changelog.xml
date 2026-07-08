@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="231" version="6.0.0">
+        <change type="change">Cambio de fuente a AnimeAv1</change>
+        <change type="new">Migración desde Animeflv</change>
+    </release>
     <release code="230" version="5.3.21">
         <change type="change">Mas información del mantenimiento</change>
     </release>

@@ -3,6 +3,7 @@ package knf.kuma.random
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.LayoutRes
@@ -18,34 +19,38 @@ import knf.kuma.R
 import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
+import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
-import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.verifyManager
 import knf.kuma.custom.BannerContainerView
 import knf.kuma.custom.GenericActivity
-import knf.kuma.database.CacheDB
+import knf.kuma.pojos.av1.DirectoryAV1Min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
+import org.nield.kotlinstatistics.randomDistinct
+import kotlin.math.min
 
 class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     val toolbar: Toolbar by bind(R.id.toolbar)
     private val refreshLayout: SwipeRefreshLayout by bind(R.id.refresh)
     val recyclerView: RecyclerView by bind(R.id.recycler)
     private var adapter: RandomAdapter? = null
-    private var counter = 0
+    var counter = PrefsUtil.randomRefresh
+    var isLoading = false
 
     private val layout: Int
         @LayoutRes
         get() = if (PrefsUtil.layType == "0") {
-            R.layout.recycler_refresh
+            if (DesignUtils.isFlat) R.layout.recycler_refresh_material else R.layout.recycler_refresh
         } else {
-            R.layout.recycler_refresh_grid
+            if (DesignUtils.isFlat) R.layout.recycler_refresh_grid_material else R.layout.recycler_refresh_grid
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,17 +76,37 @@ class RandomActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun refreshList() {
-        counter++
+        if (isLoading) return
+        counter ++
+        PrefsUtil.randomRefresh = counter
         if (counter >= 15)
             AchievementManager.unlock(listOf(32))
-        doAsync {
-            val list = CacheDB.INSTANCE.animeDAO().getRandom(PrefsUtil.randomLimit)
-            doOnUI {
+        lifecycleScope.launch {
+            val list = createList()
+            withContext(Dispatchers.Main) {
                 refreshLayout.isRefreshing = false
                 adapter?.update(list)
                 recyclerView.scheduleLayoutAnimation()
             }
         }
+    }
+
+    private suspend fun createList(): List<DirectoryAV1Min> {
+        val list = mutableListOf<DirectoryAV1Min>()
+        val checked = mutableListOf<Int>()
+        val randomLimit = PrefsUtil.randomLimit
+        while (list.size < randomLimit) {
+            val page = (1..50).random()
+            if (checked.contains(page)) continue
+            checked.add(page)
+            val data = JsExtractor.processLink("https://animeav1.com/catalogo?page=$page") ?: continue
+            val indexes = (0..<data.length()).toList().randomDistinct(min(5, randomLimit - list.size))
+            Log.e("Random", "Take $indexes from page $page")
+            for (i in indexes) {
+                list.add(DirectoryAV1Min.fromJson(data.getJSONObject(i)))
+            }
+        }
+        return list.shuffled()
     }
 
     override fun onRefresh() {

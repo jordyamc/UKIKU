@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.webkit.MimeTypeMap
 import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
 import androidx.lifecycle.lifecycleScope
@@ -119,9 +118,11 @@ class PlaybackFragment : VideoSupportFragment() {
                 }
                 setDefaultRequestProperties(headers ?: emptyMap())
             }
-            val mediaSource = when(MimeTypeMap.getFileExtensionFromUrl(mediaSourceUri.toString())) {
-                "m3u8" -> HlsMediaSource.Factory(httpFactory)
-                else -> ProgressiveMediaSource.Factory(httpFactory)
+            val url = mediaSourceUri.toString()
+            val mediaSource = if (url.contains("m3u8") || url.contains("cf-master")) {
+                HlsMediaSource.Factory(httpFactory)
+            } else {
+                ProgressiveMediaSource.Factory(httpFactory)
             }.createMediaSource(MediaItem.fromUri(mediaSourceUri))
             mPlayer?.setMediaSource(mediaSource)
             mPlayer?.prepare()

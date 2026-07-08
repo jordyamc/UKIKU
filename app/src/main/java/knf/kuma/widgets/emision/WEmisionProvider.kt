@@ -12,12 +12,15 @@ import android.widget.RemoteViews
 import androidx.preference.PreferenceManager
 import knf.kuma.R
 import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.JsExtractor
 import knf.kuma.database.CacheDB
 import knf.kuma.emision.EmissionActivity
 import knf.kuma.emision.EmissionActivityMaterial
+import knf.kuma.pojos.av1.DirectoryAV1Calendar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 
@@ -37,35 +40,17 @@ class WEmisionProvider : AppWidgetProvider() {
             }
         }
 
-    private val actualDayCode: Int
-        get() {
-            return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-                Calendar.MONDAY -> 2
-                Calendar.TUESDAY -> 3
-                Calendar.WEDNESDAY -> 4
-                Calendar.THURSDAY -> 5
-                Calendar.FRIDAY -> 6
-                Calendar.SATURDAY -> 7
-                Calendar.SUNDAY -> 1
-                else -> 2
-            }
-        }
-
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        GlobalScope.launch(Dispatchers.Main) {
-            for (i in appWidgetIds) {
-                val remoteViews = updateWidgetListView(context, i)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.words)
-                appWidgetManager.updateAppWidget(i, remoteViews)
-            }
-            super.onUpdate(context, appWidgetManager, appWidgetIds)
+        for (i in appWidgetIds) {
+            val remoteViews = updateWidgetListView(context, i)
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.words)
+            appWidgetManager.updateAppWidget(i, remoteViews)
         }
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
-    private suspend fun updateWidgetListView(context: Context, appWidgetId: Int): RemoteViews {
-        val remoteViews = RemoteViews(context.packageName,
-            R.layout.widget_emision
-        )
+    private fun updateWidgetListView(context: Context, appWidgetId: Int): RemoteViews {
+        val remoteViews = RemoteViews(context.packageName, R.layout.widget_emision)
         val svcIntent = Intent(context, WEmissionService::class.java)
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         svcIntent.data = Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME))
@@ -76,13 +61,6 @@ class WEmisionProvider : AppWidgetProvider() {
         ) else Intent(context, EmissionActivity::class.java)
         remoteViews.setTextViewText(R.id.title_day, actualDay)
         remoteViews.setTextColor(R.id.title_day, getColor(context, true))
-        remoteViews.setTextViewText(
-            R.id.title_count,
-            withContext(Dispatchers.IO) {
-                CacheDB.INSTANCE.animeDAO()
-                    .getByDayDirect(actualDayCode, getBlacklist(context)).size.toString()
-            })
-        remoteViews.setTextColor(R.id.title_count, getColor(context, true))
         remoteViews.setOnClickPendingIntent(
             R.id.back_layout,
             PendingIntent.getActivity(
@@ -90,6 +68,15 @@ class WEmisionProvider : AppWidgetProvider() {
                 555,
                 clickIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        )
+        remoteViews.setPendingIntentTemplate(
+            R.id.words,
+            PendingIntent.getActivity(
+                context,
+                appWidgetId,
+                Intent(context, DesignUtils.infoClass),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
         )
         remoteViews.setInt(R.id.back_layout, "setBackgroundColor", getColor(context, false))
@@ -112,11 +99,6 @@ class WEmisionProvider : AppWidgetProvider() {
             else
                 Color.parseColor("#FFFFFFFF")
         }
-    }
-
-    private fun getBlacklist(context: Context): Set<String> {
-        return PreferenceManager.getDefaultSharedPreferences(context).getStringSet("emision_blacklist", LinkedHashSet())
-                ?: setOf()
     }
 
     companion object {

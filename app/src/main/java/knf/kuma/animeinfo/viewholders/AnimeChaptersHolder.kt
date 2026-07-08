@@ -10,17 +10,16 @@ import com.google.android.material.snackbar.Snackbar
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener
 import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor
 import knf.kuma.R
-import knf.kuma.animeinfo.AnimeChaptersAdapter
+import knf.kuma.animeinfo.AnimeChaptersAdapterMaterial
 import knf.kuma.animeinfo.BottomActionsDialog
-import knf.kuma.animeinfo.ChapterObjWrap
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
 import knf.kuma.custom.CenterLayoutManager
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
-import knf.kuma.pojos.SeenObject
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.DirectoryAV1
 import knf.kuma.queue.QueueManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,8 +29,9 @@ import org.jetbrains.anko.find
 class AnimeChaptersHolder(view: View, private val fragment: Fragment, private val callback: ChapHolderCallback) {
     val recyclerView: RecyclerView = view.find(R.id.recycler)
     private val manager: LinearLayoutManager = CenterLayoutManager(view.context)
-    private var chapters: MutableList<AnimeObject.WebInfo.AnimeChapter> = ArrayList()
-    var adapter: AnimeChaptersAdapter? = null
+    private var anime: DirectoryAV1? = null
+    private var chapters: MutableList<Chapter> = ArrayList()
+    var adapter: AnimeChaptersAdapterMaterial? = null
         private set
     private val touchListener: DragSelectTouchListener
 
@@ -69,26 +69,19 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                         )
                                         when (state) {
                                             BottomActionsDialog.STATE_SEEN -> doAsync {
-                                                val dao = CacheDB.INSTANCE.seenDAO()
+                                                val dao = CacheDB.INSTANCE.recordAV1DAO()
                                                 for (i13 in ArrayList(
                                                     adapter?.selection
                                                         ?: arrayListOf()
                                                 )) {
-                                                    dao.addChapter(SeenObject.fromChapter(chapters[i13]))
+                                                    dao.addChapter(chapters[i13].asRecord(anime!!))
                                                 }
-                                            syncData { seen() }
-                                            val seeingDAO = CacheDB.INSTANCE.seeingDAO()
-                                            val seeingObject = seeingDAO.getByAid(chapters[0].aid)
-                                            if (seeingObject != null) {
-                                                seeingObject.chapter = chapters[0].number
-                                                seeingDAO.update(seeingObject)
-                                                syncData { seeing() }
-                                            }
+                                                syncData { history() }
                                                 fragment.doOnUI {
                                                     adapter?.apply {
                                                         if (selection.isNotEmpty()) {
                                                             selection.forEach {
-                                                                this.chapters[it].isSeen = true
+                                                                chapters[it].isSeen = true
                                                             }
                                                             deselectAll()
                                                         }
@@ -98,19 +91,12 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                         }
                                         BottomActionsDialog.STATE_UNSEEN -> doAsync {
                                             try {
-                                                val dao = CacheDB.INSTANCE.seenDAO()
+                                                val dao = CacheDB.INSTANCE.recordAV1DAO()
                                                 for (i12 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
-                                                    dao.deleteChapter(chapters[i12].aid, chapters[i12].number)
+                                                    dao.deleteChapter(anime!!.aid, chapters[i12].number)
                                                 }
-                                                syncData { seen() }
-                                                val seeingDAO = CacheDB.INSTANCE.seeingDAO()
-                                                val seeingObject = seeingDAO.getByAid(chapters[0].aid)
-                                                if (seeingObject != null) {
-                                                    seeingObject.chapter = chapters[0].number
-                                                    seeingDAO.update(seeingObject)
-                                                    syncData { seeing() }
-                                                }
+                                                syncData { history() }
                                                 fragment.doOnUI {
                                                     adapter?.apply {
                                                         if (selection.isNotEmpty()) {
@@ -129,13 +115,13 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                         }
                                         BottomActionsDialog.STATE_IMPORT_MULTIPLE -> doAsync {
                                             try {
-                                                val cChapters = ArrayList<AnimeObject.WebInfo.AnimeChapter>()
+                                                val cChapters = ArrayList<Chapter>()
                                                 val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid)
-                                                    if (!chapter.fileWrapper().exist && (downloadObject == null || !downloadObject.isDownloading))
+                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid.toString())
+                                                    if (!chapter.fileWrapper(anime!!).exist && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
                                                 }
                                                 callback.onImportMultiple(cChapters)
@@ -148,13 +134,13 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                         }
                                         BottomActionsDialog.STATE_DOWNLOAD_MULTIPLE -> doAsync {
                                             try {
-                                                val cChapters = mutableListOf<AnimeObject.WebInfo.AnimeChapter>()
+                                                val cChapters = mutableListOf<Chapter>()
                                                 val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid)
-                                                    if (!chapter.fileWrapper().exist && (downloadObject == null || !downloadObject.isDownloading))
+                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid.toString())
+                                                    if (!chapter.fileWrapper(anime!!).exist && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
@@ -167,16 +153,17 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                         }
                                         BottomActionsDialog.STATE_QUEUE_MULTIPLE -> doAsync {
                                             try {
-                                                val cChapters = mutableListOf<AnimeObject.WebInfo.AnimeChapter>()
+                                                val cChapters = mutableListOf<Chapter>()
                                                 val downloadsDAO = CacheDB.INSTANCE.downloadsDAO()
                                                 for (i13 in ArrayList(adapter?.selection
                                                         ?: arrayListOf())) {
                                                     val chapter = chapters[i13]
-                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid)
-                                                    if (!chapter.fileWrapper().exist && (downloadObject == null || !downloadObject.isDownloading))
+                                                    val downloadObject = downloadsDAO.getByEid(chapter.eid.toString())
+                                                    val fileWrapper = chapter.fileWrapper(anime!!)
+                                                    if (!fileWrapper.exist && (downloadObject == null || !downloadObject.isDownloading))
                                                         cChapters.add(chapter)
-                                                    else if (chapter.fileWrapper().exist || downloadObject?.isDownloading == true)
-                                                        QueueManager.add(Uri.fromFile(chapter.fileWrapper().file()), true, chapter)
+                                                    else if (fileWrapper.exist || downloadObject?.isDownloading == true)
+                                                        QueueManager.add(Uri.fromFile(fileWrapper.file()), true, anime!!, chapter)
                                                 }
                                                 recyclerView.post { adapter?.deselectAll() }
                                                 fragment.doOnUI { snackbar.safeDismiss() }
@@ -202,11 +189,12 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                 .withMaxScrollDistance(32)
     }
 
-    fun setAdapter(fragment: Fragment, chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>?) {
-        if (chapters == null) return
+    fun setAdapter(fragment: Fragment, anime: DirectoryAV1, chapters: MutableList<Chapter>) {
+        if (chapters.isEmpty()) return
         fragment.lifecycleScope.launch(Dispatchers.IO) {
+            this@AnimeChaptersHolder.anime = anime
             this@AnimeChaptersHolder.chapters = chapters
-            this@AnimeChaptersHolder.adapter = AnimeChaptersAdapter(fragment, recyclerView, chapters.map { ChapterObjWrap(it) }, touchListener)
+            this@AnimeChaptersHolder.adapter = AnimeChaptersAdapterMaterial(fragment, recyclerView, anime, chapters, touchListener, false)
             recyclerView.post {
                 recyclerView.adapter = adapter
                 recyclerView.addOnItemTouchListener(touchListener)
@@ -223,9 +211,9 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
         fragment.lifecycleScope.launch(Dispatchers.IO) {
             if (chapters.isNotEmpty()) {
                 val eids =
-                    chapters.sortedBy { it.number.substringAfterLast(" ").toFloat() }.map { it.eid }
+                    chapters.sortedBy { it.number }.map { it.eid }
                 eids.chunked(50).forEach { list ->
-                    val chapter = CacheDB.INSTANCE.seenDAO().getLast(list)
+                    val chapter = CacheDB.INSTANCE.recordAV1DAO().getLast(list)
                     if (chapter != null) {
                         val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
                         if (position >= 0)
@@ -243,9 +231,9 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
         fragment.lifecycleScope.launch(Dispatchers.IO) {
             if (chapters.isNotEmpty()) {
                 val eids =
-                    chapters.sortedBy { it.number.substringAfterLast(" ").toFloat() }.map { it.eid }
+                    chapters.sortedBy { it.number }.map { it.eid }
                 eids.chunked(50).forEach { list ->
-                    val chapter = CacheDB.INSTANCE.seenDAO().getLast(list)
+                    val chapter = CacheDB.INSTANCE.recordAV1DAO().getLast(list)
                     if (chapter != null) {
                         val position = chapters.indexOf(chapters.find { it.eid == chapter.eid })
                         if (position >= 0)
@@ -264,8 +252,8 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
     }
 
     interface ChapHolderCallback {
-        fun onImportMultiple(chapters: MutableList<AnimeObject.WebInfo.AnimeChapter>)
+        fun onImportMultiple(chapters: MutableList<Chapter>)
 
-        fun onDownloadMultiple(addQueue: Boolean, chapters: List<AnimeObject.WebInfo.AnimeChapter>)
+        fun onDownloadMultiple(addQueue: Boolean, chapters: List<Chapter>)
     }
 }

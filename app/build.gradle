@@ -11,10 +11,10 @@ android {
     compileSdk 36
     defaultConfig {
         applicationId "knf.kuma"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 36
-        versionCode 230
-        versionName "5.3.21"
+        versionCode 231
+        versionName "6.0.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -141,6 +141,7 @@ dependencies {
     implementation 'androidx.mediarouter:mediarouter:1.4.0' //Keep
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.leanback:leanback:1.2.0'
+    implementation 'androidx.leanback:leanback-paging:1.1.0'
     implementation 'androidx.tvprovider:tvprovider:1.1.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'
     implementation 'com.google.android.gms:play-services-cast:22.2.0'
@@ -162,6 +163,7 @@ dependencies {
     implementation 'androidx.work:work-runtime-ktx:2.11.0'
     implementation 'androidx.room:room-runtime:2.8.4'
     implementation 'androidx.room:room-ktx:2.8.4'
+    implementation 'androidx.room:room-paging:2.8.4'
     kapt 'androidx.room:room-compiler:2.8.4'
     androidTestImplementation 'androidx.room:room-testing:2.8.4'
     implementation 'com.google.dagger:dagger-android-support:2.57.2'
@@ -183,6 +185,11 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
     implementation 'com.google.android.exoplayer:extension-mediasession:2.19.1'
     implementation 'com.google.android.exoplayer:extension-okhttp:2.19.1'
+    implementation 'androidx.media3:media3-transformer:1.10.1'
+    implementation 'androidx.media3:media3-common:1.10.1'
+    implementation 'androidx.media3:media3-exoplayer:1.10.1'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.10.1'
+
     //MaterialDialogs
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:lifecycle:3.3.0'
@@ -229,6 +236,7 @@ dependencies {
     implementation 'com.github.evgenyneu:js-evaluator-for-android:v5.0.0'
     implementation 'com.github.vkay94:DoubleTapPlayerView:1.0.4'
     implementation 'org.conscrypt:conscrypt-android:2.5.3'
+    implementation 'org.mozilla:rhino:1.9.1'
     testImplementation 'junit:junit:4.13.2'
     //Kotlin
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.21'

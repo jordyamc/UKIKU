@@ -37,7 +37,7 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
     val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     private val syncItems: MutableList<SyncItemView> by lazy {
         with(binding.layButtons) {
-            arrayListOf(syncFavs, syncHistory, syncFollowing, syncSeen, syncSeenNew)
+            arrayListOf(syncFavs, syncHistory, syncFollowing)
         }
     }
     private var service: BackupService? = null
@@ -109,7 +109,6 @@ class BackUpActivity : GenericActivity(), SyncItemView.OnClick {
         binding.layFirestore.staticSyncHistory.suscribe(this, FirestoreManager.historyLiveData)
         binding.layFirestore.staticSyncQueue.suscribe(this, FirestoreManager.queueLiveData)
         binding.layFirestore.staticSyncSeeing.suscribe(this, FirestoreManager.seeingLiveData)
-        binding.layFirestore.staticSyncSeen.suscribe(this, FirestoreManager.seenLiveData)
     }
 
     private fun clearSyncButtons() {

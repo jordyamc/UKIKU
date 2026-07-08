@@ -27,10 +27,7 @@ import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.StateView
-import knf.kuma.database.CacheDB
 import knf.kuma.databinding.LayoutDiagnosticBinding
-import knf.kuma.directory.DirectoryService
-import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.uagen.randomUA
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
@@ -68,8 +65,6 @@ class Diagnostic : GenericActivity() {
 
     private fun startTests() {
         runNetworkTests()
-        //runInternetTest()
-        runDirectoryTest()
         runMemoryTest()
         runBackupTest()
     }
@@ -274,20 +269,6 @@ class Diagnostic : GenericActivity() {
             else -> "Kb/s"
         }
         return "${decimal.setScale(1, RoundingMode.HALF_UP)}$unit~"
-    }
-
-    private fun runDirectoryTest() {
-        binding.dirState.load(
-            when {
-                PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning -> "Completo"
-                PrefsUtil.isDirectoryFinished && DirectoryUpdateService.isRunning -> "Actualizando"
-                !PrefsUtil.isDirectoryFinished && DirectoryService.isRunning -> "Creando"
-                else -> "Incompleto"
-            }
-        )
-        CacheDB.INSTANCE.animeDAO().countLive.observe(this) {
-            binding.dirTotalState.load(it.toString())
-        }
     }
 
     private fun runMemoryTest() {

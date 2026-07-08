@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import knf.kuma.databinding.ActivityBrowserBinding
 import org.jetbrains.anko.longToast
+import androidx.core.net.toUri
 
 class WebPlayerActivity : AppCompatActivity() {
     val binding by lazy { ActivityBrowserBinding.inflate(layoutInflater) }
@@ -55,7 +56,8 @@ class WebPlayerActivity : AppCompatActivity() {
             }
             //loadUrl(intent.dataString?:"about:blank")
             intent.dataString?.let {
-                loadData(framed(it), "text/html; charset=utf-8", "UTF-8")
+                //loadData(framed(it), "text/html; charset=utf-8", "UTF-8")
+                loadUrl(it)
             } ?: finish()
         }
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -70,8 +72,10 @@ class WebPlayerActivity : AppCompatActivity() {
 fun framed(link: String): String =
     "<html><body style='margin:0;padding:0;'><iframe src=\"$link\" scrolling=\"no\" allowfullscreen=\"\" width=\"100%\" height=\"100%\" frameborder=\"0\"></iframe></body></html>"
 
-fun openWebPlayer(context: Context, link: String){
-    context.startActivity(Intent(context,WebPlayerActivity::class.java).apply {
-        data = Uri.parse(link)
+fun openWebPlayer(context: Context, link: String, title: String){
+    context.startActivity(Intent(context, WebPlayerActivity::class.java).apply {
+        data = link.toUri()
+        //putExtra("is_web", true)
+        putExtra("title", title)
     })
 }

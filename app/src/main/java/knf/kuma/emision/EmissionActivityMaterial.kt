@@ -17,7 +17,7 @@ import knf.kuma.databinding.ActivityEmisionMaterialBinding
 import java.util.Calendar
 
 class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListener {
-    private var pagerAdapter: EmissionPagerAdapterMaterial? = null
+    private var pagerAdapter: EmissionPagerAdapter? = null
     private val binding by lazy { ActivityEmisionMaterialBinding.inflate(layoutInflater) }
 
     private val currentDay: Int
@@ -41,18 +41,13 @@ class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListe
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.pager.offscreenPageLimit = 7
-        pagerAdapter = EmissionPagerAdapterMaterial(supportFragmentManager)
+        pagerAdapter = EmissionPagerAdapter(supportFragmentManager)
         binding.pager.adapter = pagerAdapter
         binding.tabs.setupWithViewPager(binding.pager)
         binding.tabs.addOnTabSelectedListener(this)
         binding.pager.setCurrentItem(currentDay - 1, true)
         EAHelper.clear2()
         showRandomInterstitial(this,PrefsUtil.fullAdsExtraProbability)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        pagerAdapter?.updateChanges()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -68,7 +63,6 @@ class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListe
                 Log.e("Emission", "On menu click")
                 val show = PrefsUtil.emissionShowHidden
                 PrefsUtil.emissionShowHidden = !show
-                pagerAdapter?.reloadPages()
             }
         }
         invalidateOptionsMenu()

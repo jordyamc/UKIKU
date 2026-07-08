@@ -4,6 +4,7 @@ import android.view.ViewGroup
 
 import androidx.leanback.widget.Presenter
 import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.av1.Relation
 import knf.kuma.tv.cards.RelatedCardView
 
 class RelatedPresenter : Presenter() {
@@ -14,7 +15,7 @@ class RelatedPresenter : Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         if (item == null) return
-        (viewHolder.view as RelatedCardView).bind(item as AnimeObject.WebInfo.AnimeRelated)
+        (viewHolder.view as RelatedCardView).bind(item as Relation)
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {

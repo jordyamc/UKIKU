@@ -3,7 +3,7 @@ package knf.kuma.videoservers
 import android.os.Parcel
 import android.os.Parcelable
 
-open class VideoServer : Parcelable {
+open class VideoServer {
     var name: String
     var options: MutableList<Option> = ArrayList()
     var skipVerification = false
@@ -36,27 +36,10 @@ open class VideoServer : Parcelable {
         return options.size > 1
     }
 
-    class Sorter : Comparator<VideoServer> {
-        override fun compare(videoServer: VideoServer, t1: VideoServer): Int {
-            return videoServer.name.compareTo(t1.name, ignoreCase = true)
-        }
-    }
-
-    protected constructor(parcel: Parcel) {
-        name = parcel.readString() ?: ""
-        options = parcel.createTypedArrayList(Option.CREATOR) ?: arrayListOf()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(name)
-        dest.writeTypedList(options)
-    }
-
     object Names {
+        const val UPNServer = "UPNShare"
+        const val PDRAIN = "PDrain"
+        const val ZILLA = "Zilla"
         const val IZANAGI = "Izanagi"
         const val HYPERION = "Hyperion"
         const val OKRU = "Okru"
@@ -75,40 +58,9 @@ open class VideoServer : Parcelable {
         const val STREAMWISH = "Streamwish"
         const val SBVIDEO = "SBVideo"
         const val MEGA = "Mega"
-
-        internal val downloadServers: Array<String>
-            get() = arrayOf(
-                IZANAGI,
-                HYPERION,
-                OKRU,
-                FEMBED,
-                FIRE,
-                NATSUKI,
-                SBVIDEO,
-                GOCDN,
-                STAPE,
-                STREAMWISH,
-                VERYSTREAM,
-                FENIX,
-                RV,
-                YOURUPLOAD,
-                ZIPPYSHARE,
-                MEGA,
-                MP4UPLOAD
-            )
     }
 
     companion object {
-        @JvmField
-        val CREATOR: Parcelable.Creator<VideoServer> = object : Parcelable.Creator<VideoServer> {
-            override fun createFromParcel(parcel: Parcel): VideoServer {
-                return VideoServer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<VideoServer?> {
-                return arrayOfNulls(size)
-            }
-        }
 
         fun filter(videoServers: MutableList<VideoServer>): MutableList<VideoServer> {
             val names = ArrayList<String>()
@@ -120,36 +72,6 @@ open class VideoServer : Parcelable {
                 }
             }
             return filtered
-        }
-
-        fun getNames(videoServers: MutableList<VideoServer>): MutableList<String> {
-            val names = ArrayList<String>()
-            for (videoServer in videoServers) {
-                names.add(videoServer.name)
-            }
-            return names
-        }
-
-        private fun findPosition(videoServers: MutableList<VideoServer>, name: String): Int {
-            for ((i, videoServer) in videoServers.withIndex()) {
-                if (videoServer.name == name)
-                    return i
-            }
-            return 0
-        }
-
-        fun existServer(videoServers: MutableList<VideoServer>, position: Int): Boolean {
-            val name = Names.downloadServers[position - 1]
-            for (videoServer in videoServers) {
-                if (videoServer.name == name)
-                    return true
-            }
-            return false
-        }
-
-        fun findServer(videoServers: MutableList<VideoServer>, position: Int): VideoServer {
-            val name = Names.downloadServers[position - 1]
-            return videoServers[findPosition(videoServers, name)]
         }
     }
 }

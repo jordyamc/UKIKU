@@ -13,7 +13,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -63,7 +62,6 @@ import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.custom.snackbar.SnackProgressBar
 import knf.kuma.custom.snackbar.SnackProgressBarManager
-import knf.kuma.database.CacheDB
 import knh.kuma.commons.cloudflarebypass.util.ConvertUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -101,10 +99,6 @@ fun Toolbar.changeToolbarFont(@FontRes res: Int) {
     }
 }
 
-val String.urlFixed: String get() = if (!contains("animeflv.net")) "https://www3.animeflv.net$this" else this
-
-val String.fixedHost: String get() = if (!startsWith("http")) "https:$this" else this
-
 val <T>LiveData<T>.distinct: LiveData<T>
     get() = this.distinctUntilChanged()
 
@@ -129,22 +123,6 @@ val baseDir: File
             File(Environment.getExternalStorageDirectory(), "UKIKU/backups")
         else
             App.context.filesDir
-
-fun verifiyFF() {
-    try {
-        if (PrefsUtil.isFamilyFriendly && !ffFile.exists()) {
-            ffFile.parentFile?.mkdirs()
-            ffFile.createNewFile()
-            ffFile.writeText(PrefsUtil.ffPass)
-        } else if (!PrefsUtil.isFamilyFriendly && ffFile.exists()) {
-            PrefsUtil.isFamilyFriendly = true
-            PrefsUtil.ffPass = ffFile.readText()
-            CacheDB.INSTANCE.animeDAO().nukeEcchi()
-        }
-    } catch (e: Exception) {
-        //
-    }
-}
 
 fun MaterialDialog.safeShow(func: MaterialDialog.() -> Unit): MaterialDialog {
     doOnUIGlobal {
@@ -185,6 +163,8 @@ fun Snackbar.safeDismiss() {
         e.printStackTrace()
     }
 }
+
+fun Double.roundedString(): String = if (this % 1.0 == 0.0) this.toInt().toString() else this.toString()
 
 operator fun JSONArray.iterator(): Iterator<JSONObject> = (0 until length()).asSequence().map { get(it) as JSONObject }.iterator()
 
@@ -628,83 +608,6 @@ fun okHttpDocument(url: String): Document = Jsoup.parse(okHttpCookies(url).execu
     else
         throw IllegalStateException("Response error Url: ${it.request.url}, code: ${it.code}")
 })
-
-fun isHostValid(hostName: String): Boolean {
-    if (validateAds(hostName)) return true
-    return when (hostName) {
-        "fex.net",
-        "api.crashlytics.com",
-        "e.crashlytics.com",
-        "reports.crashlytics.com",
-        "sdk-android.ad.smaato.net",
-        "cdn.myanimelist.net",
-        "myanimelist.cdn-dena.com",
-        "settings.crashlytics.com",
-        "somoskudasai.com",
-        "animeflv.net",
-        "m.animeflv.net",
-        "github.com",
-        "raw.githubusercontent.com",
-        "cdn.animeflv.net",
-        "s1.animeflv.net",
-        "streamango.com",
-        "ok.ru",
-        "www.rapidvideo.com",
-        "us-central1-nu-client.cloudfunctions.net",
-        "",
-        "worldvideodownload.com",
-        "okvid.download",
-        "www.yourupload.com" -> true
-        else -> isVideoHostName(hostName)
-    }.also { if (!it) Log.e("Hostname", "Not verified: $hostName") }
-}
-
-private fun validateAds(hostName: String): Boolean {
-    listOf(
-            "android",
-            "doubleclick",
-            "invitemedia.com",
-            "media.admob.com",
-            "gstatic",
-            "google",
-            "goo.gl",
-            "gvtl",
-            "gvt2",
-            "urchin",
-            "gkecnapps",
-            "youtube",
-            "youtu.be",
-            "yt.be",
-            "ytimg",
-            "g.co",
-            "ggpht",
-            "gkecnapps",
-            "appbrain",
-            "apptornado",
-            "startappservice",
-            "criteo",
-            "appcoachs"
-    ).forEach { if (hostName.contains(it)) return true }
-    return false
-}
-
-private fun isVideoHostName(hostName: String): Boolean {
-    return when {
-        hostName.contains("google.com") -> true
-        hostName.contains("fex.net") ||
-                hostName.contains("content-na.drive.amazonaws.com") ||
-                hostName.contains("mediafire") ||
-                hostName.contains("fruithosted.net") ||
-                hostName.contains("mp4upload.com") ||
-                hostName.contains("storage.googleapis.com") ||
-                hostName.contains("playercdn.net") ||
-                hostName.contains("vidcache.net") ||
-                hostName.contains("fembed.com") ||
-                hostName.contains("leasewebcdn.me") ||
-                hostName.contains("fvs.io") -> true
-        else -> false
-    }
-}
 
 fun <T> diceOf(default: T? = null, mapCreator: MutableMap<T, Double>.() -> Unit): T {
     val map = mutableMapOf<T, Double>()

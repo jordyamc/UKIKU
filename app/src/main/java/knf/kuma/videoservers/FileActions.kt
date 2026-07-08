@@ -13,7 +13,6 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
@@ -30,15 +29,14 @@ import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.isNull
 import knf.kuma.commons.iterator
-import knf.kuma.commons.jsoupCookies
 import knf.kuma.commons.safeShow
 import knf.kuma.commons.showProgressSnackbar
 import knf.kuma.commons.toArray
-import knf.kuma.commons.urlDecode
 import knf.kuma.custom.snackbar.SnackProgressBarManager
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManagerCentral
@@ -50,14 +48,15 @@ import knf.kuma.player.openWebPlayer
 import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.ChapterWID
+import knf.kuma.pojos.av1.DirectoryAV1
+import knf.kuma.pojos.av1.RecentAV1
 import knf.kuma.queue.QueueManager
-import knf.kuma.recents.RecentModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import xdroid.toaster.Toaster
-import java.util.Locale
 
 object FileActions {
     private var isExecuting = false
@@ -65,76 +64,49 @@ object FileActions {
     private var servers: MutableList<Server> = ArrayList()
     private var selected = 0
 
-    fun stream(fragment: Fragment, item: Any, isQueued: Boolean = false, callback: ActionCallback) {
-        when (item) {
-            is RecentModel -> stream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
-            is AnimeObject.WebInfo.AnimeChapter -> {
-                if (isQueued)
-                    queuedStream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
-                else
-                    stream(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
-            }
-        }
+    fun stream(fragment: Fragment, anime: DirectoryAV1, chapter: Chapter, isQueued: Boolean = false, callback: ActionCallback) {
+        if (isQueued)
+            queuedStream(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+        else
+            stream(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
     }
 
-    fun stream(activity: AppCompatActivity, item: Any, isQueued: Boolean = false, callback: ActionCallback) {
-        when (item) {
-            is RecentModel -> stream(activity, activity, item, activity.window.decorView, callback)
-            is AnimeObject.WebInfo.AnimeChapter -> {
-                if (isQueued)
-                    queuedStream(activity, activity, item, activity.window.decorView, callback)
-                else
-                    stream(activity, activity, item, activity.window.decorView, callback)
-            }
-        }
+    fun download(activity: AppCompatActivity, anime: DirectoryAV1, chapter: Chapter, isQueued: Boolean = false, callback: ActionCallback) {
+        if (isQueued)
+            queuedDownload(activity, activity, anime, chapter, activity.window.decorView, callback)
+        else
+            download(activity, activity, anime, chapter, activity.window.decorView, callback)
     }
 
-    fun download(fragment: Fragment, item: Any, isQueued: Boolean = false, callback: ActionCallback) {
-        when (item) {
-            is RecentModel -> download(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
-            is AnimeObject.WebInfo.AnimeChapter -> {
-                if (isQueued)
-                    queuedDownload(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
-                else
-                    download(fragment.requireContext(), fragment.viewLifecycleOwner, item, fragment.view, callback)
-            }
-        }
+    fun download(fragment: Fragment, anime: DirectoryAV1, chapter: Chapter, isQueued: Boolean = false, callback: ActionCallback) {
+        if (isQueued)
+            queuedDownload(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+        else
+            download(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
     }
 
-    fun download(activity: AppCompatActivity, item: Any, isQueued: Boolean = false, callback: ActionCallback) {
-        when (item) {
-            is RecentModel -> download(activity, activity, item, activity.window.decorView, callback)
-            is AnimeObject.WebInfo.AnimeChapter -> {
-                if (isQueued)
-                    queuedDownload(activity, activity, item, activity.window.decorView, callback)
-                else
-                    download(activity, activity, item, activity.window.decorView, callback)
-            }
-        }
+    fun stream(context: Context, owner: LifecycleOwner, item: RecentAV1, anchorView: View? = null, callback: ActionCallback) {
+        execute(context, owner, if (CastUtil.get().connected()) Type.CAST else Type.STREAM, item.chapterUrl, item, item.asDownload(), anchorView, callback)
     }
 
-    fun stream(context: Context, owner: LifecycleOwner, item: RecentModel, anchorView: View? = null, callback: ActionCallback) {
-        execute(context, owner, if (CastUtil.get().connected()) Type.CAST else Type.STREAM, item.chapterUrl, item, DownloadObject.fromRecentModel(item), anchorView, callback)
+    fun stream(context: Context, owner: LifecycleOwner, anime: DirectoryAV1, item: Chapter, anchorView: View? = null, callback: ActionCallback) {
+        execute(context, owner, if (CastUtil.get().connected()) Type.CAST else Type.STREAM, item.link(anime), item, item.asDownload(anime), anchorView, callback)
     }
 
-    fun stream(context: Context, owner: LifecycleOwner, item: AnimeObject.WebInfo.AnimeChapter, anchorView: View? = null, callback: ActionCallback) {
-        execute(context, owner, if (CastUtil.get().connected()) Type.CAST else Type.STREAM, item.link, item, DownloadObject.fromChapter(item, false), anchorView, callback)
+    fun download(context: Context, owner: LifecycleOwner, item: RecentAV1, anchorView: View? = null, callback: ActionCallback) {
+        execute(context, owner, Type.DOWNLOAD, item.chapterUrl, item, item.asDownload(), anchorView, callback)
     }
 
-    fun download(context: Context, owner: LifecycleOwner, item: RecentModel, anchorView: View? = null, callback: ActionCallback) {
-        execute(context, owner, Type.DOWNLOAD, item.chapterUrl, item, DownloadObject.fromRecentModel(item), anchorView, callback)
+    fun download(context: Context, owner: LifecycleOwner, anime: DirectoryAV1, item: Chapter, anchorView: View? = null, callback: ActionCallback) {
+        execute(context, owner, Type.DOWNLOAD, item.link(anime), item, item.asDownload(anime), anchorView, callback)
     }
 
-    fun download(context: Context, owner: LifecycleOwner, item: AnimeObject.WebInfo.AnimeChapter, anchorView: View? = null, callback: ActionCallback) {
-        execute(context, owner, Type.DOWNLOAD, item.link, item, DownloadObject.fromChapter(item, false), anchorView, callback)
+    fun queuedStream(context: Context, owner: LifecycleOwner, anime: DirectoryAV1, chapter: Chapter, anchorView: View? = null, callback: ActionCallback) {
+        execute(context, owner, Type.STREAM, chapter.link(anime), chapter, chapter.asDownload(anime, true), anchorView, callback)
     }
 
-    fun queuedStream(context: Context, owner: LifecycleOwner, item: AnimeObject.WebInfo.AnimeChapter, anchorView: View? = null, callback: ActionCallback) {
-        execute(context, owner, Type.STREAM, item.link, item, DownloadObject.fromChapter(item, true), anchorView, callback)
-    }
-
-    fun queuedDownload(context: Context, owner: LifecycleOwner, item: AnimeObject.WebInfo.AnimeChapter, anchorView: View? = null, callback: ActionCallback) {
-        execute(context, owner, Type.DOWNLOAD, item.link, item, DownloadObject.fromChapter(item, true), anchorView, callback)
+    fun queuedDownload(context: Context, owner: LifecycleOwner, anime: DirectoryAV1, chapter: Chapter, anchorView: View? = null, callback: ActionCallback) {
+        execute(context, owner, Type.DOWNLOAD, chapter.link(anime), chapter, chapter.asDownload(anime, true), anchorView, callback)
     }
 
     private fun execute(context: Context, owner: LifecycleOwner, type: Type, url: String, item: Any, downloadObject: DownloadObject, anchorView: View?, callback: ActionCallback) {
@@ -161,71 +133,85 @@ object FileActions {
             snackBarManager.showSnack("Obteniendo servidores...")
             launch(Dispatchers.IO) {
                 try {
-                    val main = jsoupCookies(url).get()
-                    val servers = ArrayList<Server>()
-                    val sScript = main.select("script")
-                    var j = ""
-                    for (element in sScript) {
-                        val sEl = element.outerHtml()
-                        if ("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().containsMatchIn(sEl)) {
-                            j = sEl
-                            break
-                        }
-                    }
-                    val jsonObject = JSONObject("\\{\"[SUBLAT]+\":\\[.*\\]\\}".toRegex().find(j)?.value
-                            ?: throw IllegalStateException("Episodes json not found"))
-                    if (jsonObject.length() > 1) {
-                        launch(Dispatchers.Main) {
-                            val langSelect: (Int) -> Unit = { index ->
-                                owner.lifecycle.coroutineScope.launch(Dispatchers.IO) {
-                                    val downloads = main.select("table.RTbl.Dwnl tr:contains(${if (index == 0) "SUB" else "LAT"}) a.Button.Sm.fa-download")
-                                    for (e in downloads) {
-                                        var z = e.attr("href")
-                                        z = z.substring(z.lastIndexOf("http"))
-                                        val server = Server.check(context, z)
-                                        if (server != null)
-                                            servers.add(server)
-                                    }
-                                    val jsonArray =
-                                            when (index) {
-                                                1 -> jsonObject.getJSONArray("LAT")
-                                                else -> jsonObject.getJSONArray("SUB")
-                                            }
-                                    for (baseLink in jsonArray) {
-                                        val server = Server.check(context, baseLink.optString("code"))
-                                        if (server != null) {
-                                            try {
-                                                var skip = false
-                                                servers.forEach {
-                                                    if (it.name == server.name) {
-                                                        skip = true
-                                                        return@forEach
-                                                    }
-                                                }
-                                                if (!skip)
-                                                    servers.add(server)
-                                            } catch (e: Exception) {
-                                                e.printStackTrace()
-                                            }
-                                        } else if (!baseLink.optString("code").contains("linkinpork")) {
-                                            servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
+                    val response = JsExtractor.processLinkMultiple(url, listOf("embeds", "downloads"))
+                    var subServers = mutableListOf<Server>()
+                    var dubServers = mutableListOf<Server>()
+                    response.forEach { (_, jSONArray) ->
+                        jSONArray?.getJSONObject(0)?.let {
+                            if (it.has("SUB")) {
+                                for (sub in it.getJSONArray("SUB")) {
+                                    val name = sub.getString("server")
+                                    val url = sub.getString("url")
+                                    if (name == "MP4Upload") {
+                                        if (subServers.find { it.baseLink.contains(url.substringAfterLast("/")) } != null){
+                                            continue
                                         }
                                     }
-                                    servers.sort()
-                                    this@FileActions.servers = servers.filter {
-                                        if (downloadObject.addQueue || type != Type.STREAM) {
-                                            it.canDownload
-                                        } else {
-                                            true
+                                    if (name == "PDrain") {
+                                        if (subServers.find { it.baseLink.substringBeforeLast("?").contains(url.substringBeforeLast("?")) } != null){
+                                            continue
                                         }
-                                    }.toMutableList()
-                                    showServerList(actionRequest)
+                                    }
+                                    val server = Server.check(context, url)
+                                    if (subServers.find { it.baseLink.substringAfterLast("/") == url.substringAfterLast("/") } == null) {
+                                        subServers.add(server?: WebServer(context, url, name))
+                                    }
                                 }
                             }
-                            if (!MultipleDownloadManager.isLoading || MultipleDownloadManager.langSelected == -1)
+                            if (it.has("DUB")) {
+                                for (dub in it.getJSONArray("DUB")) {
+                                    val name = dub.getString("server")
+                                    val url = dub.getString("url")
+                                    if (name == "MP4Upload") {
+                                        if (dubServers.find { it.baseLink.contains(url.substringAfterLast("/")) } != null){
+                                            continue
+                                        }
+                                    }
+                                    if (name == "PDrain") {
+                                        if (dubServers.find { it.baseLink.substringBeforeLast("?").contains(url.substringBeforeLast("?")) } != null){
+                                            continue
+                                        }
+                                    }
+                                    val server = Server.check(context, url)
+                                    if (dubServers.find { it.baseLink.substringAfterLast("/") == url.substringAfterLast("/") } == null) {
+                                        dubServers.add(server?: WebServer(context, url, name))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    subServers = subServers.sortedWith(
+                        compareBy(
+                            { it.name.contains("(WEB)") },
+                            {it.name}
+                        )
+                    ).toMutableList()
+                    dubServers = dubServers.sortedWith(
+                        compareBy(
+                            { it.name.contains("(WEB)") },
+                            {it.name}
+                        )
+                    ).toMutableList()
+                    val langSelect: (Int) -> Unit = { index ->
+                        servers = if (index == 0) {
+                            subServers
+                        } else {
+                            dubServers
+                        }.filter {
+                            when {
+                                downloadObject.addQueue -> it.canDownload
+                                type == Type.STREAM -> it.canStream
+                                else -> it.canDownload
+                            }
+                        }.toMutableList()
+                        showServerList(actionRequest)
+                    }
+                    if (dubServers.isNotEmpty()) {
+                        if (!MultipleDownloadManager.isLoading || MultipleDownloadManager.langSelected == -1)
+                            actionRequest.owner.lifecycleScope.launch(Dispatchers.Main) {
                                 MaterialDialog(context).safeShow {
                                     lifecycleOwner(actionRequest.owner)
-                                    listItems(items = listOf("Subtitulado", "Latino")) { _, index, _ ->
+                                    listItems(items = listOf("Subtitulado", "Doblado")) { _, index, _ ->
                                         langSelect(index)
                                         if (MultipleDownloadManager.isLoading)
                                             MultipleDownloadManager.langSelected = index
@@ -241,48 +227,11 @@ object FileActions {
                                         callback.call(CallbackState.USER_CANCELLED)
                                     }
                                 }
-                            else
-                                langSelect(MultipleDownloadManager.langSelected)
-                        }
+                            }
+                        else
+                            langSelect(MultipleDownloadManager.langSelected)
                     } else {
-                        val downloads = main.select("table.RTbl.Dwnl tr:contains(SUB) a.Button.Sm.fa-download")
-                        for (e in downloads) {
-                            var z = e.attr("href")
-                            z = urlDecode(z.substring(z.lastIndexOf("http")))
-                            val server = Server.check(context, z)
-                            if (server != null)
-                                servers.add(server)
-                        }
-                        val jsonArray = jsonObject.getJSONArray(if (jsonObject.has("SUB")) "SUB" else "LAT")
-                        for (baseLink in jsonArray) {
-                            val server = Server.check(context, baseLink.optString("code"))
-                            if (server != null) {
-                                try {
-                                    var skip = false
-                                    servers.forEach {
-                                        if (it.name == server.name) {
-                                            skip = true
-                                            return@forEach
-                                        }
-                                    }
-                                    if (!skip)
-                                        servers.add(server)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            } else if (!baseLink.optString("code").contains("linkinpork")) {
-                                servers.add(WebServer(context, baseLink.optString("code"), baseLink.optString("title")))
-                            }
-                        }
-                        servers.sort()
-                        this@FileActions.servers = servers.filter {
-                            if (downloadObject.addQueue || type != Type.STREAM) {
-                                it.canDownload
-                            } else {
-                                true
-                            }
-                        }.toMutableList()
-                        showServerList(actionRequest)
+                        langSelect(0)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -302,7 +251,7 @@ object FileActions {
     private fun showServerList(actionRequest: ActionRequest, useLast: Boolean = true) {
         actionRequest.owner.lifecycleScope.launch(Dispatchers.Main) {
             try {
-                if (servers.size == 0) {
+                if (servers.isEmpty()) {
                     Toaster.toast("Sin servidores disponibles")
                     reset()
                     actionRequest.callback.call(CallbackState.NO_SERVERS)
@@ -371,7 +320,7 @@ object FileActions {
                     selected = 0
                     Toaster.toast("Error en servidor")
                     showServerList(actionRequest)
-                } else if (server.options.size == 0) {
+                } else if (server.options.isEmpty()) {
                     servers.removeAt(selected)
                     selected = 0
                     Toaster.toast("Error en servidor")
@@ -381,7 +330,7 @@ object FileActions {
                 } else {
                     saveLastServer(text)
                     when {
-                        text.lowercase(Locale.ENGLISH) in listOf("mega d", "mega s") -> {
+                        server.option.needTabs -> {
                             if (actionRequest.downloadObject.addQueue) {
                                 Toaster.toast("Servidor no disponible para añadir a cola")
                                 showServerList(actionRequest)
@@ -399,8 +348,8 @@ object FileActions {
                         }
                         text.endsWith("(WEB)") -> {
                             delay(1000)
-                            openWebPlayer(actionRequest.context, server.option.url!!)
-                            actionRequest.callback.call(CallbackState.EXTERNAL_LINK)
+                            openWebPlayer(actionRequest.context, server.option.url!!, actionRequest.downloadObject.title)
+                            actionRequest.callback.call(CallbackState.EXTERNAL_LINK, )
                             reset()
                         }
                         else ->
@@ -416,6 +365,7 @@ object FileActions {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                reset()
             }
         }
     }
@@ -430,7 +380,7 @@ object FileActions {
                 MaterialDialog(actionRequest.context).safeShow {
                     lifecycleOwner(actionRequest.owner)
                     title(text = server.name)
-                    listItemsSingleChoice(items = Option.getNames(server.options), initialSelection = 0) { _, index, _ ->
+                    listItemsSingleChoice(items = server.options.map { it.name ?: "" }, initialSelection = 0) { _, index, _ ->
                         saveLastServer(server.name)
                         when (actionRequest.type) {
                             Type.CAST -> {
@@ -466,7 +416,7 @@ object FileActions {
 
     private fun startStreaming(actionRequest: ActionRequest, option: Option) {
         reset()
-        if (actionRequest.item is AnimeObject.WebInfo.AnimeChapter && actionRequest.downloadObject.addQueue) {
+        if (actionRequest.item is ChapterWID && actionRequest.downloadObject.addQueue) {
             QueueManager.add(Uri.parse(option.url), false, actionRequest.item)
         } else {
             AchievementManager.onPlayChapter()
@@ -563,7 +513,7 @@ object FileActions {
     private fun SnackProgressBarManager?.showSnack(text: String) {
         this ?: return
         dismissSnack()
-        showProgressSnackbar(text, SnackProgressBarManager.LENGTH_INDEFINITE)
+        showProgressSnackbar(text, 5000)
     }
 
     private fun SnackProgressBarManager?.dismissSnack() {

@@ -205,24 +205,6 @@
                 android:text="####"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="Seguidores"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2" />
-
-            <TextView
-                android:id="@+id/followers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="2dp"
-                android:text="0"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
-
             <LinearLayout
                 android:id="@+id/lay_score"
                 android:layout_width="match_parent"

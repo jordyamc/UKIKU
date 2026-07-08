@@ -16,13 +16,6 @@
         app:ssi_title="Favoritos" />
 
     <knf.kuma.custom.SyncStaticItemView
-        android:id="@+id/staticSyncSeen"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:ssi_prefId="ls_seen"
-        app:ssi_title="Vistos" />
-
-    <knf.kuma.custom.SyncStaticItemView
         android:id="@+id/staticSyncAchievements"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

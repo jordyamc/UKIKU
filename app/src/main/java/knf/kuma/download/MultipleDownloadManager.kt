@@ -8,17 +8,18 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import knf.kuma.commons.toast
-import knf.kuma.pojos.AnimeObject
+import knf.kuma.pojos.av1.Chapter
+import knf.kuma.pojos.av1.DirectoryAV1
 import knf.kuma.videoservers.FileActions
 
 object MultipleDownloadManager {
     private const val CHAPTER_SIZE = 160000000L
     private var index = 0
-    private var chaptersList: List<AnimeObject.WebInfo.AnimeChapter> = listOf()
+    private var chaptersList: List<Chapter> = listOf()
     var isLoading = false
     var langSelected = -1
 
-    fun startDownload(fragment: Fragment, view: View, list: List<AnimeObject.WebInfo.AnimeChapter>, addQueue: Boolean) {
+    fun startDownload(fragment: Fragment, view: View, anime: DirectoryAV1, list: List<Chapter>, addQueue: Boolean) {
         if (list.isEmpty()) return
         if (!addQueue && !isSpaceAvailable(list.size)) {
             "Se requieren mínimo ${minSpaceString(fragment.requireContext(), list.size)} libres!".toast()
@@ -26,10 +27,10 @@ object MultipleDownloadManager {
         }
         clear(list)
         isLoading = true
-        downloadNext(fragment, view, addQueue)
+        downloadNext(fragment, view, anime, addQueue)
     }
 
-    private fun downloadNext(fragment: Fragment, view: View, addQueue: Boolean) {
+    private fun downloadNext(fragment: Fragment, view: View, anime: DirectoryAV1, addQueue: Boolean) {
         if (index >= chaptersList.size || !fragment.isAdded || fragment.context == null) {
             isLoading = false
             langSelected = -1
@@ -50,18 +51,18 @@ object MultipleDownloadManager {
                 }
                 else -> {
                     index++
-                    downloadNext(fragment, view, addQueue)
+                    downloadNext(fragment, view, anime, addQueue)
                     Log.e("MultiDownload", "on Next")
                 }
             }
         }
         if (!addQueue)
-            FileActions.download(fragment.requireContext(), fragment.viewLifecycleOwner, current, view, callback)
+            FileActions.download(fragment.requireContext(), fragment.viewLifecycleOwner, anime, current, view, callback)
         else
-            FileActions.queuedStream(fragment.requireContext(), fragment.viewLifecycleOwner, current, view, callback)
+            FileActions.queuedStream(fragment.requireContext(), fragment.viewLifecycleOwner, anime, current, view, callback)
     }
 
-    private fun clear(list: List<AnimeObject.WebInfo.AnimeChapter>) {
+    private fun clear(list: List<Chapter>) {
         index = 0
         chaptersList = list
         isLoading = false

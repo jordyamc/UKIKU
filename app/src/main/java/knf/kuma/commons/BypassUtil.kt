@@ -14,6 +14,7 @@ import knf.tools.bypass.DisplayType
 import knf.tools.bypass.Request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.Headers
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 
@@ -38,7 +39,7 @@ class BypassUtil {
         private const val keyCfDuid = "__cfduid"
         private const val keyCookiesBypass = "bypass_cookies"
         private const val defaultValue = ""
-        const val testLink = "https://www3.animeflv.net/"
+        const val testLink = "https://animeav1.com/"
 
         fun createRequest(): Request {
             return Request(
@@ -151,9 +152,6 @@ class BypassUtil {
 
         fun getMapCookie(context: Context): Map<String, String> {
             val map = LinkedHashMap<String, String>()
-            map["device"] = "computer"
-            map["InstiSession"] =
-                "eyJpZCI6IjRlNGYwNWYxLTg4NDMtNGQwOS05ODlmLWM1OWQ5N2NmNjVlYyIsInJlZmVycmVyIjoiIiwiY2FtcGFpZ24iOnsic291cmNlIjpudWxsLCJtZWRpdW0iOm51bGwsImNhbXBhaWduIjpudWxsLCJ0ZXJtIjpudWxsLCJjb250ZW50IjpudWxsfX0="
             bypassCookies?.split(";")?.forEach {
                 if (it.contains("=")) {
                     val split = it.split("=")
@@ -177,6 +175,13 @@ class BypassUtil {
                 "Cookie" to getStringCookie(App.context),
                 "User-Agent" to userAgent
             )
+        }
+
+        fun getOKHttpHeaders(): Headers {
+            return Headers.Builder().apply {
+                add("Cookie",getStringCookie(App.context))
+                add("User-Agent", userAgent)
+            }.build()
         }
 
         fun getStringCookie(context: Context): String {
@@ -206,6 +211,11 @@ class BypassUtil {
 
         private fun setCFDuid(context: Context, value: String = defaultValue) {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString(keyCfDuid, value).apply()
+        }
+
+        suspend fun clear() {
+            bypassCookies = null
+            PrefsUtil.userAgent = UAGenerator.getLatestUserAgent()
         }
     }
 }

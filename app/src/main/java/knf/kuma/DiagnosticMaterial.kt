@@ -8,7 +8,6 @@ import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -29,10 +28,7 @@ import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
 import knf.kuma.custom.StateView
 import knf.kuma.custom.StateViewMaterial
-import knf.kuma.database.CacheDB
 import knf.kuma.databinding.LayoutDiagnosticMaterialBinding
-import knf.kuma.directory.DirectoryService
-import knf.kuma.directory.DirectoryUpdateService
 import knf.kuma.uagen.randomUA
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
@@ -71,8 +67,6 @@ class DiagnosticMaterial : GenericActivity() {
 
     private fun startTests() {
         runNetworkTests()
-        //runInternetTest()
-        runDirectoryTest()
         runMemoryTest()
         runBackupTest()
     }
@@ -277,18 +271,6 @@ class DiagnosticMaterial : GenericActivity() {
             else -> "Kb/s"
         }
         return "${decimal.setScale(1, RoundingMode.HALF_UP)}$unit~"
-    }
-
-    private fun runDirectoryTest() {
-        binding.dirState.load(when {
-            PrefsUtil.isDirectoryFinished && !DirectoryUpdateService.isRunning -> "Completo"
-            PrefsUtil.isDirectoryFinished && DirectoryUpdateService.isRunning -> "Actualizando"
-            !PrefsUtil.isDirectoryFinished && DirectoryService.isRunning -> "Creando"
-            else -> "Incompleto"
-        })
-        CacheDB.INSTANCE.animeDAO().countLive.observe(this, Observer {
-            binding.dirTotalState.load(it.toString())
-        })
     }
 
     private fun runMemoryTest() {

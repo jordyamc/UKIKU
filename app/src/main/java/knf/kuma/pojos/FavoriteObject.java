@@ -98,17 +98,6 @@ public class FavoriteObject implements Comparable<FavoriteObject> {
         return strings;
     }
 
-    public static Integer[] getIndex(List<FavoriteObject> list, String category) {
-        List<Integer> index = new ArrayList<>();
-        int i = 0;
-        for (FavoriteObject object : list) {
-            if (object.category.equals(category))
-                index.add(i);
-            i++;
-        }
-        return index.toArray(new Integer[0]);
-    }
-
     public void setCategory(String category) {
         if (category == null)
             this.category = CATEGORY_NONE;

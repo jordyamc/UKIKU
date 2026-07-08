@@ -9,10 +9,16 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -20,6 +26,8 @@ import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.gson.Gson
+import com.inmobi.media.fa
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.SSLSkipper
@@ -29,6 +37,8 @@ import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.PlayerViewBinding
 import knf.kuma.pojos.QueueObject
+import knf.kuma.uagen.randomLatestUA
+import knf.kuma.uagen.randomUA
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -42,7 +52,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  * [MediaSessionCompat] and picture in picture as well.
  */
 
-class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
+class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
     private val mediaSession: MediaSessionCompat by lazy { createMediaSession() }
     private val mediaSessionConnector: MediaSessionConnector by lazy {
         createMediaSessionConnector()
@@ -61,6 +71,10 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
         volumeControlStream = AudioManager.STREAM_MUSIC
         hideUI()
         SSLSkipper.skip()
+        initPlayer(savedInstanceState)
+    }
+
+    fun initPlayer(savedInstanceState: Bundle?) {
         binding.player.resizeMode = getResizeMode()
         find<View>(R.id.exit).onClick { onBackPressedDispatcher.onBackPressed() }
         find<View>(R.id.lock).onClick { lock() }
@@ -93,7 +107,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
             }
             //createMediaSession()
             withContext(Dispatchers.Main) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isInPictureInPictureMode)
+                if (isInPictureInPictureMode)
                     binding.player.useController = false
                 createPlayer()
                 playerHolder.start()
@@ -158,7 +172,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
 
     override fun onPause() {
         super.onPause()
-        if (Build.VERSION.SDK_INT >= 24 && isInPictureInPictureMode)
+        if (isInPictureInPictureMode)
             resumePlayer()
         else {
             if (::playerHolder.isInitialized)
@@ -229,16 +243,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
     }
 
     private fun createMediaSessionConnector(): MediaSessionConnector =
-            MediaSessionConnector(mediaSession).apply {
-                // If QueueNavigator isn't set, then mediaSessionConnector will not handle following
-                // MediaSession actions (and they won't show up in the minimized PIP activity):
-                // [ACTION_SKIP_PREVIOUS], [ACTION_SKIP_NEXT], [ACTION_SKIP_TO_QUEUE_ITEM]
-                /*setQueueNavigator(object : TimelineQueueNavigator(mediaSession) {
-                    override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
-
-                    }
-                })*/
-            }
+            MediaSessionConnector(mediaSession)
 
 
     // MediaSession related functions.
@@ -300,7 +305,7 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
 
     // Picture in Picture related functions.
     override fun onUserLeaveHint() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && ::playerHolder.isInitialized && playerHolder.audioFocusPlayer.playWhenReady && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+        if (::playerHolder.isInitialized && playerHolder.audioFocusPlayer.playWhenReady && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             noCrash {
                 enterPictureInPictureMode(
                     with(PictureInPictureParams.Builder()) {
@@ -311,7 +316,6 @@ class VideoActivity : GenericActivity(), PlayerHolder.PlayerCallback {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(
         isInPictureInPictureMode: Boolean,
         newConfig: Configuration

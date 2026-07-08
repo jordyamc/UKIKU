@@ -5,17 +5,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
-import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
-import androidx.tvprovider.media.tv.PreviewChannelHelper
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -25,36 +22,26 @@ import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.R
 import knf.kuma.commons.DesignUtils
+import knf.kuma.commons.JsExtractor
 import knf.kuma.commons.Network
-import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.create
 import knf.kuma.commons.isFullMode
-import knf.kuma.commons.jsoupCookies
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadDialogActivity
 import knf.kuma.download.FileAccessHelper
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.NotificationObj
-import knf.kuma.pojos.RecentObject
-import knf.kuma.pojos.Recents
+import knf.kuma.pojos.av1.RecentAV1
 import knf.kuma.recents.RecentsNotReceiver
-import knf.kuma.search.SearchAdvObject
-import knf.kuma.tv.ChannelUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.notificationManager
-import pl.droidsonroids.jspoon.Jspoon
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters) {
     private val RECENTS_GROUP = "recents-group"
-    private val recentsDAO = CacheDB.INSTANCE.recentsDAO()
-    private val favsDAO = CacheDB.INSTANCE.favsDAO()
-    private val seeingDAO = CacheDB.INSTANCE.seeingDAO()
-    private val animeDAO = CacheDB.INSTANCE.animeDAO()
+    private val recentsDAO = CacheDB.INSTANCE.recentAV1DAO()
+    private val favsDAO = CacheDB.INSTANCE.favoriteAV1DAO()
+    private val seeingDAO = CacheDB.INSTANCE.organizerDAO()
     private val notificationDAO = CacheDB.INSTANCE.notificationDAO()
     private val manager: NotificationManager by lazy { context.notificationManager }
 
@@ -65,23 +52,20 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
         if (!Network.isConnected) return Result.success().also { Log.e("Recents", "No Network") }
         //setForeground(createForegroundInfo())
         try {
-            val recents = withContext(Dispatchers.IO) {
-                Jspoon.create().adapter(Recents::class.java)
-                    .fromHtml(jsoupCookies("https://www3.animeflv.net/").get().outerHtml())
+            val array = JsExtractor.processLink("https://animeav1.com/")
+            val recents = mutableListOf<RecentAV1>()
+            for (i in 0 until array!!.length()) {
+                recents.add(RecentAV1.fromJson(i, array.getJSONObject(i)))
             }
-            val objects = RecentObject.create(recents.list ?: listOf())
-            for ((i, recentObject) in objects.withIndex())
-                recentObject.key = i
-            notifyChannel(objects)
             val local = recentsDAO.all
             if (local.isEmpty() && !BuildConfig.DEBUG)
                 return Result.success()
             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notify_favs", false)) {
-                notifyFavChaps(local, objects)
+                notifyFavChaps(local, recents)
             } else {
-                notifyAllChaps(local, objects)
+                notifyAllChaps(local, recents)
             }
-            recentsDAO.setCache(objects)
+            recentsDAO.setCache(recents)
             return Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -89,79 +73,38 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
         }
     }
 
-    private fun createForegroundInfo(): ForegroundInfo =
-        ForegroundInfo(
-            Random.nextInt(1000, 9999),
-            NotificationCompat.Builder(context, CHANNEL_RECENTS)
-                .setSmallIcon(R.drawable.ic_recents_group)
-                .setColor(ContextCompat.getColor(context, R.color.colorAccent))
-                .setContentText("Buscando nuevos episodios")
-                .setProgress(100, 0, true)
-                .build()
-        )
-
-    private fun notifyTest() {
-        manager.notify(
-            Random.nextInt(),
-            NotificationCompat.Builder(context, CHANNEL_RECENTS)
-                .setSmallIcon(R.drawable.ic_recents_group)
-                .setColor(ContextCompat.getColor(context, R.color.colorAccent))
-                .setContentText("Test notification, ${System.currentTimeMillis()}")
-                .build()
-        )
-    }
-
     @Throws(Exception::class)
     private fun notifyAllChaps(
-        local: MutableList<RecentObject>,
-        objects: MutableList<RecentObject>
+        local: List<RecentAV1>,
+        objects: List<RecentAV1>
     ) {
-        for (recentObject in objects) {
-            if (!local.contains(recentObject)) {
-                notifyRecent(recentObject)
+        objects.filter {
+            !local.any { l ->
+                l.eid == it.eid
             }
+        }.forEach {
+            notifyRecent(it)
         }
     }
 
     @Throws(Exception::class)
     private fun notifyFavChaps(
-        local: MutableList<RecentObject>,
-        objects: MutableList<RecentObject>
+        local: List<RecentAV1>,
+        objects: List<RecentAV1>
     ) {
-        for (recentObject in objects) {
-            if (!local.contains(recentObject) && (favsDAO.isFav(Integer.parseInt(recentObject.aid)) || seeingDAO.isSeeing(
-                    recentObject.aid
-                ))
-            ) {
-                notifyRecent(recentObject)
-            }
-        }
-    }
-
-    private fun notifyChannel(objects: List<RecentObject>) {
-        if (!context.resources.getBoolean(R.bool.isTv) || !PrefsUtil.tvRecentsChannelCreated) return
-        val lastNotified =
-            objects.indexOf(objects.find { it.eid == PrefsUtil.tvRecentsChannelLastEid })
-        if (lastNotified != 0) {
-            with(PreviewChannelHelper(context)) {
-                PrefsUtil.tvRecentsChannelIds?.forEach {
-                    deletePreviewProgram(it.toLong())
-                }
-            }
-            val newIds = mutableSetOf<String>()
-            objects.forEach {
-                newIds.add(ChannelUtils.addProgram(context, it).toString())
-            }
-            PrefsUtil.tvRecentsChannelIds = newIds
-            PrefsUtil.tvRecentsChannelLastEid = objects.first().eid
+        objects.filter {
+            !local.any { l ->
+                l.eid == it.eid
+            } && (favsDAO.isFav(it.aid) || seeingDAO.isSeeing(it.aid))
+        }.forEach {
+            notifyRecent(it)
         }
     }
 
     @Throws(Exception::class)
-    private fun notifyRecent(recentObject: RecentObject) {
-        val animeObject = getAnime(recentObject)
+    private fun notifyRecent(recentObject: RecentAV1) {
         val obj = NotificationObj(
-            "${recentObject.aid}${recentObject.chapter}".hashCode(),
+            recentObject.eid,
             NotificationObj.RECENT
         )
         val notification = NotificationCompat.Builder(context, CHANNEL_RECENTS).create {
@@ -173,29 +116,30 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
             val tone = FileAccessHelper.toneFile
             if (tone.exists())
                 setSound(
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val uri: Uri = FileProvider.getUriForFile(
-                            context,
-                            "${context.packageName}.fileprovider",
-                            tone
-                        )
+                    FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        tone
+                    ).also {
                         context.grantUriPermission(
                             "com.android.systemui",
-                            uri,
+                            FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.fileprovider",
+                                tone
+                            ),
                             Intent.FLAG_GRANT_READ_URI_PERMISSION
                         )
-                        uri
-                    } else
-                        Uri.fromFile(tone)
+                    }
                 )
-            setLargeIcon(getBitmap(recentObject))
+            setLargeIcon(getBitmap(recentObject.animeImageUrl))
             setAutoCancel(true)
             setOnlyAlertOnce(true)
             setContentIntent(
                 PendingIntent.getActivity(
                     context,
                     System.currentTimeMillis().toInt(),
-                    getAnimeIntent(animeObject, obj),
+                    getAnimeIntent(recentObject, obj),
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             )
@@ -207,7 +151,7 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             )
-            if (isFullMode && !PrefsUtil.isFamilyFriendly)
+            if (isFullMode)
                 addAction(
                     android.R.drawable.stat_sys_download_done,
                     "Acciones",
@@ -226,47 +170,30 @@ class RecentsWork(val context: Context, workerParameters: WorkerParameters) :
         notifySummary()
     }
 
-    private fun getBitmap(recentObject: RecentObject): Bitmap? {
+    private fun getBitmap(link: String): Bitmap? {
         return try {
-            if (PrefsUtil.showRecentImage) Glide.with(context).asBitmap().load(PatternUtil.getCover(recentObject.aid)).submit().get() else null
+            if (PrefsUtil.showRecentImage) Glide.with(context).asBitmap().load(link).submit().get() else null
         } catch (e: Exception) {
             null
         }
 
     }
 
-    @Throws(Exception::class)
-    private fun getAnime(recentObject: RecentObject): SearchAdvObject {
-        var animeObject: SearchAdvObject? = animeDAO.getByAid(recentObject.aid)
-        if (animeObject == null) {
-            val tmp = AnimeObject(recentObject.anime, Jspoon.create().adapter(AnimeObject.WebInfo::class.java).fromHtml(jsoupCookies(recentObject.anime).get().outerHtml()))
-            animeObject = SearchAdvObject().apply {
-                key = tmp.key
-                name = tmp.name
-                link = tmp.link
-                aid = tmp.aid
-                type = tmp.type
-                img = tmp.img
-            }
-            animeDAO.insert(tmp)
-        }
-        return animeObject
-    }
-
-    private fun getAnimeIntent(animeObject: SearchAdvObject, notificationObj: NotificationObj): Intent {
+    private fun getAnimeIntent(animeObject: RecentAV1, notificationObj: NotificationObj): Intent {
         return Intent(context, DesignUtils.infoClass)
-                .setData(Uri.parse(animeObject.link))
+                .setData(animeObject.animeUrl.toUri())
                 .putExtras(notificationObj.getBroadcast(context))
                 .putExtra("title", animeObject.name)
                 .putExtra("aid", animeObject.aid)
-                .putExtra("img", animeObject.img)
+                .putExtra("img", animeObject.animeImageUrl)
                 .putExtra("notification", true)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
-    private fun getChapIntent(recentObject: RecentObject, notificationObj: NotificationObj): Intent {
+    private fun getChapIntent(recentObject: RecentAV1, notificationObj: NotificationObj): Intent {
         return Intent(context, DownloadDialogActivity::class.java)
-                .setData(Uri.parse(recentObject.url))
+                .setData(recentObject.chapterUrl.toUri())
+                .putExtra("eid", recentObject.eid)
                 .putExtras(notificationObj.getBroadcast(context))
                 .putExtra("notification", true)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

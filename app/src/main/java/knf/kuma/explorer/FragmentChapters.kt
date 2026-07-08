@@ -26,7 +26,7 @@ import knf.kuma.commons.noCrashSuspend
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.ExplorerObject
-import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.av1.Record
 import knf.kuma.queue.QueueManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,7 +67,7 @@ class FragmentChapters : Fragment() {
         lifecycleScope.launch(Dispatchers.Main){
             noCrashSuspend {
                 withContext(Dispatchers.IO) {
-                    CacheDB.INSTANCE.recordsDAO().add(RecordObject.fromDownloaded(list.last()))
+                    CacheDB.INSTANCE.recordAV1DAO().addAll(list.map { Record.fromDownloaded(it) })
                     syncData { history() }
                     QueueManager.startQueueDownloaded(context, list)
                 }

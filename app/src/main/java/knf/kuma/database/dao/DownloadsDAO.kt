@@ -10,6 +10,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import knf.kuma.pojos.DownloadObject
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DownloadsDAO {
@@ -42,6 +43,9 @@ interface DownloadsDAO {
 
     @Query("SELECT * FROM downloadobject WHERE eid = :eid")
     fun getLiveByEid(eid: String): LiveData<DownloadObject>
+
+    @Query("SELECT * FROM downloadobject WHERE eid = :eid")
+    fun getFlowByEid(eid: String): Flow<DownloadObject?>
 
     @Query("SELECT * FROM downloadobject WHERE `key` LIKE :key")
     fun getLiveByKey(key: Int): LiveData<DownloadObject>

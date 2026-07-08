@@ -2,6 +2,7 @@ package knf.kuma.tv.search
 
 import android.view.ViewGroup
 import androidx.leanback.widget.Presenter
+import knf.kuma.pojos.av1.Genre
 import knf.kuma.tv.cards.TagCardView
 
 class TagPresenter : Presenter() {
@@ -12,7 +13,7 @@ class TagPresenter : Presenter() {
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         if (item == null) return
-        (viewHolder.view as TagCardView).bind(item as String)
+        (viewHolder.view as TagCardView).bind(item as Genre)
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {

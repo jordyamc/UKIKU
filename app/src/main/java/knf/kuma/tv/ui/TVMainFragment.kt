@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.SparseArray
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.util.size
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
@@ -25,17 +26,17 @@ import knf.kuma.backup.Backups
 import knf.kuma.backup.firestore.FirestoreManager
 import knf.kuma.backup.framework.BackupService
 import knf.kuma.backup.framework.DropBoxService
-import knf.kuma.commons.distinct
 import knf.kuma.database.CacheDB
-import knf.kuma.directory.DirObject
 import knf.kuma.home.StaffRecommendations
-import knf.kuma.pojos.AnimeObject
-import knf.kuma.pojos.FavoriteObject
-import knf.kuma.pojos.RecentObject
-import knf.kuma.pojos.RecordObject
+import knf.kuma.pojos.av1.DirectoryAV1Min
+import knf.kuma.pojos.av1.FavoriteAV1
+import knf.kuma.pojos.av1.RecentAV1
+import knf.kuma.pojos.av1.Recommended
+import knf.kuma.pojos.av1.Record
 import knf.kuma.retrofit.Repository
 import knf.kuma.tv.AnimeRow
 import knf.kuma.tv.GlideBackgroundManager
+import knf.kuma.tv.TVRepository
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.tv.anime.FavPresenter
 import knf.kuma.tv.anime.RecentsPresenter
@@ -44,6 +45,7 @@ import knf.kuma.tv.anime.SectionPresenter
 import knf.kuma.tv.anime.SyncPresenter
 import knf.kuma.tv.details.TVAnimesDetails
 import knf.kuma.tv.directory.DirPresenter
+import knf.kuma.tv.directory.RecommendedPresenter
 import knf.kuma.tv.search.TVSearch
 import knf.kuma.tv.sections.DirSection
 import knf.kuma.tv.sections.EmissionSection
@@ -51,14 +53,13 @@ import knf.kuma.tv.sections.SectionObject
 import knf.kuma.tv.sync.BypassObject
 import knf.kuma.tv.sync.LogOutObject
 import knf.kuma.tv.sync.SyncObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
 class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.OnClickListener {
     private var mRows: SparseArray<AnimeRow>? = null
-
     private var backgroundManager: GlideBackgroundManager? = null
     private var service: BackupService? = null
     private var waitingLoginDropbox = false
@@ -100,7 +101,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                 .setPage(1))
         mRows?.put(STAFF, AnimeRow()
                 .setId(STAFF)
-                .setAdapter(ArrayObjectAdapter(DirPresenter()))
+                .setAdapter(ArrayObjectAdapter(RecommendedPresenter()))
                 .setTitle("Recomendados")
                 .setPage(1))
         mRows?.put(BEST, AnimeRow()
@@ -122,7 +123,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
 
     private fun createRows() {
         val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-        for (i in 0 until (mRows?.size() ?: 0)) {
+        for (i in 0 until (mRows?.size ?: 0)) {
             val row = mRows?.get(i)
             val headerItem = HeaderItem(row?.id?.toLong() ?: 0, row?.title)
             val listRow = ListRow(headerItem, row?.adapter)
@@ -135,75 +136,80 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
     private fun fetchData() {
         Repository().reloadRecents()
         activity?.let {
-            CacheDB.INSTANCE.recentsDAO().objects.distinct.observe(it) { recentObjects ->
-                mRows?.get(RECENTS)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, recentObjects)
+            viewLifecycleOwner.lifecycleScope.launch {
+                launch {
+                    CacheDB.INSTANCE.recentAV1DAO().allFlow.distinctUntilChanged().collectLatest { recentObjects ->
+                        mRows?.get(RECENTS)?.apply {
+                            page = page.plus(1)
+                            adapter?.apply {
+                                clear()
+                                addAll(0, recentObjects)
+                            }
+                        }
+                        startEntranceTransition()
                     }
                 }
-                startEntranceTransition()
-            }
-            CacheDB.INSTANCE.recordsDAO().allLive.distinct.observe(it) { recordObjects ->
-                mRows?.get(LAST_SEEN)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, recordObjects)
+                launch {
+                    CacheDB.INSTANCE.recordAV1DAO().allFlow.distinctUntilChanged().collectLatest { recordObjects ->
+                        mRows?.get(LAST_SEEN)?.apply {
+                            page = page.plus(1)
+                            adapter?.apply {
+                                clear()
+                                addAll(0, recordObjects)
+                            }
+                        }
+                        startEntranceTransition()
                     }
                 }
-                startEntranceTransition()
-            }
-            CacheDB.INSTANCE.favsDAO().all.distinct.observe(it) { favoriteObjects ->
-                mRows?.get(FAVORITES)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, favoriteObjects)
+                launch {
+                    CacheDB.INSTANCE.favoriteAV1DAO().all.distinctUntilChanged().collectLatest {
+                        mRows?.get(FAVORITES)?.apply {
+                            page = page.plus(1)
+                            adapter?.apply {
+                                clear()
+                                addAll(0, it)
+                            }
+                        }
+                        startEntranceTransition()
                     }
                 }
-                startEntranceTransition()
-            }
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                var recList = emptyList<DirObject>()
-                while (recList.size < 15) {
-                    delay(100)
-                    recList = CacheDB.INSTANCE.animeDAO()
-                        .animesDirWithIDRandomNL(StaffRecommendations.randomIds(15))
-                }
-                launch(Dispatchers.Main) {
+                launch {
+                    val recommended = StaffRecommendations.createList(15)
                     mRows?.get(STAFF)?.apply {
                         page = page.plus(1)
                         adapter?.apply {
                             clear()
-                            addAll(0, recList)
+                            addAll(0, recommended)
                         }
                     }
                     startEntranceTransition()
                 }
-            }
-            CacheDB.INSTANCE.animeDAO().emissionVotesLimited.distinct.observe(
-                it
-            ) { emissionObjects ->
-                mRows?.get(BEST)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, emissionObjects)
+                launch {
+                    val list = TVRepository.searchDir(TVRepository.TYPE_BEST)
+                    if (list.isNotEmpty()) {
+                        mRows?.get(BEST)?.apply {
+                            page = page.plus(1)
+                            adapter?.apply {
+                                clear()
+                                addAll(0, list)
+                            }
+                        }
+                        startEntranceTransition()
                     }
                 }
-                startEntranceTransition()
-            }
-            CacheDB.INSTANCE.animeDAO().allVotesLimited.distinct.observe(it) { emissionObjects ->
-                mRows?.get(BESTGLOBAL)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, emissionObjects)
+                launch {
+                    val list = TVRepository.searchDir(TVRepository.TYPE_BEST_GLOBAL)
+                    if (list.isNotEmpty()) {
+                        mRows?.get(BESTGLOBAL)?.apply {
+                            page = page.plus(1)
+                            adapter?.apply {
+                                clear()
+                                addAll(0, list)
+                            }
+                        }
+                        startEntranceTransition()
                     }
                 }
-                startEntranceTransition()
             }
             arrayListOf(DirSection(), EmissionSection()).let { sections ->
                 mRows?.get(SECTIONS)?.apply {
@@ -223,40 +229,61 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
     }
 
     override fun onItemClicked(itemViewHolder: Presenter.ViewHolder?, item: Any?, rowViewHolder: RowPresenter.ViewHolder?, row: Row?) {
-        if (item is RecentObject) {
-            TVServersFactory.start(activity as Activity, item.url, AnimeObject.WebInfo.AnimeChapter.fromRecent(item), activity as TVServersFactory.ServersInterface)
-        } else if (item is RecordObject) {
-            if (item.animeObject != null)
-                context?.let { TVAnimesDetails.start(it, item.animeObject.link) }
-            else
-                Toaster.toast("Anime no encontrado")
-        } else if (item is FavoriteObject) {
-            context?.let { TVAnimesDetails.start(it, item.link) }
-        } else if (item is DirObject) {
-            context?.let { TVAnimesDetails.start(it, item.link) }
-        } else if (item is SectionObject) {
-            item.open(context)
-        } else if (item is SyncObject) {
-            when (item) {
-                is LogOutObject -> {
-                    service?.logOut()
-                    activity?.let { FirestoreManager.doSignOut(it) }
-                    Backups.type = Backups.Type.NONE
-                    onLogin()
-                }
-                is BypassObject -> startActivity(Intent(context, Diagnostic.FullBypass::class.java))
-                else -> {
-                    when (item.type) {
-                        Backups.Type.DROPBOX -> {
-                            waitingLoginDropbox = true
-                            if (item.type == Backups.Type.DROPBOX)
-                                service = DropBoxService().also { it.logIn() }
-                        }
-                        Backups.Type.FIRESTORE -> {
-                            waitingLoginFirestore = true
-                            activity?.let { FirestoreManager.doLogin(it) }
-                        }
-                        else -> {
+        when (item) {
+            is RecentAV1 -> {
+                TVServersFactory.start(
+                    requireActivity(),
+                    item.chapterUrl,
+                    item,
+                    activity as TVServersFactory.ServersInterface
+                )
+            }
+
+            is Record -> {
+                context?.let { TVAnimesDetails.start(it, item.animeUrl) }
+            }
+
+            is Recommended -> {
+                context?.let { TVAnimesDetails.start(it, item.animeUrl) }
+            }
+
+            is FavoriteAV1 -> {
+                context?.let { TVAnimesDetails.start(it, item.animeUrl) }
+            }
+
+            is DirectoryAV1Min -> {
+                context?.let { TVAnimesDetails.start(it, item.animeUrl) }
+            }
+
+            is SectionObject -> {
+                item.open(context)
+            }
+
+            is SyncObject -> {
+                when (item) {
+                    is LogOutObject -> {
+                        service?.logOut()
+                        activity?.let { FirestoreManager.doSignOut(it) }
+                        Backups.type = Backups.Type.NONE
+                        onLogin()
+                    }
+
+                    is BypassObject -> startActivity(Intent(context, Diagnostic.FullBypass::class.java))
+                    else -> {
+                        when (item.type) {
+                            Backups.Type.DROPBOX -> {
+                                waitingLoginDropbox = true
+                                if (item.type == Backups.Type.DROPBOX)
+                                    service = DropBoxService().also { it.logIn() }
+                            }
+
+                            Backups.Type.FIRESTORE -> {
+                                waitingLoginFirestore = true
+                                activity?.let { FirestoreManager.doLogin(it) }
+                            }
+
+                            else -> {
+                            }
                         }
                     }
                 }

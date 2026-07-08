@@ -7,6 +7,7 @@ import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import org.jsoup.Connection
 import org.jsoup.Jsoup
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -74,7 +75,8 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
             try {
                 val request = Jsoup.connect(option.url ?: "")
                     .ignoreHttpErrors(true)
-                    .ignoreContentType(true).apply {
+                    .ignoreContentType(true)
+                    .method(Connection.Method.HEAD).apply {
                         if (option.headers != null) {
                             for (pair in option.headers?.createHeaders() ?: arrayListOf()) {
                                 header(pair.first, pair.second)
@@ -120,7 +122,11 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 RVServer(context, base),
                 ZippyServer(context, base),
                 YUServer(context, base),
-                MP4UploadServer(context, base)
+                MP4UploadServer(context, base),
+                ZillaServer(context, base),
+                PixelServer(context, base),
+                UPNServer(context, base),
+                FichierServer(context, base)
             )
         }
 

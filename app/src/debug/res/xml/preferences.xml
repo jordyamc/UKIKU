@@ -31,14 +31,6 @@
             android:key="recent_image"
             android:summary="Episodios recientes"
             android:title="Portada en notificación"/>
-        <ListPreference
-            android:defaultValue="7"
-            android:entries="@array/dir_options"
-            android:entryValues="@array/dir_values"
-            android:icon="@drawable/ic_directory"
-            android:key="dir_update_time"
-            android:summary="%s"
-            android:title="Recrear directorio"/>
         <Preference
             android:icon="@drawable/ic_note"
             android:key="custom_tone"
@@ -265,11 +257,6 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Extras">
-        <SwitchPreference
-            android:defaultValue="false"
-            android:icon="@drawable/ic_ff"
-            android:key="family_friendly_enabled"
-            android:title="Modo family friendly" />
         <androidx.preference.ListPreference
             android:defaultValue="10"
             android:entries="@array/timeout_options"
@@ -304,14 +291,6 @@
             android:summaryOff="Web"
             android:summaryOn="Archivo local"
             android:title="Obtencion de changelog"/>
-        <Preference
-            android:icon="@drawable/ic_settings_reload"
-            android:key="dir_update"
-            android:title="Actualizar directorio"/>
-        <Preference
-            android:icon="@drawable/ic_danger"
-            android:key="dir_destroy"
-            android:title="Recrear directorio"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Debug">

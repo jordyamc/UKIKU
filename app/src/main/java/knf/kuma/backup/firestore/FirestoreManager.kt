@@ -31,7 +31,6 @@ import knf.kuma.backup.firestore.data.GenresData
 import knf.kuma.backup.firestore.data.HistoryData
 import knf.kuma.backup.firestore.data.QueueData
 import knf.kuma.backup.firestore.data.SeeingData
-import knf.kuma.backup.firestore.data.SeenData
 import knf.kuma.backup.firestore.data.TopData
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
@@ -39,12 +38,9 @@ import knf.kuma.commons.admFile
 import knf.kuma.commons.currentTime
 import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.noCrash
-import knf.kuma.commons.noCrashExec
-import knf.kuma.commons.noCrashLet
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.database.EADB
-import knf.kuma.pojos.SeenObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -54,8 +50,6 @@ import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster.toast
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 object FirestoreManager {
     enum class State { IDLE, UPLOAD, SYNC }
@@ -69,7 +63,6 @@ object FirestoreManager {
     val isLoggedIn: Boolean get() = uid != null
 
     val favsLiveData = MutableLiveData(State.IDLE)
-    val seenLiveData = MutableLiveData(State.IDLE)
     val eaLiveData = MutableLiveData(State.IDLE)
     val achievementsLiveData = MutableLiveData(State.IDLE)
     val genresLiveData = MutableLiveData(State.IDLE)
@@ -88,12 +81,12 @@ object FirestoreManager {
             isFirestoreEnabled = true
             QueueManager.open()
             doAsync {
-                firestoreDB.document("users/$uid/backups/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.document("users/$uid/backupsav1/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
                         if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                             runBlocking(Dispatchers.Main) { historyLiveData.value = State.SYNC }
                             documentSnapshot.toObject<HistoryData>()?.list?.let {
-                                CacheDB.INSTANCE.recordsDAO().apply {
+                                CacheDB.INSTANCE.recordAV1DAO().apply {
                                     clear()
                                     addAll(it)
                                 }
@@ -104,7 +97,7 @@ object FirestoreManager {
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
-                firestoreDB.document("users/$uid/backups/achievements").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.document("users/$uid/backupsav1/achievements").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
                         if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                             runBlocking(Dispatchers.Main) { achievementsLiveData.value = State.SYNC }
@@ -119,7 +112,7 @@ object FirestoreManager {
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
-                firestoreDB.document("users/$uid/backups/ea").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.document("users/$uid/backupsav1/ea").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
                         if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                             runBlocking(Dispatchers.Main) { eaLiveData.value = State.SYNC }
@@ -134,12 +127,12 @@ object FirestoreManager {
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
-                firestoreDB.document("users/$uid/backups/favs").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.document("users/$uid/backupsav1/favs").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
                         if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                             runBlocking(Dispatchers.Main) { favsLiveData.value = State.SYNC }
                             documentSnapshot.toObject<FavsData>()?.list?.let {
-                                CacheDB.INSTANCE.favsDAO().apply {
+                                CacheDB.INSTANCE.favoriteAV1DAO().apply {
                                     clear()
                                     addAll(it)
                                 }
@@ -150,23 +143,25 @@ object FirestoreManager {
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
-                firestoreDB.document("users/$uid/backups/genres").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.document("users/$uid/backupsav1/genres").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
                         if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                             runBlocking(Dispatchers.Main) { genresLiveData.value = State.SYNC }
-                            documentSnapshot.toObject<GenresData>()?.list?.let {
-                                CacheDB.INSTANCE.genresDAO().apply {
-                                    reset()
-                                    insertStatus(it)
+                            runBlocking {
+                                documentSnapshot.toObject<GenresData>()?.list?.let {
+                                    CacheDB.INSTANCE.genreRecordDAO().apply {
+                                        reset()
+                                        insertAll(it)
+                                    }
+                                    PrefsUtil.lsGenres = currentTime()
+                                    Log.e("Firestore", "Genres updated")
                                 }
-                                PrefsUtil.lsGenres = currentTime()
-                                Log.e("Firestore", "Genres updated")
                             }
                             runBlocking(Dispatchers.Main) { genresLiveData.value = State.IDLE }
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
-                firestoreDB.document("users/$uid/backups/queue").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.document("users/$uid/backupsav1/queue").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
                         if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                             runBlocking(Dispatchers.Main) { queueLiveData.value = State.SYNC }
@@ -182,12 +177,12 @@ object FirestoreManager {
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
-                firestoreDB.document("users/$uid/backups/seeing").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.document("users/$uid/backupsav1/seeing").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
                         if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
                             runBlocking(Dispatchers.Main) { seeingLiveData.value = State.SYNC }
                             documentSnapshot.toObject<SeeingData>()?.list?.let {
-                                CacheDB.INSTANCE.seeingDAO().apply {
+                                CacheDB.INSTANCE.organizerDAO().apply {
                                     clear()
                                     addAll(it)
                                 }
@@ -195,26 +190,6 @@ object FirestoreManager {
                                 Log.e("Firestore", "Seeing updated")
                             }
                             runBlocking(Dispatchers.Main) { seeingLiveData.value = State.IDLE }
-                        } else firebaseFirestoreException?.printStackTrace()
-                    }
-                }.also { listeners.add(it) }
-                firestoreDB.collection("users/$uid/backups/seen/data").addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-                    doAsync {
-                        if (querySnapshot.needsUpdate() && !isUpdateBlocked) {
-                            runBlocking(Dispatchers.Main) { seenLiveData.value = State.SYNC }
-                            val nList = mutableListOf<SeenObject>()
-                            querySnapshot.documents.forEach {
-                                it.toObject<SeenData>()?.list?.let { seenList ->
-                                    nList.addAll(seenList)
-                                }
-                            }
-                            CacheDB.INSTANCE.seenDAO().apply {
-                                clear()
-                                addAll(nList)
-                            }
-                            PrefsUtil.lsSeen = currentTime()
-                            Log.e("Firestore", "Seen updated")
-                            runBlocking(Dispatchers.Main) { seenLiveData.value = State.IDLE }
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
@@ -313,15 +288,7 @@ object FirestoreManager {
             QueueManager.open()
             Log.e("Firestore", "On upload all data")
             syncData {
-                history()
-                seen()
-                achievements()
-                ea()
-                favs()
-                genres()
-                queue()
-                seeing()
-                top()
+                all()
             }
             GlobalScope.launch(Dispatchers.IO) {
                 delay(10000)
@@ -347,45 +314,6 @@ object FirestoreManager {
                     Log.e("Firestore", "History upload error", it)
                     doOnUIGlobal { historyLiveData.value = State.IDLE }
                 }
-            }
-
-    fun updateSeen(collection: CollectionReference) =
-            noCrash {
-                doOnUIGlobal { seenLiveData.value = State.SYNC }
-                val data = SeenData.create()
-                val segments = data.list.chunked(10000).map { SeenData(it) }
-                collection.document("seen").set(mapOf("size" to segments.size))
-                val subcollection = collection.document("seen").collection("data")
-                segments.forEachIndexed { index, seenData ->
-                    subcollection.document("seen_$index").set(seenData).addOnSuccessListener {
-                        Log.e("Firestore", "Seen_$index upload success")
-                    }.addOnFailureListener {
-                        Log.e("Firestore", "Seen_$index upload error", it)
-                    }
-                }
-                runBlocking {
-                    var nextIndex = data.list.size
-                    var needsNext = true
-                    while (needsNext) {
-                        needsNext = suspendCoroutine {
-                            noCrashLet(false) {
-                                val reference = subcollection.document("seen_$needsNext")
-                                reference.get().addOnCompleteListener { subDocument ->
-                                    noCrashExec(exec = { it.resume(false) }) {
-                                        if (subDocument.result?.exists() == true) {
-                                            reference.delete()
-                                            it.resume(true)
-                                        } else
-                                            it.resume(false)
-                                    }
-                                }
-                            }
-                        }
-                        nextIndex++
-                    }
-                }
-                PrefsUtil.lsSeen = currentTime()
-                doOnUIGlobal { seenLiveData.value = State.IDLE }
             }
 
     fun updateAchievements(collection: CollectionReference) =
@@ -535,6 +463,7 @@ object FirestoreManager {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
                 Backups.type = Backups.Type.FIRESTORE
+                start()
                 uploadAllData(true, activity)
                 return true
             } else if (response != null) {
@@ -568,7 +497,6 @@ class SyncRequest(private val collection: CollectionReference) {
     private val syncList = mutableListOf<() -> Unit>()
 
     fun history() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateHistory(collection) } }
-    fun seen() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateSeen(collection) } }
     fun achievements() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateAchievements(collection) } }
     fun ea() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateEA(collection) } }
     fun favs() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateFavs(collection) } }
@@ -576,6 +504,16 @@ class SyncRequest(private val collection: CollectionReference) {
     fun queue() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateQueue(collection) } }
     fun seeing() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateSeeing(collection) } }
     fun top() = syncList.add { runBlocking(Dispatchers.IO) { FirestoreManager.updateTop() } }
+    fun all() {
+        history()
+        achievements()
+        ea()
+        favs()
+        genres()
+        queue()
+        seeing()
+        top()
+    }
 
     fun sync() {
         if (FirestoreManager.isLoggedIn)
@@ -585,7 +523,7 @@ class SyncRequest(private val collection: CollectionReference) {
 
 fun syncData(uploads: SyncRequest.() -> Unit) {
     if (!FirestoreManager.isFirestoreEnabled) return
-    val syncRequest = SyncRequest(FirestoreManager.firestoreDB.collection("users/${FirestoreManager.uid}/backups"))
+    val syncRequest = SyncRequest(FirestoreManager.firestoreDB.collection("users/${FirestoreManager.uid}/backupsav1"))
     uploads(syncRequest)
     syncRequest.sync()
 }

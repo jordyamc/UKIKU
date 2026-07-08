@@ -6,26 +6,15 @@ import androidx.fragment.app.DialogFragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
-import knf.kuma.commons.transform
-import java.util.Arrays
+import knf.kuma.pojos.av1.GenreRecord
 
 class BlacklistDialog : DialogFragment() {
 
-    private val genres = getGenres()
-    private var selected: MutableList<String> = mutableListOf()
+    private var genresRecord = emptyList<GenreRecord>()
     private var listener: MultiChoiceListener? = null
 
-    private val statesIndex: IntArray
-        get() {
-            val states = IntArray(selected.size)
-            selected.forEachIndexed { index, genre ->
-                states[index] = genres.indexOf(genre)
-            }
-            return states
-        }
-
-    fun init(selected: MutableList<String>, listener: MultiChoiceListener) {
-        this.selected = selected
+    fun init(list: List<GenreRecord>, listener: MultiChoiceListener) {
+        this.genresRecord = list
         this.listener = listener
     }
 
@@ -34,12 +23,8 @@ class BlacklistDialog : DialogFragment() {
             MaterialDialog(it).apply {
                 lifecycleOwner()
                 title(text = "Lista negra")
-                listItemsMultiChoice(items = genres, initialSelection = statesIndex, allowEmptySelection = true) { _, _, items ->
-                    selected = mutableListOf<String>().apply {
-                        addAll(items.transform())
-                        sort()
-                    }
-                    listener?.onOkay(selected)
+                listItemsMultiChoice(items = genresRecord.map { it.name }, initialSelection = genresRecord.mapIndexedNotNull { index, record -> if (record.isBlocked) index else null }.toIntArray(), allowEmptySelection = true) { _, indexes, items ->
+                    listener?.onOkay(genresRecord.onEachIndexed { index, record -> record.isBlocked = index in indexes })
                 }
                 positiveButton(text = "SELECCIONAR")
                 negativeButton(text = "CERRAR")
@@ -48,54 +33,6 @@ class BlacklistDialog : DialogFragment() {
     }
 
     interface MultiChoiceListener {
-        fun onOkay(selected: MutableList<String>)
-    }
-
-    companion object {
-
-        fun getGenres(): MutableList<String> {
-            return Arrays.asList(
-                    "Acción",
-                    "Artes Marciales",
-                    "Aventuras",
-                    "Carreras",
-                    "Comedia",
-                    "Demencia",
-                    "Demonios",
-                    "Deportes",
-                    "Drama",
-                    "Ecchi",
-                    "Escolares",
-                    "Espacial",
-                    "Fantasía",
-                    "Ciencia Ficción",
-                    "Harem",
-                    "Historico",
-                    "Infantil",
-                    "Josei",
-                    "Juegos",
-                    "Magia",
-                    "Mecha",
-                    "Militar",
-                    "Misterio",
-                    "Musica",
-                    "Parodia",
-                    "Policía",
-                    "Psicológico",
-                    "Recuentos de la vida",
-                    "Romance",
-                    "Samurai",
-                    "Seinen",
-                    "Shoujo",
-                    "Shounen",
-                    "Sin Generos",
-                    "Sobrenatural",
-                    "Superpoderes",
-                    "Suspenso",
-                    "Terror",
-                    "Vampiros",
-                    "Yaoi",
-                    "Yuri")
-        }
+        fun onOkay(selected: List<GenreRecord>)
     }
 }
