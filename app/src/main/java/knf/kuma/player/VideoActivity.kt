@@ -235,8 +235,8 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         binding.youtubeOverlay.player(playerHolder.audioFocusPlayer)
         mediaSession = MediaSession.Builder(this, playerHolder.audioFocusPlayer).build()
         if (!intent.getBooleanExtra("isPlayList", false)) {
-            find<View>(com.google.android.exoplayer2.R.id.exo_next).visibility = View.GONE
-            find<View>(com.google.android.exoplayer2.R.id.exo_prev).visibility = View.GONE
+            find<View>(R.id.exo_next).visibility = View.GONE
+            find<View>(R.id.exo_prev).visibility = View.GONE
         }
         //exoPlayer.overlayFrameLayout.setOnTouchListener(BVListener(this))
     }

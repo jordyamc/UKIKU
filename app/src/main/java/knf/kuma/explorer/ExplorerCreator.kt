@@ -87,8 +87,12 @@ object ExplorerCreator {
         }
         isMigratingDownloads = true
         GlobalScope.launch(Dispatchers.IO) {
-            doMigrateDownloads()
-            isMigratingDownloads = false
+            try {
+                doMigrateDownloads()
+                isMigratingDownloads = false
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
