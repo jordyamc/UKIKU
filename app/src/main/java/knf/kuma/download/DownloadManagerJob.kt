@@ -293,7 +293,7 @@ class DownloadManagerJob : JobService() {
 
         fun start(downloadObject: DownloadObject): Boolean {
             try {
-                Log.e("Download", "On start: ${downloadObject.name}")
+                Log.e("Download", "On start: ${downloadObject.file}")
                 val file = FileAccessHelper.getFileCreate(downloadObject.file)
                 file?.let {
                     val request = Request(downloadObject.link, file.absolutePath)

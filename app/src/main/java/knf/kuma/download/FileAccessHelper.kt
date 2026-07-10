@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -23,6 +24,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.findActivity
 import knf.kuma.commons.getPackage
 import knf.kuma.commons.isNull
+import knf.kuma.explorer.ExplorerCreator
 import knf.kuma.explorer.creator.Creator
 import knf.kuma.explorer.creator.DocumentFileCreator
 import knf.kuma.explorer.creator.SimpleFileCreator
@@ -306,19 +308,28 @@ object FileAccessHelper {
     }
 
     fun getDownloadsDirectoryFiles(file_name: String): List<SubFile> {
+        val rex = Regex("\\d+\\$[a-z-]+-\\d+\\.?\\d*\\.mp4")
         return try {
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
                     treeUri?.let { find(DocumentFile.fromTreeUri(App.context, it), "UKIKU/downloads/$file_name", false) }?.listFiles()?.map {
                         SubFile(it.name ?: "", it.uri.toString())
-                    }?.filter { it.name.endsWith(".mp4") } ?: emptyList()
+                    }?.filter {
+                        it.name.endsWith(".mp4") && it.name.matches(rex)
+                    } ?: emptyList()
                 PrefsUtil.downloadType == "0" -> {
-                    File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/$file_name").listFiles()?.map { SubFile(it.name, Uri.fromFile(it).toString()) }?.filter { it.name.endsWith(".mp4") }
-                            ?: emptyList()
+                    File(Environment.getExternalStorageDirectory(), "UKIKU/downloads/$file_name").listFiles()?.map {
+                        SubFile(it.name, Uri.fromFile(it).toString())
+                    }?.filter {
+                        it.name.endsWith(".mp4")&& it.name.matches(rex)
+                    } ?: emptyList()
                 }
                 else -> {
-                    File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/$file_name").listFiles()?.map { SubFile(it.name, Uri.fromFile(it).toString()) }?.filter { it.name.endsWith(".mp4") }
-                            ?: emptyList()
+                    File(FileUtil.getFullPathFromTreeUri(treeUri, App.context), "UKIKU/downloads/$file_name").listFiles()?.map {
+                        SubFile(it.name, Uri.fromFile(it).toString())
+                    }?.filter {
+                        it.name.endsWith(".mp4") && it.name.matches(rex)
+                    } ?: emptyList()
                 }
             }
         } catch (e: Exception) {
@@ -370,7 +381,7 @@ object FileAccessHelper {
                 treeUri?.let {
                     val documentFile = DocumentFile.fromTreeUri(App.context, it)
                     if (documentFile != null && documentFile.exists()) {
-                        val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name)
+                        val file = find(documentFile, "UKIKU/downloads/" + PatternUtil.getNameFromFile(file_name) + file_name, false)
                         file?.delete()
                         val dir = file?.parentFile
                         if (dir != null && dir.listFiles().isEmpty())
@@ -640,13 +651,20 @@ object FileAccessHelper {
     fun isUriValid(uri: Uri?): UriValidation {
         val uriValidation = UriValidation()
         uri ?: return uriValidation.also { it.errorMessage = "Uri es nulo" }
+        Log.e("SAF", "On URI validation")
         if (isSDCardRoot(uri, uriValidation)) {
             if (isInternalStorage(uri))
                 PrefsUtil.storageType = "Memoria Interna"
             else
                 PrefsUtil.storageType = "Memoria SD"
             App.context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            PreferenceManager.getDefaultSharedPreferences(App.context).edit().putString("tree_uri", uri.toString()).apply()
+            PreferenceManager.getDefaultSharedPreferences(App.context).edit(commit = true) {
+                putString(
+                    "tree_uri",
+                    uri.toString()
+                )
+            }
+            ExplorerCreator.migrateDownloads()
             uriValidation.isValid = true
         }
         return uriValidation

@@ -26,7 +26,6 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.squareup.picasso.Callback
 import knf.kuma.App
 import knf.kuma.R
-import knf.kuma.animeinfo.fragments.ChaptersFragmentMaterial
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
 import knf.kuma.commons.CastUtil
@@ -323,7 +322,7 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                             R.id.share -> fragment.activity?.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
                                     .setType("text/plain")
                                     .putExtra(Intent.EXTRA_TEXT, chapter.episodeName(anime) + "\n" + chapter.link(anime)), "Compartir"))
-                            R.id.import_file -> (fragment as ChaptersFragmentMaterial).onMove(chapter.filePath(anime))
+                            R.id.import_file -> (fragment as MoveCallback).onMove(chapter.filePath(anime))
                         }
                         true
                     }

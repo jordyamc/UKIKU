@@ -47,10 +47,6 @@ class DirectoryFragmentMaterial : BottomFragment() {
         snackbar?.safeDismiss()
     }
 
-    fun onChangeOrder() {
-        fragmentHolder?.onChangeOrder()
-    }
-
     override fun onReselect() {
         EAHelper.enter1("D")
         fragmentHolder?.onReselect()

@@ -1,7 +1,6 @@
 package knf.kuma.seeing
 
 import android.app.Activity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,15 +10,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
-import com.inmobi.media.De
-import com.inmobi.media.se
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.DesignUtils
-import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.load
@@ -27,7 +22,6 @@ import knf.kuma.commons.optionalBind
 import knf.kuma.commons.roundedString
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.SeeingObject
-import knf.kuma.pojos.av1.Organizer
 import knf.kuma.pojos.av1.OrganizerWRecord
 import org.jetbrains.anko.doAsync
 
@@ -58,7 +52,7 @@ internal class SeeingAdapter(private val activity: Activity, private val isFullL
         if (holder is SeeingItem)
             holder.chapter.text = getCardText(seeingObject)
         (holder as? SeeingItemNormal)?.apply {
-            imageView.load(seeingObject.organizer.imageUrl)
+            imageView.load(seeingObject.organizer.imageUrl())
             title.text = seeingObject.organizer.name
             progressView?.visibility = View.GONE
             cardView.setOnClickListener { ActivityAnime.open(activity, seeingObject.organizer) }

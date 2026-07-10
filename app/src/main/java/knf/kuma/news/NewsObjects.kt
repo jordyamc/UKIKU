@@ -4,10 +4,11 @@ import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -95,7 +96,11 @@ class NewsDataSource(private val newsFactory: NewsFactory, val category: String,
             val response = withContext(Dispatchers.IO) {
                 when (category) {
                     "noticias/" -> newsFactory.getLatestPage().execute()
-                    else -> newsFactory.getNewsPage(category, page).execute()
+                    else -> if (page == 1) {
+                        newsFactory.getNewsPageFirst(category).execute()
+                    } else {
+                        newsFactory.getNewsPage(category, page).execute()
+                    }
                 }
             }
             if (response.isSuccessful) {
@@ -131,8 +136,11 @@ class NewsDataSource(private val newsFactory: NewsFactory, val category: String,
 }
 
 interface NewsFactory {
-    @GET("{category}/{page}/")
+    @GET("noticias/{category}/{page}/")
     fun getNewsPage(@Path("category") category: String, @Path("page") page: Int): Call<NewsPage>
+
+    @GET("noticias/{category}/")
+    fun getNewsPageFirst(@Path("category") category: String): Call<NewsPage>
 
     @GET("noticias/")
     fun getLatestPage(): Call<NewsPage>
@@ -159,14 +167,14 @@ object NewsRepository {
 
 fun openNews(activity: AppCompatActivity, newsItem: NewsItem) {
     try {
-        NewsDialog.show(activity, newsItem.link)
+        //NewsDialog.show(activity, newsItem.link)
         //CommentariesDialog.show(activity, newsItem.link)
-        //CustomTabsIntent.Builder().build().launchUrl(activity, newsItem.link.toUri())
+        CustomTabsIntent.Builder().build().launchUrl(activity, newsItem.link.toUri())
     } catch (e: ActivityNotFoundException) {
         try {
-            activity.startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(newsItem.link)))
+            activity.startActivity(Intent(Intent.ACTION_VIEW).setData(newsItem.link.toUri()))
         } catch (anfe: ActivityNotFoundException) {
-            "No se encontró ningun navegador para abrir noticia".toast()
+            "No se encontró ningún navegador para abrir noticia".toast()
         }
     } catch (ex: Exception) {
         "Error al abrir noticia".toast()

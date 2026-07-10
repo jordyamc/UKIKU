@@ -1,28 +1,29 @@
 package knf.kuma.tv.exoplayer
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
+import androidx.annotation.OptIn
 import androidx.leanback.app.VideoSupportFragment
 import androidx.leanback.app.VideoSupportFragmentGlueHost
 import androidx.lifecycle.lifecycleScope
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.trackselection.TrackSelector
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.util.Util
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.util.Util
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.TrackSelector
 import knf.kuma.database.CacheDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@OptIn(UnstableApi::class)
 class PlaybackFragment : VideoSupportFragment() {
     private var mPlayerGlue: VideoPlayerGlue? = null
     private var mPlayerAdapter: LeanbackPlayerAdapter? = null
@@ -39,15 +40,12 @@ class PlaybackFragment : VideoSupportFragment() {
 
     override fun onStart() {
         super.onStart()
-        if (Util.SDK_INT > 23) {
-            initializePlayer()
-        }
+        initializePlayer()
     }
 
     override fun onResume() {
         super.onResume()
-        if (Util.SDK_INT <= 23 || mPlayer ==
-                null) {
+        if (mPlayer == null) {
             initializePlayer()
         }
     }
@@ -55,29 +53,26 @@ class PlaybackFragment : VideoSupportFragment() {
     /**
      * Pauses the exoPlayer.
      */
-    @TargetApi(Build.VERSION_CODES.N)
     override fun onPause() {
         super.onPause()
         mPlayerGlue?.save(mVideo)
         if (mPlayerGlue?.isPlaying == true)
             mPlayerGlue?.pause()
-        if (Util.SDK_INT <= 23) {
-            releasePlayer()
-        }
     }
 
     override fun onStop() {
         super.onStop()
-        if (Util.SDK_INT > 23) {
-            releasePlayer()
-        }
+        releasePlayer()
     }
 
     private fun initializePlayer() {
         val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
         mTrackSelector = DefaultTrackSelector(requireContext(), videoTrackSelectionFactory)
         mPlayer =
-            ExoPlayer.Builder(requireContext(), DefaultRenderersFactory(requireContext())).build()
+            ExoPlayer.Builder(
+                requireContext(),
+                DefaultRenderersFactory(requireContext())
+            ).build()
         mPlayerAdapter =
             LeanbackPlayerAdapter(activity as Context, mPlayer as ExoPlayer, UPDATE_DELAY)
         mPlayerGlue = VideoPlayerGlue(activity as Context, mPlayerAdapter as LeanbackPlayerAdapter)
@@ -88,6 +83,7 @@ class PlaybackFragment : VideoSupportFragment() {
     }
 
     private fun releasePlayer() {
+        mPlayer?.pause()
         mPlayer?.release()
         mPlayer = null
         mTrackSelector = null
@@ -100,7 +96,9 @@ class PlaybackFragment : VideoSupportFragment() {
             mPlayerGlue?.title = video?.title
             mPlayerGlue?.subtitle = video?.chapter
             prepareMediaForPlaying(video?.uri ?: Uri.EMPTY, video?.headers)
-            val state = withContext(Dispatchers.IO) { CacheDB.INSTANCE.playerStateDAO().find("${video?.title}: ${video?.chapter}") }
+            val state = withContext(Dispatchers.IO) {
+                CacheDB.INSTANCE.playerStateDAO().find("${video?.title}: ${video?.chapter}")
+            }
             if (state != null) {
                 mPlayerGlue?.seekTo(state.position)
             }

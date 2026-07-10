@@ -88,7 +88,7 @@ object FirestoreManager {
                             documentSnapshot.toObject<HistoryData>()?.list?.let {
                                 CacheDB.INSTANCE.recordAV1DAO().apply {
                                     clear()
-                                    addAll(it)
+                                    addAll(it.filter { it.isValid() })
                                 }
                                 PrefsUtil.lsHistory = currentTime()
                                 Log.e("Firestore", "History updated")
@@ -134,7 +134,7 @@ object FirestoreManager {
                             documentSnapshot.toObject<FavsData>()?.list?.let {
                                 CacheDB.INSTANCE.favoriteAV1DAO().apply {
                                     clear()
-                                    addAll(it)
+                                    addAll(it.filter { it.isValid() })
                                 }
                                 PrefsUtil.lsFavs = currentTime()
                                 Log.e("Firestore", "Favs updated")
@@ -184,7 +184,7 @@ object FirestoreManager {
                             documentSnapshot.toObject<SeeingData>()?.list?.let {
                                 CacheDB.INSTANCE.organizerDAO().apply {
                                     clear()
-                                    addAll(it)
+                                    addAll(it.filter { it.isValid() })
                                 }
                                 PrefsUtil.lsSeeing = currentTime()
                                 Log.e("Firestore", "Seeing updated")

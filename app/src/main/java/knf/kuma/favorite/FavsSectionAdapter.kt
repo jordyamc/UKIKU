@@ -74,9 +74,9 @@ class FavsSectionAdapter(private val fragment: Fragment, private val recyclerVie
                 holder.action.setOnClickListener { listener.onEdit(favoriteObject.name) }
             }
         } else if (holder is ItemHolder && favoriteObject is FavoriteAV1) {
-            holder.imageView.load(favoriteObject.imageUrl)
+            holder.imageView.load(favoriteObject.imageUrl())
             holder.title.text = favoriteObject.name
-            holder.type.text = favoriteObject.typeText
+            holder.type.text = favoriteObject.typeText()
             holder.cardView.setOnClickListener { ActivityAnime.open(fragment, favoriteObject, holder.imageView) }
             if (showSections)
                 holder.cardView.setOnLongClickListener {

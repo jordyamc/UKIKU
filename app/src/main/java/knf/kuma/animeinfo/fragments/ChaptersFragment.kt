@@ -16,6 +16,7 @@ import knf.kuma.App
 import knf.kuma.BottomFragment
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeViewModel
+import knf.kuma.animeinfo.MoveCallback
 import knf.kuma.animeinfo.viewholders.AnimeChaptersHolder
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.FileUtil
@@ -32,7 +33,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
 
-class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallback {
+class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallback, MoveCallback {
     private var holder: AnimeChaptersHolder? = null
     private var moveFile: String? = null
     private var anime: DirectoryAV1? = null
@@ -76,7 +77,7 @@ class ChaptersFragment : BottomFragment(), AnimeChaptersHolder.ChapHolderCallbac
         holder?.smoothGoToChapter()
     }
 
-    fun onMove(to: String) {
+    override fun onMove(to: String) {
         try {
             this.moveFile = to
             startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT)

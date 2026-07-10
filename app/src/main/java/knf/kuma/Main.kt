@@ -69,7 +69,7 @@ import knf.kuma.faq.FaqActivity
 import knf.kuma.favorite.FavoriteFragment
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
-import knf.kuma.news.NewsActivity
+import knf.kuma.news.MaterialNewsActivity
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.preferences.ConfigurationFragment
 import knf.kuma.queue.QueueActivity
@@ -222,8 +222,8 @@ class Main : GenericActivity(),
     }
 
     private fun subscribeBadges() {
-        val bottomNavigationMenuView = bottomNavigationView.getChildAt(0) as BottomNavigationMenuView
         try {
+            val bottomNavigationMenuView = bottomNavigationView.getChildAt(0) as BottomNavigationMenuView
             val v = bottomNavigationMenuView.getChildAt(1)
             if (badgeView == null) {
                 badgeView = QBadgeView(this)
@@ -435,9 +435,7 @@ class Main : GenericActivity(),
             when (PrefsUtil.dirOrder) {
                 0 -> menu.findItem(R.id.by_name_dir).isChecked = true
                 1 -> menu.findItem(R.id.by_votes).isChecked = true
-                2 -> menu.findItem(R.id.by_id_dir).isChecked = true
-                3 -> menu.findItem(R.id.by_added_dir).isChecked = true
-                4 -> menu.findItem(R.id.by_followers).isChecked = true
+                2 -> menu.findItem(R.id.by_added_dir).isChecked = true
             }
         } else {
             menuInflater.inflate(R.menu.main, menu)
@@ -472,16 +470,8 @@ class Main : GenericActivity(),
                 PrefsUtil.favsOrder = 1
                 changeOrder()
             }
-            R.id.by_id_dir -> {
-                PrefsUtil.dirOrder = 2
-                changeOrder()
-            }
             R.id.by_added_dir -> {
-                PrefsUtil.dirOrder = 3
-                changeOrder()
-            }
-            R.id.by_followers -> {
-                PrefsUtil.dirOrder = 4
+                PrefsUtil.dirOrder = 2
                 changeOrder()
             }
         }
@@ -489,9 +479,6 @@ class Main : GenericActivity(),
     }
 
     private fun changeOrder() {
-        if (selectedFragment is DirectoryFragmentMaterial) {
-            (selectedFragment as DirectoryFragmentMaterial).onChangeOrder()
-        }
         invalidateOptionsMenu()
     }
 
@@ -505,7 +492,7 @@ class Main : GenericActivity(),
             R.id.drawer_emision -> EmissionActivity.open(this)
             R.id.drawer_queue -> QueueActivity.open(this)
             R.id.drawer_suggestions -> RecommendActivity.open(this)
-            R.id.drawer_news -> NewsActivity.open(this)
+            R.id.drawer_news -> MaterialNewsActivity.open(this)
             R.id.drawer_records -> RecordActivity.open(this)
             R.id.drawer_seeing -> SeeingActivity.open(this)
             R.id.drawer_random -> RandomActivity.open(this)

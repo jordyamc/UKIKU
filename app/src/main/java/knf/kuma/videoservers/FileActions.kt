@@ -65,24 +65,36 @@ object FileActions {
     private var selected = 0
 
     fun stream(fragment: Fragment, anime: DirectoryAV1, chapter: Chapter, isQueued: Boolean = false, callback: ActionCallback) {
-        if (isQueued)
-            queuedStream(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
-        else
-            stream(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+        try {
+            if (isQueued)
+                queuedStream(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+            else
+                stream(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
     }
 
     fun download(activity: AppCompatActivity, anime: DirectoryAV1, chapter: Chapter, isQueued: Boolean = false, callback: ActionCallback) {
-        if (isQueued)
-            queuedDownload(activity, activity, anime, chapter, activity.window.decorView, callback)
-        else
-            download(activity, activity, anime, chapter, activity.window.decorView, callback)
+        try {
+            if (isQueued)
+                queuedDownload(activity, activity, anime, chapter, activity.window.decorView, callback)
+            else
+                download(activity, activity, anime, chapter, activity.window.decorView, callback)
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
     }
 
     fun download(fragment: Fragment, anime: DirectoryAV1, chapter: Chapter, isQueued: Boolean = false, callback: ActionCallback) {
-        if (isQueued)
-            queuedDownload(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
-        else
-            download(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+        try {
+            if (isQueued)
+                queuedDownload(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+            else
+                download(fragment.requireContext(), fragment.viewLifecycleOwner, anime, chapter, fragment.view, callback)
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
     }
 
     fun stream(context: Context, owner: LifecycleOwner, item: RecentAV1, anchorView: View? = null, callback: ActionCallback) {
@@ -513,7 +525,7 @@ object FileActions {
     private fun SnackProgressBarManager?.showSnack(text: String) {
         this ?: return
         dismissSnack()
-        showProgressSnackbar(text, 5000)
+        showProgressSnackbar(text, 10000)
     }
 
     private fun SnackProgressBarManager?.dismissSnack() {

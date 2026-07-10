@@ -57,7 +57,7 @@ public class ExplorerObject {
     @Ignore
     private boolean isProcessing = false;
     @Ignore
-    private List<SubFile> file_list;
+    public List<SubFile> file_list;
 
     public ExplorerObject(int key, String img, String link, String fileName, String name, String aid, int count, String path, List<FileDownObj> chapters) {
         this.key = key;
@@ -113,9 +113,6 @@ public class ExplorerObject {
         this.name = object.getName();
         this.aid = String.valueOf(object.getAid());
         file_list = FileAccessHelper.INSTANCE.getDownloadsDirectoryFiles(object.getSlug());
-        if (file_list.isEmpty()) {
-            throw new IllegalStateException("Directory empty: " + object.getName());
-        }
         this.count = file_list.size();
         this.path = "";
     }

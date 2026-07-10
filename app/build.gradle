@@ -13,8 +13,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 26
         targetSdkVersion 36
-        versionCode 232
-        versionName "6.0.1"
+        versionCode 233
+        versionName "6.0.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -64,12 +64,15 @@ android {
         tv {
             initWith release
             applicationIdSuffix ".tv"
+            matchingFallbacks = ['release']
         }
         playstore {
             initWith release
+            matchingFallbacks = ['release']
         }
         amazon {
             initWith release
+            matchingFallbacks = ['release']
         }
     }
     sourceSets {
@@ -181,12 +184,12 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'me.zhanghai.android.materialratingbar:library:1.4.0'
     implementation 'at.blogc:expandabletextview:1.0.5'
-    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
-    implementation 'com.google.android.exoplayer:extension-mediasession:2.19.1'
-    implementation 'com.google.android.exoplayer:extension-okhttp:2.19.1'
     implementation 'androidx.media3:media3-transformer:1.10.1'
     implementation 'androidx.media3:media3-common:1.10.1'
+    implementation 'androidx.media3:media3-session:1.10.1'
+    implementation 'androidx.media3:media3-ui:1.10.1'
+    implementation 'androidx.media3:media3-datasource:1.10.1'
+    implementation 'androidx.media3:media3-ui-leanback:1.10.1'
     implementation 'androidx.media3:media3-exoplayer:1.10.1'
     implementation 'androidx.media3:media3-exoplayer-hls:1.10.1'
 
@@ -234,7 +237,7 @@ dependencies {
     implementation 'com.scottyab:secure-preferences-lib:0.1.7'
     implementation 'com.github.florent37:expansionpanel:1.2.2'
     implementation 'com.github.evgenyneu:js-evaluator-for-android:v5.0.0'
-    implementation 'com.github.vkay94:DoubleTapPlayerView:1.0.4'
+    implementation 'com.github.vkay94.dtpv:doubletapplayerview:1.0.5'
     implementation 'org.conscrypt:conscrypt-android:2.5.3'
     implementation 'org.mozilla:rhino:1.9.1'
     testImplementation 'junit:junit:4.13.2'

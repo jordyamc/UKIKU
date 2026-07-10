@@ -20,6 +20,7 @@
         android:keepScreenOn="true"
         android:animateLayoutChanges="true"
         app:controller_layout_id="@layout/exo_playback_youtube_control_view"
+        app:animation_enabled="false"
         app:resize_mode="fit"
         app:dtpv_controller="@+id/youtubeOverlay" />
 

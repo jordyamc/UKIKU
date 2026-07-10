@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.CookieManager
@@ -12,10 +11,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import knf.kuma.databinding.ActivityBrowserBinding
 import org.jetbrains.anko.longToast
-import androidx.core.net.toUri
 
 class WebPlayerActivity : AppCompatActivity() {
     val binding by lazy { ActivityBrowserBinding.inflate(layoutInflater) }
@@ -36,6 +35,8 @@ class WebPlayerActivity : AppCompatActivity() {
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
+                useWideViewPort = true
+                loadWithOverviewMode = true
             }
             webViewClient = object : WebViewClient() {
                 @Deprecated("Deprecated in Java")

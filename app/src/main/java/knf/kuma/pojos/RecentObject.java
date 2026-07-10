@@ -13,7 +13,6 @@ import java.util.List;
 
 import knf.kuma.commons.FileWrapper;
 import knf.kuma.commons.PatternUtil;
-import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDBWrap;
 import knf.kuma.database.dao.AnimeDAO;
 import knf.kuma.search.SearchObject;
@@ -90,21 +89,11 @@ public class RecentObject {
     }
 
     public String getFileName() {
-        if (PrefsUtil.INSTANCE.getSaveWithName())
-            return eid + "$" + PatternUtil.INSTANCE.getFileName(url);
-        else
-            return eid + "$" + aid + "-" + chapter.substring(chapter.lastIndexOf(" ") + 1) + ".mp4";
+        return eid + "$" + PatternUtil.INSTANCE.getFileName(url);
     }
 
     public String getFilePath() {
-        if (PrefsUtil.INSTANCE.getSaveWithName())
-            return "$" + PatternUtil.INSTANCE.getFileName(url);
-        else
-            return "$" + aid + "-" + chapter.substring(chapter.lastIndexOf(" ") + 1) + ".mp4";
-    }
-
-    public String getEpTitle() {
-        return name + chapter.substring(chapter.lastIndexOf(" "));
+        return eid + "$" + PatternUtil.INSTANCE.getFileName(url);
     }
 
     public FileWrapper fileWrapper() {

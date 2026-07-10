@@ -1,15 +1,11 @@
 package knf.kuma.player
 
-import android.annotation.TargetApi
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.media.AudioAttributesCompat
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.SimpleExoPlayer
+import androidx.media3.exoplayer.ExoPlayer
 
 /**
  * Wrapper around a [SimpleExoPlayer] simplifies playback by automatically handling
@@ -46,8 +42,6 @@ class AudioFocusWrapper(
             }
         }
     }
-
-    @get:RequiresApi(Build.VERSION_CODES.O)
     private val audioFocusRequest by lazy { buildFocusRequest() }
 
     override fun setPlayWhenReady(playWhenReady: Boolean) {
@@ -55,14 +49,7 @@ class AudioFocusWrapper(
     }
 
     private fun requestAudioFocus() {
-        val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            requestAudioFocusOreo()
-        } else {
-            @Suppress("deprecation")
-            audioManager.requestAudioFocus(audioFocusListener,
-                    audioAttributes.legacyStreamType,
-                    AudioManager.AUDIOFOCUS_GAIN)
-        }
+        val result = requestAudioFocusOreo()
 
         // Call the listener whenever focus is granted - even the first time!
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -75,21 +62,13 @@ class AudioFocusWrapper(
 
     private fun abandonAudioFocus() {
         player.playWhenReady = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            abandonAudioFocusOreo()
-        } else {
-            @Suppress("deprecation")
-            audioManager.abandonAudioFocus(audioFocusListener)
-        }
+        abandonAudioFocusOreo()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun requestAudioFocusOreo(): Int = audioManager.requestAudioFocus(audioFocusRequest)
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun abandonAudioFocusOreo() = audioManager.abandonAudioFocusRequest(audioFocusRequest)
 
-    @TargetApi(Build.VERSION_CODES.O)
     private fun buildFocusRequest(): AudioFocusRequest =
             AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                     .setAudioAttributes(audioAttributes.unwrap() as AudioAttributes)

@@ -372,8 +372,9 @@ class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
                 if (!validation.isValid) {
                     Toaster.toast("Directorio invalido: $validation")
                     FileAccessHelper.openTreeChooser(this)
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
                     preferenceScreen.findPreference<Preference>("download_type_q")?.summary = PrefsUtil.storageType
+                }
             } else if (requestCode == 4784 && resultCode == Activity.RESULT_OK) {
                 if (!FileAccessHelper.toneFile.exists())
                     FileAccessHelper.toneFile.createNewFile()
@@ -398,7 +399,7 @@ class ConfigurationFragmentMaterial : PreferenceFragmentCompat() {
                             }
                         })
             } else if (requestCode == 5879) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context))
+                if (Settings.canDrawOverlays(context))
                     (preferenceScreen.findPreference("achievements_permissions") as? SwitchPreference)?.apply {
                         isChecked = true
                         isEnabled = false

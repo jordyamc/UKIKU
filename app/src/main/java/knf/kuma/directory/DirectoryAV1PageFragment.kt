@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import androidx.annotation.LayoutRes
 import androidx.annotation.UiThread
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import knf.kuma.BottomFragment
@@ -20,6 +21,8 @@ import knf.kuma.commons.showSnackbar
 import knf.kuma.commons.verifyManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
@@ -43,27 +46,30 @@ class DirectoryAV1PageFragment : BottomFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         lifecycleScope.launch {
-            createDirectoryAV1PagedList(getType()) {
-                try {
-                    var snack: Snackbar? = null
-                    snack = recyclerView.showSnackbar("Error al cargar directorio", Snackbar.LENGTH_INDEFINITE, "reintentar") {
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            if (withContext(Dispatchers.IO) { BypassUtil.isNeeded(BypassUtil.testLink) }) {
-                                startActivity(Intent(requireContext(), DiagnosticMaterial.FullBypass::class.java))
-                            }else {
-                                snack?.dismiss()
-                                delay(2000)
-                                adapter.retry()
+            PrefsUtil.dirOrderFlow.flatMapLatest { order ->
+                createDirectoryAV1PagedList(getType(), order) {
+                    try {
+                        var snack: Snackbar? = null
+                        snack = recyclerView.showSnackbar("Error al cargar directorio", Snackbar.LENGTH_INDEFINITE, "reintentar") {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                if (withContext(Dispatchers.IO) { BypassUtil.isNeeded(BypassUtil.testLink) }) {
+                                    startActivity(Intent(requireContext(), DiagnosticMaterial.FullBypass::class.java))
+                                }else {
+                                    snack?.dismiss()
+                                    delay(2000)
+                                    adapter.retry()
+                                }
                             }
                         }
-                    }
-                }catch (e:Exception){
-                    lifecycleScope.launch {
-                        delay(2000)
-                        adapter.retry()
+                    }catch (e:Exception){
+                        lifecycleScope.launch {
+                            delay(2000)
+                            adapter.retry()
+                        }
                     }
                 }
-            }.collect {
+            }.collectLatest {
+                adapter.submitData(PagingData.empty())
                 adapter.submitData(it)
             }
         }

@@ -48,7 +48,6 @@ import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.EAMapActivity
 import knf.kuma.commons.JsExtractor
-import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.changeToolbarFont
@@ -225,8 +224,8 @@ class MainMaterial : GenericActivity(),
     }
 
     private fun subscribeBadges() {
-        val bottomNavigationMenuView = bottomNavigationView.getChildAt(0) as BottomNavigationMenuView
         try {
+            val bottomNavigationMenuView = bottomNavigationView.getChildAt(0) as BottomNavigationMenuView
             val v = bottomNavigationMenuView.getChildAt(1)
             if (badgeView == null) {
                 badgeView = QBadgeView(this)
@@ -393,14 +392,12 @@ class MainMaterial : GenericActivity(),
             }
             if (!PrefsUtil.showFavSections())
                 menu.findItem(R.id.action_new_category).isVisible = false
-        } else if (selectedFragment is DirectoryFragmentMaterial && (PrefsUtil.isDirectoryFinished || !Network.isConnected)) {
+        } else if (selectedFragment is DirectoryFragmentMaterial) {
             menuInflater.inflate(R.menu.dir_menu_material, menu)
             when (PrefsUtil.dirOrder) {
                 0 -> menu.findItem(R.id.by_name_dir).isChecked = true
                 1 -> menu.findItem(R.id.by_votes).isChecked = true
-                2 -> menu.findItem(R.id.by_id_dir).isChecked = true
-                3 -> menu.findItem(R.id.by_added_dir).isChecked = true
-                4 -> menu.findItem(R.id.by_followers).isChecked = true
+                2 -> menu.findItem(R.id.by_added_dir).isChecked = true
             }
         } else {
             menuInflater.inflate(R.menu.main_material, menu)
@@ -429,16 +426,8 @@ class MainMaterial : GenericActivity(),
                 PrefsUtil.favsOrder = 1
                 changeOrder()
             }
-            R.id.by_id_dir -> {
-                PrefsUtil.dirOrder = 2
-                changeOrder()
-            }
             R.id.by_added_dir -> {
-                PrefsUtil.dirOrder = 3
-                changeOrder()
-            }
-            R.id.by_followers -> {
-                PrefsUtil.dirOrder = 4
+                PrefsUtil.dirOrder = 2
                 changeOrder()
             }
         }
@@ -446,9 +435,6 @@ class MainMaterial : GenericActivity(),
     }
 
     private fun changeOrder() {
-        if (selectedFragment is DirectoryFragmentMaterial) {
-            (selectedFragment as DirectoryFragmentMaterial).onChangeOrder()
-        }
         invalidateOptionsMenu()
     }
 

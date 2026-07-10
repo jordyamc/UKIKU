@@ -20,7 +20,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import knf.kuma.App
 import knf.kuma.BuildConfig
 import knf.kuma.achievements.AchievementManager
-import knf.kuma.animeinfo.ktx.fileName
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
@@ -40,25 +39,19 @@ import knf.kuma.download.FileAccessHelper
 import knf.kuma.download.MultipleDownloadManager
 import knf.kuma.download.service
 import knf.kuma.player.openWebPlayer
-import knf.kuma.pojos.AnimeObject
 import knf.kuma.pojos.DownloadObject
 import knf.kuma.pojos.QueueObject
 import knf.kuma.pojos.av1.Chapter
 import knf.kuma.pojos.av1.ChapterWID
 import knf.kuma.pojos.av1.DirectoryAV1
 import knf.kuma.queue.QueueManager
-import knf.kuma.videoservers.FileActions.CallbackState
-import knf.kuma.videoservers.FileActions.Type
-import knf.kuma.videoservers.FileActions.reset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster
-import java.util.Locale
 import kotlin.math.abs
 
 
@@ -420,7 +413,7 @@ class ServersFactory {
     private fun showSnack(text: String) {
         dismissSnack()
         //snackbar = serversInterface.getView()?.showSnackbar(text, duration = Snackbar.LENGTH_INDEFINITE)
-        getSnackManager()?.showProgressSnackbar(text, 5000)
+        getSnackManager()?.showProgressSnackbar(text, 10000)
     }
 
     private fun dismissSnack() {

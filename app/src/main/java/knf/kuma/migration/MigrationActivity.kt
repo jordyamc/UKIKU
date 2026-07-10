@@ -17,6 +17,8 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.ActivityMigrationBinding
+import knf.kuma.download.FileAccessHelper
+import knf.kuma.explorer.ExplorerCreator
 import knf.kuma.pojos.av1.DirectoryAV1
 import knf.kuma.pojos.av1.FavoriteAV1
 import knf.kuma.tv.ui.TVMain
@@ -60,6 +62,15 @@ class MigrationActivity: GenericActivity() {
                 withContext(Dispatchers.IO) {
                     CacheDB.INSTANCE.queueDAO().nuke()
                     BypassUtil.clear()
+                }
+                if (FileAccessHelper.isStoragePermissionEnabled()) {
+                    try {
+                        setState("Renombrando descargas")
+                        ExplorerCreator.doMigrateDownloads()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Firebase.crashlytics.recordException(e)
+                    }
                 }
                 Toaster.toastLong("Migración finalizada")
                 PrefsUtil.isAV1DataMigrated = true
@@ -268,7 +279,7 @@ class MigrationActivity: GenericActivity() {
                                     chapter.number == number
                                 }
                                 if (chapter != null) {
-                                    CacheDB.INSTANCE.recordAV1DAO().addChapter(chapter.asRecord(migrated, lastDate))
+                                    CacheDB.INSTANCE.recordAV1DAO().addChapterIgnore(chapter.asRecord(migrated, lastDate))
                                 }
                                 CacheDB.INSTANCE.seenDAO().delete(seen)
                                 globalCount++

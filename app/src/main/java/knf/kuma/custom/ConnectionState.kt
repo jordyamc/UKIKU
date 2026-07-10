@@ -49,6 +49,7 @@ import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.UnknownHostException
 import javax.net.ssl.SSLException
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("SetTextI18n")
 class ConnectionState : LinearLayout {
@@ -97,7 +98,10 @@ class ConnectionState : LinearLayout {
                     }
                     normalState()
                 }
-                doNetworkTests(owner, onShowDialog)
+                //doNetworkTests(owner, onShowDialog)
+                delay(1.seconds)
+                okState()
+                dismiss()
                 isInitialized = true
             }
     }

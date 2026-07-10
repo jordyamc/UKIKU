@@ -1,25 +1,18 @@
 package knf.kuma.widgets.emision
 
-import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Color
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.preference.PreferenceManager
-import androidx.slice.builders.list
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.animeinfo.ActivityAnimeMaterial
-import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.JsExtractor
-import knf.kuma.commons.PatternUtil
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.av1.DirectoryAV1Calendar
-import knf.kuma.pojos.av1.DirectoryAV1Min
 import kotlinx.coroutines.runBlocking
-import xdroid.toaster.Toaster
 import java.util.Calendar
 
 class WEListProvider internal constructor(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
@@ -124,7 +117,11 @@ class WEListProvider internal constructor(private val context: Context) : Remote
     }
 
     override fun getItemId(position: Int): Long {
-        return items[position].aid.toLong()
+        return try {
+            items[position].aid.toLong()
+        } catch (e: Exception) {
+            position.toLong()
+        }
 
     }
 

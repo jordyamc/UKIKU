@@ -40,9 +40,9 @@ class RecordsAdapter(private val activity: AppCompatActivity) : PagingDataAdapte
 
     override fun onBindViewHolder(holder: RecordItem, position: Int) {
         val item = getItem(position) ?: return
-        holder.imageView.load(item.imageUrl)
+        holder.imageView.load(item.imageUrl())
         holder.title.text = item.name
-        holder.chapter.text = item.chapter
+        holder.chapter.text = item.chapter()
         holder.cardView.setOnClickListener {
             ActivityAnime.open(activity, item, holder.imageView)
         }

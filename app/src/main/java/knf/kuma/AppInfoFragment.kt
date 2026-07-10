@@ -118,6 +118,15 @@ class AppInfoFragment: MaterialAboutFragment() {
             donateCard.addItem(
                 ConvenienceBuilder.createWebsiteActionItem(
                     requireContext(),
+                    getDrawable(requireContext(), R.drawable.ic_bitcoin),
+                    "Binance",
+                    false,
+                    "https://app.binance.com/uni-qr/4ARGHuhS".toUri()
+                )
+            )
+            donateCard.addItem(
+                ConvenienceBuilder.createWebsiteActionItem(
+                    requireContext(),
                     getDrawable(requireContext(), R.drawable.ic_patreon),
                     "Patreon",
                     false,

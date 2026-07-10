@@ -1,7 +1,10 @@
 package knf.kuma.explorer.creator
 
+import android.util.Log
 import knf.kuma.database.CacheDB
+import knf.kuma.explorer.ExplorerCreator
 import knf.kuma.pojos.ExplorerObject
+import knf.kuma.retrofit.Repository
 import java.io.File
 import java.io.FileFilter
 
@@ -18,21 +21,36 @@ class SimpleFileCreator(val base: File) : Creator {
 
     override fun createDirectoryList(progressCallback: (Int, Int) -> Unit): List<ExplorerObject> {
         return if (base.exists()) {
-            val list = mutableListOf<ExplorerObject>()
-            val files = base.listFiles(FileFilter { it.isDirectory })
+            val files = base.listFiles(FileFilter { it.isDirectory && !it.name.startsWith("$")})
             if (files != null) {
                 var progress = 0
-                CacheDB.INSTANCE.directoryDAO().findAllBySlug(files.mapNotNull { it.name }).forEach {
+                return files.mapNotNull {
+                    val name = it.name ?: return@mapNotNull null
+                    if (it.listFiles()!!.isEmpty()) {
+                        it.delete()
+                        return@mapNotNull null
+                    }
+                    val dir = CacheDB.INSTANCE.directoryDAO().findBySlug(name) ?: Repository.getDirectory(name)
+                    progress++
+                    progressCallback(progress, files.size)
                     try {
-                        progress++
-                        progressCallback(progress, files.size)
-                        list.add(ExplorerObject(it))
-                    } catch (e: IllegalStateException) {
+                        ExplorerObject(dir!!).also {
+                            Log.e("ExplorerCreator", "Found dir: ${it.fileName}")
+                            it.file_list.forEach {
+                                Log.e("ExplorerCreator", "Found file: ${it.name}")
+                            }
+                        }
+                    } catch (e: ExplorerCreator.DirectoryEmptyException) {
                         e.printStackTrace()
+                        it.delete()
+                        null
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
                     }
                 }
             }
-            list
+            emptyList()
         } else
             emptyList()
     }

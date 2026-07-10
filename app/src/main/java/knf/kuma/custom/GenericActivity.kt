@@ -119,7 +119,7 @@ open class GenericActivity : AppCompatActivity() {
             } ?: false
             BypassUtil.isLoading = false
             bypassLive.value = Pair(first = cookiesUpdated, second = false)
-            Repository().reloadRecents()
+            Repository.reloadRecents()
             onBypassUpdated()
             PicassoSingle.clear()
             //ThumbsDownloader.start(this)

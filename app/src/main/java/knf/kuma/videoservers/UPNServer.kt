@@ -21,7 +21,7 @@ class UPNServer(context: Context, baseLink: String) : Server(context, baseLink) 
         get() {
             return try {
                 val url = runBlocking {
-                    Unpacker.listenResources(context, baseLink, Pattern.compile(".*master.m3u8.*"), executeOnFinish = "javascript:setInterval(function(){var el=document.getElementById('player-button-container');if(el)el.click();},100);")
+                    Unpacker.listenResources(context, baseLink, Pattern.compile(".*master.m3u8.*"), 15000, executeOnFinish = "javascript:setInterval(function(){var el=document.getElementById('player-button-container');if(el)el.click();},100);")
                 }
                 Log.e("UPNServer", "url: $url")
                 VideoServer(UPNServer,

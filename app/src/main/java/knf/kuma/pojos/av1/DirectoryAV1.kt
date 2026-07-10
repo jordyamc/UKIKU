@@ -1,5 +1,6 @@
 package knf.kuma.pojos.av1
 
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -18,7 +19,6 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import knf.kuma.commons.FileWrapper
 import knf.kuma.commons.JsExtractor
-import knf.kuma.commons.PrefsUtil.saveWithName
 import knf.kuma.commons.roundedString
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.AnimeObject
@@ -268,8 +268,7 @@ data class ChapterWID(
     val episodeName: String get() = "Episodio ${number.roundedString()}"
     val fileWrapper: FileWrapper<*> by lazy { FileWrapper.create(filePath()) }
     fun filePath(): String {
-        return if (saveWithName) "$eid$$slug-${number.roundedString()}.mp4"
-        else "$eid$$aid-${number.roundedString()}.mp4"
+        return "$eid$$slug-${number.roundedString()}.mp4"
     }
 
     fun asRecord() : Record {
@@ -346,13 +345,14 @@ data class Chapter(
     }
 
     fun filePath(anime: DirectoryAV1): String {
-        return if (saveWithName) "$${anime.slug}-${number.roundedString()}.mp4"
-        else "$${anime.aid}-${number.roundedString()}.mp4"
+        return "$eid$${anime.slug}-${number.roundedString()}.mp4"
     }
 
     fun fileWrapper(anime: DirectoryAV1): FileWrapper<*> {
         return file ?: FileWrapper.create(filePath(anime)).also {
             file = it
+            it.file()
+            Log.e("Chapter", "Number $number; File: ${anime.slug}/${filePath(anime)}")
         }
     }
 }

@@ -179,7 +179,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".player.CustomExoPlayer"
+            android:name=".player.BasicExoplayer"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:immersive="true"
             android:launchMode="singleTask"
@@ -419,7 +419,6 @@
         <activity android:name="knf.kuma.player.WebPlayerActivity"
             android:configChanges="orientation"
             android:screenOrientation="sensorLandscape"/>
-        <activity android:name="knf.kuma.migration.MaintainmentActivity" />
         <activity android:name="knf.kuma.migration.MigrationActivity" />
 
         <service

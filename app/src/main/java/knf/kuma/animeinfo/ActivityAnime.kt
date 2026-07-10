@@ -212,7 +212,7 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         try {
             startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
                 .setType("text/plain")
-                .putExtra(Intent.EXTRA_TEXT, favoriteObject?.name + "\n" + favoriteObject?.animeUrl), "Compartir"))
+                .putExtra(Intent.EXTRA_TEXT, favoriteObject?.name + "\n" + favoriteObject?.animeUrl()), "Compartir"))
             AchievementManager.onShare()
         } catch (e: ActivityNotFoundException) {
             Toaster.toast("No se encontraron aplicaciones para enviar")
@@ -316,10 +316,10 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
 
         fun open(activity: Activity, recordObject: Record, view: ImageView) {
             val intent = Intent(activity, DesignUtils.infoClass)
-            intent.data = recordObject.animeUrl.toUri()
+            intent.data = recordObject.animeUrl().toUri()
             intent.putExtra(keyTitle, recordObject.name)
             intent.putExtra(keyAid, recordObject.aid)
-            intent.putExtra(keyImg, recordObject.imageUrl)
+            intent.putExtra(keyImg, recordObject.imageUrl())
             intent.putExtra(keyPersist, true)
             intent.putExtra(keyIsRecord, true)
             activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
@@ -328,9 +328,9 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         fun open(activity: Activity?, organizer: Organizer) {
             activity ?: return
             val intent = Intent(activity, DesignUtils.infoClass)
-            intent.data = organizer.animeUrl.toUri()
+            intent.data = organizer.animeUrl().toUri()
             intent.putExtra(keyTitle, organizer.name)
-            intent.putExtra(keyImg, organizer.imageUrl)
+            intent.putExtra(keyImg, organizer.imageUrl())
             intent.putExtra(keyPersist, true)
             intent.putExtra(keyNoTransition, true)
             intent.putExtra(keyIsRecord, true)
@@ -340,10 +340,10 @@ class ActivityAnime : GenericActivity(), AnimeActivityHolder.Interface {
         fun open(fragment: Fragment, favoriteObject: FavoriteAV1, view: ImageView) {
             val activity = fragment.activity ?: return
             val intent = Intent(fragment.context, DesignUtils.infoClass)
-            intent.data = favoriteObject.animeUrl.toUri()
+            intent.data = favoriteObject.animeUrl().toUri()
             intent.putExtra(keyTitle, favoriteObject.name)
             intent.putExtra(keyAid, favoriteObject.aid)
-            intent.putExtra(keyImg, favoriteObject.imageUrl)
+            intent.putExtra(keyImg, favoriteObject.imageUrl())
             intent.putExtra(keyFromFav, true)
             fragment.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())
         }

@@ -11,7 +11,7 @@ import com.securepreferences.SecurePreferences
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.ads.AdsUtils
-import knf.kuma.player.CustomExoPlayer
+import knf.kuma.player.BasicExoplayer
 import knf.kuma.player.VideoActivity
 import knf.kuma.uagen.randomUA
 import knh.kuma.commons.cloudflarebypass.util.ConvertUtil
@@ -46,6 +46,33 @@ object PrefsUtil {
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("dir_order", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("dir_order", value).apply()
 
+    var recordOrder: Int
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("record_order", 0)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putInt(
+                "record_order",
+                value
+            )
+        }
+
+    var useInternalPlayer: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("player_type", "0") == "0"
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putString(
+                "player_type",
+                if (value) "0" else "1"
+            )
+        }
+
+
+    val recordOrderFlow: Flow<Int>
+        get() = PreferenceManager.getDefaultSharedPreferences(context).intFlow("record_order", 0)
+
+
+    val dirOrderFlow: Flow<Int>
+        get() = PreferenceManager.getDefaultSharedPreferences(context).intFlow("dir_order", 0)
+
+
     var achievementsVersion: Int
         get() = PreferenceManager.getDefaultSharedPreferences(context).getInt("achievements_version", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("achievements_version", value).apply()
@@ -64,6 +91,10 @@ object PrefsUtil {
     var isAV1DataMigrated: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("av1_data_migrated", false)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("av1_data_migrated", value).apply()
+
+    var isAV1DownloadsMigrated: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("av1_downloads_migrated", false)
+        set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("av1_downloads_migrated", value).apply()
 
     var isAV1MigrateDirectoryFinished: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("av1_dir_migrated", false)
@@ -173,9 +204,6 @@ object PrefsUtil {
     var firstStart: Long
         get() = PreferenceManager.getDefaultSharedPreferences(context).getLong("first_start_new", 0)
         set(value) = PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("first_start_new", value).apply()
-
-    val saveWithName: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(context).getString("save_type", "0") == "0"
 
     var emissionShowFavs: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("show_favs", true)
@@ -397,7 +425,7 @@ object PrefsUtil {
         return if (useExperimentalPlayer)
             Intent(context, VideoActivity::class.java)
         else
-            Intent(context, CustomExoPlayer::class.java)
+            Intent(context, BasicExoplayer::class.java)
     }
 
     fun getLiveShowFavIndicator(): LiveData<Boolean> {

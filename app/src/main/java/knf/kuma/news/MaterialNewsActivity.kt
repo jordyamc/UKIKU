@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
@@ -81,6 +82,7 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
                     }
                     runOnUiThread { binding.refresh.isRefreshing = false }
                 }.collect {
+                    adapter.submitData(PagingData.empty())
                     adapter.submitData(it)
                 }
             }
@@ -91,15 +93,11 @@ class MaterialNewsActivity : GenericActivity(), SwipeRefreshLayout.OnRefreshList
 
     private fun getCategory(): String {
         return when (model.selectedFilter) {
-            1 -> "noticias/anime"
-            2 -> "noticias/cultura-otaku"
-            3 -> "noticias/japon"
-            4 -> "noticias/live-action"
-            5 -> "noticias/manga"
-            6 -> "noticias/mercancia-de-anime"
-            7 -> "noticias/novelas-ligeras"
-            8 -> "noticias/videojuegos"
-            9 -> "noticias/resenas"
+            1 -> "anime"
+            2 -> "cultura-otaku"
+            3 -> "japon"
+            4 -> "live-action"
+            5 -> "manga"
             else -> "noticias/"
         }
     }

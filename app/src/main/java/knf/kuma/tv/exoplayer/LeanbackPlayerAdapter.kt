@@ -5,50 +5,46 @@ import android.os.Handler
 import android.os.Looper
 import android.view.Surface
 import android.view.SurfaceHolder
+import androidx.annotation.OptIn
 import androidx.leanback.media.PlaybackGlueHost
 import androidx.leanback.media.PlayerAdapter
 import androidx.leanback.media.SurfaceHolderGlueHost
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.ExoPlayerLibraryInfo
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.Timeline
-import com.google.android.exoplayer2.util.ErrorMessageProvider
-import com.google.android.exoplayer2.video.VideoSize
+import androidx.media3.common.C
+import androidx.media3.common.MediaLibraryInfo
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Timeline
+import androidx.media3.common.VideoSize
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import knf.kuma.commons.findActivity
 import xdroid.toaster.Toaster
 
 /**
- * Leanback `PlayerAdapter` implementation for [SimpleExoPlayer].
+ * Leanback `PlayerAdapter` implementation for [ExoPlayer].
  */
+@OptIn(UnstableApi::class)
 class LeanbackPlayerAdapter
 /**
  * Builds an instance. Note that the `PlayerAdapter` does not manage the lifecycle of the
- * [SimpleExoPlayer] instance. The caller remains responsible for releasing the exoPlayer when
+ * [ExoPlayer] instance. The caller remains responsible for releasing the exoPlayer when
  * it's no longer required.
  *
  * @param context        The current context (activity).
  * @param player         Instance of your exoplayer that needs to be configured.
  * @param updatePeriodMs The delay between exoPlayer control updates, in milliseconds.
  */
-    (private val context: Context, private val player: ExoPlayer, updatePeriodMs: Int) :
-    PlayerAdapter() {
+    (private val context: Context, private val player: ExoPlayer, updatePeriodMs: Int) : PlayerAdapter() {
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val componentListener: ComponentListener
     private val updateProgressRunnable: Runnable
-
-    //private var controlDispatcher: ControlDispatcher? = null
-    private var errorMessageProvider: ErrorMessageProvider<in ExoPlaybackException>? = null
     private var surfaceHolderGlueHost: SurfaceHolderGlueHost? = null
     private var hasSurface: Boolean = false
     private var lastNotifiedPreparedState: Boolean = false
 
+
     init {
         componentListener = ComponentListener()
-        //controlDispatcher = DefaultControlDispatcher()
         updateProgressRunnable = object : Runnable {
             override fun run() {
                 callback?.apply {
@@ -187,9 +183,14 @@ class LeanbackPlayerAdapter
             setVideoSurface(null)
         }
 
-        // Player.EventListener implementation.
+        // Player.Listener implementation.
 
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            callback?.onPlayStateChanged(this@LeanbackPlayerAdapter)
+            notifyStateChanged()
+        }
+
+        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
             callback?.onPlayStateChanged(this@LeanbackPlayerAdapter)
             notifyStateChanged()
         }
@@ -236,8 +237,9 @@ class LeanbackPlayerAdapter
     companion object {
 
         init {
-            ExoPlayerLibraryInfo.registerModule("goog.exo.leanback")
+            MediaLibraryInfo.registerModule("goog.exo.leanback")
         }
     }
 
 }
+

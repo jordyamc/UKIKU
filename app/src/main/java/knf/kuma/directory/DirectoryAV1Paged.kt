@@ -9,7 +9,7 @@ import knf.kuma.pojos.av1.DirectoryAV1Min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class DirectoryAV1DataSource(val type: String, val retryCallback: () -> Unit) :
+class DirectoryAV1DataSource(val type: String, val order: Int, val retryCallback: () -> Unit) :
     PagingSource<String, DirectoryAV1Min>() {
 
     private val pages = listOf("0","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z")
@@ -22,7 +22,7 @@ class DirectoryAV1DataSource(val type: String, val retryCallback: () -> Unit) :
         val page = code.split(":")[1].toInt()
         try {
             val dir = withContext(Dispatchers.IO) {
-                JsExtractor.processLink("https://animeav1.com/catalogo?order=title&letter=$letter$type&page=$page")
+                JsExtractor.processLink("https://animeav1.com/catalogo?${getOrder()}${if (order == 0) "&letter=$letter" else ""}$type&page=$page")
             }
             if (dir == null) {
                 retryCallback()
@@ -30,7 +30,7 @@ class DirectoryAV1DataSource(val type: String, val retryCallback: () -> Unit) :
             }
             if (dir.length() == 0) {
                 val currentLetterIndex = pages.indexOf(letter)
-                if (currentLetterIndex < pages.size - 1) {
+                if (currentLetterIndex < pages.size - 1 && order == 0) {
                     return LoadResult.Page(emptyList(), null, pages[currentLetterIndex + 1] + ":1")
                 }
                 return LoadResult.Page(emptyList(), null, null)
@@ -55,10 +55,18 @@ class DirectoryAV1DataSource(val type: String, val retryCallback: () -> Unit) :
             return LoadResult.Error(e)
         }
     }
+
+    fun getOrder(): String {
+        return when(order) {
+            1 -> "order=popular"
+            2 -> "order=latest_released"
+            else -> "order=title"
+        }
+    }
 }
 
-fun createDirectoryAV1PagedList(type: String, retryCallback: () -> Unit) =
+fun createDirectoryAV1PagedList(type: String, order: Int, retryCallback: () -> Unit) =
     Pager(
         config = PagingConfig(20),
-        pagingSourceFactory = { DirectoryAV1DataSource(type, retryCallback) }
+        pagingSourceFactory = { DirectoryAV1DataSource(type, order, retryCallback) }
     ).flow

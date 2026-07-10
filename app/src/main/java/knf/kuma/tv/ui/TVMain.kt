@@ -27,11 +27,8 @@ import knf.kuma.updater.UpdateActivity
 import knf.kuma.updater.UpdateChecker
 import knf.tools.bypass.startBypass
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.jvm.java
-import kotlin.time.Duration.Companion.seconds
 
 class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecker.CheckListener {
 
@@ -161,7 +158,7 @@ class TVMain : TVBaseActivity(), TVServersFactory.ServersInterface, UpdateChecke
                 BypassUtil.saveCookies(this, it.getStringExtra("cookies") ?: "null")
             } ?: false
             GenericActivity.bypassLive.postValue(Pair(first = cookiesUpdated, second = false))
-            Repository().reloadRecents()
+            Repository.reloadRecents()
             BypassUtil.isLoading = false
             PicassoSingle.clear()
             RecentsWork.run()

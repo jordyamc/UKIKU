@@ -1,24 +1,11 @@
 package knf.kuma.ads
 
-/*import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback*/
+
 import android.app.Activity
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import knf.kuma.BuildConfig
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.news.AdNewsObject
-import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
@@ -102,27 +89,6 @@ fun MutableList<FavoriteObject>.implAdsFavoriteMob() {
         }
     }
     this@implAdsFavoriteMob.add(0, AdFavoriteObject(AdsUtilsMob.FAVORITE_BANNER))
-}
-
-fun MutableList<NewsObject>.implAdsNewsMob() {
-    if (!PrefsUtil.isAdsEnabled || isEmpty()) return
-    var adIndex = 0
-    forEachReversedWithIndex { index, _ ->
-        if (index % 5 == 0 && index > 0) {
-            val adID: String = when (adIndex) {
-                0 -> {
-                    adIndex = 1
-                    AdsUtilsMob.NEWS_BANNER
-                }
-                else -> {
-                    adIndex = 0
-                    AdsUtilsMob.NEWS_BANNER
-                }
-            }
-            add(index, AdNewsObject(adID))
-        }
-    }
-    add(0, AdNewsObject(AdsUtilsMob.NEWS_BANNER))
 }
 
 fun MutableList<Achievement>.implAdsAchievementMob() {

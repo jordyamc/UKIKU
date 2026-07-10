@@ -3,6 +3,7 @@ package knf.kuma.tv.ui
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.SparseArray
 import android.view.View
@@ -49,6 +50,7 @@ import knf.kuma.tv.directory.RecommendedPresenter
 import knf.kuma.tv.search.TVSearch
 import knf.kuma.tv.sections.DirSection
 import knf.kuma.tv.sections.EmissionSection
+import knf.kuma.tv.sections.ExternalPlayer
 import knf.kuma.tv.sections.SectionObject
 import knf.kuma.tv.sync.BypassObject
 import knf.kuma.tv.sync.LogOutObject
@@ -134,7 +136,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
     }
 
     private fun fetchData() {
-        Repository().reloadRecents()
+        Repository.reloadRecents()
         activity?.let {
             viewLifecycleOwner.lifecycleScope.launch {
                 launch {
@@ -211,7 +213,11 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                     }
                 }
             }
-            arrayListOf(DirSection(), EmissionSection()).let { sections ->
+            if (Build.VERSION.SDK_INT < 29) {
+                listOf(DirSection(), EmissionSection(), ExternalPlayer())
+            } else {
+                listOf(DirSection(), EmissionSection())
+            }.let { sections ->
                 mRows?.get(SECTIONS)?.apply {
                     page = page.plus(1)
                     adapter?.apply {
@@ -240,7 +246,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
             }
 
             is Record -> {
-                context?.let { TVAnimesDetails.start(it, item.animeUrl) }
+                context?.let { TVAnimesDetails.start(it, item.animeUrl()) }
             }
 
             is Recommended -> {
@@ -248,7 +254,7 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
             }
 
             is FavoriteAV1 -> {
-                context?.let { TVAnimesDetails.start(it, item.animeUrl) }
+                context?.let { TVAnimesDetails.start(it, item.animeUrl()) }
             }
 
             is DirectoryAV1Min -> {

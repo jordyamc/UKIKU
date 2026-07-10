@@ -5,6 +5,7 @@ import android.net.http.SslError
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceRequest
@@ -12,12 +13,11 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.Keep
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.regex.Pattern
 
 class WebJS(context: Context) {
     private val webView = WebView(context)
+    private val cookieManager = CookieManager.getInstance()
     private var currentUrl: String? = null
     private var callback: ((String?, String) -> Unit)? = null
 
@@ -55,15 +55,22 @@ class WebJS(context: Context) {
         val handler = Handler(Looper.getMainLooper())
         val regex = pattern.toRegex()
         val run = Runnable {
+            webView.post {
+                webView.loadUrl("about:blank")
+            }
             if (!response) {
                 response = true
                 callback(null, null)
             }
         }
+        WebView.setWebContentsDebuggingEnabled(true)
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
+            useWideViewPort = true
+            loadWithOverviewMode = true
         }
+        Log.e("WebJS", "listenResources: $link")
         webView.webViewClient = object : WebViewClient() {
             override fun onReceivedSslError(
                 view: WebView?,
@@ -77,10 +84,42 @@ class WebJS(context: Context) {
                 view: WebView?,
                 request: WebResourceRequest?
             ): Boolean {
+                Log.e("WebJS", "shouldOverrideUrlLoading: ${request?.url}")
                 return true
             }
 
+            override fun shouldInterceptRequest(
+                view: WebView?,
+                url: String?
+            ): WebResourceResponse? {
+                Log.e("WebJS", "shouldInterceptRequest: $url")
+                if (!response && url?.matches(regex) == true) {
+                    handler.removeCallbacks(run)
+                    response = true
+                    callback(url, cookieManager.getCookie(link).let {
+                        if (it.isNullOrBlank() || !it.contains("=")) {
+                            emptyMap()
+                        } else {
+                            it.split(";").associate {
+                                it.trim().split("=").let {
+                                    it[0] to it[1]
+                                }
+                            }
+                        }
+                    })
+                    webView.post {
+                        webView.loadUrl("about:blank")
+                    }
+                }
+                return if (response) {
+                    WebResourceResponse("text/plain", "UTF-8", null)
+                } else {
+                    super.shouldInterceptRequest(view, url)
+                }
+            }
+
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+                Log.e("WebJS", "shouldInterceptRequest: ${request?.url}")
                 if (!response && request?.url?.toString()?.matches(regex) == true) {
                     handler.removeCallbacks(run)
                     response = true
@@ -89,7 +128,11 @@ class WebJS(context: Context) {
                         webView.loadUrl("about:blank")
                     }
                 }
-                return super.shouldInterceptRequest(view, request)
+                return if (response) {
+                    WebResourceResponse("text/plain", "UTF-8", null)
+                } else {
+                    super.shouldInterceptRequest(view, request)
+                }
             }
             override fun onPageFinished(view: WebView?, url: String?) {
                 if (executeOnFinish != null) {

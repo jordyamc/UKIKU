@@ -17,8 +17,8 @@ class RecordCardView(context: Context) : BindableCardView<Record>(context) {
         get() = R.layout.item_tv_card_chapter
 
     override fun bind(data: Record) {
-        imageView.loadGlide(data.imageUrl)
+        imageView.loadGlide(data.imageUrl())
         find<TextView>(R.id.title).text = data.name
-        find<TextView>(R.id.chapter).text = data.chapter
+        find<TextView>(R.id.chapter).text = data.chapter()
     }
 }

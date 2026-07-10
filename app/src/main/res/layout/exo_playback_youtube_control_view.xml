@@ -76,22 +76,18 @@
 
             <ImageButton
                 android:id="@id/exo_prev"
-                style="@style/ExoMediaButton.Previous"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_marginEnd="48dp"
-                android:scaleType="fitCenter"
+                android:background="?selectableItemBackgroundBorderless"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
 
         <ImageButton
-            android:id="@id/exo_play"
-            style="@style/ExoMediaButton.Play"
-            android:scaleType="fitCenter"
-            tools:ignore="ContentDescription" />
-
-        <ImageButton
-            android:id="@id/exo_pause"
-            style="@style/ExoMediaButton.Pause"
-            android:scaleType="fitCenter"
+            android:id="@id/exo_play_pause"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="?selectableItemBackgroundBorderless"
             tools:ignore="ContentDescription" />
 
         <RelativeLayout
@@ -101,9 +97,10 @@
 
             <ImageButton
                 android:id="@id/exo_next"
-                style="@style/ExoMediaButton.Next"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_marginStart="48dp"
-                android:scaleType="fitCenter"
+                android:background="?selectableItemBackgroundBorderless"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
 
@@ -133,7 +130,7 @@
             android:textSize="12sp"
             tools:text="12:30" />
 
-        <com.google.android.exoplayer2.ui.DefaultTimeBar
+        <androidx.media3.ui.DefaultTimeBar
             android:id="@id/exo_progress"
             android:layout_width="0dp"
             android:layout_height="16dp"
@@ -163,6 +160,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginBottom="2dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/background_ripple"
         android:clickable="true"
         android:focusable="true"

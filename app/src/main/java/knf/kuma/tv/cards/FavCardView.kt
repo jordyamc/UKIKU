@@ -17,7 +17,7 @@ class FavCardView(context: Context) : BindableCardView<FavoriteAV1>(context) {
         get() = R.layout.item_tv_card
 
     override fun bind(data: FavoriteAV1) {
-        imageView.loadGlide(data.imageUrl)
+        imageView.loadGlide(data.imageUrl())
         find<TextView>(R.id.title).text = data.name
     }
 }

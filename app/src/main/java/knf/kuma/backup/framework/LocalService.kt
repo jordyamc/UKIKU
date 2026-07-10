@@ -50,7 +50,11 @@ class LocalService : BackupService() {
     override suspend fun search(id: String, manual: Boolean): BackupObject<*>? {
         val file = File(baseFile, "$id.backup")
         return if (file.exists()) {
-            noCrashLet { gson.fromJson(file.readText().checkResponse(id), Backups.getType(id)) as BackupObject<*> }
+            noCrashLet {
+                val backup = gson.fromJson(file.readText().checkResponse(id), Backups.getType(id)) as BackupObject<*>
+                check(backup.version == BackupObject.BACKUP_VERSION)
+                backup
+            }
         } else {
             if (manual && id != Backups.keyAutoBackup) {
                 doOnUIGlobal { Toast.makeText(safeContext, "El archivo de respaldo necesita estar en ${file.path}", Toast.LENGTH_LONG).show() }

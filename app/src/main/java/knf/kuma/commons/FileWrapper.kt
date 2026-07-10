@@ -25,8 +25,8 @@ abstract class FileWrapper<T>(val path: String) {
         fun create(file_name: String?): FileWrapper<*> {
             file_name ?: throw IllegalStateException("Path can't be null!")
             return when {
-                PrefsUtil.downloadType == "0" -> NormalFileWrapper(file_name)
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> DocumentFileWrapper(file_name)
+                PrefsUtil.downloadType == "0" -> NormalFileWrapper(file_name)
                 else -> NormalPreQFileWrapper(file_name)
             }
         }

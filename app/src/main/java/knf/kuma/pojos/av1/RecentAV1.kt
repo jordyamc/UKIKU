@@ -16,7 +16,6 @@ import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.FileWrapper
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.commons.PrefsUtil.saveWithName
 import knf.kuma.commons.roundedString
 import knf.kuma.database.CacheDB
 import knf.kuma.database.CacheDBWrap
@@ -53,8 +52,7 @@ data class RecentAV1(
     val state: RecentState = RecentState(this)
 
     fun getFilePath(): String {
-        return if (saveWithName) "$eid$$slug-${number.roundedString()}.mp4"
-        else "$eid$$aid-${number.roundedString()}.mp4"
+        return "$eid$$slug-${number.roundedString()}.mp4"
     }
 
     fun asRecord(): Record = Record(
@@ -131,9 +129,9 @@ val RecentAV1.menuHideList: List<Int>
     get() = mutableListOf<Int>().apply {
         if (PrefsUtil.recentActionType == "0")
             add(R.id.streaming)
-        if (PrefsUtil.recentActionType == "1" || state.downloadObject?.isDownloadingOrPaused == true || state.canPlay)
+        if (PrefsUtil.recentActionType == "1" || state.isDownloaded || state.downloadObject?.isDownloadingOrPaused == true || state.canPlay)
             add(R.id.download)
-        if (state.isDeleting || !state.canPlay)
+        if (!state.isDownloaded)
             add(R.id.delete)
     }
 

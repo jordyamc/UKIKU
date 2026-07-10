@@ -36,8 +36,6 @@ class VideoPlayerGlue(
     private val mRepeatAction: PlaybackControlsRow.RepeatAction
     private val mThumbsUpAction: PlaybackControlsRow.ThumbsUpAction = PlaybackControlsRow.ThumbsUpAction(context)
     private val mThumbsDownAction: PlaybackControlsRow.ThumbsDownAction
-    private val mSkipPreviousAction: PlaybackControlsRow.SkipPreviousAction = PlaybackControlsRow.SkipPreviousAction(context)
-    private val mSkipNextAction: PlaybackControlsRow.SkipNextAction = PlaybackControlsRow.SkipNextAction(context)
     private val mFastForwardAction: PlaybackControlsRow.FastForwardAction = PlaybackControlsRow.FastForwardAction(context)
     private val mRewindAction: PlaybackControlsRow.RewindAction = PlaybackControlsRow.RewindAction(context)
 
@@ -135,23 +133,6 @@ class VideoPlayerGlue(
             newPosition = if (newPosition > duration) duration else newPosition
             playerAdapter.seekTo(newPosition)
         }
-    }
-
-
-    /**
-     * Listens for when skip to next and previous actions have been dispatched.
-     */
-    interface OnActionClickedListener {
-
-        /**
-         * Skip to the previous item in the queue.
-         */
-        fun onPrevious()
-
-        /**
-         * Skip to the next item in the queue.
-         */
-        fun onNext()
     }
 
     companion object {

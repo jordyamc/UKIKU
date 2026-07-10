@@ -7,12 +7,11 @@ import knf.kuma.retrofit.Repository
 import kotlinx.coroutines.flow.Flow
 
 class RecentsViewModel : ViewModel() {
-    private val repository = Repository()
 
     val dbFlowData: Flow<List<RecentAV1>>
         get() = CacheDB.INSTANCE.recentAV1DAO().allFlow
 
     fun reload() {
-        repository.reloadRecents()
+        Repository.reloadRecents()
     }
 }

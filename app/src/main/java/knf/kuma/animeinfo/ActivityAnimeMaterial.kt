@@ -211,7 +211,7 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         try {
             startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND)
                     .setType("text/plain")
-                    .putExtra(Intent.EXTRA_TEXT, favoriteObject?.name + "\n" + favoriteObject?.animeUrl), "Compartir"))
+                    .putExtra(Intent.EXTRA_TEXT, favoriteObject?.name + "\n" + favoriteObject?.animeUrl()), "Compartir"))
             AchievementManager.onShare()
         } catch (e: ActivityNotFoundException) {
             Toaster.toast("No se encontraron aplicaciones para enviar")
@@ -316,10 +316,10 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
 
         fun open(activity: Activity, record: Record, view: ImageView) {
             val intent = Intent(activity, DesignUtils.infoClass)
-            intent.data = record.animeUrl.toUri()
+            intent.data = record.animeUrl().toUri()
             intent.putExtra(keyTitle, record.name)
             intent.putExtra(keyAid, record.aid)
-            intent.putExtra(keyImg, record.imageUrl)
+            intent.putExtra(keyImg, record.imageUrl())
             intent.putExtra(keyPersist, true)
             intent.putExtra(keyIsRecord, true)
             activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, sharedImg).toBundle())

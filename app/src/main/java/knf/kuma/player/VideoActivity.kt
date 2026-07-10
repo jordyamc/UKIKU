@@ -6,39 +6,29 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.media.AudioManager
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.annotation.RequiresApi
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.MediaSession
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.preference.PreferenceManager
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.gson.Gson
-import com.inmobi.media.fa
 import knf.kuma.R
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.SSLSkipper
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.noCrash
-import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.PlayerViewBinding
 import knf.kuma.pojos.QueueObject
-import knf.kuma.uagen.randomLatestUA
-import knf.kuma.uagen.randomUA
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -53,10 +43,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  */
 
 class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
-    private val mediaSession: MediaSessionCompat by lazy { createMediaSession() }
-    private val mediaSessionConnector: MediaSessionConnector by lazy {
-        createMediaSessionConnector()
-    }
+    private lateinit var mediaSession: MediaSession
     private val binding by lazy { PlayerViewBinding.inflate(layoutInflater) }
     private lateinit var playerState: PlayerState
     private lateinit var playerHolder: PlayerHolder
@@ -74,6 +61,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         initPlayer(savedInstanceState)
     }
 
+    @OptIn(UnstableApi::class)
     fun initPlayer(savedInstanceState: Bundle?) {
         binding.player.resizeMode = getResizeMode()
         find<View>(R.id.exit).onClick { onBackPressedDispatcher.onBackPressed() }
@@ -111,7 +99,6 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
                     binding.player.useController = false
                 createPlayer()
                 playerHolder.start()
-                activateMediaSession()
             }
         }
     }
@@ -126,11 +113,13 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         }
     }
 
+    @OptIn(UnstableApi::class)
     private fun lock() {
         binding.player.hideController()
         binding.layLocked.isVisible = true
     }
 
+    @OptIn(UnstableApi::class)
     private fun unlock() {
         binding.player.showController()
         binding.layLocked.isVisible = false
@@ -146,6 +135,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         window.addFlags(View.KEEP_SCREEN_ON)
     }
 
+    @OptIn(UnstableApi::class)
     private fun getResizeMode(): Int {
         return when (PreferenceManager.getDefaultSharedPreferences(this).getString("player_resize", "0")) {
             "0" -> AspectRatioFrameLayout.RESIZE_MODE_FIT
@@ -160,7 +150,6 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         super.onStart()
         if (::playerHolder.isInitialized) {
             startPlayer()
-            activateMediaSession()
         }
     }
 
@@ -188,16 +177,13 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
         }
     }
 
-    override fun onStop() {
-        deactivateMediaSession()
-        super.onStop()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         stopPlayer()
         releasePlayer()
-        releaseMediaSession()
+        if (::mediaSession.isInitialized) {
+            mediaSession.release()
+        }
     }
 
     private fun saveState() {
@@ -227,46 +213,27 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
             override fun onSkipToNext() {
                 super.onSkipToNext()
                 with(playerHolder.audioFocusPlayer) {
-                    if (hasNext())
-                        next()
+                    if (hasNextMediaItem())
+                        seekToNextMediaItem()
                 }
             }
 
             override fun onSkipToPrevious() {
                 super.onSkipToPrevious()
                 with(playerHolder.audioFocusPlayer) {
-                    if (hasPrevious())
-                        previous()
+                    if (hasPreviousMediaItem())
+                        seekToPreviousMediaItem()
                 }
             }
         })
     }
 
-    private fun createMediaSessionConnector(): MediaSessionConnector =
-            MediaSessionConnector(mediaSession)
-
-
-    // MediaSession related functions.
-    private fun activateMediaSession() {
-        // Note: do not pass a null to the 3rd param below, it will cause a NullPointerException.
-        // To pass Kotlin arguments to Java varargs, use the Kotlin spread operator `*`.
-        mediaSessionConnector.setPlayer(playerHolder.audioFocusPlayer)
-        mediaSession.isActive = true
-    }
-
-    private fun deactivateMediaSession() {
-        mediaSessionConnector.setPlayer(null)
-        mediaSession.isActive = false
-    }
-
-    private fun releaseMediaSession() {
-        mediaSession.release()
-    }
 
     // ExoPlayer related functions.
     private fun createPlayer() {
         playerHolder = PlayerHolder(this, playerState, binding.player, intent, playList)
         binding.youtubeOverlay.player(playerHolder.audioFocusPlayer)
+        mediaSession = MediaSession.Builder(this, playerHolder.audioFocusPlayer).build()
         if (!intent.getBooleanExtra("isPlayList", false)) {
             find<View>(com.google.android.exoplayer2.R.id.exo_next).visibility = View.GONE
             find<View>(com.google.android.exoplayer2.R.id.exo_prev).visibility = View.GONE
@@ -332,13 +299,13 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
 
     override fun onLoadingChange(loading: Boolean) {
         with(find<View>(R.id.progress)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode)
+            if (isInPictureInPictureMode)
                 post { visibility = View.GONE }
             post { visibility = if (loading) View.VISIBLE else View.GONE }
         }
     }
 
-    override fun onPlayerStateChanged(state: Int, playWhenReady: Boolean) {
+    override fun onPlayerStateChanged(state: Int) {
         if (state == Player.STATE_READY)
             doOnUI { hideUI() }
     }

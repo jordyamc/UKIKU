@@ -1,5 +1,6 @@
 package knf.kuma.commons
 
+import knf.kuma.uagen.UAGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -9,6 +10,8 @@ import okhttp3.TlsVersion
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
+import org.jsoup.HttpStatusException
+import org.jsoup.Jsoup
 import org.mozilla.javascript.Scriptable
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
@@ -93,8 +96,13 @@ object JsExtractor {
 
     private suspend fun fetchUrl(url: String, tries: Int = 0): String = withContext(Dispatchers.IO) {
         try {
-            jsoupCookies(url).ignoreContentType(true).execute().body()
+            if (tries > 0) {
+                Jsoup.connect(url).userAgent(UAGenerator.getLatestUserAgent())
+            } else {
+                jsoupCookies(url)
+            }.ignoreContentType(true).execute().body()
         } catch (e: Exception) {
+            if (e is HttpStatusException && e.statusCode == 404) throw e
             if (tries < 3) {
                 delay(500.milliseconds * (tries + 1))
                 fetchUrl(url, tries + 1)
@@ -102,13 +110,6 @@ object JsExtractor {
                 throw e
             }
         }
-        /*val request = Request.Builder()
-            .url(url)
-            .build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw java.io.IOException("Unexpected code $response")
-            response.body.string()
-        }*/
     }
 
     private fun executeJS(rawArrayJs: String, key: String?): String? {

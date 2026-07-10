@@ -7,21 +7,26 @@ import android.content.Intent
 import android.media.AudioManager
 import android.net.Uri
 import android.support.v4.media.MediaDescriptionCompat
+import androidx.annotation.OptIn
 import androidx.media.AudioAttributesCompat
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.ui.PlayerView
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.afollestad.materialdialogs.MaterialDialog
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.CustomKeysAndValues
+import com.google.firebase.crashlytics.crashlytics
 import io.reactivex.rxjava3.disposables.Disposable
 import knf.kuma.commons.BypassUtil
 import knf.kuma.commons.noCrashLetNullable
@@ -82,8 +87,13 @@ class PlayerHolder(
         return mediaCatalog.mapNotNull { noCrashLetNullable { createExtractorMediaSource(it) } }
     }
 
+    @OptIn(UnstableApi::class)
     private fun createExtractorMediaSource(descriptor: MediaDescriptionCompat): MediaData {
-        val item = MediaItem.fromUri(descriptor.mediaUri?: Uri.EMPTY)
+        val item = MediaItem.fromUri(descriptor.mediaUri?: Uri.EMPTY).buildUpon()
+            .setMediaMetadata(MediaMetadata.Builder()
+                .setTitle(descriptor.title)
+                .build()
+            ).build()
         if (intent.getBooleanExtra("isFile", false)) return MediaData(item)
         val httpFactory = DefaultHttpDataSource.Factory().apply {
             descriptor.extras?.getStringArray("headers")?.let { headerArray ->
@@ -115,6 +125,8 @@ class PlayerHolder(
         }
         private lateinit var mediaSource: MediaSource
         private lateinit var mediaItem: MediaItem
+
+        @OptIn(UnstableApi::class)
         fun addMedia(exoPlayer: ExoPlayer) {
             if (::mediaSource.isInitialized) {
                 exoPlayer.addMediaSource(mediaSource)
@@ -181,10 +193,11 @@ class PlayerHolder(
      * For more info on ExoPlayer logging, please review this
      * [codelab](https://codelabs.developers.google.com/codelabs/exoplayer-intro/#5).
      */
+    @OptIn(UnstableApi::class)
     private fun attachLogging(exoPlayer: ExoPlayer) {
         // Show toasts on state changes.
         exoPlayer.addListener(object : Player.Listener {
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
                     Player.STATE_ENDED -> {
                         playerCallback.onFinish()
@@ -202,11 +215,11 @@ class PlayerHolder(
                     })
                     positiveButton(text = "OK")
                 }
-                FirebaseCrashlytics.getInstance().recordException(error)
+                Firebase.crashlytics.recordException(error, CustomKeysAndValues.Builder().putString("link", intent.dataString?:"Empty").putString("extras", intent.extras.toString()).build())
                 playerCallback.onFinish()
             }
 
-            override fun onLoadingChanged(isLoading: Boolean) {
+            override fun onIsLoadingChanged(isLoading: Boolean) {
                 playerCallback.onLoadingChange(isLoading)
             }
 
@@ -239,50 +252,12 @@ class PlayerHolder(
                     e.printStackTrace()
                 }
             }
-
-            /*override fun onPositionDiscontinuity(reason: Int) {
-                try {
-                    val latestPosition = audioFocusPlayer.currentWindowIndex
-                    if (latestPosition != listPosition) {
-                        playerState.apply {
-                            title = playList[listPosition].title()
-                            if (reason == 0) {
-                                position = 0
-                            } else if (reason in 1..2) {
-                                position = lastPosition
-                            }
-                        }
-                        doAsync {
-                                CacheDB.INSTANCE.playerStateDAO().set(playerState)
-                        }
-                        listPosition = latestPosition
-                        playerCallback.onChangeTitle((mediaCatalog[listPosition].title
-                                ?: "").toString())
-                        setUpRetriever(mediaCatalog[listPosition])
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }*/
         })
         // Write to log on state changes.
         exoPlayer.addListener(object : Player.Listener {
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                //Log.i("Player", "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady")
-                playerCallback.onPlayerStateChanged(playbackState, playWhenReady)
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                playerCallback.onPlayerStateChanged(playbackState)
             }
-
-            fun getStateString(state: Int): String {
-                return when (state) {
-                    Player.STATE_BUFFERING -> "STATE_BUFFERING"
-                    Player.STATE_ENDED -> "STATE_ENDED"
-                    Player.STATE_IDLE -> "STATE_IDLE"
-                    Player.STATE_READY -> "STATE_READY"
-                    else -> "?"
-                }
-            }
-
-
         })
 
     }
@@ -290,7 +265,7 @@ class PlayerHolder(
     interface PlayerCallback {
         fun onChangeTitle(title: String)
         fun onLoadingChange(loading: Boolean)
-        fun onPlayerStateChanged(state: Int, playWhenReady: Boolean)
+        fun onPlayerStateChanged(state: Int)
         fun onFinish()
     }
 

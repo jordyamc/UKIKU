@@ -6,23 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import knf.kuma.pojos.av1.DirectoryAV1
 import knf.kuma.pojos.av1.SearchDataSource
 import knf.kuma.pojos.av1.SearchState
-import knf.kuma.retrofit.Repository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import java.util.concurrent.Flow
-import kotlin.time.Duration.Companion.milliseconds
 
 class SearchViewModel : ViewModel() {
     private var queryLive = MutableLiveData<String?>(null)

@@ -1,22 +1,20 @@
 package knf.kuma.tv
 
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.FragmentActivity
 import androidx.leanback.widget.Presenter
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import knf.kuma.App
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.JsExtractor
+import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.doOnUIGlobal
 import knf.kuma.commons.iterator
 import knf.kuma.database.CacheDB
 import knf.kuma.player.openWebPlayer
-import knf.kuma.pojos.AnimeObject
-import knf.kuma.pojos.DownloadObject
-import knf.kuma.pojos.RecordObject
-import knf.kuma.pojos.SeenObject
-import knf.kuma.pojos.av1.Chapter
 import knf.kuma.pojos.av1.RecentAV1
 import knf.kuma.pojos.av1.Record
 import knf.kuma.tv.exoplayer.TVPlayer
@@ -29,7 +27,6 @@ import knf.kuma.videoservers.VideoServer
 import knf.kuma.videoservers.WebServer
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
-import org.json.JSONObject
 import xdroid.toaster.Toaster
 import java.util.Locale
 
@@ -58,7 +55,10 @@ class TVServersFactory private constructor(
                 } else {
                     activity.startActivityForResult(
                         Intent(activity, TVServerSelection::class.java)
-                            .putExtra(TVServerSelectionFragment.SERVERS_DATA, Server.getNames(servers) as ArrayList),
+                            .putExtra(
+                                TVServerSelectionFragment.SERVERS_DATA,
+                                Server.getNames(servers) as ArrayList
+                            ),
                         REQUEST_CODE_LIST
                     )
                 }
@@ -70,7 +70,7 @@ class TVServersFactory private constructor(
     }
 
     fun analyzeMulti(position: Int) {
-        when(position) {
+        when (position) {
             0 -> this.servers = subServes.toMutableList()
             1 -> this.servers = dubServers.toMutableList()
         }
@@ -88,7 +88,7 @@ class TVServersFactory private constructor(
                 } else if (server == null) {
                     Toaster.toast("Error en servidor")
                     showServerList()
-                } else if (server.options.size == 0) {
+                } else if (server.options.isEmpty()) {
                     Toaster.toast("Error en servidor")
                     showServerList()
                 } else if (server.haveOptions()) {
@@ -111,7 +111,7 @@ class TVServersFactory private constructor(
                 } else {
                     val serverName = text.lowercase(Locale.getDefault())
                     when {
-                         serverName.contains("mega") -> {
+                        serverName.contains("mega") -> {
                             Toaster.toast("No se puede usar Mega en TV")
                             showServerList()
                         }
@@ -134,7 +134,8 @@ class TVServersFactory private constructor(
             Intent(activity, TVServerSelection::class.java)
                 .putExtra("name", server.name)
                 .putExtra(
-                    TVServerSelectionFragment.VIDEO_DATA, (server.options.map { it.name ?: "" } as? ArrayList)
+                    TVServerSelectionFragment.VIDEO_DATA,
+                    (server.options.map { it.name ?: "" } as? ArrayList)
                         ?: arrayListOf<String>()
                 ),
             REQUEST_CODE_OPTION
@@ -148,12 +149,39 @@ class TVServersFactory private constructor(
                 history()
             }
         }
-        activity.startActivity(Intent(activity, TVPlayer::class.java).apply {
-            setDataAndType(Uri.parse(option.url), "video/*")
-            putExtra("title", name)
-            putExtra("chapter", chapter)
-            putStringArrayListExtra("headers", ArrayList(option.headers?.createHeadersList()?: emptyList()))
-        })
+        val applyExtras: (Intent) -> Intent = {
+            it.apply {
+                setDataAndType(Uri.parse(option.url), "video/*")
+                putExtra("title", name)
+                putExtra("chapter", chapter)
+                putStringArrayListExtra(
+                    "headers",
+                    ArrayList(option.headers?.createHeadersList() ?: emptyList())
+                )
+            }
+        }
+        try {
+            activity.startActivity(
+                if (PrefsUtil.useInternalPlayer) {
+                    applyExtras(Intent(activity, TVPlayer::class.java))
+                } else {
+                    val intent = applyExtras(Intent(Intent.ACTION_VIEW))
+                    val resolveInfo = App.context.packageManager.queryIntentActivities(intent, 0)
+                    val componentsToExclude = resolveInfo.filter {
+                        it.activityInfo.packageName == "knf.kuma"
+                    }.map {
+                        ComponentName(it.activityInfo.packageName, it.activityInfo.name)
+                    }
+                    if (resolveInfo.size - componentsToExclude.size <= 0) throw IllegalStateException("No player found")
+                    Intent.createChooser(intent, "Selecciona un reproductor").apply {
+                        putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, componentsToExclude.toTypedArray())
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toaster.toastLong("Instala un reproductor externo o cambia a reproductor interno")
+        }
         serversInterface.onFinish(false, true)
     }
 
@@ -170,12 +198,21 @@ class TVServersFactory private constructor(
                                 val name = sub.getString("server")
                                 val url = sub.getString("url")
                                 if (name == "MP4Upload") {
-                                    if (subServers.find { it.baseLink.contains(url.substringAfterLast("/")) } != null){
+                                    if (subServers.find {
+                                            it.baseLink.contains(
+                                                url.substringAfterLast(
+                                                    "/"
+                                                )
+                                            )
+                                        } != null) {
                                         continue
                                     }
                                 }
                                 if (name == "PDrain") {
-                                    if (subServers.find { it.baseLink.substringBeforeLast("?").contains(url.substringBeforeLast("?")) } != null){
+                                    if (subServers.find {
+                                            it.baseLink.substringBeforeLast("?")
+                                                .contains(url.substringBeforeLast("?"))
+                                        } != null) {
                                         continue
                                     }
                                 }
@@ -183,8 +220,12 @@ class TVServersFactory private constructor(
                                     continue
                                 }
                                 val server = Server.check(activity, url)
-                                if (subServers.find { it.baseLink.substringAfterLast("/") == url.substringAfterLast("/") } == null) {
-                                    subServers.add(server?: WebServer(activity, url, name))
+                                if (subServers.find {
+                                        it.baseLink.substringAfterLast("/") == url.substringAfterLast(
+                                            "/"
+                                        )
+                                    } == null) {
+                                    subServers.add(server ?: WebServer(activity, url, name))
                                 }
                             }
                         }
@@ -193,12 +234,21 @@ class TVServersFactory private constructor(
                                 val name = dub.getString("server")
                                 val url = dub.getString("url")
                                 if (name == "MP4Upload") {
-                                    if (dubServers.find { it.baseLink.contains(url.substringAfterLast("/")) } != null){
+                                    if (dubServers.find {
+                                            it.baseLink.contains(
+                                                url.substringAfterLast(
+                                                    "/"
+                                                )
+                                            )
+                                        } != null) {
                                         continue
                                     }
                                 }
                                 if (name == "PDrain") {
-                                    if (dubServers.find { it.baseLink.substringBeforeLast("?").contains(url.substringBeforeLast("?")) } != null){
+                                    if (dubServers.find {
+                                            it.baseLink.substringBeforeLast("?")
+                                                .contains(url.substringBeforeLast("?"))
+                                        } != null) {
                                         continue
                                     }
                                 }
@@ -206,8 +256,12 @@ class TVServersFactory private constructor(
                                     continue
                                 }
                                 val server = Server.check(activity, url)
-                                if (dubServers.find { it.baseLink.substringAfterLast("/") == url.substringAfterLast("/") } == null) {
-                                    dubServers.add(server?: WebServer(activity, url, name))
+                                if (dubServers.find {
+                                        it.baseLink.substringAfterLast("/") == url.substringAfterLast(
+                                            "/"
+                                        )
+                                    } == null) {
+                                    dubServers.add(server ?: WebServer(activity, url, name))
                                 }
                             }
                         }
@@ -216,13 +270,13 @@ class TVServersFactory private constructor(
                 this@TVServersFactory.subServes = subServers.sortedWith(
                     compareBy(
                         { it.name.contains("(WEB)") },
-                        {it.name}
+                        { it.name }
                     )
                 ).filter { it is WebServer || it.canStream }.toMutableList()
                 this@TVServersFactory.dubServers = dubServers.sortedWith(
                     compareBy(
                         { it.name.contains("(WEB)") },
-                        {it.name}
+                        { it.name }
                     )
                 ).filter { it is WebServer || it.canStream }.toMutableList()
                 if (dubServers.isNotEmpty()) {
@@ -255,14 +309,36 @@ class TVServersFactory private constructor(
         var REQUEST_CODE_OPTION = 6157
         var REQUEST_CODE_MULTI = 6497
 
-        fun start(activity: FragmentActivity, url: String, chapter: RecentAV1, serversInterface: ServersInterface) {
-            start(activity, url, chapter.name, chapter.chapter, chapter.asRecord(), null, serversInterface)
+        fun start(
+            activity: FragmentActivity,
+            url: String,
+            chapter: RecentAV1,
+            serversInterface: ServersInterface
+        ) {
+            start(
+                activity,
+                url,
+                chapter.name,
+                chapter.chapter,
+                chapter.asRecord(),
+                null,
+                serversInterface
+            )
         }
 
-        fun start(activity: FragmentActivity, url: String, name: String, chapter: String, record: Record, viewHolder: Presenter.ViewHolder?, serversInterface: ServersInterface?) {
+        fun start(
+            activity: FragmentActivity,
+            url: String,
+            name: String,
+            chapter: String,
+            record: Record,
+            viewHolder: Presenter.ViewHolder?,
+            serversInterface: ServersInterface?
+        ) {
             doAsync {
                 serversInterface?.let {
-                    val factory = TVServersFactory(activity, url, name, chapter, record, viewHolder, it)
+                    val factory =
+                        TVServersFactory(activity, url, name, chapter, record, viewHolder, it)
                     serversInterface.onReady(factory)
                     factory.get()
                 }

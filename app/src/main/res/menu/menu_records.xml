@@ -13,4 +13,23 @@
         android:icon="@drawable/ic_info"
         android:title="Estado"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_group"
+        android:icon="@drawable/ic_group"
+        android:title="Agrupar"
+        app:showAsAction="always">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/action_group_individual"
+                    android:title="Individual"
+                    app:showAsAction="never"/>
+                <item
+                    android:id="@+id/action_group_last"
+                    android:title="Solo último capítulo"
+                    app:showAsAction="never"/>
+            </group>
+        </menu>
+    </item>
 </menu>

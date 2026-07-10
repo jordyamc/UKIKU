@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -23,6 +24,7 @@ import knf.kuma.achievements.AchievementManager
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.ads.showRandomInterstitial
+import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.PrefsUtil
@@ -35,6 +37,8 @@ import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
@@ -96,10 +100,19 @@ class RecordActivity : GenericActivity() {
             }
         }
         lifecycleScope.launch {
-            Pager(
-                config = PagingConfig(20, enablePlaceholders = false),
-                pagingSourceFactory = { CacheDB.INSTANCE.recordAV1DAO().allPagedMaxOnly }
-            ).flow.collectLatest {
+            PrefsUtil.recordOrderFlow.distinctUntilChanged().flatMapLatest { order ->
+                Pager(
+                    config = PagingConfig(20, enablePlaceholders = false),
+                    pagingSourceFactory = {
+                        if (order == 0) {
+                            CacheDB.INSTANCE.recordAV1DAO().allPaged
+                        } else {
+                            CacheDB.INSTANCE.recordAV1DAO().allPagedMaxOnly
+                        }
+                    }
+                ).flow
+            }.collectLatest {
+                adapter.submitData(PagingData.empty())
                 adapter.submitData(it)
                 if (isFirst) {
                     isFirst = false
@@ -112,6 +125,10 @@ class RecordActivity : GenericActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_records, menu)
+        when (PrefsUtil.recordOrder) {
+            0 -> menu.findItem(R.id.action_group_individual).isChecked = true
+            1 -> menu.findItem(R.id.action_group_last).isChecked = true
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -121,8 +138,11 @@ class RecordActivity : GenericActivity() {
                 MaterialDialog(this@RecordActivity).safeShow {
                     message(text = "¿Limpiar el historial?")
                     positiveButton(text = "Continuar") {
-                        lifecycleScope.launch {
+                        lifecycleScope.launch(Dispatchers.IO) {
                             CacheDB.INSTANCE.recordAV1DAO().clear()
+                            syncData {
+                                history()
+                            }
                         }
                     }
                     negativeButton(text = "cancelar")
@@ -132,6 +152,14 @@ class RecordActivity : GenericActivity() {
                 lifecycleScope.launch {
                     "${withContext(Dispatchers.IO) { CacheDB.INSTANCE.recordAV1DAO().count }} episodios vistos".toast()
                 }
+            }
+            R.id.action_group_individual -> {
+                item.isChecked = true
+                PrefsUtil.recordOrder = 0
+            }
+            R.id.action_group_last -> {
+                item.isChecked = true
+                PrefsUtil.recordOrder = 1
             }
         }
         return super.onOptionsItemSelected(item)

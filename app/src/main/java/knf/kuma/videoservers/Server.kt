@@ -12,7 +12,7 @@ import org.jsoup.Jsoup
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-abstract class Server(internal var context: Context, internal var baseLink: String) : Comparable<Server> {
+abstract class Server(val context: Context, val baseLink: String) : Comparable<Server> {
     private var server: VideoServer? = null
 
     abstract val isValid: Boolean
@@ -78,13 +78,13 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                     .ignoreContentType(true)
                     .method(Connection.Method.HEAD).apply {
                         if (option.headers != null) {
-                            for (pair in option.headers?.createHeaders() ?: arrayListOf()) {
+                            for (pair in option.headers.createHeaders()) {
                                 header(pair.first, pair.second)
                             }
                         }
                     }
                 val response = request.execute()
-                if (response.statusCode() > 300 || response.statusCode() < 200) {
+                if (response.statusCode() !in 200..300) {
                     Log.e("Remove Option", "Server: " + option.server + "\nUrl: " + option.url + "\nCode: " + response.statusCode())
                     videoServer.options.remove(option)
                 }
@@ -93,7 +93,7 @@ abstract class Server(internal var context: Context, internal var baseLink: Stri
                 videoServer.options.remove(option)
             }
 
-        return if (videoServer.options.size == 0) null else videoServer
+        return if (videoServer.options.isEmpty()) null else videoServer
     }
 
     override fun compareTo(other: Server): Int {

@@ -6,8 +6,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
-import knf.kuma.news.AdNewsObject
-import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
@@ -75,26 +73,6 @@ fun MutableList<FavoriteObject>.implAdsFavoriteBrains() {
                 }
                 this@implAdsFavoriteBrains.add(index, AdFavoriteObject(adID))
             }
-        }
-    }
-}
-
-fun MutableList<NewsObject>.implAdsNewsBrain() {
-    if (!PrefsUtil.isAdsEnabled || isEmpty()) return
-    var adIndex = 0
-    ArrayList(this).forEachIndexed { index, _ ->
-        if (index % 5 == 0 && index > 0) {
-            val adID: String = when (adIndex) {
-                0 -> {
-                    adIndex = 1
-                    AdsUtilsBrains.NEWS_BANNER
-                }
-                else -> {
-                    adIndex = 0
-                    AdsUtilsBrains.NEWS_BANNER
-                }
-            }
-            add(index, AdNewsObject(adID))
         }
     }
 }

@@ -18,10 +18,6 @@ class DirAV1PagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIO
         }
     }
 
-    fun onChangeOrder() {
-
-    }
-
     override fun getItem(position: Int): Fragment {
         return when (position) {
             1 -> ovas

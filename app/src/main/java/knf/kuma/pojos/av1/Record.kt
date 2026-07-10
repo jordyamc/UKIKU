@@ -12,10 +12,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.TypeConverters
-import com.google.firebase.firestore.Exclude
 import com.google.gson.annotations.SerializedName
 import knf.kuma.commons.FileWrapper
-import knf.kuma.commons.PrefsUtil.saveWithName
 import knf.kuma.commons.roundedString
 import knf.kuma.database.BaseConverter
 import knf.kuma.database.CacheDB
@@ -43,15 +41,15 @@ data class Record(
 
     constructor(): this(0, "", 0.0, 0, "", 0L)
 
-
-    val animeUrl: String @Exclude get() = "https://animeav1.com/media/$slug"
-    val imageUrl: String @Exclude get() = "https://cdn.animeav1.com/covers/$aid.jpg"
-    val chapterUrl: String @Exclude get() = "https://animeav1.com/media/$slug/${number.roundedString()}"
-    val chapter: String @Exclude get() = "Episodio ${number.roundedString()}"
+    fun animeUrl() = "https://animeav1.com/media/$slug"
+    fun imageUrl() = "https://cdn.animeav1.com/covers/$aid.jpg"
+    fun chapterUrl() = "https://animeav1.com/media/$slug/${number.roundedString()}"
+    fun chapter() = "Episodio ${number.roundedString()}"
     val fileWrapper: FileWrapper<*> by lazy { FileWrapper.create(getFilePath()) }
+
+    fun isValid(): Boolean = eid != 0
     private fun getFilePath(): String {
-        return if (saveWithName) "$eid$$slug-${number.roundedString()}.mp4"
-        else "$eid$$aid-${number.roundedString()}.mp4"
+        return "$eid$$slug-${number.roundedString()}.mp4"
     }
     companion object {
         val DIFF = object : DiffUtil.ItemCallback<Record>() {

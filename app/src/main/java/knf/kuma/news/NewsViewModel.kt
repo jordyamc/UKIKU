@@ -12,9 +12,5 @@ class NewsViewModel : ViewModel(){
         add("Japón")
         add("Live Action")
         add("Manga")
-        add("Mercancía / Figuras")
-        add("Novelas Ligeras")
-        add("VideoJuegos")
-        add("Reseñas")
     }
 }

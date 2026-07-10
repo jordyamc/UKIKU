@@ -19,6 +19,7 @@ import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.custom.GenericActivity
 import knf.kuma.database.CacheDB
+import knf.kuma.explorer.ExplorerCreator
 import knf.kuma.migration.MigrationActivity
 import knf.kuma.tv.ui.TVMain
 import knf.tools.signatures.getSignatures
@@ -29,7 +30,6 @@ import kotlinx.coroutines.withContext
 import xdroid.toaster.Toaster
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.jvm.java
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -157,6 +157,7 @@ class SplashActivity : GenericActivity() {
     }
 
     private fun startApp() {
+        ExplorerCreator.migrateDownloads()
         lifecycleScope.launch(Dispatchers.Main) {
             if (PrefsUtil.mayUseRandomUA)
                 PrefsUtil.alwaysGenerateUA = !withContext(Dispatchers.IO) { doBlockTests() }

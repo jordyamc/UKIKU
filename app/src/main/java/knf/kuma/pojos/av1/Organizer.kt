@@ -14,7 +14,6 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.TypeConverters
 import androidx.room.Update
-import com.google.firebase.firestore.Exclude
 import com.google.gson.annotations.SerializedName
 import knf.kuma.database.BaseConverter
 import kotlinx.coroutines.flow.Flow
@@ -37,8 +36,10 @@ data class Organizer(
 
     constructor(): this(0, "", "", 0, 0)
 
-    val animeUrl: String @Exclude get() = "https://animeav1.com/media/$slug"
-    val imageUrl: String @Exclude get() = "https://cdn.animeav1.com/covers/$aid.jpg"
+    fun animeUrl() = "https://animeav1.com/media/$slug"
+    fun imageUrl() = "https://cdn.animeav1.com/covers/$aid.jpg"
+
+    fun isValid(): Boolean = aid != 0
 }
 
 data class OrganizerWRecord(

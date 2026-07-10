@@ -76,6 +76,7 @@ class DropBoxService : BackupService() {
                         gson.fromJson<Any>(it.readText().checkResponse(id), Backups.getType(id)) as BackupObject<*>
                     }
                     downloader?.close()
+                    check(backupObject.version == BackupObject.BACKUP_VERSION)
                     backupObject
                 } else
                     null

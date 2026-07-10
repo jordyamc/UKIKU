@@ -11,7 +11,6 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.diceOf
 import knf.kuma.commons.noCrash
 import knf.kuma.commons.noCrashLet
-import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.FavoriteObject
 import knf.kuma.pojos.av1.BaseRecentAV1
@@ -136,20 +135,6 @@ fun MutableList<FavoriteObject>.implAdsFavorite() {
                     put({ implAdsFavoriteBrains() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
                 if (AdsUtils.isApplovinEnabled)
                     put({ implAdsFavoriteLovin() }, AdsUtils.remoteConfigs.getDouble("applovin_percent"))
-            }()
-        }
-}
-
-fun MutableList<NewsObject>.implAdsNews() {
-    if (AdsUtils.isRemoteAdsEnabled && AdsUtils.isRemoteBannerEnabled && PrefsUtil.isAdsEnabled)
-        noCrash {
-            diceOf({ implAdsNewsBrain() }) {
-                if (AdsUtils.remoteConfigs.getBoolean("admob_enabled"))
-                    put({ implAdsNewsMob() }, AdsUtils.remoteConfigs.getDouble("admob_percent"))
-                if (AdsUtils.remoteConfigs.getBoolean("appbrains_enabled"))
-                    put({ implAdsNewsBrain() }, AdsUtils.remoteConfigs.getDouble("appbrains_percent"))
-                if (AdsUtils.isApplovinEnabled)
-                    put({ implAdsNewsLovin() }, AdsUtils.remoteConfigs.getDouble("applovin_percent"))
             }()
         }
 }

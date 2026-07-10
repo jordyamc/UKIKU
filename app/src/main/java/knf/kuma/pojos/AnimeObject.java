@@ -41,7 +41,6 @@ import knf.kuma.animeinfo.ktx.ExtensionsKt;
 import knf.kuma.commons.ExtensionUtilsKt;
 import knf.kuma.commons.FileWrapper;
 import knf.kuma.commons.PatternUtil;
-import knf.kuma.commons.PrefsUtil;
 import knf.kuma.database.CacheDB;
 import pl.droidsonroids.jspoon.ElementConverter;
 import pl.droidsonroids.jspoon.annotation.Selector;
@@ -204,10 +203,7 @@ public class AnimeObject implements Comparable<AnimeObject>, Serializable {
     }
 
     public String getFileName() {
-        if (PrefsUtil.INSTANCE.getSaveWithName())
-            return fileName;
-        else
-            return aid;
+        return fileName;
     }
 
     public String getGenresString() {

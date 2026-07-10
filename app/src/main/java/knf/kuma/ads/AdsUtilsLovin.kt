@@ -26,8 +26,6 @@ import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.asPx
 import knf.kuma.custom.BannerContainerView
-import knf.kuma.news.AdNewsObject
-import knf.kuma.news.NewsObject
 import knf.kuma.pojos.Achievement
 import knf.kuma.pojos.AchievementAd
 import knf.kuma.pojos.FavoriteObject
@@ -96,28 +94,6 @@ fun MutableList<FavoriteObject>.implAdsFavoriteLovin() {
         }
     }
     this@implAdsFavoriteLovin.add(0, AdFavoriteObject(AdsUtilsMob.FAVORITE_BANNER))
-}
-
-fun MutableList<NewsObject>.implAdsNewsLovin() {
-    if (!PrefsUtil.isAdsEnabled || isEmpty()) return
-    var adIndex = 0
-    forEachReversedWithIndex { index, _ ->
-        if (index % 5 == 0 && index > 0) {
-            val adID: String = when (adIndex) {
-                0 -> {
-                    adIndex = 1
-                    AdsUtilsMob.NEWS_BANNER
-                }
-
-                else -> {
-                    adIndex = 0
-                    AdsUtilsMob.NEWS_BANNER
-                }
-            }
-            add(index, AdNewsObject(adID))
-        }
-    }
-    add(0, AdNewsObject(AdsUtilsMob.NEWS_BANNER))
 }
 
 fun MutableList<Achievement>.implAdsAchievementLovin() {
