@@ -60,6 +60,7 @@ class FaqActivity : GenericActivity() {
 
     private fun createFAQList(): List<FaqItem> =
             listOf(
+                    FaqItem("¿Por qué al reproducir solo se escucha el audio pero no se ve video?", "La nueva fuente usa un codec de video llamado AV1, el cual solo está soportado a partir de Android 10, para versiones anteriores se recomienda usar un reproductor externo que tenga soporte para AV1"),
                     FaqItem("¿Por qué no me funcionan los servidores?", "Los servidores vienen de AnimeAV1, son ellos los encargados de re subir los enlaces caídos, la app no puede hacer nada"),
                     FaqItem("¿Para que funcionan las loli-coins?", "Sirven para comprar los pasos del easter egg y revelar logros ocultos"),
                     FaqItem("¿Por qué me dice error 403?", "Solo presiona la barra roja que aparece"),
@@ -79,9 +80,9 @@ class FaqActivity : GenericActivity() {
                     FaqItem("¿Cómo puedo ayudar a la app?", "Puedes activar los anuncios desde configuracion, ver anuncios de video, donar mediante Paypal, o haciendote Patreon"),
                     FaqItem("¿Para qué sirven los logros?", "Para divertirte, se añadieron para que los usuarios tuvieran un objetivo aparte de ver anime"),
                     FaqItem("¿Cómo puedo cambiar de color la app?", "Debes resolver el easter egg"),
-                    FaqItem("¿Como puedo reportar un error?", "Mediante la página de facebook, o mandando un mensaje al desarrollador vía Telegram o email"),
+                    FaqItem("¿Como puedo reportar un error?", "Mediante un mensaje al grupo de telegram @ukiku_group"),
                     FaqItem("¿Por qué al abrir la app me dice error de conexión (tiempo de conexión)?", "AnimeAV1 podria estar lento, esto suele solucionarse después de unos minutos"),
-                    FaqItem("¿Cómo puedo contactar al desarrollador?", "Mediante la página de facebook, en Telegram como @UnbarredStream, o al email jordyamc@hotmail.com"),
+                    FaqItem("¿Cómo puedo contactar al desarrollador?", "Mediante Telegram como @Unbarred_Stream, o al email jordyamc@hotmail.com"),
                     FaqItem("¿Ella en verdad me ama?", "NO")
 
             )

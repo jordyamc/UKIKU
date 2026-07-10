@@ -72,7 +72,7 @@ abstract class OrganizerDao {
     @get:Query(QUERY_ALL)
     abstract val all: Flow<List<OrganizerWRecord>>
 
-    @get:Query(QUERY_ALL)
+    @get:Query("$QUERY_ALL$ORDER_NAME")
     abstract val allPaging: PagingSource<Int, OrganizerWRecord>
 
     @get:Query("SELECT * FROM Organizer ORDER BY name")
