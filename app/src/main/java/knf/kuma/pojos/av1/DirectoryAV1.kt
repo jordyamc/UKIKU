@@ -462,9 +462,14 @@ class DirectoryConverter {
     }
     @TypeConverter
     fun stringToChapters(string: String): List<Chapter> {
-        return string.split(";").map {
-            val (eid, number) = it.split(":")
-            Chapter(eid.toInt(), number.toDouble())
+        return string.split(";").mapNotNull {
+            try {
+                val (eid, number) = it.split(":")
+                Chapter(eid.toInt(), number.toDouble())
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
     }
     @TypeConverter

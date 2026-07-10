@@ -14,6 +14,7 @@ import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import knf.kuma.pojos.av1.DirectoryAV1Min
 import knf.kuma.pojos.av1.Genre
 import knf.kuma.search.SearchFragmentMaterial
@@ -52,6 +53,7 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
             currentQuery.flatMapLatest {
                 TVRepository.searchQuery(it)
             }.collectLatest {
+                adapter.submitData(PagingData.empty())
                 adapter.submitData(it)
                 val headerItem = HeaderItem(
                     when {
