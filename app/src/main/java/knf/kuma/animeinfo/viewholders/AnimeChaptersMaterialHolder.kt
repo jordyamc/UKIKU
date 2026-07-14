@@ -30,7 +30,7 @@ class AnimeChaptersMaterialHolder(view: View, private val fragment: Fragment, pr
     val recyclerView: RecyclerView = view.find(R.id.recycler)
     private val manager: LinearLayoutManager = CenterLayoutManager(view.context)
     private var anime: DirectoryAV1? = null
-    private var chapters: MutableList<Chapter> = ArrayList()
+    private var chapters: List<Chapter> = emptyList()
     var adapter: AnimeChaptersAdapterMaterial? = null
         private set
     private val touchListener: DragSelectTouchListener
@@ -190,7 +190,7 @@ class AnimeChaptersMaterialHolder(view: View, private val fragment: Fragment, pr
                 .withMaxScrollDistance(32)
     }
 
-    fun setAdapter(fragment: Fragment, anime: DirectoryAV1, chapters: MutableList<Chapter>) {
+    fun setAdapter(fragment: Fragment, anime: DirectoryAV1, chapters: List<Chapter>) {
         if (chapters.isEmpty()) return
         fragment.viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO){
             this@AnimeChaptersMaterialHolder.anime = anime

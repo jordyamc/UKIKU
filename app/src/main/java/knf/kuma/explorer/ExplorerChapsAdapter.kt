@@ -106,7 +106,7 @@ class ExplorerChapsAdapter internal constructor(val fragment: Fragment, private 
                 MaterialDialog(context).safeShow {
                     message(text = "¿Eliminar el episodio ${chapObject.obj.chapter} de ${chapObject.obj.title}?")
                     positiveButton(text = "CONFIRMAR") {
-                        delete(chapObject.obj, holder.adapterPosition)
+                        delete(chapObject.obj, holder.bindingAdapterPosition)
                     }
                     negativeButton(text = "CANCELAR")
                 }

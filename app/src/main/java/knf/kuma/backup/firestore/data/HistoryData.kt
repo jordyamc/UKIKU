@@ -8,5 +8,8 @@ import knf.kuma.pojos.av1.Record
 data class HistoryData(val list: List<Record> = emptyList()) {
     companion object {
         fun create(): HistoryData = HistoryData(CacheDB.INSTANCE.recordAV1DAO().all)
+        fun createBatched(): List<HistoryData> = CacheDB.INSTANCE.recordAV1DAO().all.chunked(500).map {
+            HistoryData(it)
+        }
     }
 }

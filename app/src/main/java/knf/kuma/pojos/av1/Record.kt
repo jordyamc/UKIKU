@@ -11,6 +11,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
 import knf.kuma.commons.FileWrapper
@@ -94,7 +95,7 @@ abstract class RecordDao {
     @get:Query("SELECT * FROM Record")
     abstract val all: MutableList<Record>
 
-    @get:Query("SELECT * FROM Record")
+    @get:Query("SELECT * FROM Record ORDER BY date DESC")
     abstract val allFlow: Flow<List<Record>>
 
     @get:Query("SELECT * FROM Record ORDER BY date DESC")
@@ -151,9 +152,18 @@ abstract class RecordDao {
     @Delete
     abstract fun delete(chapter: Record)
 
+    @Delete
+    abstract fun deleteAll(chapters: List<Record>)
+
     @Query("DELETE FROM Record WHERE aid = :aid AND number = :number")
     abstract fun deleteChapter(aid: Int, number: Double)
 
     @Query("DELETE FROM Record")
     abstract fun clear()
+
+    @Transaction
+    open fun updateAll(list: List<Record>) {
+        clear()
+        addAll(list)
+    }
 }

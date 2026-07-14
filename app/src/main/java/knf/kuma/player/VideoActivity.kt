@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Rational
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.TextView
@@ -276,7 +277,7 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
             noCrash {
                 enterPictureInPictureMode(
                     with(PictureInPictureParams.Builder()) {
-                        //setAspectRatio(Rational(16, 9))
+                        setAspectRatio(Rational(16, 9))
                         build()
                     })
             }

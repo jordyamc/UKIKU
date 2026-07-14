@@ -40,6 +40,7 @@ import knf.kuma.commons.getSurfaceColor
 import knf.kuma.commons.isFullMode
 import knf.kuma.commons.load
 import knf.kuma.commons.noCrash
+import knf.kuma.commons.roundedString
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.download.DownloadManagerCentral
@@ -352,7 +353,7 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
     }
 
     override fun getSectionName(position: Int): String {
-        return chapters[position].number.toString()
+        return chapters[position].number.roundedString()
     }
 
     private fun setOrientation(block: Boolean) {

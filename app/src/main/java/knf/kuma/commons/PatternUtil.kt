@@ -1,6 +1,5 @@
 package knf.kuma.commons
 
-import android.os.Build
 import android.text.Html
 import android.util.Log
 import java.util.regex.Pattern
@@ -9,10 +8,7 @@ import java.util.regex.Pattern
 object PatternUtil {
     @Suppress("DEPRECATION")
     fun fromHtml(html: String): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(html.r("\\\\u", "\\u").r("\\/", "/"), Html.FROM_HTML_MODE_LEGACY).toString()
-        else
-            Html.fromHtml(html.r("\\\\u", "\\u").r("\\/", "/")).toString()
+        return Html.fromHtml(html.r("\\\\u", "\\u").r("\\/", "/"), Html.FROM_HTML_MODE_LEGACY).toString()
     }
 
     fun getRapidLink(link: String): String {

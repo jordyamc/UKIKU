@@ -15,13 +15,19 @@ class UPNServer(context: Context, baseLink: String) : Server(context, baseLink) 
         get() = UPNServer
 
     override val canDownload: Boolean
-        get() = false
+        get() = true
 
     override val videoServer: VideoServer?
         get() {
             return try {
                 val url = runBlocking {
-                    Unpacker.listenResources(context, baseLink, Pattern.compile(".*master.m3u8.*"), 15000, executeOnFinish = "javascript:setInterval(function(){var el=document.getElementById('player-button-container');if(el)el.click();},100);")
+                    Unpacker.listenResources(
+                        context,
+                        "$baseLink&dl=1",
+                        Pattern.compile(".*master.m3u8.*|https://\\d+\\.\\d+\\.\\d+\\.\\d+.*mp4.*"),
+                        timeout = 15000,
+                        executeOnFinish = "javascript:setInterval(function(){var el=document.getElementsByClassName('downloader-button')[0];if(el)el.click();},100);"
+                    )
                 }
                 Log.e("UPNServer", "url: $url")
                 VideoServer(UPNServer,

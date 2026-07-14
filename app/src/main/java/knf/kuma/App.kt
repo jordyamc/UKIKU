@@ -9,6 +9,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.webkit.WebView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.Configuration
 import androidx.work.WorkManager
@@ -83,6 +84,12 @@ class App : Application(), Configuration.Provider {
         }
         if (!WorkManager.isInitialized()) {
             WorkManager.initialize(this, Configuration.Builder().build())
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val processName = getProcessName()
+            if (packageName != processName) {
+                WebView.setDataDirectorySuffix(processName)
+            }
         }
         OkHttp.initialize(this)
         AppCompatDelegate.setDefaultNightMode(PrefsUtil.themeOption.toInt())

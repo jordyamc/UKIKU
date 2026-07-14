@@ -89,7 +89,7 @@ open class GenericActivity : AppCompatActivity() {
                         MaterialDialog(this@GenericActivity).show {
                             lifecycleOwner(this@GenericActivity)
                             title(text = "Bypass necesario")
-                            message(text = "La app necesita saltarse la proteccion de animeflv asi que necesita crear un bypass, esto puede tardar varios minutos, la pantalla cambiara automaticamente una vez terminado el proceso")
+                            message(text = "La app necesita saltarse la proteccion de AnimeAV1 asi que necesita crear un bypass, esto puede tardar varios minutos, la pantalla cambiara automaticamente una vez terminado el proceso")
                             cancelable(false)
                             positiveButton(text = "OK"){
                                 PrefsUtil.isBypassWarningShown = true

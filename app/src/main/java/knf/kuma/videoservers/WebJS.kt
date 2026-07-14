@@ -26,10 +26,18 @@ class WebJS(context: Context) {
             javaScriptEnabled = true
             domStorageEnabled = true
         }
-        webView.addJavascriptInterface(JSInterface { callback?.invoke(currentUrl, it) }, "myInterface")
+        webView.addJavascriptInterface(
+            JSInterface { callback?.invoke(currentUrl, it) },
+            "myInterface"
+        )
     }
 
-    fun evalOnFinish(link: String, js: String, delay: Long = 5000, callback: (String?, String) -> Unit) {
+    fun evalOnFinish(
+        link: String,
+        js: String,
+        delay: Long = 5000,
+        callback: (String?, String) -> Unit
+    ) {
         this.callback = callback
         var response = false
         val handler = Handler(Looper.getMainLooper())
@@ -50,7 +58,14 @@ class WebJS(context: Context) {
         webView.loadUrl(link)
     }
 
-    fun listenResources(link: String, pattern: Pattern, timeout: Long, executeOnFinish: String? = null, callback: (String?, Map<String, String>?) -> Unit) {
+    fun listenResources(
+        link: String,
+        pattern: Pattern,
+        userAgent: String,
+        timeout: Long,
+        executeOnFinish: String? = null,
+        callback: (String?, Map<String, String>?) -> Unit
+    ) {
         var response = false
         val handler = Handler(Looper.getMainLooper())
         val regex = pattern.toRegex()
@@ -69,6 +84,7 @@ class WebJS(context: Context) {
             domStorageEnabled = true
             useWideViewPort = true
             loadWithOverviewMode = true
+            userAgentString = userAgent
         }
         Log.e("WebJS", "listenResources: $link")
         webView.webViewClient = object : WebViewClient() {
@@ -84,16 +100,24 @@ class WebJS(context: Context) {
                 view: WebView?,
                 request: WebResourceRequest?
             ): Boolean {
-                Log.e("WebJS", "shouldOverrideUrlLoading: ${request?.url}")
+                if (!response && request?.url?.toString()?.matches(regex) == true) {
+                    Log.e("WebJS", "Found: ${request?.url}")
+                    handler.removeCallbacks(run)
+                    response = true
+                    callback(request.url.toString(), request.requestHeaders)
+                    webView.post {
+                        webView.loadUrl("about:blank")
+                    }
+                }
                 return true
             }
 
-            override fun shouldInterceptRequest(
+            /*override fun shouldInterceptRequest(
                 view: WebView?,
                 url: String?
             ): WebResourceResponse? {
-                Log.e("WebJS", "shouldInterceptRequest: $url")
                 if (!response && url?.matches(regex) == true) {
+                    Log.e("WebJS", "Found: $url")
                     handler.removeCallbacks(run)
                     response = true
                     callback(url, cookieManager.getCookie(link).let {
@@ -114,13 +138,17 @@ class WebJS(context: Context) {
                 return if (response) {
                     WebResourceResponse("text/plain", "UTF-8", null)
                 } else {
+                    Log.e("WebJS", "shouldInterceptRequest: $url")
                     super.shouldInterceptRequest(view, url)
                 }
-            }
+            }*/
 
-            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-                Log.e("WebJS", "shouldInterceptRequest: ${request?.url}")
+            override fun shouldInterceptRequest(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): WebResourceResponse? {
                 if (!response && request?.url?.toString()?.matches(regex) == true) {
+                    Log.e("WebJS", "Found: ${request?.url}")
                     handler.removeCallbacks(run)
                     response = true
                     callback(request.url.toString(), request.requestHeaders)
@@ -131,10 +159,20 @@ class WebJS(context: Context) {
                 return if (response) {
                     WebResourceResponse("text/plain", "UTF-8", null)
                 } else {
+                    Log.e("WebJS", "shouldInterceptRequest: ${request?.url}")
                     super.shouldInterceptRequest(view, request)
                 }
             }
+
             override fun onPageFinished(view: WebView?, url: String?) {
+                val javascript = """
+            (function() {
+                document.querySelectorAll('video, audio').forEach(function(media) {
+                    media.muted = true;
+                });
+            })();
+        """.trimIndent()
+                view?.evaluateJavascript(javascript, null)
                 if (executeOnFinish != null) {
                     webView.loadUrl(executeOnFinish)
                 }

@@ -1,6 +1,5 @@
 package knf.kuma.pojos;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -10,7 +9,6 @@ import androidx.room.TypeConverters;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import knf.kuma.animeinfo.ktx.ExtensionsKt;
 import knf.kuma.commons.PatternUtil;
 import knf.kuma.database.BaseConverter;
 import knf.kuma.videoservers.Headers;
@@ -88,11 +86,6 @@ public class DownloadObject {
         this.time = System.currentTimeMillis();
         this.canResume = false;
         this.state = PENDING;
-    }
-
-    @NonNull
-    public static DownloadObject fromChapter(AnimeObject.WebInfo.AnimeChapter chapter, boolean addQueue) {
-        return new DownloadObject(chapter.eid, ExtensionsKt.getFileName(chapter), PatternUtil.INSTANCE.fromHtml(chapter.name), chapter.number, addQueue);
     }
 
     public boolean isDownloading() {

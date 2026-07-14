@@ -13,8 +13,8 @@ android {
         applicationId "knf.kuma"
         minSdkVersion 26
         targetSdkVersion 36
-        versionCode 233
-        versionName "6.0.2"
+        versionCode 234
+        versionName "6.0.3"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -239,7 +239,6 @@ dependencies {
     implementation 'com.github.evgenyneu:js-evaluator-for-android:v5.0.0'
     implementation 'com.github.vkay94.dtpv:doubletapplayerview:1.0.5'
     implementation 'org.conscrypt:conscrypt-android:2.5.3'
-    implementation 'org.mozilla:rhino:1.9.1'
     testImplementation 'junit:junit:4.13.2'
     //Kotlin
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.21'

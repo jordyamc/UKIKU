@@ -45,14 +45,14 @@ class BypassUtil {
             return Request(
                 testLink,
                 lastUA = PrefsUtil.userAgent,
-                showReload = AdsUtils.remoteConfigs.getBoolean("bypass_show_reload"),
+                showReload = true,
                 useFocus = isTV,
                 maxTryCount = AdsUtils.remoteConfigs.getLong("bypass_max_tries").toInt(),
                 useLatestUA = true,
                 reloadOnCaptcha = false,
-                waitCaptcha = true,
+                waitCaptcha = false,
                 clearCookiesAtStart = true,
-                displayType = DisplayType.DIALOG,
+                displayType = DisplayType.BACKGROUND,
                 dialogStyle = 0
             )
         }

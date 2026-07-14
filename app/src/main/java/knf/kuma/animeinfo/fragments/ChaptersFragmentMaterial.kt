@@ -8,6 +8,8 @@ import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -32,34 +34,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
+import kotlin.time.Duration.Companion.seconds
 
 class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.ChapHolderCallback, MoveCallback {
     private var holder: AnimeChaptersMaterialHolder? = null
     private var moveFile: String? = null
     private var anime: DirectoryAV1? = null
-    private var chapters: MutableList<Chapter> = ArrayList()
+    private var chapters: List<Chapter> = emptyList()
     private lateinit var snackManager: SnackProgressBarManager
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        activity?.let { activity ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                ViewModelProvider(activity)[AnimeViewModel::class.java].infoFlow.collectLatest { animeObject ->
-                    animeObject?.chapters?.let {
-                        anime = animeObject
-                        launch(Dispatchers.Main) {
-                            chapters = animeObject.chapters.toMutableList()
-                            if (PrefsUtil.isChapsAsc)
-                                chapters.reverse()
-                            holder?.setAdapter(this@ChaptersFragmentMaterial, animeObject, chapters)
-                            delay(1000)
-                            holder?.goToChapter()
-                        }
-                    }
-                }
-            }
-        }
-    }
+    private var recyclerInitialPadding: Int? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.recycler_chapters, container, false)
@@ -70,6 +53,46 @@ class ChaptersFragmentMaterial : BottomFragment(), AnimeChaptersMaterialHolder.C
                     .setOverlayLayoutColor(android.R.color.background_dark)
         }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        holder?.recyclerView?.apply {
+            if (recyclerInitialPadding == null) {
+                recyclerInitialPadding = paddingBottom
+            }
+            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+                val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                view.setPadding(
+                    view.paddingLeft,
+                    view.paddingTop,
+                    view.paddingRight,
+                    recyclerInitialPadding?.plus(navigationBarsInsets.bottom) ?: navigationBarsInsets.bottom
+                )
+                insets
+            }
+        }
+        activity?.let { activity ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                ViewModelProvider(activity)[AnimeViewModel::class.java].infoFlow.collectLatest { animeObject ->
+                    animeObject?.chapters?.let {
+                        anime = animeObject
+                        launch(Dispatchers.Main) {
+                            chapters = animeObject.chapters.let {
+                                if (PrefsUtil.isChapsAsc) {
+                                    it.sortedBy { it.number }
+                                } else {
+                                    it.sortedByDescending { it.number }
+                                }
+                            }
+                            holder?.setAdapter(this@ChaptersFragmentMaterial, animeObject, chapters)
+                            delay(1.seconds)
+                            holder?.goToChapter()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onReselect() {

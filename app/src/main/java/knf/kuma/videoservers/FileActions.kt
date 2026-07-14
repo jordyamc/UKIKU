@@ -212,7 +212,7 @@ object FileActions {
                         }.filter {
                             when {
                                 downloadObject.addQueue -> it.canDownload
-                                type == Type.STREAM -> it.canStream
+                                type == Type.STREAM -> it.canStream || it is WebServer
                                 else -> it.canDownload
                             }
                         }.toMutableList()

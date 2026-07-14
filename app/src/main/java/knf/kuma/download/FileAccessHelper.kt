@@ -308,7 +308,7 @@ object FileAccessHelper {
     }
 
     fun getDownloadsDirectoryFiles(file_name: String): List<SubFile> {
-        val rex = Regex("\\d+\\$[a-z-]+-\\d+\\.?\\d*\\.mp4")
+        val rex = Regex("\\d+\\$[a-z0-9-]+-\\d+\\.?\\d*\\.mp4")
         return try {
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->

@@ -3,7 +3,6 @@ package knf.kuma.tv.ui
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.util.SparseArray
 import android.view.View
@@ -213,20 +212,14 @@ class TVMainFragment : BrowseSupportFragment(), OnItemViewClickedListener, View.
                     }
                 }
             }
-            if (Build.VERSION.SDK_INT < 29) {
-                listOf(DirSection(), EmissionSection(), ExternalPlayer())
-            } else {
-                listOf(DirSection(), EmissionSection())
-            }.let { sections ->
-                mRows?.get(SECTIONS)?.apply {
-                    page = page.plus(1)
-                    adapter?.apply {
-                        clear()
-                        addAll(0, sections)
-                    }
+            mRows?.get(SECTIONS)?.apply {
+                page = page.plus(1)
+                adapter?.apply {
+                    clear()
+                    addAll(0, listOf(DirSection(), EmissionSection(), ExternalPlayer()))
                 }
-                startEntranceTransition()
             }
+            startEntranceTransition()
         }
     }
 

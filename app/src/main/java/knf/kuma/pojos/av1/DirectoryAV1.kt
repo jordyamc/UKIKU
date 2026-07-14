@@ -209,11 +209,17 @@ data class DirectoryAV1(
                 item.getJSONObject("category").getString("slug"),
                 item.getInt("status"),
                 item.let {
-                    if (item.getInt("status") == 2 && item.getString("startDate") != null) {
-                        LocalDate.parse(
-                            item.getString("startDate"),
-                            DateTimeFormatter.ISO_LOCAL_DATE
-                        ).dayOfWeek.value
+                    if (item.getInt("status") == 2 && item.getString("updatedAt") != null || item.getString("startDate") != null) {
+                        if (item.getString("updatedAt") != null) {
+                            OffsetDateTime.parse(
+                                item.getString("updatedAt").replace(" ", "T")
+                            ).dayOfWeek.value
+                        }else {
+                            LocalDate.parse(
+                                item.getString("startDate"),
+                                DateTimeFormatter.ISO_LOCAL_DATE
+                            ).dayOfWeek.value
+                        }
                     } else {
                         null
                     }

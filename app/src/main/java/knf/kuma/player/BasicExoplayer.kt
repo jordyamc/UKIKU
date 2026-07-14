@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.util.Rational
 import android.view.View
@@ -251,11 +250,15 @@ class BasicExoplayer : AppCompatActivity(), Player.Listener {
     }
 
     override fun onUserLeaveHint() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            val builder = PictureInPictureParams.Builder()
-                .setAspectRatio(Rational(16, 9))
-                .build()
-            enterPictureInPictureMode(builder)
+        if (exoPlayer?.playWhenReady == true && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            try {
+                val builder = PictureInPictureParams.Builder()
+                    .setAspectRatio(Rational(16, 9))
+                    .build()
+                enterPictureInPictureMode(builder)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         super.onUserLeaveHint()
         exoPlayer?.playWhenReady = false

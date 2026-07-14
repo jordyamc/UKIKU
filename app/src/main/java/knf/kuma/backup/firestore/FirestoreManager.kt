@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.afollestad.materialdialogs.MaterialDialog
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -41,6 +42,7 @@ import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeShow
 import knf.kuma.database.CacheDB
 import knf.kuma.database.EADB
+import knf.kuma.pojos.av1.Record
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -50,6 +52,7 @@ import org.jetbrains.anko.doAsync
 import xdroid.toaster.Toaster.toast
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.time.Duration.Companion.seconds
 
 object FirestoreManager {
     enum class State { IDLE, UPLOAD, SYNC }
@@ -69,8 +72,6 @@ object FirestoreManager {
     val historyLiveData = MutableLiveData(State.IDLE)
     val queueLiveData = MutableLiveData(State.IDLE)
     val seeingLiveData = MutableLiveData(State.IDLE)
-
-    private var isUpdateBlocked = false
     var isFirestoreEnabled = false
 
 
@@ -81,25 +82,27 @@ object FirestoreManager {
             isFirestoreEnabled = true
             QueueManager.open()
             doAsync {
-                firestoreDB.document("users/$uid/backupsav1/history").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                firestoreDB.collection("users/$uid/backupsav1/history/data").addSnapshotListener { documentSnapshots, firebaseFirestoreException ->
+                    Log.e("Firestore", "On snapshot, ${documentSnapshots.needsUpdate()}, ${documentSnapshots?.documents?.size}")
                     doAsync {
-                        if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        if (documentSnapshots.needsUpdate() && documentSnapshots.documents.isNotEmpty()) {
                             runBlocking(Dispatchers.Main) { historyLiveData.value = State.SYNC }
-                            documentSnapshot.toObject<HistoryData>()?.list?.let {
-                                CacheDB.INSTANCE.recordAV1DAO().apply {
-                                    clear()
-                                    addAll(it.filter { it.isValid() })
+                            val pending = mutableListOf<Record>()
+                            for (doc in documentSnapshots.documents) {
+                                doc.toObject<HistoryData>()?.list?.let {
+                                    pending.addAll(it.filter { it.isValid() })
                                 }
-                                PrefsUtil.lsHistory = currentTime()
-                                Log.e("Firestore", "History updated")
                             }
+                            CacheDB.INSTANCE.recordAV1DAO().updateAll(pending)
+                            PrefsUtil.lsHistory = currentTime()
+                            Log.e("Firestore", "History updated")
                             runBlocking(Dispatchers.Main) { historyLiveData.value = State.IDLE }
                         } else firebaseFirestoreException?.printStackTrace()
                     }
                 }.also { listeners.add(it) }
                 firestoreDB.document("users/$uid/backupsav1/achievements").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
-                        if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        if (documentSnapshot.needsUpdate()) {
                             runBlocking(Dispatchers.Main) { achievementsLiveData.value = State.SYNC }
                             documentSnapshot.toObject<AchievementsData>()?.list?.let {
                                 CacheDB.INSTANCE.achievementsDAO().apply {
@@ -114,7 +117,7 @@ object FirestoreManager {
                 }.also { listeners.add(it) }
                 firestoreDB.document("users/$uid/backupsav1/ea").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
-                        if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        if (documentSnapshot.needsUpdate()) {
                             runBlocking(Dispatchers.Main) { eaLiveData.value = State.SYNC }
                             documentSnapshot.toObject<EAData>()?.list?.let {
                                 EADB.INSTANCE.eaDAO().apply {
@@ -129,7 +132,7 @@ object FirestoreManager {
                 }.also { listeners.add(it) }
                 firestoreDB.document("users/$uid/backupsav1/favs").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
-                        if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        if (documentSnapshot.needsUpdate()) {
                             runBlocking(Dispatchers.Main) { favsLiveData.value = State.SYNC }
                             documentSnapshot.toObject<FavsData>()?.list?.let {
                                 CacheDB.INSTANCE.favoriteAV1DAO().apply {
@@ -145,7 +148,7 @@ object FirestoreManager {
                 }.also { listeners.add(it) }
                 firestoreDB.document("users/$uid/backupsav1/genres").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
-                        if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        if (documentSnapshot.needsUpdate()) {
                             runBlocking(Dispatchers.Main) { genresLiveData.value = State.SYNC }
                             runBlocking {
                                 documentSnapshot.toObject<GenresData>()?.list?.let {
@@ -163,7 +166,7 @@ object FirestoreManager {
                 }.also { listeners.add(it) }
                 firestoreDB.document("users/$uid/backupsav1/queue").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
-                        if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        if (documentSnapshot.needsUpdate()) {
                             runBlocking(Dispatchers.Main) { queueLiveData.value = State.SYNC }
                             documentSnapshot.toObject<QueueData>()?.list?.let {
                                 CacheDB.INSTANCE.queueDAO().apply {
@@ -179,7 +182,7 @@ object FirestoreManager {
                 }.also { listeners.add(it) }
                 firestoreDB.document("users/$uid/backupsav1/seeing").addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
                     doAsync {
-                        if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                        if (documentSnapshot.needsUpdate()) {
                             runBlocking(Dispatchers.Main) { seeingLiveData.value = State.SYNC }
                             documentSnapshot.toObject<SeeingData>()?.list?.let {
                                 CacheDB.INSTANCE.organizerDAO().apply {
@@ -220,11 +223,13 @@ object FirestoreManager {
             firestoreDB.document("top/${uid
                     ?: PrefsUtil.instanceUuid}").addSnapshotListener { documentSnapshot, _ ->
                 doAsync {
-                    if (documentSnapshot.needsUpdate() && !isUpdateBlocked) {
+                    if (documentSnapshot.needsUpdate()) {
                         documentSnapshot.toObject<TopData>()?.let {
                             if (it.forced) {
                                 user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(it.name).build())
-                                        ?: { PrefsUtil.instanceName = it.name }()
+                                        ?: run {
+                                            PrefsUtil.instanceName = it.name
+                                        }
                             }
                             PrefsUtil.userRewardedVideoCount = it.number
                             Log.e("Firestore", "Top updated")
@@ -242,57 +247,55 @@ object FirestoreManager {
 
     private fun uploadAllData(checkForFiles: Boolean, activity: Activity) {
         if (!isFirestoreEnabled) return
-        if (checkForFiles)
+        if (checkForFiles) {
             firestoreDB.collection("users/$uid/backups").get()
-                    .addOnSuccessListener {
-                        if (it.isEmpty) {
-                            MaterialDialog(activity).safeShow {
-                                title(text = "¿Nuevo usuario?")
-                                message(text = "Este parece ser tu primer inicio de sesion, tus datos necesitan ser subidos a la nube, primero asegurate que éste sea tu dispositivo principal!")
-                                cancelable(false)
-                                positiveButton(text = "Subir") {
-                                    setDefaultDevice()
-                                    uploadAllData(false, activity)
-                                }
-                                negativeButton(text = "Cerrar sesion") {
-                                    doSignOut(activity)
-                                }
+                .addOnSuccessListener {
+                    if (it.isEmpty) {
+                        MaterialDialog(activity).safeShow {
+                            title(text = "¿Nuevo usuario?")
+                            message(text = "Este parece ser tu primer inicio de sesion, tus datos necesitan ser subidos a la nube, primero asegurate que éste sea tu dispositivo principal!")
+                            cancelable(false)
+                            positiveButton(text = "Subir") {
+                                setDefaultDevice()
+                                uploadAllData(false, activity)
                             }
-                            firestoreDB.document("top/${PrefsUtil.instanceUuid}").delete()
-                        } else {
-                            firestoreDB.document("users/$uid/backups/info")
-                                    .get().addOnCompleteListener { document ->
-                                        val data = document.result?.data
-                                        if (data != null && data["uuid"] == PrefsUtil.instanceUuid) {
-                                            MaterialDialog(activity).safeShow {
-                                                title(text = "Bienvenido de nuevo")
-                                                message(text = "Actualmente tienes datos en la nube y este es tu dispositivo principal, ¿que datos quieres usar?\n(Usar tus datos locales sobreescribirá lo que haya en la nube)")
-                                                cancelable(false)
-                                                positiveButton(text = "Datos locales") {
-                                                    uploadAllData(false, activity)
-                                                }
-                                                negativeButton(text = "Descargar de la nube") {
-                                                    start()
-                                                }
-                                            }
-                                        } else {
-                                            toast("Se descargarán tus datos de la nube")
+                            negativeButton(text = "Cerrar sesion") {
+                                doSignOut(activity)
+                            }
+                        }
+                        firestoreDB.document("top/${PrefsUtil.instanceUuid}").delete()
+                    } else {
+                        firestoreDB.document("users/$uid/backups/info")
+                            .get().addOnCompleteListener { document ->
+                                val data = document.result?.data
+                                if (data != null && data["uuid"] == PrefsUtil.instanceUuid) {
+                                    MaterialDialog(activity).safeShow {
+                                        title(text = "Bienvenido de nuevo")
+                                        message(text = "Actualmente tienes datos en la nube y este es tu dispositivo principal, ¿que datos quieres usar?\n(Usar tus datos locales sobreescribirá lo que haya en la nube)")
+                                        cancelable(false)
+                                        positiveButton(text = "Datos locales") {
+                                            uploadAllData(false, activity)
+                                        }
+                                        negativeButton(text = "Descargar de la nube") {
                                             start()
                                         }
                                     }
-                        }
+                                } else {
+                                    toast("Se descargarán tus datos de la nube")
+                                    start()
+                                }
+                            }
                     }
-        else {
+                }
+        } else {
             stop()
-            isUpdateBlocked = true
             QueueManager.open()
             Log.e("Firestore", "On upload all data")
             syncData {
                 all()
             }
             GlobalScope.launch(Dispatchers.IO) {
-                delay(10000)
-                isUpdateBlocked = false
+                delay(10.seconds)
                 start()
             }
         }
@@ -306,13 +309,23 @@ object FirestoreManager {
     fun updateHistory(collection: CollectionReference) =
             noCrash {
                 doOnUIGlobal { historyLiveData.value = State.SYNC }
-                collection.document("history").set(HistoryData.create()).addOnSuccessListener {
-                    Log.e("Firestore", "History upload success")
-                    PrefsUtil.lsHistory = currentTime()
-                    doOnUIGlobal { historyLiveData.value = State.IDLE }
-                }.addOnFailureListener {
-                    Log.e("Firestore", "History upload error", it)
-                    doOnUIGlobal { historyLiveData.value = State.IDLE }
+                val collectionData = collection.document("history").collection("data")
+                collectionData.get().addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Tasks.whenAllComplete(it.result.map {
+                            it.reference.delete()
+                        })
+                        doAsync {
+                            Tasks.whenAllComplete(
+                                HistoryData.createBatched().mapIndexed { index, data ->
+                                    Log.e("Firestore", "History upload batch_$index")
+                                    collectionData.document("batch_$index").set(data)
+                                }
+                            )
+                            PrefsUtil.lsHistory = currentTime()
+                            doOnUIGlobal { historyLiveData.value = State.IDLE }
+                        }
+                    }
                 }
             }
 

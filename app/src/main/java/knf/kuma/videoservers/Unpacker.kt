@@ -1,6 +1,7 @@
 package knf.kuma.videoservers
 
 import android.content.Context
+import android.webkit.WebSettings
 import android.webkit.WebView
 import com.venom.greendark.decoder.WebJS
 import de.prosiebensat1digital.oasisjsbridge.JsBridge
@@ -67,13 +68,14 @@ object Unpacker {
         }
     }
 
-    suspend fun listenResources(context: Context, link: String, pattern: Pattern, timeout: Long = 10000, executeOnFinish: String? = null): String? {
+    suspend fun listenResources(context: Context, link: String, pattern: Pattern, userAgent: String = WebSettings.getDefaultUserAgent(context), timeout: Long = 10000, executeOnFinish: String? = null): String? {
         return withContext(Dispatchers.Main) {
             val evaluator = WebJS(context)
             suspendCoroutine { continuation ->
                 evaluator.listenResources(
                     link,
                     pattern,
+                    userAgent,
                     timeout,
                     executeOnFinish
                 ) { url, headers ->

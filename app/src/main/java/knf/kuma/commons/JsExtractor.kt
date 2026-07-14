@@ -1,5 +1,8 @@
 package knf.kuma.commons
 
+import de.prosiebensat1digital.oasisjsbridge.JsBridge
+import de.prosiebensat1digital.oasisjsbridge.JsBridgeConfig
+import knf.kuma.App
 import knf.kuma.uagen.UAGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -12,15 +15,14 @@ import org.json.JSONObject
 import org.json.JSONTokener
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
-import org.mozilla.javascript.Scriptable
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLHandshakeException
 import kotlin.time.Duration.Companion.milliseconds
-import org.mozilla.javascript.Context as RhinoContext
 
 object JsExtractor {
     private var client: OkHttpClient = createClient()
+    private val jsBridge = JsBridge(JsBridgeConfig.bareConfig(), App.context)
 
     private fun createClient(): OkHttpClient {
         return OkHttpClient.Builder()
@@ -113,12 +115,7 @@ object JsExtractor {
     }
 
     private fun executeJS(rawArrayJs: String, key: String?): String? {
-        val rhino = RhinoContext.enter()
         try {
-            rhino.isInterpretedMode = true
-
-            val scope: Scriptable = rhino.initStandardObjects()
-
             val script = """
                 function findKey(obj, keys) {
                     if (obj === null || typeof obj !== 'object') return undefined;
@@ -144,16 +141,15 @@ object JsExtractor {
                     return JSON.stringify(result);
                 })();
             """.trimIndent()
-
-            val result = rhino.evaluateString(scope, script, "extract.js", 1, null)
-
+            val result = jsBridge.evaluateBlocking<String?>(script)
             return if (result == null || result == "undefined") {
                 null
             } else {
-                result.toString()
+                result
             }
-        } finally {
-            RhinoContext.exit()
+        } catch (e: Exception){
+            e.printStackTrace()
+            return null
         }
     }
 

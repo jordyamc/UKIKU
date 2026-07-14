@@ -319,28 +319,28 @@ class Diagnostic : GenericActivity() {
     private fun show502Info() {
         MaterialDialog(this).safeShow {
             title(text = "HTTP 502")
-            message(text = "Animeflv esta caido por el momento, revisa de nuevo en unas horas")
+            message(text = "AnimeAV1 esta caido por el momento, revisa de nuevo en unas horas")
         }
     }
 
     private fun show503Info() {
         MaterialDialog(this).safeShow {
             title(text = "HTTP 503")
-            message(text = "Animeflv tiene el cloudflare activado, la app crea un bypass para funcionar normalmente")
+            message(text = "AnimeAV1 tiene el cloudflare activado, la app crea un bypass para funcionar normalmente")
         }
     }
 
     private fun show403Info() {
         MaterialDialog(this).safeShow {
             title(text = "HTTP 403")
-            message(text = "Tu proveedor de internet bloquea la conexión con Animeflv, reinicia tu modem!")
+            message(text = "Tu proveedor de internet bloquea la conexión con AnimeAV1, reinicia tu modem!")
         }
     }
 
     private fun showTimeoutInfo() {
         MaterialDialog(this).safeShow {
             title(text = "Timeout")
-            message(text = "La página de Animeflv carga muy lento, modifica la espera de conexión desde configuración")
+            message(text = "La página de AnimeAV1 carga muy lento, modifica la espera de conexión desde configuración")
         }
     }
 
