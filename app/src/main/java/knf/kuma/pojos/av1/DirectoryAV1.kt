@@ -30,6 +30,7 @@ import org.json.JSONObject
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 
 data class Recommended(
     @SerializedName("aid")
@@ -210,15 +211,25 @@ data class DirectoryAV1(
                 item.getInt("status"),
                 item.let {
                     if (item.getInt("status") == 2 && item.getString("updatedAt") != null || item.getString("startDate") != null) {
-                        if (item.getString("updatedAt") != null) {
-                            OffsetDateTime.parse(
-                                item.getString("updatedAt").replace(" ", "T")
-                            ).dayOfWeek.value
-                        }else {
-                            LocalDate.parse(
-                                item.getString("startDate"),
-                                DateTimeFormatter.ISO_LOCAL_DATE
-                            ).dayOfWeek.value
+                        try {
+                            if (item.getString("updatedAt") != null) {
+                                val formatter = DateTimeFormatterBuilder()
+                                    .append(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                                    .appendOffset("+HH:mm", "Z")
+                                    .toFormatter()
+                                OffsetDateTime.parse(
+                                    item.getString("updatedAt").replace(" ", "T"),
+                                    formatter
+                                ).dayOfWeek.value
+                            }else {
+                                LocalDate.parse(
+                                    item.getString("startDate"),
+                                    DateTimeFormatter.ISO_LOCAL_DATE
+                                ).dayOfWeek.value
+                            }
+                        } catch (e: Exception){
+                            e.printStackTrace()
+                            null
                         }
                     } else {
                         null
