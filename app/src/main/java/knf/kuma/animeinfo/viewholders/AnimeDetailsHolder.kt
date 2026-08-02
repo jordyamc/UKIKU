@@ -189,15 +189,19 @@ class AnimeDetailsHolder(val view: View) {
             2 -> "Emisión"
             else -> "Próximamente"
         }
-        return when (day) {
-            1 -> "$state - Lunes"
-            2 -> "$state - Martes"
-            3 -> "$state - Miércoles"
-            4 -> "$state - Jueves"
-            5 -> "$state - Viernes"
-            6 -> "$state - Sábado"
-            7 -> "$state - Domingo"
-            else -> state
+        return if (stateFlag == 2) {
+            when (day) {
+                1 -> "$state - Lunes"
+                2 -> "$state - Martes"
+                3 -> "$state - Miércoles"
+                4 -> "$state - Jueves"
+                5 -> "$state - Viernes"
+                6 -> "$state - Sábado"
+                7 -> "$state - Domingo"
+                else -> state
+            }
+        } else {
+            state
         }
     }
 }
