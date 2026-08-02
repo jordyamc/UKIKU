@@ -1,6 +1,5 @@
 package knf.kuma.tv
 
-import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData

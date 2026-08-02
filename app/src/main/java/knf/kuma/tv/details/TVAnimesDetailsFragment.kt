@@ -50,10 +50,6 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
     private val actionAdapter by lazy { SparseArrayObjectAdapter() }
     private var listRowAdapter: ArrayObjectAdapter? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         onItemViewClickedListener = this
@@ -109,7 +105,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                     DetailsOverviewRow::class.java,
                                     rowPresenter
                                 )
-                                launch {
+                                viewLifecycleOwner.lifecycleScope.launch {
                                     selector.addClassPresenter(
                                         ChaptersListRow::class.java,
                                         ChaptersListPresenter(getLastSeen(animeObject.aid))
