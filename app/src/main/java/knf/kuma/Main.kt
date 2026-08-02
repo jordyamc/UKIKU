@@ -50,6 +50,7 @@ import knf.kuma.commons.DesignUtils
 import knf.kuma.commons.EAHelper
 import knf.kuma.commons.EAMapActivity
 import knf.kuma.commons.JsExtractor
+import knf.kuma.commons.Network
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.bind
 import knf.kuma.commons.changeToolbarFont
@@ -70,6 +71,7 @@ import knf.kuma.favorite.FavoriteFragment
 import knf.kuma.jobscheduler.RecentsWork
 import knf.kuma.jobscheduler.UpdateWork
 import knf.kuma.news.MaterialNewsActivity
+import knf.kuma.pojos.av1.DirectoryAV1Calendar
 import knf.kuma.preferences.BottomPreferencesFragment
 import knf.kuma.preferences.ConfigurationFragment
 import knf.kuma.queue.QueueActivity
@@ -268,17 +270,26 @@ class Main : GenericActivity(),
             badgeQueue.setTypeface(null, Typeface.BOLD)
             badgeQueue.gravity = Gravity.CENTER_VERTICAL
             lifecycleScope.launch {
-                CacheDB.INSTANCE.calendarBlacklistDAO().allAidsFlow.collectLatest { blacklisted ->
-                    val data = JsExtractor.processLink("https://animeav1.com/horario")?: return@collectLatest
-                    var count = 0
-                    for (i in 0 until data.length()) {
-                        val item = data.getJSONObject(i)
-                        if (item.getInt("id") !in blacklisted) {
-                            count++
+                if (Network.isConnected) {
+                    val result = JsExtractor.processLink("https://animeav1.com/horario")
+                    if (result != null) {
+                        val local = CacheDB.INSTANCE.calendarBlacklistDAO().all()
+                        val tList = mutableListOf<DirectoryAV1Calendar>()
+                        for (i in 0 until result.length()) {
+                            tList.add(DirectoryAV1Calendar.fromJson(result.getJSONObject(i)))
                         }
+                        tList.forEach { n ->
+                            val saved = local.find { l -> n.aid == l.aid }
+                            if (saved != null) {
+                                n.isHidden = saved.isHidden
+                            }
+                        }
+                        CacheDB.INSTANCE.calendarBlacklistDAO().update(tList)
                     }
-                    badgeEmission.text = count.toString()
-                    badgeEmission.isVisible = count > 0
+                }
+                CacheDB.INSTANCE.calendarBlacklistDAO().notHiddenCountFlow.collectLatest {
+                    badgeEmission.text = it.toString()
+                    badgeEmission.isVisible = it > 0
                 }
             }
             lifecycleScope.launch {

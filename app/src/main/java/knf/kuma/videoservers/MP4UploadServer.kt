@@ -18,7 +18,8 @@ class MP4UploadServer(context: Context, baseLink: String) : Server(context, base
         get() {
             return try {
                 val url = runBlocking {
-                    Unpacker.listenResources(context, baseLink, Pattern.compile(".*video.mp4"))
+                    val regex = Regex(".*video.mp4")
+                    Unpacker.listenResources(context, baseLink, onRequest = { it != null && it.matches(regex) })
                 }
                 Log.e("MP4UPLOAD", "url: $url")
                 VideoServer(

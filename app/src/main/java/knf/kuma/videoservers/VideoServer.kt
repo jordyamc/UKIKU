@@ -1,8 +1,5 @@
 package knf.kuma.videoservers
 
-import android.os.Parcel
-import android.os.Parcelable
-
 open class VideoServer {
     var name: String
     var options: MutableList<Option> = ArrayList()
@@ -37,6 +34,7 @@ open class VideoServer {
     }
 
     object Names {
+        const val TRANSFERIT = "TransferIt"
         const val UPNServer = "UPNShare"
         const val PDRAIN = "PDrain"
         const val ZILLA = "Zilla"

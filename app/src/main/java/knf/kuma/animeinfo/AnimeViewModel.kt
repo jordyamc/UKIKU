@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import knf.kuma.commons.JsExtractor
+import knf.kuma.commons.Network
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.av1.DirectoryAV1
 import kotlinx.coroutines.Dispatchers
@@ -16,19 +17,24 @@ class AnimeViewModel : ViewModel() {
     fun init(link: String?, persist: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("Details", "On load $link")
-            val info = link?.let {
-                try {
-                    val data = JsExtractor.processLink(link)?.getJSONObject(0) ?: return@let null
-                    DirectoryAV1.fromJson(data)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
+            val slug = link?.substringAfterLast("/")
+            if (Network.isConnected) {
+                val info = link?.let {
+                    try {
+                        val data = JsExtractor.processLink(link)?.getJSONObject(0) ?: return@let null
+                        DirectoryAV1.fromJson(data)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        CacheDB.INSTANCE.directoryDAO().findBySlug(slug ?: ":none:")
+                    }
                 }
+                if (info != null && persist) {
+                    CacheDB.INSTANCE.directoryDAO().add(info)
+                }
+                infoFlow.value = info
+            } else {
+                infoFlow.value = CacheDB.INSTANCE.directoryDAO().findBySlug(slug ?: ":none:")
             }
-            if (info != null && persist) {
-                CacheDB.INSTANCE.directoryDAO().add(info)
-            }
-            infoFlow.value = info
         }
     }
 

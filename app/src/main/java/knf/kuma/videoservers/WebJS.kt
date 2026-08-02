@@ -13,7 +13,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.Keep
-import java.util.regex.Pattern
+import knf.kuma.BuildConfig
 
 class WebJS(context: Context) {
     private val webView = WebView(context)
@@ -30,6 +30,12 @@ class WebJS(context: Context) {
             JSInterface { callback?.invoke(currentUrl, it) },
             "myInterface"
         )
+    }
+
+    fun logger(tag: String, message: String) {
+        if (BuildConfig.DEBUG) {
+            Log.e(tag, message)
+        }
     }
 
     fun evalOnFinish(
@@ -60,7 +66,7 @@ class WebJS(context: Context) {
 
     fun listenResources(
         link: String,
-        pattern: Pattern,
+        onRequest: (String?) -> Boolean,
         userAgent: String,
         timeout: Long,
         executeOnFinish: String? = null,
@@ -68,7 +74,6 @@ class WebJS(context: Context) {
     ) {
         var response = false
         val handler = Handler(Looper.getMainLooper())
-        val regex = pattern.toRegex()
         val run = Runnable {
             webView.post {
                 webView.loadUrl("about:blank")
@@ -86,7 +91,6 @@ class WebJS(context: Context) {
             loadWithOverviewMode = true
             userAgentString = userAgent
         }
-        Log.e("WebJS", "listenResources: $link")
         webView.webViewClient = object : WebViewClient() {
             override fun onReceivedSslError(
                 view: WebView?,
@@ -100,8 +104,9 @@ class WebJS(context: Context) {
                 view: WebView?,
                 request: WebResourceRequest?
             ): Boolean {
-                if (!response && request?.url?.toString()?.matches(regex) == true) {
-                    Log.e("WebJS", "Found: ${request?.url}")
+                logger("WebJS", "shouldOverrideUrlLoading: ${request?.url}")
+                if (!response && request != null && onRequest(request.url?.toString())) {
+                    logger("WebJS", "Found: ${request?.url}")
                     handler.removeCallbacks(run)
                     response = true
                     callback(request.url.toString(), request.requestHeaders)
@@ -117,7 +122,7 @@ class WebJS(context: Context) {
                 url: String?
             ): WebResourceResponse? {
                 if (!response && url?.matches(regex) == true) {
-                    Log.e("WebJS", "Found: $url")
+                    logger("WebJS", "Found: $url")
                     handler.removeCallbacks(run)
                     response = true
                     callback(url, cookieManager.getCookie(link).let {
@@ -138,7 +143,7 @@ class WebJS(context: Context) {
                 return if (response) {
                     WebResourceResponse("text/plain", "UTF-8", null)
                 } else {
-                    Log.e("WebJS", "shouldInterceptRequest: $url")
+                    logger("WebJS", "shouldInterceptRequest: $url")
                     super.shouldInterceptRequest(view, url)
                 }
             }*/
@@ -147,8 +152,8 @@ class WebJS(context: Context) {
                 view: WebView?,
                 request: WebResourceRequest?
             ): WebResourceResponse? {
-                if (!response && request?.url?.toString()?.matches(regex) == true) {
-                    Log.e("WebJS", "Found: ${request?.url}")
+                if (!response && request != null && onRequest(request.url?.toString())) {
+                    logger("WebJS", "Found: ${request?.url}")
                     handler.removeCallbacks(run)
                     response = true
                     callback(request.url.toString(), request.requestHeaders)
@@ -159,7 +164,7 @@ class WebJS(context: Context) {
                 return if (response) {
                     WebResourceResponse("text/plain", "UTF-8", null)
                 } else {
-                    Log.e("WebJS", "shouldInterceptRequest: ${request?.url}")
+                    logger("WebJS", "shouldInterceptRequest: ${request?.url}")
                     super.shouldInterceptRequest(view, request)
                 }
             }

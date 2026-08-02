@@ -243,6 +243,13 @@ class ActivityAnimeMaterial : GenericActivity(), AnimeActivityMaterialHolder.Int
         }
     }
 
+    override fun onPause() {
+        syncData {
+            history()
+        }
+        super.onPause()
+    }
+
     companion object {
         private var REQUEST_CODE = 558
         private const val keyTitle = "title"

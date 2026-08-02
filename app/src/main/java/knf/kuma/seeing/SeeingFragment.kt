@@ -2,7 +2,6 @@ package knf.kuma.seeing
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,15 +11,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.map
 import knf.kuma.R
 import knf.kuma.ads.AdsType
 import knf.kuma.ads.implBanner
 import knf.kuma.commons.verifyManager
 import knf.kuma.database.CacheDB
 import knf.kuma.databinding.FragmentSeeingBinding
-import knf.kuma.pojos.SeeingObject
-import knf.kuma.pojos.av1.Organizer
 import knf.kuma.pojos.av1.OrganizerWRecord
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -122,7 +118,7 @@ class SeeingFragment : Fragment() {
                 val state = arguments?.getInt("state", -1) ?: -1
                 if (state == -1) return@launch
                 val num = if (state == 0)
-                    CacheDB.INSTANCE.organizerDAO().countAll
+                    CacheDB.INSTANCE.organizerDAO().countAll()
                 else
                     CacheDB.INSTANCE.organizerDAO().countByState(state)
                 if (num > 0)

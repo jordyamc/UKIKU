@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="236" version="6.0.6">
+        <change type="new">Servidor TransferIt</change>
+        <change type="change">Soporte para calendario sin conexión</change>
+        <change type="fix">Error al reproducir Zilla</change>
+        <change type="fix">Error al abrir información de anime sin conexión (Solo anteriormente visitados)</change>
+    </release>
     <release code="235" version="6.0.4">
         <change type="fix">Error al abrir información de anime en TV</change>
     </release>

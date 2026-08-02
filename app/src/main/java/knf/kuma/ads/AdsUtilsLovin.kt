@@ -128,30 +128,18 @@ fun ViewGroup.implBannerLovin(unitID: AdsType, isSmart: Boolean = false) {
 
 fun ViewGroup.implBannerLovin() {
     if (PrefsUtil.isAdsEnabled) {
-        GlobalScope.launch g@{
-            if (this@implBannerLovin.tag == "AdView added")
-                return@g
-            if (this@implBannerLovin !is BannerContainerView) {
-                GlobalScope.launch {
-                    val adView = MaxAdView("91d782c7eb7efc75")
-                    adView.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50.asPx)
-                    adView.setBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
-                    launch(Dispatchers.Main) {
-                        addView(adView)
-                        this@implBannerLovin.tag = "AdView added"
-                        adView.loadAd()
-                    }
-                }
+        post {
+            if (this.tag == "AdView added") return@post
+            val adView = MaxAdView("91d782c7eb7efc75")
+            adView.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50.asPx)
+            adView.setBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
+            if (this !is BannerContainerView) {
+                addView(adView)
             } else {
-                val adView = MaxAdView("91d782c7eb7efc75")
-                adView.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50.asPx)
-                adView.setBackgroundColor(ContextCompat.getColor(App.context, R.color.cardview_background))
-                launch(Dispatchers.Main) {
-                    show(adView)
-                    adView.loadAd()
-                    this@implBannerLovin.tag = "AdView added"
-                }
+                show(adView)
             }
+            this.tag = "AdView added"
+            adView.loadAd()
         }
     }
 }

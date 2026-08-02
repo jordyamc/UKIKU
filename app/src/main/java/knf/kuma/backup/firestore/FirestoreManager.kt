@@ -83,7 +83,6 @@ object FirestoreManager {
             QueueManager.open()
             doAsync {
                 firestoreDB.collection("users/$uid/backupsav1/history/data").addSnapshotListener { documentSnapshots, firebaseFirestoreException ->
-                    Log.e("Firestore", "On snapshot, ${documentSnapshots.needsUpdate()}, ${documentSnapshots?.documents?.size}")
                     doAsync {
                         if (documentSnapshots.needsUpdate() && documentSnapshots.documents.isNotEmpty()) {
                             runBlocking(Dispatchers.Main) { historyLiveData.value = State.SYNC }

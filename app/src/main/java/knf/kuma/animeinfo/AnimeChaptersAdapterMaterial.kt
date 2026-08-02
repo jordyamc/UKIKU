@@ -26,7 +26,6 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.squareup.picasso.Callback
 import knf.kuma.App
 import knf.kuma.R
-import knf.kuma.backup.firestore.syncData
 import knf.kuma.cast.CastMedia
 import knf.kuma.commons.CastUtil
 import knf.kuma.commons.EAHelper
@@ -199,9 +198,6 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                                 chapter.isSeen = true
                                 holder.setSeen(true)
                                 ServersFactory.startPlay(context, chapter.episodeName(anime), chapter.fileWrapper(anime).name())
-                                syncData {
-                                    history()
-                                }
                             } else {
                                 Toaster.toast("Aun no se está descargando")
                             }
@@ -212,9 +208,6 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                                     recordsDAO.addChapter(chapter.asRecord(anime))
                                 }
                                 chapter.isSeen = true
-                                syncData {
-                                    history()
-                                }
                                 holder.setSeen(true)
                             }
                             R.id.casting -> CastUtil.get().openControls()
@@ -277,9 +270,6 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                                                 recordsDAO.addChapter(chapter.asRecord(anime))
                                             }
                                             chapter.isSeen = true
-                                            syncData {
-                                                history()
-                                            }
                                             holder.setSeen(true)
                                         }
 
@@ -344,7 +334,6 @@ class AnimeChaptersAdapterMaterial(private val fragment: Fragment, private val r
                 chapter.isSeen = true
                 holder.chapter.setTextColor(ContextCompat.getColor(context, EAHelper.getThemeColor()))
             }
-            syncData { history() }
         }
         holder.cardView.setOnLongClickListener {
             touchListener.startDragSelection(holder.adapterPosition)

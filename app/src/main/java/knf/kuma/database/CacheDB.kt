@@ -72,7 +72,7 @@ import knf.kuma.recents.RecentModel
         GenreRecord::class,
         DirectoryAV1Calendar::class
     ],
-    version = 21
+    version = 22
 )
 abstract class CacheDB : RoomDatabase() {
 
@@ -379,6 +379,12 @@ abstract class CacheDB : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_21_22: Migration = object : Migration(21, 22) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `CalendarBlacklist`  ADD COLUMN `isHidden` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         val INSTANCE: CacheDB by lazy { init(App.context) }
 
         private fun init(context: Context): CacheDB =
@@ -404,7 +410,8 @@ abstract class CacheDB : RoomDatabase() {
                     MIGRATION_17_18,
                     MIGRATION_18_19,
                     MIGRATION_19_20,
-                    MIGRATION_20_21
+                    MIGRATION_20_21,
+                    MIGRATION_21_22
                 ).build()
     }
 

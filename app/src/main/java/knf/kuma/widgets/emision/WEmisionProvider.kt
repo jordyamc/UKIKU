@@ -12,16 +12,8 @@ import android.widget.RemoteViews
 import androidx.preference.PreferenceManager
 import knf.kuma.R
 import knf.kuma.commons.DesignUtils
-import knf.kuma.commons.JsExtractor
-import knf.kuma.database.CacheDB
 import knf.kuma.emision.EmissionActivity
 import knf.kuma.emision.EmissionActivityMaterial
-import knf.kuma.pojos.av1.DirectoryAV1Calendar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 class WEmisionProvider : AppWidgetProvider() {
@@ -102,15 +94,16 @@ class WEmisionProvider : AppWidgetProvider() {
     }
 
     companion object {
-
-        fun update(context: Context?) {
-            if (context == null) return
-            val intent = Intent(context, WEmisionProvider::class.java)
-            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            val ids = AppWidgetManager.getInstance(context)
-                    .getAppWidgetIds(ComponentName(context, WEmisionProvider::class.java))
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-            context.sendBroadcast(intent)
+        fun update(context: Context) {
+            try {
+                val manager = AppWidgetManager.getInstance(context)
+                val ids = manager.getAppWidgetIds(ComponentName(context, WEListProvider::class.java))
+                for (id in ids) {
+                    manager.notifyAppWidgetViewDataChanged(id, R.id.words)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

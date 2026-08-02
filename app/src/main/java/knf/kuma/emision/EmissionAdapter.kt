@@ -43,12 +43,8 @@ class EmissionAdapter internal constructor(private val fragment: Fragment) : Rec
         holder.cardView.setOnClickListener { ActivityAnime.open(fragment, animeObject, holder.imageView, false, animate = true) }
         holder.cardView.setOnLongClickListener {
             fragment.viewLifecycleOwner.lifecycleScope.launch {
-                if (animeObject.isHidden) {
-                    CacheDB.INSTANCE.calendarBlacklistDAO().remove(animeObject)
-                } else {
-                    CacheDB.INSTANCE.calendarBlacklistDAO().add(animeObject)
-                }
                 animeObject.isHidden = !animeObject.isHidden
+                CacheDB.INSTANCE.calendarBlacklistDAO().add(animeObject)
                 if (PrefsUtil.emissionShowHidden) {
                     withContext(Dispatchers.Main) {
                         holder.hiddenOverlay.setHidden(animeObject.isHidden, true)

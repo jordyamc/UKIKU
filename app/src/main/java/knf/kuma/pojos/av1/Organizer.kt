@@ -102,8 +102,8 @@ abstract class OrganizerDao {
     @get:Query("SELECT count(*) FROM Organizer")
     abstract val countLive: LiveData<Int>
 
-    @get:Query("SELECT count(*) FROM Organizer")
-    abstract val countAll: Int
+    @Query("SELECT count(*) FROM Organizer")
+    abstract suspend fun countAll(): Int
 
     @get:Query("SELECT count(*) FROM Organizer WHERE state=1")
     abstract val countWatchingFlow: Flow<Int>

@@ -25,7 +25,9 @@ class ZillaServer(context: Context, baseLink: String) : Server(context, baseLink
                 }
                 VideoServer(ZILLA,
                         mutableListOf(
-                                Option(name, null, url),
+                                Option(name, null, url, Headers {
+                                    add("Sec-Fetch-Site" to "same-origin")
+                                }),
                         ))
             } catch (e: Exception) {
                 null

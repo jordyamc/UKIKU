@@ -76,7 +76,6 @@ class AnimeChaptersHolder(view: View, private val fragment: Fragment, private va
                                                 )) {
                                                     dao.addChapter(chapters[i13].asRecord(anime!!))
                                                 }
-                                                syncData { history() }
                                                 fragment.doOnUI {
                                                     adapter?.apply {
                                                         if (selection.isNotEmpty()) {

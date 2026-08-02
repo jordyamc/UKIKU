@@ -1,18 +1,17 @@
 package knf.kuma.pojos.av1
 
-import android.util.Log
 import androidx.core.net.toUri
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
@@ -104,13 +103,11 @@ data class DirectoryAV1Calendar(
     val name: String,
     val slug: String,
     val day: Int,
-    val category: Int
+    val category: Int,
+    var isHidden: Boolean = false
 ) {
     val animeUrl: String get() = "https://animeav1.com/media/$slug"
     val imageUrl: String get() = "https://cdn.animeav1.com/covers/$aid.jpg"
-
-    @Ignore
-    var isHidden: Boolean = false
     @Ignore
     var isFavorite: Boolean = false
 
@@ -369,7 +366,6 @@ data class Chapter(
         return file ?: FileWrapper.create(filePath(anime)).also {
             file = it
             it.file()
-            Log.e("Chapter", "Number $number; File: ${anime.slug}/${filePath(anime)}")
         }
     }
 }
@@ -465,11 +461,38 @@ interface CalendarDao {
     @get:Query("SELECT aid FROM CalendarBlacklist")
     val allAids: List<Int>
 
+    @get:Query("SELECT count(*) FROM CalendarBlacklist WHERE isHidden = 0")
+    val notHiddenCountFlow: Flow<Int>
+
+    @Query("SELECT * FROM CalendarBlacklist WHERE isHidden = 0 AND day = :day ORDER BY name")
+    fun notHiddenForDay(day: Int): List<DirectoryAV1Calendar>
+
+    @Query("SELECT * FROM CalendarBlacklist WHERE isHidden = 0 AND day = :day ORDER BY name")
+    fun notHiddenForDayFlow(day: Int): Flow<List<DirectoryAV1Calendar>>
+
+    @Query("SELECT * FROM CalendarBlacklist WHERE day = :day ORDER BY name")
+    fun allForDayFlow(day: Int): Flow<List<DirectoryAV1Calendar>>
+
+    @Query("SELECT * FROM CalendarBlacklist")
+    suspend fun all(): List<DirectoryAV1Calendar>
+
+    @Query("SELECT * FROM CalendarBlacklist")
+    suspend fun allNotHidden(): List<DirectoryAV1Calendar>
+
+    @Query("DELETE FROM CalendarBlacklist")
+    suspend fun nuke()
+
+    @Transaction
+    suspend fun update(list: List<DirectoryAV1Calendar>) {
+        nuke()
+        addAll(list)
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(directoryAV1: DirectoryAV1Calendar)
 
-    @Delete
-    suspend fun remove(directoryAV1: DirectoryAV1Calendar)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addAll(list: List<DirectoryAV1Calendar>)
 }
 
 class DirectoryConverter {

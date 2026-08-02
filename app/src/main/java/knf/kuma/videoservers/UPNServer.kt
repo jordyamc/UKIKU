@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import knf.kuma.videoservers.VideoServer.Names.UPNServer
 import kotlinx.coroutines.runBlocking
-import java.util.regex.Pattern
 
 class UPNServer(context: Context, baseLink: String) : Server(context, baseLink) {
 
@@ -21,10 +20,11 @@ class UPNServer(context: Context, baseLink: String) : Server(context, baseLink) 
         get() {
             return try {
                 val url = runBlocking {
+                    val regex = Regex(".*master.m3u8.*|https://\\d+\\.\\d+\\.\\d+\\.\\d+.*mp4.*")
                     Unpacker.listenResources(
                         context,
                         "$baseLink&dl=1",
-                        Pattern.compile(".*master.m3u8.*|https://\\d+\\.\\d+\\.\\d+\\.\\d+.*mp4.*"),
+                        onRequest = { it != null && it.matches(regex) },
                         timeout = 15000,
                         executeOnFinish = "javascript:setInterval(function(){var el=document.getElementsByClassName('downloader-button')[0];if(el)el.click();},100);"
                     )

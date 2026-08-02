@@ -121,7 +121,7 @@ class BasicExoplayer : AppCompatActivity(), Player.Listener {
                 exoPlayer?.addListener(this@BasicExoplayer)
                 addMedia(exoPlayer, intent)
                 exoPlayer?.prepare()
-                val canResume = playerState.window >= 0 && playerState.position != C.TIME_UNSET
+                val canResume = playerState.window >= 0 && playerState.position >= 0
                 if (canResume)
                     exoPlayer?.seekTo(playerState.window, playerState.position)
                 exoPlayer?.playWhenReady = true

@@ -73,7 +73,7 @@ abstract class Server(val context: Context, val baseLink: String) : Comparable<S
         if (videoServer.skipVerification) return videoServer
         for (option in ArrayList(videoServer.options))
             try {
-                val request = Jsoup.connect(option.url ?: "")
+                val request = Jsoup.connect(option.url!!)
                     .ignoreHttpErrors(true)
                     .ignoreContentType(true)
                     .method(Connection.Method.HEAD).apply {
@@ -126,7 +126,8 @@ abstract class Server(val context: Context, val baseLink: String) : Comparable<S
                 ZillaServer(context, base),
                 PixelServer(context, base),
                 UPNServer(context, base),
-                FichierServer(context, base)
+                FichierServer(context, base),
+                TransferIt(context, base)
             )
         }
 

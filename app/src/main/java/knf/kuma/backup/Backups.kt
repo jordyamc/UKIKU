@@ -2,6 +2,7 @@ package knf.kuma.backup
 
 import android.content.Context
 import android.view.View
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
@@ -46,7 +47,12 @@ object Backups {
             0 -> Type.LOCAL
             else -> Type.NONE
         }
-        set(type) = PreferenceManager.getDefaultSharedPreferences(App.context).edit().putInt("backup_type", type.value).apply()
+        set(type) = PreferenceManager.getDefaultSharedPreferences(App.context).edit {
+            putInt(
+                "backup_type",
+                type.value
+            )
+        }
 
     fun createService(): BackupService? =
             when (type) {

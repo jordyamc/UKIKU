@@ -57,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import xdroid.toaster.Toaster
+import kotlin.time.Duration.Companion.seconds
 
 object FileActions {
     private var isExecuting = false
@@ -359,7 +360,7 @@ object FileActions {
                             reset()
                         }
                         text.endsWith("(WEB)") -> {
-                            delay(1000)
+                            delay(1.seconds)
                             openWebPlayer(actionRequest.context, server.option.url!!, actionRequest.downloadObject.title)
                             actionRequest.callback.call(CallbackState.EXTERNAL_LINK, )
                             reset()

@@ -28,17 +28,11 @@ import com.bumptech.glide.request.transition.Transition
 import knf.kuma.App
 import knf.kuma.R
 import knf.kuma.backup.firestore.syncData
-import knf.kuma.commons.PatternUtil
 import knf.kuma.commons.noCrash
 import knf.kuma.database.CacheDB
-import knf.kuma.pojos.AnimeObject
-import knf.kuma.pojos.FavoriteObject
-import knf.kuma.pojos.av1.Chapter
 import knf.kuma.pojos.av1.ChapterWID
-import knf.kuma.pojos.av1.DirectoryAV1
 import knf.kuma.pojos.av1.FavoriteAV1
 import knf.kuma.pojos.av1.Relation
-import knf.kuma.retrofit.Repository
 import knf.kuma.tv.TVRepository
 import knf.kuma.tv.TVServersFactory
 import knf.kuma.tv.anime.ChapterPresenter
@@ -115,7 +109,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                                     DetailsOverviewRow::class.java,
                                     rowPresenter
                                 )
-                                viewLifecycleOwner.lifecycleScope.launch {
+                                launch {
                                     selector.addClassPresenter(
                                         ChaptersListRow::class.java,
                                         ChaptersListPresenter(getLastSeen(animeObject.aid))

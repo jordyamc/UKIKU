@@ -21,8 +21,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 class EmissionFragment : Fragment() {
     private val adapter: EmissionAdapter by lazy { EmissionAdapter(this) }
@@ -43,29 +43,25 @@ class EmissionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            delay(1000)
+            delay(1.seconds)
             binding.adContainer.implBanner(AdsType.EMISSION_BANNER, true)
         }
         binding.recycler.verifyManager()
         binding.recycler.adapter = adapter
         viewLifecycleOwner.lifecycleScope.launch {
-            val map = vm.emissionFlow.first { it.isNotEmpty() }
+            vm.emissionFlow.first { it.isNotEmpty() }
             PrefsUtil.emissionShowHiddenFlow().flatMapLatest { showHidden ->
-                CacheDB.INSTANCE.calendarBlacklistDAO().allAidsFlow.mapLatest { blacklist ->
-                    if (showHidden) {
-                        map[day]?.onEach { it.isHidden = it.aid in blacklist }
-                    } else {
-                        map[day]?.filter { it.aid !in blacklist }
-                    }
+                if (showHidden) {
+                    CacheDB.INSTANCE.calendarBlacklistDAO().allForDayFlow(day)
+                } else {
+                    CacheDB.INSTANCE.calendarBlacklistDAO().notHiddenForDayFlow(day)
                 }
             }.collectLatest {
-                if ( it!= null) {
-                    binding.progress.visibility = View.GONE
-                    adapter.update(it.onEach { it.isFavorite = CacheDB.INSTANCE.favoriteAV1DAO().isFavSuspend(it.aid) }, !isFirst)
-                    if (isFirst) {
-                        isFirst = false
-                        binding.recycler.scheduleLayoutAnimation()
-                    }
+                binding.progress.visibility = View.GONE
+                adapter.update(it.onEach { it.isFavorite = CacheDB.INSTANCE.favoriteAV1DAO().isFavSuspend(it.aid) }, !isFirst)
+                if (isFirst) {
+                    isFirst = false
+                    binding.recycler.scheduleLayoutAnimation()
                 }
                 binding.error.isVisible = it.isNullOrEmpty()
             }

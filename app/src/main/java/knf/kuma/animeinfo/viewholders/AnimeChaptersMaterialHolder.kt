@@ -12,7 +12,6 @@ import com.michaelflisar.dragselectrecyclerview.DragSelectionProcessor
 import knf.kuma.R
 import knf.kuma.animeinfo.AnimeChaptersAdapterMaterial
 import knf.kuma.animeinfo.BottomActionsDialog
-import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.doOnUI
 import knf.kuma.commons.safeDismiss
 import knf.kuma.commons.showSnackbar
@@ -77,7 +76,6 @@ class AnimeChaptersMaterialHolder(view: View, private val fragment: Fragment, pr
                                                 )) {
                                                     dao.addChapter(chapters[i13].asRecord(anime!!))
                                                 }
-                                                syncData { history() }
                                                 fragment.doOnUI {
                                                     adapter?.apply {
                                                         if (selection.isNotEmpty()) {
@@ -97,7 +95,6 @@ class AnimeChaptersMaterialHolder(view: View, private val fragment: Fragment, pr
                                                         ?: arrayListOf())) {
                                                     dao.deleteChapter(anime!!.aid, chapters[i12].number)
                                                 }
-                                                syncData { history() }
                                                 fragment.doOnUI {
                                                     adapter?.apply {
                                                         if (selection.isNotEmpty()) {

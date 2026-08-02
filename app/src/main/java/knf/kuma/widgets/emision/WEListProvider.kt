@@ -9,7 +9,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import knf.kuma.R
 import knf.kuma.animeinfo.ActivityAnime
-import knf.kuma.commons.JsExtractor
 import knf.kuma.database.CacheDB
 import knf.kuma.pojos.av1.DirectoryAV1Calendar
 import kotlinx.coroutines.runBlocking
@@ -37,18 +36,12 @@ class WEListProvider internal constructor(private val context: Context) : Remote
     }
 
     override fun onDataSetChanged() {
-        runBlocking {
-            val data = JsExtractor.processLink("https://animeav1.com/horario")
-            if (data != null) {
-                val blacklist = CacheDB.INSTANCE.calendarBlacklistDAO().allAids
-                val allList = mutableListOf<DirectoryAV1Calendar>()
-                for (i in 0 until data.length()) {
-                    allList.add(DirectoryAV1Calendar.fromJson(data.getJSONObject(i)))
-                }
-                if (allList.isNotEmpty()) {
-                    items = allList.filter { it.day == actualDayCode && it.aid !in blacklist }.sortedBy { it.name }
-                }
+        try {
+            runBlocking {
+                items = CacheDB.INSTANCE.calendarBlacklistDAO().notHiddenForDay(actualDayCode)
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

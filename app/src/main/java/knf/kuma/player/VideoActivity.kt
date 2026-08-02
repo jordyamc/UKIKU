@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import java.util.UUID
 
 /**
  * Allows playback of videos that are in a playlist, using [PlayerHolder] to load the and render
@@ -234,7 +235,8 @@ class VideoActivity : AppCompatActivity(), PlayerHolder.PlayerCallback {
     private fun createPlayer() {
         playerHolder = PlayerHolder(this, playerState, binding.player, intent, playList)
         binding.youtubeOverlay.player(playerHolder.audioFocusPlayer)
-        mediaSession = MediaSession.Builder(this, playerHolder.audioFocusPlayer).build()
+        mediaSession = MediaSession.Builder(this, playerHolder.audioFocusPlayer)
+            .setId(UUID.randomUUID().toString()).build()
         if (!intent.getBooleanExtra("isPlayList", false)) {
             find<View>(R.id.exo_next).visibility = View.GONE
             find<View>(R.id.exo_prev).visibility = View.GONE

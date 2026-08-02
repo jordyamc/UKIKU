@@ -121,7 +121,7 @@ class RecentAV1ModelsAdapter(private val fragment: Fragment) : ListAdapter<Recen
                             }
                         }
                         R.id.info -> {
-                            item.openInfo(fragment.requireContext())
+                            item.openInfo(fragment.context)
                         }
                     }
                 }
@@ -129,7 +129,7 @@ class RecentAV1ModelsAdapter(private val fragment: Fragment) : ListAdapter<Recen
                 actionMenu.isVisible = false
             root.setOnClickListener {
                 if (!isFullMode) {
-                    item.openInfo(fragment.requireContext())
+                    item.openInfo(fragment.context)
                     return@setOnClickListener
                 }
                 if (item.state.isDownloaded) {

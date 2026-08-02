@@ -135,7 +135,8 @@ val RecentAV1.menuHideList: List<Int>
             add(R.id.delete)
     }
 
-fun RecentAV1.openInfo(context: Context) {
+fun RecentAV1.openInfo(context: Context?) {
+    context?:return
     context.startActivity(Intent(context, DesignUtils.infoClass).apply {
         data = this@openInfo.animeUrl.toUri()
         putExtra("title", name)

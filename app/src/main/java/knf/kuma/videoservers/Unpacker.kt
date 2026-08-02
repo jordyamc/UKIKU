@@ -11,7 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
-import java.util.regex.Pattern
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -68,13 +67,13 @@ object Unpacker {
         }
     }
 
-    suspend fun listenResources(context: Context, link: String, pattern: Pattern, userAgent: String = WebSettings.getDefaultUserAgent(context), timeout: Long = 10000, executeOnFinish: String? = null): String? {
+    suspend fun listenResources(context: Context, link: String, onRequest: (String?) -> Boolean, userAgent: String = WebSettings.getDefaultUserAgent(context), timeout: Long = 10000, executeOnFinish: String? = null): String? {
         return withContext(Dispatchers.Main) {
             val evaluator = WebJS(context)
             suspendCoroutine { continuation ->
                 evaluator.listenResources(
                     link,
-                    pattern,
+                    onRequest,
                     userAgent,
                     timeout,
                     executeOnFinish

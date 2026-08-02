@@ -14,6 +14,7 @@ import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.setSurfaceBars
 import knf.kuma.custom.GenericActivity
 import knf.kuma.databinding.ActivityEmisionMaterialBinding
+import knf.kuma.widgets.emision.WEmisionProvider
 import java.util.Calendar
 
 class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListener {
@@ -48,6 +49,11 @@ class EmissionActivityMaterial : GenericActivity(), TabLayout.OnTabSelectedListe
         binding.pager.setCurrentItem(currentDay - 1, true)
         EAHelper.clear2()
         showRandomInterstitial(this,PrefsUtil.fullAdsExtraProbability)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        WEmisionProvider.update(applicationContext)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

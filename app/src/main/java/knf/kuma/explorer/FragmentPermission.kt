@@ -22,7 +22,9 @@ class FragmentPermission : Fragment() {
     private lateinit var listener: PermissionListener
     private val permissionContract = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
-            listener.onPermission()
+            if (::listener.isInitialized) {
+                listener.onPermission()
+            }
         } else {
             Toast.makeText(requireContext(), "Permiso denegado", Toast.LENGTH_SHORT).show()
         }
@@ -32,7 +34,9 @@ class FragmentPermission : Fragment() {
         if (!validation.isValid) {
             Toaster.toast("Directorio invalido: $validation")
         } else {
-            listener.onPermission()
+            if (::listener.isInitialized) {
+                listener.onPermission()
+            }
         }
     }
 
