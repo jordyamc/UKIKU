@@ -107,9 +107,10 @@ class AnimeDetailsMaterialHolder(val view: View) {
                 }
                 showLayout(layouts[2])
             }
-            noCrash {
+            noCrashSuspend {
                 type.text = animeObject.typeText
-                state.text = getStateString(animeObject.state, animeObject.day)
+                val day = CacheDB.INSTANCE.calendarBlacklistDAO().find(animeObject.aid)?.day ?: animeObject.day
+                state.text = getStateString(animeObject.state, day)
                 id.text = animeObject.aid.toString()
                 if (animeObject.rateStars == 0.0f)
                     layScore.visibility = View.GONE

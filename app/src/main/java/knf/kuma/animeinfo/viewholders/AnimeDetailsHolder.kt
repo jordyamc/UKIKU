@@ -25,6 +25,7 @@ import knf.kuma.animeinfo.AnimeTagsAdapterMaterial
 import knf.kuma.backup.firestore.syncData
 import knf.kuma.commons.PrefsUtil
 import knf.kuma.commons.noCrash
+import knf.kuma.commons.noCrashSuspend
 import knf.kuma.commons.removeAllDecorations
 import knf.kuma.custom.ExpandableTV
 import knf.kuma.custom.VariantLinearLayoutManager
@@ -102,9 +103,10 @@ class AnimeDetailsHolder(val view: View) {
                     showCard(cardViews[2])
                 }
             }
-            noCrash {
+            noCrashSuspend {
                 type.text = animeObject.typeText
-                state.text = getStateString(animeObject.state, animeObject.day)
+                val day = CacheDB.INSTANCE.calendarBlacklistDAO().find(animeObject.aid)?.day ?: animeObject.day
+                state.text = getStateString(animeObject.state, day)
                 id.text = animeObject.aid.toString()
                 if (animeObject.rateStars == 0.0f)
                     layScore.visibility = View.GONE

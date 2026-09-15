@@ -70,10 +70,11 @@ abstract class Server(val context: Context, val baseLink: String) : Comparable<S
     private fun verify(videoServer: VideoServer?): VideoServer? {
         if (videoServer == null)
             return null
-        if (videoServer.skipVerification) return videoServer
         for (option in ArrayList(videoServer.options))
             try {
-                val request = Jsoup.connect(option.url!!)
+                check(option.url != null)
+                if (videoServer.skipVerification) continue
+                val request = Jsoup.connect(option.url)
                     .ignoreHttpErrors(true)
                     .ignoreContentType(true)
                     .method(Connection.Method.HEAD).apply {

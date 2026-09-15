@@ -6,6 +6,7 @@ import android.webkit.WebView
 import com.venom.greendark.decoder.WebJS
 import de.prosiebensat1digital.oasisjsbridge.JsBridge
 import de.prosiebensat1digital.oasisjsbridge.JsBridgeConfig
+import knf.kuma.commons.noCrash
 import knf.kuma.commons.safeContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -78,7 +79,9 @@ object Unpacker {
                     timeout,
                     executeOnFinish
                 ) { url, headers ->
-                    continuation.resume(url)
+                    noCrash {
+                        continuation.resume(url)
+                    }
                 }
             }
         }

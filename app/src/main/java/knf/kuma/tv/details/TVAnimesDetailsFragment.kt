@@ -80,6 +80,7 @@ class TVAnimesDetailsFragment : DetailsSupportFragment(), OnItemViewClickedListe
                             transition: Transition<in Bitmap>?
                         ) {
                             Palette.from(resource).generate { palette ->
+                                if (!isAdded || view == null) return@generate
                                 val swatch = palette?.darkMutedSwatch
                                 favoriteObject = animeObject.asFavorite()
                                 chapters = animeObject.chapters.sortedBy { it.number }.map { it.withID(animeObject) }

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+    <release code="238" version="6.0.8">
+        <change type="fix">Error al mostrar estado y día de emisión en información del anime</change>
+        <change type="fix">Errores varios</change>
+    </release>
     <release code="237" version="6.0.7">
         <change type="fix">Error al abrir información de anime en TV</change>
     </release>

@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import knf.kuma.commons.PatternUtil;
@@ -205,7 +206,7 @@ public class DownloadObject {
                 && key == ((DownloadObject) obj).key
                 && state == ((DownloadObject) obj).state
                 && file.equals(((DownloadObject) obj).file)
-                && link.equals(((DownloadObject) obj).link)
+                && Objects.equals(link, ((DownloadObject) obj).link)
                 && eta.equals(((DownloadObject) obj).eta)
                 && speed.equals(((DownloadObject) obj).speed)
                 && progress == ((DownloadObject) obj).progress

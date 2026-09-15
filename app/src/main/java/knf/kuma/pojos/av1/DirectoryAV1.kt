@@ -476,6 +476,9 @@ interface CalendarDao {
     @Query("SELECT * FROM CalendarBlacklist")
     suspend fun all(): List<DirectoryAV1Calendar>
 
+    @Query("SELECT * FROM CalendarBlacklist WHERE aid = :aid")
+    suspend fun find(aid: Int): DirectoryAV1Calendar?
+
     @Query("SELECT * FROM CalendarBlacklist")
     suspend fun allNotHidden(): List<DirectoryAV1Calendar>
 
